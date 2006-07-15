@@ -1,0 +1,1222 @@
+VIPER Change Log
+
+Version 3.40 - Build 348; July 5, 2006
+	- Recompiled source due to new development computer
+		- New versions of CWSpectrumDll.dll, MwtWindll.dll, and MassTagsAccess.dll
+
+Version 3.40 - Build 347; June 26, 2006
+	- Updated the Pair finding window (Steps->4. Find Pairs->Delta UMC) to auto-enable "Compute ER Scan-by-Scan" if the user selects "Set O16/O18" and to auto-disable "Compute ER Scan-by-Scan" if the user selects "Set N14/N15"
+		- Made a similar change to the Edit Analysis Settings window
+		- Added Pair Tolerance units (Da) to both Pair finding windows
+	- Updated several references to GANET to instead say NET or "Avg Obs NET"
+	- Added Sleep of 250 msec prior to showing the MSAlign form during auto analysis, in hopes of preventing the 'ctl2DHeatMap' bug mentioned in build 345 from appearing
+
+Version 3.40 - Build 346; June 16, 2006
+	- Added additional logging during auto analysis when calling MSAlign, in hopes of tracking down the 'ctl2DHeatMap' bug mentioned in build 345
+
+Version 3.40 - Build 345; June 14, 2006
+	- On the pair search form, added option to not "Auto-clear existing pairs when finding new pairs"
+		- Necessary if one wishes to search for custom pair delta values that cannot be defined using a single Delta mass value
+	- Now checking for error message "Failed to load control 'ctl2DHeatMap'" during automated analysis
+		- If found, then Viper exits immediately
+		- Additionally, file RestartViper.txt is created to indicate that it is safe to restart Viper
+
+Version 3.40 - Build 344; May 19, 2006
+	- Updated to new version of MZDataFileReaderDLL.dll and MZXmlFileReaderDLL.dll
+
+Version 3.40 - Build 343; May 18, 2006
+	- Fixed bug that failed to retry connecting to the database for obtaining PMT Tags if a timeout occurred
+	- Added option to save points in view to a .PEK file
+		- Can either read the original .PEK file and save a new one with the same information but updated values
+		- Or, can create a new, bare-bones .PEK file using the points in view
+	- Updated to new versions of MZDataFileReaderDLL.dll and MZXmlFileReaderDLL.dll
+		- Now validating the mzXML and mzData file versions when reading the data files
+		- Currently supports mzXML version 2.x (normally 2.0 or 2.1) and mzData version 1.x (normally 1.05)
+		- Program now informs the user if an error occurs while parsing the input XML file
+
+Version 3.40 - Build 342; April 10, 2006
+	- Added option to compare the UMC mass and NET vs. the PMT mass and NET using a rectangular region rather than an elliptical region
+		- Auto analysis searching now includes this option for both tolerance refinement and final DB searching
+	- Added ability to zoom out the mass and NET error histograms in the MS Align window
+		- Right click on the plot or press the Backspace key to zoom out
+	- Fixed bug that sometimes prevented the NET residual values to be copied from MS Align to the clipboard
+	- Fixed bug that did not flag all of the UMCs used for NET adjustment when using MS Align
+
+Version 3.40 - Build 341; March 31, 2006
+	- Additional improvements to support legacy DBs (Access DBs) for supplying MT tags
+		- Will now read protein information from the AMT_Proteins and AMT_to_Protein_Map tables, if present
+		- The AMT_Proteins table should have columns Protein_ID and Protein_Name
+		- The AMT_to_Protein_Map table should have columns AMT_ID and Protein_ID
+	- Increased the default "Maximum Data Points to Load" value to 400000 points
+	- Updated the slow plot drawing minimum warning time to 5 seconds
+	- No longer saving the GelORFData(), GelORFMassTags(), and GelORFViewerSavedGelListAndOptions() variables in the .Gel file 
+		- These were used by the ORF Viewer, which has been removed
+
+Version 3.40 - Build 340; March 28, 2006
+	- Added support for reading mzXML data files
+		- Uses DLL MZXmlDataFileReaderDLL to read the data
+		- Files are read using a SAX parser to keep the memory overhead to a minimum for large .xml files
+	- Added support for reading mzData data files
+		- Uses DLL MZDataFileReaderDLL to read the data
+		- Files are read using a SAX parser to keep the memory overhead to a minimum for large .xml files
+	- Added ability to limit the number of data points loaded to the top N data points, favoring higher abundance data
+		- Default is top 125,000 data points
+	- Added checking for slow plot drawing
+		- If the elapsed plot draw time surpasses 3 seconds, then the user is warned and given the option to abort drawing
+		- Each time the user clicks "yes" to continue drawing, the warning threshold is increased by 1/3 second
+	- Added ability to use a legacy DB (Access DB) for supplying MT tags during automated analysis
+		- Edit using the "MT Tags" tab in the Save/Load/Edit analysis Settings window
+		- Set parameter UseLegacyDBForMTs to True and define LegacyAMTDBPath in the auto-analysis .Ini file
+	- Updated the window shown after selecting a file to load to include several new filter options
+		- Maximum Data Count filter
+		- Even/odd scan number filter (useful for DREAMS data)
+		- MS Level filter (only applicable for mzXML and mzDAta files)
+	- Added the Apache 2.0 license details to the About box and to the window displayed when running Viper with /? at the command line
+	- Added two compile-time settable switches: APP_BUILD_DISABLE_MTS and APP_BUILD_DISABLE_ADVANCED
+		- Allows for compiling publicly distributable versions of Viper
+		- When APP_BUILD_DISABLE_MTS is set to True, then Viper does not try to contact MTS and only uses legacy databases (Access DB files)
+		- When APP_BUILD_DISABLE_MTS is set to True, then the "Select/Modify Database Connection" window (frmOrganizeDBConnections) only displays the Legacy DB controls
+		- When APP_BUILD_DISABLE_ADVANCED is set to True, the MSAlign (mass and NET warping) is not available interactively or through automated analysis
+		- When APP_BUILD_DISABLE_ADVANCED is set to True, then none of the obsolete featues are available and their menu items are hidden
+		- Publicly distributable version of Viper is file Viper.exe
+		- PNNL Internal Standard use version of Viper is file Viper_MTS.exe
+	- Added columns TIC_from_Raw_Data and Deisotoping_Peak_Count to the "Report Results by UMCs" report in the UMC search window
+		- TIC_from_Raw_Data is the TIC of the raw data, as recorded in the input file
+		- Deisotoping_Peak_Count is the number of data points considered for deisotoping by ICR-2LS
+	- Changed additional menu items in the main window to only be visible if "Include Obsolete Menus" is checked
+	- Fixed bug in UMC 2003 window that failed to update all of the values to defaults when clicking "Set to Defaults"
+	- Removed the ORF Viewer code and window since no longer supported
+	- Removed references to the NET prediction DLL (GANETClass.dll) since was only used by the ORF Viewer
+	- Removed support for .Gel files and Gel Access DBs from 1999 and 2000 (glCERT1999 = "2DGelVisual1999.01" and glCERT2000 = "2DGelVisual2000.01")
+	- Replaced all instances of mass tag with MT Tag
+	- Replaced all exclamation marks in messages to users with periods
+
+Version 3.39 - Build 338; March 8, 2006
+	- Now limiting the mass shift applied by LCMSWarp to be, at most, 10000 ppm
+		- If over 5% of the data points in a given alignment are shifted by over 10000 ppm, then none of the data will be shifted at all
+	- Now validating the values passed to Sql Server stored procedures for decimal number types to assure the values are in the allowed range
+
+Version 3.39 - Build 337; March 1, 2006
+	- Updated the filter form so that pressing the Escape key will close the form
+	- Updated the program to remember the setting for "Include DB Search Matches" when repeatedly opening .Gel files within a single Viper session
+		- Pertains to the "Copy Points in View" and "Copy UMCs in View" menu items
+
+Version 3.39 - Build 336; February 26, 2006
+	- Fixed bug involving reading the NET column from the AMT table in legacy databases
+
+Version 3.39 - Build 335; February 21, 2006
+	- Added option to Exclude Visible Points (shortcut key is Ctrl+W)
+		- Useful for excluding noise regions by eye, then finding UMCs using the remaining, visible points
+
+Version 3.39 - Build 334; February 18, 2006
+	- Updated to new version of MwtWinDll.dll
+
+Version 3.39 - Build 333; February 7, 2006
+	- Now saving the NET Residuals plots using the mass calibrated data rather than the uncalibrated data
+	- Increased the delay before creating a montage image file from 250 msec to 3500 msec
+	- Now using default width and height values when creating a montage image file if the use of the Identify command fails
+
+Version 3.39 - Build 332; February 5, 2006
+	- Updated the montage image creation process to verify that the combined file was created
+		- If the file is not found, will retry creation of the file up to 3 times
+
+Version 3.39 - Build 331; February 4, 2006
+	- Now saving the Mass Calibration Residual plots as montage images during auto analysis rather than as separate images
+	- Added the option to set the axis ranges of the residual plots in the MS Warp window
+
+Version 3.39 - Build 330; February 3, 2006
+	- Added Mass vs. m/z residuals plot to the MS Warp window
+	- Updated auto analysis to save the Mass vs. m/z residuals plot in addition to the mass vs. scan residuals plot
+	- Updated the NET residuals montage creation code to save the montage-related files on the local drive, then copy them over the network
+
+Version 3.39 - Build 329; February 1, 2006
+	- Updated the graphics file saving routines to save files on the local drive, then copy them over the network if the final destination is on a remote computer
+		- Affected saving of the main 2D plot, plots in MS Warp, and plots on the Mass Tolerance Refinement window
+
+Version 3.39 - Build 328; January 30, 2006
+	- Updated to new version of MassMatchCOM.Dll
+	- Now informing user when MS Warp does not finish successfully
+
+Version 3.39 - Build 327; January 27, 2006
+	- Updated the default values for contraction factor and max distortion in MS Warp
+		- Changed contraction factor from 2 to 3
+		- Changed max distortion from 3 to 10
+
+Version 3.39 - Build 326; January 23, 2006
+	- Updated auto analysis to save the MS Warp surface plot during NET and Mass Calibration, in addition to during simple NET calibration
+		- The Index.html file only links to the surface plot saved suring NET and Mass Calibration
+	- Now adjusting m/z values during mass calibration using MS Warp or using Linear Correction
+		- Previously, was only updating the monoisotopic, average, and most abundant masses, but not the m/z
+	- Fixed bug in MS Warp module that displayed invalid mass error plot data if a mass calibration was performed, then a NET calibration was performed
+	- Fixed overflow bug in MS Warp Surface plot control
+		- Prevented the blue and green trend lines from being drawn on the surface plot for datasets with large scan number values (greater than 200000)
+	- Fixed bug that resulted in slightly different masses when reversing mass calibrations already applied to the data
+		- This bug was only visible if a user repeatedly ran MS Warp with NET and Mass calibration, causing a slight drift in overall mass with each iteration of mass calibration and mass calibration reversal
+
+Version 3.39 - Build 325; January 22, 2006
+	- Updated the PEK File Merging utility to renumber scan numbers when merging two or more PEK files
+		- Utility is available at Tools->PEK Functions->Merge Pek Files
+	- Updated the PEK file loading code to keep track of the average scan increment between scan numbers, then use that scan increment when auto numbering scan numbers of a non-increasing scan number is encountered
+	- Fixed overflow bug when determining the closest linear NET fit for the NET alignment function returned by MS Warp
+
+Version 3.39 - Build 324; January 20, 2006
+	- Updated to new version of MassMatchCOM.Dll
+		- Hybrid NET alignment and mass calibration now working well and enabled by default
+	- Updated the versions of the GelUMCNETAdjDef structure in the binary file
+		- The updated GelUMCNETAdjDef structure holds information related to the NET and mass recalibration options of MS Warp (RobustNETWarp)
+	- Updated the MassTagsAccess.dll component
+		- Supports showing hiding frozen DBs and/or unused DBs when selecting DBs
+
+Version 3.38 - Build 323; January 11, 2006
+	- Expanded the 'Save PEK file using UMCs in view' option to save UMCs composed of charge state (CS) data in the 'Charge state mass transform results' section of PEK files
+		- Isotopic data is saved in the 'Isotopic mass transform results' section of PEK files
+	- Added a 'Reset to Defaults' button in the UMC 2003 UMC Finding window
+
+Version 3.38 - Build 322; January 10, 2006
+	- Fixed bug in MS Align window that prevented users from using a Legacy Database for the PMT Tags
+	- Added four new fields that can be used in legacy mass tag databases stored in Microsoft Access files
+		- PNET -> predicted NET values
+			- If the PNET field is present, then the RetentionTime field's data is ignored
+			- If the RetentionTime field is present (and PNET is not present), then the RetentionTime field's data is stored in the PNET memory location
+		- MSMS_Obs_Count -> MS/MS Observation Count; used during MS Align
+		- High_Normalized_Score -> Typically XCorr; used for filtering PMTs
+		- High_Discriminant_Score -> Discriminant Score; also used for filtering PMTs
+		- If any of these fields is missing from the Access file, default values will be used
+
+Version 3.38 - Build 321; December 30, 2005
+	- Added an additional database search after mass calibration refinement using MS Align during auto analysis
+		- Necessary since MS Align may have shifted the masses a large distance, which would make the tolerance refinement plots unlikely to contain useful information
+
+Version 3.38 - Build 320; December 30, 2005
+	- Dramatically improved UMC Class Stats calculation speed
+		- Switched from using the StatDoubles class to computing the necessary stats directly with the source data arrays, removing the need to duplicate the UMC data in memory to generate the stats
+		- No longer repeatedly reserving memory for the various temporary data arrays used to compute the stats for each UMC
+	- Slightly improved UMC finding speed by switching from using a QuickSort to using a ShellSort
+	- Fixed mass recalibration bug in MS Align that shifted the data the wrong direction
+	- Updated logic to auto-remove previous mass calibration values only if the alignment mode is set to "NET and Mass Alignment"
+	- Enabled mass calibration via MS Align to now occur by default during auto analysis
+		- Note that simple linear mass calibration is still also applied since the MS Align mass calibration often does not result in a mass error plot centered at 0
+
+Version 3.38 - Build 319; December 23, 2005
+	- Added ability to limit the PMTs loaded to come from only the dataset associated with the job being analyzed
+		- This search mode is appropriate for LTQ-FT or LTQ-Orbitrap data where both MS and MS/MS spectra are acquired
+		- Requires that the MS/MS portion of the data be searched by Sequest or XTandem and the results loaded into the PMT Tag database
+		- Specify this option when defining the Minimum PMT Discriminant Score, Minimum PMT Quality Score, etc.
+	- Replaced all references to NET Lockers with Internal Standards
+	- Updated the method used to select and load Internal Standards
+		- The appropriate internal standards will be loaded for the given job based on the internal standards data defined in DMS
+		- One can optionally specify an explicit internal standard to load, in case the given job is not associated with an internal standard but one wants to match against internal standard peptides anyway
+	- Updated to use new MTS SPs that have Internal Standard parameters rather than NET Locker parameters
+		- Updated calls to RequestPeakMatchingTaskMaster, GetMassTagMatchCount, GetMassTagsGANETParam, AddMatchMaking, AddFTICRUmc, and AddFTICRUmcMatch
+		- Replaced call to GetGANETLockers with call to GetInternalStandards
+		- Replaced call to AddFTICRUmcNETLockerMatch with call to AddFTICRUmcInternalStdMatch
+	- Updated the MassTagsAccess.dll component to support the new options
+		- Fixed listbox selection error that occurred when the selected database had no LC-MS datasets
+		- Updated various aspects of the UI to make data file selection more user friendly and less error-prone
+	- Updated to new version of MassMatchCOM.dll, which includes three mass recalibration modes
+		- m/z coefficient recalibration
+		- mass vs. elution time recalibration
+		- hybrid recalibration
+	- Updated the automation routines to support mass recalibration using MS Align, though that option is currently disabled due to a mass shifting bug in MassMatchCOM.dll
+
+Version 3.38 - Build 318; December 8, 2005
+	- Updated to new version of MassMatchCOM.dll
+		- Fixes bugs that caused certain datasets to crash the program during alignment
+		- Implements mass recalibration in addition to NET alignment
+		- Mass calibration is performed across LC time slices, applying a custom correction as the elution time changes
+		- Mass calibration during automated Viper analysis is not yet enabled
+	- Updated the versions of the GelData and GelUMCNETAdjDef structures in the binary file
+		- The updated GelData structure holds custom mass shift values for each data point
+		- The updated GelUMCNETAdjDef structure holds information related to the mass recalibration options of MS WARP (RobustNETWarp)
+	- Updated "Save What You See (WYS) As New Gel File" to save UMC information for the points in view
+	- Disabled parameter SLiCScoreOptions.UseAMTNETStDev
+		- When computing SLiC score, now always setting UseAMTNETStDev to False such that only SLiCScoreOptions.NETStDev is used to compute SLiC
+	- Added parameter @toolVersion for SP RequestPeakMatchingTaskMaster
+
+Version 3.38 - Build 317; November 16, 2005
+	- Changed the sorting algorithm from a QuickSort to a ShellSort for the PMT Mass arrays in frmSearchMT_ConglomerateUMC
+		- Change required since QuickSort can run out of stack space due to too much recusion for large mass lists with many similar masses
+
+Version 3.38 - Build 316; November 12, 2005
+	- Added new UMC peak matching mode: ConglomerateUMCsWithLightPairsPlusUnpaired
+		- Will search the light members of UMCs plus the unpaired UMCs in a single search
+	- Renamed the MS Align window to MS Warp
+	- Renamed the NET Residual plots in the MS Warp window
+		- Changed from "Linear NET Residual vs Scan #" to "Residuals Using Linear NET Fit (prior to warping)"
+		- Changed from "Custom NET Residual vs Scan #" to "Residuals Using MS Warp Alignment"
+	- Changed the color of the averaged data on the "Residuals Using Linear NET Fit" plot from green to blue
+	- Updated the "Residuals Using MS Warp Alignment" plot to have the same Y-axis zoom range as the "Residuals Using Linear NET Fit" plot
+
+Version 3.38 - Build 315; October 31, 2005
+	- Added option Steps->9. Save QC Plots
+		- This option will auto-generate the various QC plots normally produced during auto analysis
+		- This option does not automatically match UMCs to PMT Tags; you need to do that yourself.  If you don't match the data to the PMT Tags, then the _DataWithHits plot and other (with Hits plots) will be empty
+		- Also, note that the _MassErrors_BeforeRefinement and _GANETErrors_BeforeRefinement files will not be generated since this feature doesn't actually search the data; it just creates plots for the current results in memory.  The _BeforeRefinement plots require searching the data with wide tolerances, and since this feature doesn't perform the searching for you, these plots can't be made.
+
+Version 3.38 - Build 314; October 25, 2005
+	- Updated Signal to Noise computation for Mass Error Histograms to exclude the data within the identified peak when determining the noise threshold
+	- Fixed bug in Auto Analysis processing that used the wrong values for the expected NET Slope Minimum and Maximum when using NET Alignment via MassMatchCOM
+	- Now exiting Viper if an Out Of Memory error occurs
+		- Done for safety reasons to prevent multiple failed tasks on the same computer
+		- Will post an entry to PRISM_RPT if this happens
+	- Now skipping database searching if NET alignment fails, since valid NET values will not be present in memory
+
+Version 3.38 - Build 313; October 13, 2005
+	- Updated to new version of MassMatchCOM.dll
+		- This version adds the option MassTagPromiscuity, a parameter that can be used to prevent long, tailed peaks or background ions from adversely affecting the alignment when the peak is split into numerous UMCs
+
+Version 3.38 - Build 312; October 11, 2005
+	- Updated the "Custom NET Residual vs Scan#" plot in the MS Align window to no longer display the transformation function
+	- During auto analysis, now saving both NET residual plots, setting their height to 50% of the typical plot height
+		- A combined PNG of the two plots is created and included in the Index.html created during auto-analysis
+	- Updated to latest version of ImageMagickObject.dll (from http://www.imagemagick.org/)
+
+Version 3.38 - Build 311; October 11, 2005
+	- Updated the Linear NET estimation method in the MS Align window to use the top 20% of UMCs by abundance when computing the closest Linear NET mapping
+		- If the minimum number of UMCs do not have matches to the database, then the percent of UMCs to use is incremented by 20%, repeating the process until the minimum is met or 100% of the UMCs are used
+
+Version 3.38 - Build 310; October 10, 2005
+	- Updated to save the heat map in the MS Align window during auto analysis, rather than saving the National Instruments 2D plot
+	- Added a new NET plot residuals to the MS Align Window
+		- Displays NET residuals between the PMT Tag NETs and the Custom NET values, plus the residual between the Custom NETs and the Linear NETs
+
+Version 3.38 - Build 309; October 7, 2005
+	- Updated to new version of MassMatchCOM.dll
+	- Added a Residuals Plot to the MS Align window
+	- Updated the Fit (mean residual) value to be the difference between the PMT Tag NET and the custom NET value
+		- Previously was the difference between the PMT Tag NET and the NET value from the linear fit
+	- Now saving two NET Alignment plots as PNG files during automated analysis
+	- Updated the installer to include cwui.ocx and mesa.dll, required by the National Instruments plots
+
+Version 3.38 - Build 308; September 29, 2005
+	- Fixed rounding bug that caused a plotting error in the Mass and NET error histograms
+	- Updated the installer to include files msvcp71.dll and msvcr71.dll, required by MassMatchCOM.dll 
+
+Version 3.38 - Build 307; September 26, 2005
+	- Updated the automation portions of the program to recognize the new "Warping using MS Align" method of aligning features to PMT tags
+	- Rearranged and renamed some of the controls on the UMC Single Mass search form to more clearly indicate their purpose
+	- Now displaying additional search stats on the UMC Single Mass search form
+		- Showing the number of UMCs with a match, the unique count of PMT tags matched, and the unique count of NET lockers matched
+	- Added a "Set To Defaults" button on the UMC Single Mass search form and on the MS Align window
+	- Updated the Save/Load/Edit analysis settings form to hide the old NET adjustment options when "Warping using MS Align" is enabled
+	- Updated the versions of the UMCNetAdj, GelData, and UMCListType structures in the binary file
+		- The updated structures hold information related to the new NET Adjustment mode named Warping using MS Align (RobustNETWarp)
+
+Version 3.38 - Build 306; September 21, 2005
+	- Implemented the MassMatchCOM DLL component to allow alignment of UMCs to PMT Tags using an algorithm developed by Deep Jaitly
+	- Added the option to store custom NET values for each scan
+		- Made extensive updates to the program to optionally use the Custom NET value for each scan rather than using the transformation "NET = Slope * ScanNumber + Intercept"
+	- Moved the position the Filter Data form appears in the bottom right corner of the screen to be up a little higher, allowing for better placement on computers with a two row tall Windows TaskBar
+
+Version 3.37 - Build 305; September 14, 2005
+	- Added option to filter the data in .Pek files to only load charge state or only load isotopic data (only present in the GUI, not auto-analysis)
+	- Updated the "Copy all UMCs in View" option to allow copying of UMCs made from charge state data
+	- Updated the "Save PEK File using UMCs in View" option to allow saving of UMCs made from charge state data
+	- Fixed a bug in the Pair Finder that caused overflow errors if the pair searching was cancelled and the Pair Finder window was then closed
+
+Version 3.37 - Build 304; September 11, 2005
+	- Added computation of relative risk to the mass and NET error plots
+		- Involves finding the base of the error plot, then computing the area above and area below the base
+	- Updated Select/Modify Database Connection form to use a stored procedure to retrieve the data
+		- Now calling SP GetMassTagMatchCount rather than performing a direct query against the tables
+		- This allows the call to be made asynchronously, which allows for the display of a progress indicator
+	- Added option to display the Mass Calibration and Tolerance Refinement window from the Search UMCs window
+	- Updated the signal to noise computation to use more data around the peak, thus giving a more accurate value for S/N
+
+Version 3.37 - Build 303; September 9, 2005
+	- Added the option to use UMC stats when generating mass and NET error plots
+		- Previously, have been using every point in every UMC with a match to the database when generating the mass and NET error plots
+		- This option will use just one point for each UMC, using the class mass and class NET of the UMC
+	- Added the option to filter on minimum SLiC score when generating mass and NET error plots
+	- Consolidated the 12 parallel AMT() arrays into a single AMTData() UDT array
+	- Now loading MS/MS Observation count from the database (preparation for the new MSAlign feature)
+
+Version 3.36 - Build 302; September 1, 2005
+	- Updated the UMC Refinement algorithm to include the option "Percent max abundance to use to gauge width"
+		- This feature was added to prevent high abundance peaks with long, tailing chromatographic behavior from being filtered out as "long UMCs"
+		- The algorithm takes the UMC's max abundance value times "Percent max abundance"/100 to determine the abundance threshold
+		- It then looks for the first data point in the UMC and last data point in the UMC with an abundance greater than or equal to the threshold
+		- The width between the matching data points is used to determine the UMC width, rather than the using the full width of the UMC
+		- If you specify a "Percent max abundance" value of 0, then this behavior is disabled and the entire UMC width is used
+
+Version 3.36 - Build 301; August 23, 2005
+	- Added option "File->Save PEK File Using UMCs In View"
+		- This creates a .PEK file with one entry for each UMC
+		- Uses the UMC class mass (typically median mass) and scan of the class representative (typically the scan with the highest abundance)
+	- Fixed bug in Special->Export Raw Data that crashed the program if use selected "Export Type" UMC then clicked "Export".  Now instructing the user to use Edit->Copy UMCs in View->Copy to File
+
+Version 3.36 - Build 300; August 12, 2005
+	- Updated call to SP AddQuantitationDescription to remove parameters that are no longer used
+
+Version 3.36 - Build 299; July 28, 2005
+	- Fixed bug that sometimes reported "UMC count with hits" and "Unique mass tag count" values too low when creating the Index.html file during auto-analysis
+		- The bug occurred for UMCs where all of the PMT Tag matches were marked as "inherited" in the members of the UMC
+		- Members have inherited matches when a UMC's median mass is within the search tolerance of a PMT Tag, but the mass difference between the member and the match is greater than the search tolerance
+		- For some UMCs, notably those with just two members, the median mass can be far away from any of the members; in cases like this the members will all have inherited matches, and as a result, the match would not have been counted when determining "UMC count with hits" and "Unique mass tag count"
+	- Fixed bug that erroneously gave Mass Tag ID values of 0 for a few UMCs when using Edit->Copy UMCs in View
+		- Only affected UMCs where all of the UMC's members had inherited matches (described above)
+
+Version 3.36 - Build 298; July 26, 2005
+	- Updated the command-line automation mode to allow for loading of .Gel files previously saved using Viper
+	- Added option to Skip UMC finding, which is only appropriate when loading .Gel files (key SkipFindUMCs in section AutoAnalysisOptions)
+	- Added option to automatically enter the password when running Viper via command line automation and exporting the data to the database (key DBExportPW in section AutoAnalysisOptions)
+
+Version 3.36 - Build 296; July 11, 2005
+	- Now clipping negative error plot values at 0 to prevent the Y-axis from showing negative numbers
+
+Version 3.36 - Build 295; July 8, 2005
+	- Added option to plot the Butterworth smoothed data on the Mass Error and NET Error plots
+	- Updated several default values related to the error plots
+		- Mass Error bin width is now 0.2 ppm (was 0.5 ppm)
+		- GANET Error bin width is now 0.001 NET (was 0.005 NET)
+		- Butterworth frequency is now 0.2 (was 0.15)
+
+Version 3.36 - Build 294; June 16, 2005
+	- Updated frmSearchMT_ConglomerateUMC to create a Q Rollup entry when searching only GANET Lockers
+		- Previously, a Q Rollup was not created since Q Rollup didn't support NET Lockers
+
+Version 3.36 - Build 293; May 16, 2005
+	- Fixed file loading bug that prevented Viper from loading un-deconvoluted (charge state) based PEK files
+	- Added ability to filter on a minimum intensity value when loading un-deconvoluted data
+
+Version 3.36 - Build 292; May 7, 2005
+	- Switched the SLiC score computation to set sigma_mass = MassTolerance/2 and sigma_NET = NETTolerance/2
+		- For a search window of +-6 ppm and +-0.05 NET, this is equivalent to what was done prior to build 289 (when sigma_mass was fixed at 3 ppm and sigma_NET was fixed at 0.025 NET)
+	- Added support for several new parameters in SP AddMatchMaking
+		- RefineMassCalPeakWidthPPM, RefineMassCalPeakCenterPPM, RefineNETTolPeakHeightCounts, RefineNETTolPeakWidthNET, and RefineNETTolPeakCenterNET
+		- These are only populated during auto analysis
+	- Now writing out the Mass Error and NET Error peak stat values at the top of the Index.html file in the output folder during auto analysis
+
+Version 3.36 - Build 291; May 5, 2005
+	- Tweaked the improved error checking when calling SetPeakMatchingTaskCompleteMaster
+		- Now re-establishing the connection after each failed call to the stored procedure
+
+Version 3.36 - Build 290; April 30, 2005
+	- Improved error checking when calling SetPeakMatchingTaskCompleteMaster
+		- Will now call the procedure up to 5 times, waiting 10 seconds between each failed call
+		- This was necessary due to new network errors that started appearing after we installed the Sygate firewall
+
+Version 3.36 - Build 289; April 13, 2005
+	- Added parameter AutoDefineSLiCScoreThresholds to the SLiCScoreOptions section
+		- When True, then the Mass StDev and NET StDev values used in SLiC score computation are set equal to the search tolerances
+		- When False, then the Mass StDev and NET StDev values are those specified by MassPPMStDev and NETStDev in the .Ini file
+		- Updated the default value for MaxSearchDistanceMultiplier to be 2 instead of 4; this value is automatically set to 2 if AutoDefineSLiCScoreThresholds is not present in the .Ini file
+		- Note that up to now, the Mass StDev was fixed at 3 ppm and the NET StDev was fixed at 0.025 NET
+	- Now recording DelSLiC in the AMT Match Description text stored with every data point
+	- Updated the Copy UMCs to Clipboard option to include DelSLiC
+
+Version 3.36 - Build 288; April 10, 2005
+	- Fixed SLiC Score computation bug involving computation of DelSLiC
+		- Previously, was only using SLiC scores of the top two PMTs passing the final mass and NET tolerance values when computing SLiC score
+		- Now using all matches to compute DelSLiC, then filtering matches out of tolerances
+
+Version 3.36 - Build 287; March 9, 2005
+	- Fixed bug in LookupExpressionRatio function that returned 0 rather than sngERValueIfNotDefined for data points that did not have ER values
+	- Updated the Filter form to disallow incompatible filter options
+		- Exclude identified / exclude unidentified
+		- Exclude data with ER / exclude data without ER
+		- Exclude data out of range when exclude data with ER is enabled
+
+Version 3.36 - Build 286; March 8, 2005
+	- Now computing SLiC scores using all matches, including both normal PMT matches and NET locker matches
+		- This allows one to determine the uniqueness of a match when considering both normal matches and NET locker matches
+	- Fixed SLiC score computation bug that incorrectly looked up a NET StDev value for NET locker matches
+
+Version 3.36 - Build 285; March 3, 2005
+	- Fixed bug that occurred using menu item View->Mass Tags Display
+	- Fixed bug related to querying a specific database on a specific server during Prism Automation
+
+Version 3.36 - Build 284; March 2, 2005
+	- Added ability to read the new comma separated (csv) file format produced by Decon-2LS
+	- Fixed bug involving call to GetMassTagsGANETParam in DBs with Schema Version 1
+	- Updated the DocumentData structure to consolidate all of the scan info values in the new .ScanInfo() array of UDTs, part of the DocumentData structure
+		- Removed the following arrays from the DocumentData structure: .DFN, .DFFN, .DFPI, .DFFS, .DFIN
+	- Updated the DocumentData structure to utilize 1D arrays of UDTs rather than 2D arrays of variants to score the Isotopic data and Charge State data
+		- Replaced .CSNum() and .IsoNum() with .CSData() and .IsoData()
+	- Updated the filter dialog to warn the user if the current filters exclude all of the data
+		- Also updated the behavior to not auto-hide the filter dialog when it is deactivated
+		- Instead, the filter window now stays on top of all other windows
+
+Version 3.35 - Build 283; February 24, 2005
+	- Fixed slowdown that occured when running Viper on Windows XP SP2 and removing existing matches from peaks
+		- Resulted from On Error Goto handling of Null variant values; added use of IsNull() to prevent error being raised
+	- Added ability to manually override the job number associated with the loaded .Gel file
+	- Fixed bug that asked user for Gel file name twice when saving
+
+Version 3.35 - Build 282; February 21, 2005
+	- Fixed bug in Robust NET adjustment that caused an error when working with legacy mass tag databases (Microsoft Access DB)
+	- Added ability to edit the NET formula even when connected to a legacy mass tag database
+	- Added ability to edit the Robust NET options and the minimum S/N value on the Edit Analysis Settings window (frmEditAnalysisSettings)
+
+Version 3.35 - Build 281; February 20, 2005
+	- Added Robust NET adjustment option
+		- Can iterate through a range of Slope, Intercept, and Mass Shift values to find the best slope and intercept for optimal alignment of the UMCs to the PMTs in memory
+		- Implemented a rudimentary Simulated Annealing approach for finding the optimal slope, intercept, and mass shift values without exhaustive iteration through ranges
+			- Current approach chooses new slope, intercept, mass shift, and UMC Top Abu Pct values at random.  A superior (future) approach would be to use the previous trials to guide the next values to test.
+	- Changed export of UMC members to the T_FTICR_UMC_Members table to be turned off by default
+		- Enable using .Ini file option ExportUMCMembers for a given search mode
+	- Now raising an error if a slope value determined during NET adjustment is outside the expected range
+		- The range is given by NETSlopeExpectedMinimum and NETSlopeExpectedMaximum if using simple NET adjustment
+		- The range is given by RobustNETSlopeStart and RobustNETSlopeEnd if using Robust NET adjustment
+	- Removed unused/dead functions and variables throughout the code
+	- Improved the peak finder (used to find the peak on the mass error plots) to use Butterworth smoothing and to compute Signal to Noise ratios
+		- If the peak height is less than 5 times the minimum peak height, then the observed S/N must be greater than the minimum S/N (default 2.5)
+
+Version 3.34 - Build 280; February 6, 2005
+	- Added ability to filter PMTs by discriminant score, an experiment inclusion filter, and/or an experiment exclusion filter when loading from the database
+		- Required updating the MassTagsAccess.dll component
+	- Added ability to filter PMTs by a separate, custom discriminant score during NET adjustment, DB search, and auto-analysis tolerance refinement
+
+Version 3.33 - Build 278; January 10, 2005
+	- Moved mass calibration refinement to occur before NET adjustment when a mass calibration override value is defined (RefineMassCalibrationOverridePPM)
+		- Must have RefineMassCalibration = True
+
+Version 3.33 - Build 277; January 3, 2005
+	- Program is now capable of displaying the raw mass spectra for data loaded from LTQ-FT datasets
+		- Displays spectra in ICR-2LS scopes
+		- Requires that Finnigan Xcalibur be installed
+
+Version 3.33 - Build 276; December 31, 2004
+	- Updated the GelData structure to track the master scan order of the data in the .Pek file
+		- Necessary when loading LTQ-FT data, where the MS scans are interleaved with MS/MS scans, and thus the spacing between scans is greater than 1
+	- Updated the UMC searching modes (both UMC2003 and UMCIonNet) to use master scan index rather than true scan number
+		- This was necessary to properly find UMCs in LTQ-FT data
+	- Updated the TIC and BPI plotting module to interpolate scan gaps for LTQ-FT data, resulting in smooth chromatograms
+	- Updated the UMC Browser and Pairs Browser modules to also interpolate scan gaps for LTQ-FT data
+	- Removed the auto-renumber scans option since no longer necessary (option was added in build 272)
+	- Switched to using stored procedure GetMassTagToProteinNameMap to retrieve the PMT to protein mappings
+		- Faster execution than simply polling V_IFC_Mass_Tag_to_Protein_Name_Map since we can filter on minimum high normalized score and minimum PMT quality score
+
+Version 3.33 - Build 275; December 12, 2004
+	- Updated the MassTagsAccess.dll component to use MTS_Master to obtain the MT database list
+		- Now tracks the server that each MT database resides on
+	- Updated frmPRISMAutomation to poll Prism_RPT to obtain new peak matching tasks, and to track the server that the given MT database resides on
+
+Version 3.32 - Build 273; November 17, 2004
+	- Modified UMC splitting algorithm to only split UMCs if their mass difference is at least as large as the StDev of the masses within each portion of the UMC being examined, even if the mass difference is less than the given mass difference threshold (which, to date, has typically been 4 ppm)
+
+Version 3.32 - Build 272; November 15, 2004
+	- Added .Ini file option to auto-renumber scans when reading a .pek file; necessary to properly process data from data files acquired with alternating MS and MS/MS scans (e.g. the LTQ-FT or LTQ, processing only the survey scans)
+
+Version 3.32 - Build 271; October 22, 2004
+	- Increased maximum number of loadable points from 500,000 to 750,000
+	- Now auto-clicking "Use Abundance Filter" if user enters a non-zero minimum abundance value
+
+Version 3.32 - Build 270; October 08, 2004
+	- Added parameter @IniFileName to call to SP AddMatchMaking
+	- Fixed bug in pair browser that deleted pairs without MT hits when deleting marked pairs, but pairs without MT hits were hidden
+
+Version 3.32 - Build 269; October 01, 2004
+	- No longer recording Average_Mass or Most_Abundant_Mass in table T_FTICR_UMC_Members in Mass Tag DBs with DB Schema Version 2
+
+Version 3.32 - Build 268; September 30, 2004
+	- Now populating table T_FTICR_UMC_Members in Mass Tag DBs with DB Schema Version 2
+	- Updated code in GetMassTagMatchCount for use with DB Schema Version 2
+
+Version 3.32 - Build 267; September 23, 2004
+	- Updated Viper to properly interface with Mass Tag DBs having DB Schema Version 2
+		- Involved numerous updates for obtaining mass tags, including no longer filtering on AMT or Lockers, and changing from Dynamic or Static Mods simply Mods
+	- Updated the MassTagsAccess.dll component to work with the new DB schema version
+		- Now only shows the necessary fields when selecting mass tags for a database
+		- Updated initial view to show the database names in a listbox rather than a dropdown combobox and to filter out unused and frozen databases by default
+	- No longer creating Index.html files in the parent folder on Pogo since the Index Creator tool is automatically doing this every 4 hours
+
+Version 3.31 - Build 266; September 16, 2004
+	- Extended Copy All Points in View option to include detailed stats about the DB matches, including mass, NET, NETStDev, SLiC Score, and Mass Error (similar stats to Copy all UMCs in View)
+	- Updated the WriteIDResultsByIonToTextFileAfterAutoSearches feature to use Copy All Points in View rather than frmExport for exporting all peaks with a database match
+
+Version 3.31 - Build 265; August 31, 2004
+	- Fixed bug involving scan-by-scan ER computation and symmetric ratios that affected pairs with just one overlapping scan
+
+Version 3.31 - Build 264; August 23, 2004
+	- Now including the SLiC Score column when using Edit->Copy UMCs in View
+	- Added ability to use the Tools->Zoom In menu when viewing the Mass Tags Display (View->Mass Tag Display)
+	- Added ability to copy the mass tags from the Mass Tag Display using Edit->Copy Points in View
+
+Version 3.31 - Build 263; August 21, 2004
+	- Fixed bug that included Mass Tag matches for UMCs even when "Copy UMCs In View->Include DB Search Matches" was unchecked 
+	- Updated reference to GANET prediction DLL to use the August 2004 version (v3.5), which supports alkylated cysteines (use lower case c instead of C)
+
+Version 3.31 - Build 262; August 20, 2004
+	- Switched to referencing ICR-2LS using late binding (CreateObject) instead of via early binding
+
+Version 3.31 - Build 261; August 20, 2004
+	- Added option to sum raw mass spectra for all selected points
+	- Added option to close all open ICR-2LS spectra
+	- Fixed bug in scan-by-scan ER calculation that occurred when symmetric ERs were used and fewer than 3 overlapping scans existed for a pair
+		- Bug caused ER value to skip conversion from normal ER to symmetric ER, which caused subsequent conversion from symmetric ER back to normal ER to give an invalid ER
+
+Version 3.31 - Build 260; August 16, 2004
+	- Added option to view raw mass spectra for all selected points (previous version only was for most recently selected point)
+	- Modified Grubb's test outlier filtering of ER values to use shifted symmetric ER values, rather than log-10 values
+		- This leads to a more accurate detection of outliers (better than log 10) due to accurate computation of standard deviation values
+
+Version 3.31 - Build 259; August 16, 2004
+	- Restored the ability to view raw mass spectra using ICR-2LS
+		- Extracts the spectra from the .Zip files on the storage servers, and stores a locally cached copy in the MSSpectra folder on the same drive as the Viper.exe file
+		- Deletes a dataset's entire cache folder if not used for 7 days (checked on next program exit)
+		- Additionally, removes the oldest-accessed spectra if the cache folder size for a single dataset grows to over 100 MB
+	- Modified Grubb's test outlier filtering of ER values to use base-10 Log ER values
+		- Also using base-10 log ER values for computing the weighted average
+	- Changed use of GelData().PathtoDataFiles to store the path to the zipped s-folder files, which is the parent folder path of the .PEK file
+		- This path is used when loading raw spectra
+	- Changed use of GelData().Filename to always store the path to the original PEK file loaded
+		- Previously, had been replacing the PEK file path with the path that the .Gel file was saved
+	- Updated reference to MwtWinDll.Dll file to latest version (2.32, build 63)
+
+Version 3.30 - Build 258; August 13, 2004
+	- Added use of Grubb's test to remove outliers when computing ER values scan-by-scan
+	- Updated the GelP_D_L structure to keep track of IReport settings and outlier removal settings
+		- Required updating the binary file version for DeltaLabeledPairs from 5 to 6
+	- Updated Index.html browsing file creation feature to create or update the Index.html file in the parent folder of the output directory during auto analysis
+
+Version 3.30 - Build 257; August 11, 2004
+	- Updated Index.html file generation for results folder browsing to include various UMC stats
+		- Stats include number of UMCs, number of UMCs with hits, and number of unique mass tag hits
+		- If the Index.html file is being created during auto-analysis, then uses the data in memory to determine these stats
+		- If the Index.html file is being created from existing results on disk, then uses the GetPeakMatchingTaskResultStats SP to lookup the stats, given the peak matching task ID
+
+Version 3.30 - Build 256; August 11, 2004
+	- Added calculation of ER values for 16O/18O pairs using the IReport values
+		- Equations for use were provided by Weijun Qian
+		- Corrected abundance values are computed for the peaks 2 Da and 4 Da away from the monoisotopic peak, then are used to compute an ER value that takes into account the isotopic distribution of O18 labelled species
+
+Version 3.30 - Build 255; August 5, 2004
+	- Extended Index.html file generation for navigation of Viper results folders to create Index.html files for parent folders (i.e. folders that don't contain results)
+		- Added /G:FolderStartPath switch to automatically initiate the process from the command line, then exit
+
+Version 3.30 - Build 254; August 3, 2004
+	- Minor IReport bug fixes
+
+Version 3.30 - Build 253; August 3, 2004
+	- Added UMC Browser utility
+		- Displays list of UMC's, sorted by mass, scan, abundance, number of members, m/z, most abundant charge state, or UMC index
+		- When a UMC is selected, zooms the 2D plot to the mass region of the UMC
+		- Plots the abundance curve vs. time for the UMC
+		- Can filter to only show UMCs with mass tag matches
+		- Can copy the abundance plot graphic or data
+		- While browsing the list of UMCs, can manually delete a UMC that the user does not like		
+	- Added the ability to read IReport data from ICR-2LS .Pek files
+		- IReport data has two columns of intensity listed after the "Most abundant MW" column in the primary data block of the .PEK file
+		- These intensities are the intensies of the monoisotopic peak and the peak 2 Da heavier than the monoisotopic peak
+	- Increased the size of the 2nd dimension of the .IsoNum() two-dimensional array from 10 to 12
+		- Added isfIReport2DaAbundance = 11 and isfIReport4DaAbundance = 12
+	- Added DataStatusBits member to the DocumentData structure that holds the data read from the .PEK file
+		- This member is a long variable, and is used to indicate features of the data
+		- For now, it is normally 0, but will be 2 if IReport data was loaded
+
+Version 3.30 - Build 252; August 1, 2004
+	- Fixed bug that added an incorrect entry to the history log when N14/N15 database pairs searching was enabled
+	- Changed behavior of database export on the N14/N15 Pairs Database search form (frmSearchMTPairs) to not record database hits in the Peak Results Table for heavy members of pairs
+		- This behavior is now identical to that used for the UMC Results table exporting, both on the Pairs Database search form, and on the Conglomerate UMC Mass search form
+	- Changed Tolerance Refinement search mode selection logic to not use a GANET Locker Only search mode if several search modes are present
+
+Version 3.30 - Build 251; July 31, 2004
+	- Fixed bug in auto analysis routines that failed to update the pair-based search definition from the .Ini file
+	- Added RefineMassCalibrationOverridePPM option which specifies a Mass Calibration shift to use, regardless of the mass error plot
+		- Must have RefineMassCalibration = True
+	- Added option to include the NET Locker matches in the mass error plot data (IncludeNetLockerMatches)
+
+Version 3.30 - Build 250; July 29, 2004
+	- Added computation of the SLiC Score (aka the likelihood of a match score)
+		- SLiC = spatially localized confidence sore
+		- SLiC is a score, based on the density of the region around a UMC, that defines the confidence of the match
+		- SLiC ranges from 0 to 1
+		- Also recording the Del_SLiC score, which:
+			- If there is only one match (within tolerance) for a UMC, is 1
+			- If there is more than one match, is computed using highest SLiC Score - 2nd highest SLiC score for the first match, and is 0 for all other matches
+	- Added new feature to require that the UMCs forming a pair overlap at their UMC apexes, within a given scan tolerance
+		- Useful for assuring that two UMCs forming a pair line up with one another
+	- Updated the Copy All UMCs in View function to include multiple entries for each UMC if it is a member of multiple pairs
+	- Updated Report Results by UMCs and Export Results to Mass Tag DB on frmSearchMT_ConglomerateUMC to show or save all pairs that a UMC belongs to
+	- When searching for ambiguous pairs, have new option to keep the most "confident" pair
+		- This feature checks whether the light member of the pair is also the light member of other pairs
+		- If it is, then it keeps the pair with the largest sum of Light + Heavy
+		- The thought is that instead of deleting all ambiguous pairs, we would keep the "best" one; this is definitely open to tweaking
+	- Added new ambiguous pair exclusion option: "Exclude Ambiguous Pairs (only those with hits)"
+		- This function only considers pairs that have UMCs with one or more mass tag hits when looking for pairs to exclude
+		- The exclusion process will include a pair if its light member is only a member of that pair and if its heavy member is only a member of that pair
+		- If the light member is shared or the heavy member is shared, then will keep the most "confident" pair (if that setting is enabled) or exclude the pair
+	- If "Exclude ambiguous pairs after database search" is enabled, now deleting the excluded pairs prior to exporting the data to the database
+		- Had previously been marking them as excluded, but they were still exported to the database
+		- Also now utilizing the new "Exclude Ambiguous Pairs (only those with hits)" option when auto-excluding pairs during auto-analysis
+	- When matching Paired UMCs against mass tags using "UMC Single Mass" DB searching (frmSearchMT_ConglomerateUMC), now only searching UMCs that belong to at least one included pair
+		- This was already the behavior on frmSearchMTPairs (N14/N15 searching)
+	- Updated the GelP_D_L structure to keep track of all of the pair searching settings used
+		- Allows the user to have several gel files open and see the correct pair searching settings when opening the Find Pairs window
+		- Allows for display of the correct pair finding settings when opening a saved .Gel file
+		- Allows for more accurate re-computation of ER values after closing the Find Pairs form
+		- Required updating the binary file version for DeltaLabeledPairs from 4 to 5
+		- Had to rearrange several UDTs (structure variables) to accomplish this
+			- Allowed for cleaner code on the pair searching forms
+			- Allows for sharing of the pair searching variables between the GelP_D_L structure and the glbPreferencesExpanded variable (.Ini file settings)
+	- Updated the order of subtraction when computing the NET error between an observed UMC and an AMT to match the subtraction order used to compute Mass Error
+		- Subtraction order is now ObservedNET - AMTNet, similar to ObservedMass - AMTMass
+		- Order was previously AMTNet - ObservedNET
+		- This change flips the sign of the NET Error value stored in .IsoVar(i, isvfMTID) and displayed to the user
+		- This change does not affect whether or not an AMT is within tolerance of a UMC
+	- Fixed bug in frmSearchMT_ConglomerateUMC that incorrectly did not always export the opposite UMC member of a pair when searching using pairs
+		- Note that we do not record the matching mass tag information with the opposite UMC member of a pair; just the stats for the paired UMC
+	- Fixed bug in frmSearchMTPairs that included the matching mass tag information for the heavy UMC member of a pair
+	- Removed the "N14/N15 pairs (individual peaks in UMCs)" search option (aka "DBSearchPairsN14N15") search option
+		- Not needed since the "N14/N15 pairs (conglomerate UMC masses)" option works nearly identically
+
+Version 3.29 - Build 248; July 13, 2004
+	- Added Pair Browser utility
+		- Displays list of paired UMC's, sorted by mass, scan, ER, abundance, or pair index
+		- When a pair is selected, zooms the 2D plot to the mass region of the pair
+		- Plots the abundance curves vs. time for both members of the curve, using only the charge states used to compute the ER for the curve
+		- Can filter to only show pairs with mass tag matches
+		- Can copy the abundance plot graphic or data
+		- While browsing the list of pairs, can manually delete a pair that the user does not like
+	- Updated the GelP_D_L structure to track the charge states used to compute the ER for the pair
+		- Added ERChargesUsed() array
+		- Required updating the binary file version for DeltaLabeledPairs from 3 to 4
+	- Added PairBrowserOptions section to glbPreferences (and .Ini file)
+	- Updated Spectra Plotter Control to allow additional customization of the graph, including point and line colors and point styles
+	- Fixed bug that failed to delete the pair information if UMC's were deleted (typically prior to repeating UMC search)
+	- Removed "UMC with Auto Refine" UMC search option (aka AUTO_ANALYSIS_UMC2002 or frmUMCWithAutoRefine) since obsolete
+	- Removed "Correlations" form (aka frmCorrelations) since obsolete
+	- Removed Pairs View forms (aka frmVisPairs and frmPairsView) since obsolete
+	- Removed all references to the GelP variable, since not used
+
+Version 3.28 - Build 244; July 10, 2004
+	- Updated call to AddFTICRUmcMatch to utilize @MatchingMemberCount and @MatchScore
+		- Had previously been storing the matching member counts using @MatchScore; now using @MatchingMemberCount
+		- We'll be utilizing @MatchScore in the near future to store the likelihood of match score (based on density of AMT tags for given matching UMC)
+	- Updated call to AddFTICRUmc to record distinct values for 14N/15N and 16O/18O paired UMCs
+	- Fixed bug when calling AddMatchMaking to store the correct FPR_Type_Name value when being called from frmSearchMT_Conglomerate
+
+Version 3.28 - Build 243; July 8, 2004
+	- Fixed bug that failed to suppress warning messages on frmFilter when invalid filters were used.  Instead now logging a message to the analysis history.
+	- Fixed bug on Save/Load/Edit analysis settings that failed to set the Min/Max Delta count when toggling between N14/N15 and O16/O18 pairs
+	- Fixed bug in Ini file save section that overwrote the RestrictIsoMZMax value with the RestrictGANETRangeMin value
+	- Fixed bug in Ini file save section that wrote a blank value for RestrictIsoAbundanceMax
+
+Version 3.28 - Build 242; July 2, 2004
+	- Renamed the GANET prediction DLL weight file back from elute.wts to elute342.wts
+
+Version 3.28 - Build 241; July 1, 2004
+	- Now creating an Index.html file in the auto-analysis output folder
+		- Includes reduced-size views of the major plots, plus links to all of the graphics and text files
+		- Added utility function to generate Index.html files for existing auto-analysis output folders
+	- Removed references to frmSearchMT_UMC and to IndividualPeaksInUMCsWithNET, IndividualPeaksInUMCsPaired, and IndividualPeaksInUMCsUnpaired (aka AUTO_SEARCH_UMC_HERETIC)
+	- Now setting FPR_Type_Name (Field FT_ID in T_FTICR_UMC_Results) to "Pair - N14/N15 - Light" or "Pair - N14/N15 - Heavy" (type 1 and 2) when searching using Conglomerate UMC search with Pairs only
+		- Had been previously setting the field to 1 = "Standard" in this case
+		- Also now exporting the UMC that is paired with the matching UMC
+	- Now exporting additional ER stats to the FTICR_UMC_Results table in the mass tag database, plus the member count used for UMC abundance
+	- When computing ER scan-by-scan, now weighting the ER values by abundance, even within the same charge state
+		- After getting a weighted average ER for a given charge state, then average all charge states, again using a weighted average
+	- Updated reference to GANET prediction DLL to use the June 2004 version
+	- Added workaround for the GetTickCount() function that prevents it from returning a negative number (true 24 to 48 days after computer reboot)
+	- Removed Beta warning message on the pair searching form.
+
+Version 3.27 - Build 240; June 29, 2004
+	- Reporting class stats charge basis and class m/z value in Report Pairs on the UMC Pair Searching forms (function ReportDltLblPairs_UMC)
+	- Now reporting M/Z value for the Class Stats Charge basis in "Copy UMCs in View to Clipboard"
+	- Now querying user about loading ORFs from the database if not yet loaded when using "Copy UMCs in View to Clipboard"
+
+Version 3.27 - Build 239; June 18, 2004
+	- Improved the handling of legacy mass tag databases stored in Microsoft Access files
+		- Numerous changes made in several places to allow proper handling of the equation determined from NET adjustment
+		- Fixed bugs that resulted from connecting to an "offical" mass tag DB, then disconnecting, then using a legacy DB, or vice versa
+		- Updated the error messages that result from legacy mass tag databases to indicate the correct location of the legacy database settings
+		- Now storing the path to the most recent legacy DB file in the .Ini file
+	- Added the option to define the path to the legacy DB file on the Organize DB connections form
+
+Version 3.27 - Build 238; June 16, 2004
+	- Updated the string comparison functions to be case insensitive when checking the current FTICR Calibration Function used for the data
+		- Necessary since PEK files now have calibration functions like "m/z=A/(F-B)" but the functions are stored in Viper as "m/z=A/(f-B)"
+
+Version 3.27 - Build 237; June 14, 2004
+	- Added new UMC class mass and class abundance options: 
+		- "Sum of Top X Members of Class" for class abundance, allowing one to only include the Top X members of a class in the abundance sum, or a middle portion of the members of a class in the sum (using minimum and maximum abundance tolerances)
+		- "Average" and "Median of Top X Members of Class" for class mass, again, using either the Top X members of a class to compute the average or median mass, or using a middle portion of the members of a class in the calculation
+	- Added Pairs ER option of computing ER values scan-by-scan for paired UMC's, then averaging
+		- If require matching charge state is turned on, then requires this when stepping scan-by-scan
+	- Added option to average ER values for all charge states of a pair
+		- Uses a weighted average based on the overall abundance of the charge-subgroup of the UMC
+	- Changed paired UMC overlap test to require both ends be within tolerance, or the smaller UMC be completely inside the larger UMC
+		- TODO: Consider requiring that the smaller UMC be fairly centered with the larger UMC
+	- Added option to filter the data in the .PEK file by abundance when loading
+		- Useful for huge data files (over 500,000 points)
+	- Added option to auto-number the scan numbers when they are not present in the .PEK file in ascending order
+		- This occurs if one appends one .PEK file to another one
+		- When appending huge .PEK files, it is inconvenient to fudge the scan numbers in the second file
+		- Auto-numbering will increment the scan number by 1 for each scan following the first non-ascending scan encountered
+	- Added File Load Options dialog when loading new .PEK file
+		- Allows user to specify whether or not filtering by isotopic fit or by abundance
+	- Updated the GelP_D_L structure to track additional pairs statistics
+		- Added RequireMatchingChargeStatesForPairMembers, UseIdenticalChargesForER, ComputeERScanByScan, AverageERsAllChargeStates, AverageERsWeightingMode 
+		- Required updating the binary file version for DeltaLabeledPairs from 2 to 3
+	- Added new parameters to the UMC Results database export routines
+		- MemberCountUsedForAbu, ExpressionRatioStDev, ExpressionRatioChargeStateBasisCount, ExpressionRatioMemberBasisCount 
+	- Added stPairsO16O18 as a new analysis type
+		- Used to indicate 16O/18O pairs when exporting results to the database
+
+Version 3.26 - Build 236; May 12, 2004
+	- Now including mass tag NET value when copying UMC's in view to the clipboard
+
+Version 3.26 - Build 235; April 26, 2004
+	- Updated the logic that choose which .PEK file to choose to choose the .pek file instead of _ic.pek if .pek is specified first in the list
+
+Version 3.26 - Build 234; April 18, 2004
+	- Changed default value for blnProcessImmediately in ExportMTDBAddQuantitationDescriptionEntry from True to False when Auto Analysis Mode is enabled
+		- Change made since new update logic for the mass tag databases includes a call to QuantitationProcessStart every 15 minutes
+
+Version 3.26 - Build 233; April 14, 2004
+	- Fixed bug that incorrectly redimensioned and incorrectly accessed the AMTHiNormalizedScore() array in frmSearchMT_ConglomerateUMC and frmSearchMTPairs when dynamic or static modifications were applied
+
+Version 3.26 - Build 232; April 8, 2004
+	- Now populating MinimumHighNormalizedScore and MinimumPMTQualityScore in T_Matching_Making_Description via call to AddMatchingMaking SP
+
+Version 3.26 - Build 231; March 27, 2004
+	- Updated reference to latest version of MwtWinDll.dll (v2.31)
+
+Version 3.26 - Build 230; March 26, 2004
+	- Changed default naming schema for .Ini files from yymmdd to yyyy-mm-dd
+
+Version 3.26 - Build 229; March 25, 2004
+	- Disabled checking for the "Molecule Reference" table when opening Legacy mass tag database Access files since this table isn't really needed
+	- Fixed bug in LoadAMTData that failed to ReDim AMTSequence and AMTHiNormalizedScore
+	- Fixed bug in ValidateMTMinimimumHighNormalizedScore that failed to set sngMTMinimumHighNormalizedScore to 0 if an error occurred in that function
+	- Updated reference to GANET prediction DLL to use the March 2004 version
+	- Updated some of the default search values, including NET InitialSlope from 0.00025 to 0.00020 and MassCalibrationMaximumShift from 25 to 15 ppm
+
+Version 3.26 - Build 227; March 2, 2004
+	- Updated reference to latest version of MwtWinDll.Dll (v2.30)
+	- Removed notification to user when cannot create an object reference to ICR-2LS; still writing UnexpErr.log
+
+Version 3.26 - Build 226; February 20, 2004
+	- Added a few more trace log options
+	- Changed the default MaximumAgeLoadedMassTagsHours from 24 to 8 hours
+	- Added a new Graphic Export options section to the .ini file (and to glbPreferencesExpanded)
+		- Includes the options CopyEMFIncludeFilenameAndDate and CopyEMFIncludeTextLabels
+
+Version 3.26 - Build 225; February 19, 2004
+	- Added trace log level option under the menu
+		- When the trace log level is >0, then writes trace log entries to the trace file if the trace entry value is >= the trace log level
+	- Added Class Stats Charge Basis to the Report Results by UMC function on frmSearchMT_ConglomerateUMC and frmSearch_UMC
+		- This information was already being exported to the database, but was previously not being exported to text files or to the clipboard
+
+Version 3.26 - Build 224; February 17, 2004
+	- If NET Adjustment fails, and the InitialSlope and InitialIntercept values are used, then the fit value is set to 1.11E-3
+		- Previously, the fit value would be the fit value from the previous NET Adjustment iteration
+
+Version 3.26 - Build 223; February 17, 2004
+	- Changed behavior when SkipGANETSlopeAndInterceptComputation is True during Auto Analysis to use the InitialSlope and InitialIntercept values defined in the .Ini file if the GANET_Slope = 0 in the AutoAnalysisDBInfo section of the .Ini file
+		- A fit value of 1.11E-3 is used in this situation
+
+Version 3.26 - Build 222; February 3, 2004
+	- Added check when using a Minimum High Normalized Score for filtering mass tags during Net Adjustment, Tolerance Refinement, or DB searching to make sure that at least 1 (Net Adjustment) or 2 (DB Searching) mass tags pass the filters
+		- If not enough mass tags pass the filter, then the filter threshold is divided by 2 (if > 2) or decreased by 0.5 (if <= 2) until the desired number of mass tags are found to pass the filter
+
+Version 3.26 - Build 221; February 2, 2004
+	- Added ability fo filter the mass tags present in memory using Minimum High Normalized Score for the following routines:
+		- NET Adjustment; set to Score >= 2.5 by default
+		- Tolerance Refinement; set to Score >= 2.5 by default
+		- Search Database, Conglomerate UMC's (frmSearchMT_ConglomerateUMC); set to Score >= 0 by default
+		- Search Database using N14/N15 Pairs (frmSearchMTPairs); set to Score >= 0 by default
+	- This filter is applied to the mass tags in memory, allowing one to load mass tags, then perform different searches with different XCorr cutoffs
+	- This filter is mainly intended to be used during NET Adjustment and during Tolerance Refinement
+		- Use of an XCorr filter allows one to perform NET Adjustment and Tolerance Refinement with the higher quality mass tags, but still search
+		  a larger set of mass tags for the final step of database searching
+	- This required updating LoadMassTags to populate a new global array, AMTHiNormalizedScore
+		- This also required updating the GetMassTagsGANETParam stored procedure in the mass tag databases
+	
+Version 3.26 - Build 220; January 20, 2004
+	- Updated the .PEK file reading function to handle the output produced by ICR-2LS for .CDF files
+		- Made the code more general in that it now looks for an integer at the end of a line that starts with FileName:
+		- The number found is the scan number (aka file number)
+		- For Q-Star .wiff files it must first remove :1 or any other colon and number at the end of the line, since the scan number is located before the colon
+
+Version 3.26 - Build 219; January 12, 2004
+	- Fixed a bug in the routine that removes heavy or light members of pairs that have database hits
+
+Version 3.26 - Build 218; January 12, 2004
+	- Updated the Write Gel as PEK file function to handle the new .PEK file features of guessing the N14 or N15 state of isotopic distributions
+	- Updated reference to latest version of MwtWinDll.Dll (v2.29)
+
+Version 3.26 - Build 217; January 10, 2004
+	- Added new option to find pairs, then search the database using the pairs, then remove the heavy or light UMC's that belong to pairs that matched mass tags from the database search
+		- This allows another search to be performed after this step using all the data, but thus skipping the UMC's that appear to have heavy (e.g. N15) atoms
+	- Extended the Split UMC's procedure to optionally also look for UMC's with gaps larger than MaxScanGap
+		- To enable, set ScanGapBehavior to 1 or 2
+		- If ScanGapBehavior = 1 ("Split if mass difference") then looks for gaps but only splits to adjacent regions if their difference in average mass is above the threshold
+		- If ScanGapBehavior = 2 ("Always split") then looks for gaps and splits regardless of mass
+		- Useful when using UMCIonNet searching
+		- To disable this feature, set ScanGapBehavior = 0 ("Ignore scan gaps") and/or MaxScanGap = 0
+	- Modified .PEK file load routines to handle the latest version of ICR-2LS, while retaining backwards compatibility with old .PEK file formats
+	- Upgraded references to latest version of ICR-2LS (v2.29.54)
+
+Version 3.26 - Build 216; January 7, 2004
+	- Now recording additional information about the loaded mass tags in the analysis history
+	- Updated the peak finding algorithm for the tolerance refinement procedure to do a better job of determining the peak width when a single, good peak is found
+	- Changed the behavior of mass calibration refinement
+		- Mass refinement (shift masses) will not occur if the identified peak width is more than the maximum search tolerance refinement value
+
+Version 3.26 - Build 215; January 6, 2004
+	- Added support for PMT_Quality_Score to the mass tag selection routines and auto analysis procedures
+	- Added "Minimum PMT Quality Score" option to the Mass Tags selection procedures (MassTagsAccess.dll)
+	- Added automatic .PEK file selection when using the File -> New Analysis (Choose from DMS) option; again, this is an update to MassTagsAccess.dll
+	- Switched to using a new stored procedure named GetMassTagsGANETParam for retrieving the desired mass tags
+		- This stored procedure is identical to the old one, GetMassTagsGANET, except that each option is now an individual parameter
+		- The new stored procedure also supports the new MinimumPMTQualityScore option
+
+Version 3.26 - Build 213; January 3, 2004
+	- Now obtaining NET adjustment lockers from the T_GANET_Lockers table in the database
+		- If an error occurs or data missing from the database, then loads the default, hard coded values:
+			823.4664 Da = 0.215 NET; 966.5471 Da = 0.139 NET; 1124.6229 Da = 0.375; 1478.0061 Da = 0.572 NET; 1522.0374 Da = 0.656 NET
+		- These hard coded values can be defined in the VIPERSettings.ini file to override them
+		- Moved storage of GANET lockers to a new global variable, UMCNetLockers
+	- Implemented use of GANET Lockers in frmSearchForNetAdjustmentUMC
+		- Uses the same iteration procedure as was already in place for matching mass tags to UMC's
+		- Added a new minimum match count parameter called NetAdjLockerMinimumMatchCount
+			- Needed since there are typically only 5 GANET lockers; default minimum match count is 3
+		- If not enough matches to the GANET lockers are found, then the old algorithm of matching all of the mass tags to the UMC's is used
+	- Added option to search for GANET lockers on frmSearchMT_ConglomerateUMC
+		- Three search options are available during both manual and auto analysis:
+			- Do not search for GANET lockers
+			- Simultaneously search for mass tags and GANET Lockers
+			- Only search for GANET lockers
+		- Exports locker hit count information to T_FTICR_UMC_Results
+		- Exports locker hits to T_FTICR_UMC_NetLockerDetails
+		- Modified Report Results by UMC to show the GANET locker compounds (new column IsNetLockerMatch)
+	- Modified "Copy UMC's in View" function to be aware of GANET locker compounds (new column IsNetLockerMatch)
+	- Added new auto analysis step: SaveGANETLockerHitsAndData
+		- If enabled, uses the Conglomerate UMC's search mode to search for only the GANET lockers, then saves the matching UMC's to disk
+		- Also saves a graphic of the 2D plot to disk, showing only the GANET locker hits
+
+Version 3.25 - Build 212; December 31, 2003
+	- Added ability to define default NET Slope and NET Intercept settings
+		- These are used to form the initial NET Adjustment equation in frmSearchForNetAdjustmentUMC and on the various frmSearchMT forms when choosing Elution Time -> Generic
+		- The old method was to define the NET range to be 0 to 1, regardless of the number of scans
+		- The new method will not be affected by analyses that have a smaller number of scans actually saved to disk (provided the standard gradient slope is used in the LC separation)
+		- Default values are Slope = 0.00025 and Intercept = 0
+	- Added check for negative slope being computed during NET adjustment
+		- If a negative slope is found, then the slope and intercept are reset to the default values
+		- If not running auto analysis, then the user is informed of this
+	- Updated call to the EditFAD_GANET stored procedure to allow for recording of the total scan count, scan start, scan end, and run duration
+		- We currently don't have a way of determining the run duration from PEK files, so this has been included for future use
+	- Added ability to define GANET locker compounds
+		- For each locker, define a monoisotopic mass, NET value, and minimum and maximum expected charge
+		- Can also record a description and sequence for each
+		- Note: Actual usage of GANET lockers for NET Adjustment is not yet implemented (see Build 213)
+	- Added ClassStatsChargeBasis to the "Copy UMC's in View" menu item on frmGraph
+
+Version 3.25 - Build 211; December 29, 2003
+	- Added NET Value Type option for selecting mass tags, thus allowing user to use theoretical NET values for all mass tags
+		Type 0 means to use the AVG_GANET column in T_Mass_Tags_NET
+		Type 1 means to use the PNET column in T_Mass_Tags_NET
+		Type 2 means to calculate the theoretical NET value using the GANETClass.dll file
+	- Updated MassTagsAccess.dll to allow the user to set the NET Value Type
+	- Added ability to read the NET value type from the T_Peak_Matching_Task table during automated Viper analysis
+	- Implemented an improved peak finder for the Tolerance Refinement procedure
+		- If a single, large peak is found, then uses it for re-calibration
+		- If several peaks are found, but one of them is at least 2 times larger than the others, then it is used for re-calibration
+		- If a single, good peak cannot be found, then the old peak finding method of using center of mass of all of the data is used
+	- Added a Zoom Region form (frmZoomRegionList); access using Special->Zoom Region List Editor
+		- Allows the user to quickly zoom to certain regions
+
+Version 3.24 - Build 210; November 23, 2003
+	- Had to recompile due to a new version of MwtWinDll.Dll
+
+Version 3.23 - Build 209; November 19, 2003
+	- Added export of the mass tag modification mass to the T_FTICR_UMC_ResultDetails table in the MTDBExportRoutines.bas module
+		- This included updating frmSearchMT_UMC, frmSearch_MTConglomerateUMC, and frmSearchMTPairs
+
+Version 3.23 - Build 208; November 18, 2003
+	- Fixed bug in the pairs searching forms that referenced GelAnalysis().MD_Type and failed when GelAnalysis() was nothing for the current gel
+		- Added check for GelAnalysis() being nothing
+		- The variable will be nothing (undefined) if the user has not yet connected to a database
+	- Updated the clsInSilicoDigest code to match the updates made to the ParseFastaFile application
+
+Version 3.23 - Build 207; November 12, 2003
+	- Added exporting of the MassTagMods string to the T_FTICR_UMC_ResultDetails table in the MTDBExportRoutines.bas module
+		- This included updating frmSearchMT_UMC, frmSearch_MTConglomerateUMC, and frmSearchMTPairs
+	- Updated history description on frmSearchForNETAdjustmentUMC to indicate whether or not N15 masses were used for the AMT's
+
+Version 3.23 - Build 206; November 10, 2003
+	- Updated call to AddEntryToMatchMakingDescriptionTable in frmSearchMTPairs.ExportIDPairsToPeakResultsTable to pass True for the parameter "Set State to OK"
+
+Version 3.23 - Build 205; November 8, 2003
+	- Added option to export all of the UMC's to the database without performing a database search
+		- This is one of the database "search modes", even though no search is performed
+		- This option automatically enables "Export UMC's with no database matches" before exporting
+	- Updated the peak detection class (clsPeakDetection) to match some of the changes made in the VB.Net version of the peak detection class
+
+Version 3.23 - Build 204; November 7, 2003
+	- Added option to require that pairs (found using UMC-based pair searching) require matching charge states
+	- Added option to compute the expression ratio for a pair using the same charge state ions in the two UMC's of the pair
+		- If the most abundant charge state is identical for both members of the pair, then the ratio is computed using the ions belonging to the given charge state groups
+		- If the most abundant charge state doesn't match, then determines the pair containing the most abundant charge state group and searches for the given charge in the other member of the pair
+		- If no charge state overlap exists between the members of the pair, then the ER is computed using highest abundance charge state group for each member
+		  (this situation is not possible if the option to require matching charge states was enabled)
+	- Updated the ResidueToModify combobox on various forms to automatically update the ResidueToModifyMass textbox when the user changes the selection of the combobox
+		- Updates the modification mass to 0 for all residues, except for STY, which updates the mass to 79.96633
+		- This is done to prevent accidental mass modifications from being applied
+	- Added option to use N15 masses for the mass tags during Net Adjustment
+		- Useful if the sample was grown on N15 media and is not mixed with a sample grown on N14 media
+
+Version 3.23 - Build 203; November 5, 2003
+	- Fixed odd bug in GelDrawMetafile() that handles the situation where GetWinMetaFileBits() returns 0 on the first call; a second call often results in a valid return value
+
+Version 3.23 - Build 202; October 30, 2003
+	- Added STY as an optional "residue" modification when searching the database
+		- If selected, then the modification mass will be added for each S, T, or Y present in a mass tag
+	- Recompiled all dependent Dll's since migrated to a new computer
+ 
+Version 3.23 - Build 200; October 15, 2003
+	- Added option to Filter data to only show the data in even-numbered scans or only show the data in odd-numbered scans
+		- Necessary when analyzing DREAMS-based data
+		- Typically, the DREAMS scans are the even numbered scans in the .PEK file (and thus in VIPER)
+	- If the .Ini file for auto-analysis includes a filter for even-numbered or odd-numbered scans, then VIPER only loads the appropriate scan-type when reading the .PEK file
+		- This is done so that the TIC and BPI plots only use the appropriate data (since they do not examine the filter states of the data)
+	- During auto-analysis, added saving of 2D plot with x-axis labeled as NET, showing DB hits only
+		- The additional 2D plots are still saved, all with the x-axis labeled as Scan Number
+	- Now finding the groups of ions in each UMC with the same charge state and computing their abundance and mass
+		- Statistics for each group of ions with the same charge state are computed and saved with each UMC
+		- This will aid in computing expression ratios for isotopic pairs (to be implemented in a future version)
+		- Class Mass and Class Abundance can optionally be defined to use the values for the most abundant charge state for each UMC
+			- The most abundant charge state can be defined to be the group with the largest abundance sum, the one with the most members, or the one with the highest single intensity member
+	- Updated the UMC Data structures (Type UMClass and Type UMC) to handle the new UMC statistics being computed
+	- Updated the UMC Definition structure to reflect the new stats being computed(new variable is UMCClassStatsUseStatsFromMostAbuChargeState)
+	- Updated the UMC Search Def structure to reflect the updated UMC Definition OldDef and UMC Data structure
+	- Fixed bug in BinarySaveData that would record the incorrect filename and file path to the Analysis History when saving to a remote network drive
+		- When saving to a remove drive over the network we first save to a temporary file on the local drive, then copy to the network drive; this is done since writing directly to the network drive can be very slow
+		- Prior to this build, we had been accidentally recording the path to the temporary file in the Analysis History (this didn't hurt anything, but resulted in the incorrect name and path in the history)
+	- Fixed bug in UC.Bas->UMCCount that erased the .UMCs() array if only 1 UMC was found when using the UMC2002 search method
+
+Version 3.22 - Build 199; October 14, 2003
+	- Modified the QueryPRISM function in frmPRISMAutomation to allow for multiple copies of VIPER running on the same machine
+		- Examining the folder name that the VIPER.Exe file resides in.  
+		- If it has extra characters following the text VIPER, then appends those characters to the computer name
+		- For example, if Viper is in C:\Program Files\Viper\Viper.exe and C:\Program Files\Viper_B\Viper.exe on Ceres02
+			then the computer name reported to PRISM will be Ceres02 and Ceres02_B, respectively
+
+Version 3.22 - Build 198; October 10, 2003
+	- Added option to add dynamic or static modifications when using the N14/N15-based database search using pairs (frmSearchMTPairs)
+		- This option had previously been added for UMC Conglomerate and UMC ion-by-ion in Build 196
+
+Version 3.22 - Build 197; October 9, 2003
+	- Added display of root foldername and PEK filename to the choose .Ini file dialog
+	- If the SkipNetAdjustment option is enabled in the Save/Load/Edit .Ini file dialog, then the default filename now contains the text SkipNetAdj
+	- Fixed bug in frmPrismAutomation that tried to query prism when "Exclusively Process This Database" was enabled, but no database was defined to exclusively process
+	- Fixed bug in frmSearchForNETAdjustmentUMC that allowed iterations to continue forever when using the "Stop when change less than" stop condition and the change never reached the desired lower limit
+	- Fixed bug in frmVisUMC.AutoRemoveUMCsWork that incorrectly computed the scan range of a UMC
+		- Originally using "Range = Max - Min"; now using "Range = Max - Min + 1"
+
+Version 3.22 - Build 196; October 8, 2003
+	- Added option to add an adjustment mass to each mass tag as a dynamic or static modification
+		- Set ResidueToModify to "Full MT" and set ResidueMassModification to a non-zero value to enable this option
+		- Note that we already added the option to add an adjustment mass to a certain residue in each mass tag in Build 191
+	- Added option to filter UMC's by scan range
+		- Still have the option of filtering UMC's by number of members
+		- Can also specify a minimum member count when filtering by scan range; useful to define a range of 3 and minimum member count of 3, thus excluding UMC's with just 2 members and UMC's less than 3 scans long
+	- Tweaked the refine UMC's code in frmVisUMC to handle the possibility that all of the UMC's in memory will get filtered out
+	- Increased default database timeout from 120 to 300 seconds
+	- Fixed bug in ExtractTimeDomainSignalFromPEK that failed to reserve enough memory for the time domain data when the scan numbers in the PEK file have gaps of greater than 1000
+	- Fixed bug in FindFreeIndex() that failed to initialize the MassCalibrationInfo section of the GelSearchDef data structure when loading a new .PEK file after closing a previous one
+		- The result of this was that it would appear that a mass calibration mass shift had been applied to the new .PEK file, when in reality, one had not
+	- Fixed bug in the QueryPRISM function of frmPrismAutomation that failed to reset the blnWorking variable to false when a connection to the database cannot be established
+	- Updated the export to DB descriptions recorded in the Analysis Log to include a more detailed description of the calling procedure (to help with debugging timeout errors)
+
+Version 3.22 - Build 195; September 30, 2003
+	- Tweaked the NET Adjustment Auto Increment Top Abu Pct algorithm to not auto-increment if the NET adjustment stop type is "stop after iteration" and the desired number of iterations was actually reached
+		- Normally, the Top Abu Pct would be incremented if the number of iterations is below the iteration threshold; however, if the user has specified a number of iterations less than that threshold, then the Top Abu Pct value would get incremented and the procedure repeated
+	- Re-ordered the steps menu agin, this time swapping Find Pairs with Select Mass Tags so that the Steps menu matches the Save/Load/Edit Analysis Options window
+	- Fixed bug with overlays that cause the zoom in function to fail (swapping the minimum and maximum specified NET values)
+	- When matching UMC's to mass tags, if the search function has the option to use UMC conglomerate NET in the searching, then now recording in the analysis history whether or not that option was enabled
+	- Now including the .Ini filename used for AutoAnalysis in the Analysis Parameters variable, which is used to populate the MD_Parameters column in the database
+		- The .Ini filename is only included if it was a fully-automated PRISM-initiated analysis, not if the user performed the analysis on their local computer (even if they did use a .Ini file)
+
+Version 3.22 - Build 194; September 28, 2003
+	- Added option to use the NET value of a UMC's class representative for database searching
+		- Available on the UMC_Conglomerate mass form, and the N14/N15 pairs form
+		- If disabled, then traditional method of comparing the NET value of each member of a UMC vs. the mass tags's NET is used
+	- Re-ordered the steps menu, placing Find Pairs directly after Find UMC's
+	- Replaced use of Elution() function with ScanToGANET() when the elution formula is the default GANET-based formula (and thus doesn't contain the text MinFN or MaxFN)
+		- This results in a speed increase of 10 to 20-fold for the process of matching UMC's to mass tags and storing the results in the data arrays
+		- Also applied this change to the UMC NET Adjustment code (frmSearchForNETAdjustmentUMC)
+	- Added ability to display only those UMC's that were used for NET adjustment and had database hits
+	- Added a check in the NET Adjustment procedure for cases when the user did not start with the generic NET equation
+		- If the number of iterations is below the threshold for auto-incrementing the UMC Top Abu Pct, but the number of ID's is over the threshold, then if the last Stop_Change equation result comparing NetMin and NetMax was small, then no error is raised and the Top Abu Pct value is not incremented
+	- Added a Use Defaults button to the Net Adjustment procedure window
+	- Changed the default Maximum mass tolerance value that could be found by Tolerance Refinement from 20 ppm to 10 ppm
+	- Changed default NET Adjust stop change value from 0.001 to 0.0001; increased maximum number of iterations from 30 to 50
+	- Fixed bug introduced in Build 187 that was using an incorrect tick mark spacing value for the X Axis scan numbers on the 2D Plot
+	- Also fixed bug from Build 187 that was using 10 tick marks for the y axis instead of 11 tick marks
+	- Moved the warning dialog about write-permission denied in the output folder to appear at the end of user-initiated auto-analysis rather than the beginning
+	- Removed the Use UMC's with Null Mass checkbox from the Save/Load/Edit Analysis Options window.  The setting is still present in the .Ini file
+
+Version 3.21 - Build 193; September 19, 2003
+	- Now defining the search type (MD_Type) value after finding pairs or searching the database
+		- Possible values are 1 = Standard Individual, 2 = N14/N15 Pairs, 3 = ICAT Pairs, etc.
+	- Modified UMC dispersion code to ignore UMC's that are too short or too few scans wide when adding back UMC's in a segment with a low UMC count
+	- Fixed UMC selection bug when dispersion was enabled that primarily occurred when Top Abu Pct = 100%.  An array was not being dimensioned with enough space in this situation, which raised an error and prevented NET adjustment using 100% of the data to occur.  The result of the previous NET adjustment would have been used in that situation.
+	- Added an error and warning status message dialog to be displayed at the end of auto analysis if an error or warning occurs while VIPER is being used interactively.
+	- Fixed bug on Save/Load/Edit Analysis Settings that failed to display the defined UMC search type for UMC 2003 searching
+
+Version 3.21 - Build 192; September 17, 2003
+	- Removed automatic adjustment of the mass error plotting range when drastically larger than the tolerance refinement search tolerance
+	- Added a warning on the Edit Analysis Settings form if the user specifies a Tolerance Refinement tolerance smaller than the database search tolerance
+
+Version 3.21 - Build 191; September 16, 2003
+	- Added Browse for Folder button on Tab 7 of Save/Load/Edit Analysis Settings.
+	- Added option to modify a single amino acid residue's mass for all mass tags when using UMC-based database searching
+	- Added graphical editing of the NET adjustment UMC dispersion options using the Save/Load/Edit Analysis Settings window
+	- Changed text on Tab 7 of Save/Load/Edit Analysis Settings from "Save UMC Statistics" to "Save all UMC's to text file" to reduce confusion
+	- Fixed bug that occurred when attempting to show the database exporting password form while a modally displayed form was visible
+
+Version 3.21 - Build 190; September 12, 2003
+	- Added 2 new columns to the database search results reports (by UMC) on the UMC Search, UMC Conglomerate Mass Search, and N14/N15 Search forms
+		- Mass Error, listing the difference between the UMC's observed mass and the mass tag's mass
+		- GANET Error, listing the difference between the UMC's average NET value and the mass tag's NET value
+
+Version 3.21 - Build 189; September 11, 2003
+	- Added recording of the computer's name in the auto-analysis Log file
+	- During manually-initiated auto analysis, if the user does not select a .Ini file, program now asks whether they wish to continue
+	- Updated NET Adjustment UMC dispersion checking to take the paired status of a UMC into account
+		- If the UMC's to use for NET adjustment setting is not All UMC's, then only adds back the correct UMC type if a segment has a low percentage of used UMC's
+	- Tweaked the dimensions (pixels) of the plot used when saving graphics to disk during auto analysis
+	- Added automatic truncation of the filename displayed at the bottom of the plot to 85 characters if too long
+	- Tweaked the font size used to display text in the 2D plot (Now using .lfWidth = 75 and .lfHeight = 290)
+
+Version 3.21 - Build 187; September 10, 2003
+	- Changed 2D plot tick mark spacing to give evenly spaced tick marks (for round number ranges like 500 to 5000) on the x and y axes
+	- Now only showing the Charge State or Isotopic symbol label if Charge State mode is enabled
+	- Changed 2D plot labels from MW(Linear Scale) to Monoisotopic Mass and from File Number to Scan Number
+	- Added option to display NET values as the tick marks rather than scan numbers
+		- Updated the zoom in/out code to synchronize across gels by NET value
+	- Added option to include/exclude the file name and current date on copied and saved WMF 2D plots
+	- Tweaked the colors used for the Charge State Map 2D plot to use a darker green (3+) and and darker light blue (5+)
+	- Tweaked the font size used to display text in the 2D plot (Using .lfWidth = 75 and .lfHeight = 300)
+
+Version 3.21 - Build 186; September 9, 2003
+	- Added option to use conglomerate UMC mass on the N14/N15 DB Search form
+		- Added new search mode: DBSearchPairsN14N15ConglomerateMass
+	- Added two more columns to the N14/N15 search report: Light MemberCount and Heavy MemberCount
+	- Changed default Export options on the Save/Load/Edit Analysis settings form to have Export to Database unchecked and Write Search Results to Text File checked
+
+Version 3.21 - Build 185; September 8, 2003
+	- Changed file save logic when reporting search results from N14/N15 DB Search using Pairs to include unidentified pairs only if AutoAnalysisSavePairsToTextFile = False (had previously been only if AutoAnalysisSavePairsToTextFile = True)
+	- Extended reporting for N14/N15 DB searches to include the ORF name if IncludeORFNameInTextFileOutput = True
+	- Fixed bug with position of search progress on N14/N15 DB Search form
+
+Version 3.21 - Build 184; September 4, 2003
+	- Changed number of digits to display for the NET Slope and Intercept in frmNETFormulaEditor to 6 digits, using scientific notation
+	- Changed Copy all Points in View and Copy All UMC's in View to use the defined separation character
+	- Added option to save the UMC's to disk during auto analysis
+	- Added UMC Class Rep Scan column to the Copy All UMC's in View function
+	- Replaced the AvgGANET column with a GANETClassRep column in the Copy All UMC's in View function
+
+Version 3.21 - Build 183; August 27, 2003
+	- Updated calls to the AddQuantitationDescription stored procedures to reflect the new quantitation schema (rollup by replicate, then by fraction, then by top level fraction)
+
+Version 3.21 - Build 182; August 22, 2003
+	- Added tracking of the percentage of mass tags in a database that have null mass or NET values
+		- If the percentage of mass tags with null values is above a threshold (default 10%), or if the number of mass tags with null values is above a threshold (default 500), then if the time of the last load is greater than a threshold (default 30 minutes), then the mass tags a re-loaded
+		- Added 4 new .Ini file parameters to control the staleness thresholds: MaximumAgeLoadedMassTagsHours, MaximumFractionAMTsWithNulls, MaximumCountAMTsWithNulls, and MinimumTimeBetweenReloadMinutes
+	- Changed resize of 2D display to preset size (like 800x600 or 1024x768, use Windows->Size To) to also resize the parent window (MDIForm1)
+	- Added option to require that the UMC's used for NET adjustment must be dispersed throughout the length of the dataset
+		- The data is divided into SegmentCount segments (default 10)
+		- Can use ScanPctStart and ScanPctEnd to define the starting and ending scans (as a percentage of the total scans) to use when dividing into segments
+		- The MinimumUMCsPerSegmentPctTopAbuPct value affects the minimum percentage of UMC's in each segment that must be used for NET Adjustment
+			- The Top Abu Pct value is taken times MinimumUMCsPerSegmentPctTopAbuPct to obtain a new percentage
+			- This new percentage is taken times the number of UMC's in the segment to obtain the minimum number that must be used
+		- If the number of UMC's in a given segment is too low, then the high abundance UMC's in the given segment are added
+	- Added option to define the maximum plotting value for Time Domain Plot
+		- This was done because sometimes the Time Domain Intensity data in the .PEK file is abnormally large (like 1E+28 or larger) rather than the normal value of 3000 to 65000
+	- Slightly modified the "Auto analyze file?" question when loading a new .Pek file
+
+
+Version 3.21 - Build 181; August 14, 2003
+	- Added the Range statistic for the selection calculator in the 2D display (frmGraph)
+		- Can compute the Avg, StDev, Min, Max, or Range of the MW, Intensity, Fit, or Expression Ratio (ER) of the selected points (range is new)
+		- Consolidated several functions in Selection.Bas into one master function, SelStatsCompute()
+	- Changed menu item in Steps menu from "UMC N14/N15 or O16/O18 pairs" to "UMC N14/N15 pairs" since that feature is not appropriate for O16/O18
+	- Changed Comparative View menu to be visible in all menu modes except Basic Mode (was previously hidden in DB Search - no pairs mode)
+	- Increased default database connection timeout to 120 seconds (was 60 seconds)
+		- Note that the timeout for calling QuantitationProcessStart is 600 seconds (this is not new)
+		- Also note that loading of mass tags from the database, Function ConfirmMassTagsLoaded(), will make several attempts, with increasingly longer timeout values, when unable to connect to the database  (this is not new)
+
+
+Version 3.21 - Build 180; August 13, 2003
+	- Fixed bug in Mass Calibration that failed to update the ppm Error values stored in GelData().IsoVar(i, isvfMTID) after mass calibration
+		- .IsoVar(i, isvfMTID) contains the database match stats, include AMT ID and mass difference (in ppm) between the peak and the mass tag
+		- When using the Mass Calibration option (frmErrorDistribution2DLoadedData) to change the mass values of all of the data, the ppm mass errors will initially be incorrect directly after applying a mass calibration
+		- Modified the code to adjust the ppm mass errors when using mass calibration
+		- This required changing several procedures to store the mass error, including a negative sign where appropriate, rather than storing the absolute value of the mass error
+			- Affected procedures include ConstructAMTReference(), GetAMTReferenceMW(), GetAMTReferenceMWNET(), GetAMTReferenceMWRT(), GetLckReferenceMWET(), and GetLckReferenceMW()
+
+
+Version 3.21 - Build 179; August 12, 2003
+	** Pairs related Items **
+	- Automated pairs identification and database searching using pairs
+		- Implemented identifying pairs using Isotopic Ratio delta values (e.g. N14/N15 or O16/O18) or using Isotopic Labeling values (e.g. ICAT)
+			- Can identify pairs, then optionally find and exclude those with ER values out of range
+			- Can write pairs info to a text file (_Pairs.txt and _PairStatistics.txt)
+		- Did not implement Delta/Label combination pairs searching since existing code for Delta/Label pairs is not fully coded
+		- Added new section to .Ini file: PairSearchOptions
+		- Implemented search using Paired UMC's or Unpaired UMC's in the UMC-based search forms (frmSearchMT_UMC and frmSearchMT_ConglomerateUMC)
+	- Updated NET Adjustment to include the option to specify which UMCs to use when Pairs exist (frmSearchForNETAdjustmentUMC)
+		- Options are: 	All UMC's, regardless of pair or light/heavy status
+						Unpaired UMC's only
+						Unpaired UMC's plus light members of paired UMC's
+						Paired UMC's, both light and heavy members
+						Paired UMC's, light members only
+						Paired UMC's, heavy members only
+	- Changed export to database to store the UMC type (e.g. 0 = Standard, 1 = Pair - N14/N15 - Light, 2 = Pair - N14/N15 - Heavy, etc.) in the PeakFPRType parameter, and thus populate the FT_ID column
+		- Had previously been incorrectly storing the FTICR_Type value (1 = Charge State, 2 = Isotopic) in this parameter
+		- Required updating the AddFTICRUmc SP to rename the @FTICRType parameter to @PeakFPRType
+	- Changed the expression ratio value to store in the database to be 0 when the expression ratio is undefined (was previously -1)
+	- Moved the Pair_UMC_Ind field from the T_FTICR_UMC_ResultDetails table to the T_FTICR_UMC_Results table
+		- Required removing a column from T_FTICR_UMC_ResultDetails and adding one to T_FTICR_UMC_Results
+		- Required moving the @PairUMCInd parameter from the AddFTICRUmcMatch SP to the AddFTICRUmc SP
+		- Each UMC in a pair will have the same Pair_UMC_Ind value
+	- Changed default behavior when parsing PEK files to not attempt to read ICR-2LS derived expression ratio values
+		- For example, ICR-2LS can be instructed to try to find pairs and try to compute an expression ratio, then record this value in the PEK file
+		- However, this same field can also contain other values that are not expression ratios
+		- When parsing the PEK file, these values were being loaded and stored in the .IsoVar(i, isvfMTDDRatio) field, which is normally used to record expression ratio values
+		- By default, this field will no longer get populated
+		- The new parameter UsePEKBasedERValues can be set to True to force the expression ratio values to be read from the .Ini file
+	- Changed Mass Tolerance Refinement default Minimum Tolerance from 0.1 ppm to 1.0 ppm
+	- Fixed bug in call to the LookupExpressionRatio() when populating the .IsoER() array (used to graphically display the Expression Ratio values for the data points)
+		- Now returning -1 when no expression ratio is defined; was returning 0
+	- Added PairIndex and ExpressionRatio columns to the Copy UMC's in View report on the main 2D display window
+	- Added PairIndex and ExpressionRatio columns to the Report Results feature on various DB search forms (frmSearchMT_UMC, frmSearchMT_Conglomerate, and frmSearchMTPairs)
+
+
+	** General Items **
+	- Implemented use of Mass Tag Modification masses when searching the database (frmSearchMT_UMC and frmSearchMT_ConglomerateUMC)
+		- Note that the Copy Points in View and Copy UMC's in View functions in the main graph window will report the unmodified AMT mass.  This behavior is by design, since determination of the modified AMT mass would take some guesswork.  Use the Reporting option from the DB search form to obtin the modified AMT mass.
+		- In contrast, the Report Results by UMCs and Report Results by Ions functions in frmSerachMT_Conglomerate do report the modified AMT mass when appropriate
+	- Added option to treat the mass tag modification masses as fixed masses, wherein all cysteine residues for a given mass tag have the modification
+		- This is different from the traditional method wherein in mass tag modification masses are added dynamically
+		- For example, for alkylation, a mass tag with 3 Cys residues could have 1, 2, or all 3 alkylated with dynamic mods; with static mods, this same mass tag would only exist with all 3 Cys residues alkylated
+	- Modified AutoAnalysis output folder logic to check if user has permissions to write data to the specified output folder
+		- Does this by simply attempting to create a temporary text file; if creation fails, then changes the output folder to the local computer's temp folder
+	- Added option to save 2D graphics as PNG files; involves saving as BMP then using the ImageMagickObject to convert to PNG
+	- Added new Selection feature in 2D data display (frmGraph): Add Visible Points to Selected
+	- Fixed bug in save graphic to file as EMF; previous versions were keeping a handle to the output file open, preventing the creation of additional EMF files until after stopping and restarting the program
+	- Fixed bug in frmExcludeMassRange.FillExclusionTextBox() that called qsDbl.QSAsc in a Debug.Assert statement, and consequently would not get called in the compiled version (since Debug.Assert statements are not included in compiled .Exe's)
+	- Fixed bug in frmSearchMT_ConglomerateUMC.ShowOrSaveResultsByIon() and frmSearchMT_ConglomerateUMC.ShowOrSaveResultsByUMC() that failed to initialize the ORF name lookup array, resulting in the text UnknownORF when exporting DB search results to textfiles or the clipboard; this was again due to inappropriate use of a Debug.Assert statement
+	- Fixed bug in frmGraph.mnuSavePic_Click that incorrectly used the full path to the file (including parent folders) as the default name for the graphic file; only affected the user manually saving a graphic of the 2D data
+	- Updated the ConfirmMassTagsLoaded() function to delineate between when no mass tags were loaded because of a database connection error and when no mass tags were loaded because no valid mass tags were found in the database
+		- Typically encounter no valid mass tags when all have Null masses or all have Null GANET values
+	- Replaced call to fUMCScanRange() in frmSearchForNETAdjustment with use of the .MaxScan and .MinScan statistics that are inherently defined for UMC's
+	- The file format for .Ini files was changed slightly to write each database search mode in a separate section
+		- Example section name is [AutoAnalysisSearchMode1]
+	- A new section was added to the .Ini file for pair searching options: [PairSearchOptions]
+
+Version 3.20 - Build 178; August 8, 2003
+	- Updated the automatic iteration logic for NET adjustment (frmSearchForNETAdjustmentUMC)
+		- Keeps iterating until Stop Change reaches threshold
+		- If number of ID's goes below threshold, then resets parameters, increases Top UMC Abu Pct, and repeats (this behavior already existed)
+		- Additionally, if number of iterations is below a threshold, then also resets parameters, increases Top UMC Abu Pct and repeats (this behavior is new)
+		- If Top UMC Abu Pct = Maximum Top Abu Pct (normally 100%, but adjustable by editing the .Ini file), and either the number of ID's or number of iterations is too low, then lowers the ID count threshold to NETAdjustmentMinIDCountAbsoluteMinimum (this behavior is new)
+	- Added UMC Min MW and UMC Max MW to the Reports by UMC's report on frmSearchMT_ConglomerateUMC
+	- Added password protection for initiating Fully Automated PRISM Analysis
+		- Program does not prompt for a password if started using the /A switch at the command line
+	- Added password protection for user-initiated automatic analysis (using a .Ini file) in cases where the .Ini file specifies exporting to a database
+	- Fixed Mass Tag Database Settings controls in the Edit Analysis Settings window (frmEditAnalysisSettings) to properly show the database settings defined in a .Ini file upon load

@@ -1,0 +1,92 @@
+== VIPER Overview ==
+
+VIPER stands for '''V'''isual '''I'''nspection of '''P'''eak/'''E'''lution '''R'''elationships
+
+VIPER can be used to visualize and characterize the features detected during
+LC-MS analyses.  It is primarily intended for processing deisotoped data from 
+high mass measurement accuracy instruments (e.g. FT, TOF, or Orbitrap) and 
+comparing the features found to a list of expected peptides (aka mass and 
+time (MT) tags), as practiced by the AMT Tag approach (see Zimmer, Monroe, 
+Qian, & Smith, Mass Spec Reviews, 2006, 25, 450-482).
+
+The software allows one to display the data as a two-dimensional plot of 
+spectrum number (i.e. elution time) vs. mass.  It can read MS data from 
+several file formats: .PEK, .CSV, .mzXML, and .mzData.  See below for 
+additional details on the various file formats. VIPER can process a data 
+file in an automated fashion to:
+# Load and filter the data
+# Find features and their chromatographic peak profile
+# Align the observed elution times of the features with the elution times of the expected peptides (i.e. MT Tags)
+# Refine the mass calibration
+# Match the features to the MT tags
+# Export the results to a report file
+
+VIPER has a rich, full featured graphical user interface with numerous options 
+for exploring the data and customizing the analysis parameters.  It runs on 
+Windows computers and requires Microsoft Access be installed to create and edit
+the MT tag databases.  In order to view mass spectra from raw data files (e.g.
+Finnigan .Raw files, you will also need to install ICR-2LS (see the .PEK files 
+section below for more info).
+
+== VIPER Installation ==
+
+To install, go to '''\\floyd\software\VIPER\''' and double-click file '''VIPER_MTS_Installer.msi'''  You also need ICR-2LS installed; go to '''\\floyd\software\ICR-2LS\''' and double-click file '''ICR-2LS.msi'''  After installing Viper, run it using "Start Menu->Programs->PAST Toolkit-> VIPER (MTS Version)"  When you run it, if you get an error message concerning the "Molecular Weight Calculator" or "mwtwin.dll", then install the Molecular Weight Calculator from '''\\floyd\software\MolecularWeightCalculator\'''
+
+== VIPER QuickStart ==
+
+After installing, to load one the results of an ICR-2LS or Decon2LS analysis, run Viper and choose "File->New Analysis (Choose from DMS)".  Now, select your database (e.g. MT_Shewanella_P196) then click "Select Mass Tags".  For this DB, I suggest using minimum Discriminant Score of 0.2 and Minimum PMT Quality Score of 2.  Click OK to close the Mass Tags Selection window, then click Next in the "Choose Analysis to Load" window.  Either find your dataset in the list, or type some text in "Search for" and click "Search".  For example, entering "drms" and clicking "Search" brings up Dreams datasets and analysis jobs in that DB.  Select an analysis job, click Next again, and you'll see the files located on the DMS storage server for the selected job.  Here you can select the .Pek file or the _ic.pek file.  If the dataset had internal standards infused at the end (it typically does), choose the _ic.pek file, otherwise choose the .pek file.  Click next and you see a screen with a bunch of settings that don't really matter, so you now click OK.  
+
+The program now asks if you want to Auto-Analyze the file.  Choose No.  Now you can define the settings to be applied to the data when loading, including maximum isotopit fit, abundance range, maximum data points to load, and scans to load.  After customizing the filters, click Load, and the data will load.  Once the data is loaded, go to the Steps menu and choose each of the pertinent steps, typically:
+
+:2) Find UMCs
+
+:3) Select MT Tags (to confirm what you chose when selecting the dataset and clicked "Select Mass Tags").  For P196, with Discriminant Score >= 0.2 and PMT Quality Score >= 2, there should be ~85000 MT Tags.
+
+:4) Find pairs (only if appropriate, e.g. 16O/18O or 14N/15N pairs)
+
+:5) NET Adjustment->Align and Warp
+
+:6) Database Search
+
+From the Database Search screen, after searching, you can choose "Function->Mass Calibration and Tolerance Refinement" to see the mass and NET error histograms.  You can also choose "Function->Report Results by UMCs" to see the peptides matched (and the UMC details that matched them).  You can copy the text of this report and paste into Excel for browsing, sorting, and filtering.  Or, choose "Function->Export Results to MT Tag DB", enter the password (contact [[Matt_Monroe|Matt]] for this) and export the data (for the question "Include UMCs that did not match any PMT Tags?", you typically select "No").
+
+After the matches have been exported to the DB for several analyses, you can run the Q Rollup program to export the data and generate a crosstab report comparing the peptides.  To install Q Rollup, go to '''\\floyd\software\QRollupExport\'''
+
+== Microsoft Access MT Database files ==
+An Access database is used to store the details of the MT tags to match against.  You can have multiple Microsoft Access database files, each with a different set of MT tags.  Use "Steps->3. Select MT Tags (Connect to DB)" to specify or change the database.
+
+The Access database file must have a table named AMT, containing the fields:
+* AMT_ID
+* AMTMonoisotopicMass
+* NET
+* PNET or RetentionTime (the RetentionTime field is skipped if PNET is present)
+
+The AMT table can also optionally contain the fields: 
+* MSMS_Obs_Count
+* High_Normalized_Score
+* High_Discriminant_Score
+* NitrogenAtom
+* AA_Cystine_Count
+* Status
+
+The Access database file can optionally contain two tables containing Protein information and MT to Protein Mapping information.  If these tables are present, then Viper can optionally display the protein names along with the MT tags matched.
+* The Protein table must be named Proteins, containing the fields:
+** Protein_ID
+** Protein_Name
+* The MT to Protein Mapping table must be named AMT_to_Protein_Map, with fields:
+** AMT_ID
+** Protein_ID
+* The advantage of using two tables to track protein information is that additional information for each protein can be defined in the Proteins table while the AMT_to_Protein_Map simply associates MT tags with proteins
+* The database can contain other tables, but Viper will only read data from the AMT table.  Also, the AMT, AMT_to_Protein_Map, and AMT_Proteins tables can contain other columns besides those mentioned above, but Viper will only read the data from the known columns.
+* The column order in the tables does not matter; Viper can cope with rearranged columns.
+
+See file QCStandards.mdb for an example database and example AMT tables (installed by VIPER_Installer.msi at C:\Program Files\Viper\)
+
+== Auto-analysis files ==
+
+You can save a .Ini file using File->Save/Load/Edit Analysis Settings to capture all of the parameters used for analyzing data.  This .Ini file can be used to auto-analyze one or more input files.  For more information, please run VIPER from the command line (aka the command prompt or Dos shell) using "VIPER /?" to see a help screen with info on initiating automated analyses.
+
+== Additional Information ==
+* A tutorial for Viper is available in file '''VIPER_HelpFile_v3.20.ppt''' at '''\\floyd\software\VIPER\'''
+* Please see the Readme.txt file that is installed with Viper for additional information (particularly on Input file format notes)
+* Contact [[Matt_Monroe|Matt]] at matthew.monroe@pnl.gov if you have specific questions

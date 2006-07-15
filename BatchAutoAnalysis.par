@@ -1,0 +1,6 @@
+; Note: You can enter multiple PEK or Gel File Paths and multiple job numbers; separate them using a vertical bar: |
+InputFilePath=C:\PeakMatching\Job112171.gel|C:\PeakMatching\Job113732.gel
+JobNumber=112171|113732
+OutputFolderPath=C:\PeakMatching
+IniFilePath=C:\PeakMatching\UMCIonNet_SkipFindUMCs_SkipNetAdj_AMT5ppm_0.04NET_Export_SaveGraphics_2005-07-25.ini
+LogFilePath=C:\PeakMatching\TestLog.log

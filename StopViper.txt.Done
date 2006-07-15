@@ -1,0 +1,3 @@
+Create a file named StopViper.txt in the program directory.
+VIPER will look for this file every 10 seconds when PRISM Automation mode is enabled.
+If found, it will shut itself down, renaming this file to StopViper.txt.done in the process

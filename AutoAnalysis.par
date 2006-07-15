@@ -1,0 +1,6 @@
+; Note: You can enter multiple PEK File Paths and multiple job numbers; separate them using a vertical bar: |
+InputFilePath=\\proto-3\7T_DMS8\DRadPEO_CIEFCE_MS_073002_fraction4\ICR200207310027_Auto15838\DRadPEO_CIEFCE_MS_073002_fraction4_7_30_2002.Pek
+JobNumber=15838
+OutputFolderPath=C:\PeakMatching\
+IniFilePath=C:\PeakMatching\PeakMatchingSettings.ini
+LogFilePath=C:\PeakMatching\TestLog.log

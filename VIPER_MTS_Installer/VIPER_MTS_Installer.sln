@@ -1,0 +1,13 @@
+Microsoft Visual Studio Solution File, Format Version 1.00
+Project("{73393D18-DAC4-11D1-88FC-0000F8064EBB}") = "VIPER (MTS Version)", "VIPER_MTS_Installer.wip", "{146E95F6-3964-4776-B6D3-866E33594904}"
+EndProject
+Global
+	GlobalSection(LocalDeployment) = postSolution
+		StartupProject = {00000000-0000-0000-0000-000000000000}
+	EndGlobalSection
+	GlobalSection(BuildOrder) = postSolution
+		0 = {146E95F6-3964-4776-B6D3-866E33594904}
+	EndGlobalSection
+	GlobalSection(DeploymentRoot) = postSolution
+	EndGlobalSection
+EndGlobal

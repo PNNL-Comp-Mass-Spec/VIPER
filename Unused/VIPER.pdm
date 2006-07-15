@@ -1,0 +1,313 @@
+[Root]
+Most Recent Package=LaV2DG_CSVVersion
+
+
+[Package|LaV2DG_MTEdition|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\2DGelInstall_MTEdition1
+
+[Package|LaV2DG_MTEdition|Configure DAO ISAMs]
+Applicable=No
+
+[Package|LaV2DG_MTEdition|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|LaV2DG_MTEdition|Files Found]
+
+[Package|LaV2DG_MTEdition|Files Released]
+2dgel.hlp=
+
+[Package|LaV2DG_MTEdition|Missing Dependency Information]
+
+[Package|LaV2DG_MTEdition|Out-of-Date Dependency Information]
+C:\WINDOWS\SYSTEM\SCRRUN.DLL=
+
+[Package|LaV2DG_MTEdition|Files Added]
+C:\Nikola\VBProjects\InstallSource\LaV2DG_MTEdition\FAXA.init=
+
+[Package|LaV2DG_MTEdition|Files Removed]
+
+[Package|LaV2DG_MTEdition|Files In Project]
+C:\Nikola\VBProjects\InstallSource\LaV2DG_MTEdition\VIPER.exe=Yes
+C:\WINDOWS\SYSTEM\MSVBVM60.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\SYSTEM\ijl15.dll=Yes
+C:\WINDOWS\SYSTEM\SCRRUN.DLL=Yes
+C:\WINDOWS\SYSTEM\MSVCRT.DLL=Yes
+C:\Program Files\Common Files\Microsoft Shared\DAO\dao360.dll=Yes
+C:\WINDOWS\SYSTEM\msjet40.dll=Yes
+C:\WINDOWS\SYSTEM\MSJTER40.DLL=Yes
+C:\WINDOWS\SYSTEM\MSJINT40.DLL=Yes
+C:\WINDOWS\SYSTEM\VBAJET32.DLL=Yes
+C:\WINDOWS\SYSTEM\expsrv.dll=Yes
+C:\WINDOWS\SYSTEM\MSWSTR10.DLL=Yes
+C:\WINDOWS\SYSTEM\mswdat10.dll=Yes
+C:\WINDOWS\SYSTEM\msrd2x40.dll=Yes
+C:\WINDOWS\SYSTEM\MSRD3X40.DLL=Yes
+C:\WINDOWS\SYSTEM\msrepl40.dll=Yes
+C:\WINDOWS\SYSTEM\msjtes40.dll=Yes
+C:\WINDOWS\SYSTEM\VB5DB.dll=Yes
+C:\Program Files\Common Files\SYSTEM\ADO\msado25.tlb=Yes
+C:\WINDOWS\SYSTEM\MassTagsAccess.exe=Yes
+C:\WINDOWS\SYSTEM\ICR-2LS.exe=Yes
+C:\WINDOWS\SYSTEM\COMCTL32.OCX=Yes
+C:\WINDOWS\SYSTEM\MSFLXGRD.OCX=Yes
+C:\WINDOWS\SYSTEM\RICHTX32.OCX=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\RICHED32.DLL=Yes
+C:\WINDOWS\SYSTEM\MSINET.OCX=Yes
+C:\WINDOWS\SYSTEM\DBLIST32.OCX=Yes
+C:\WINDOWS\SYSTEM\COMDLG32.OCX=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\SYSTEM\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Nikola\VBProjects\InstallSource\LaV2DG_MTEdition\FAXA.init=Yes
+
+[Package|LaV2DG_MTEdition|Configure Registry Files]
+Applicable=No
+
+[Package|LaV2DG_MTEdition|Configure Remote Servers]
+Applicable=No
+
+[Package|LaV2DG_MTEdition|Install Locations]
+C:\Nikola\VBProjects\InstallSource\LaV2DG_MTEdition\VIPER.exe=$(AppPath)
+C:\WINDOWS\SYSTEM\MSVBVM60.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\ijl15.dll=$(WinSysPath)
+C:\WINDOWS\SYSTEM\SCRRUN.DLL=$(WinSysPath)
+C:\WINDOWS\SYSTEM\MSVCRT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Common Files\Microsoft Shared\DAO\dao360.dll=$(MSDAOPath)
+C:\WINDOWS\SYSTEM\msjet40.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSJTER40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSJINT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\VBAJET32.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSWSTR10.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\mswdat10.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\msrd2x40.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSRD3X40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\msrepl40.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\msjtes40.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\VB5DB.dll=$(WinSysPath)
+C:\Program Files\Common Files\SYSTEM\ADO\msado25.tlb=$(WinSysPath)
+C:\WINDOWS\SYSTEM\MassTagsAccess.exe=$(WinSysPath)
+C:\WINDOWS\SYSTEM\ICR-2LS.exe=$(WinSysPath)
+C:\WINDOWS\SYSTEM\COMCTL32.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\MSFLXGRD.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\RICHTX32.OCX=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\RICHED32.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSINET.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\DBLIST32.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\COMDLG32.OCX=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\SYSTEM\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Nikola\VBProjects\InstallSource\LaV2DG_MTEdition\FAXA.init=$(AppPath)
+
+[Package|LaV2DG_MTEdition|Configure Shared Files]
+Applicable=Yes
+C:\Nikola\VBProjects\InstallSource\LaV2DG_MTEdition\VIPER.exe=No
+C:\Nikola\VBProjects\InstallSource\LaV2DG_MTEdition\FAXA.init=No
+
+[Package|LaV2DG_MTEdition|Distribution]
+Type=single
+Size=
+Title=Contemporary 2D Displays
+
+[Package|LaV2DG_MTEdition|IconGroups]
+Group0=Contemporary 2D Displays
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|LaV2DG_MTEdition|Contemporary 2D Displays]
+Icon1=VIPER.exe
+Title1=Contemporary 2D Displays
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|LaV2DG_MTEdition|Package]
+PackageFolder=C:\2DGelInstall_MTEdition1
+ProjectFolder=C:\Nikola\VBProjects\InstallSource\LaV2DG_MTEdition
+ServerSideCab=
+File1=C:\2DGelInstall_MTEdition1\setup.exe
+File2=C:\2DGelInstall_MTEdition1\Setup.Lst
+File3=C:\2DGelInstall_MTEdition1\VIPER.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz
+
+
+[Package|LaV2DG_CSVVersion|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=C:\2DGelInstall_Merged
+
+[Package|LaV2DG_CSVVersion|Configure DAO ISAMs]
+Applicable=No
+
+[Package|LaV2DG_CSVVersion|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|LaV2DG_CSVVersion|Files Found]
+
+[Package|LaV2DG_CSVVersion|Files Released]
+2dgel.hlp=
+
+[Package|LaV2DG_CSVVersion|Missing Dependency Information]
+C:\WINDOWS\SYSTEM\GANETClass.dll=
+C:\WINDOWS\SYSTEM\MwtWindll.dll=
+
+[Package|LaV2DG_CSVVersion|Out-of-Date Dependency Information]
+C:\WINDOWS\SYSTEM\SCRRUN.DLL=
+
+[Package|LaV2DG_CSVVersion|Files Added]
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\NW32.DLL=
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\Elute100.wts=
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\FAXA.init=
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\maxmin20.csv=
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\UnexpErr.log=
+
+[Package|LaV2DG_CSVVersion|Files Removed]
+
+[Package|LaV2DG_CSVVersion|Files In Project]
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\VIPER.exe=Yes
+C:\WINDOWS\SYSTEM\MSVBVM60.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=Yes
+C:\WINDOWS\SYSTEM\ijl15.dll=Yes
+C:\WINDOWS\SYSTEM\SCRRUN.DLL=Yes
+C:\WINDOWS\SYSTEM\MSVCRT.DLL=Yes
+C:\Program Files\Common Files\Microsoft Shared\DAO\dao360.dll=Yes
+C:\WINDOWS\SYSTEM\msjet40.dll=Yes
+C:\WINDOWS\SYSTEM\MSJTER40.DLL=Yes
+C:\WINDOWS\SYSTEM\MSJINT40.DLL=Yes
+C:\WINDOWS\SYSTEM\VBAJET32.DLL=Yes
+C:\WINDOWS\SYSTEM\expsrv.dll=Yes
+C:\WINDOWS\SYSTEM\MSWSTR10.DLL=Yes
+C:\WINDOWS\SYSTEM\mswdat10.dll=Yes
+C:\WINDOWS\SYSTEM\msrd2x40.dll=Yes
+C:\WINDOWS\SYSTEM\MSRD3X40.DLL=Yes
+C:\WINDOWS\SYSTEM\msrepl40.dll=Yes
+C:\WINDOWS\SYSTEM\msjtes40.dll=Yes
+C:\WINDOWS\SYSTEM\VB5DB.dll=Yes
+C:\Program Files\Common Files\SYSTEM\ADO\msado25.tlb=Yes
+C:\WINDOWS\SYSTEM\MassTagsAccess.exe=Yes
+C:\WINDOWS\SYSTEM\ICR-2LS.exe=Yes
+C:\WINDOWS\SYSTEM\MwtWindll.dll=Yes
+C:\WINDOWS\SYSTEM\GANETClass.dll=Yes
+C:\WINDOWS\SYSTEM\COMCTL32.OCX=Yes
+C:\WINDOWS\SYSTEM\MSFLXGRD.OCX=Yes
+C:\WINDOWS\SYSTEM\RICHTX32.OCX=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\RICHED32.DLL=Yes
+C:\WINDOWS\SYSTEM\MSINET.OCX=Yes
+C:\WINDOWS\SYSTEM\DBLIST32.OCX=Yes
+C:\WINDOWS\SYSTEM\COMDLG32.OCX=Yes
+C:\WINDOWS\SYSTEM\MSCOMCTL.OCX=Yes
+C:\WINDOWS\SYSTEM\TABCTL32.OCX=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\SYSTEM\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=Yes
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\NW32.DLL=Yes
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\Elute100.wts=Yes
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\FAXA.init=Yes
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\maxmin20.csv=Yes
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\UnexpErr.log=Yes
+
+[Package|LaV2DG_CSVVersion|Configure Registry Files]
+Applicable=No
+
+[Package|LaV2DG_CSVVersion|Configure Remote Servers]
+Applicable=No
+
+[Package|LaV2DG_CSVVersion|Install Locations]
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\VIPER.exe=$(AppPath)
+C:\WINDOWS\SYSTEM\MSVBVM60.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEAUT32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\OLEPRO32.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\ASYCFILT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\STDOLE2.TLB=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\COMCAT.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\ijl15.dll=$(WinSysPath)
+C:\WINDOWS\SYSTEM\SCRRUN.DLL=$(WinSysPath)
+C:\WINDOWS\SYSTEM\MSVCRT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Common Files\Microsoft Shared\DAO\dao360.dll=$(MSDAOPath)
+C:\WINDOWS\SYSTEM\msjet40.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSJTER40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSJINT40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\VBAJET32.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\expsrv.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSWSTR10.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\mswdat10.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\msrd2x40.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSRD3X40.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\msrepl40.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\msjtes40.dll=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\VB5DB.dll=$(WinSysPath)
+C:\Program Files\Common Files\SYSTEM\ADO\msado25.tlb=$(WinSysPath)
+C:\WINDOWS\SYSTEM\MassTagsAccess.exe=$(WinSysPath)
+C:\WINDOWS\SYSTEM\ICR-2LS.exe=$(WinSysPath)
+C:\WINDOWS\SYSTEM\MwtWindll.dll=$(WinSysPath)
+C:\WINDOWS\SYSTEM\GANETClass.dll=$(WinSysPath)
+C:\WINDOWS\SYSTEM\COMCTL32.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\MSFLXGRD.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\RICHTX32.OCX=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\Redist\RICHED32.DLL=$(WinSysPathSysFile)
+C:\WINDOWS\SYSTEM\MSINET.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\DBLIST32.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\COMDLG32.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\MSCOMCTL.OCX=$(WinSysPath)
+C:\WINDOWS\SYSTEM\TABCTL32.OCX=$(WinSysPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\SYSTEM\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\Wizards\PDWizard\ST6UNST.EXE=$(WinPath)
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\NW32.DLL=$(WinSysPath)
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\Elute100.wts=$(WinSysPath)
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\FAXA.init=$(AppPath)
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\maxmin20.csv=$(WinSysPath)
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\UnexpErr.log=$(AppPath)
+
+[Package|LaV2DG_CSVVersion|Configure Shared Files]
+Applicable=Yes
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\VIPER.exe=No
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\FAXA.init=No
+C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG\UnexpErr.log=No
+
+[Package|LaV2DG_CSVVersion|Distribution]
+Type=single
+Size=
+Title=Contemporary 2D Displays
+
+[Package|LaV2DG_CSVVersion|IconGroups]
+Group0=Contemporary 2D Displays
+PrivateGroup0=-1
+Parent0=$(Programs)
+
+[Package|LaV2DG_CSVVersion|Contemporary 2D Displays]
+Icon1=VIPER.exe
+Title1=Contemporary 2D Displays
+StartIn1=$(AppPath)
+Key1=Icon1
+
+[Package|LaV2DG_CSVVersion|Package]
+PackageFolder=C:\2DGelInstall_Merged
+ProjectFolder=C:\Nikola\VBProjects\InstallSource\LaV2DG_CVS_Version\LaV2DG
+ServerSideCab=
+File1=C:\2DGelInstall_Merged\setup.exe
+File2=C:\2DGelInstall_Merged\Setup.Lst
+File3=C:\2DGelInstall_Merged\VIPER.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz

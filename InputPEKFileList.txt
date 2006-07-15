@@ -1,0 +1,3 @@
+D:\Gels\DLADS_ProteinComplex\DLADS008_12Feb03_Saturn_C2_ICR2LSPickPeaks.pek
+'D:\Gels\DLADS_ProteinComplex\DLADS011_10Feb03_Saturn_C2_AnalystPickPeaks_s.pek
+'D:\Gels\DLADS_ProteinComplex\DLADS012_11Feb03_Saturn_C1_ICR2LSPickPeaks.pek
