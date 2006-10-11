@@ -3,16 +3,16 @@ Begin VB.Form frmUMCDltPairs
    BackColor       =   &H00C0FFC0&
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "UMC Delta Pairing Analysis"
-   ClientHeight    =   8670
+   ClientHeight    =   7830
    ClientLeft      =   45
    ClientTop       =   615
-   ClientWidth     =   5895
+   ClientWidth     =   5535
    Icon            =   "frmUMCDltPairs.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   8670
-   ScaleWidth      =   5895
+   ScaleHeight     =   7830
+   ScaleWidth      =   5535
    ShowInTaskbar   =   0   'False
    StartUpPosition =   1  'CenterOwner
    Begin VB.CommandButton cmdResetToDefaults 
@@ -316,7 +316,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   400
          Left            =   2880
          TabIndex        =   55
-         Top             =   1920
+         Top             =   1940
          Width           =   1455
       End
    End
@@ -409,7 +409,7 @@ Begin VB.Form frmUMCDltPairs
    Begin VB.Frame fraDeltaOptions 
       BackColor       =   &H00C0FFC0&
       Caption         =   "Delta Mass Options"
-      Height          =   2150
+      Height          =   2145
       Left            =   120
       TabIndex        =   3
       Top             =   480
@@ -462,7 +462,7 @@ Begin VB.Form frmUMCDltPairs
       Begin VB.Frame fraControls 
          BackColor       =   &H00C0FFC0&
          BorderStyle     =   0  'None
-         Height          =   600
+         Height          =   720
          Left            =   120
          TabIndex        =   13
          Top             =   1395
@@ -688,6 +688,14 @@ Public Property Get FormMode() As pfmPairFormMode
     FormMode = mFormMode
 End Property
 
+Public Property Let AutoClearPairsWhenFindingPairs(blnEnable As Boolean)
+    mnuFAutoClearPairsWhenFindingPairs.Checked = blnEnable
+End Property
+
+Public Property Get AutoClearPairsWhenFindingPairs() As Boolean
+    AutoClearPairsWhenFindingPairs = mnuFAutoClearPairsWhenFindingPairs.Checked
+End Property
+
 Private Sub ClearAllPairs()
     mPairInfoChanged = True
     DestroyDltLblPairs CallerID
@@ -745,7 +753,7 @@ On Error GoTo exit_cmdFindPairs
 
 blnSuccess = True
 If blnShowMessages Then
-    If GelP_D_L(CallerID).PCnt > 0 And mnuFAutoClearPairsWhenFindingPairs.Checked Then
+    If GelP_D_L(CallerID).PCnt > 0 And Me.AutoClearPairsWhenFindingPairs() Then
         ' Data is already in pairs structure; give user chance to change their mind
         eResponse = MsgBox("Pairs structure already contains pairs. Selected procedure will clear all existing pairs. Continue?", vbOKCancel, glFGTU)
         If eResponse <> vbOK Then
@@ -758,7 +766,7 @@ If blnSuccess Then
     Me.MousePointer = vbHourglass
     blnSuccess = False
     
-    If GelP_D_L(CallerID).PCnt > 0 And mnuFAutoClearPairsWhenFindingPairs.Checked Then
+    If GelP_D_L(CallerID).PCnt > 0 And Me.AutoClearPairsWhenFindingPairs() Then
         ClearAllPairs
     End If
     
@@ -821,7 +829,7 @@ mAbortProcess = False
 
 ShowHideControls True
 
-If GelP_D_L(CallerID).PCnt = 0 Or mnuFAutoClearPairsWhenFindingPairs.Checked Then
+If GelP_D_L(CallerID).PCnt = 0 Or Me.AutoClearPairsWhenFindingPairs() Then
     ' Initially reserve space for 40000 pairs
     blnSuccess = InitDltLblPairs(CallerID)
 Else
@@ -1289,7 +1297,7 @@ Public Sub InitializeForm()
     On Error GoTo InitializeFormErrorHandler
     
     If bLoading Then
-       CallerID = Me.Tag
+        CallerID = Me.Tag
         
         If CallerID >= 1 And CallerID <= UBound(GelBody) Then
             glbPreferencesExpanded.PairSearchOptions.SearchDef = GelP_D_L(CallerID).SearchDef
@@ -1429,6 +1437,11 @@ Private Sub ResetToDefaults()
     InitializeForm
 End Sub
 
+Public Sub SetDeltaMass(dblDeltaMass As Double)
+    txtDelta.Text = dblDeltaMass
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMass = dblDeltaMass
+End Sub
+
 Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
     
     Const CONTROL_SPACING = 100
@@ -1544,13 +1557,19 @@ Private Sub ShowHideControls(blnSearchingForPairs As Boolean)
 End Sub
 
 Private Sub UpdateDynamicControls()
+    Dim blnEnableOutlierControls As Boolean
+    
     With glbPreferencesExpanded.PairSearchOptions.SearchDef
         chkAverageERsAllChargeStates.Enabled = (.UseIdenticalChargesForER And .RequireMatchingChargeStatesForPairMembers)
         cboAverageERsWeightingMode.Enabled = (.AverageERsAllChargeStates And chkAverageERsAllChargeStates.Enabled)
     
         chkRemoveOutlierERs.Enabled = .ComputeERScanByScan
-        chkRemoveOutlierERsIterate.Enabled = .ComputeERScanByScan And .RemoveOutlierERs
-        txtRemoveOutlierERsMinimumDataPointCount.Enabled = .ComputeERScanByScan And .RemoveOutlierERs
+        
+        blnEnableOutlierControls = .ComputeERScanByScan And .RemoveOutlierERs
+        chkRemoveOutlierERsIterate.Enabled = blnEnableOutlierControls
+        txtRemoveOutlierERsMinimumDataPointCount.Enabled = blnEnableOutlierControls
+        chkOutlierRemovalUsesSymmetricERs.Enabled = blnEnableOutlierControls
+        lblRemoveOutlierERsMinimumDataPointCount.Enabled = blnEnableOutlierControls
     End With
     
     On Error Resume Next
@@ -1730,6 +1749,8 @@ With cboAverageERsWeightingMode
     .ListIndex = aewAbundance
 End With
 
+AutoClearPairsWhenFindingPairs = True
+
 mPairInfoChanged = False
 ShowHideControls False
 
@@ -1748,7 +1769,7 @@ Private Sub Form_Unload(Cancel As Integer)
 End Sub
 
 Private Sub mnuFAutoClearPairsWhenFindingPairs_Click()
-    mnuFAutoClearPairsWhenFindingPairs.Checked = Not mnuFAutoClearPairsWhenFindingPairs.Checked
+    Me.AutoClearPairsWhenFindingPairs = Not Me.AutoClearPairsWhenFindingPairs()
 End Sub
 
 Private Sub mnuFClearAllPairs_Click()

@@ -1,0 +1,13 @@
+How to replicate the Pogo/Albert databases on a separate computer then use that computer for the source PMT tag data in Viper
+
+1. Copy MTS_Master from pogo to computer.
+2. Copy MT_Main from database server computer (albert) to your own.
+3. Update MT_Main->V_DMS_Mass_Correction_Factors to return bogus values:
+	ALTER VIEW dbo.V_DMS_Mass_Correction_Factors
+	AS SELECT -1 AS Mass_Correction_Tag, -1 AS Mass_Correction_ID
+4. Set the states of the databases on your local computer to 5. Replace the states of all the other databases to 100. Do this by changing values in MT_Main->T_MT_Database_List. 
+5. Add your local computer as a server in MTS_Master->T_MTS_Servers. Set its active state to 1. Disable the active states of the other computers. (Do you really need to disable the states of the other servers?).
+6. Delete and readd mtuser as a user on the mass tag database that was restored and has Database role memberships of public, db_datareader, DMS_SP_User.
+7. Change FAXA.init file in the VIPER program folder and change the Provider field in MTS Master Database section so that the field Data Source is the local computer: 
+	[MTS Master Database]
+	Provider=sqloledb;Data Source=wd37552;Initial Catalog=MTS_Master;User ID=MTUser;Password=mt4fun 

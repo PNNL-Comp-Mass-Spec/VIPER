@@ -413,7 +413,7 @@ Public Type udtMSWarpOptionsType
     MassLSQOutlierZScore As Single             ' Typically 3
     MassLSQNumKnots As Integer                 ' Typically 12
         
-    AdditionalValue1 As Long        ' 4 bytes
+    AdditionalValue1 As Long        ' 4 bytes; use for future expansion (name can be changed in the future)
     AdditionalValue2 As Long        ' 4 bytes
     AdditionalValue3 As Long        ' 4 bytes
     AdditionalValue4 As Long        ' 4 bytes

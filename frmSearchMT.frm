@@ -536,7 +536,7 @@ GelStatus(CallerID).Dirty = True
 
 'MonroeMod
 GelSearchDef(CallerID).AMTSearchOnIons = samtDef
-AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched ions for MT tags", HitsCnt, 0, 0, samtDef, False, GelData(CallerID).CustomNETsDefined)
+AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched ions for MT tags", HitsCnt, 0, 0, 0, samtDef, False, GelData(CallerID).CustomNETsDefined)
 
 Me.MousePointer = vbDefault
 Select Case HitsCnt

@@ -28,6 +28,7 @@ Private Const glAMT_FIELD_Status = "Status"
 Private Const glAMT_FIELD_MSMSObsCount = "MSMS_Obs_Count"
 Private Const glAMT_FIELD_HighNormalizedScore = "High_Normalized_Score"
 Private Const glAMT_FIELD_HighDiscriminantScore = "High_Discriminant_Score"
+Private Const glAMT_FIELD_PeptideProphetProbability = "Peptide_Prophet_Probability"
 
 Private Const PROTEIN_FIELD_AMT_ID As String = "AMT_ID"
 Private Const PROTEIN_FIELD_Protein_ID As String = "Protein_ID"
@@ -158,8 +159,9 @@ Public Type udtAMTDataType
     CNT_N As Long                 'count of N atoms
     CNT_Cys As Long               'count of Cysteines
     Sequence As String            'peptide sequences
-    HighNormalizedScore As Single   'High normalized score (typically XCorr)
-    HighDiscriminantScore As Single 'High discriminant score
+    HighNormalizedScore As Single       'High normalized score (typically XCorr)
+    HighDiscriminantScore As Single     'High discriminant score
+    PeptideProphetProbability As Single ' High Peptide Prophet Probability
 End Type
 
 Private Type udtAMTFieldPresentType
@@ -171,6 +173,7 @@ Private Type udtAMTFieldPresentType
     MSMSObsCount As Boolean
     HighNormalizedScore As Boolean
     HighDiscriminantScore As Boolean
+    PeptideProphetProbability As Boolean
 End Type
 
 'once open AMT database stays open for the duration of the application
@@ -270,7 +273,7 @@ Static blnUserWarnedMissingProteinTableFields As Boolean
 On Error GoTo err_ConnectToLegacyAMTDB
 
 strRequiredAMTFields = "The [AMT] table should contain the fields: " & glAMT_FIELD_NEW_ID & ", " & glAMT_FIELD_MW & ", " & glAMT_FIELD_NET & ", " & glAMT_FIELD_Status & ", and " & glAMT_FIELD_RETENTION & " or " & glAMT_FIELD_PNET & ".  "
-strRequiredAMTFields = strRequiredAMTFields & "It can optionally contain the fields: " & glAMT_FIELD_MSMSObsCount & ", " & glAMT_FIELD_HighNormalizedScore & ", " & glAMT_FIELD_HighDiscriminantScore & ", " & glAMT_FIELD_NitrogenAtom & ", and " & glAMT_FIELD_CysCount & "."
+strRequiredAMTFields = strRequiredAMTFields & "It can optionally contain the fields: " & glAMT_FIELD_MSMSObsCount & ", " & glAMT_FIELD_HighNormalizedScore & ", " & glAMT_FIELD_HighDiscriminantScore & ", " & glAMT_FIELD_PeptideProphetProbability & ", " & glAMT_FIELD_NitrogenAtom & ", and " & glAMT_FIELD_CysCount & "."
 
 strRequiredProteinFields = "The [AMT_Proteins] table should contain the fields " & PROTEIN_FIELD_Protein_ID & " and " & PROTEIN_FIELD_Protein_Name & ". "
 strRequiredProteinFields = strRequiredProteinFields & "The [AMT_to_Protein_Map] table should contain the fields " & PROTEIN_FIELD_AMT_ID & " and " & PROTEIN_FIELD_Protein_ID & "."
@@ -631,6 +634,7 @@ Case glAMT_GENERATION_NEW
     If udtFieldPresent.MSMSObsCount Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_MSMSObsCount
     If udtFieldPresent.HighNormalizedScore Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_HighNormalizedScore
     If udtFieldPresent.HighDiscriminantScore Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_HighDiscriminantScore
+    If udtFieldPresent.PeptideProphetProbability Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_PeptideProphetProbability
                       
     rsAMTSQL = rsAMTSQL & " FROM [" & TABLE_NAME_AMT & "]" & _
                           " ORDER BY " & strTable & glAMT_FIELD_MW & ";"
@@ -679,6 +683,7 @@ With rsAMT
         AMTData(i).MSMSObsCount = 1
         AMTData(i).HighNormalizedScore = 0
         AMTData(i).HighDiscriminantScore = 0
+        AMTData(i).PeptideProphetProbability = 0
         
         If udtFieldPresent.Status Then
             AMTData(i).flag = CLng(.Fields(glAMT_FIELD_Status).Value)
@@ -737,6 +742,12 @@ With rsAMT
         If udtFieldPresent.HighDiscriminantScore Then
            If Not IsNull(.Fields(glAMT_FIELD_HighDiscriminantScore).Value) Then
               AMTData(i).HighDiscriminantScore = CSng(.Fields(glAMT_FIELD_HighDiscriminantScore).Value)
+           End If
+        End If
+        
+        If udtFieldPresent.PeptideProphetProbability Then
+           If Not IsNull(.Fields(glAMT_FIELD_PeptideProphetProbability).Value) Then
+              AMTData(i).PeptideProphetProbability = CSng(.Fields(glAMT_FIELD_PeptideProphetProbability).Value)
            End If
         End If
         
@@ -818,6 +829,7 @@ With udtFieldPresent
     .MSMSObsCount = False
     .HighNormalizedScore = False
     .HighDiscriminantScore = False
+    .PeptideProphetProbability = False
 End With
 
 On Error GoTo err_EnumerateAMTFields:
@@ -857,6 +869,9 @@ If AMTFldCnt > 0 Then
         End If
         If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_HighDiscriminantScore) Then
             udtFieldPresent.HighDiscriminantScore = True
+        End If
+        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_PeptideProphetProbability) Then
+            udtFieldPresent.PeptideProphetProbability = True
         End If
     Next fldAny
 End If

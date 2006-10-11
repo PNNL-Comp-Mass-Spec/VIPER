@@ -1,9 +1,9 @@
 VERSION 5.00
 Begin VB.Form frmUMCBrowser 
-   Caption         =   "UMC Browser"
+   Caption         =   "LC-MS Feature Browser"
    ClientHeight    =   9090
    ClientLeft      =   165
-   ClientTop       =   840
+   ClientTop       =   855
    ClientWidth     =   7215
    LinkTopic       =   "Form1"
    ScaleHeight     =   9090
@@ -119,7 +119,7 @@ Begin VB.Form frmUMCBrowser
       _ExtentY        =   450
    End
    Begin VB.Frame fraUMCInfo 
-      Caption         =   "Info on Selected UMC"
+      Caption         =   "Info on Selected Feature"
       Height          =   975
       Left            =   120
       TabIndex        =   4
@@ -166,7 +166,7 @@ Begin VB.Form frmUMCBrowser
          Width           =   3015
       End
       Begin VB.CheckBox chkFilterUMCsOnMTHits 
-         Caption         =   "Only show UMCs with MT Tag hits"
+         Caption         =   "Only show features with MT Tag hits"
          Height          =   255
          Left            =   120
          TabIndex        =   25
@@ -240,7 +240,7 @@ Begin VB.Form frmUMCBrowser
       _ExtentY        =   8916
    End
    Begin VB.Label lblUMCList 
-      Caption         =   "UMC List"
+      Caption         =   "Feature List (UMCs)"
       Height          =   255
       Left            =   180
       TabIndex        =   0
@@ -1600,7 +1600,7 @@ Private Sub mnuFileFindUMCs2003_Click()
         MsgBox "The Find UMC 2003 window is already open.", vbInformation + vbOKOnly, "Cannot Open Window"
     Else
         frmUMCSimple.Tag = CallerIDLoaded
-        frmUMCSimple.show vbModal
+        frmUMCSimple.Show vbModal
         If GelUMCDraw(CallerIDLoaded).Visible Then
             With GelBody(CallerIDLoaded)
                 .RequestRefreshPlot
@@ -1619,7 +1619,7 @@ Private Sub mnuFileFindUMCsIonNetworks_Click()
         MsgBox "The Find UMC Ion Networks window is already open.", vbInformation + vbOKOnly, "Cannot Open Window"
     Else
         frmUMCIonNet.Tag = CallerIDLoaded
-        frmUMCIonNet.show vbModal
+        frmUMCIonNet.Show vbModal
         If GelUMCDraw(CallerIDLoaded).Visible Then
             With GelBody(CallerIDLoaded)
                 .RequestRefreshPlot

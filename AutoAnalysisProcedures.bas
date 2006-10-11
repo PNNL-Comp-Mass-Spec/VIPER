@@ -41,7 +41,7 @@ Private Const HTML_SUMMARY_FILE_HEADING_NET_RESIDUALS As String = "NET Alignment
 Private Const HTML_SUMMARY_FILE_HEADING_NET_RESIDUALS_MASS_CAL As String = "NET Alignment Residuals with Mass Calibration"
 
 Private Const EXPORT_TO_DB_PASSWORD As String = "mt4real"
-Private Const RESIDUALS_PLOT_POINT_SIZE As Integer = 3
+Private Const RESIDUALS_PLOT_POINT_SIZE As Integer = 2
 
 Private Const CTL2DHEATMAP_ERROR_MESSAGE As String = "Failed to load control 'ctl2DHeatMap'"
 
@@ -776,11 +776,13 @@ End Sub
 
 Private Sub AutoAnalysisFindPairs(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject)
     
-    Dim objPairsSearchForm As VB.Form
+    Dim objPairsSearchForm As frmUMCDltPairs
     Dim ePairFormMode As pfmPairFormMode
     Dim blnSuccess As Boolean
     Dim strPairsFilePath As String
     Dim strMessage As String
+    
+    Dim intIndex As Integer
     
 On Error GoTo FindPairsErrorHandler
 
@@ -807,31 +809,47 @@ On Error GoTo FindPairsErrorHandler
             .Show vbModeless
             .InitializeForm
             blnSuccess = .FindPairsWrapper(False)
-            
-            If glbPreferencesExpanded.PairSearchOptions.AutoExcludeOutOfERRange Then
-                .MarkBadERPairs
-            Else
-                ' Change .Pairs().State to glPAIR_Inc for all pairs with .State = glPAIR_Neu
-                PairSearchIncludeNeutralPairs udtWorkingParams.GelIndex
-            End If
-            
-            If glbPreferencesExpanded.PairSearchOptions.AutoAnalysisSavePairsToTextFile Then
-                strPairsFilePath = udtWorkingParams.ResultsFileNameBase & "_Pairs.txt"
-                strPairsFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strPairsFilePath)
-                .ReportPairs 0, strPairsFilePath
-            End If
-            
-            If glbPreferencesExpanded.PairSearchOptions.AutoAnalysisSavePairsStatisticsToTextFile Then
-                strPairsFilePath = udtWorkingParams.ResultsFileNameBase & "_PairStatistics.txt"
-                strPairsFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strPairsFilePath)
-                .ReportERStatistics strPairsFilePath
-            End If
-            
-            If glbPreferencesExpanded.PairSearchOptions.AutoExcludeOutOfERRange Then
-                strMessage = DeleteExcludedPairs(udtWorkingParams.GelIndex)
-                AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage
+        End With
+        
+        With glbPreferencesExpanded.PairSearchOptions
+            If .AutoAnalysisDeltaMassAddnlCount > 0 Then
+                
+                ' Search for the additional delta masses defined in .AutoAnalysisDeltaMassAddnl()
+                For intIndex = 0 To .AutoAnalysisDeltaMassAddnlCount - 1
+                    ' Disable clearing existing pairs when searching for new pairs
+                    objPairsSearchForm.AutoClearPairsWhenFindingPairs = False
+                    ' Update the delta mass
+                    objPairsSearchForm.SetDeltaMass .AutoAnalysisDeltaMassAddnl(intIndex)
+                    ' Search for new pairs
+                    objPairsSearchForm.FindPairsWrapper (False)
+                Next intIndex
             End If
         End With
+            
+        If glbPreferencesExpanded.PairSearchOptions.AutoExcludeOutOfERRange Then
+            objPairsSearchForm.MarkBadERPairs
+        Else
+            ' Change .Pairs().State to glPAIR_Inc for all pairs with .State = glPAIR_Neu
+            PairSearchIncludeNeutralPairs udtWorkingParams.GelIndex
+        End If
+        
+        If glbPreferencesExpanded.PairSearchOptions.AutoAnalysisSavePairsToTextFile Then
+            strPairsFilePath = udtWorkingParams.ResultsFileNameBase & "_Pairs.txt"
+            strPairsFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strPairsFilePath)
+            objPairsSearchForm.ReportPairs 0, strPairsFilePath
+        End If
+        
+        If glbPreferencesExpanded.PairSearchOptions.AutoAnalysisSavePairsStatisticsToTextFile Then
+            strPairsFilePath = udtWorkingParams.ResultsFileNameBase & "_PairStatistics.txt"
+            strPairsFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strPairsFilePath)
+            objPairsSearchForm.ReportERStatistics strPairsFilePath
+        End If
+        
+        If glbPreferencesExpanded.PairSearchOptions.AutoExcludeOutOfERRange Then
+            strMessage = DeleteExcludedPairs(udtWorkingParams.GelIndex)
+            AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage
+        End If
+        
         Unload objPairsSearchForm
         Set objPairsSearchForm = Nothing
     
@@ -1832,6 +1850,7 @@ Private Function AutoAnalysisLoadOptions(ByRef udtWorkingParams As udtAutoAnalys
     ' Returns False otherwise
 
     Dim udtAnalysisInfo As udtGelAnalysisInfoType
+    
     Dim strDBInIniFile As String, strDBSelectedByUser As String
     Dim strParentFolderName As String
     Dim strMessage As String
@@ -1924,44 +1943,46 @@ On Error GoTo LoadOptionsErrorHandler
     End If
     
     ' Next attempt to initialize GelAnalysis(udtWorkingParams.GelIndex)
-    If glbPreferencesExpanded.AutoAnalysisDBInfoIsValid Then
-        If GelAnalysis(udtWorkingParams.GelIndex) Is Nothing Then
-            Set GelAnalysis(udtWorkingParams.GelIndex) = New FTICRAnalysis
-            dblSlope = 0
-            dblIntercept = 0
-        Else
-            If udtWorkingParams.LoadedGelFile Then
-                dblSlope = GelAnalysis(udtWorkingParams.GelIndex).GANET_Slope
-                dblIntercept = GelAnalysis(udtWorkingParams.GelIndex).GANET_Intercept
-            End If
-        End If
+    If GelAnalysis(udtWorkingParams.GelIndex) Is Nothing Then
+        Set GelAnalysis(udtWorkingParams.GelIndex) = New FTICRAnalysis
+        dblSlope = 0
+        dblIntercept = 0
         
-        FillGelAnalysisObject GelAnalysis(udtWorkingParams.GelIndex), glbPreferencesExpanded.AutoAnalysisDBInfo
-        
-        If udtWorkingParams.LoadedGelFile And dblSlope <> 0 Then
-            GelAnalysis(udtWorkingParams.GelIndex).GANET_Slope = dblSlope
-            GelAnalysis(udtWorkingParams.GelIndex).GANET_Intercept = dblIntercept
-        End If
-        
-        If udtAutoParams.MTDBOverride.Enabled Then
-            GelAnalysis(udtWorkingParams.GelIndex).MTDB.cn.ConnectionString = udtAutoParams.MTDBOverride.ConnectionString
-        End If
-        
-        If Len(GelAnalysis(udtWorkingParams.GelIndex).MTDB.cn.ConnectionString) = 0 Or APP_BUILD_DISABLE_MTS Then
-            If Len(GelData(udtWorkingParams.GelIndex).PathtoDatabase) = 0 And Len(glbPreferencesExpanded.LegacyAMTDBPath) > 0 Then
-                GelData(udtWorkingParams.GelIndex).PathtoDatabase = glbPreferencesExpanded.LegacyAMTDBPath
-            End If
-            
-            If Len(glbPreferencesExpanded.LegacyAMTDBPath) > 0 Then
-                blnDBReadyToLoad = True
-            Else
-                blnDBReadyToLoad = False
-            End If
-        Else
-            blnDBReadyToLoad = True
+        ClearGelAnalysisObject udtWorkingParams.GelIndex, False
+    Else
+        If udtWorkingParams.LoadedGelFile Then
+            dblSlope = GelAnalysis(udtWorkingParams.GelIndex).GANET_Slope
+            dblIntercept = GelAnalysis(udtWorkingParams.GelIndex).GANET_Intercept
         End If
     End If
     
+    If glbPreferencesExpanded.AutoAnalysisDBInfoIsValid Then
+        FillGelAnalysisObject GelAnalysis(udtWorkingParams.GelIndex), glbPreferencesExpanded.AutoAnalysisDBInfo
+    End If
+    
+    If udtWorkingParams.LoadedGelFile And dblSlope <> 0 Then
+        GelAnalysis(udtWorkingParams.GelIndex).GANET_Slope = dblSlope
+        GelAnalysis(udtWorkingParams.GelIndex).GANET_Intercept = dblIntercept
+    End If
+    
+    If udtAutoParams.MTDBOverride.Enabled Then
+        GelAnalysis(udtWorkingParams.GelIndex).MTDB.cn.ConnectionString = udtAutoParams.MTDBOverride.ConnectionString
+    End If
+    
+    If Len(GelAnalysis(udtWorkingParams.GelIndex).MTDB.cn.ConnectionString) = 0 Or APP_BUILD_DISABLE_MTS Then
+        If Len(GelData(udtWorkingParams.GelIndex).PathtoDatabase) = 0 And Len(glbPreferencesExpanded.LegacyAMTDBPath) > 0 Then
+            GelData(udtWorkingParams.GelIndex).PathtoDatabase = glbPreferencesExpanded.LegacyAMTDBPath
+        End If
+        
+        If Len(glbPreferencesExpanded.LegacyAMTDBPath) > 0 Then
+            blnDBReadyToLoad = True
+        Else
+            blnDBReadyToLoad = False
+        End If
+    Else
+        blnDBReadyToLoad = True
+    End If
+
     If APP_BUILD_DISABLE_MTS Then
         udtAutoParams.AutoDMSAnalysisManuallyInitiated = False
         udtAutoParams.MTDBOverride.Enabled = False
@@ -2011,7 +2032,9 @@ On Error GoTo LoadOptionsErrorHandler
                     
                     .DBStuff(NAME_MINIMUM_HIGH_NORMALIZED_SCORE).Value = udtAutoParams.MTDBOverride.MinimumHighNormalizedScore
                     .DBStuff(NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE).Value = udtAutoParams.MTDBOverride.MinimumHighDiscriminantScore
+                    .DBStuff(NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY).Value = udtAutoParams.MTDBOverride.MinimumPeptideProphetProbability
                     .DBStuff(NAME_MINIMUM_PMT_QUALITY_SCORE).Value = udtAutoParams.MTDBOverride.MinimumPMTQualityScore
+                    
                     .DBStuff(NAME_EXPERIMENT_INCLUSION_FILTER).Value = udtAutoParams.MTDBOverride.ExperimentInclusionFilter
                     .DBStuff(NAME_EXPERIMENT_EXCLUSION_FILTER).Value = udtAutoParams.MTDBOverride.ExperimentExclusionFilter
                     .DBStuff(NAME_INTERNAL_STANDARD_EXPLICIT).Value = udtAutoParams.MTDBOverride.InternalStandardExplicit
@@ -3897,6 +3920,7 @@ On Error GoTo AutoAnalysisSaveInternalStdHitsErrorHandler
             .InternalStdSearchMode = issmFindOnlyInternalStandards
             .DBSearchMinimumHighNormalizedScore = 0
             .DBSearchMinimumHighDiscriminantScore = 0
+            .DBSearchMinimumPeptideProphetProbability = 0
             .ExportResultsToDatabase = False
             .ExportUMCMembers = False
             .WriteResultsToTextFile = True
@@ -4235,6 +4259,7 @@ Private Sub AutoAnalysisSearchDatabase(ByRef udtWorkingParams As udtAutoAnalysis
     Dim eInternalStdSearchMode As issmInternalStandardSearchModeConstants
     Dim sngMTMinimumHighNormalizedScore As Single
     Dim sngMTMinimumHighDiscriminantScore As Single
+    Dim sngMTMinimumPeptideProphetProbability As Single
     
     Dim lngHitCount As Long
     Dim lngExportDataToDBErrorCode As Long, lngExportDataToDiskErrorCode As Long
@@ -4357,6 +4382,7 @@ On Error GoTo SearchDatabaseErrorHandler
                 eInternalStdSearchMode = .InternalStdSearchMode
                 sngMTMinimumHighNormalizedScore = .DBSearchMinimumHighNormalizedScore
                 sngMTMinimumHighDiscriminantScore = .DBSearchMinimumHighDiscriminantScore
+                sngMTMinimumPeptideProphetProbability = .DBSearchMinimumPeptideProphetProbability
                 
                 ' Copy this search index's mass mods to GelSearchDef()
                 GelSearchDef(udtWorkingParams.GelIndex).AMTSearchMassMods = .MassMods
@@ -4457,6 +4483,7 @@ On Error GoTo SearchDatabaseErrorHandler
                     
                     .SetMinimumHighNormalizedScore sngMTMinimumHighNormalizedScore
                     .SetMinimumHighDiscriminantScore sngMTMinimumHighDiscriminantScore
+                    .SetMinimumPeptideProphetProbability sngMTMinimumPeptideProphetProbability
                     
                     If blnToleranceRefinementSearch Then
                         .SearchRegionShape = glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.DBSearchRegionShape
@@ -4538,6 +4565,7 @@ On Error GoTo SearchDatabaseErrorHandler
                     
                     .SetMinimumHighNormalizedScore sngMTMinimumHighNormalizedScore
                     .SetMinimumHighDiscriminantScore sngMTMinimumHighDiscriminantScore
+                    .SetMinimumPeptideProphetProbability sngMTMinimumPeptideProphetProbability
                     
                     If blnToleranceRefinementSearch Then
                         .SearchRegionShape = glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.DBSearchRegionShape
@@ -4761,6 +4789,7 @@ On Error GoTo AutoAnalysisToleranceRefinementErrorHandler
        
         .AutoAnalysisSearchMode(0).DBSearchMinimumHighNormalizedScore = .AutoToleranceRefinement.DBSearchMinimumHighNormalizedScore
         .AutoAnalysisSearchMode(0).DBSearchMinimumHighDiscriminantScore = .AutoToleranceRefinement.DBSearchMinimumHighDiscriminantScore
+        .AutoAnalysisSearchMode(0).DBSearchMinimumPeptideProphetProbability = .AutoToleranceRefinement.DBSearchMinimumPeptideProphetProbability
         
         .AutoAnalysisSearchMode(0).WriteResultsToTextFile = False
         .AutoAnalysisSearchMode(0).ExportResultsToDatabase = False
@@ -6104,6 +6133,7 @@ Public Sub InitializeAutoAnalysisParameters(ByRef udtAutoParams As udtAutoAnalys
             .MinimumPMTQualityScore = False
             .MinimumHighNormalizedScore = 0
             .MinimumHighDiscriminantScore = 0
+            .MinimumPeptideProphetProbability = 0
             .ExperimentInclusionFilter = ""
             .ExperimentExclusionFilter = ""
             .InternalStandardExplicit = ""

@@ -62,6 +62,61 @@ DetermineFileTypeErrorHandler:
     
 End Function
 
+Public Function DetermineParentFolderPath(strFileNameOrPath As String) As String
+    
+    Dim fso As New FileSystemObject
+    Dim objFile As File
+    Dim objFolder As Folder
+    
+    Dim blnUseParentFolder As Boolean
+    Dim intIndex As Integer
+    Dim intCharLoc As Integer
+    Dim intAsciiValue As Integer
+       
+    Dim strParentFolderPath As String
+
+On Error GoTo DetermineParentFolderPathErrorHandler
+
+    strParentFolderPath = ""
+    
+    Set objFile = fso.GetFile(strFileNameOrPath)
+    
+    ' Initially set strParentFolderPath to the folder that objFile resides in
+    strParentFolderPath = objFile.ParentFolder
+    
+    blnUseParentFolder = False
+    intCharLoc = InStr(LCase(strParentFolderPath), "_auto")
+    
+    If intCharLoc > 1 Then
+        blnUseParentFolder = True
+        
+        ' Make sure _auto is only followed by digits
+        For intIndex = intCharLoc + 5 To Len(strParentFolderPath)
+            intAsciiValue = Asc(Mid(strParentFolderPath, intIndex, 1))
+            If intAsciiValue < 48 Or intAsciiValue > 57 Then
+                blnUseParentFolder = False
+                Exit For
+            End If
+        Next intIndex
+    End If
+    
+    If blnUseParentFolder Then
+        Set objFolder = objFile.ParentFolder
+        strParentFolderPath = objFolder.ParentFolder.Path
+    End If
+        
+    DetermineParentFolderPath = strParentFolderPath
+    Exit Function
+    
+DetermineParentFolderPathErrorHandler:
+    Debug.Print "Error in DetermineParentFolderPath: " & Err.Description
+    Debug.Assert False
+    
+    LogErrors Err.Number, "DetermineParentFolderPath"
+    DetermineParentFolderPath = strParentFolderPath
+    
+End Function
+
 Public Sub FileOpenProc(ByVal hwndOwner As Long)
 Dim strOpenFileName As String
 Dim strFilter As String

@@ -3,7 +3,7 @@ Begin VB.Form frmMassTagsSelection
    BackColor       =   &H00C0E0FF&
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Mass Tags Selection"
-   ClientHeight    =   7515
+   ClientHeight    =   7920
    ClientLeft      =   2760
    ClientTop       =   3750
    ClientWidth     =   6480
@@ -11,7 +11,7 @@ Begin VB.Form frmMassTagsSelection
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   7515
+   ScaleHeight     =   7920
    ScaleWidth      =   6480
    ShowInTaskbar   =   0   'False
    StartUpPosition =   1  'CenterOwner
@@ -20,21 +20,21 @@ Begin VB.Form frmMassTagsSelection
       BorderStyle     =   0  'None
       Height          =   3255
       Left            =   120
-      TabIndex        =   43
-      Top             =   4080
+      TabIndex        =   45
+      Top             =   4320
       Width           =   6135
       Begin VB.CommandButton cmdOK 
          Caption         =   "&OK"
          Height          =   375
          Left            =   4560
-         TabIndex        =   39
+         TabIndex        =   41
          Top             =   2760
          Width           =   975
       End
       Begin VB.ListBox lstIncList 
          Height          =   2010
          Left            =   2880
-         TabIndex        =   37
+         TabIndex        =   39
          Top             =   480
          Width           =   3015
       End
@@ -42,7 +42,7 @@ Begin VB.Form frmMassTagsSelection
          Caption         =   "Clear"
          Height          =   315
          Left            =   5040
-         TabIndex        =   36
+         TabIndex        =   38
          ToolTipText     =   "Clears inclusion list"
          Top             =   60
          Width           =   855
@@ -51,7 +51,7 @@ Begin VB.Form frmMassTagsSelection
          Caption         =   "&Cancel"
          Height          =   375
          Left            =   3360
-         TabIndex        =   38
+         TabIndex        =   40
          Top             =   2760
          Width           =   975
       End
@@ -59,7 +59,7 @@ Begin VB.Form frmMassTagsSelection
          Caption         =   "I&nclude >"
          Height          =   375
          Left            =   1680
-         TabIndex        =   28
+         TabIndex        =   30
          Top             =   1440
          Width           =   975
       End
@@ -68,7 +68,7 @@ Begin VB.Form frmMassTagsSelection
          Caption         =   "Dynamic Modifications"
          Height          =   1215
          Left            =   0
-         TabIndex        =   21
+         TabIndex        =   23
          Top             =   0
          Width           =   2655
          Begin VB.OptionButton optDIsIsNotAny 
@@ -77,7 +77,7 @@ Begin VB.Form frmMassTagsSelection
             Height          =   255
             Index           =   0
             Left            =   240
-            TabIndex        =   22
+            TabIndex        =   24
             Top             =   360
             Value           =   -1  'True
             Width           =   615
@@ -88,7 +88,7 @@ Begin VB.Form frmMassTagsSelection
             Height          =   255
             Index           =   1
             Left            =   840
-            TabIndex        =   23
+            TabIndex        =   25
             Top             =   360
             Width           =   975
          End
@@ -98,7 +98,7 @@ Begin VB.Form frmMassTagsSelection
             Height          =   255
             Index           =   2
             Left            =   1800
-            TabIndex        =   24
+            TabIndex        =   26
             Top             =   360
             Width           =   615
          End
@@ -106,7 +106,7 @@ Begin VB.Form frmMassTagsSelection
             Height          =   315
             Left            =   120
             Style           =   2  'Dropdown List
-            TabIndex        =   25
+            TabIndex        =   27
             Top             =   720
             Width           =   2415
          End
@@ -116,7 +116,7 @@ Begin VB.Form frmMassTagsSelection
          Caption         =   "Static Modifications"
          Height          =   1215
          Left            =   0
-         TabIndex        =   29
+         TabIndex        =   31
          Top             =   1920
          Width           =   2655
          Begin VB.OptionButton optSIsIsNotAny 
@@ -125,7 +125,7 @@ Begin VB.Form frmMassTagsSelection
             Height          =   255
             Index           =   0
             Left            =   240
-            TabIndex        =   30
+            TabIndex        =   32
             Top             =   360
             Value           =   -1  'True
             Width           =   615
@@ -136,7 +136,7 @@ Begin VB.Form frmMassTagsSelection
             Height          =   255
             Index           =   1
             Left            =   840
-            TabIndex        =   31
+            TabIndex        =   33
             Top             =   360
             Width           =   855
          End
@@ -146,7 +146,7 @@ Begin VB.Form frmMassTagsSelection
             Height          =   255
             Index           =   2
             Left            =   1800
-            TabIndex        =   32
+            TabIndex        =   34
             Top             =   360
             Width           =   615
          End
@@ -154,7 +154,7 @@ Begin VB.Form frmMassTagsSelection
             Height          =   315
             Left            =   120
             Style           =   2  'Dropdown List
-            TabIndex        =   33
+            TabIndex        =   35
             Top             =   720
             Width           =   2415
          End
@@ -165,7 +165,7 @@ Begin VB.Form frmMassTagsSelection
          Index           =   0
          Left            =   0
          Style           =   1  'Graphical
-         TabIndex        =   26
+         TabIndex        =   28
          Top             =   1440
          Value           =   -1  'True
          Width           =   615
@@ -176,7 +176,7 @@ Begin VB.Form frmMassTagsSelection
          Index           =   1
          Left            =   720
          Style           =   1  'Graphical
-         TabIndex        =   27
+         TabIndex        =   29
          Top             =   1440
          Width           =   615
       End
@@ -184,7 +184,7 @@ Begin VB.Form frmMassTagsSelection
          Caption         =   "&Del."
          Height          =   315
          Left            =   4080
-         TabIndex        =   35
+         TabIndex        =   37
          ToolTipText     =   "Delete selected item from the list"
          Top             =   60
          Width           =   855
@@ -195,7 +195,7 @@ Begin VB.Form frmMassTagsSelection
          Height          =   255
          Index           =   1
          Left            =   2880
-         TabIndex        =   34
+         TabIndex        =   36
          Top             =   120
          Width           =   1095
       End
@@ -203,31 +203,39 @@ Begin VB.Form frmMassTagsSelection
    Begin VB.Frame fraSettings2 
       BackColor       =   &H00C0E0FF&
       BorderStyle     =   0  'None
-      Height          =   2535
+      Height          =   2775
       Left            =   120
-      TabIndex        =   40
+      TabIndex        =   42
       Top             =   1440
       Width           =   6135
+      Begin VB.TextBox txtMinimumPeptideProphetProbability 
+         Height          =   285
+         Left            =   5520
+         TabIndex        =   12
+         Text            =   "0"
+         Top             =   675
+         Width           =   495
+      End
       Begin VB.ComboBox cboInternalStandardExplicit 
          Height          =   315
          Left            =   2160
          Style           =   2  'Dropdown List
-         TabIndex        =   20
-         Top             =   2160
+         TabIndex        =   22
+         Top             =   2400
          Width           =   2655
       End
       Begin VB.TextBox txtExperimentExclusionFilter 
          Height          =   285
          Left            =   2160
-         TabIndex        =   18
-         Top             =   1860
+         TabIndex        =   20
+         Top             =   2100
          Width           =   2175
       End
       Begin VB.TextBox txtExperimentInclusionFilter 
          Height          =   285
          Left            =   2160
-         TabIndex        =   16
-         Top             =   1560
+         TabIndex        =   18
+         Top             =   1800
          Width           =   2175
       End
       Begin VB.TextBox txtMinimumHighDiscriminantScore 
@@ -250,25 +258,34 @@ Begin VB.Form frmMassTagsSelection
          Height          =   315
          Left            =   1800
          Style           =   2  'Dropdown List
-         TabIndex        =   14
-         Top             =   1080
+         TabIndex        =   16
+         Top             =   1320
          Width           =   2655
       End
       Begin VB.TextBox txtMinimumPMTQualityScore 
          Height          =   285
          Left            =   5520
-         TabIndex        =   12
+         TabIndex        =   14
          Text            =   "0"
-         Top             =   675
+         Top             =   975
          Width           =   495
+      End
+      Begin VB.Label lblMinimumPeptideProphetProbability 
+         BackColor       =   &H00C0E0FF&
+         Caption         =   "Minimum peptide prophet probability (0 to ignore pep prophet probality):"
+         Height          =   255
+         Left            =   0
+         TabIndex        =   11
+         Top             =   695
+         Width           =   5535
       End
       Begin VB.Label lblInternalStdExplicit 
          BackColor       =   &H00C0E0FF&
          Caption         =   "Explicit internal standard:"
          Height          =   255
          Left            =   0
-         TabIndex        =   19
-         Top             =   2160
+         TabIndex        =   21
+         Top             =   2420
          Width           =   2175
       End
       Begin VB.Label lblExperimentExclusionFilter 
@@ -276,8 +293,8 @@ Begin VB.Form frmMassTagsSelection
          Caption         =   "Experiment Exclusion Filter:"
          Height          =   255
          Left            =   0
-         TabIndex        =   17
-         Top             =   1860
+         TabIndex        =   19
+         Top             =   2120
          Width           =   2175
       End
       Begin VB.Label lblExperimentInclusionFilter 
@@ -285,26 +302,26 @@ Begin VB.Form frmMassTagsSelection
          Caption         =   "Experiment Inclusion Filter:"
          Height          =   255
          Left            =   0
-         TabIndex        =   15
-         Top             =   1560
+         TabIndex        =   17
+         Top             =   1820
          Width           =   2175
       End
       Begin VB.Label lblMinimumHighDiscriminantScore 
          BackColor       =   &H00C0E0FF&
-         Caption         =   "Minimum high discriminant score (0 to load all mass tags, regardless of score):"
+         Caption         =   "Minimum high discriminant score (0 to ignore discriminant score):"
          Height          =   255
          Left            =   0
          TabIndex        =   9
-         Top             =   420
+         Top             =   395
          Width           =   5535
       End
       Begin VB.Label lblMinimumHighNormalizedScore 
          BackColor       =   &H00C0E0FF&
-         Caption         =   "Minimum high normalized XCorr (0 to load all mass tags, regardless of score):"
+         Caption         =   "Minimum high normalized XCorr (0 to ignore XCorr):"
          Height          =   255
          Left            =   0
          TabIndex        =   7
-         Top             =   120
+         Top             =   95
          Width           =   5535
       End
       Begin VB.Label lblNETValueType 
@@ -312,17 +329,17 @@ Begin VB.Form frmMassTagsSelection
          Caption         =   "NET Values to use:"
          Height          =   255
          Left            =   0
-         TabIndex        =   13
-         Top             =   1110
+         TabIndex        =   15
+         Top             =   1350
          Width           =   1575
       End
       Begin VB.Label lblMinimumPMTQualityScore 
          BackColor       =   &H00C0E0FF&
-         Caption         =   "Minimum PMT quality score (0 to load all mass tags, regardless of score):"
+         Caption         =   "Minimum PMT quality score (0 to ignore PMT quality score):"
          Height          =   255
          Left            =   0
-         TabIndex        =   11
-         Top             =   720
+         TabIndex        =   13
+         Top             =   960
          Width           =   5535
       End
    End
@@ -331,7 +348,7 @@ Begin VB.Form frmMassTagsSelection
       BorderStyle     =   0  'None
       Height          =   1335
       Left            =   120
-      TabIndex        =   41
+      TabIndex        =   43
       Top             =   120
       Width           =   6135
       Begin VB.CheckBox chkLimitToPMTsFromDataset 
@@ -403,7 +420,7 @@ Begin VB.Form frmMassTagsSelection
          BackStyle       =   0  'Transparent
          Height          =   585
          Left            =   2040
-         TabIndex        =   42
+         TabIndex        =   44
          Top             =   720
          Width           =   4005
       End
@@ -426,7 +443,7 @@ Attribute VB_Exposed = False
 'NetValueType=2          use theoretical NET values (computed using GANETClass.dll) (nvtTheoreticalNET)
 '------------------------------------------------------------------------
 'created: 12/07/2001 nt
-'last modified: 12/21/2005 mem
+'last modified: 10/9/2006 mem
 '------------------------------------------------------------------------
 Option Explicit
 
@@ -442,6 +459,7 @@ Const NAME_LIMIT_TO_PMTS_FROM_DATASET As String = "Limit to PMTs from Dataset"
 
 Const NAME_MINIMUM_HIGH_NORMALIZED_SCORE As String = "Minimum High Normalized Score"
 Const NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE As String = "Minimum High Discriminant Score"
+Const NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY As String = "Minimum Peptide Prophet Probability"
 Const NAME_MINIMUM_PMT_QUALITY_SCORE As String = "MinimumPMTQualityScore"
 Const NAME_EXPERIMENT_INCLUSION_FILTER As String = "Experiment Inclusion Filter"
 Const NAME_EXPERIMENT_EXCLUSION_FILTER As String = "Experiment Exclusion Filter"
@@ -742,7 +760,7 @@ Private Sub ShowHideControls()
     Else
         blnShowlegacyControls = False
     End If
-    
+       
     chkAccurateOnly.Visible = blnShowlegacyControls
     chkLockersOnly.Visible = blnShowlegacyControls
     chkLimitToPMTsFromDataset.Visible = Not blnShowlegacyControls
@@ -757,6 +775,9 @@ Private Sub ShowHideControls()
     txtMinimumHighDiscriminantScore.Enabled = Not blnShowlegacyControls
     lblMinimumHighDiscriminantScore.Enabled = Not blnShowlegacyControls
 
+    txtMinimumPeptideProphetProbability.Enabled = Not blnShowlegacyControls
+    lblMinimumPeptideProphetProbability.Enabled = Not blnShowlegacyControls
+
     txtExperimentInclusionFilter.Enabled = Not blnShowlegacyControls
     txtExperimentExclusionFilter.Enabled = Not blnShowlegacyControls
     cboInternalStandardExplicit.Enabled = Not blnShowlegacyControls
@@ -766,11 +787,11 @@ Private Sub ShowHideControls()
 
     If blnShowlegacyControls Then
         fraSettings1.Height = 1335
-        fraSettings2.Height = 1500
+        fraSettings2.Height = 1695
         fraSettings3.Height = 3255
     Else
         fraSettings1.Height = 375
-        fraSettings2.Height = 2535
+        fraSettings2.Height = 2775
         fraSettings3.Height = 2200
     End If
     
@@ -1013,6 +1034,7 @@ End If
 
 EditAddName NAME_MINIMUM_HIGH_NORMALIZED_SCORE, txtMinimumHighNormalizedScore
 EditAddName NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE, txtMinimumHighDiscriminantScore
+EditAddName NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY, txtMinimumPeptideProphetProbability
 EditAddName NAME_MINIMUM_PMT_QUALITY_SCORE, txtMinimumPMTQualityScore
 
 EditAddName NAME_EXPERIMENT_INCLUSION_FILTER, txtExperimentInclusionFilter
@@ -1468,6 +1490,17 @@ Else
 End If
 
 TmpVal = ""
+TmpVal = MyStuff.Item(NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY).Value
+If IsNumeric(TmpVal) Then
+    If Val(TmpVal) < 0 Or Val(TmpVal) > 10000 Then
+        TmpVal = "0"
+    End If
+    txtMinimumPeptideProphetProbability = TmpVal
+Else
+    txtMinimumPeptideProphetProbability = "0"
+End If
+
+TmpVal = ""
 TmpVal = MyStuff.Item(NAME_MINIMUM_PMT_QUALITY_SCORE).Value
 If IsNumeric(TmpVal) Then
     If Val(TmpVal) < 0 Or Val(TmpVal) > 10000 Then
@@ -1535,10 +1568,23 @@ Private Sub txtMinimumHighNormalizedScore_LostFocus()
     End If
 End Sub
 
+Private Sub txtMinimumPeptideProphetProbability_LostFocus()
+    If IsNumeric(txtMinimumPeptideProphetProbability) Then
+        If Val(txtMinimumPeptideProphetProbability) < 0 Then
+            txtMinimumPeptideProphetProbability = "0"
+        ElseIf Val(txtMinimumPeptideProphetProbability) > 1 Then
+            txtMinimumPeptideProphetProbability = ".999"
+        End If
+    Else
+        txtMinimumPeptideProphetProbability = "0"
+    End If
+
+End Sub
+
 Private Sub txtMinimumPMTQualityScore_LostFocus()
     If IsNumeric(txtMinimumPMTQualityScore) Then
         If Val(txtMinimumPMTQualityScore) < 0 Or Val(txtMinimumPMTQualityScore) > 1000 Then
-            txtMinimumHighNormalizedScore = "0"
+            txtMinimumPMTQualityScore = "0"
         End If
     Else
         txtMinimumPMTQualityScore = "0"

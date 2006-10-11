@@ -1,7 +1,7 @@
 VERSION 5.00
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "Tabctl32.ocx"
 Begin VB.Form frmSearchForNETAdjustmentUMC 
    Caption         =   "Search MT Tag Database For NET Adjustment"
    ClientHeight    =   8760
@@ -133,15 +133,10 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
       TabPicture(0)   =   "frmSearchForNETAdjustmentUMC.frx":0000
       Tab(0).ControlEnabled=   0   'False
       Tab(0).Control(0)=   "lblRobustNETPredictedIterationCount"
-      Tab(0).Control(0).Enabled=   0   'False
       Tab(0).Control(1)=   "lblRobustNETCurrentSettings"
-      Tab(0).Control(1).Enabled=   0   'False
       Tab(0).Control(2)=   "fraNETSlopeRange"
-      Tab(0).Control(2).Enabled=   0   'False
       Tab(0).Control(3)=   "fraNETInterceptRange"
-      Tab(0).Control(3).Enabled=   0   'False
       Tab(0).Control(4)=   "fraMassShiftPPMRange"
-      Tab(0).Control(4).Enabled=   0   'False
       Tab(0).ControlCount=   5
       TabCaption(1)   =   "Addnl NET Options"
       TabPicture(1)   =   "frmSearchForNETAdjustmentUMC.frx":001C
@@ -813,6 +808,7 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          _ExtentX        =   9551
          _ExtentY        =   3889
          _Version        =   393217
+         Enabled         =   -1  'True
          ScrollBars      =   2
          TextRTF         =   $"frmSearchForNETAdjustmentUMC.frx":0054
       End
@@ -5264,7 +5260,8 @@ For i = 0 To PeakCnt - 1
                 
                 For j = 0 To TmpCnt - 1
                     If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Then
-                        If AMTData(Hits(j)).HighNormalizedScore >= mMTMinimumHighNormalizedScore And AMTData(Hits(j)).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore Then
+                        If AMTData(Hits(j)).HighNormalizedScore >= mMTMinimumHighNormalizedScore And _
+                           AMTData(Hits(j)).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore Then
                             blnAddMassTag = True
                         Else
                             blnAddMassTag = False
@@ -5943,9 +5940,9 @@ Private Sub ValidatePMTScoreFilters(blnUsingInternalStandards As Boolean)
         If AMTCnt >= 2 Then
             If mMTMinimumHighDiscriminantScore > 0 Then
                 ' Make sure at least two of the loaded MT tags have score values >= mMTMinimumHighDiscriminantScore, also taking into account HighNormalizedScore
-                ' It's possible that mMTMinimumHighDiscriminantScore will be lowered to 0 by the call to ValidateMTMinimimumHighDiscriminantScore
+                ' It's possible that mMTMinimumHighDiscriminantScore will be lowered to 0 by the call to ValidateMTMinimumDiscriminantAndPepProphet
                 ' If that happens, then call ValidateMTMinimimumHighNormalizedScore
-                ValidateMTMinimimumHighDiscriminantScore AMTData(), 1, AMTCnt, mMTMinimumHighDiscriminantScore, mMTMinimumHighNormalizedScore, 2
+                ValidateMTMinimumDiscriminantAndPepProphet AMTData(), 1, AMTCnt, mMTMinimumHighDiscriminantScore, 0, mMTMinimumHighNormalizedScore, 2
             End If
             
             If mMTMinimumHighDiscriminantScore = 0 Then

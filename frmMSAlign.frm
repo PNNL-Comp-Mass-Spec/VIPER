@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "Tabctl32.ocx"
 Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Object = "{C02A7541-5364-11D2-9373-00A02411EBE6}#1.6#0"; "cw3dgrph.ocx"
 Begin VB.Form frmMSAlign 
@@ -7,7 +7,7 @@ Begin VB.Form frmMSAlign
    Caption         =   "MS Warp"
    ClientHeight    =   10410
    ClientLeft      =   165
-   ClientTop       =   840
+   ClientTop       =   855
    ClientWidth     =   14340
    LinkTopic       =   "MS Align"
    MinButton       =   0   'False
@@ -2201,8 +2201,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   4.96896431515468E-293
-         DataMax_5       =   4.96896431515468E-293
+         DataMin_5       =   3.74289482607272E-295
+         DataMax_5       =   3.74289482607272E-295
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2268,8 +2268,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   4.97953393627268E-293
-         DataMax_14      =   4.97953393627268E-293
+         DataMin_14      =   3.7720873120663E-295
+         DataMax_14      =   3.7720873120663E-295
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2337,8 +2337,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   4.99354394039474E-293
-         DataMax_23      =   4.99354394039474E-293
+         DataMin_23      =   3.78236067798118E-295
+         DataMax_23      =   3.78236067798118E-295
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -5619,6 +5619,10 @@ On Error GoTo Save3DViewErrorHandler
     End If
 
     If Len(strFilePath) > 0 Then
+        ' Note: The .ControlImageEx function is only available in Measurement Studio v6.0 if you
+        '  download and install the patch from http://digital.ni.com/softlib.nsf/websearch/2AAC97491D073A6C86256EEF005374CE?opendocument&node=132060_US
+        ' After updating, the c:\windows\system32\cwui.ocx file should be 2,335,240 bytes with date 7/24/2004 2:20 am
+        ' Also, make sure the installer does not install an out-of-date cwui.ocx file in the c:\program files\viper folder
         If blnSaveHQ Then
             SavePicture ctlCWGraphNI.ControlImageEx(400, 400), strFilePath
         Else
@@ -5940,6 +5944,10 @@ On Error GoTo SaveResidualsPlotErrorHandler
     End If
 
     If Len(strFilePath) > 0 Then
+        ' Note: The .ControlImageEx function is only available in Measurement Studio v6.0 if you
+        '  download and install the patch from http://digital.ni.com/softlib.nsf/websearch/2AAC97491D073A6C86256EEF005374CE?opendocument&node=132060_US
+        ' After updating, the c:\windows\system32\cwui.ocx file should be 2,335,240 bytes with date 7/24/2004 2:20 am
+        ' Also, make sure the installer does not install an out-of-date cwui.ocx file in the c:\program files\viper folder
         If blnSaveHQ Then
             SavePicture ctlPlot.ControlImageEx(400, 400), strFilePath
         Else

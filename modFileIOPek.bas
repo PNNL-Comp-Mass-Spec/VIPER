@@ -391,8 +391,6 @@ Public Function LoadNewPEK(ByVal strPEKFilePath As String, ByVal lngGelIndex As 
     Dim lngIndex As Long
     
     Dim fso As New FileSystemObject
-    Dim objFile As File
-    Dim objFolder As Folder
     
     Dim strParFileSetting As String
     
@@ -404,7 +402,6 @@ Public Function LoadNewPEK(ByVal strPEKFilePath As String, ByVal lngGelIndex As 
     Dim lngTotalBytesRead As Long
     
     Dim MaxMZ As Double
-
     
 On Error GoTo LoadNewPEKErrorHandler
     
@@ -551,10 +548,9 @@ On Error GoTo LoadNewPEKErrorHandler
 
     With GelData(mGelIndex)
          ' Old: .PathtoDataFiles = GetPathWOFileName(CurrDataFName)
-         ' New: data file folder path is the folder one folder up from .Filename's folder
-        Set objFile = fso.GetFile(.FileName)
-        Set objFolder = objFile.ParentFolder
-        .PathtoDataFiles = objFolder.Path
+         ' New: data file folder path is the folder one folder up from .Filename's folder if .Filename's folder contains _Auto00000
+         '      if .Filename's folder does not contain _Auto0000, then simply use .Filename's folder
+        .PathtoDataFiles = DetermineParentFolderPath(.FileName)
         
         .DataLines = .IsoLines + .CSLines
         

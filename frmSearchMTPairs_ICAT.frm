@@ -915,7 +915,7 @@ Case Else
     
     'MonroeMod
     GelSearchDef(CallerID).AMTSearchOnPairs = samtDef
-    AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched ICAT pairs for MT tags", HitsCnt, 0, 0, samtDef, True, GelData(CallerID).CustomNETsDefined)
+    AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched ICAT pairs for MT tags", HitsCnt, 0, 0, 0, samtDef, True, GelData(CallerID).CustomNETsDefined)
 End Select
 
 End Sub

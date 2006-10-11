@@ -11,10 +11,19 @@ Begin VB.Form frmSearchMTPairs
    ScaleHeight     =   6225
    ScaleWidth      =   6990
    StartUpPosition =   1  'CenterOwner
+   Begin VB.TextBox txtDBSearchMinimumPeptideProphetProbability 
+      Alignment       =   1  'Right Justify
+      Height          =   285
+      Left            =   3000
+      TabIndex        =   29
+      Text            =   "0"
+      Top             =   4200
+      Width           =   615
+   End
    Begin VB.TextBox txtDBSearchMinimumHighDiscriminantScore 
       Alignment       =   1  'Right Justify
       Height          =   285
-      Left            =   2880
+      Left            =   3000
       TabIndex        =   27
       Text            =   "0"
       Top             =   3900
@@ -23,7 +32,7 @@ Begin VB.Form frmSearchMTPairs
    Begin VB.TextBox txtDBSearchMinimumHighNormalizedScore 
       Alignment       =   1  'Right Justify
       Height          =   285
-      Left            =   2880
+      Left            =   3000
       TabIndex        =   25
       Text            =   "0"
       Top             =   3600
@@ -34,15 +43,15 @@ Begin VB.Form frmSearchMTPairs
       Caption         =   "Modifications"
       Height          =   1575
       Left            =   120
-      TabIndex        =   28
-      Top             =   4440
+      TabIndex        =   30
+      Top             =   4560
       Width           =   4815
       Begin VB.CheckBox chkAlkylation 
          BackColor       =   &H00E0E0E0&
          Caption         =   "Alkylation"
          Height          =   255
          Left            =   240
-         TabIndex        =   29
+         TabIndex        =   31
          ToolTipText     =   "Check to add the alkylation mass correction below to all MT Tag masses (added to each cys residue)"
          Top             =   360
          Width           =   1095
@@ -51,7 +60,7 @@ Begin VB.Form frmSearchMTPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   360
-         TabIndex        =   31
+         TabIndex        =   33
          Text            =   "57.0215"
          Top             =   960
          Width           =   855
@@ -63,7 +72,7 @@ Begin VB.Form frmSearchMTPairs
          Height          =   855
          Index           =   49
          Left            =   3135
-         TabIndex        =   36
+         TabIndex        =   38
          Top             =   360
          Width           =   1095
          Begin VB.OptionButton optDBSearchModType 
@@ -72,7 +81,7 @@ Begin VB.Form frmSearchMTPairs
             Height          =   255
             Index           =   0
             Left            =   120
-            TabIndex        =   38
+            TabIndex        =   40
             Top             =   240
             Width           =   750
          End
@@ -82,7 +91,7 @@ Begin VB.Form frmSearchMTPairs
             Height          =   255
             Index           =   1
             Left            =   120
-            TabIndex        =   39
+            TabIndex        =   41
             Top             =   525
             Value           =   -1  'True
             Width           =   975
@@ -93,7 +102,7 @@ Begin VB.Form frmSearchMTPairs
             Height          =   255
             Index           =   100
             Left            =   120
-            TabIndex        =   37
+            TabIndex        =   39
             Top             =   0
             Width           =   900
          End
@@ -102,7 +111,7 @@ Begin VB.Form frmSearchMTPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   1800
-         TabIndex        =   35
+         TabIndex        =   37
          Text            =   "0"
          Top             =   1080
          Width           =   855
@@ -111,7 +120,7 @@ Begin VB.Form frmSearchMTPairs
          Height          =   315
          Left            =   1800
          Style           =   2  'Dropdown List
-         TabIndex        =   33
+         TabIndex        =   35
          Top             =   480
          Width           =   1095
       End
@@ -120,7 +129,7 @@ Begin VB.Form frmSearchMTPairs
          Caption         =   "Alkylation mass:"
          Height          =   255
          Left            =   240
-         TabIndex        =   30
+         TabIndex        =   32
          Top             =   720
          Width           =   1335
       End
@@ -136,7 +145,7 @@ Begin VB.Form frmSearchMTPairs
          Caption         =   "Mass (Da):"
          Height          =   255
          Left            =   1680
-         TabIndex        =   34
+         TabIndex        =   36
          Top             =   840
          Width           =   1095
       End
@@ -152,7 +161,7 @@ Begin VB.Form frmSearchMTPairs
          Caption         =   "Residue to modify:"
          Height          =   255
          Left            =   1680
-         TabIndex        =   32
+         TabIndex        =   34
          Top             =   240
          Width           =   1335
       End
@@ -257,7 +266,7 @@ Begin VB.Form frmSearchMTPairs
          Height          =   315
          Left            =   120
          Style           =   2  'Dropdown List
-         TabIndex        =   40
+         TabIndex        =   42
          Top             =   960
          Width           =   2295
       End
@@ -358,6 +367,16 @@ Begin VB.Form frmSearchMTPairs
       TabIndex        =   1
       Top             =   1200
       Width           =   1095
+   End
+   Begin VB.Label lblDescription 
+      BackStyle       =   0  'Transparent
+      Caption         =   "Minimum Peptide Prophet Probability"
+      Height          =   255
+      Index           =   1
+      Left            =   120
+      TabIndex        =   28
+      Top             =   4215
+      Width           =   2865
    End
    Begin VB.Label lblDescription 
       BackStyle       =   0  'Transparent
@@ -648,6 +667,7 @@ Private mKeyPressAbortProcess As Integer
 Private mUsingDefaultGANET As Boolean
 Private mMTMinimumHighNormalizedScore As Single
 Private mMTMinimumHighDiscriminantScore As Single
+Private mMTMinimumPeptideProphetProbability As Single
 
 Private objMTDBNameLookupClass As mtdbMTNames
 '
@@ -1097,6 +1117,10 @@ Private Sub txtDBSearchMinimumHighNormalizedScore_LostFocus()
     ValidateTextboxValueDbl txtDBSearchMinimumHighNormalizedScore, 0, 100000, 0
 End Sub
 
+Private Sub txtDBSearchMinimumPeptideProphetProbability_LostFocus()
+    ValidateTextboxValueDbl txtDBSearchMinimumPeptideProphetProbability, 0, 1, 0
+End Sub
+
 Private Sub txtMWTol_LostFocus()
 If IsNumeric(txtMWTol.Text) Then
    samtDef.MWTol = CDbl(txtMWTol.Text)
@@ -1251,11 +1275,17 @@ If IsNumeric(txtDBSearchMinimumHighDiscriminantScore.Text) Then
 Else
     mMTMinimumHighDiscriminantScore = 0
 End If
-    
-If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Then
+
+If IsNumeric(txtDBSearchMinimumPeptideProphetProbability.Text) Then
+    mMTMinimumPeptideProphetProbability = CSngSafe(txtDBSearchMinimumPeptideProphetProbability.Text)
+Else
+    mMTMinimumPeptideProphetProbability = 0
+End If
+
+If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
     If mMTMinimumHighDiscriminantScore > 0 Then
         ' Make sure at least two of the loaded MT tags have score values >= mMTMinimumHighDiscriminantScore, also taking into account HighNormalizedScore
-        ValidateMTMinimimumHighDiscriminantScore AMTData(), 1, AMTCnt, mMTMinimumHighDiscriminantScore, mMTMinimumHighNormalizedScore, 2
+        ValidateMTMinimumDiscriminantAndPepProphet AMTData(), 1, AMTCnt, mMTMinimumHighDiscriminantScore, mMTMinimumPeptideProphetProbability, mMTMinimumHighNormalizedScore, 2
     Else
         ' Make sure at least two of the loaded MT tags have score values >= mMTMinimumHighNormalizedScore
         ValidateMTMinimimumHighNormalizedScore AMTData(), 1, AMTCnt, mMTMinimumHighNormalizedScore, 2
@@ -1272,8 +1302,10 @@ If AMTCnt > 0 Then
    ReDim mMTMods(AMTCnt - 1)
    mMTCnt = 0
    For i = 1 To AMTCnt
-        If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Then
-            If AMTData(i).HighNormalizedScore >= mMTMinimumHighNormalizedScore And AMTData(i).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore Then
+        If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
+            If AMTData(i).HighNormalizedScore >= mMTMinimumHighNormalizedScore And _
+               AMTData(i).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore And _
+               AMTData(i).PeptideProphetProbability >= mMTMinimumPeptideProphetProbability Then
                 blnAddMassTag = True
             Else
                 blnAddMassTag = False
@@ -1820,7 +1852,7 @@ Case Else
     GelSearchDef(CallerID).AMTSearchOnPairs = samtDef
     strSearchDescription = "Searched N14/N15 pairs for MT tags (Conglomerate UMC Mass)"
     
-    AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText(strSearchDescription, HitsCnt, mMTMinimumHighNormalizedScore, mMTMinimumHighDiscriminantScore, samtDef, True, GelData(CallerID).CustomNETsDefined)
+    AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText(strSearchDescription, HitsCnt, mMTMinimumHighNormalizedScore, mMTMinimumHighDiscriminantScore, mMTMinimumPeptideProphetProbability, samtDef, True, GelData(CallerID).CustomNETsDefined)
 End Select
 
 If Not blnShowMessages And HitsCnt < 0 Then
@@ -2218,6 +2250,10 @@ End Sub
 
 Public Sub SetMinimumHighNormalizedScore(sngMinimumHighNormalizedScore As Single)
     txtDBSearchMinimumHighNormalizedScore = sngMinimumHighNormalizedScore
+End Sub
+
+Public Sub SetMinimumPeptideProphetProbability(sngMinimumPeptideProphetProbability As Single)
+    txtDBSearchMinimumPeptideProphetProbability = sngMinimumPeptideProphetProbability
 End Sub
 
 Private Sub StartExportResultsToDB()

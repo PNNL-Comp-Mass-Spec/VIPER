@@ -556,7 +556,7 @@ Begin VB.Form frmGraph
          Caption         =   "TIC and BPI Plots"
       End
       Begin VB.Menu mnuViewUMCBrowser 
-         Caption         =   "UMC Browser"
+         Caption         =   "LC-MS Feature (UMC) Browser"
       End
       Begin VB.Menu mnuViewPairsBrowser 
          Caption         =   "Pairs Browser"

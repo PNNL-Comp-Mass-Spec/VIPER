@@ -2,20 +2,29 @@ VERSION 5.00
 Begin VB.Form frmSearchMT_ConglomerateUMC 
    BackColor       =   &H00FFFFFF&
    Caption         =   "Search MT tag DB - Single UMC Mass"
-   ClientHeight    =   6690
+   ClientHeight    =   6915
    ClientLeft      =   60
    ClientTop       =   630
    ClientWidth     =   7605
    LinkTopic       =   "Form1"
-   ScaleHeight     =   6690
+   ScaleHeight     =   6915
    ScaleWidth      =   7605
    StartUpPosition =   1  'CenterOwner
+   Begin VB.TextBox txtDBSearchMinimumPeptideProphetProbability 
+      Alignment       =   1  'Right Justify
+      Height          =   285
+      Left            =   3000
+      TabIndex        =   14
+      Text            =   "0"
+      Top             =   2640
+      Width           =   615
+   End
    Begin VB.CommandButton cmdSetDefaults 
       Cancel          =   -1  'True
       Caption         =   "Set to Defaults"
       Height          =   375
       Left            =   6000
-      TabIndex        =   50
+      TabIndex        =   52
       Top             =   1800
       Width           =   1335
    End
@@ -23,14 +32,14 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Height          =   285
       Left            =   60
       Locked          =   -1  'True
-      TabIndex        =   49
-      Top             =   6280
+      TabIndex        =   51
+      Top             =   6525
       Width           =   7455
    End
    Begin VB.TextBox txtDBSearchMinimumHighDiscriminantScore 
       Alignment       =   1  'Right Justify
       Height          =   285
-      Left            =   2880
+      Left            =   3000
       TabIndex        =   12
       Text            =   "0"
       Top             =   2340
@@ -40,14 +49,14 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Height          =   315
       Left            =   4200
       Style           =   2  'Dropdown List
-      TabIndex        =   48
+      TabIndex        =   50
       Top             =   1200
       Width           =   3255
    End
    Begin VB.TextBox txtDBSearchMinimumHighNormalizedScore 
       Alignment       =   1  'Right Justify
       Height          =   285
-      Left            =   2880
+      Left            =   3000
       TabIndex        =   10
       Text            =   "0"
       Top             =   2040
@@ -93,14 +102,14 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Modifications"
       Height          =   1575
       Left            =   0
-      TabIndex        =   27
-      Top             =   4320
+      TabIndex        =   29
+      Top             =   4560
       Width           =   6735
       Begin VB.ComboBox cboResidueToModify 
          Height          =   315
          Left            =   3120
          Style           =   2  'Dropdown List
-         TabIndex        =   35
+         TabIndex        =   37
          Top             =   480
          Width           =   1095
       End
@@ -108,7 +117,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   3120
-         TabIndex        =   37
+         TabIndex        =   39
          Text            =   "0"
          Top             =   1080
          Width           =   855
@@ -120,7 +129,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   855
          Index           =   47
          Left            =   5760
-         TabIndex        =   42
+         TabIndex        =   44
          Top             =   360
          Width           =   800
          Begin VB.OptionButton optN 
@@ -129,7 +138,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   0
             Left            =   0
-            TabIndex        =   44
+            TabIndex        =   46
             Top             =   240
             Value           =   -1  'True
             Width           =   700
@@ -140,7 +149,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   1
             Left            =   0
-            TabIndex        =   45
+            TabIndex        =   47
             Top             =   525
             Width           =   700
          End
@@ -150,7 +159,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   103
             Left            =   0
-            TabIndex        =   43
+            TabIndex        =   45
             Top             =   0
             Width           =   600
          End
@@ -162,7 +171,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   855
          Index           =   49
          Left            =   4460
-         TabIndex        =   38
+         TabIndex        =   40
          Top             =   360
          Width           =   1095
          Begin VB.OptionButton optDBSearchModType 
@@ -171,7 +180,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   1
             Left            =   120
-            TabIndex        =   41
+            TabIndex        =   43
             Top             =   525
             Value           =   -1  'True
             Width           =   975
@@ -182,7 +191,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   0
             Left            =   120
-            TabIndex        =   40
+            TabIndex        =   42
             Top             =   240
             Width           =   750
          End
@@ -192,7 +201,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   100
             Left            =   120
-            TabIndex        =   39
+            TabIndex        =   41
             Top             =   0
             Width           =   900
          End
@@ -201,7 +210,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   1680
-         TabIndex        =   33
+         TabIndex        =   35
          Text            =   "57.0215"
          Top             =   960
          Width           =   855
@@ -211,7 +220,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Alkylation"
          Height          =   255
          Left            =   1560
-         TabIndex        =   31
+         TabIndex        =   33
          ToolTipText     =   "Check to add the alkylation mass correction below to all MT Tag masses (added to each cys residue)"
          Top             =   360
          Width           =   1095
@@ -221,7 +230,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "ICAT d8"
          Height          =   255
          Left            =   240
-         TabIndex        =   30
+         TabIndex        =   32
          Top             =   1080
          Width           =   975
       End
@@ -230,7 +239,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "ICAT d0"
          Height          =   255
          Left            =   240
-         TabIndex        =   29
+         TabIndex        =   31
          Top             =   720
          Width           =   975
       End
@@ -239,7 +248,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "PEO"
          Height          =   255
          Left            =   240
-         TabIndex        =   28
+         TabIndex        =   30
          Top             =   360
          Width           =   855
       End
@@ -248,7 +257,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Residue to modify:"
          Height          =   255
          Left            =   3000
-         TabIndex        =   34
+         TabIndex        =   36
          Top             =   240
          Width           =   1335
       End
@@ -264,7 +273,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Mass (Da):"
          Height          =   255
          Left            =   3000
-         TabIndex        =   36
+         TabIndex        =   38
          Top             =   840
          Width           =   1095
       End
@@ -294,7 +303,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Alkylation mass:"
          Height          =   255
          Left            =   1560
-         TabIndex        =   32
+         TabIndex        =   34
          Top             =   720
          Width           =   1335
       End
@@ -304,8 +313,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "NET  Calculation"
       Height          =   1455
       Left            =   0
-      TabIndex        =   13
-      Top             =   2760
+      TabIndex        =   15
+      Top             =   3000
       Width           =   5175
       Begin VB.CheckBox chkDisableCustomNETs 
          BackColor       =   &H00FFFFFF&
@@ -313,7 +322,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          ForeColor       =   &H80000008&
          Height          =   255
          Left            =   2640
-         TabIndex        =   16
+         TabIndex        =   18
          Top             =   480
          Width           =   2400
       End
@@ -322,7 +331,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Use Class NET for UMCs"
          Height          =   255
          Left            =   2640
-         TabIndex        =   19
+         TabIndex        =   21
          ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0000
          Top             =   240
          Width           =   2205
@@ -331,7 +340,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   4320
-         TabIndex        =   21
+         TabIndex        =   23
          Text            =   "0.1"
          Top             =   1020
          Width           =   615
@@ -342,7 +351,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Index           =   1
          Left            =   120
-         TabIndex        =   15
+         TabIndex        =   17
          ToolTipText     =   "Use Predicted NET values for the MT tags"
          Top             =   480
          Width           =   2500
@@ -353,7 +362,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Index           =   0
          Left            =   120
-         TabIndex        =   14
+         TabIndex        =   16
          ToolTipText     =   "Use NET calculated from all peptide observations for each MT tag"
          Top             =   240
          Value           =   -1  'True
@@ -362,7 +371,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Begin VB.TextBox txtNETFormula 
          Height          =   285
          Left            =   120
-         TabIndex        =   18
+         TabIndex        =   20
          Text            =   "(FN-MinFN)/(MaxFN-MinFN)"
          Top             =   1020
          Width           =   2775
@@ -372,7 +381,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "NET T&olerance"
          Height          =   255
          Left            =   3000
-         TabIndex        =   20
+         TabIndex        =   22
          ToolTipText     =   "Normalized Elution Time Tolerance (if blank NET will not be considered in search)"
          Top             =   1035
          Width           =   1335
@@ -382,7 +391,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Formula  F(FN, MinFN, MaxFN)"
          Height          =   255
          Left            =   120
-         TabIndex        =   17
+         TabIndex        =   19
          Top             =   810
          Width           =   2415
       End
@@ -392,14 +401,14 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Molecular Mass Tolerance"
       Height          =   1455
       Left            =   5280
-      TabIndex        =   22
-      Top             =   2760
+      TabIndex        =   24
+      Top             =   3000
       Width           =   2175
       Begin VB.ComboBox cboSearchRegionShape 
          Height          =   315
          Left            =   120
          Style           =   2  'Dropdown List
-         TabIndex        =   51
+         TabIndex        =   53
          Top             =   1080
          Width           =   1935
       End
@@ -409,7 +418,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Index           =   1
          Left            =   1080
-         TabIndex        =   26
+         TabIndex        =   28
          Top             =   720
          Width           =   855
       End
@@ -419,7 +428,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Index           =   0
          Left            =   1080
-         TabIndex        =   25
+         TabIndex        =   27
          Top             =   360
          Value           =   -1  'True
          Width           =   855
@@ -428,7 +437,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   160
-         TabIndex        =   24
+         TabIndex        =   26
          Text            =   "10"
          Top             =   640
          Width           =   735
@@ -439,7 +448,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Tolerance"
          Height          =   255
          Left            =   160
-         TabIndex        =   23
+         TabIndex        =   25
          Top             =   360
          Width           =   855
       End
@@ -451,6 +460,16 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       TabIndex        =   4
       Top             =   960
       Width           =   1815
+   End
+   Begin VB.Label lblDescription 
+      BackStyle       =   0  'Transparent
+      Caption         =   "Minimum Peptide Prophet Probability"
+      Height          =   255
+      Index           =   1
+      Left            =   120
+      TabIndex        =   13
+      Top             =   2655
+      Width           =   2865
    End
    Begin VB.Label lblDescription 
       BackStyle       =   0  'Transparent
@@ -497,16 +516,16 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Generic NET"
       Height          =   255
       Left            =   5280
-      TabIndex        =   47
-      Top             =   6000
+      TabIndex        =   49
+      Top             =   6240
       Width           =   2175
    End
    Begin VB.Label lblStatus 
       BackStyle       =   0  'Transparent
       Height          =   255
       Left            =   120
-      TabIndex        =   46
-      Top             =   6000
+      TabIndex        =   48
+      Top             =   6240
       Width           =   4935
    End
    Begin VB.Label lblMTStatus 
@@ -738,6 +757,7 @@ Private mUsingDefaultGANET As Boolean
 Private eInternalStdSearchMode As issmInternalStandardSearchModeConstants
 Private mMTMinimumHighNormalizedScore As Single
 Private mMTMinimumHighDiscriminantScore As Single
+Private mMTMinimumPeptideProphetProbability As Single
 
 Private mMDTypeSaved As Long
 
@@ -962,7 +982,7 @@ Private Function DisplayHitSummary(strSearchScope As String) As String
     
     GelSearchDef(CallerID).AMTSearchOnUMCs = samtDef
     
-    AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched " & strSearchScope & " UMC's for " & strSearchItems & " (searched by UMC conglomerate mass, " & lblUMCMassMode & "; however, all members of a UMC are assigned all matches found for the UMC)", mMatchStatsCount, mMTMinimumHighNormalizedScore, mMTMinimumHighDiscriminantScore, samtDef, True, mSearchUsedCustomNETs)
+    AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched " & strSearchScope & " UMC's for " & strSearchItems & " (searched by UMC conglomerate mass, " & lblUMCMassMode & "; however, all members of a UMC are assigned all matches found for the UMC)", mMatchStatsCount, mMTMinimumHighNormalizedScore, mMTMinimumHighDiscriminantScore, mMTMinimumPeptideProphetProbability, samtDef, True, mSearchUsedCustomNETs)
     
     strModMassDescription = ConstructMassTagModMassDescription(GelSearchDef(CallerID).AMTSearchMassMods)
     If Len(strModMassDescription) > 0 Then
@@ -2261,11 +2281,17 @@ If IsNumeric(txtDBSearchMinimumHighDiscriminantScore.Text) Then
 Else
     mMTMinimumHighDiscriminantScore = 0
 End If
-    
-If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Then
-    If mMTMinimumHighDiscriminantScore > 0 Then
+
+If IsNumeric(txtDBSearchMinimumPeptideProphetProbability.Text) Then
+    mMTMinimumPeptideProphetProbability = CSngSafe(txtDBSearchMinimumPeptideProphetProbability.Text)
+Else
+    mMTMinimumPeptideProphetProbability = 0
+End If
+
+If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
+    If mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
         ' Make sure at least two of the loaded MT tags have score values >= mMTMinimumHighDiscriminantScore, also taking into account HighNormalizedScore
-        ValidateMTMinimimumHighDiscriminantScore AMTData(), 1, AMTCnt, mMTMinimumHighDiscriminantScore, mMTMinimumHighNormalizedScore, 2
+        ValidateMTMinimumDiscriminantAndPepProphet AMTData(), 1, AMTCnt, mMTMinimumHighDiscriminantScore, mMTMinimumPeptideProphetProbability, mMTMinimumHighNormalizedScore, 2
     Else
         ' Make sure at least two of the loaded MT tags have score values >= mMTMinimumHighNormalizedScore
         ValidateMTMinimimumHighNormalizedScore AMTData(), 1, AMTCnt, mMTMinimumHighNormalizedScore, 2
@@ -2289,8 +2315,10 @@ Else
    ReDim mMTMods(AMTCnt - 1)
    mMTCnt = 0
    For i = 1 To AMTCnt
-        If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Then
-            If AMTData(i).HighNormalizedScore >= mMTMinimumHighNormalizedScore And AMTData(i).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore Then
+        If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
+            If AMTData(i).HighNormalizedScore >= mMTMinimumHighNormalizedScore And _
+               AMTData(i).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore And _
+               AMTData(i).PeptideProphetProbability >= mMTMinimumPeptideProphetProbability Then
                 blnAddMassTag = True
             Else
                 blnAddMassTag = False
@@ -3160,6 +3188,7 @@ Private Sub SetDefaultOptions()
     
     txtDBSearchMinimumHighNormalizedScore.Text = 0
     txtDBSearchMinimumHighDiscriminantScore.Text = 0
+    txtDBSearchMinimumPeptideProphetProbability.Text = 0
     
     optNETorRT(udtSearchDef.NETorRT).Value = True
     SetCheckBox chkUseUMCConglomerateNET, True
@@ -3266,6 +3295,10 @@ End Sub
 
 Public Sub SetMinimumHighNormalizedScore(sngMinimumHighNormalizedScore As Single)
     txtDBSearchMinimumHighNormalizedScore = sngMinimumHighNormalizedScore
+End Sub
+
+Public Sub SetMinimumPeptideProphetProbability(sngMinimumPeptideProphetProbability As Single)
+    txtDBSearchMinimumPeptideProphetProbability = sngMinimumPeptideProphetProbability
 End Sub
 
 Private Sub ShowErrorDistribution2DForm()
@@ -4567,6 +4600,10 @@ End Sub
 
 Private Sub txtDBSearchMinimumHighNormalizedScore_LostFocus()
     ValidateTextboxValueDbl txtDBSearchMinimumHighNormalizedScore, 0, 100000, 0
+End Sub
+
+Private Sub txtDBSearchMinimumPeptideProphetProbability_LostFocus()
+    ValidateTextboxValueDbl txtDBSearchMinimumPeptideProphetProbability, 0, 1, 0
 End Sub
 
 Private Sub txtMWTol_LostFocus()

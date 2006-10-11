@@ -126,6 +126,7 @@ Private Sub ResetAutoSearchModeEntry(udtAutoSearchModeEntry As udtAutoAnalysisSe
         
         .DBSearchMinimumHighNormalizedScore = 0
         .DBSearchMinimumHighDiscriminantScore = 0
+        .DBSearchMinimumPeptideProphetProbability = 0
         ResetDBSearchMassMods .MassMods
     End With
 End Sub
@@ -1231,6 +1232,31 @@ On Error GoTo LoadSettingsFileHandler
     
         .NETAdjustmentPairedSearchUMCSelection = GetIniFileSettingLng(IniStuff, "PairSearchOptions", "NETAdjustmentPairedSearchUMCSelection", CInt(.NETAdjustmentPairedSearchUMCSelection))
         .OutlierRemovalUsesSymmetricERs = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "OutlierRemovalUsesSymmetricERs", .OutlierRemovalUsesSymmetricERs)
+        
+        .AutoAnalysisDeltaMassAddnlCount = GetIniFileSettingInt(IniStuff, "PairSearchOptions", "AutoAnalysisDeltaMassAddnlCount", .AutoAnalysisDeltaMassAddnlCount)
+        
+        If .AutoAnalysisDeltaMassAddnlCount <= 0 Then
+            ReDim .AutoAnalysisDeltaMassAddnl(0)
+        Else
+            ReDim .AutoAnalysisDeltaMassAddnl(.AutoAnalysisDeltaMassAddnlCount - 1)
+        End If
+        
+        For intIndex = 0 To .AutoAnalysisDeltaMassAddnlCount - 1
+            strKeyPrefix = "AutoAnalysisDeltaMassAddnl" & Trim(intIndex + 1)
+        
+            strKeyValue = GetIniFileSetting(IniStuff, "PairSearchOptions", strKeyPrefix, ENTRY_NOT_FOUND)
+            If strKeyValue = ENTRY_NOT_FOUND Then
+                .AutoAnalysisDeltaMassAddnlCount = intIndex
+                Exit For
+            Else
+                If IsNumeric(strKeyValue) Then
+                    .AutoAnalysisDeltaMassAddnl(intIndex) = CDbl(strKeyValue)
+                Else
+                    .AutoAnalysisDeltaMassAddnl(intIndex) = 0
+                End If
+            End If
+        Next intIndex
+        
     End With
     
     ' IReport Pair options
@@ -1288,6 +1314,10 @@ On Error GoTo LoadSettingsFileHandler
             
             .DBSearchMinimumHighNormalizedScore = GetIniFileSettingSng(IniStuff, "AutoToleranceRefinement", "DBSearchMinimumHighNormalizedScore", .DBSearchMinimumHighNormalizedScore)
             .DBSearchMinimumHighDiscriminantScore = GetIniFileSettingSng(IniStuff, "AutoToleranceRefinement", "DBSearchMinimumHighDiscriminantScore", .DBSearchMinimumHighDiscriminantScore)
+            
+            ' Note: if DBSearchMinimumPeptideProphetProbability is missing from the .Ini file, we're assuming a value of 0, not a value of .DBSearchMinimumPeptideProphetProbability
+            ' This is done to assure backwards compatibility
+            .DBSearchMinimumPeptideProphetProbability = GetIniFileSettingSng(IniStuff, "AutoToleranceRefinement", "DBSearchMinimumPeptideProphetProbability", 0)
             
             .RefineMassCalibration = GetIniFileSettingBln(IniStuff, "AutoToleranceRefinement", "RefineMassCalibration", .RefineMassCalibration)
             .RefineMassCalibrationOverridePPM = GetIniFileSettingDbl(IniStuff, "AutoToleranceRefinement", "RefineMassCalibrationOverridePPM", .RefineMassCalibrationOverridePPM)
@@ -1365,6 +1395,7 @@ On Error GoTo LoadSettingsFileHandler
                 
                 .DBSearchMinimumHighNormalizedScore = GetIniFileSettingSng(IniStuff, strSectionName, "DBSearchMinimumHighNormalizedScore", .DBSearchMinimumHighNormalizedScore)
                 .DBSearchMinimumHighDiscriminantScore = GetIniFileSettingSng(IniStuff, strSectionName, "DBSearchMinimumHighDiscriminantScore", .DBSearchMinimumHighDiscriminantScore)
+                .DBSearchMinimumPeptideProphetProbability = GetIniFileSettingSng(IniStuff, strSectionName, "DBSearchMinimumPeptideProphetProbability", .DBSearchMinimumPeptideProphetProbability)
 
                 With .MassMods
                     .DynamicMods = GetIniFileSettingBln(IniStuff, strSectionName, "DynamicMods", .DynamicMods)
@@ -1401,6 +1432,7 @@ On Error GoTo LoadSettingsFileHandler
                         
                         .DBSearchMinimumHighNormalizedScore = GetIniFileSettingSng(IniStuff, strSectionName, "DBSearchMinimumHighNormalizedScore", 0)
                         .DBSearchMinimumHighDiscriminantScore = GetIniFileSettingSng(IniStuff, strSectionName, "DBSearchMinimumHighDiscriminantScore", 0)
+                        .DBSearchMinimumPeptideProphetProbability = GetIniFileSettingSng(IniStuff, strSectionName, "DBSearchMinimumPeptideProphetProbability", 0)
                                         
                         With .MassMods
                             .DynamicMods = GetIniFileSettingBln(IniStuff, strSectionName, "DynamicMods", True)
@@ -2192,8 +2224,8 @@ On Error GoTo SaveSettingsFileHandler
     IniStuff.WriteSection "UMCBrowserOptions", strKeys(), strValues()
     
     ' Write the Pair Search Options
-    ReDim strKeys(0 To 36)
-    ReDim strValues(0 To 36)
+    ReDim strKeys(0 To 37)
+    ReDim strValues(0 To 37)
     With udtPrefsExpanded.PairSearchOptions
         With .SearchDef
             strKeys(0) = "DeltaMass": strValues(0) = .DeltaMass
@@ -2246,6 +2278,27 @@ On Error GoTo SaveSettingsFileHandler
         
         strKeys(35) = "NETAdjustmentPairedSearchUMCSelection": strValues(35) = .NETAdjustmentPairedSearchUMCSelection
         strKeys(36) = "OutlierRemovalUsesSymmetricERs": strValues(36) = .OutlierRemovalUsesSymmetricERs
+    
+        strKeys(37) = "AutoAnalysisDeltaMassAddnlCount": strValues(37) = .AutoAnalysisDeltaMassAddnlCount
+        
+        If .AutoAnalysisDeltaMassAddnlCount > 0 Then
+            intTargetIndexBase = UBound(strKeys) + 1
+            ReDim Preserve strKeys(intTargetIndexBase + .AutoAnalysisDeltaMassAddnlCount - 1)
+            ReDim Preserve strValues(intTargetIndexBase + .AutoAnalysisDeltaMassAddnlCount - 1)
+            
+            For intIndex = 0 To .AutoAnalysisDeltaMassAddnlCount - 1
+                strKeys(intTargetIndexBase + intIndex) = "AutoAnalysisDeltaMassAddnl" & Trim(intIndex + 1)
+                strValues(intTargetIndexBase + intIndex) = .AutoAnalysisDeltaMassAddnl(intIndex)
+            Next intIndex
+        Else
+            intTargetIndexBase = UBound(strKeys) + 1
+            ReDim Preserve strKeys(intTargetIndexBase)
+            ReDim Preserve strValues(intTargetIndexBase)
+            
+            strKeys(intTargetIndexBase) = "AutoAnalysisDeltaMassAddnl1"
+            strValues(intTargetIndexBase) = "0"
+        End If
+        
     End With
     IniStuff.WriteSection "PairSearchOptions", strKeys(), strValues()
         
@@ -2299,8 +2352,8 @@ On Error GoTo SaveSettingsFileHandler
     IniStuff.WriteSection "GraphicExportOptions", strKeys(), strValues()
     
     ' Write the Auto Tolerance Refinement Options
-    ReDim strKeys(0 To 9)
-    ReDim strValues(0 To 9)
+    ReDim strKeys(0 To 10)
+    ReDim strValues(0 To 10)
     With udtPrefsExpanded.AutoAnalysisOptions.AutoToleranceRefinement
         strKeys(0) = "DBSearchMWTol": strValues(0) = .DBSearchMWTol
         strKeys(1) = "DBSearchTolType": strValues(1) = .DBSearchTolType
@@ -2308,10 +2361,11 @@ On Error GoTo SaveSettingsFileHandler
         strKeys(3) = "DBSearchRegionShape": strValues(3) = .DBSearchRegionShape
         strKeys(4) = "DBSearchMinimumHighNormalizedScore": strValues(4) = .DBSearchMinimumHighNormalizedScore
         strKeys(5) = "DBSearchMinimumHighDiscriminantScore": strValues(5) = .DBSearchMinimumHighDiscriminantScore
-        strKeys(6) = "RefineMassCalibration": strValues(6) = .RefineMassCalibration
-        strKeys(7) = "RefineMassCalibrationOverridePPM": strValues(7) = .RefineMassCalibrationOverridePPM
-        strKeys(8) = "RefineDBSearchMassTolerance": strValues(8) = .RefineDBSearchMassTolerance
-        strKeys(9) = "RefineDBSearchNETTolerance": strValues(9) = .RefineDBSearchNETTolerance
+        strKeys(6) = "DBSearchMinimumPeptideProphetProbability": strValues(6) = .DBSearchMinimumPeptideProphetProbability
+        strKeys(7) = "RefineMassCalibration": strValues(7) = .RefineMassCalibration
+        strKeys(8) = "RefineMassCalibrationOverridePPM": strValues(8) = .RefineMassCalibrationOverridePPM
+        strKeys(9) = "RefineDBSearchMassTolerance": strValues(9) = .RefineDBSearchMassTolerance
+        strKeys(10) = "RefineDBSearchNETTolerance": strValues(10) = .RefineDBSearchNETTolerance
     End With
     IniStuff.WriteSection "AutoToleranceRefinement", strKeys(), strValues()
     
@@ -2379,8 +2433,8 @@ On Error GoTo SaveSettingsFileHandler
             With .AutoAnalysisSearchMode(intAutoSearchModeIndex)
                 
                 ' Write this Auto Analysis Search Mode's settings
-                ReDim strKeys(0 To 18)
-                ReDim strValues(0 To 18)
+                ReDim strKeys(0 To 19)
+                ReDim strValues(0 To 19)
                 
                 strKeys(0) = "SearchModeList": strValues(0) = "; Options are " & GetAutoAnalysisOptionsList()
                 strKeys(1) = "SearchMode": strValues(1) = .SearchMode
@@ -2392,17 +2446,18 @@ On Error GoTo SaveSettingsFileHandler
                 strKeys(7) = "InternalStdSearchMode": strValues(7) = .InternalStdSearchMode
                 strKeys(8) = "DBSearchMinimumHighNormalizedScore": strValues(8) = .DBSearchMinimumHighNormalizedScore
                 strKeys(9) = "DBSearchMinimumHighDiscriminantScore": strValues(9) = .DBSearchMinimumHighDiscriminantScore
+                strKeys(10) = "DBSearchMinimumPeptideProphetProbability": strValues(10) = .DBSearchMinimumPeptideProphetProbability
                 
                 With .MassMods
-                    strKeys(10) = "DynamicMods": strValues(10) = .DynamicMods
-                    strKeys(11) = "N15InsteadOfN14": strValues(11) = .N15InsteadOfN14
-                    strKeys(12) = "PEO": strValues(12) = .PEO
-                    strKeys(13) = "ICATd0": strValues(13) = .ICATd0
-                    strKeys(14) = "ICATd8": strValues(14) = .ICATd8
-                    strKeys(15) = "Alkylation": strValues(15) = .Alkylation
-                    strKeys(16) = "AlkylationMass": strValues(16) = .AlkylationMass
-                    strKeys(17) = "ResidueToModify": strValues(17) = .ResidueToModify
-                    strKeys(18) = "ResidueMassModification": strValues(18) = .ResidueMassModification
+                    strKeys(11) = "DynamicMods": strValues(11) = .DynamicMods
+                    strKeys(12) = "N15InsteadOfN14": strValues(12) = .N15InsteadOfN14
+                    strKeys(13) = "PEO": strValues(13) = .PEO
+                    strKeys(14) = "ICATd0": strValues(14) = .ICATd0
+                    strKeys(15) = "ICATd8": strValues(15) = .ICATd8
+                    strKeys(16) = "Alkylation": strValues(16) = .Alkylation
+                    strKeys(17) = "AlkylationMass": strValues(17) = .AlkylationMass
+                    strKeys(18) = "ResidueToModify": strValues(18) = .ResidueToModify
+                    strKeys(19) = "ResidueMassModification": strValues(19) = .ResidueMassModification
                 End With
                 
                 IniStuff.WriteSection "AutoAnalysisSearchMode" & Trim(intAutoSearchModeIndex + 1), strKeys(), strValues()
@@ -2487,7 +2542,9 @@ On Error GoTo SaveSettingsFileHandler
             
             .MinimumHighNormalizedScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_HIGH_NORMALIZED_SCORE))
             .MinimumHighDiscriminantScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE))
+            .MinimumPeptideProphetProbability = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY))
             .MinimumPMTQualityScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_PMT_QUALITY_SCORE))
+            
             .ExperimentInclusionFilter = CStrSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_EXPERIMENT_INCLUSION_FILTER))
             .ExperimentExclusionFilter = CStrSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_EXPERIMENT_EXCLUSION_FILTER))
             .InternalStandardExplicit = CStrSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_INTERNAL_STANDARD_EXPLICIT))
@@ -2663,7 +2720,9 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
                 
                 .MinimumHighNormalizedScore = CSngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "MinimumHighNormalizedScore"))
                 .MinimumHighDiscriminantScore = CSngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "MinimumHighDiscriminantScore"))
+                .MinimumPeptideProphetProbability = CSngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "MinimumPeptideProphetProbability"))
                 .MinimumPMTQualityScore = CSngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "MinimumPMTQualityScore"))
+                
                 .ExperimentInclusionFilter = CStrSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "ExperimentInclusionFilter"))
                 .ExperimentExclusionFilter = CStrSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "ExperimentExclusionFilter"))
                 .InternalStandardExplicit = LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "InternalStandardExplicit")
@@ -2771,7 +2830,9 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
                         
                         AddOrUpdateCollectionArrayItem .DBStuffArray(), .DBStuffArrayCount, NAME_MINIMUM_HIGH_NORMALIZED_SCORE, CStr(udtDBSettingsSingle.MinimumHighNormalizedScore)
                         AddOrUpdateCollectionArrayItem .DBStuffArray(), .DBStuffArrayCount, NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE, CStr(udtDBSettingsSingle.MinimumHighDiscriminantScore)
+                        AddOrUpdateCollectionArrayItem .DBStuffArray(), .DBStuffArrayCount, NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY, CStr(udtDBSettingsSingle.MinimumPeptideProphetProbability)
                         AddOrUpdateCollectionArrayItem .DBStuffArray(), .DBStuffArrayCount, NAME_MINIMUM_PMT_QUALITY_SCORE, CStr(udtDBSettingsSingle.MinimumPMTQualityScore)
+                        
                         AddOrUpdateCollectionArrayItem .DBStuffArray(), .DBStuffArrayCount, NAME_EXPERIMENT_INCLUSION_FILTER, CStr(udtDBSettingsSingle.ExperimentInclusionFilter)
                         AddOrUpdateCollectionArrayItem .DBStuffArray(), .DBStuffArrayCount, NAME_EXPERIMENT_EXCLUSION_FILTER, CStr(udtDBSettingsSingle.ExperimentExclusionFilter)
                         AddOrUpdateCollectionArrayItem .DBStuffArray(), .DBStuffArrayCount, NAME_INTERNAL_STANDARD_EXPLICIT, CStr(udtDBSettingsSingle.InternalStandardExplicit)
@@ -2781,7 +2842,8 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
                         
                         ' .DBStuffArrayCount was 29 in August 2004
                         ' .DBStuffArrayCount is 32 in December 2005
-                        Debug.Assert .DBStuffArrayCount = 32
+                        ' .DBStuffArrayCount is 33 in October 2006
+                        Debug.Assert .DBStuffArrayCount = 33
     
                         ' Also update .ConnectionString
                         .ConnectionString = udtDBSettingsSingle.ConnectionString
@@ -2836,11 +2898,11 @@ Private Sub IniFileWriteSingleDBConnection(objIniStuff As clsIniStuff, strSectio
     With udtDBSettingsSingle
     
         If blnIncludeDetailedAnalysisInfo Then
-            ReDim strKeys(0 To 51)
-            ReDim strValues(0 To 51)
+            ReDim strKeys(0 To 52)
+            ReDim strValues(0 To 52)
         Else
-            ReDim strKeys(0 To 20)
-            ReDim strValues(0 To 20)
+            ReDim strKeys(0 To 21)
+            ReDim strValues(0 To 21)
         End If
             
         ' Write the version number
@@ -2857,58 +2919,60 @@ Private Sub IniFileWriteSingleDBConnection(objIniStuff As clsIniStuff, strSectio
         
         strKeys(7) = "MinimumHighNormalizedScore": strValues(7) = CStr(.MinimumHighNormalizedScore)
         strKeys(8) = "MinimumHighDiscriminantScore": strValues(8) = CStr(.MinimumHighDiscriminantScore)
-        strKeys(9) = "MinimumPMTQualityScore": strValues(9) = CStr(.MinimumPMTQualityScore)
-        strKeys(10) = "ExperimentInclusionFilter": strValues(10) = .ExperimentInclusionFilter
-        strKeys(11) = "ExperimentExclusionFilter": strValues(11) = .ExperimentExclusionFilter
-        strKeys(12) = "InternalStandardExplicit": strValues(12) = .InternalStandardExplicit
+        strKeys(9) = "MinimumPeptideProphetProbability": strValues(9) = CStr(.MinimumPeptideProphetProbability)
+        strKeys(10) = "MinimumPMTQualityScore": strValues(10) = CStr(.MinimumPMTQualityScore)
         
-        strKeys(13) = "NETValueType": strValues(13) = CStr(.NETValueType)
+        strKeys(11) = "ExperimentInclusionFilter": strValues(11) = .ExperimentInclusionFilter
+        strKeys(12) = "ExperimentExclusionFilter": strValues(12) = .ExperimentExclusionFilter
+        strKeys(13) = "InternalStandardExplicit": strValues(13) = .InternalStandardExplicit
         
-        strKeys(14) = "MassTagSubsetID": strValues(14) = CStr(.MassTagSubsetID)
-        strKeys(15) = "ModificationList": strValues(15) = .ModificationList
+        strKeys(14) = "NETValueType": strValues(14) = CStr(.NETValueType)
         
-        strKeys(16) = "SelectedMassTagCount": strValues(16) = CStr(.SelectedMassTagCount)
+        strKeys(15) = "MassTagSubsetID": strValues(15) = CStr(.MassTagSubsetID)
+        strKeys(16) = "ModificationList": strValues(16) = .ModificationList
+        
+        strKeys(17) = "SelectedMassTagCount": strValues(17) = CStr(.SelectedMassTagCount)
         
         ' Now write the values in .AnalysisInfo
         With .AnalysisInfo
             
-            strKeys(17) = "GANET_Fit": strValues(17) = CStr(.GANET_Fit)
-            strKeys(18) = "GANET_Intercept": strValues(18) = CStr(.GANET_Intercept)
-            strKeys(19) = "GANET_Slope": strValues(19) = CStr(.GANET_Slope)
-            strKeys(20) = "ValidAnalysisDataPresent": strValues(20) = CStr(.ValidAnalysisDataPresent)
+            strKeys(18) = "GANET_Fit": strValues(18) = CStr(.GANET_Fit)
+            strKeys(19) = "GANET_Intercept": strValues(19) = CStr(.GANET_Intercept)
+            strKeys(20) = "GANET_Slope": strValues(20) = CStr(.GANET_Slope)
+            strKeys(21) = "ValidAnalysisDataPresent": strValues(21) = CStr(.ValidAnalysisDataPresent)
             
             If blnIncludeDetailedAnalysisInfo Then
-                strKeys(21) = "AnalysisTool": strValues(21) = .Analysis_Tool
-                strKeys(22) = "Created": strValues(22) = .Created
-                strKeys(23) = "Dataset": strValues(23) = .Dataset
-                strKeys(24) = "Dataset_Folder": strValues(24) = .Dataset_Folder
-                strKeys(25) = "Dataset_ID": strValues(25) = .Dataset_ID
-                strKeys(26) = "Desc_DataFolder": strValues(26) = .Desc_DataFolder
-                strKeys(27) = "Desc_Type": strValues(27) = .Desc_Type
-                strKeys(28) = "Duration": strValues(28) = .Duration
-                strKeys(29) = "Experiment": strValues(29) = .Experiment
-                strKeys(30) = "Instrument_Class": strValues(30) = .Instrument_Class
-                strKeys(31) = "Job": strValues(31) = .Job
-                strKeys(32) = "MD_Date": strValues(32) = .MD_Date
-                strKeys(33) = "MD_file": strValues(33) = .MD_file
-                strKeys(34) = "MD_Parameters": strValues(34) = .MD_Parameters
-                strKeys(35) = "MD_Reference_Job": strValues(35) = .MD_Reference_Job
-                strKeys(36) = "MD_State": strValues(36) = .MD_State
-                strKeys(37) = "MD_Type": strValues(37) = .MD_Type
-                strKeys(38) = "NET_Intercept": strValues(38) = .NET_Intercept
-                strKeys(39) = "NET_Slope": strValues(39) = .NET_Slope
-                strKeys(40) = "NET_TICFit": strValues(40) = .NET_TICFit
-                strKeys(41) = "Organism": strValues(41) = .Organism
-                strKeys(42) = "Organism_DB_Name": strValues(42) = .Organism_DB_Name
-                strKeys(43) = "Parameter_File_Name": strValues(43) = .Parameter_File_Name
-                strKeys(44) = "ProcessingType": strValues(44) = .ProcessingType
-                strKeys(45) = "Results_Folder": strValues(45) = .Results_Folder
-                strKeys(46) = "Settings_File_Name": strValues(46) = .Settings_File_Name
-                strKeys(47) = "State": strValues(47) = .STATE
-                strKeys(48) = "Storage_Path": strValues(48) = .Storage_Path
-                strKeys(49) = "Total_Scans": strValues(49) = .Total_Scans
-                strKeys(50) = "Vol_Client": strValues(50) = .Vol_Client
-                strKeys(51) = "Vol_Server": strValues(51) = .Vol_Server
+                strKeys(22) = "AnalysisTool": strValues(22) = .Analysis_Tool
+                strKeys(23) = "Created": strValues(23) = .Created
+                strKeys(24) = "Dataset": strValues(24) = .Dataset
+                strKeys(25) = "Dataset_Folder": strValues(25) = .Dataset_Folder
+                strKeys(26) = "Dataset_ID": strValues(26) = .Dataset_ID
+                strKeys(27) = "Desc_DataFolder": strValues(27) = .Desc_DataFolder
+                strKeys(28) = "Desc_Type": strValues(28) = .Desc_Type
+                strKeys(29) = "Duration": strValues(29) = .Duration
+                strKeys(30) = "Experiment": strValues(30) = .Experiment
+                strKeys(31) = "Instrument_Class": strValues(31) = .Instrument_Class
+                strKeys(32) = "Job": strValues(32) = .Job
+                strKeys(33) = "MD_Date": strValues(33) = .MD_Date
+                strKeys(34) = "MD_file": strValues(34) = .MD_file
+                strKeys(35) = "MD_Parameters": strValues(35) = .MD_Parameters
+                strKeys(36) = "MD_Reference_Job": strValues(36) = .MD_Reference_Job
+                strKeys(37) = "MD_State": strValues(37) = .MD_State
+                strKeys(38) = "MD_Type": strValues(38) = .MD_Type
+                strKeys(39) = "NET_Intercept": strValues(39) = .NET_Intercept
+                strKeys(40) = "NET_Slope": strValues(40) = .NET_Slope
+                strKeys(41) = "NET_TICFit": strValues(41) = .NET_TICFit
+                strKeys(42) = "Organism": strValues(42) = .Organism
+                strKeys(43) = "Organism_DB_Name": strValues(43) = .Organism_DB_Name
+                strKeys(44) = "Parameter_File_Name": strValues(44) = .Parameter_File_Name
+                strKeys(45) = "ProcessingType": strValues(45) = .ProcessingType
+                strKeys(46) = "Results_Folder": strValues(46) = .Results_Folder
+                strKeys(47) = "Settings_File_Name": strValues(47) = .Settings_File_Name
+                strKeys(48) = "State": strValues(48) = .STATE
+                strKeys(49) = "Storage_Path": strValues(49) = .Storage_Path
+                strKeys(50) = "Total_Scans": strValues(50) = .Total_Scans
+                strKeys(51) = "Vol_Client": strValues(51) = .Vol_Client
+                strKeys(52) = "Vol_Server": strValues(52) = .Vol_Server
             End If
             
             objIniStuff.WriteSection strSectionName, strKeys(), strValues()
@@ -2938,6 +3002,7 @@ Private Sub IniFileWriteSingleDBConnection(objIniStuff As clsIniStuff, strSectio
                         Case NAME_LIMIT_TO_PMTS_FROM_DATASET        ' Do not write to disk; it is included in the summary variables above
                         Case NAME_MINIMUM_HIGH_NORMALIZED_SCORE     ' Do not write to disk; it is included in the summary variables above
                         Case NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE   ' Do not write to disk; it is included in the summary variables above
+                        Case NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY   ' Do not write to disk; it is included in the summary variables above
                         Case NAME_MINIMUM_PMT_QUALITY_SCORE         ' Do not write to disk; it is included in the summary variables above
                         Case NAME_EXPERIMENT_INCLUSION_FILTER       ' Do not write to disk; it is included in the summary variables above
                         Case NAME_EXPERIMENT_EXCLUSION_FILTER       ' Do not write to disk; it is included in the summary variables above
@@ -3399,6 +3464,9 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .NETAdjustmentPairedSearchUMCSelection = punaUnpairedPlusPairedLight
                 
                 .OutlierRemovalUsesSymmetricERs = True
+                
+                .AutoAnalysisDeltaMassAddnlCount = 0
+                ReDim .AutoAnalysisDeltaMassAddnl(0)
             End With
         End If
         
@@ -3553,6 +3621,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .DBSearchRegionShape = srsElliptical
                     .DBSearchMinimumHighNormalizedScore = 2.5
                     .DBSearchMinimumHighDiscriminantScore = 0.5
+                    .DBSearchMinimumPeptideProphetProbability = 0.5
                     .RefineMassCalibration = True
                     .RefineMassCalibrationOverridePPM = 0
                     .RefineDBSearchMassTolerance = False

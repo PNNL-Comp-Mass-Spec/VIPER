@@ -331,7 +331,7 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
     Dim lngIndex As Long
     Dim lngReturnValue As Long
     
-    Dim objFile As file
+    Dim objFile As File
     Dim objFolder As Folder
     
     Dim MaxMZ As Double
@@ -441,10 +441,9 @@ On Error GoTo ReadCSVIsosFileErrorHandler
             
     With GelData(mGelIndex)
          ' Old: .PathtoDataFiles = GetPathWOFileName(CurrDataFName)
-         ' New: data file folder path is the folder one folder up from .Filename's folder
-        Set objFile = fso.GetFile(.FileName)
-        Set objFolder = objFile.ParentFolder
-        .PathtoDataFiles = objFolder.Path
+         ' New: data file folder path is the folder one folder up from .Filename's folder if .Filename's folder contains _Auto00000
+         '      if .Filename's folder does not contain _Auto0000, then simply use .Filename's folder
+        .PathtoDataFiles = DetermineParentFolderPath(.FileName)
         
         ' Note: CS Data is not loaded by this function
         ReDim .CSData(0)

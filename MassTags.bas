@@ -36,7 +36,9 @@ Public Const NAME_LIMIT_TO_PMTS_FROM_DATASET As String = "Limit to PMTs from Dat
 
 Public Const NAME_MINIMUM_HIGH_NORMALIZED_SCORE As String = "Minimum High Normalized Score"
 Public Const NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE As String = "Minimum High Discriminant Score"
+Public Const NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY As String = "Minimum Peptide Prophet Probability"
 Public Const NAME_MINIMUM_PMT_QUALITY_SCORE As String = "MinimumPMTQualityScore"
+
 Public Const NAME_NET_VALUE_TYPE As String = "NETValueType"
 Public Const NAME_EXPERIMENT_INCLUSION_FILTER As String = "Experiment Inclusion Filter"
 Public Const NAME_EXPERIMENT_EXCLUSION_FILTER As String = "Experiment Exclusion Filter"
@@ -60,7 +62,9 @@ Public Type udtMTFilteringOptionsType
     
     MinimumHighNormalizedScore As Single
     MinimumHighDiscriminantScore As Single      ' Only used in Schema Version 2
+    MinimumPeptideProphetProbability As Single  ' Only used in Schema Version 2
     MinimumPMTQualityScore As Single
+    
     ExperimentInclusionFilter As String         ' Only used in Schema Version 2
     ExperimentExclusionFilter As String         ' Only used in Schema Version 2
     InternalStandardExplicit As String          ' Only used in Schema Version 2
@@ -120,6 +124,8 @@ Dim prmMinimumHighDiscriminantScore As ADODB.Parameter
 Dim prmExperimentInclusionFilter As ADODB.Parameter
 Dim prmExperimentExclusionFilter As ADODB.Parameter
 Dim prmJobToFilterOnByDataset As ADODB.Parameter
+
+Dim prmMinimumPeptideProphetProbability As ADODB.Parameter
 
 ' MonroeMod
 Dim strProgressDots As String
@@ -282,6 +288,9 @@ If sngDBSchemaVersion >= 2 Then
         prmJobToFilterOnByDataset.Value = udtFilteringOptions.CurrentJob
     End If
     cmdGetMassTags.Parameters.Append prmJobToFilterOnByDataset
+
+    Set prmMinimumPeptideProphetProbability = cmdGetMassTags.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamInput, , udtFilteringOptions.MinimumPeptideProphetProbability)
+    cmdGetMassTags.Parameters.Append prmMinimumPeptideProphetProbability
 End If
 
 'procedure returns error number or 0 if OK
@@ -328,6 +337,7 @@ With rsMassTags
            
            AMTData(AMTCnt).HighNormalizedScore = FixNullDbl(.Fields(5).Value, 0)
            AMTData(AMTCnt).HighDiscriminantScore = FixNullDbl(.Fields(7).Value, 0)
+           AMTData(AMTCnt).PeptideProphetProbability = FixNullDbl(.Fields(11).Value, 0)
            
             ' MonroeMod: Store -1 as the Mass value when the MT tag Mass value is Null
            AMTData(AMTCnt).MW = FixNullDbl(.Fields(2).Value, MASS_VALUE_IF_NULL)
@@ -492,6 +502,7 @@ Dim prmConfirmedOnly As ADODB.Parameter
 Dim prmMinimumPMTQualityScore As ADODB.Parameter
 Dim prmMinimumHighNormalizedScore As ADODB.Parameter
 Dim prmMinimumHighDiscriminantScore As ADODB.Parameter
+Dim prmMinimumPeptideProphetProbability As ADODB.Parameter
 
 Dim intMTIDField As Integer, intORFIDField As Integer, intReferenceField As Integer
 Dim intFieldIndex As Integer
@@ -563,6 +574,7 @@ If blnIncludeORFsForMassTagsNotInMemory Then
         .ConfirmedOnly = False
         .MinimumHighNormalizedScore = 0
         .MinimumHighDiscriminantScore = 0
+        .MinimumPeptideProphetProbability = 0
         .MinimumPMTQualityScore = 0
     End With
 End If
@@ -579,6 +591,8 @@ cmdGetMap.Parameters.Append prmMinimumPMTQualityScore
 Set prmMinimumHighDiscriminantScore = cmdGetMap.CreateParameter("MinimumHighDiscriminantScore", adSingle, adParamInput, , udtFilteringOptions.MinimumHighDiscriminantScore)
 cmdGetMap.Parameters.Append prmMinimumHighDiscriminantScore
 
+Set prmMinimumPeptideProphetProbability = cmdGetMap.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamInput, , udtFilteringOptions.MinimumPeptideProphetProbability)
+cmdGetMap.Parameters.Append prmMinimumPeptideProphetProbability
 
 'procedure returns error number or 0 if OK
 Set rsMT_ORF_Map = cmdGetMap.Execute
@@ -827,6 +841,11 @@ Public Sub LookupMTFilteringOptions(ByVal lngGelIndex As Long, ByRef udtFilterin
             udtFilteringOptions.MinimumHighDiscriminantScore = 0
             Err.Clear
         End If
+        udtFilteringOptions.MinimumPeptideProphetProbability = .DBStuff(NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY).Value      ' Single
+        If Err Then
+            udtFilteringOptions.MinimumPeptideProphetProbability = 0
+            Err.Clear
+        End If
         udtFilteringOptions.MinimumPMTQualityScore = .DBStuff(NAME_MINIMUM_PMT_QUALITY_SCORE).Value      ' Single
         If Err Then
            udtFilteringOptions.MinimumPMTQualityScore = 0
@@ -1025,7 +1044,9 @@ On Error Resume Next
             
             strMessage = strMessage & "; Minimum High Normalized Score = " & Trim(.MinimumHighNormalizedScore)
             strMessage = strMessage & "; Minimum High Discriminant Score = " & Trim(.MinimumHighDiscriminantScore)
+            strMessage = strMessage & "; Minimum Peptide Prophet Probability = " & Trim(.MinimumPeptideProphetProbability)
             strMessage = strMessage & "; Minimum PMT Quality Score = " & Trim(.MinimumPMTQualityScore)
+            
             If Len(.ExperimentInclusionFilter) > 0 Then
                 strMessage = strMessage & "; Experiment Inclusion Filter = " & .ExperimentInclusionFilter
             End If

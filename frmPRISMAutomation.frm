@@ -729,6 +729,7 @@ Private Sub QueryPRISM()
     Dim prmMessage As New ADODB.Parameter
     Dim prmDBSchemaVersion As New ADODB.Parameter
     Dim prmToolVersion As New ADODB.Parameter
+    Dim prmMinimumPeptideProphetProbability As New ADODB.Parameter
     
     ' Do not allow recursive calls to this sub
     ' If a recursive call does occur, make sure the Timer is disabled
@@ -908,22 +909,22 @@ On Error GoTo QueryPRISMErrorHandler
     Set prmModList = cmdGetPMTask.CreateParameter("modList", adVarChar, adParamOutput, 128, "")
     cmdGetPMTask.Parameters.Append prmModList
     
-    Set prmMinimumHighNormalizedScore = cmdGetPMTask.CreateParameter("MinimumHighNormalizedScore", adSingle, adParamOutput)
+    Set prmMinimumHighNormalizedScore = cmdGetPMTask.CreateParameter("MinimumHighNormalizedScore", adSingle, adParamOutput, , 0)
     cmdGetPMTask.Parameters.Append prmMinimumHighNormalizedScore
     
-    Set prmMinimumHighDiscriminantScore = cmdGetPMTask.CreateParameter("MinimumHighDiscriminantScore", adSingle, adParamOutput)
+    Set prmMinimumHighDiscriminantScore = cmdGetPMTask.CreateParameter("MinimumHighDiscriminantScore", adSingle, adParamOutput, , 0)
     cmdGetPMTask.Parameters.Append prmMinimumHighDiscriminantScore
     
-    Set prmMinimumPMTQualityScore = cmdGetPMTask.CreateParameter("MinimumPMTQualityScore", adSingle, adParamOutput)
+    Set prmMinimumPMTQualityScore = cmdGetPMTask.CreateParameter("MinimumPMTQualityScore", adSingle, adParamOutput, , 0)
     cmdGetPMTask.Parameters.Append prmMinimumPMTQualityScore
     
-    Set prmExperimentInclusionFilter = cmdGetPMTask.CreateParameter("ExperimentFilter", adVarChar, adParamOutput, 64)
+    Set prmExperimentInclusionFilter = cmdGetPMTask.CreateParameter("ExperimentFilter", adVarChar, adParamOutput, 64, "")
     cmdGetPMTask.Parameters.Append prmExperimentInclusionFilter
     
-    Set prmExperimentExclusionFilter = cmdGetPMTask.CreateParameter("ExperimentExclusionFilter", adVarChar, adParamOutput, 64)
+    Set prmExperimentExclusionFilter = cmdGetPMTask.CreateParameter("ExperimentExclusionFilter", adVarChar, adParamOutput, 64, "")
     cmdGetPMTask.Parameters.Append prmExperimentExclusionFilter
     
-    Set prmInternalStdExplicit = cmdGetPMTask.CreateParameter("InternalStdExplicit", adVarChar, adParamOutput, 255)
+    Set prmInternalStdExplicit = cmdGetPMTask.CreateParameter("InternalStdExplicit", adVarChar, adParamOutput, 255, "")
     cmdGetPMTask.Parameters.Append prmInternalStdExplicit
     
     Set prmNETValueType = cmdGetPMTask.CreateParameter("NETValueType", adTinyInt, adParamOutput, , 0)
@@ -946,6 +947,10 @@ On Error GoTo QueryPRISMErrorHandler
     
     Set prmToolVersion = cmdGetPMTask.CreateParameter("toolVersion", adVarChar, adParamInput, 128, GetMyNameVersion(True, True))
     cmdGetPMTask.Parameters.Append prmToolVersion
+    
+    Set prmMinimumPeptideProphetProbability = cmdGetPMTask.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamOutput, , 0)
+    cmdGetPMTask.Parameters.Append prmMinimumPeptideProphetProbability
+    
     
     strLastGoodLocation = "Execute Stored Procedure: " & strRequestTaskSPName
     If mDebug Then AddToPrismAutoAnalysisLog strLastGoodLocation
@@ -1009,7 +1014,9 @@ On Error GoTo QueryPRISMErrorHandler
                 
                 .MinimumHighNormalizedScore = CSngSafe(prmMinimumHighNormalizedScore.Value)
                 .MinimumHighDiscriminantScore = CSngSafe(prmMinimumHighDiscriminantScore.Value)
+                .MinimumPeptideProphetProbability = CSngSafe(prmMinimumPeptideProphetProbability.Value)
                 .MinimumPMTQualityScore = CSngSafe(prmMinimumPMTQualityScore.Value)
+                
                 .ExperimentInclusionFilter = CStrSafe(prmExperimentInclusionFilter.Value)
                 .ExperimentExclusionFilter = CStrSafe(prmExperimentExclusionFilter.Value)
                 .InternalStandardExplicit = CStrSafe(prmInternalStdExplicit.Value)

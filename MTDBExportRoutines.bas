@@ -127,6 +127,8 @@ Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Conne
     
     Dim prmLimitToPMTsFromDataset As New ADODB.Parameter        ' 1 if the MT tags were limited to only come from the dataset associated with the loaded job
     
+    Dim prmMinimumPeptideProphetProbability As New ADODB.Parameter  ' Minimum Peptide Prophet Probability for MT tags loaded from database
+    
     Dim strEntryInAnalysisHistory As String, lngValueFromAnalysisHistory As Long
     Dim strNetAdjUMCsWithDBHits As String
     Dim lngHistoryIndexOfMatch As Long
@@ -378,6 +380,9 @@ On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
     
     Set prmLimitToPMTsFromDataset = cmdPutNewMM.CreateParameter("LimitToPMTsFromDataset", adTinyInt, adParamInput, , BoolToTinyInt(CurrMTFilteringOptions.LimitToPMTsFromDataset))
     cmdPutNewMM.Parameters.Append prmLimitToPMTsFromDataset
+    
+    Set prmMinimumPeptideProphetProbability = cmdPutNewMM.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamInput, , CurrMTFilteringOptions.MinimumPeptideProphetProbability)
+    cmdPutNewMM.Parameters.Append prmMinimumPeptideProphetProbability
     
 
     ' Call the SP
@@ -940,7 +945,7 @@ Public Function ExportMTDBAddQuantitationDescriptionEntry(ByRef frmCallingForm A
 ''    Dim prmMinimumPeptideReplicateCount As New ADODB.Parameter
 ''    Dim prmORFCoverageComputationLevel As New ADODB.Parameter
 ''    Dim prmInternalStdInclusionMode As New ADODB.Parameter
-    
+''    Dim prmMinimumPeptideProphetProbability as New ADODB.Parameter
     
     On Error GoTo ExportMTDBAddQuantitationDescriptionEntryErrorHandler
     

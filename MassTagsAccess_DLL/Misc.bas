@@ -352,12 +352,12 @@ Dim FldState As String
 Dim FldServer As String
 Dim FldDBSchemaVersion As String
 
-Dim NewCn As ADODB.Connection
-Dim NewRs As ADODB.Recordset
+Dim NewCn As adodb.Connection
+Dim NewRs As adodb.Recordset
 
 Dim strSPName As String
-Dim cmdSPGetAllMassTagDBs As New ADODB.Command
-Dim prmIncludeUnused As ADODB.Parameter
+Dim cmdSPGetAllMassTagDBs As New adodb.Command
+Dim prmIncludeUnused As adodb.Parameter
 
 Dim Res As Long
 Dim MTDBsCnt As Long
@@ -386,7 +386,7 @@ If SecCnt >= 6 Then
     strSPName = MTSMasterSec(MTSMasterSPRetrieve)
     
     ' Connect to the server
-    Set NewCn = New ADODB.Connection
+    Set NewCn = New adodb.Connection
     NewCn.ConnectionTimeout = 30
     NewCn.Open strMTSMasterConnStr
 
@@ -463,16 +463,16 @@ Public Function GetDBSchemaVersion(ByVal ConnStr As String, ByVal SPName As Stri
 'Looks up DB schema version
 '---------------------------------------------------------------
 
-    Dim NewCn As ADODB.Connection
-    Dim cmdSPCommand As New ADODB.Command
-    Dim prmDBSchemaVersion As ADODB.Parameter
+    Dim NewCn As adodb.Connection
+    Dim cmdSPCommand As New adodb.Command
+    Dim prmDBSchemaVersion As adodb.Parameter
 
 
     If Len(SPName) <= 0 Then
         SPName = "GetDBSchemaVersion"
     End If
 
-    Set NewCn = New ADODB.Connection
+    Set NewCn = New adodb.Connection
     NewCn.Open ConnStr
 
 On Error GoTo GetDBSchemaVersionErrorHandler
@@ -513,8 +513,8 @@ Public Function GetMTSubsets(ByVal ConnStr As String, _
 'and third subset description
 'returns 0 if OK; error number if not
 '---------------------------------------------------------------
-Dim NewCn As ADODB.Connection
-Dim NewRs As ADODB.Recordset
+Dim NewCn As adodb.Connection
+Dim NewRs As adodb.Recordset
 Dim Res As Long
 Dim MTSSCnt As Long
 On Error GoTo err_GetMTSubsets
@@ -524,10 +524,10 @@ ReDim MTSSName(141)
 ReDim MTSSDesc(141)
 
 If Len(MTSSSQL) > 0 Then
-   Set NewCn = New ADODB.Connection
+   Set NewCn = New adodb.Connection
    NewCn.Open ConnStr
 
-   Set NewRs = New ADODB.Recordset
+   Set NewRs = New adodb.Recordset
    NewRs.CursorLocation = adUseClient
    NewRs.Open MTSSSQL, NewCn, adOpenStatic, adLockReadOnly
       
@@ -587,8 +587,8 @@ Public Function GetGlobMods(ByVal ConnStr As String, _
 'NOTE: this still works although Dynamic and Static modifications
 'are now separated
 '------------------------------------------------------------------
-Dim NewCn As ADODB.Connection
-Dim NewRs As ADODB.Recordset
+Dim NewCn As adodb.Connection
+Dim NewRs As adodb.Recordset
 Dim Res As Long
 Dim GlobModCnt As Long
 On Error GoTo err_GetGlobMods
@@ -598,10 +598,10 @@ ReDim GlobModName(141)
 ReDim GlobModDesc(141)
 
 If Len(GlobModViewName) > 0 Then
-   Set NewCn = New ADODB.Connection
+   Set NewCn = New adodb.Connection
    NewCn.Open ConnStr
 
-   Set NewRs = New ADODB.Recordset
+   Set NewRs = New adodb.Recordset
    NewRs.CursorLocation = adUseClient
    NewRs.Open GlobModViewName, NewCn, adOpenStatic, adLockReadOnly
       
@@ -663,8 +663,8 @@ Public Function GetInternalStandardNames(ByVal ConnStr As String, _
     ' Returns 0 if OK; error number if not
     '------------------------------------------------------------------
     
-    Dim NewCn As ADODB.Connection
-    Dim NewRs As ADODB.Recordset
+    Dim NewCn As adodb.Connection
+    Dim NewRs As adodb.Recordset
     Dim Res As Long
     
 On Error GoTo GetInternalStandardNamesErrorHandler
@@ -674,10 +674,10 @@ On Error GoTo GetInternalStandardNamesErrorHandler
     ReDim strInternalStandardNames(100)
     
     If Len(InternalStdsViewName) > 0 Then
-       Set NewCn = New ADODB.Connection
+       Set NewCn = New adodb.Connection
        NewCn.Open ConnStr
     
-       Set NewRs = New ADODB.Recordset
+       Set NewRs = New adodb.Recordset
        NewRs.CursorLocation = adUseClient
        NewRs.Open InternalStdsViewName, NewCn, adOpenStatic, adLockReadOnly
           
@@ -741,8 +741,8 @@ Public Function GetLockerTypes(ByVal ConnStr As String, _
 'and will contain ID, second column should list locker type names
 'returns 0 if OK; error number if not
 '----------------------------------------------------------------
-Dim NewCn As ADODB.Connection
-Dim NewRs As ADODB.Recordset
+Dim NewCn As adodb.Connection
+Dim NewRs As adodb.Recordset
 Dim Res As Long
 Dim LT_Cnt As Long
 On Error GoTo err_GetLockerTypes
@@ -751,10 +751,10 @@ ReDim LT_ID(141)    'should be plenty
 ReDim LT_Name(141)
 
 If Len(LT_SQL) > 0 Then
-   Set NewCn = New ADODB.Connection
+   Set NewCn = New adodb.Connection
    NewCn.Open ConnStr
 
-   Set NewRs = New ADODB.Recordset
+   Set NewRs = New adodb.Recordset
    NewRs.CursorLocation = adUseClient
    NewRs.Open LT_SQL, NewCn, adOpenStatic, adLockReadOnly
       

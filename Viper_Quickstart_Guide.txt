@@ -52,6 +52,14 @@ From the Database Search screen, after searching, you can choose "Function->Mass
 
 After the matches have been exported to the DB for several analyses, you can run the Q Rollup program to export the data and generate a crosstab report comparing the peptides.  To install Q Rollup, go to '''\\floyd\software\QRollupExport\'''
 
+== VIPER FAQ ==
+
+'''Question:''' After searching the database using "Steps->6. Database Search", then choosing "Function->Export Results to MT Tag DB", I receive error messsage: ''"Error making entry in Match Making Description (most likely the job number is not defined in T_FTICR_Analysis_Description): INSERT statement conflicted with COLUMN FOREIGN KEY constraint 'FK_T_Match_Making_Description_T_FTICR_Analysis_Description"'' What should I do?
+: '''Answer:''' Either the job you're analyzing isn't defined in the given database or VIPER doesn't know the job number of the .PEK file you loaded.  To fix this, you can:
+:* Load the data using "File->New Analysis (Choose form DMS)".  If the job is not listed under the desired database, then you'll need to submit a [[Useful_Links|Footprints Support Queue]] request to have the job added to the given database.
+:* Manually set the job number in VIPER by going to "Steps->3. Select MT Tags", then clicking "Override Job Info", typing the job number in the Job Number spot, and clicking "Save Job Info Changes".  VIPER needs to have the job number properly defined, both in VIPER and in T_FTICR_Analysis_Description in order to export data to the database.
+
+
 == Microsoft Access MT Database files ==
 An Access database is used to store the details of the MT tags to match against.  You can have multiple Microsoft Access database files, each with a different set of MT tags.  Use "Steps->3. Select MT Tags (Connect to DB)" to specify or change the database.
 

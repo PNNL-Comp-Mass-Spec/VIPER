@@ -17,21 +17,21 @@ Begin VB.Form frmOrganizeDBConnections
       Caption         =   "Path to Legacy DB (Access DB with MT Tags)"
       Height          =   615
       Left            =   120
-      TabIndex        =   56
+      TabIndex        =   60
       Top             =   7200
       Width           =   9615
       Begin VB.CommandButton cmdBrowseForLegacyDB 
          Caption         =   "B&rowse"
          Height          =   375
          Left            =   8640
-         TabIndex        =   58
+         TabIndex        =   62
          Top             =   160
          Width           =   855
       End
       Begin VB.TextBox txtLegacyDBPath 
          Height          =   285
          Left            =   120
-         TabIndex        =   57
+         TabIndex        =   61
          Top             =   220
          Width           =   8415
       End
@@ -40,14 +40,14 @@ Begin VB.Form frmOrganizeDBConnections
       Caption         =   "Database info for the current gel file"
       Height          =   1095
       Left            =   120
-      TabIndex        =   38
+      TabIndex        =   42
       Top             =   6000
       Width           =   9615
       Begin VB.CommandButton cmdOverrideInfoSaveChanges 
          Caption         =   "Save Job Info Changes"
          Height          =   375
          Left            =   120
-         TabIndex        =   60
+         TabIndex        =   64
          Top             =   600
          Width           =   2175
       End
@@ -55,7 +55,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "Override Job Info"
          Height          =   255
          Left            =   120
-         TabIndex        =   59
+         TabIndex        =   63
          Top             =   280
          Width           =   2175
       End
@@ -63,7 +63,7 @@ Begin VB.Form frmOrganizeDBConnections
          Height          =   315
          Left            =   7320
          Locked          =   -1  'True
-         TabIndex        =   42
+         TabIndex        =   46
          Top             =   240
          Width           =   1335
       End
@@ -71,7 +71,7 @@ Begin VB.Form frmOrganizeDBConnections
          Height          =   315
          Left            =   4320
          Locked          =   -1  'True
-         TabIndex        =   44
+         TabIndex        =   48
          Top             =   600
          Width           =   5055
       End
@@ -79,7 +79,7 @@ Begin VB.Form frmOrganizeDBConnections
          Height          =   315
          Left            =   4320
          Locked          =   -1  'True
-         TabIndex        =   40
+         TabIndex        =   44
          Top             =   240
          Width           =   1095
       End
@@ -87,7 +87,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "MD_Type:"
          Height          =   255
          Left            =   6240
-         TabIndex        =   41
+         TabIndex        =   45
          Top             =   300
          Width           =   1095
       End
@@ -95,7 +95,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "Source Filename:"
          Height          =   255
          Left            =   2880
-         TabIndex        =   43
+         TabIndex        =   47
          Top             =   660
          Width           =   1455
       End
@@ -103,7 +103,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "Job number:"
          Height          =   255
          Left            =   2880
-         TabIndex        =   39
+         TabIndex        =   43
          Top             =   300
          Width           =   1455
       End
@@ -111,14 +111,14 @@ Begin VB.Form frmOrganizeDBConnections
    Begin VB.Frame fraSelectingMassTags 
       Height          =   1815
       Left            =   240
-      TabIndex        =   52
+      TabIndex        =   56
       Top             =   8280
       Width           =   4695
       Begin VB.CommandButton cmdSelectingMassTagsOK 
          Caption         =   "&Ok"
          Height          =   375
          Left            =   1920
-         TabIndex        =   54
+         TabIndex        =   58
          ToolTipText     =   "Select MT Tags to load for search"
          Top             =   1200
          Width           =   975
@@ -127,7 +127,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "&Cancel"
          Height          =   375
          Left            =   720
-         TabIndex        =   53
+         TabIndex        =   57
          ToolTipText     =   "Select MT Tags to load for search"
          Top             =   1200
          Width           =   975
@@ -136,7 +136,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   $"frmOrganizeDBConnections.frx":0000
          Height          =   1095
          Left            =   120
-         TabIndex        =   55
+         TabIndex        =   59
          Top             =   240
          Width           =   4215
       End
@@ -145,14 +145,14 @@ Begin VB.Form frmOrganizeDBConnections
       BorderStyle     =   0  'None
       Height          =   2535
       Left            =   240
-      TabIndex        =   45
+      TabIndex        =   49
       Top             =   3120
       Width           =   2655
       Begin VB.ComboBox cboSortBy 
          Height          =   315
          Left            =   0
          Style           =   2  'Dropdown List
-         TabIndex        =   46
+         TabIndex        =   50
          Top             =   0
          Width           =   2565
       End
@@ -160,7 +160,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "Link to &DB Not Listed Above"
          Height          =   375
          Left            =   0
-         TabIndex        =   48
+         TabIndex        =   52
          ToolTipText     =   "Link to a MT Tag database that isn't listed above"
          Top             =   960
          Width           =   2175
@@ -169,7 +169,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "&Cancel"
          Height          =   375
          Left            =   0
-         TabIndex        =   50
+         TabIndex        =   54
          Top             =   2040
          Width           =   975
       End
@@ -177,7 +177,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "&Ok"
          Height          =   375
          Left            =   1200
-         TabIndex        =   51
+         TabIndex        =   55
          Top             =   2040
          Width           =   975
       End
@@ -185,7 +185,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "&Break Current DB Link"
          Height          =   375
          Left            =   0
-         TabIndex        =   49
+         TabIndex        =   53
          ToolTipText     =   "Remove the current link to a MT Tag database"
          Top             =   1440
          Width           =   2175
@@ -194,7 +194,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "&Link to Selected DB"
          Height          =   375
          Left            =   0
-         TabIndex        =   47
+         TabIndex        =   51
          ToolTipText     =   "Link with the selected MT Tag database"
          Top             =   480
          Width           =   2175
@@ -202,67 +202,76 @@ Begin VB.Form frmOrganizeDBConnections
    End
    Begin VB.Frame fraCurrentConnectionDetails 
       Caption         =   "Details for the currently connected database"
-      Height          =   3015
+      Height          =   2775
       Left            =   3000
-      TabIndex        =   19
+      TabIndex        =   21
       Top             =   3000
       Width           =   6735
+      Begin VB.TextBox txtCurrentDBMinimumPeptideProphetProbability 
+         Height          =   285
+         Left            =   2400
+         Locked          =   -1  'True
+         TabIndex        =   38
+         Text            =   "0"
+         Top             =   1800
+         Width           =   495
+      End
       Begin VB.CheckBox chkCurrentDBLimitToPMTsFromDataset 
          Caption         =   "Limit to MT tags from Dataset for Job"
          Height          =   375
-         Left            =   600
-         TabIndex        =   29
-         Top             =   1440
+         Left            =   3840
+         TabIndex        =   31
+         Top             =   2160
          Width           =   1815
       End
       Begin VB.TextBox txtCurrentDBMinimumHighDiscriminantScore 
          Height          =   285
-         Left            =   2760
+         Left            =   2400
          Locked          =   -1  'True
-         TabIndex        =   34
+         TabIndex        =   36
          Text            =   "0"
-         Top             =   2220
+         Top             =   1500
          Width           =   495
       End
       Begin VB.TextBox txtCurrentDBMinimumPMTQualityScore 
          Height          =   285
-         Left            =   2760
+         Left            =   2400
          Locked          =   -1  'True
-         TabIndex        =   36
+         TabIndex        =   40
          Text            =   "0"
-         Top             =   2520
+         Top             =   2100
          Width           =   495
       End
       Begin VB.TextBox txtCurrentDBMinimumHighNormalizedScore 
          Height          =   285
-         Left            =   2760
+         Left            =   2400
          Locked          =   -1  'True
-         TabIndex        =   32
+         TabIndex        =   34
          Text            =   "0"
-         Top             =   1920
+         Top             =   1200
          Width           =   495
       End
       Begin VB.CheckBox chkCurrentDBLockersOnly 
          Caption         =   "Lockers Only"
          Height          =   255
-         Left            =   120
-         TabIndex        =   28
-         Top             =   1640
+         Left            =   3360
+         TabIndex        =   30
+         Top             =   2355
          Width           =   1455
       End
       Begin VB.CheckBox chkCurrentDBConfirmedOnly 
          Caption         =   "Confirmed Only"
          Height          =   255
-         Left            =   120
-         TabIndex        =   26
-         Top             =   1160
+         Left            =   3360
+         TabIndex        =   28
+         Top             =   1875
          Width           =   1455
       End
       Begin VB.CommandButton cmdSelectMassTags 
          Caption         =   "&Select MT Tags"
          Height          =   375
          Left            =   4920
-         TabIndex        =   25
+         TabIndex        =   27
          ToolTipText     =   "Select the MT Tags to use"
          Top             =   720
          Width           =   1695
@@ -270,63 +279,71 @@ Begin VB.Form frmOrganizeDBConnections
       Begin VB.TextBox txtCurrentDBAllowedModifications 
          Height          =   615
          Left            =   3360
-         TabIndex        =   30
+         TabIndex        =   32
          Top             =   1200
          Width           =   3255
       End
       Begin VB.CheckBox chkCurrentDBAMTsOnly 
          Caption         =   "AMT's Only"
          Height          =   255
-         Left            =   120
-         TabIndex        =   27
-         Top             =   1400
+         Left            =   3360
+         TabIndex        =   29
+         Top             =   2115
          Width           =   1455
       End
       Begin VB.TextBox txtCurrentDBName 
          Height          =   315
          Left            =   1560
          Locked          =   -1  'True
-         TabIndex        =   21
+         TabIndex        =   23
          Top             =   240
          Width           =   5055
       End
-      Begin VB.Label lblCurrentDBMinimumHighDiscriminantScore 
-         Caption         =   "Minimum high discriminant score:"
+      Begin VB.Label lblCurrentDBMinimumPeptideProphetProbability 
+         Caption         =   "Minimum peptide prophet prob:"
          Height          =   255
          Left            =   120
-         TabIndex        =   33
-         Top             =   2240
-         Width           =   2655
+         TabIndex        =   37
+         Top             =   1820
+         Width           =   2205
+      End
+      Begin VB.Label lblCurrentDBMinimumHighDiscriminantScore 
+         Caption         =   "Minimum discriminant score:"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   35
+         Top             =   1520
+         Width           =   2205
       End
       Begin VB.Label lblCurrentDBMinimumPMTQualityScore 
          Caption         =   "Minimum PMT quality score:"
          Height          =   255
          Left            =   120
-         TabIndex        =   35
-         Top             =   2540
-         Width           =   2655
+         TabIndex        =   39
+         Top             =   2120
+         Width           =   2205
       End
       Begin VB.Label lblCurrentDBNETValueType 
          Caption         =   "Avg Obs NET - from DB"
          Height          =   255
-         Left            =   3600
-         TabIndex        =   37
-         Top             =   2640
-         Width           =   1935
+         Left            =   120
+         TabIndex        =   41
+         Top             =   2430
+         Width           =   2535
       End
       Begin VB.Label lblCurrentDBMinimumHighNormalizedScore 
-         Caption         =   "Minimum high normalized XCorr:"
+         Caption         =   "Minimum normalized XCorr:"
          Height          =   255
          Left            =   120
-         TabIndex        =   31
-         Top             =   1940
-         Width           =   2655
+         TabIndex        =   33
+         Top             =   1220
+         Width           =   2205
       End
       Begin VB.Label lblCurrentDBInternalStdExplicitOrMTSubset 
          Caption         =   "Explicit Internal Standard:"
          Height          =   225
          Left            =   120
-         TabIndex        =   24
+         TabIndex        =   26
          Top             =   900
          Width           =   4695
       End
@@ -334,7 +351,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "0"
          Height          =   255
          Left            =   3480
-         TabIndex        =   23
+         TabIndex        =   25
          Top             =   660
          Width           =   735
       End
@@ -342,7 +359,7 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "Count of selected MT Tags in current DB:"
          Height          =   255
          Left            =   120
-         TabIndex        =   22
+         TabIndex        =   24
          Top             =   660
          Width           =   3255
       End
@@ -350,82 +367,91 @@ Begin VB.Form frmOrganizeDBConnections
          Caption         =   "Database Name:"
          Height          =   255
          Left            =   120
-         TabIndex        =   20
+         TabIndex        =   22
          Top             =   300
          Width           =   1455
       End
    End
    Begin VB.Frame fraSelectedConnectionDetails 
       Caption         =   "Details for the selected connection in the list at left"
-      Height          =   2895
+      Height          =   2775
       Left            =   4200
       TabIndex        =   1
       Top             =   0
       Width           =   5535
+      Begin VB.TextBox txtSelectedDBMinimumPeptideProphetProbability 
+         Height          =   285
+         Left            =   2040
+         Locked          =   -1  'True
+         TabIndex        =   17
+         Text            =   "0"
+         Top             =   1800
+         Width           =   495
+      End
       Begin VB.CheckBox chkSelectedDBLimitToPMTsFromDataset 
          Caption         =   "Limit to MT tags from Dataset for Job"
          Height          =   375
-         Left            =   480
+         Left            =   3120
          TabIndex        =   10
-         Top             =   1440
+         Top             =   2160
          Width           =   1815
       End
       Begin VB.TextBox txtSelectedDBMinimumHighDiscriminantScore 
          Height          =   285
-         Left            =   2520
+         Left            =   2040
          Locked          =   -1  'True
          TabIndex        =   15
          Text            =   "0"
-         Top             =   2220
+         Top             =   1500
          Width           =   495
       End
       Begin VB.TextBox txtSelectedDBMinimumPMTQualityScore 
          Height          =   285
-         Left            =   2520
+         Left            =   2040
          Locked          =   -1  'True
-         TabIndex        =   17
+         TabIndex        =   19
          Text            =   "0"
-         Top             =   2520
+         Top             =   2100
          Width           =   495
       End
       Begin VB.TextBox txtSelectedDBMinimumHighNormalizedScore 
          Height          =   285
-         Left            =   2520
+         Left            =   2040
          Locked          =   -1  'True
          TabIndex        =   13
          Text            =   "0"
-         Top             =   1920
+         Top             =   1200
          Width           =   495
       End
       Begin VB.CheckBox chkSelectedDBLockersOnly 
          Caption         =   "Lockers Only"
          Height          =   255
-         Left            =   120
+         Left            =   2640
          TabIndex        =   9
-         Top             =   1640
+         Top             =   2355
          Width           =   1455
       End
       Begin VB.CheckBox chkSelectedDBConfirmedOnly 
          Caption         =   "Confirmed Only"
          Height          =   255
-         Left            =   120
+         Left            =   2640
          TabIndex        =   7
-         Top             =   1160
+         Top             =   1875
          Width           =   1455
       End
       Begin VB.TextBox txtSelectedDBAllowedModifications 
          Height          =   615
-         Left            =   2160
+         Left            =   2640
          TabIndex        =   11
          Top             =   1200
-         Width           =   3255
+         Width           =   2775
       End
       Begin VB.CheckBox chkSelectedDBAMTsOnly 
          Caption         =   "AMT's Only"
          Height          =   255
-         Left            =   120
+         Left            =   2640
          TabIndex        =   8
-         Top             =   1400
+         Top             =   2115
          Width           =   1455
       End
       Begin VB.TextBox txtSelectedDBName 
@@ -435,37 +461,45 @@ Begin VB.Form frmOrganizeDBConnections
          Top             =   240
          Width           =   3855
       End
-      Begin VB.Label lblSelectedDBMinimumHighDiscriminantScore 
-         Caption         =   "Minimum high discriminant score:"
-         Height          =   255
-         Left            =   120
-         TabIndex        =   14
-         Top             =   2240
-         Width           =   2415
-      End
-      Begin VB.Label lblSelectedDBMinimumPMTQualityScore 
-         Caption         =   "Minimum PMT quality score:"
+      Begin VB.Label lblSelectedDBMinimumPeptideProphetProbability 
+         Caption         =   "Minimum peptide prophet:"
          Height          =   255
          Left            =   120
          TabIndex        =   16
-         Top             =   2540
-         Width           =   2415
+         Top             =   1820
+         Width           =   1905
+      End
+      Begin VB.Label lblSelectedDBMinimumHighDiscriminantScore 
+         Caption         =   "Minimum discriminant:"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   14
+         Top             =   1520
+         Width           =   1900
+      End
+      Begin VB.Label lblSelectedDBMinimumPMTQualityScore 
+         Caption         =   "Minimum PMT quality:"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   18
+         Top             =   2120
+         Width           =   1905
       End
       Begin VB.Label lblSelectedDBNETValueType 
          Caption         =   "Avg Obs NET - from DB"
          Height          =   255
-         Left            =   3480
-         TabIndex        =   18
-         Top             =   2040
+         Left            =   120
+         TabIndex        =   20
+         Top             =   2430
          Width           =   1935
       End
       Begin VB.Label lblSelectedDBMinimumHighNormalizedScore 
-         Caption         =   "Minimum high normalized XCorr:"
+         Caption         =   "Minimum XCorr:"
          Height          =   255
          Left            =   120
          TabIndex        =   12
-         Top             =   1940
-         Width           =   2415
+         Top             =   1220
+         Width           =   1900
       End
       Begin VB.Label lblSelectedDBInternalStdExplicitOrMTSubset 
          Caption         =   "Explicit Internal Standard:"
@@ -560,7 +594,9 @@ Private Sub BreakMTSLink()
         
         .MinimumHighNormalizedScore = 0
         .MinimumHighDiscriminantScore = 0
+        .MinimumPeptideProphetProbability = 0
         .MinimumPMTQualityScore = 0
+        
         .ExperimentInclusionFilter = ""
         .ExperimentExclusionFilter = ""
         .InternalStandardExplicit = ""
@@ -618,6 +654,7 @@ Private Sub DisplayCurrentDBSettings()
             
             txtCurrentDBMinimumHighNormalizedScore = .MinimumHighNormalizedScore
             txtCurrentDBMinimumHighDiscriminantScore = .MinimumHighDiscriminantScore
+            txtCurrentDBMinimumPeptideProphetProbability = .MinimumPeptideProphetProbability
             txtCurrentDBMinimumPMTQualityScore = .MinimumPMTQualityScore
             
             lblCurrentDBNETValueType.Caption = LookupNETValueTypeDescription(CInt(.NETValueType))
@@ -637,6 +674,7 @@ Private Sub DisplayCurrentDBSettings()
             
             txtCurrentDBMinimumHighNormalizedScore = "0"
             txtCurrentDBMinimumHighDiscriminantScore = "0"
+            txtCurrentDBMinimumPeptideProphetProbability = "0"
             txtCurrentDBMinimumPMTQualityScore = "0"
             
             lblCurrentDBNETValueType.Caption = LookupNETValueTypeDescription(nvtGANET)
@@ -673,6 +711,7 @@ Private Sub DisplayInfoOnSelectedItem()
             
             txtSelectedDBMinimumHighNormalizedScore = .MinimumHighNormalizedScore
             txtSelectedDBMinimumHighDiscriminantScore = .MinimumHighDiscriminantScore
+            txtSelectedDBMinimumPeptideProphetProbability = .MinimumPeptideProphetProbability
             txtSelectedDBMinimumPMTQualityScore = .MinimumPMTQualityScore
             
             lblSelectedDBNETValueType.Caption = LookupNETValueTypeDescription(CInt(.NETValueType))
@@ -693,6 +732,7 @@ Private Sub DisplayInfoOnSelectedItem()
         
         txtSelectedDBMinimumHighNormalizedScore = "0"
         txtSelectedDBMinimumHighDiscriminantScore = "0"
+        txtSelectedDBMinimumPeptideProphetProbability = "0"
         txtSelectedDBMinimumPMTQualityScore = "0"
         
         lblSelectedDBNETValueType.Caption = LookupNETValueTypeDescription(nvtGANET)

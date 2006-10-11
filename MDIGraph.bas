@@ -949,9 +949,9 @@ Public Type IsoPairsDltLbl2004dType
     OtherInfo As String
 End Type
 
-' Pair search options; note that this structure is used by both IsoPairsDltLblType and udtPairSearchOptionsType
+' Used by IsoPairsDltLblType
 Public Type udtIsoPairsSearchDefType
-    DeltaMass As Double                         ' Typically glN14N15_DELTA or glO16O18_DELTA
+    DeltaMass As Double                         ' Typically glN14N15_DELTA or glO16O18_DELTA; note: see also .DeltaMass2 through .DeltaMass6 (defined below)
     DeltaMassTolerance As Double                ' on frmUMCLblPairs this is actually the label mass tolerance
     AutoCalculateDeltaMinMaxCount As Boolean
     DeltaCountMin As Long
@@ -991,7 +991,6 @@ Public Type udtIsoPairsSearchDefType
     OtherInfo As String
 End Type
 
-
 'structure for isotopic pairs that use delta and label
 'this is used for PEO N14/N15 pairs as well as ICAT pairs
 'also structure works for individual as well as UMCListType pairs
@@ -1008,8 +1007,6 @@ Public Type IsoPairsDltLblType
     
     OtherInfo As String
 End Type
-
-
 
 'Delta structure (used to read Expression ratios)
 'this will be parallel to FN arrays in DocumentData structure
@@ -1083,7 +1080,7 @@ Public GelUMCIon() As UMCIonNet        ' UMCIon UMC searching definition and dat
 'Unused variable (July 2004)
 'Public GelP() As IsoPairs                   ' saved pairs; used for isotopic labeling analysis  (seem to be unused, January 2004)
 
-Public GelP_D_L() As IsoPairsDltLblType     ' all pairs, including delta labeled pairs
+Public GelP_D_L() As IsoPairsDltLblType      ' all pairs, including delta labeled pairs
 
 'No longer supported (March 2006)
 'Public GelDB() As Database                  ' used only with DB gels

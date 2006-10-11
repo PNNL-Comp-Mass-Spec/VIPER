@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "July 5, 2006"
+Public Const APP_BUILD_DATE As String = "October 10, 2006"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -300,7 +300,9 @@ Public Type udtDBSettingsType
     
     MinimumHighNormalizedScore As Single
     MinimumHighDiscriminantScore As Single
+    MinimumPeptideProphetProbability As Single
     MinimumPMTQualityScore As Single
+    
     ExperimentInclusionFilter As String
     ExperimentExclusionFilter As String
     InternalStandardExplicit As String
@@ -805,7 +807,9 @@ Public Type udtPairSearchOptionsType
     NETAdjustmentPairedSearchUMCSelection As punaPairsUMCNetAdjustmentConstants
     
     OutlierRemovalUsesSymmetricERs As Boolean
-
+    
+    AutoAnalysisDeltaMassAddnlCount As Integer
+    AutoAnalysisDeltaMassAddnl() As Double
 End Type
 
 Public Type udtPairMatchStatsType
@@ -938,6 +942,7 @@ Public Type udtAutoToleranceRefinementType
     
     DBSearchMinimumHighNormalizedScore As Single        ' Minimum MT tag high normalized score (usually XCorr) to use when searching DB for tolerance refinement
     DBSearchMinimumHighDiscriminantScore As Single      ' Minimum MT tag high discriminant score to use when searching DB for tolerance refinement
+    DBSearchMinimumPeptideProphetProbability As Single      ' Minimum MT tag peptide prophet probability to use when searching DB for tolerance refinement
 
     RefineMassCalibration As Boolean
     RefineMassCalibrationOverridePPM As Double          ' If this value is non-zero, and RefineMassCalibration = True, then the data will be shifted by this amount, regardless of where the peak is in the mass error plot
@@ -955,6 +960,7 @@ Public Type udtAutoAnalysisSearchModeOptionsType
     InternalStdSearchMode As issmInternalStandardSearchModeConstants    ' Note: if APP_BUILD_DISABLE_MTS = True, then this is set to issmFindOnlyMassTags when searching the UMCs
     DBSearchMinimumHighNormalizedScore As Single
     DBSearchMinimumHighDiscriminantScore As Single
+    DBSearchMinimumPeptideProphetProbability As Single
     MassMods As udtDBSearchMassModificationOptionsType
 End Type
 
@@ -1241,6 +1247,7 @@ Public Type udtAutoAnalysisMTDBOverrideType
     LimitToPMTsFromDataset As Boolean
     MinimumHighNormalizedScore As Single
     MinimumHighDiscriminantScore As Single
+    MinimumPeptideProphetProbability As Single
     MinimumPMTQualityScore As Single
     ExperimentInclusionFilter As String
     ExperimentExclusionFilter As String
@@ -1338,6 +1345,6 @@ Public glbPreferencesExpanded As udtPreferencesExpandedType
 
 ' This refers to the MwtWin.Dll ActiveX DLL
 ' It contains useful routines for handling peptide and protein sequences (determining mass, naming peptides, finding tryptic peptides, etc.)
-Public objMwtWin As MolecularWeightCalculator
-Public gMwtWinLoaded As Boolean
+''Public objMwtWin As MolecularWeightCalculator
+''Public gMwtWinLoaded As Boolean
 Public gTraceLogLevel As Integer

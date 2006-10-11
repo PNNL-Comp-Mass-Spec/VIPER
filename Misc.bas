@@ -322,7 +322,8 @@ CreateOlyBackClrObject OlyOptions.BackColor
 CreateOlyForeClrObject OlyOptions.ForeColor
 SetDDRColorObjects
 InitICR2LS
-InitMwtWin
+' Unused function (September 2006)
+''InitMwtWin
 InitDisplay0
 ParseCommandLine
 End Sub

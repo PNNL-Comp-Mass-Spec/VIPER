@@ -1,5 +1,25 @@
 VIPER Change Log
 
+Version 3.41 - Build 350; October 10, 2006
+	- Added option to search for additional Delta pair values
+		- Use parameters AutoAnalysisDeltaMassAddnlCount and AutoAnalysisDeltaMassAddnl1, AutoAnalysisDeltaMassAddnl2, etc. in section PairSearchOptions to define that additional search masses should be used
+		- For example, the following will search for pairs with a spacing of 6.02, 8.01, or 10.0 Da
+			[PairSearchOptions]
+			DeltaMass=6.0201324
+			DeltaMassTolerance=0.02
+			AutoAnalysisDeltaMassAddnlCount=2
+			AutoAnalysisDeltaMassAddnl1=8.0142036
+			AutoAnalysisDeltaMassAddnl2=10.0082748
+	- Added support for filtering PMTs based on Peptide Prophet Probability
+		- Updated calls to SPs: RequestPeakMatchingTaskMaster, AddMatchMaking, AddQuantitationDescription, GetMassTagMatchCount, GetMassTagsGANETParam, & GetMassTagToProteinNameMap
+	- Updated MassTagsAccess.dll to support specifying a Peptide Prophet threshold for loading PMTs
+
+Version 3.40 - Build 349; September 11, 2006
+	- Decreased point size for residual plots saved to disk via MSAlign to be point size 2 (was point size 3)
+	- Fixed bug that did not set the Path To Data Files to the parent folder of the input file's folder and instead set it to the folder containing the input file
+		- The new behavior will set Path To Data Files to the parent folder of the input file's folder only if the input file's folder contains _Auto followed by 0 or more digits
+	- Renamed UMC Browser to LC-MS Feature Browser
+
 Version 3.40 - Build 348; July 5, 2006
 	- Recompiled source due to new development computer
 		- New versions of CWSpectrumDll.dll, MwtWindll.dll, and MassTagsAccess.dll

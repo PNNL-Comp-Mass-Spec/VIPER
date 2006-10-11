@@ -460,8 +460,9 @@ Public Function ConfirmMassTagsAndInternalStdsLoaded(frmCallingForm As VB.Form, 
                         End If
                         
                         If CurrMTSchemaVersion < 1 Or CurrMTSchemaVersion >= 2 Then
-                            ' Schema version 2; examine MinimumHighDiscriminantScore, ExperimentInclusionFilter, ExperimentExclusionFilter, and InternalStandardExplicit
+                            ' Schema version 2; examine MinimumHighDiscriminantScore, MinimumPeptideProphetProbability, ExperimentInclusionFilter, ExperimentExclusionFilter, and InternalStandardExplicit
                             If (CurrMTFilteringOptions.MinimumHighDiscriminantScore = .MinimumHighDiscriminantScore) And _
+                               (CurrMTFilteringOptions.MinimumPeptideProphetProbability = .MinimumPeptideProphetProbability) And _
                                (UCase(CurrMTFilteringOptions.ExperimentInclusionFilter) = UCase(.ExperimentInclusionFilter)) And _
                                (UCase(CurrMTFilteringOptions.ExperimentExclusionFilter) = UCase(.ExperimentExclusionFilter)) Then
                                 blnValuesAgree = True
@@ -1077,7 +1078,7 @@ End Function
 '''End Function
 
 
-Public Function GetMassTagSearchSummaryText(strSearchDescription As String, lngHitCount As Long, sngMTMinimumHighNormalizedScore As Single, sngMTMinimumHighDiscriminantScore As Single, udtSAmtDef As SearchAMTDefinition, blnIncludeConglomerateNETStatus As Boolean, blnUsingCustomNETs As Boolean) As String
+Public Function GetMassTagSearchSummaryText(strSearchDescription As String, lngHitCount As Long, sngMTMinimumHighNormalizedScore As Single, sngMTMinimumHighDiscriminantScore As Single, sngMTMinimumPeptideProphetProbability As Single, udtSAmtDef As SearchAMTDefinition, blnIncludeConglomerateNETStatus As Boolean, blnUsingCustomNETs As Boolean) As String
     Dim strScope As String
     Dim strSummary As String
     
@@ -1093,6 +1094,7 @@ Public Function GetMassTagSearchSummaryText(strSearchDescription As String, lngH
         strSummary = strSummary & "; Scope = " & strScope & "; Hit Count = " & Trim(lngHitCount) & "; Mass tolerance = ±" & Trim(.MWTol) & " " & GetSearchToleranceUnitText(CInt(.TolType)) & "; NET Tolerance = ±" & Trim(.NETTol)
         strSummary = strSummary & "; MT tag Minimum High Normalized Score = " & Trim(sngMTMinimumHighNormalizedScore)
         strSummary = strSummary & "; MT tag Minimum High Discriminant Score = " & Trim(sngMTMinimumHighDiscriminantScore)
+        strSummary = strSummary & "; MT tag Minimum Peptide Prophet Probability = " & Trim(sngMTMinimumPeptideProphetProbability)
         If blnIncludeConglomerateNETStatus Then
             If glbPreferencesExpanded.UseUMCConglomerateNET Then
                 strSummary = strSummary & "; ConglomerateNET used = True"
@@ -1149,33 +1151,34 @@ Public Function GetSearchToleranceUnitText(eTolType As glMassToleranceConstants)
     End Select
 End Function
 
-Public Sub InitMwtWin()
-    Dim strMwtWinVersion As String
-    
-On Error GoTo InitMwtWinErrorHandler
-
-    Set objMwtWin = New MolecularWeightCalculator
-    
-    strMwtWinVersion = objMwtWin.AppVersion
-    Debug.Assert CSngSafe(strMwtWinVersion) > 2#
-    
-    gMwtWinLoaded = True
-    
-    Exit Sub
-
-InitMwtWinErrorHandler:
-    
-    If Not CommandLineContainsAutomationCommand() Then
-        If Err.Number = -2147024770 Or Err.Number = 429 Then
-            MsgBox "Error connecting to MwtWinDll.Dll; you probably need to re-install this application or the Molecular Weight Calculator to properly register the DLL", vbExclamation + vbOKOnly, "Error"
-        Else
-            MsgBox "Unknown error while initializing MwtWinDll.Dll: " & Err.Description, vbExclamation + vbOKOnly, "Error"
-        End If
-    End If
-    
-    gMwtWinLoaded = False
-    
-End Sub
+' Unused function (September 2006)
+''Public Sub InitMwtWin()
+''    Dim strMwtWinVersion As String
+''
+''On Error GoTo InitMwtWinErrorHandler
+''
+''    Set objMwtWin = New MolecularWeightCalculator
+''
+''    strMwtWinVersion = objMwtWin.AppVersion
+''    Debug.Assert CSngSafe(strMwtWinVersion) > 2#
+''
+''    gMwtWinLoaded = True
+''
+''    Exit Sub
+''
+''InitMwtWinErrorHandler:
+''
+''    If Not CommandLineContainsAutomationCommand() Then
+''        If Err.Number = -2147024770 Or Err.Number = 429 Then
+''            MsgBox "Error connecting to MwtWinDll.Dll; you probably need to re-install this application or the Molecular Weight Calculator to properly register the DLL", vbExclamation + vbOKOnly, "Error"
+''        Else
+''            MsgBox "Unknown error while initializing MwtWinDll.Dll: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+''        End If
+''    End If
+''
+''    gMwtWinLoaded = False
+''
+''End Sub
 
 Public Function InitializeSPCommand(cmdSPCommand As ADODB.Command, cnnConnection As ADODB.Connection, strSPName As String) As Boolean
     ' Returns True if success, False if an error
@@ -2102,6 +2105,7 @@ On Error GoTo FillDBSettingsUsingAnalysisInfoUDTErrorHandler
             
             .MinimumHighNormalizedScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_HIGH_NORMALIZED_SCORE))
             .MinimumHighDiscriminantScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE))
+            .MinimumPeptideProphetProbability = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY))
             .MinimumPMTQualityScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_PMT_QUALITY_SCORE))
             .ExperimentInclusionFilter = CStrSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_EXPERIMENT_INCLUSION_FILTER))
             .ExperimentExclusionFilter = CStrSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_EXPERIMENT_EXCLUSION_FILTER))
@@ -2137,7 +2141,9 @@ On Error GoTo FillDBSettingsUsingAnalysisInfoUDTErrorHandler
             
             .MinimumHighNormalizedScore = 0
             .MinimumHighDiscriminantScore = 0
+            .MinimumPeptideProphetProbability = 0
             .MinimumPMTQualityScore = 0
+            
             .ExperimentInclusionFilter = ""
             .ExperimentExclusionFilter = ""
             .InternalStandardExplicit = ""
@@ -3119,6 +3125,7 @@ Public Function GetMassTagMatchCount(ByRef udtDBSettings As udtDBSettingsType, B
     Dim prmExperimentInclusionFilter As ADODB.Parameter
     Dim prmExperimentExclusionFilter As ADODB.Parameter
     Dim prmJobToFilterOnByDataset As ADODB.Parameter
+    Dim prmMinimumPeptideProphetProbability As ADODB.Parameter
     
     Dim strConnectionString As String
     Dim strCaptionSaved As String
@@ -3134,6 +3141,7 @@ Public Function GetMassTagMatchCount(ByRef udtDBSettings As udtDBSettingsType, B
     
     Dim sngMinimumHighNormalizedScore As Single
     Dim sngMinimumHighDiscriminantScore As Single
+    Dim sngMinimumPeptideProphetProbability As Single
     Dim sngMinimumPMTQualityScore As Single
     Dim strExperimentInclusionFilter As String
     Dim strExperimentExclusionFilter As String
@@ -3183,6 +3191,7 @@ On Error GoTo GetMassTagMatchCountErrorHandler
 
         sngMinimumHighNormalizedScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_HIGH_NORMALIZED_SCORE))
         sngMinimumHighDiscriminantScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE))
+        sngMinimumPeptideProphetProbability = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY))
         sngMinimumPMTQualityScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_PMT_QUALITY_SCORE))
 
         strExperimentInclusionFilter = CStrSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_EXPERIMENT_INCLUSION_FILTER))
@@ -3247,6 +3256,9 @@ On Error GoTo GetMassTagMatchCountErrorHandler
             prmJobToFilterOnByDataset.Value = lngCurrentJob
         End If
         cmdGetMassTagMatchCount.Parameters.Append prmJobToFilterOnByDataset
+    
+        Set prmMinimumPeptideProphetProbability = cmdGetMassTagMatchCount.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamInput, , sngMinimumPeptideProphetProbability)
+        cmdGetMassTagMatchCount.Parameters.Append prmMinimumPeptideProphetProbability
     End If
     
     
@@ -3293,174 +3305,6 @@ GetMassTagMatchCountErrorHandler:
     Resume GetMassTagMatchCountCleanup
     
  End Function
-
-''Public Function GetMassTagMatchCount(ByRef udtDBSettings As udtDBSettingsType, frmCallingForm As VB.Form) As Long
-''    ' Retrieves a count of the MT tags that would be returned by the connection values
-''    '  stored in udtDBSettings
-''    ' This function does not take into account specific filters for static or dynamic modifications
-''
-''    ' Returns the count if successful, 0 if no matching records, and 0 if an error
-''
-''    Dim cnnConnection As ADODB.Connection
-''    Dim sngDBSchemaVersion As Single
-''
-''    Dim rstRecordset As ADODB.Recordset
-''    Dim strConnectionString As String
-''    Dim strSQL As String
-''    Dim strSqlSelect As String, strSqlFrom As String, strSqlJoin As String, strSqlWhere As String
-''    Dim strCaptionSaved As String
-''
-''    Dim strMTSubsetID As String
-''    Dim lngMTSubsetID As Long
-''    Dim blnConfirmedOnly As Boolean
-''    Dim blnAccurateOnly As Boolean
-''    Dim blnLockersOnly As Boolean
-''    Dim sngMinimumHighNormalizedScore As Single
-''    Dim sngMinimumHighDiscriminantScore As Single
-''    Dim sngMinimumPMTQualityScore As Single
-''
-''On Error GoTo GetMassTagMatchCountErrorHandler
-''
-''    strConnectionString = udtDBSettings.AnalysisInfo.MTDB.ConnectionString
-''    If strConnectionString = "" Then
-''        GetMassTagMatchCount = 0
-''        Exit Function
-''    End If
-''
-''    strCaptionSaved = frmCallingForm.Caption
-''
-''    frmCallingForm.Caption = "Counting number of matching MT tags: Connecting to database"
-''
-''    If Not EstablishConnection(cnnConnection, strConnectionString) Then
-''        GetMassTagMatchCount = 0
-''        Exit Function
-''    End If
-''
-''    ' Lookup the DB Schema Version
-''    sngDBSchemaVersion = LookupDBSchemaVersion(cnnConnection)
-''
-''
-''    With udtDBSettings
-''
-''        blnConfirmedOnly = CBoolSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_CONFIRMED_ONLY))
-''
-''        If sngDBSchemaVersion < 2 Then
-''            blnAccurateOnly = CBoolSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_ACCURATE_ONLY))
-''            blnLockersOnly = CBoolSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_LOCKERS_ONLY))
-''        End If
-''
-''        sngMinimumHighNormalizedScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_HIGH_NORMALIZED_SCORE))
-''        sngMinimumHighDiscriminantScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE))
-''        sngMinimumPMTQualityScore = CSngSafe(LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_MINIMUM_PMT_QUALITY_SCORE))
-''
-''        ' Note: .ExperimentInclusion and .ExperimentExclusion are not considered when estimating the MT tag match count
-''        ' Note: .NETValueType is not considered when estimating the MT tag match count
-''
-''        If sngDBSchemaVersion < 2 Then
-''            strMTSubsetID = LookupCollectionArrayValueByName(.AnalysisInfo.MTDB.DBStuffArray(), .AnalysisInfo.MTDB.DBStuffArrayCount, NAME_SUBSET)
-''            If Len(strMTSubsetID) > 0 Then
-''                lngMTSubsetID = CLngSafe(strMTSubsetID)
-''            Else
-''                lngMTSubsetID = -1
-''            End If
-''        End If
-''    End With
-''
-''    ' We use the above settings to get an idea for the number of MT tags matching the search criteria
-''    ' We are ignoring the possibility of modifications for these counts, since the procedure for selecting
-''    ' MT tags with modifications is not very straightforward
-''
-''    strSqlSelect = " SELECT COUNT(*) as [TotalMassTags]"
-''    strSqlFrom = "   FROM " & TBL_MASS_TAGS
-''
-''    strSqlWhere = " WHERE " & TBL_MASS_TAGS & ".High_Normalized_Score >= " & Trim(sngMinimumHighNormalizedScore)
-''
-''    If sngDBSchemaVersion >= 2 Then
-''        strSqlWhere = strSqlWhere & " AND " & TBL_MASS_TAGS & ".High_Discriminant_Score >= " & Trim(sngMinimumHighDiscriminantScore)
-''    End If
-''
-''    strSqlWhere = strSqlWhere & " AND " & TBL_MASS_TAGS & ".PMT_Quality_Score >= " & Trim(sngMinimumPMTQualityScore) & " "
-''
-''    If blnConfirmedOnly Then
-''        strSqlWhere = strSqlWhere & " AND (" & TBL_MASS_TAGS & ".Is_Confirmed = 1)"
-''    End If
-''
-''    If sngDBSchemaVersion >= 2 Then
-''        strSQL = strSqlSelect & " " & strSqlFrom & " " & strSqlWhere
-''    Else
-''        ' DB Schema Version 1
-''        If blnAccurateOnly Then
-''            If blnLockersOnly Then
-''                strSqlWhere = strSqlWhere & " AND ((" & TBL_MASS_TAGS & ".Is_Amt = 1) OR (" & TBL_MTSUBSET_MASS_TAGS & ".Is_Locker = 1))"
-''            Else
-''                strSqlWhere = strSqlWhere & " AND (" & TBL_MASS_TAGS & ".Is_Amt = 1)"
-''            End If
-''        ElseIf blnLockersOnly Then
-''            strSqlWhere = strSqlWhere & " AND (" & TBL_MASS_TAGS & ".Is_Locker = 1)"
-''        End If
-''
-''        If lngMTSubsetID <> -1 Then
-''            ' Include only ions part of a subset
-''            ' The Sql statement will be of the form:
-''            '   SELECT COUNT(dbo.T_Mass_Tags.Mass_Tag_ID)
-''            '   FROM dbo.T_Mass_Tags INNER JOIN
-''            '    dbo.T_MTSubset_Mass_Tags ON
-''            '    dbo.T_Mass_Tags.Mass_Tag_ID = dbo.T_MTSubset_Mass_Tags.MTID
-''            '   WHERE (dbo.T_MTSubset_Mass_Tags.MTSubset_ID = 1000) AND
-''            '    (dbo.T_Mass_Tags.Is_AMT = 1)
-''            '
-''
-''            strSqlJoin = " INNER JOIN " & TBL_MTSUBSET_MASS_TAGS & " ON " & TBL_MASS_TAGS & ".Mass_Tag_ID = " & TBL_MTSUBSET_MASS_TAGS & ".MTID"
-''
-''            If strSqlWhere = "" Then
-''                strSqlWhere = "WHERE "
-''            Else
-''                strSqlWhere = strSqlWhere & " AND "
-''            End If
-''            strSqlWhere = strSqlWhere & " (" & TBL_MTSUBSET_MASS_TAGS & ".MTSubset_ID = " & Trim(lngMTSubsetID) & ")"
-''
-''            strSQL = strSqlSelect & " " & strSqlFrom & " " & strSqlJoin & " " & strSqlWhere
-''        Else
-''            strSQL = strSqlSelect & " " & strSqlFrom & " " & strSqlWhere
-''        End If
-''    End If
-''
-''
-''    Set rstRecordset = New ADODB.Recordset
-''
-''    frmCallingForm.Caption = "Counting number of matching MT tags: Connecting to MT tag table"
-''
-''    rstRecordset.CursorLocation = adUseClient
-''    rstRecordset.Open strSQL, cnnConnection, adOpenStatic, adLockReadOnly
-''    rstRecordset.ActiveConnection = Nothing
-''
-''    If rstRecordset.RecordCount = 0 Then
-''        MsgBox "Unable to determine count of MT tags in database " & udtDBSettings.DatabaseName, vbExclamation + vbOKOnly, "Error"
-''    Else
-''        frmCallingForm.Caption = "Counting number of matching MT tags: Loading data"
-''
-''        GetMassTagMatchCount = rstRecordset!TotalMassTags
-''    End If
-''
-''    rstRecordset.Close
-''
-''GetMassTagMatchCountCleanup:
-''    On Error Resume Next
-''    If rstRecordset.STATE <> adStateClosed Then rstRecordset.Close
-''    If cnnConnection.STATE <> adStateClosed Then cnnConnection.Close
-''    Set rstRecordset = Nothing
-''    Set cnnConnection = Nothing
-''
-''    frmCallingForm.Caption = strCaptionSaved
-''
-''    Exit Function
-''
-''GetMassTagMatchCountErrorHandler:
-''    MsgBox "Error while determining count of MT tags matching the given parameters (sub GetMassTagMatchCount): " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
-''    GetMassTagMatchCount = 0
-''    Resume GetMassTagMatchCountCleanup
-''
-''End Function
 
 Public Sub InitializePairMatchStats(ByRef udtPairMatchStats As udtPairMatchStatsType, Optional ByVal dblValueIfERNotDefined As Double = ER_NO_RATIO)
     udtPairMatchStats.PairIndex = -1
@@ -5674,36 +5518,66 @@ ValidateScoreErrorHandler:
     
 End Sub
 
-Public Sub ValidateMTMinimimumHighDiscriminantScore(ByRef udtAMTData() As udtAMTDataType, ByVal lngIndexStart As Long, ByVal lngIndexEnd As Long, ByRef sngMTMinimumHighDiscriminantScore As Single, ByRef sngMTMinimumHighNormalizedScore As Single, Optional ByVal lngMinMatchCount As Long = 1)
-    ' Make sure at least lngMinMatchCount of the loaded MT tags have score values >= mMTMinimumHighDiscriminantScore and >= sngMTMinimumHighNormalizedScore
-    ' If not, subtract 0.1, and test again
-    ' If any errors occur, set sngMTMinimumHighDiscriminantScore to 0
+Public Sub ValidateMTMinimumDiscriminantAndPepProphet(ByRef udtAMTData() As udtAMTDataType, ByVal lngIndexStart As Long, ByVal lngIndexEnd As Long, ByRef sngMTMinimumHighDiscriminantScore As Single, ByRef sngMTMinimumPeptideProphetProbability As Single, ByRef sngMTMinimumHighNormalizedScore As Single, Optional ByVal lngMinMatchCount As Long = 1)
+    ' Make sure at least lngMinMatchCount of the loaded MT tags have score values >= sngMTMinimumHighDiscriminantScore and >= sngMinimumPeptideProphetProbability and >= sngMTMinimumHighNormalizedScore
+    ' If not, subtract 0.1 from the discriminant score or the peptide prophet score (favoring the higher score), then test again
+    ' If any errors occur, set sngMTMinimumHighDiscriminantScore to 0 and set sngMTMinimumPeptideProphetProbability to 0
+    
+    Const DECREASE_AMOUNT As Single = 0.1
+    Const MAX_ITERATIONS As Integer = 25
     
     Dim lngIndex As Long
     Dim lngMatchCount As Long
+    Dim intRepeatCount As Integer
+    Dim intIterationCount As Integer
     
     On Error GoTo ValidateScoreErrorHandler
 
+    ' We should have, at most, 2*(1/DECREASE_AMOUNT) = 20 iterations since we're decrementing Discriminant Score or Peptide Prophet probability by 0.1 on each loop
+    intIterationCount = 0
+
+    intRepeatCount = 0
     Do
         lngMatchCount = 0
         For lngIndex = lngIndexStart To lngIndexEnd
-            If udtAMTData(lngIndex).HighDiscriminantScore >= sngMTMinimumHighDiscriminantScore And udtAMTData(lngIndex).HighNormalizedScore >= sngMTMinimumHighNormalizedScore Then
+            If udtAMTData(lngIndex).HighDiscriminantScore >= sngMTMinimumHighDiscriminantScore And _
+               udtAMTData(lngIndex).PeptideProphetProbability >= sngMTMinimumPeptideProphetProbability And _
+               udtAMTData(lngIndex).HighNormalizedScore >= sngMTMinimumHighNormalizedScore Then
                 lngMatchCount = lngMatchCount + 1
             End If
-            If lngMatchCount >= lngMinMatchCount Then Exit Do
+            If lngMatchCount >= lngMinMatchCount Then
+                Exit Do
+            End If
         Next lngIndex
         
-        ' Not enough matching MT tags
-        sngMTMinimumHighDiscriminantScore = sngMTMinimumHighDiscriminantScore - 0.1
-        If sngMTMinimumHighDiscriminantScore < 0 Then sngMTMinimumHighDiscriminantScore = 0
-    Loop While sngMTMinimumHighDiscriminantScore > 0
+        ' Not enough matching MT tags; try lowering the thresholds
+        If sngMTMinimumHighDiscriminantScore > 0 And sngMTMinimumHighDiscriminantScore >= sngMTMinimumPeptideProphetProbability Then
+            ' Discriminant is larger than Peptide Prophet; decrease discriminant threshold
+            sngMTMinimumHighDiscriminantScore = sngMTMinimumHighDiscriminantScore - 0.1
+            If sngMTMinimumHighDiscriminantScore < 0 Then sngMTMinimumHighDiscriminantScore = 0
+        ElseIf sngMTMinimumPeptideProphetProbability > 0 Then
+            ' Discriminant is zero, or Discriminant is less than Peptide Prophet; decrease Peptide Prophet threshold
+            sngMTMinimumPeptideProphetProbability = sngMTMinimumPeptideProphetProbability - 0.1
+            If sngMTMinimumPeptideProphetProbability < 0 Then sngMTMinimumPeptideProphetProbability = 0
+        Else
+            intRepeatCount = intRepeatCount + 1
+        End If
+        
+        intIterationCount = intIterationCount + 1
+    Loop While intRepeatCount < 2 And intIterationCount <= MAX_ITERATIONS
 
+    If intIterationCount > MAX_ITERATIONS Then
+        ' This code should never be reached
+        Debug.Assert False
+    End If
+    
     Exit Sub
 
 ValidateScoreErrorHandler:
     Debug.Assert False
-    LogErrors Err.Number, "MonroeLaVRoutines->ValidateMTMinimimumHighDiscriminantScore"
+    LogErrors Err.Number, "MonroeLaVRoutines->ValidateMTMinimumDiscriminantAndPepProphet"
     sngMTMinimumHighDiscriminantScore = 0
+    sngMTMinimumPeptideProphetProbability = 0
     
 End Sub
 

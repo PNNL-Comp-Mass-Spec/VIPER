@@ -687,7 +687,7 @@ End If
 If blnShowMessages Then MsgBox "Number of MT tags hits: " & SRCount, vbOKOnly, glFGTU
 
 GelSearchDef(CallerID).AMTSearchOnUMCs = samtDef
-AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched UMC's for MT tags (searched ion by ion, only examining ions belonging to UMC's)", SRCount, 0, 0, samtDef, False, False) & " Note: NET Information was not used in the search"
+AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched UMC's for MT tags (searched ion by ion, only examining ions belonging to UMC's)", SRCount, 0, 0, 0, samtDef, False, False) & " Note: NET Information was not used in the search"
 
 exit_cmdSearch_Click:
 TrimSRArrays
