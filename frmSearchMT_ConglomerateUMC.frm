@@ -3540,6 +3540,7 @@ Dim dblMatchMass As Double
 Dim dblMatchNET As Double
 Dim strMatchID As String
 Dim strInternalStdDescription As String
+Dim sngPeptideProphetProbability As Single
 
 Dim dblMassErrorPPM As Double
 Dim lngScanClassRep As Long
@@ -3593,12 +3594,12 @@ blnPairsPresent = PairIndexLookupInitialize(CallerID, objP1IndFastSearch, objP2I
 
 strSepChar = LookupDefaultSeparationCharacter()
 
-' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; IsInternalStdMatch; TIC_from_Raw_Data; Deisotoping_Peak_Count
+' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
 strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
 strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar
 strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
 strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar
-strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar & "IsInternalStdMatch" & strSepChar
+strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar
 strLineOut = strLineOut & "TIC_from_Raw_Data" & strSepChar & "Deisotoping_Peak_Count"
 If blnIncludeORFInfo Then strLineOut = strLineOut & strSepChar & "MultiORFCount" & strSepChar & "ORFName"
 ts.WriteLine strLineOut
@@ -3614,6 +3615,7 @@ ts.WriteLine strLineOut
                 strMatchID = .SeqID
                 strInternalStdDescription = .Description
             End With
+            sngPeptideProphetProbability = 0
         Else
             lngMassTagIndexPointer = mMTInd(mUMCMatchStats(mgInd).IDIndex)
             lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
@@ -3629,6 +3631,8 @@ ts.WriteLine strLineOut
             dblMatchNET = AMTData(lngMassTagIndexOriginal).NET
             ' Future: dblMatchNETStDev = AMTData(lngMassTagIndexOriginal).NETStDev
             strMatchID = AMTData(lngMassTagIndexOriginal).ID
+            
+            sngPeptideProphetProbability = AMTData(lngMassTagIndexOriginal).PeptideProphetProbability
         End If
     
         With GelUMC(CallerID).UMCs(lngUMCIndexOriginal)
@@ -3700,6 +3704,7 @@ ts.WriteLine strLineOut
         strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).SLiCScore, 4)
         strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).DelSLiC, 4)
         strLineOutEnd = strLineOutEnd & strSepChar & mUMCMatchStats(mgInd).IDIsInternalStd
+        strLineOutEnd = strLineOutEnd & strSepChar & Round(sngPeptideProphetProbability, 5)
         
         lngScanIndex = LookupScanNumberRelativeIndex(CallerID, lngScanClassRep)
         If lngScanIndex = 0 Then
@@ -4508,7 +4513,7 @@ ShowOrSaveResultsByIon "", True, mnuFReportIncludeORFs.Checked
 End Sub
 
 Private Sub mnuFReportByUMC_Click()
-ShowOrSaveResultsByUMC "", True, mnuFReportIncludeORFs.Checked
+    ShowOrSaveResultsByUMC "", True, mnuFReportIncludeORFs.Checked
 End Sub
 
 Private Sub mnuFReportIncludeORFs_Click()

@@ -1,5 +1,9 @@
 VIPER Change Log
 
+Version 3.41 - Build 351; October 17, 2006
+	- Updated "Copy UMCs in View" to now include Peptide Prophet Probability for PMT tag matches
+	- Renamed several menu items to use LC-MS Features instead of (or in addition to) UMCs
+
 Version 3.41 - Build 350; October 10, 2006
 	- Added option to search for additional Delta pair values
 		- Use parameters AutoAnalysisDeltaMassAddnlCount and AutoAnalysisDeltaMassAddnl1, AutoAnalysisDeltaMassAddnl2, etc. in section PairSearchOptions to define that additional search masses should be used

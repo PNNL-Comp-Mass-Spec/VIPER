@@ -206,7 +206,7 @@ Begin VB.Form frmGraph
          Caption         =   "1b. &Filter"
       End
       Begin VB.Menu mnuStepsUMCs 
-         Caption         =   "2. Find &UMC's"
+         Caption         =   "2. Find LC-MS Features (&UMCs)"
          Begin VB.Menu mnuStepsUMCMode 
             Caption         =   "UMC 2003 (faster)"
             Index           =   0
@@ -317,7 +317,7 @@ Begin VB.Form frmGraph
          End
       End
       Begin VB.Menu mnuSCopyUMCsInView 
-         Caption         =   "Copy UMCs In View"
+         Caption         =   "Copy LC-MS Features (UMCs) In View"
          Begin VB.Menu mnuSCopyPointsInViewByUMCtoClipboard 
             Caption         =   "Copy to Clipboard"
             Shortcut        =   ^U
@@ -383,7 +383,7 @@ Begin VB.Form frmGraph
          Caption         =   "-"
       End
       Begin VB.Menu mnuEditUMC 
-         Caption         =   "&Unique Mass Classes"
+         Caption         =   "LC-MS Features (&Unique Mass Classes)"
       End
       Begin VB.Menu mnuEditAvgUMC 
          Caption         =   "&Avg. UMC Member Masses"
@@ -3960,6 +3960,7 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     
     Dim lngScanClassRep As Long
     Dim dblGANETClassRep As Double, dblAMTMW As Double, dblAMTNet As Double, dblAMTNetStDev As Double
+    Dim sngPeptideProphetProbability As Single
     
     ' The following two arrays are used to look up the mass of each MT tag, given the MT tag ID
     ' If the user specified a mass modification (like alkylation, ICAT, or N15), then the standard mass
@@ -4162,11 +4163,11 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     lngExportCountDimmed = lngCSCount + lngIsoCount
     ReDim strExport(lngExportCountDimmed)
     
-    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; ExpressionRatioStDev; ExpressionRatioBasisCount; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagNET; MassTagNETStDev; SLiC Score; DelSLiC; MemberCountMatchingMassTag; IsInternalStdMatch
+    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; ExpressionRatioStDev; ExpressionRatioBasisCount; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagNET; MassTagNETStDev; SLiC Score; DelSLiC; MemberCountMatchingMassTag; IsInternalStdMatch; PeptideProphetProbability
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
-    strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch"
+    strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability"
     
     strExport(0) = strLineOut
     If Len(strFilePath) > 0 Then
@@ -4242,23 +4243,27 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 dblAMTMW = AMTData(lngMassTagIndexOriginal).MW
                 dblAMTNet = AMTData(lngMassTagIndexOriginal).NET
                 dblAMTNetStDev = AMTData(lngMassTagIndexOriginal).NETStDev
+                sngPeptideProphetProbability = AMTData(lngMassTagIndexOriginal).PeptideProphetProbability
                 Debug.Assert AMTData(lngMassTagIndexOriginal).ID = udtUMCsInView(lngUMCIndex).IDIndex
             Else
                 dblAMTMW = 0
                 dblAMTNet = 0
                 dblAMTNetStDev = 0
+                sngPeptideProphetProbability = 0
             End If
         Else
             dblAMTMW = 0
             dblAMTNet = 0
             dblAMTNetStDev = 0
+            sngPeptideProphetProbability = 0
         End If
         
-        strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).IDIndex & strSepChar & Round(dblAMTMW, 6) & strSepChar & Round(dblAMTNet, 4) & strSepChar & Round(dblAMTNetStDev, 4) & strSepChar
-        strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).SLiCScore & strSepChar
-        strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).DelSLiC & strSepChar
-        strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).MemberHitCount & strSepChar
-        strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).IDIsInternalStd
+        strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).IDIndex & strSepChar & Round(dblAMTMW, 6) & strSepChar & Round(dblAMTNet, 4) & strSepChar & Round(dblAMTNetStDev, 4)
+        strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).SLiCScore
+        strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).DelSLiC
+        strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).MemberHitCount
+        strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).IDIsInternalStd
+        strLineOutEnd = strLineOutEnd & strSepChar & Round(sngPeptideProphetProbability, 5)
         
         lngPairIndex = -1
         lngPairMatchCount = 0
