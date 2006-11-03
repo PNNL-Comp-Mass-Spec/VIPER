@@ -18,7 +18,7 @@ Begin VB.Form frmUMCIonNet
       Default         =   -1  'True
       Height          =   375
       Left            =   120
-      TabIndex        =   126
+      TabIndex        =   135
       Top             =   4920
       Width           =   975
    End
@@ -32,14 +32,16 @@ Begin VB.Form frmUMCIonNet
       _ExtentY        =   8281
       _Version        =   393216
       Style           =   1
-      Tab             =   2
       TabHeight       =   520
       TabCaption(0)   =   "1. Find Connections"
       TabPicture(0)   =   "frmUMCIonNet.frx":0000
-      Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "cmdFindConnectionsThenUMCs"
+      Tab(0).ControlEnabled=   -1  'True
+      Tab(0).Control(0)=   "fraNet(0)"
+      Tab(0).Control(0).Enabled=   0   'False
       Tab(0).Control(1)=   "fraUMCScope"
-      Tab(0).Control(2)=   "fraNet(0)"
+      Tab(0).Control(1).Enabled=   0   'False
+      Tab(0).Control(2)=   "cmdFindConnectionsThenUMCs"
+      Tab(0).Control(2).Enabled=   0   'False
       Tab(0).ControlCount=   3
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
@@ -49,14 +51,13 @@ Begin VB.Form frmUMCIonNet
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define UMC's using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
-      Tab(2).ControlEnabled=   -1  'True
+      Tab(2).ControlEnabled=   0   'False
       Tab(2).Control(0)=   "fraNet(1)"
-      Tab(2).Control(0).Enabled=   0   'False
       Tab(2).ControlCount=   1
       Begin VB.CommandButton cmdFindConnectionsThenUMCs 
          Caption         =   "&Find Connections then UMC's"
          Height          =   375
-         Left            =   -66960
+         Left            =   8040
          TabIndex        =   54
          ToolTipText     =   "Create Net based on current settings, then Find UMC's"
          Top             =   3840
@@ -65,7 +66,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraUMCScope 
          Caption         =   "Definition Scope"
          Height          =   975
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   1
          Top             =   420
          Width           =   1815
@@ -139,7 +140,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   4095
          Index           =   1
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   61
          Top             =   360
          Width           =   10695
@@ -147,7 +148,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Find &UMC's"
             Height          =   375
             Left            =   9240
-            TabIndex        =   124
+            TabIndex        =   133
             Top             =   2760
             Width           =   1095
          End
@@ -155,7 +156,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Abort!"
             Height          =   375
             Left            =   9240
-            TabIndex        =   125
+            TabIndex        =   134
             Top             =   2760
             Width           =   1095
          End
@@ -163,7 +164,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "&Report"
             Height          =   375
             Left            =   9360
-            TabIndex        =   123
+            TabIndex        =   132
             Top             =   2160
             Width           =   855
          End
@@ -172,7 +173,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   375
             Index           =   1
             Left            =   9120
-            TabIndex        =   122
+            TabIndex        =   131
             Top             =   240
             Width           =   1455
          End
@@ -182,7 +183,7 @@ Begin VB.Form frmUMCIonNet
             Left            =   1680
             List            =   "frmUMCIonNet.frx":0056
             Style           =   2  'Dropdown List
-            TabIndex        =   121
+            TabIndex        =   130
             Top             =   3675
             Width           =   2175
          End
@@ -190,7 +191,7 @@ Begin VB.Form frmUMCIonNet
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   7200
-            TabIndex        =   119
+            TabIndex        =   128
             Text            =   "0"
             Top             =   3675
             Width           =   495
@@ -199,7 +200,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Interpolate abundances across gaps"
             Height          =   255
             Left            =   4080
-            TabIndex        =   117
+            TabIndex        =   126
             Top             =   3405
             Width           =   3015
          End
@@ -214,7 +215,7 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Use most abundant charge state group stats for class stats"
                Height          =   530
                Left            =   240
-               TabIndex        =   133
+               TabIndex        =   139
                ToolTipText     =   "Make single-member classes from unconnected nodes"
                Top             =   2760
                Width           =   2055
@@ -223,7 +224,7 @@ Begin VB.Form frmUMCIonNet
                Height          =   315
                Left            =   240
                Style           =   2  'Dropdown List
-               TabIndex        =   131
+               TabIndex        =   137
                Top             =   2360
                Width           =   3255
             End
@@ -265,7 +266,7 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Most Abu Charge State Group Type"
                Height          =   255
                Left            =   240
-               TabIndex        =   132
+               TabIndex        =   138
                Top             =   2120
                Width           =   3135
             End
@@ -307,12 +308,12 @@ Begin VB.Form frmUMCIonNet
             _ExtentY        =   5530
             _Version        =   393216
             Style           =   1
-            Tab             =   2
             TabHeight       =   520
             TabCaption(0)   =   "Auto-Refine Options"
             TabPicture(0)   =   "frmUMCIonNet.frx":0058
-            Tab(0).ControlEnabled=   0   'False
+            Tab(0).ControlEnabled=   -1  'True
             Tab(0).Control(0)=   "fraOptionFrame(10)"
+            Tab(0).Control(0).Enabled=   0   'False
             Tab(0).ControlCount=   1
             TabCaption(1)   =   "Split UMC's Options"
             TabPicture(1)   =   "frmUMCIonNet.frx":0074
@@ -321,24 +322,22 @@ Begin VB.Form frmUMCIonNet
             Tab(1).ControlCount=   1
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
-            Tab(2).ControlEnabled=   -1  'True
-            Tab(2).Control(0)=   "fraClassAbundanceTopX"
-            Tab(2).Control(0).Enabled=   0   'False
-            Tab(2).Control(1)=   "fraClassMassTopX"
-            Tab(2).Control(1).Enabled=   0   'False
+            Tab(2).ControlEnabled=   0   'False
+            Tab(2).Control(0)=   "fraClassMassTopX"
+            Tab(2).Control(1)=   "fraClassAbundanceTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
                Height          =   1215
-               Left            =   120
-               TabIndex        =   110
+               Left            =   -74880
+               TabIndex        =   119
                Top             =   1800
                Width           =   4095
                Begin VB.TextBox txtClassMassTopXMinAbu 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   112
+                  TabIndex        =   121
                   Text            =   "0"
                   Top             =   240
                   Width           =   900
@@ -347,7 +346,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   114
+                  TabIndex        =   123
                   Text            =   "0"
                   ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
                   Top             =   540
@@ -357,7 +356,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   116
+                  TabIndex        =   125
                   Text            =   "3"
                   Top             =   840
                   Width           =   900
@@ -367,7 +366,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   111
+                  TabIndex        =   120
                   Top             =   270
                   Width           =   2535
                End
@@ -376,7 +375,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Maximum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   113
+                  TabIndex        =   122
                   Top             =   560
                   Width           =   2535
                End
@@ -385,7 +384,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum members to include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   115
+                  TabIndex        =   124
                   Top             =   870
                   Width           =   2535
                End
@@ -393,15 +392,15 @@ Begin VB.Form frmUMCIonNet
             Begin VB.Frame fraClassAbundanceTopX 
                Caption         =   "Class Abundance Top X"
                Height          =   1215
-               Left            =   120
-               TabIndex        =   103
+               Left            =   -74880
+               TabIndex        =   112
                Top             =   480
                Width           =   4095
                Begin VB.TextBox txtClassAbuTopXMinMembers 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   109
+                  TabIndex        =   118
                   Text            =   "3"
                   Top             =   840
                   Width           =   900
@@ -410,7 +409,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   107
+                  TabIndex        =   116
                   Text            =   "0"
                   ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
                   Top             =   540
@@ -420,7 +419,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   105
+                  TabIndex        =   114
                   Text            =   "0"
                   Top             =   240
                   Width           =   900
@@ -430,7 +429,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum members to include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   108
+                  TabIndex        =   117
                   Top             =   870
                   Width           =   2535
                End
@@ -439,7 +438,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Maximum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   106
+                  TabIndex        =   115
                   Top             =   560
                   Width           =   2535
                End
@@ -448,7 +447,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   104
+                  TabIndex        =   113
                   Top             =   270
                   Width           =   2535
                End
@@ -457,14 +456,14 @@ Begin VB.Form frmUMCIonNet
                Height          =   2640
                Index           =   15
                Left            =   -74880
-               TabIndex        =   84
+               TabIndex        =   93
                Top             =   330
                Width           =   4300
                Begin VB.ComboBox cboSplitUMCsScanGapBehavior 
                   Height          =   315
                   Left            =   1800
                   Style           =   2  'Dropdown List
-                  TabIndex        =   102
+                  TabIndex        =   111
                   Top             =   2220
                   Width           =   2295
                End
@@ -472,7 +471,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   99
+                  TabIndex        =   108
                   Text            =   "3"
                   Top             =   1890
                   Width           =   495
@@ -481,7 +480,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   96
+                  TabIndex        =   105
                   Text            =   "4"
                   Top             =   1560
                   Width           =   495
@@ -490,7 +489,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   93
+                  TabIndex        =   102
                   Text            =   "15"
                   Top             =   1230
                   Width           =   495
@@ -499,7 +498,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   90
+                  TabIndex        =   99
                   Text            =   "6"
                   Top             =   900
                   Width           =   495
@@ -508,7 +507,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   87
+                  TabIndex        =   96
                   Text            =   "4"
                   Top             =   570
                   Width           =   495
@@ -517,7 +516,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Split UMC's by examining abundance"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   85
+                  TabIndex        =   94
                   Top             =   240
                   Width           =   3015
                End
@@ -525,7 +524,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Scan gap behavior:"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   101
+                  TabIndex        =   110
                   Top             =   2250
                   Width           =   1620
                End
@@ -534,7 +533,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   3
                   Left            =   3480
-                  TabIndex        =   100
+                  TabIndex        =   109
                   Top             =   1920
                   Width           =   600
                End
@@ -544,7 +543,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   1
                   Left            =   120
-                  TabIndex        =   98
+                  TabIndex        =   107
                   Top             =   1920
                   Width           =   2655
                End
@@ -552,7 +551,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Peak picking minimum width"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   95
+                  TabIndex        =   104
                   Top             =   1590
                   Width           =   2700
                End
@@ -561,7 +560,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   5
                   Left            =   3480
-                  TabIndex        =   97
+                  TabIndex        =   106
                   Top             =   1590
                   Width           =   600
                End
@@ -569,7 +568,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Peak picking intensity threshold"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   92
+                  TabIndex        =   101
                   Top             =   1260
                   Width           =   2700
                End
@@ -578,7 +577,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   0
                   Left            =   3480
-                  TabIndex        =   94
+                  TabIndex        =   103
                   Top             =   1260
                   Width           =   700
                End
@@ -586,7 +585,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Maximum peak count to split UMC"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   89
+                  TabIndex        =   98
                   Top             =   930
                   Width           =   2700
                End
@@ -595,7 +594,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   1
                   Left            =   3480
-                  TabIndex        =   91
+                  TabIndex        =   100
                   Top             =   930
                   Width           =   600
                End
@@ -603,7 +602,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum difference in average mass"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   86
+                  TabIndex        =   95
                   Top             =   600
                   Width           =   2700
                End
@@ -612,147 +611,200 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   2
                   Left            =   3480
-                  TabIndex        =   88
+                  TabIndex        =   97
                   Top             =   600
                   Width           =   600
                End
             End
             Begin VB.Frame fraOptionFrame 
-               Height          =   2640
+               Height          =   2700
                Index           =   10
-               Left            =   -74880
+               Left            =   120
                TabIndex        =   71
-               Top             =   330
-               Width           =   4300
+               Top             =   300
+               Width           =   4545
+               Begin VB.TextBox txtMaxLengthPctAllScans 
+                  Alignment       =   1  'Right Justify
+                  Height          =   285
+                  Left            =   3000
+                  TabIndex        =   85
+                  Text            =   "15"
+                  Top             =   1520
+                  Width           =   495
+               End
+               Begin VB.CheckBox chkRemoveMaxLengthPctAllScans 
+                  Caption         =   "Remove cls. with length over"
+                  Height          =   255
+                  Left            =   240
+                  TabIndex        =   84
+                  Top             =   1520
+                  Width           =   2535
+               End
                Begin VB.TextBox txtPercentMaxAbuToUseToGaugeLength 
                   Alignment       =   1  'Right Justify
                   Height          =   285
-                  Left            =   2640
-                  TabIndex        =   83
-                  Text            =   "25"
-                  Top             =   1680
+                  Left            =   3000
+                  TabIndex        =   88
+                  Text            =   "33"
+                  Top             =   1840
                   Width           =   495
                End
                Begin VB.TextBox txtAutoRefineMinimumMemberCount 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   3480
-                  TabIndex        =   129
+                  TabIndex        =   92
                   Text            =   "3"
-                  Top             =   2225
+                  Top             =   2300
                   Width           =   495
                End
                Begin VB.CheckBox chkRefineUMCLengthByScanRange 
                   Caption         =   "Test UMC length using scan range"
                   Height          =   375
                   Left            =   240
-                  TabIndex        =   128
+                  TabIndex        =   90
                   ToolTipText     =   "If True, then considers scan range for the length tests; otherwise, considers member count"
-                  Top             =   2120
+                  Top             =   2200
                   Value           =   1  'Checked
                   Width           =   1695
                End
                Begin VB.CheckBox chkRemoveLoAbu 
-                  Caption         =   "Remove low intensity classes(%)"
+                  Caption         =   "Remove low intensity classes"
                   Height          =   255
                   Left            =   240
                   TabIndex        =   72
                   Top             =   240
-                  Width           =   2775
+                  Width           =   2550
                End
                Begin VB.TextBox txtLoAbuPct 
                   Alignment       =   1  'Right Justify
                   Height          =   285
-                  Left            =   3120
+                  Left            =   3000
                   TabIndex        =   73
                   Text            =   "30"
                   Top             =   240
-                  Width           =   615
+                  Width           =   495
                End
                Begin VB.CheckBox chkRemoveHiAbu 
-                  Caption         =   "Remove high intensity classes(%)"
+                  Caption         =   "Remove high intensity classes"
                   Height          =   255
                   Left            =   240
-                  TabIndex        =   74
-                  Top             =   600
-                  Width           =   2775
+                  TabIndex        =   75
+                  Top             =   560
+                  Width           =   2550
                End
                Begin VB.TextBox txtHiAbuPct 
                   Alignment       =   1  'Right Justify
                   Height          =   285
-                  Left            =   3120
-                  TabIndex        =   75
+                  Left            =   3000
+                  TabIndex        =   76
                   Text            =   "30"
-                  Top             =   600
-                  Width           =   615
+                  Top             =   560
+                  Width           =   495
                End
                Begin VB.CheckBox chkRemoveLoCnt 
                   Caption         =   "Remove cls. with less than"
                   Height          =   255
                   Left            =   240
-                  TabIndex        =   76
-                  Top             =   960
+                  TabIndex        =   78
+                  Top             =   880
                   Width           =   2295
                End
                Begin VB.TextBox txtLoCnt 
                   Alignment       =   1  'Right Justify
                   Height          =   285
-                  Left            =   2640
-                  TabIndex        =   77
+                  Left            =   3000
+                  TabIndex        =   79
                   Text            =   "3"
-                  Top             =   960
+                  Top             =   880
                   Width           =   495
                End
                Begin VB.CheckBox chkRemoveHiCnt 
-                  Caption         =   "Remove cls. with more than"
+                  Caption         =   "Remove cls. with length over"
                   Height          =   255
                   Left            =   240
-                  TabIndex        =   79
-                  Top             =   1320
-                  Width           =   2295
+                  TabIndex        =   81
+                  Top             =   1200
+                  Width           =   2535
                End
                Begin VB.TextBox txtHiCnt 
                   Alignment       =   1  'Right Justify
                   Height          =   285
-                  Left            =   2640
-                  TabIndex        =   80
+                  Left            =   3000
+                  TabIndex        =   82
                   Text            =   "500"
-                  Top             =   1320
+                  Top             =   1200
                   Width           =   495
                End
+               Begin VB.Label lblAutoRefineLengthLabel 
+                  Caption         =   "%"
+                  Height          =   255
+                  Index           =   5
+                  Left            =   3600
+                  TabIndex        =   77
+                  Top             =   590
+                  Width           =   270
+               End
+               Begin VB.Label lblAutoRefineLengthLabel 
+                  Caption         =   "%"
+                  Height          =   255
+                  Index           =   4
+                  Left            =   3600
+                  TabIndex        =   74
+                  Top             =   270
+                  Width           =   270
+               End
+               Begin VB.Label lblAutoRefineLengthLabel 
+                  Caption         =   "% all scans"
+                  Height          =   255
+                  Index           =   3
+                  Left            =   3600
+                  TabIndex        =   86
+                  Top             =   1545
+                  Width           =   855
+               End
+               Begin VB.Label lblAutoRefineLengthLabel 
+                  Caption         =   "%"
+                  Height          =   255
+                  Index           =   2
+                  Left            =   3600
+                  TabIndex        =   89
+                  Top             =   1870
+                  Width           =   285
+               End
                Begin VB.Label lblPercentMaxAbuToUseToGaugeLength 
-                  Caption         =   "Percent max abundance to use to gauge width"
-                  Height          =   405
-                  Left            =   720
-                  TabIndex        =   82
-                  Top             =   1560
-                  Width           =   1845
+                  Caption         =   "Percent max abu for gauging width"
+                  Height          =   240
+                  Left            =   360
+                  TabIndex        =   87
+                  Top             =   1845
+                  Width           =   2565
                End
                Begin VB.Label lblAutoRefineMinimumMemberCount 
                   Caption         =   "Minimum member count:"
                   Height          =   375
                   Left            =   2280
-                  TabIndex        =   130
-                  Top             =   2120
+                  TabIndex        =   91
+                  Top             =   2200
                   Width           =   1125
                End
                Begin VB.Label lblAutoRefineLengthLabel 
                   Caption         =   "members"
                   Height          =   255
                   Index           =   0
-                  Left            =   3240
-                  TabIndex        =   78
-                  Top             =   1000
-                  Width           =   1000
+                  Left            =   3600
+                  TabIndex        =   80
+                  Top             =   915
+                  Width           =   900
                End
                Begin VB.Label lblAutoRefineLengthLabel 
                   Caption         =   "members"
                   Height          =   255
                   Index           =   1
-                  Left            =   3240
-                  TabIndex        =   81
-                  Top             =   1360
-                  Width           =   1000
+                  Left            =   3600
+                  TabIndex        =   83
+                  Top             =   1230
+                  Width           =   900
                End
             End
          End
@@ -761,7 +813,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "UMC Draw Type"
             Height          =   255
             Left            =   240
-            TabIndex        =   120
+            TabIndex        =   129
             Top             =   3705
             Width           =   1455
          End
@@ -770,7 +822,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Maximum size of gap to interpolate:"
             Height          =   255
             Left            =   4080
-            TabIndex        =   118
+            TabIndex        =   127
             Top             =   3705
             Width           =   2535
          End
@@ -778,10 +830,19 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   3255
          Index           =   0
-         Left            =   -72960
+         Left            =   2040
          TabIndex        =   4
          Top             =   420
          Width           =   8535
+         Begin VB.CommandButton cmdResetToOldDefaults 
+            Caption         =   "Set to Old Defaults"
+            Height          =   250
+            Index           =   2
+            Left            =   5280
+            TabIndex        =   140
+            Top             =   240
+            Width           =   1575
+         End
          Begin VB.CommandButton cmdResetToDefaults 
             Caption         =   "Set to Defaults"
             Height          =   375
@@ -1249,7 +1310,7 @@ Begin VB.Form frmUMCIonNet
       ForeColor       =   &H80000008&
       Height          =   255
       Left            =   1200
-      TabIndex        =   127
+      TabIndex        =   136
       Top             =   4980
       Width           =   7095
    End
@@ -1350,9 +1411,13 @@ Private Sub DisplayCurrentOptions()
     With glbPreferencesExpanded.UMCAutoRefineOptions
         SetCheckBox chkRemoveLoCnt, .UMCAutoRefineRemoveCountLow
         SetCheckBox chkRemoveHiCnt, .UMCAutoRefineRemoveCountHigh
+        SetCheckBox chkRemoveMaxLengthPctAllScans, .UMCAutoRefineRemoveMaxLengthPctAllScans
+        
         txtLoCnt = .UMCAutoRefineMinLength
         txtHiCnt = .UMCAutoRefineMaxLength
+        txtMaxLengthPctAllScans = .UMCAutoRefineMaxLengthPctAllScans
         txtPercentMaxAbuToUseToGaugeLength = .UMCAutoRefinePercentMaxAbuToUseForLength
+        
         SetCheckBox chkRefineUMCLengthByScanRange, .TestLengthUsingScanRange
         txtAutoRefineMinimumMemberCount = .MinMemberCountWhenUsingScanRange
         UpdateDynamicControls
@@ -1598,6 +1663,10 @@ Else
 End If
 End Sub
 
+Private Sub chkRemoveMaxLengthPctAllScans_Click()
+     glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveMaxLengthPctAllScans = cChkBox(chkRemoveMaxLengthPctAllScans)
+End Sub
+
 Private Sub chkRefineUMCLengthByScanRange_Click()
     glbPreferencesExpanded.UMCAutoRefineOptions.TestLengthUsingScanRange = cChkBox(chkRefineUMCLengthByScanRange)
     UpdateDynamicControls
@@ -1628,7 +1697,7 @@ On Error Resume Next
 If mCalculating Then
     SetCheckBox chkUse(Index), MyDef.MetricData(Index).Use
 Else
-    MyDef.MetricData(Index).Use = (chkUse(Index).value = vbChecked)
+    MyDef.MetricData(Index).Use = (chkUse(Index).Value = vbChecked)
 End If
 End Sub
 
@@ -1644,7 +1713,7 @@ Private Sub chkUseUntangledAsSingle_Click()
 If mCalculating Then
     SetCheckBox chkUseUntangledAsSingle, UMCMakeSingleMemberClasses
 Else
-    UMCMakeSingleMemberClasses = (chkUseUntangledAsSingle.value = vbChecked)
+    UMCMakeSingleMemberClasses = (chkUseUntangledAsSingle.Value = vbChecked)
     glbPreferencesExpanded.UMCIonNetOptions.MakeSingleMemberClasses = UMCMakeSingleMemberClasses
 End If
 End Sub
@@ -1856,6 +1925,10 @@ Private Sub cmdResetToDefaults_Click(Index As Integer)
     ResetToDefaults
 End Sub
 
+Private Sub cmdResetToOldDefaults_Click(Index As Integer)
+    ResetToOldDefaults
+End Sub
+
 Private Sub Form_Activate()
     InitializeUMCSearch
 End Sub
@@ -2010,6 +2083,15 @@ If IsNumeric(txtLoCnt.Text) Then
 Else
    MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
    txtLoCnt.SetFocus
+End If
+End Sub
+
+Private Sub txtMaxLengthPctAllScans_Lostfocus()
+If IsNumeric(txtMaxLengthPctAllScans.Text) Then
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLengthPctAllScans = Abs(CLng(txtMaxLengthPctAllScans.Text))
+Else
+   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+   txtMaxLengthPctAllScans.SetFocus
 End If
 End Sub
 
@@ -2582,7 +2664,7 @@ End If
 MyDef.NetDim = chkUse.Count
 MyDef.NetActualDim = 0
 For i = 0 To chkUse.Count - 1
-    If chkUse(i).value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
+    If chkUse(i).Value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
 Next i
 If MyDef.NetActualDim < 1 Then
    strMessage = "At least one data dimension has to be selected."
@@ -2965,10 +3047,10 @@ End Function
 Private Sub UpdateDynamicControls()
     ' Update the UMC auto refine length labels
     If glbPreferencesExpanded.UMCAutoRefineOptions.TestLengthUsingScanRange Then
-        chkRemoveLoCnt.Caption = "Remove classes less than"
-        chkRemoveHiCnt.Caption = "Remove classes more than"
-        lblAutoRefineLengthLabel(0) = "scans wide"
-        lblAutoRefineLengthLabel(1) = "scans wide"
+        chkRemoveLoCnt.Caption = "Remove cls. with less than"
+        chkRemoveHiCnt.Caption = "Remove cls. with length over"
+        lblAutoRefineLengthLabel(0) = "scans"
+        lblAutoRefineLengthLabel(1) = "scans"
         lblAutoRefineMinimumMemberCount.Enabled = True
     Else
         chkRemoveLoCnt.Caption = "Remove cls. with less than"
@@ -3039,6 +3121,36 @@ Private Sub ResetToDefaults()
     
 End Sub
 
+Private Sub ResetToOldDefaults()
+    Dim eResponse As VbMsgBoxResult
+    
+    eResponse = MsgBox("Are you sure you want to use old defaults?", vbQuestion Or vbYesNoCancel Or vbDefaultButton3, "Old Defaults")
+    If eResponse <> vbYes Then Exit Sub
+    
+    ResetToDefaults
+    
+    ' These are old defaults, set in July 2003
+    With glbPreferencesExpanded.UMCAutoRefineOptions
+        .UMCAutoRefineRemoveCountLow = True
+        .UMCAutoRefineMinLength = 2
+        
+        .UMCAutoRefineRemoveCountHigh = True
+        .UMCAutoRefineMaxLength = 400
+        
+        .UMCAutoRefineRemoveMaxLengthPctAllScans = False
+        .UMCAutoRefineMaxLengthPctAllScans = 15
+        
+        .UMCAutoRefinePercentMaxAbuToUseForLength = 33
+        .TestLengthUsingScanRange = True
+        .MinMemberCountWhenUsingScanRange = 2
+    End With
+
+    ' These are old defaults, set in July 2003
+    SetOldDefaultUMCIonNetDef MyDef
+    
+    DisplayCurrentOptions
+End Sub
+
 Private Sub SetDefinition()
 '--------------------------------------------------------------
 'sets definitions frm structures to control properties
@@ -3077,6 +3189,22 @@ LogErrors Err.Number, "frmUMCIonNet->SetDefinition"
 ChangeStatus "Error accepting net definition."
 End Sub
 
+Private Sub SetOldDefaultUMCIonNetDef(ByRef udtUMCIonNetDef As UMCIonNetDefinition)
+    ' These are old defaults, set in July 2003
+    With udtUMCIonNetDef
+        .MetricType = METRIC_EUCLIDEAN
+        .NETType = Net_SPIDER_66
+        .NetDim = 5
+        .NetActualDim = 5
+        .TooDistant = 0.1
+        ReDim .MetricData(.NetDim - 1)
+        .MetricData(0).Use = True:  .MetricData(0).DataType = DATA_MONO_MW:   .MetricData(0).WeightFactor = 0.5:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 0.025: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(1).Use = True:  .MetricData(1).DataType = DATA_AVG_MW:    .MetricData(1).WeightFactor = 0.5:   .MetricData(1).ConstraintType = Net_CT_LT:       .MetricData(1).ConstraintValue = 0.025: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(2).Use = True:  .MetricData(2).DataType = DATA_LOG_ABU:   .MetricData(2).WeightFactor = 0.1:   .MetricData(2).ConstraintType = Net_CT_None:     .MetricData(2).ConstraintValue = 0.1:   .MetricData(2).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(3).Use = True:  .MetricData(3).DataType = DATA_SCAN:      .MetricData(3).WeightFactor = 0.01:   .MetricData(3).ConstraintType = Net_CT_None:    .MetricData(3).ConstraintValue = 0.01:  .MetricData(3).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(4).Use = True:  .MetricData(4).DataType = DATA_FIT:       .MetricData(4).WeightFactor = 0.1:    .MetricData(4).ConstraintType = Net_CT_None:    .MetricData(4).ConstraintValue = 0.01:  .MetricData(4).ConstraintUnits = DATA_UNITS_MASS_DA
+    End With
+End Sub
 
 Private Sub SetUMCDefinition()
 '----------------------------------------------------------------------------
@@ -3090,7 +3218,7 @@ With UMCDef
     cboChargeStateAbuType.ListIndex = .ChargeStateStatsRepType
     SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
     
-    optDefScope(.DefScope).value = True
+    optDefScope(.DefScope).Value = True
     SetCheckBox chkInterpolateMissingIons, .InterpolateGaps
     txtInterpolateMaxGapSize = .InterpolateMaxGapSize
     txtHoleSize = .GapMaxSize

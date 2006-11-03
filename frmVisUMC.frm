@@ -4,21 +4,21 @@ Begin VB.Form frmVisUMC
    Caption         =   "UMC Editor"
    ClientHeight    =   9480
    ClientLeft      =   150
-   ClientTop       =   825
-   ClientWidth     =   11835
+   ClientTop       =   840
+   ClientWidth     =   13005
    Icon            =   "frmVisUMC.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
    ScaleHeight     =   9480
-   ScaleWidth      =   11835
+   ScaleWidth      =   13005
    ShowInTaskbar   =   0   'False
    StartUpPosition =   3  'Windows Default
    Begin VB.CheckBox chkShowUMC 
       Caption         =   "Show Unique Mass Classes"
       Height          =   255
       Left            =   4680
-      TabIndex        =   62
+      TabIndex        =   47
       Top             =   8640
       Width           =   2415
    End
@@ -28,163 +28,215 @@ Begin VB.Form frmVisUMC
       Left            =   7320
       TabIndex        =   0
       Top             =   0
-      Width           =   4440
-      Begin VB.Frame fraAutoRemove 
-         Caption         =   "Auto-Remove Options"
-         Height          =   3195
+      Width           =   5040
+      Begin VB.Frame fraOptionFrame 
+         Caption         =   "Auto-remove Options"
+         Height          =   3180
+         Index           =   10
          Left            =   120
-         TabIndex        =   43
-         Top             =   6060
-         Width           =   4215
-         Begin VB.TextBox txtPercentMaxAbuToUseToGaugeLength 
-            Alignment       =   1  'Right Justify
-            Height          =   285
-            Left            =   2520
-            TabIndex        =   59
-            Text            =   "25"
-            Top             =   1680
-            Width           =   495
-         End
-         Begin VB.TextBox txtAutoRefineMinimumMemberCount 
-            Alignment       =   1  'Right Justify
-            Height          =   285
-            Left            =   3360
-            TabIndex        =   64
-            Text            =   "3"
-            Top             =   2160
-            Width           =   495
-         End
-         Begin VB.CheckBox chkRefineUMCLengthByScanRange 
-            Caption         =   "Test UMC length using scan range"
-            Height          =   375
-            Left            =   120
+         TabIndex        =   48
+         Top             =   6120
+         Width           =   4545
+         Begin VB.CheckBox chkRemovePairedLUMC 
+            Caption         =   "Remove classes paired as light members"
+            Enabled         =   0   'False
+            Height          =   255
+            Left            =   240
             TabIndex        =   63
-            ToolTipText     =   "If True, then considers scan range for the length tests; otherwise, considers member count"
-            Top             =   2040
-            Value           =   1  'Checked
-            Width           =   1815
+            Top             =   2640
+            Width           =   3615
          End
          Begin VB.CheckBox chkRemovePairedHUMC 
             Caption         =   "Remove classes paired as heavy members"
             Enabled         =   0   'False
             Height          =   255
-            Left            =   120
-            TabIndex        =   61
+            Left            =   240
+            TabIndex        =   64
             Top             =   2880
-            Width           =   3615
-         End
-         Begin VB.CheckBox chkRemovePairedLUMC 
-            Caption         =   "Remove classes paired as light members"
-            Enabled         =   0   'False
-            Height          =   255
-            Left            =   120
-            TabIndex        =   60
-            Top             =   2565
             Width           =   3615
          End
          Begin VB.TextBox txtHiCnt 
             Alignment       =   1  'Right Justify
             Height          =   285
-            Left            =   2520
+            Left            =   3000
             TabIndex        =   56
             Text            =   "500"
-            Top             =   1320
+            Top             =   1200
             Width           =   495
          End
          Begin VB.CheckBox chkRemoveHiCnt 
-            Caption         =   "Remove cls. with more than"
+            Caption         =   "Remove cls. with length over"
             Height          =   255
-            Left            =   120
+            Left            =   240
             TabIndex        =   55
-            Top             =   1320
-            Value           =   1  'Checked
-            Width           =   2295
+            Top             =   1200
+            Width           =   2535
          End
          Begin VB.TextBox txtLoCnt 
             Alignment       =   1  'Right Justify
             Height          =   285
-            Left            =   2520
-            TabIndex        =   53
+            Left            =   3000
+            TabIndex        =   54
             Text            =   "3"
-            Top             =   960
+            Top             =   880
             Width           =   495
          End
          Begin VB.CheckBox chkRemoveLoCnt 
             Caption         =   "Remove cls. with less than"
             Height          =   255
-            Left            =   120
-            TabIndex        =   52
-            Top             =   960
+            Left            =   240
+            TabIndex        =   53
+            Top             =   880
             Width           =   2295
          End
          Begin VB.TextBox txtHiAbuPct 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   51
+            TabIndex        =   52
             Text            =   "30"
-            Top             =   600
-            Width           =   615
+            Top             =   560
+            Width           =   495
          End
          Begin VB.CheckBox chkRemoveHiAbu 
-            Caption         =   "Remove high intensity classes(%)"
+            Caption         =   "Remove high intensity classes"
             Height          =   255
-            Left            =   120
-            TabIndex        =   50
-            Top             =   600
-            Width           =   2775
+            Left            =   240
+            TabIndex        =   51
+            Top             =   560
+            Width           =   2550
          End
          Begin VB.TextBox txtLoAbuPct 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   49
+            TabIndex        =   50
             Text            =   "30"
             Top             =   240
-            Width           =   615
+            Width           =   495
          End
          Begin VB.CheckBox chkRemoveLoAbu 
-            Caption         =   "Remove low intensity classes(%)"
+            Caption         =   "Remove low intensity classes"
             Height          =   255
-            Left            =   120
-            TabIndex        =   48
+            Left            =   240
+            TabIndex        =   49
             Top             =   240
-            Value           =   1  'Checked
-            Width           =   2775
+            Width           =   2550
          End
-         Begin VB.Label lblPercentMaxAbuToUseToGaugeLength 
-            Caption         =   "Percent max abundance to use to gauge width"
-            Height          =   405
-            Left            =   600
-            TabIndex        =   58
-            Top             =   1560
-            Width           =   1845
-         End
-         Begin VB.Label lblAutoRefineMinimumMemberCount 
-            Caption         =   "Minimum member count:"
+         Begin VB.CheckBox chkRefineUMCLengthByScanRange 
+            Caption         =   "Test UMC length using scan range"
             Height          =   375
-            Left            =   2160
-            TabIndex        =   65
-            Top             =   2040
-            Width           =   1125
+            Left            =   240
+            TabIndex        =   61
+            ToolTipText     =   "If True, then considers scan range for the length tests; otherwise, considers member count"
+            Top             =   2200
+            Value           =   1  'Checked
+            Width           =   1695
+         End
+         Begin VB.TextBox txtAutoRefineMinimumMemberCount 
+            Alignment       =   1  'Right Justify
+            Height          =   285
+            Left            =   3480
+            TabIndex        =   62
+            Text            =   "3"
+            Top             =   2300
+            Width           =   495
+         End
+         Begin VB.TextBox txtPercentMaxAbuToUseToGaugeLength 
+            Alignment       =   1  'Right Justify
+            Height          =   285
+            Left            =   3000
+            TabIndex        =   60
+            Text            =   "33"
+            Top             =   1840
+            Width           =   495
+         End
+         Begin VB.CheckBox chkRemoveMaxLengthPctAllScans 
+            Caption         =   "Remove cls. with length over"
+            Height          =   255
+            Left            =   240
+            TabIndex        =   57
+            Top             =   1520
+            Width           =   2535
+         End
+         Begin VB.TextBox txtMaxLengthPctAllScans 
+            Alignment       =   1  'Right Justify
+            Height          =   285
+            Left            =   3000
+            TabIndex        =   58
+            Text            =   "20"
+            Top             =   1520
+            Width           =   495
          End
          Begin VB.Label lblAutoRefineLengthLabel 
             Caption         =   "members"
             Height          =   255
             Index           =   1
-            Left            =   3120
-            TabIndex        =   57
-            Top             =   1360
-            Width           =   1000
+            Left            =   3600
+            TabIndex        =   71
+            Top             =   1230
+            Width           =   900
          End
          Begin VB.Label lblAutoRefineLengthLabel 
             Caption         =   "members"
             Height          =   255
             Index           =   0
-            Left            =   3120
-            TabIndex        =   54
-            Top             =   1000
-            Width           =   1000
+            Left            =   3600
+            TabIndex        =   70
+            Top             =   915
+            Width           =   900
+         End
+         Begin VB.Label lblAutoRefineMinimumMemberCount 
+            Caption         =   "Minimum member count:"
+            Height          =   375
+            Left            =   2280
+            TabIndex        =   69
+            Top             =   2200
+            Width           =   1125
+         End
+         Begin VB.Label lblPercentMaxAbuToUseToGaugeLength 
+            Caption         =   "Percent max abu for gauging width"
+            Height          =   240
+            Left            =   360
+            TabIndex        =   59
+            Top             =   1845
+            Width           =   2565
+         End
+         Begin VB.Label lblAutoRefineLengthLabel 
+            Caption         =   "%"
+            Height          =   255
+            Index           =   2
+            Left            =   3600
+            TabIndex        =   68
+            Top             =   1870
+            Width           =   285
+         End
+         Begin VB.Label lblAutoRefineLengthLabel 
+            Caption         =   "% all scans"
+            Height          =   255
+            Index           =   3
+            Left            =   3600
+            TabIndex        =   67
+            Top             =   1545
+            Width           =   855
+         End
+         Begin VB.Label lblAutoRefineLengthLabel 
+            Caption         =   "%"
+            Height          =   255
+            Index           =   4
+            Left            =   3600
+            TabIndex        =   66
+            Top             =   270
+            Width           =   270
+         End
+         Begin VB.Label lblAutoRefineLengthLabel 
+            Caption         =   "%"
+            Height          =   255
+            Index           =   5
+            Left            =   3600
+            TabIndex        =   65
+            Top             =   590
+            Width           =   270
          End
       End
       Begin VB.Frame fraAutoMerge 
@@ -251,7 +303,7 @@ Begin VB.Form frmVisUMC
             Caption         =   "Clear"
             Height          =   325
             Left            =   2940
-            TabIndex        =   47
+            TabIndex        =   46
             Top             =   1680
             Width           =   975
          End
@@ -259,7 +311,7 @@ Begin VB.Form frmVisUMC
             Caption         =   "Del. Class"
             Height          =   325
             Left            =   1980
-            TabIndex        =   46
+            TabIndex        =   45
             Top             =   1680
             Width           =   975
          End
@@ -267,7 +319,7 @@ Begin VB.Form frmVisUMC
             Caption         =   "Add Group"
             Height          =   325
             Left            =   1020
-            TabIndex        =   45
+            TabIndex        =   44
             Top             =   1680
             Width           =   975
          End
@@ -275,7 +327,7 @@ Begin VB.Form frmVisUMC
             Caption         =   "Add Class"
             Height          =   325
             Left            =   60
-            TabIndex        =   44
+            TabIndex        =   43
             Top             =   1680
             Width           =   975
          End
@@ -847,200 +899,167 @@ Attribute MyViewer.VB_VarHelpID = -1
 Private mChangeList As String
 
 Public Sub AutoRemoveUMCsWork()
-'-------------------------------------------------------
-'mark all classes satisfying conditions for removal
-'-------------------------------------------------------
-Dim i As Long, j As Long
-Dim lngScan As Long
-Dim arrAbu() As Double
-Dim arrInd() As Long
-Dim qsAbu As QSDouble
-Dim PctCnt As Long
-Dim lngOriginalUMCCount As Long
-Dim strProcessSummary As String
-Dim udtAutoRefine As udtUMCAutoRefineOptionsType
-
-Dim lngMemberIndex As Long
-Dim lngScanStart As Long
-Dim lngScanEnd As Long
-Dim lngCurrentScan As Long
-
-Dim sngThreshold As Single
+    '-------------------------------------------------------
+    'mark all classes satisfying conditions for removal
+    '-------------------------------------------------------
+    Dim i As Long, j As Long
+    Dim lngScan As Long
+    Dim arrAbu() As Double
+    Dim arrInd() As Long
+    Dim qsAbu As QSDouble
+    Dim PctCnt As Long
+    Dim lngOriginalUMCCount As Long
+    Dim strProcessSummary As String
+    Dim udtAutoRefine As udtUMCAutoRefineOptionsType
+    
+    Dim lngMinFN As Long, lngMaxFN As Long
+    Dim lngScanRangeTotal As Long
+    Dim lngMaxLengthScans As Long
 
 On Error GoTo AutoRemoveUMCsWorkErrorHandler
-
-' Copy the .UMCAutoRefineOptions to a local variable to make the code a little cleaner (shorter variable names)
-udtAutoRefine = glbPreferencesExpanded.UMCAutoRefineOptions
-
-If udtAutoRefine.TestLengthUsingScanRange Then
-    ' Need to determine the minimum and maximum scan of each UMC in Tmp
-    With tmp
-        If .UMCCnt > 0 Then
-           For i = 0 To .UMCCnt - 1
-               With .UMCs(i)
-                   .MinScan = glHugeLong:               .MaxScan = -glHugeLong
-                   If .ClassCount > 0 Then
-                      For j = 0 To .ClassCount - 1
-                          Select Case .ClassMType(j)
-                          Case glCSType
-                               lngScan = GelData(CallerID).CSData(.ClassMInd(j)).ScanNumber
-                          Case glIsoType
-                               lngScan = GelData(CallerID).IsoData(.ClassMInd(j)).ScanNumber
-                          End Select
-                          If lngScan < .MinScan Then .MinScan = lngScan
-                          If lngScan > .MaxScan Then .MaxScan = lngScan
-                      Next j
+    
+    ' Copy the .UMCAutoRefineOptions to a local variable to make the code a little cleaner (shorter variable names)
+    udtAutoRefine = glbPreferencesExpanded.UMCAutoRefineOptions
+    
+    If udtAutoRefine.TestLengthUsingScanRange Then
+        ' Need to determine the minimum and maximum scan of each UMC in Tmp
+        With tmp
+            If .UMCCnt > 0 Then
+               For i = 0 To .UMCCnt - 1
+                   With .UMCs(i)
+                       .MinScan = glHugeLong:               .MaxScan = -glHugeLong
+                       If .ClassCount > 0 Then
+                          For j = 0 To .ClassCount - 1
+                              Select Case .ClassMType(j)
+                              Case glCSType
+                                   lngScan = GelData(CallerID).CSData(.ClassMInd(j)).ScanNumber
+                              Case glIsoType
+                                   lngScan = GelData(CallerID).IsoData(.ClassMInd(j)).ScanNumber
+                              End Select
+                              If lngScan < .MinScan Then .MinScan = lngScan
+                              If lngScan > .MaxScan Then .MaxScan = lngScan
+                          Next j
+                       End If
+                   End With
+                   If .UMCs(i).ClassCount > 0 Then
+                   Else                             'something wrong
+                      .UMCs(i).MinScan = -1
+                      .UMCs(i).MaxScan = -1
                    End If
-               End With
-               If .UMCs(i).ClassCount > 0 Then
-               Else                             'something wrong
-                  .UMCs(i).MinScan = -1
-                  .UMCs(i).MaxScan = -1
-               End If
+               Next i
+            End If
+        End With
+    End If
+    
+    UpdateStatus "Selecting classes to remove..."
+    Me.MousePointer = vbHourglass
+    With tmp
+        lngOriginalUMCCount = .UMCCnt
+        If udtAutoRefine.UMCAutoRefineRemoveAbundanceHigh Then
+           UpdateStatus "Eliminating high abundance classes ..."
+           PctCnt = CLng(.UMCCnt * udtAutoRefine.UMCAutoRefinePctHighAbundance / 100)
+           ReDim arrAbu(.UMCCnt - 1)
+           ReDim arrInd(.UMCCnt - 1)
+           For i = 0 To .UMCCnt - 1
+               arrInd(i) = i
+               arrAbu(i) = .UMCs(i).ClassAbundance
            Next i
+           Set qsAbu = New QSDouble
+           If qsAbu.QSDesc(arrAbu(), arrInd()) Then     'eliminate first PctCnt classes
+              For i = 0 To PctCnt - 1
+                  TmpInc(arrInd(i)) = REMOVE_UMC_MARK
+              Next i
+           End If
+           strProcessSummary = "Removed high abundance classes (" & Trim(udtAutoRefine.UMCAutoRefinePctHighAbundance) & "% removed)"
         End If
-    End With
-End If
-
-UpdateStatus "Selecting classes to remove..."
-Me.MousePointer = vbHourglass
-With tmp
-    lngOriginalUMCCount = .UMCCnt
-    If udtAutoRefine.UMCAutoRefineRemoveAbundanceHigh Then
-       UpdateStatus "Eliminating high abundance classes ..."
-       PctCnt = CLng(.UMCCnt * udtAutoRefine.UMCAutoRefinePctHighAbundance / 100)
-       ReDim arrAbu(.UMCCnt - 1)
-       ReDim arrInd(.UMCCnt - 1)
-       For i = 0 To .UMCCnt - 1
-           arrInd(i) = i
-           arrAbu(i) = .UMCs(i).ClassAbundance
-       Next i
-       Set qsAbu = New QSDouble
-       If qsAbu.QSDesc(arrAbu(), arrInd()) Then     'eliminate first PctCnt classes
-          For i = 0 To PctCnt - 1
-              TmpInc(arrInd(i)) = REMOVE_UMC_MARK
-          Next i
-       End If
-       strProcessSummary = "Removed high abundance classes (" & Trim(udtAutoRefine.UMCAutoRefinePctHighAbundance) & "% removed)"
-    End If
-    If udtAutoRefine.UMCAutoRefineRemoveAbundanceLow Then
-       UpdateStatus "Eliminating low abundance classes ..."
-       PctCnt = CLng(.UMCCnt * udtAutoRefine.UMCAutoRefinePctLowAbundance / 100)
-       ReDim arrAbu(.UMCCnt - 1)
-       ReDim arrInd(.UMCCnt - 1)
-       For i = 0 To .UMCCnt - 1
-           arrInd(i) = i
-           arrAbu(i) = .UMCs(i).ClassAbundance
-       Next i
-       Set qsAbu = New QSDouble
-       If qsAbu.QSAsc(arrAbu(), arrInd()) Then     'eliminate first PctCnt classes
-          For i = 0 To PctCnt - 1
-              TmpInc(arrInd(i)) = REMOVE_UMC_MARK
-          Next i
-       End If
-       If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
-       strProcessSummary = strProcessSummary & "Removed low abundance classes (" & Trim(udtAutoRefine.UMCAutoRefinePctLowAbundance) & "% removed)"
-    End If
-    If udtAutoRefine.UMCAutoRefineRemoveCountLow Then
-       If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
-       If Not udtAutoRefine.TestLengthUsingScanRange Then
-            UpdateStatus "Removing classes with too few members ..."
-            For i = 0 To .UMCCnt - 1
-                If .UMCs(i).ClassCount < udtAutoRefine.UMCAutoRefineMinLength Then TmpInc(i) = REMOVE_UMC_MARK
-            Next i
-            strProcessSummary = strProcessSummary & "Removed classes with low member count (count < " & Trim(udtAutoRefine.UMCAutoRefineMinLength) & ")"
-       Else
-            UpdateStatus "Removing classes with too short of a scan range ..."
-            For i = 0 To .UMCCnt - 1
-                If .UMCs(i).MaxScan - .UMCs(i).MinScan + 1 < udtAutoRefine.UMCAutoRefineMinLength Or _
-                   .UMCs(i).ClassCount < udtAutoRefine.MinMemberCountWhenUsingScanRange Then
-                    TmpInc(i) = REMOVE_UMC_MARK
-                End If
-            Next i
-            strProcessSummary = strProcessSummary & "Removed classes with too short of a scan range (range < " & Trim(udtAutoRefine.UMCAutoRefineMinLength) & " scans) or too few members (count < " & Trim(udtAutoRefine.MinMemberCountWhenUsingScanRange) & ")"
-       End If
-    End If
-    If udtAutoRefine.UMCAutoRefineRemoveCountHigh Then
-       If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
-       If Not udtAutoRefine.TestLengthUsingScanRange Then
-            UpdateStatus "Removing classes with too many members ..."
-            For i = 0 To .UMCCnt - 1
-                If .UMCs(i).ClassCount > udtAutoRefine.UMCAutoRefineMaxLength Then TmpInc(i) = REMOVE_UMC_MARK
-            Next i
-            strProcessSummary = strProcessSummary & "Removed classes with high member count (count > " & Trim(udtAutoRefine.UMCAutoRefineMaxLength) & ")"
-       Else
-            UpdateStatus "Removing classes with too long of a scan range ..."
-            For i = 0 To .UMCCnt - 1
-                If udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength > 0 Then
-                    ' Determine the first and last scan numbers in the UMC that have data with an intensity value >= the MaximumIntensity * .UMCAutoRefinePercentMaxAbuToUseForLength / 100
-                    With .UMCs(i)
-                        ' First, determine the maximum intensity
-                        Select Case .ClassRepType
-                        Case glCSType
-                            sngThreshold = GelData(CallerID).CSData(.ClassRepInd).Abundance * udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength / 100
-                            lngScanStart = GelData(CallerID).CSData(.ClassRepInd).ScanNumber
-                        Case glIsoType
-                            sngThreshold = GelData(CallerID).IsoData(.ClassRepInd).Abundance * udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength / 100
-                            lngScanStart = GelData(CallerID).IsoData(.ClassRepInd).ScanNumber
-                        End Select
-                        lngScanEnd = lngScanStart
-
-                        ' Now examine the data to find the first scan with a data point whose abundance is >= sngThreshold
-                        For lngMemberIndex = 0 To .ClassCount - 1
-                            
-                            Select Case .ClassMType(lngMemberIndex)
-                            Case glCSType
-                                lngCurrentScan = GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).ScanNumber
-                                If GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).Abundance >= sngThreshold And lngCurrentScan < lngScanStart Then
-                                    lngScanStart = lngCurrentScan
-                                End If
-                            Case glIsoType
-                                lngCurrentScan = GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)).ScanNumber
-                                If GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)).Abundance >= sngThreshold And lngCurrentScan < lngScanStart Then
-                                    lngScanStart = lngCurrentScan
-                                End If
-                            End Select
-                        Next lngMemberIndex
-
-                        ' Now examine the data to find the last scan with a data point whose abundance is >= sngThreshold
-                        For lngMemberIndex = .ClassCount - 1 To 0 Step -1
-                            Select Case .ClassMType(lngMemberIndex)
-                            Case glCSType
-                                lngCurrentScan = GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).ScanNumber
-                                If GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).Abundance >= sngThreshold And lngCurrentScan > lngScanEnd Then
-                                    lngScanEnd = lngCurrentScan
-                                End If
-                            Case glIsoType
-                                lngCurrentScan = GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)).ScanNumber
-                                If GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)).Abundance >= sngThreshold And lngCurrentScan > lngScanEnd Then
-                                    lngScanEnd = lngCurrentScan
-                                End If
-                            End Select
-                        Next lngMemberIndex
-                        
-                        ' We can now examine the total width of the UMC
-                        If lngScanEnd - lngScanStart + 1 > udtAutoRefine.UMCAutoRefineMaxLength Then
-                            TmpInc(i) = REMOVE_UMC_MARK
-                        End If
-                    End With
-                    
-                Else
-                    ' Use the entire length of the UMC to gauge the total scans
-                    If .UMCs(i).MaxScan - .UMCs(i).MinScan + 1 > udtAutoRefine.UMCAutoRefineMaxLength Then
+        If udtAutoRefine.UMCAutoRefineRemoveAbundanceLow Then
+           UpdateStatus "Eliminating low abundance classes ..."
+           PctCnt = CLng(.UMCCnt * udtAutoRefine.UMCAutoRefinePctLowAbundance / 100)
+           ReDim arrAbu(.UMCCnt - 1)
+           ReDim arrInd(.UMCCnt - 1)
+           For i = 0 To .UMCCnt - 1
+               arrInd(i) = i
+               arrAbu(i) = .UMCs(i).ClassAbundance
+           Next i
+           Set qsAbu = New QSDouble
+           If qsAbu.QSAsc(arrAbu(), arrInd()) Then     'eliminate first PctCnt classes
+              For i = 0 To PctCnt - 1
+                  TmpInc(arrInd(i)) = REMOVE_UMC_MARK
+              Next i
+           End If
+           If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
+           strProcessSummary = strProcessSummary & "Removed low abundance classes (" & Trim(udtAutoRefine.UMCAutoRefinePctLowAbundance) & "% removed)"
+        End If
+        If udtAutoRefine.UMCAutoRefineRemoveCountLow Then
+           If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
+           If Not udtAutoRefine.TestLengthUsingScanRange Then
+                UpdateStatus "Removing classes with too few members ..."
+                For i = 0 To .UMCCnt - 1
+                    If .UMCs(i).ClassCount < udtAutoRefine.UMCAutoRefineMinLength Then TmpInc(i) = REMOVE_UMC_MARK
+                Next i
+                strProcessSummary = strProcessSummary & "Removed classes with low member count (count < " & Trim(udtAutoRefine.UMCAutoRefineMinLength) & ")"
+           Else
+                UpdateStatus "Removing classes with too short of a scan range ..."
+                For i = 0 To .UMCCnt - 1
+                    If .UMCs(i).MaxScan - .UMCs(i).MinScan + 1 < udtAutoRefine.UMCAutoRefineMinLength Or _
+                       .UMCs(i).ClassCount < udtAutoRefine.MinMemberCountWhenUsingScanRange Then
                         TmpInc(i) = REMOVE_UMC_MARK
                     End If
-                End If
-            Next i
+                Next i
+                strProcessSummary = strProcessSummary & "Removed classes with too short of a scan range (range < " & Trim(udtAutoRefine.UMCAutoRefineMinLength) & " scans) or too few members (count < " & Trim(udtAutoRefine.MinMemberCountWhenUsingScanRange) & ")"
+           End If
+        End If
+    End With
+
+    If udtAutoRefine.UMCAutoRefineRemoveCountHigh Then
+        If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
+        If Not udtAutoRefine.TestLengthUsingScanRange Then
+            UpdateStatus "Removing classes with too many members ..."
+            With tmp
+                For i = 0 To .UMCCnt - 1
+                    If .UMCs(i).ClassCount > udtAutoRefine.UMCAutoRefineMaxLength Then TmpInc(i) = REMOVE_UMC_MARK
+                Next i
+            End With
+            strProcessSummary = strProcessSummary & "Removed classes with high member count (count > " & Trim(udtAutoRefine.UMCAutoRefineMaxLength) & ")"
+        Else
+            UpdateStatus "Removing classes with too long of a scan range ..."
+            AutoRemoveUMCsCheckLongScanLength tmp, udtAutoRefine, udtAutoRefine.UMCAutoRefineMaxLength
+            
             strProcessSummary = strProcessSummary & "Removed classes with too long of a scan range (range > " & Trim(udtAutoRefine.UMCAutoRefineMaxLength) & " scans); "
             strProcessSummary = strProcessSummary & "Max abundance to use to gauge width = " & Trim(udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength) & "%"
             If udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength = 0 Then
                 strProcessSummary = strProcessSummary & " (used full width of the UMC to gauge width)"
             End If
-            
-       End If
+        End If
     End If
+    
+    If udtAutoRefine.UMCAutoRefineRemoveMaxLengthPctAllScans Then
+        If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
+        UpdateStatus "Removing classes with length longer than a percent of the total scans ..."
+        UpdateStatus "Removing classes with too long of a scan range ..."
+        
+        GetScanRange CallerID, lngMinFN, lngMaxFN, lngScanRangeTotal
+        
+        lngMaxLengthScans = udtAutoRefine.UMCAutoRefineMaxLengthPctAllScans / 100# * lngScanRangeTotal
+        If lngMaxLengthScans = 0 Then
+            lngMaxLengthScans = lngScanRangeTotal
+        End If
+        
+        If lngMaxLengthScans = 0 Then
+            strProcessSummary = strProcessSummary & "Error removing classes with too long of a scan range based on percent of total scans since Scan_Number_Max - Scan_Number_Min = 0"
+        Else
+            AutoRemoveUMCsCheckLongScanLength tmp, udtAutoRefine, lngMaxLengthScans
+            
+            strProcessSummary = strProcessSummary & "Removed classes with too long of a scan range (range > " & Trim(lngMaxLengthScans) & " scans, which is " & Trim(udtAutoRefine.UMCAutoRefineMaxLengthPctAllScans) & "% of the total number of scans in this dataset); "
+            strProcessSummary = strProcessSummary & "Max abundance to use to gauge width = " & Trim(udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength) & "%"
+            If udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength = 0 Then
+                strProcessSummary = strProcessSummary & " (used full width of the UMC to gauge width)"
+            End If
+        End If
+    End If
+    
     With GelP_D_L(CallerID)
-       If chkRemovePairedLUMC.value = vbChecked Then
+       If chkRemovePairedLUMC.Value = vbChecked Then
           If .PCnt > 0 And PairsUMCInSync Then
              For i = 0 To .PCnt - 1
                  TmpInc(.Pairs(i).P1) = REMOVE_UMC_MARK
@@ -1049,7 +1068,7 @@ With tmp
           If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
           strProcessSummary = strProcessSummary & "Removed classes paired as light members"
        End If
-       If chkRemovePairedHUMC.value = vbChecked Then
+       If chkRemovePairedHUMC.Value = vbChecked Then
           If .PCnt > 0 And PairsUMCInSync Then
              For i = 0 To .PCnt - 1
                  TmpInc(.Pairs(i).P2) = REMOVE_UMC_MARK
@@ -1059,28 +1078,105 @@ With tmp
           strProcessSummary = strProcessSummary & "Removed classes paired as heavy members"
        End If
     End With
-End With
+    
+    UpdateStatus "Recalculating class structure..."
+    Call ClearGroupsAndLists
+    Call RemoveClasses
+    Call ResetUMC
+    AddToTentativeChangeList "Auto-removed UMC's; Original UMC Count = " & Trim(lngOriginalUMCCount) & "; Count after removal = " & Trim(tmp.UMCCnt) & "; " & strProcessSummary
+    NeedToSave = True
+    UpdateStatus ""
+    Me.MousePointer = vbDefault
 
-UpdateStatus "Recalculating class structure..."
-Call ClearGroupsAndLists
-Call RemoveClasses
-Call ResetUMC
-AddToTentativeChangeList "Auto-removed UMC's; Original UMC Count = " & Trim(lngOriginalUMCCount) & "; Count after removal = " & Trim(tmp.UMCCnt) & "; " & strProcessSummary
-NeedToSave = True
-UpdateStatus ""
-Me.MousePointer = vbDefault
-
-Exit Sub
+    Exit Sub
 
 AutoRemoveUMCsWorkErrorHandler:
-If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-    MsgBox "Error in AutoRemoveUMCsWork: " & Err.Description, vbExclamation Or vbOKOnly, "Error"
-Else
-    LogErrors Err.Number, "AutoRemoveUMCsWork"
-End If
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error in AutoRemoveUMCsWork: " & Err.Description, vbExclamation Or vbOKOnly, "Error"
+    Else
+        LogErrors Err.Number, "AutoRemoveUMCsWork"
+    End If
 
 End Sub
 
+Private Sub AutoRemoveUMCsCheckLongScanLength(ByRef tmp As UMCListType, ByRef udtAutoRefine As udtUMCAutoRefineOptionsType, ByVal lngMaxLengthScans As Long)
+    Dim i As Integer
+    
+    Dim lngMemberIndex As Long
+    Dim lngScanStart As Long
+    Dim lngScanEnd As Long
+    Dim lngScanMaxAbu As Long
+    Dim lngCurrentScan As Long
+    
+    Dim sngThreshold As Single
+    
+    With tmp
+        For i = 0 To .UMCCnt - 1
+            If udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength > 0 Then
+                ' Determine the first and last scan numbers in the UMC that have data with an intensity value >= the MaximumIntensity * .UMCAutoRefinePercentMaxAbuToUseForLength / 100
+                With .UMCs(i)
+                    ' First, determine the maximum intensity
+                    Select Case .ClassRepType
+                    Case glCSType
+                        sngThreshold = GelData(CallerID).CSData(.ClassRepInd).Abundance * udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength / 100
+                        lngScanMaxAbu = GelData(CallerID).CSData(.ClassRepInd).ScanNumber
+                    Case glIsoType
+                        sngThreshold = GelData(CallerID).IsoData(.ClassRepInd).Abundance * udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength / 100
+                        lngScanMaxAbu = GelData(CallerID).IsoData(.ClassRepInd).ScanNumber
+                    End Select
+                    lngScanStart = lngScanMaxAbu
+                    lngScanEnd = lngScanMaxAbu
+
+                    ' Now examine the data to find the first scan with a data point whose abundance is >= sngThreshold
+                    For lngMemberIndex = 0 To .ClassCount - 1
+                        
+                        Select Case .ClassMType(lngMemberIndex)
+                        Case glCSType
+                            lngCurrentScan = GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).ScanNumber
+                            If GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).Abundance >= sngThreshold And lngCurrentScan < lngScanStart Then
+                                lngScanStart = lngCurrentScan
+                            End If
+                        Case glIsoType
+                            lngCurrentScan = GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)).ScanNumber
+                            If GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)).Abundance >= sngThreshold And lngCurrentScan < lngScanStart Then
+                                lngScanStart = lngCurrentScan
+                            End If
+                        End Select
+                    Next lngMemberIndex
+
+                    ' Now examine the data to find the last scan with a data point whose abundance is >= sngThreshold
+                    For lngMemberIndex = .ClassCount - 1 To 0 Step -1
+                        Select Case .ClassMType(lngMemberIndex)
+                        Case glCSType
+                            lngCurrentScan = GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).ScanNumber
+                            If GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).Abundance >= sngThreshold And lngCurrentScan > lngScanEnd Then
+                                lngScanEnd = lngCurrentScan
+                            End If
+                        Case glIsoType
+                            lngCurrentScan = GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)).ScanNumber
+                            If GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)).Abundance >= sngThreshold And lngCurrentScan > lngScanEnd Then
+                                lngScanEnd = lngCurrentScan
+                            End If
+                        End Select
+                    Next lngMemberIndex
+                    
+                    ' We can now examine the total width of the UMC
+                    If lngScanEnd - lngScanStart + 1 > lngMaxLengthScans Then
+                        TmpInc(i) = REMOVE_UMC_MARK
+                    End If
+                End With
+                
+            Else
+                ' Use the entire length of the UMC to gauge the total scans
+                If .UMCs(i).MaxScan - .UMCs(i).MinScan + 1 > lngMaxLengthScans Then
+                    TmpInc(i) = REMOVE_UMC_MARK
+                End If
+            End If
+        Next i
+    End With
+    
+End Sub
+            
 Public Sub InitializeUMCs()
 On Error GoTo err_Activate
    UpdateStatus "Loading..."
@@ -1128,7 +1224,7 @@ Private Sub FillComboBoxes()
 End Sub
 
 Private Sub chkMultiMemberGroups_Click()
-MultiGroupsOnly = (chkMultiMemberGroups.value = vbChecked)
+MultiGroupsOnly = (chkMultiMemberGroups.Value = vbChecked)
 End Sub
 
 Private Sub chkRefineUMCLengthByScanRange_Click()
@@ -1152,9 +1248,13 @@ Private Sub chkRemoveLoCnt_Click()
 glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveCountLow = cChkBox(chkRemoveLoCnt)
 End Sub
 
+Private Sub chkRemoveMaxLengthPctAllScans_Click()
+glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveMaxLengthPctAllScans = cChkBox(chkRemoveMaxLengthPctAllScans)
+End Sub
+
 Private Sub chkShowUMC_Click()
-If chkShowUMC.value = vbChecked Then
-   MyViewer.show
+If chkShowUMC.Value = vbChecked Then
+   MyViewer.Show
 Else
    MyViewer.Hide
 End If
@@ -1241,7 +1341,7 @@ f1MWDist = txtf1MWDist.Text
 f1ScanDist = txtf1ScanDist.Text
 f1MWTol = txtf1MWTol.Text
 f1Multiplicity = txtMultiplicity.Text
-MultiGroupsOnly = chkMultiMemberGroups.value
+MultiGroupsOnly = chkMultiMemberGroups.Value
 CurrGroupInd = -1
 CurrClassInd = -1
 CurrPeakInd = -1
@@ -1252,10 +1352,13 @@ amMWMax = txtAutoMergeMaxMW.Text
 With glbPreferencesExpanded.UMCAutoRefineOptions
     SetCheckBox chkRemoveLoCnt, .UMCAutoRefineRemoveCountLow
     SetCheckBox chkRemoveHiCnt, .UMCAutoRefineRemoveCountHigh
+    SetCheckBox chkRemoveMaxLengthPctAllScans, .UMCAutoRefineRemoveMaxLengthPctAllScans
+    
     txtLoCnt = .UMCAutoRefineMinLength
     txtHiCnt = .UMCAutoRefineMaxLength
+    txtMaxLengthPctAllScans = .UMCAutoRefineMaxLengthPctAllScans
     txtPercentMaxAbuToUseToGaugeLength = .UMCAutoRefinePercentMaxAbuToUseForLength
-    
+
     SetCheckBox chkRefineUMCLengthByScanRange, .TestLengthUsingScanRange
     txtAutoRefineMinimumMemberCount = .MinMemberCountWhenUsingScanRange
     UpdateDynamicControls
@@ -1289,10 +1392,10 @@ End Sub
 Private Sub UpdateDynamicControls()
     ' Update the UMC auto refine length labels
     If glbPreferencesExpanded.UMCAutoRefineOptions.TestLengthUsingScanRange Then
-        chkRemoveLoCnt.Caption = "Remove classes less than"
-        chkRemoveHiCnt.Caption = "Remove classes more than"
-        lblAutoRefineLengthLabel(0) = "scans wide"
-        lblAutoRefineLengthLabel(1) = "scans wide"
+        chkRemoveLoCnt.Caption = "Remove cls. with less than"
+        chkRemoveHiCnt.Caption = "Remove cls. with length over"
+        lblAutoRefineLengthLabel(0) = "scans"
+        lblAutoRefineLengthLabel(1) = "scans"
         lblAutoRefineMinimumMemberCount.Enabled = True
     Else
         chkRemoveLoCnt.Caption = "Remove cls. with less than"
@@ -1454,7 +1557,7 @@ Case F_MW_SCAN_EXACT_DISTANCE
        Set fs = Nothing
        Me.MousePointer = vbDefault
        frmDataInfo.Tag = "Misc"
-       frmDataInfo.show vbModal
+       frmDataInfo.Show vbModal
     Else
        MsgBox "MW distance must be positive number with this option.", vbOKOnly, glFGTU
     End If
@@ -1474,10 +1577,10 @@ ClearGroupsAndLists
 f1Type = Index
 Select Case f1Type
 Case F_MW_SCAN_PROXIMITY
-    chkMultiMemberGroups.value = vbChecked
+    chkMultiMemberGroups.Value = vbChecked
     Grouped = GroupByMWScanProximity()
 Case F_MW_SCAN_EXACT_DISTANCE
-    chkMultiMemberGroups.value = vbChecked
+    chkMultiMemberGroups.Value = vbChecked
     If f1MWDist > 0 Then
        Grouped = GroupByMWDistanceScan()
     Else
@@ -1728,7 +1831,7 @@ Me.SetFocus
 End Sub
 
 Private Sub MyViewer_pvUnload()
-chkShowUMC.value = vbUnchecked
+chkShowUMC.Value = vbUnchecked
 End Sub
 
 Private Sub txtAutoMergemaxmw_LostFocus()
@@ -2281,8 +2384,8 @@ If tmp.UMCCnt > 0 Then
 End If
 
 If Not PairsUMCInSync Then                  'disable using pairs if something changed
-   chkRemovePairedLUMC.value = vbUnchecked
-   chkRemovePairedHUMC.value = vbUnchecked
+   chkRemovePairedLUMC.Value = vbUnchecked
+   chkRemovePairedHUMC.Value = vbUnchecked
    chkRemovePairedLUMC.Enabled = False
    chkRemovePairedHUMC.Enabled = False
 End If
@@ -2616,6 +2719,15 @@ If IsNumeric(txtLoCnt.Text) Then
 Else
    MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
    txtLoCnt.SetFocus
+End If
+End Sub
+
+Private Sub txtMaxLengthPctAllScans_Lostfocus()
+If IsNumeric(txtMaxLengthPctAllScans.Text) Then
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLengthPctAllScans = Abs(CLng(txtMaxLengthPctAllScans.Text))
+Else
+   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+   txtMaxLengthPctAllScans.SetFocus
 End If
 End Sub
 

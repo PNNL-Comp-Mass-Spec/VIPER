@@ -1071,6 +1071,16 @@ With GelDraw(Ind)
 End With
 End Sub
 
+Public Sub GelCSInvertVisible(ByVal Ind As Long)
+Dim i As Long
+On Error Resume Next
+With GelDraw(Ind)
+    For i = 1 To .CSCount
+        .CSID(i) = -.CSID(i)
+    Next i
+End With
+End Sub
+
 Public Sub GelCSExcludeAll(ByVal Ind As Long)
 Dim i As Long
 On Error Resume Next
@@ -1087,6 +1097,16 @@ On Error Resume Next
 With GelDraw(Ind)
     For i = 1 To .IsoCount
         .IsoID(i) = Abs(.IsoID(i))
+    Next i
+End With
+End Sub
+
+Public Sub GelIsoInvertVisible(ByVal Ind As Long)
+Dim i As Long
+On Error Resume Next
+With GelDraw(Ind)
+    For i = 1 To .IsoCount
+        .IsoID(i) = -.IsoID(i)
     Next i
 End With
 End Sub

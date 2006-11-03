@@ -266,7 +266,7 @@ Begin VB.Form frmMassTagsSelection
          Height          =   285
          Left            =   5520
          TabIndex        =   14
-         Text            =   "0"
+         Text            =   "1"
          Top             =   975
          Width           =   495
       End
@@ -1504,11 +1504,11 @@ TmpVal = ""
 TmpVal = MyStuff.Item(NAME_MINIMUM_PMT_QUALITY_SCORE).Value
 If IsNumeric(TmpVal) Then
     If Val(TmpVal) < 0 Or Val(TmpVal) > 10000 Then
-        TmpVal = "0"
+        TmpVal = "1"
     End If
     txtMinimumPMTQualityScore = TmpVal
 Else
-    txtMinimumPMTQualityScore = "0"
+    txtMinimumPMTQualityScore = "1"
 End If
 
 TmpVal = ""
@@ -1584,9 +1584,9 @@ End Sub
 Private Sub txtMinimumPMTQualityScore_LostFocus()
     If IsNumeric(txtMinimumPMTQualityScore) Then
         If Val(txtMinimumPMTQualityScore) < 0 Or Val(txtMinimumPMTQualityScore) > 1000 Then
-            txtMinimumPMTQualityScore = "0"
+            txtMinimumPMTQualityScore = "1"
         End If
     Else
-        txtMinimumPMTQualityScore = "0"
+        txtMinimumPMTQualityScore = "1"
     End If
 End Sub

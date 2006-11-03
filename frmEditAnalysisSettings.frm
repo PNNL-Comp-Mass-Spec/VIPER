@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "Tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmEditAnalysisSettings 
    Caption         =   "Edit Analysis Settings"
    ClientHeight    =   9870
@@ -27,7 +27,7 @@ Begin VB.Form frmEditAnalysisSettings
       _Version        =   393216
       Style           =   1
       Tabs            =   8
-      Tab             =   2
+      Tab             =   1
       TabsPerRow      =   8
       TabHeight       =   520
       OLEDropMode     =   1
@@ -46,39 +46,49 @@ Begin VB.Form frmEditAnalysisSettings
       Tab(0).ControlCount=   9
       TabCaption(1)   =   "2. UMC's"
       TabPicture(1)   =   "frmEditAnalysisSettings.frx":001C
-      Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "chkSkipFindUMCs"
-      Tab(1).Control(1)=   "cboChargeStateAbuType"
-      Tab(1).Control(2)=   "chkUseMostAbuChargeStateStatsForClassStats"
-      Tab(1).Control(3)=   "tbsUMCRefinementOptions"
-      Tab(1).Control(4)=   "fraUMCIonNetOptions"
-      Tab(1).Control(5)=   "chkInterpolateMissingIons"
-      Tab(1).Control(6)=   "txtInterpolateMaxGapSize"
-      Tab(1).Control(7)=   "cmbUMCAbu"
-      Tab(1).Control(8)=   "cmbUMCMW"
-      Tab(1).Control(9)=   "fraUMCSearch200x"
-      Tab(1).Control(10)=   "cboUMCSearchMode"
-      Tab(1).Control(11)=   "lblDescription(61)"
-      Tab(1).Control(12)=   "lblDescription(58)"
-      Tab(1).Control(13)=   "lblDescription(64)"
-      Tab(1).Control(14)=   "lblDescription(63)"
-      Tab(1).Control(15)=   "lblDescription(115)"
+      Tab(1).ControlEnabled=   -1  'True
+      Tab(1).Control(0)=   "lblDescription(115)"
+      Tab(1).Control(0).Enabled=   0   'False
+      Tab(1).Control(1)=   "lblDescription(63)"
+      Tab(1).Control(1).Enabled=   0   'False
+      Tab(1).Control(2)=   "lblDescription(64)"
+      Tab(1).Control(2).Enabled=   0   'False
+      Tab(1).Control(3)=   "lblDescription(58)"
+      Tab(1).Control(3).Enabled=   0   'False
+      Tab(1).Control(4)=   "lblDescription(61)"
+      Tab(1).Control(4).Enabled=   0   'False
+      Tab(1).Control(5)=   "cboUMCSearchMode"
+      Tab(1).Control(5).Enabled=   0   'False
+      Tab(1).Control(6)=   "fraUMCSearch200x"
+      Tab(1).Control(6).Enabled=   0   'False
+      Tab(1).Control(7)=   "cmbUMCMW"
+      Tab(1).Control(7).Enabled=   0   'False
+      Tab(1).Control(8)=   "cmbUMCAbu"
+      Tab(1).Control(8).Enabled=   0   'False
+      Tab(1).Control(9)=   "txtInterpolateMaxGapSize"
+      Tab(1).Control(9).Enabled=   0   'False
+      Tab(1).Control(10)=   "chkInterpolateMissingIons"
+      Tab(1).Control(10).Enabled=   0   'False
+      Tab(1).Control(11)=   "fraUMCIonNetOptions"
+      Tab(1).Control(11).Enabled=   0   'False
+      Tab(1).Control(12)=   "tbsUMCRefinementOptions"
+      Tab(1).Control(12).Enabled=   0   'False
+      Tab(1).Control(13)=   "chkUseMostAbuChargeStateStatsForClassStats"
+      Tab(1).Control(13).Enabled=   0   'False
+      Tab(1).Control(14)=   "cboChargeStateAbuType"
+      Tab(1).Control(14).Enabled=   0   'False
+      Tab(1).Control(15)=   "chkSkipFindUMCs"
+      Tab(1).Control(15).Enabled=   0   'False
       Tab(1).ControlCount=   16
       TabCaption(2)   =   "3. MT Tags"
       TabPicture(2)   =   "frmEditAnalysisSettings.frx":0038
-      Tab(2).ControlEnabled=   -1  'True
-      Tab(2).Control(0)=   "lblDescription(121)"
-      Tab(2).Control(0).Enabled=   0   'False
-      Tab(2).Control(1)=   "fraOptionFrame(16)"
-      Tab(2).Control(1).Enabled=   0   'False
-      Tab(2).Control(2)=   "fraSelectingMassTags"
-      Tab(2).Control(2).Enabled=   0   'False
-      Tab(2).Control(3)=   "cmdSelectOtherDB"
-      Tab(2).Control(3).Enabled=   0   'False
-      Tab(2).Control(4)=   "fraOptionFrame(44)"
-      Tab(2).Control(4).Enabled=   0   'False
-      Tab(2).Control(5)=   "fraOptionFrame(19)"
-      Tab(2).Control(5).Enabled=   0   'False
+      Tab(2).ControlEnabled=   0   'False
+      Tab(2).Control(0)=   "fraOptionFrame(19)"
+      Tab(2).Control(1)=   "fraOptionFrame(44)"
+      Tab(2).Control(2)=   "cmdSelectOtherDB"
+      Tab(2).Control(3)=   "fraSelectingMassTags"
+      Tab(2).Control(4)=   "fraOptionFrame(16)"
+      Tab(2).Control(5)=   "lblDescription(121)"
       Tab(2).ControlCount=   6
       TabCaption(3)   =   "4. Pairs"
       TabPicture(3)   =   "frmEditAnalysisSettings.frx":0054
@@ -183,22 +193,22 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Legacy MT DB Path"
          Height          =   1215
          Index           =   19
-         Left            =   120
-         TabIndex        =   219
+         Left            =   -74880
+         TabIndex        =   224
          Top             =   6240
          Width           =   10215
          Begin VB.CheckBox chkUseLegacyDBForMTs 
             Caption         =   "Use Legacy DB for MT tags"
             Height          =   255
             Left            =   120
-            TabIndex        =   222
+            TabIndex        =   227
             Top             =   720
             Width           =   3615
          End
          Begin VB.TextBox txtLegacyAMTDatabasePath 
             Height          =   315
             Left            =   120
-            TabIndex        =   220
+            TabIndex        =   225
             Top             =   285
             Width           =   8895
          End
@@ -206,7 +216,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "B&rowse"
             Height          =   375
             Left            =   9240
-            TabIndex        =   221
+            TabIndex        =   226
             Top             =   240
             Width           =   855
          End
@@ -217,7 +227,7 @@ Begin VB.Form frmEditAnalysisSettings
          Left            =   -68400
          List            =   "frmEditAnalysisSettings.frx":00E2
          Style           =   2  'Dropdown List
-         TabIndex        =   383
+         TabIndex        =   388
          Top             =   4200
          Width           =   4365
       End
@@ -228,14 +238,14 @@ Begin VB.Form frmEditAnalysisSettings
          Picture         =   "frmEditAnalysisSettings.frx":00E4
          ScaleHeight     =   2085
          ScaleWidth      =   2865
-         TabIndex        =   588
+         TabIndex        =   593
          Top             =   2880
          Width           =   2925
       End
       Begin VB.CheckBox chkSkipFindUMCs 
          Caption         =   "Skip Finding UMCs (only appropriate if auto-processing .Gel files)"
          Height          =   255
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   68
          Top             =   520
          Width           =   5295
@@ -253,7 +263,7 @@ Begin VB.Form frmEditAnalysisSettings
          EndProperty
          Height          =   190
          Left            =   -70800
-         TabIndex        =   381
+         TabIndex        =   386
          Top             =   4230
          Width           =   2175
       End
@@ -261,14 +271,14 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Criteria To Use Peak For Refinement"
          Height          =   1335
          Left            =   -74760
-         TabIndex        =   423
+         TabIndex        =   428
          Top             =   4320
          Width           =   3015
          Begin VB.TextBox txtToleranceRefinementPercentageOfMaxForWidth 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2280
-            TabIndex        =   428
+            TabIndex        =   433
             Text            =   "60"
             Top             =   600
             Width           =   615
@@ -277,7 +287,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1320
-            TabIndex        =   425
+            TabIndex        =   430
             Text            =   "25"
             Top             =   300
             Width           =   615
@@ -286,7 +296,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2280
-            TabIndex        =   430
+            TabIndex        =   435
             Text            =   "2.5"
             Top             =   920
             Width           =   615
@@ -296,7 +306,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   147
             Left            =   120
-            TabIndex        =   427
+            TabIndex        =   432
             Top             =   640
             Width           =   2055
          End
@@ -305,7 +315,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   146
             Left            =   120
-            TabIndex        =   424
+            TabIndex        =   429
             Top             =   330
             Width           =   1215
          End
@@ -314,7 +324,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   8
             Left            =   2040
-            TabIndex        =   426
+            TabIndex        =   431
             Top             =   330
             Width           =   840
          End
@@ -323,7 +333,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   49
             Left            =   120
-            TabIndex        =   429
+            TabIndex        =   434
             Top             =   940
             Width           =   2055
          End
@@ -333,7 +343,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   615
          Index           =   56
          Left            =   -71040
-         TabIndex        =   582
+         TabIndex        =   587
          Top             =   720
          Width           =   5055
          Begin VB.OptionButton optERCalc 
@@ -341,7 +351,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   195
             Index           =   0
             Left            =   120
-            TabIndex        =   585
+            TabIndex        =   590
             ToolTipText     =   "Ratio (Abundance of Light member/ Abundance of Heavy Member)"
             Top             =   240
             Width           =   1215
@@ -351,7 +361,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   195
             Index           =   1
             Left            =   1680
-            TabIndex        =   584
+            TabIndex        =   589
             ToolTipText     =   "Logarithmic Ratio (Abundance of Light member/ Abundance of Heavy Member)"
             Top             =   240
             Width           =   1215
@@ -361,7 +371,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   195
             Index           =   2
             Left            =   3240
-            TabIndex        =   583
+            TabIndex        =   588
             ToolTipText     =   "Zero Symetric Ratio (Abundance of Light member/ Abundance of Heavy Member)"
             Top             =   240
             Width           =   1695
@@ -374,7 +384,7 @@ Begin VB.Form frmEditAnalysisSettings
          Picture         =   "frmEditAnalysisSettings.frx":0A16
          ScaleHeight     =   2160
          ScaleWidth      =   9345
-         TabIndex        =   581
+         TabIndex        =   586
          Top             =   5450
          Width           =   9400
       End
@@ -383,7 +393,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1215
          Index           =   53
          Left            =   -64800
-         TabIndex        =   280
+         TabIndex        =   285
          Top             =   6120
          Visible         =   0   'False
          Width           =   5295
@@ -392,7 +402,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   1
             Left            =   2040
-            TabIndex        =   284
+            TabIndex        =   289
             Top             =   920
             Width           =   2295
          End
@@ -401,7 +411,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   0
             Left            =   2040
-            TabIndex        =   283
+            TabIndex        =   288
             Top             =   680
             Width           =   2295
          End
@@ -409,7 +419,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Enable removal"
             Height          =   300
             Left            =   240
-            TabIndex        =   282
+            TabIndex        =   287
             Top             =   720
             Width           =   1560
          End
@@ -418,7 +428,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   420
             Index           =   113
             Left            =   240
-            TabIndex        =   281
+            TabIndex        =   286
             Top             =   240
             Width           =   4695
          End
@@ -428,14 +438,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1750
          Index           =   2
          Left            =   -66960
-         TabIndex        =   395
+         TabIndex        =   400
          Top             =   4800
          Width           =   2895
          Begin VB.TextBox txtNetAdjInitialIntercept 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1320
-            TabIndex        =   399
+            TabIndex        =   404
             Text            =   "0"
             Top             =   660
             Width           =   855
@@ -444,7 +454,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1320
-            TabIndex        =   397
+            TabIndex        =   402
             Text            =   "0.0003"
             Top             =   300
             Width           =   855
@@ -453,7 +463,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Initial NET Stats"
             Height          =   615
             Left            =   120
-            TabIndex        =   400
+            TabIndex        =   405
             Top             =   1005
             Width           =   2565
          End
@@ -462,7 +472,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   110
             Left            =   120
-            TabIndex        =   398
+            TabIndex        =   403
             Top             =   675
             Width           =   1185
          End
@@ -471,7 +481,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   109
             Left            =   120
-            TabIndex        =   396
+            TabIndex        =   401
             Top             =   315
             Width           =   1140
          End
@@ -481,7 +491,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   2415
          Index           =   52
          Left            =   -69360
-         TabIndex        =   266
+         TabIndex        =   271
          Top             =   3600
          Width           =   5295
          Begin VB.CheckBox chkPairEROptions 
@@ -489,7 +499,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   4
             Left            =   120
-            TabIndex        =   272
+            TabIndex        =   277
             Top             =   1320
             Value           =   1  'Checked
             Width           =   3375
@@ -499,7 +509,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   5
             Left            =   120
-            TabIndex        =   273
+            TabIndex        =   278
             Top             =   1635
             Value           =   1  'Checked
             Width           =   4695
@@ -509,7 +519,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   300
             Index           =   6
             Left            =   360
-            TabIndex        =   274
+            TabIndex        =   279
             Top             =   1875
             Value           =   1  'Checked
             Width           =   2415
@@ -518,7 +528,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   4320
-            TabIndex        =   276
+            TabIndex        =   281
             Text            =   "3"
             Top             =   1965
             Width           =   615
@@ -527,7 +537,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   315
             Left            =   3000
             Style           =   2  'Dropdown List
-            TabIndex        =   270
+            TabIndex        =   275
             Top             =   720
             Width           =   2055
          End
@@ -536,7 +546,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   1
             Left            =   120
-            TabIndex        =   268
+            TabIndex        =   273
             Top             =   495
             Value           =   1  'Checked
             Width           =   4095
@@ -546,7 +556,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   0
             Left            =   120
-            TabIndex        =   267
+            TabIndex        =   272
             Top             =   240
             Value           =   1  'Checked
             Width           =   3255
@@ -556,7 +566,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   3
             Left            =   120
-            TabIndex        =   271
+            TabIndex        =   276
             Top             =   1020
             Value           =   1  'Checked
             Width           =   2655
@@ -566,7 +576,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   2
             Left            =   120
-            TabIndex        =   269
+            TabIndex        =   274
             Top             =   765
             Value           =   1  'Checked
             Width           =   2895
@@ -577,14 +587,14 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   405
             Index           =   140
             Left            =   2880
-            TabIndex        =   275
+            TabIndex        =   280
             Top             =   1875
             Width           =   1455
          End
       End
       Begin VB.ComboBox cboChargeStateAbuType 
          Height          =   315
-         Left            =   -74760
+         Left            =   240
          Style           =   2  'Dropdown List
          TabIndex        =   76
          Top             =   2880
@@ -593,7 +603,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.CheckBox chkUseMostAbuChargeStateStatsForClassStats 
          Caption         =   "Use most abundant charge state group stats for class stats"
          Height          =   520
-         Left            =   -71760
+         Left            =   3240
          TabIndex        =   80
          Top             =   2760
          Width           =   2175
@@ -603,14 +613,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   855
          Index           =   48
          Left            =   -69360
-         TabIndex        =   277
+         TabIndex        =   282
          Top             =   6480
          Width           =   3375
          Begin VB.CheckBox chkPairsSaveStatisticsTextFile 
             Caption         =   "Save pairs statistics (binned)  to text file"
             Height          =   300
             Left            =   120
-            TabIndex        =   279
+            TabIndex        =   284
             Top             =   480
             Value           =   1  'Checked
             Width           =   3195
@@ -619,7 +629,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Save pairs to text file"
             Height          =   300
             Left            =   120
-            TabIndex        =   278
+            TabIndex        =   283
             Top             =   240
             Value           =   1  'Checked
             Width           =   3000
@@ -630,14 +640,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1995
          Index           =   31
          Left            =   -74760
-         TabIndex        =   516
+         TabIndex        =   521
          Top             =   5520
          Width           =   3255
          Begin VB.CheckBox chkSaveUMCStatisticsToTextFile 
             Caption         =   "Save all UMC's to text file (not just those with database matches)"
             Height          =   375
             Left            =   240
-            TabIndex        =   519
+            TabIndex        =   524
             ToolTipText     =   "Saves statistics, including scan, mass, NET, and member information, for all UMC's"
             Top             =   1010
             Width           =   2900
@@ -645,7 +655,7 @@ Begin VB.Form frmEditAnalysisSettings
          Begin VB.TextBox txtOutputFileSeparationCharacter 
             Height          =   285
             Left            =   2280
-            TabIndex        =   521
+            TabIndex        =   526
             Text            =   "<TAB>"
             ToolTipText     =   "Type a single separation character, like a comma or a semicolon, or enter the text <TAB> to indicate a tab."
             Top             =   1545
@@ -655,7 +665,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Write search results by ion to text file after auto search completion"
             Height          =   495
             Left            =   240
-            TabIndex        =   517
+            TabIndex        =   522
             Top             =   200
             Width           =   2805
          End
@@ -663,7 +673,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Include ORF name in text file output"
             Height          =   255
             Left            =   240
-            TabIndex        =   518
+            TabIndex        =   523
             Top             =   710
             Value           =   1  'Checked
             Width           =   2900
@@ -673,7 +683,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   405
             Index           =   68
             Left            =   240
-            TabIndex        =   520
+            TabIndex        =   525
             Top             =   1485
             Width           =   1695
          End
@@ -683,14 +693,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   2175
          Index           =   41
          Left            =   -74760
-         TabIndex        =   257
+         TabIndex        =   262
          Top             =   5160
          Width           =   5295
          Begin VB.CheckBox chkPairsExcludeAmbiguousKeepMostConfident 
             Caption         =   "Ambiguous pairs exclusion keeps most confident pair"
             Height          =   255
             Left            =   360
-            TabIndex        =   586
+            TabIndex        =   591
             Top             =   1130
             Value           =   1  'Checked
             Width           =   4485
@@ -701,7 +711,7 @@ Begin VB.Form frmEditAnalysisSettings
             Left            =   120
             List            =   "frmEditAnalysisSettings.frx":43D4A
             Style           =   2  'Dropdown List
-            TabIndex        =   265
+            TabIndex        =   270
             Top             =   1680
             Width           =   4935
          End
@@ -709,7 +719,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Exclude pairs outside of the ER inclusion range"
             Height          =   255
             Left            =   120
-            TabIndex        =   262
+            TabIndex        =   267
             Top             =   620
             Width           =   4455
          End
@@ -717,7 +727,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Exclude ambiguous pairs after database search (prior to exporting)"
             Height          =   255
             Left            =   120
-            TabIndex        =   263
+            TabIndex        =   268
             Top             =   875
             Width           =   5055
          End
@@ -726,7 +736,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   0
             Left            =   2280
-            TabIndex        =   259
+            TabIndex        =   264
             Text            =   "-5"
             Top             =   240
             Width           =   855
@@ -736,7 +746,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   1
             Left            =   3720
-            TabIndex        =   261
+            TabIndex        =   266
             Text            =   "5"
             Top             =   240
             Width           =   855
@@ -746,7 +756,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   102
             Left            =   120
-            TabIndex        =   264
+            TabIndex        =   269
             Top             =   1440
             Width           =   2895
          End
@@ -755,7 +765,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   99
             Left            =   3360
-            TabIndex        =   260
+            TabIndex        =   265
             ToolTipText     =   "285"
             Top             =   280
             Width           =   255
@@ -765,7 +775,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   98
             Left            =   240
-            TabIndex        =   258
+            TabIndex        =   263
             Top             =   280
             Width           =   1935
          End
@@ -775,14 +785,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1250
          Index           =   40
          Left            =   -74760
-         TabIndex        =   249
+         TabIndex        =   254
          Top             =   3760
          Width           =   5295
          Begin VB.TextBox txtPairsScanTolApex 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3960
-            TabIndex        =   256
+            TabIndex        =   261
             Text            =   "5"
             Top             =   840
             Width           =   495
@@ -791,7 +801,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3960
-            TabIndex        =   254
+            TabIndex        =   259
             Text            =   "5"
             Top             =   495
             Width           =   495
@@ -800,7 +810,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Require pair-classes &overlap at UMC apexes"
             Height          =   255
             Left            =   240
-            TabIndex        =   255
+            TabIndex        =   260
             ToolTipText     =   "If checked pair classes have to show at least once in the same scan"
             Top             =   855
             Width           =   3600
@@ -809,7 +819,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1560
-            TabIndex        =   251
+            TabIndex        =   256
             Text            =   "0.02"
             Top             =   180
             Width           =   855
@@ -818,7 +828,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Require pair-classes &overlap at UMC edges"
             Height          =   255
             Left            =   240
-            TabIndex        =   253
+            TabIndex        =   258
             ToolTipText     =   "If checked pair classes have to show at least once in the same scan"
             Top             =   525
             Value           =   1  'Checked
@@ -829,7 +839,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   111
             Left            =   2520
-            TabIndex        =   591
+            TabIndex        =   596
             Top             =   210
             Width           =   495
          End
@@ -838,7 +848,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   97
             Left            =   3840
-            TabIndex        =   252
+            TabIndex        =   257
             Top             =   240
             Width           =   1335
          End
@@ -847,7 +857,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   25
             Left            =   240
-            TabIndex        =   250
+            TabIndex        =   255
             Top             =   215
             Width           =   1335
          End
@@ -857,14 +867,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   2055
          Index           =   38
          Left            =   -71040
-         TabIndex        =   238
+         TabIndex        =   243
          Top             =   1440
          Width           =   5055
          Begin VB.TextBox txtPairsMaxLblDiff 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2640
-            TabIndex        =   248
+            TabIndex        =   253
             Text            =   "1"
             Top             =   1560
             Width           =   855
@@ -873,7 +883,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3960
-            TabIndex        =   242
+            TabIndex        =   247
             Text            =   "8.05"
             Top             =   300
             Width           =   855
@@ -883,7 +893,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   0
             Left            =   1080
-            TabIndex        =   244
+            TabIndex        =   249
             Text            =   "1"
             Top             =   660
             Width           =   855
@@ -893,7 +903,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   1
             Left            =   1080
-            TabIndex        =   246
+            TabIndex        =   251
             Text            =   "5"
             Top             =   1020
             Width           =   855
@@ -902,7 +912,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1080
-            TabIndex        =   240
+            TabIndex        =   245
             Text            =   "442.2249697"
             Top             =   300
             Width           =   1215
@@ -913,7 +923,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   495
             Index           =   24
             Left            =   120
-            TabIndex        =   247
+            TabIndex        =   252
             Top             =   1440
             Width           =   2415
          End
@@ -923,7 +933,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   21
             Left            =   2520
-            TabIndex        =   241
+            TabIndex        =   246
             Top             =   340
             Width           =   1455
          End
@@ -933,7 +943,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   22
             Left            =   120
-            TabIndex        =   243
+            TabIndex        =   248
             Top             =   700
             Width           =   900
          End
@@ -943,7 +953,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   23
             Left            =   120
-            TabIndex        =   245
+            TabIndex        =   250
             Top             =   1060
             Width           =   900
          End
@@ -953,7 +963,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   20
             Left            =   120
-            TabIndex        =   239
+            TabIndex        =   244
             Top             =   340
             Width           =   975
          End
@@ -963,7 +973,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   2295
          Index           =   37
          Left            =   -74760
-         TabIndex        =   225
+         TabIndex        =   230
          Top             =   1440
          Width           =   3495
          Begin VB.TextBox txtPairsMinMaxDelta 
@@ -971,7 +981,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   2
             Left            =   1920
-            TabIndex        =   237
+            TabIndex        =   242
             Text            =   "1"
             Top             =   1920
             Width           =   615
@@ -980,7 +990,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "C12/C13"
             Height          =   300
             Left            =   1200
-            TabIndex        =   229
+            TabIndex        =   234
             Top             =   645
             Width           =   975
          End
@@ -988,7 +998,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1200
-            TabIndex        =   227
+            TabIndex        =   232
             Text            =   "0.9970356"
             Top             =   300
             Width           =   975
@@ -998,7 +1008,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   1
             Left            =   2760
-            TabIndex        =   235
+            TabIndex        =   240
             Text            =   "100"
             Top             =   1620
             Width           =   615
@@ -1008,7 +1018,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   0
             Left            =   1080
-            TabIndex        =   233
+            TabIndex        =   238
             Text            =   "1"
             Top             =   1620
             Width           =   615
@@ -1017,7 +1027,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "N14/N15"
             Height          =   300
             Left            =   120
-            TabIndex        =   228
+            TabIndex        =   233
             Top             =   645
             Width           =   975
          End
@@ -1025,7 +1035,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "O16/O18"
             Height          =   300
             Left            =   2280
-            TabIndex        =   230
+            TabIndex        =   235
             Top             =   645
             Width           =   975
          End
@@ -1033,7 +1043,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "C&alculate N14/N15 Min/Max Deltas from class molecular mass"
             Height          =   420
             Left            =   240
-            TabIndex        =   231
+            TabIndex        =   236
             Top             =   1155
             Width           =   2775
          End
@@ -1042,7 +1052,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   141
             Left            =   120
-            TabIndex        =   236
+            TabIndex        =   241
             Top             =   1935
             Width           =   1860
          End
@@ -1051,7 +1061,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   17
             Left            =   240
-            TabIndex        =   226
+            TabIndex        =   231
             Top             =   340
             Width           =   495
          End
@@ -1060,7 +1070,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   19
             Left            =   1880
-            TabIndex        =   234
+            TabIndex        =   239
             Top             =   1640
             Width           =   900
          End
@@ -1069,7 +1079,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   18
             Left            =   120
-            TabIndex        =   232
+            TabIndex        =   237
             Top             =   1640
             Width           =   900
          End
@@ -1080,7 +1090,7 @@ Begin VB.Form frmEditAnalysisSettings
          Left            =   -74760
          List            =   "frmEditAnalysisSettings.frx":43D4E
          Style           =   2  'Dropdown List
-         TabIndex        =   224
+         TabIndex        =   229
          Top             =   960
          Width           =   3495
       End
@@ -1089,7 +1099,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   2600
          Index           =   1
          Left            =   -70800
-         TabIndex        =   384
+         TabIndex        =   389
          Top             =   4800
          Width           =   3735
          Begin VB.TextBox txtNETAlignmentOption 
@@ -1097,7 +1107,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   7
             Left            =   2880
-            TabIndex        =   393
+            TabIndex        =   398
             Text            =   "0"
             Top             =   1920
             Width           =   615
@@ -1107,7 +1117,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   6
             Left            =   2280
-            TabIndex        =   391
+            TabIndex        =   396
             Text            =   "2.5"
             Top             =   1620
             Width           =   615
@@ -1116,7 +1126,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Use N15 MT Masses"
             Height          =   255
             Left            =   240
-            TabIndex        =   394
+            TabIndex        =   399
             Top             =   2240
             Width           =   2895
          End
@@ -1125,7 +1135,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   4
             Left            =   2640
-            TabIndex        =   386
+            TabIndex        =   391
             Text            =   "0.1"
             Top             =   360
             Width           =   495
@@ -1134,7 +1144,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Do not use peaks pointing to multiple IDs on NET distance of more than"
             Height          =   615
             Left            =   240
-            TabIndex        =   385
+            TabIndex        =   390
             Top             =   240
             Value           =   1  'Checked
             Width           =   2295
@@ -1143,7 +1153,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Exclude IDs with bad NET (<0 or >1)"
             Height          =   330
             Left            =   240
-            TabIndex        =   387
+            TabIndex        =   392
             Top             =   885
             Value           =   1  'Checked
             Width           =   3015
@@ -1153,7 +1163,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   5
             Left            =   2280
-            TabIndex        =   389
+            TabIndex        =   394
             Text            =   "5000"
             Top             =   1320
             Width           =   615
@@ -1164,7 +1174,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   142
             Left            =   240
-            TabIndex        =   392
+            TabIndex        =   397
             Top             =   1920
             Width           =   2625
          End
@@ -1173,7 +1183,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   133
             Left            =   240
-            TabIndex        =   390
+            TabIndex        =   395
             Top             =   1660
             Width           =   1785
          End
@@ -1182,7 +1192,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   400
             Index           =   75
             Left            =   240
-            TabIndex        =   388
+            TabIndex        =   393
             Top             =   1220
             Width           =   1815
          End
@@ -1192,7 +1202,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   3075
          Index           =   0
          Left            =   -74715
-         TabIndex        =   305
+         TabIndex        =   310
          Top             =   4335
          Width           =   3735
          Begin VB.CheckBox chkNetAdjIterationOptions 
@@ -1200,7 +1210,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   0
             Left            =   360
-            TabIndex        =   315
+            TabIndex        =   320
             Top             =   1755
             Width           =   2295
          End
@@ -1209,7 +1219,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   1
             Left            =   360
-            TabIndex        =   317
+            TabIndex        =   322
             Top             =   2040
             Width           =   2390
          End
@@ -1218,7 +1228,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   3
             Left            =   2640
-            TabIndex        =   313
+            TabIndex        =   318
             Text            =   "0.0001"
             Top             =   1200
             Width           =   735
@@ -1228,7 +1238,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   1
             Left            =   2640
-            TabIndex        =   309
+            TabIndex        =   314
             Text            =   "75"
             ToolTipText     =   "Desired minimum number of UMC's matching MT tags in the database"
             Top             =   560
@@ -1239,7 +1249,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   0
             Left            =   2640
-            TabIndex        =   307
+            TabIndex        =   312
             Text            =   "50"
             Top             =   240
             Width           =   735
@@ -1249,7 +1259,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   4
             Left            =   2760
-            TabIndex        =   316
+            TabIndex        =   321
             Text            =   "2.5"
             Top             =   1725
             Width           =   615
@@ -1259,7 +1269,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   5
             Left            =   2760
-            TabIndex        =   318
+            TabIndex        =   323
             Text            =   "0.025"
             Top             =   2040
             Width           =   615
@@ -1269,7 +1279,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   2
             Left            =   120
-            TabIndex        =   319
+            TabIndex        =   324
             Top             =   2400
             Width           =   3495
          End
@@ -1278,7 +1288,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   6
             Left            =   2640
-            TabIndex        =   321
+            TabIndex        =   326
             Text            =   "20"
             Top             =   2700
             Width           =   735
@@ -1288,7 +1298,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   2
             Left            =   2640
-            TabIndex        =   311
+            TabIndex        =   316
             Text            =   "10"
             ToolTipText     =   "Alternative minimum UMC match count to use if the minimum matching UMC count cannot be obtained using the default settings"
             Top             =   880
@@ -1299,7 +1309,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   45
             Left            =   120
-            TabIndex        =   314
+            TabIndex        =   319
             Top             =   1520
             Width           =   2895
          End
@@ -1308,7 +1318,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   46
             Left            =   120
-            TabIndex        =   312
+            TabIndex        =   317
             Top             =   1240
             Width           =   2445
          End
@@ -1317,7 +1327,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   47
             Left            =   120
-            TabIndex        =   308
+            TabIndex        =   313
             Top             =   600
             Width           =   2445
          End
@@ -1326,7 +1336,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   48
             Left            =   120
-            TabIndex        =   306
+            TabIndex        =   311
             Top             =   280
             Width           =   2445
          End
@@ -1335,7 +1345,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   95
             Left            =   360
-            TabIndex        =   320
+            TabIndex        =   325
             Top             =   2730
             Width           =   2205
          End
@@ -1344,7 +1354,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   96
             Left            =   120
-            TabIndex        =   310
+            TabIndex        =   315
             Top             =   920
             Width           =   2445
          End
@@ -1354,7 +1364,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1720
          Index           =   18
          Left            =   -74715
-         TabIndex        =   296
+         TabIndex        =   301
          Top             =   2505
          Width           =   3735
          Begin VB.Frame fraOptionFrame 
@@ -1362,7 +1372,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   975
             Index           =   36
             Left            =   240
-            TabIndex        =   297
+            TabIndex        =   302
             Top             =   260
             Width           =   1935
             Begin VB.OptionButton optNETAdjTolType 
@@ -1370,7 +1380,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   1020
-               TabIndex        =   301
+               TabIndex        =   306
                Top             =   600
                Width           =   855
             End
@@ -1379,7 +1389,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   0
                Left            =   1020
-               TabIndex        =   300
+               TabIndex        =   305
                Top             =   240
                Value           =   -1  'True
                Width           =   855
@@ -1388,7 +1398,7 @@ Begin VB.Form frmEditAnalysisSettings
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   160
-               TabIndex        =   299
+               TabIndex        =   304
                Text            =   "10"
                Top             =   525
                Width           =   735
@@ -1398,7 +1408,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   51
                Left            =   165
-               TabIndex        =   298
+               TabIndex        =   303
                Top             =   240
                Width           =   855
             End
@@ -1407,7 +1417,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1920
-            TabIndex        =   304
+            TabIndex        =   309
             Text            =   "0.2"
             Top             =   1320
             Width           =   735
@@ -1417,7 +1427,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   810
             Index           =   7
             Left            =   2265
-            TabIndex        =   302
+            TabIndex        =   307
             Top             =   360
             Width           =   1305
          End
@@ -1426,7 +1436,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   52
             Left            =   240
-            TabIndex        =   303
+            TabIndex        =   308
             Top             =   1350
             Width           =   1695
          End
@@ -1436,7 +1446,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1620
          Index           =   3
          Left            =   -74715
-         TabIndex        =   286
+         TabIndex        =   291
          Top             =   840
          Width           =   3735
          Begin VB.TextBox txtNETAlignmentOption 
@@ -1444,7 +1454,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   0
             Left            =   3120
-            TabIndex        =   288
+            TabIndex        =   293
             Text            =   "3"
             Top             =   240
             Width           =   495
@@ -1453,7 +1463,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Use high-abundance UMCs only - (Top Abu %)"
             Height          =   375
             Left            =   240
-            TabIndex        =   293
+            TabIndex        =   298
             Top             =   1155
             Value           =   1  'Checked
             Width           =   2175
@@ -1463,7 +1473,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   3
             Left            =   2520
-            TabIndex        =   294
+            TabIndex        =   299
             Text            =   "20"
             Top             =   1240
             Width           =   495
@@ -1473,7 +1483,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   1
             Left            =   3120
-            TabIndex        =   290
+            TabIndex        =   295
             Text            =   "3"
             Top             =   560
             Width           =   495
@@ -1484,7 +1494,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   2
             Left            =   3120
-            TabIndex        =   292
+            TabIndex        =   297
             Text            =   "10"
             Top             =   880
             Width           =   495
@@ -1494,7 +1504,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   53
             Left            =   240
-            TabIndex        =   287
+            TabIndex        =   292
             Top             =   285
             Width           =   2535
          End
@@ -1502,7 +1512,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "%"
             Height          =   255
             Left            =   3120
-            TabIndex        =   295
+            TabIndex        =   300
             Top             =   1275
             Width           =   135
          End
@@ -1511,7 +1521,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   55
             Left            =   240
-            TabIndex        =   289
+            TabIndex        =   294
             Top             =   600
             Width           =   2535
          End
@@ -1521,7 +1531,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   56
             Left            =   240
-            TabIndex        =   291
+            TabIndex        =   296
             Top             =   915
             Width           =   2535
          End
@@ -1531,14 +1541,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   2415
          Index           =   2
          Left            =   -69120
-         TabIndex        =   442
+         TabIndex        =   447
          Top             =   1920
          Width           =   4695
          Begin VB.CheckBox chkRefineDBSearchMassTolerance 
             Caption         =   "Refine DB mass search tolerance using mass error plot"
             Height          =   255
             Left            =   240
-            TabIndex        =   443
+            TabIndex        =   448
             Top             =   360
             Width           =   4335
          End
@@ -1547,7 +1557,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   0
             Left            =   1800
-            TabIndex        =   445
+            TabIndex        =   450
             Text            =   "0"
             Top             =   720
             Width           =   615
@@ -1557,7 +1567,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   1
             Left            =   1800
-            TabIndex        =   448
+            TabIndex        =   453
             Text            =   "0"
             Top             =   1080
             Width           =   615
@@ -1566,7 +1576,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   315
             Left            =   240
             Style           =   2  'Dropdown List
-            TabIndex        =   452
+            TabIndex        =   457
             Top             =   1800
             Width           =   3495
          End
@@ -1574,7 +1584,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3600
-            TabIndex        =   451
+            TabIndex        =   456
             Text            =   "0"
             Top             =   1440
             Width           =   615
@@ -1584,7 +1594,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   72
             Left            =   240
-            TabIndex        =   444
+            TabIndex        =   449
             Top             =   750
             Width           =   1455
          End
@@ -1593,7 +1603,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   86
             Left            =   2520
-            TabIndex        =   446
+            TabIndex        =   451
             Top             =   750
             Width           =   600
          End
@@ -1602,7 +1612,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   76
             Left            =   240
-            TabIndex        =   447
+            TabIndex        =   452
             Top             =   1110
             Width           =   1455
          End
@@ -1611,7 +1621,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   87
             Left            =   2520
-            TabIndex        =   449
+            TabIndex        =   454
             Top             =   1110
             Width           =   600
          End
@@ -1620,7 +1630,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   94
             Left            =   240
-            TabIndex        =   450
+            TabIndex        =   455
             Top             =   1440
             Width           =   3255
          End
@@ -1630,14 +1640,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1815
          Index           =   3
          Left            =   -69120
-         TabIndex        =   453
+         TabIndex        =   458
          Top             =   4440
          Width           =   4695
          Begin VB.TextBox txtRefineDBSearchNETToleranceMaximum 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1800
-            TabIndex        =   459
+            TabIndex        =   464
             Text            =   "0"
             Top             =   1080
             Width           =   615
@@ -1646,7 +1656,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1800
-            TabIndex        =   456
+            TabIndex        =   461
             Text            =   "0"
             Top             =   720
             Width           =   615
@@ -1655,7 +1665,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Refine DB NET search tolerance using GANET error plot"
             Height          =   255
             Left            =   240
-            TabIndex        =   454
+            TabIndex        =   459
             Top             =   360
             Width           =   4335
          End
@@ -1663,7 +1673,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1800
-            TabIndex        =   462
+            TabIndex        =   467
             Text            =   "1"
             Top             =   1440
             Width           =   615
@@ -1673,7 +1683,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   90
             Left            =   2520
-            TabIndex        =   460
+            TabIndex        =   465
             Top             =   1110
             Width           =   600
          End
@@ -1682,7 +1692,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   83
             Left            =   240
-            TabIndex        =   458
+            TabIndex        =   463
             Top             =   1110
             Width           =   1455
          End
@@ -1691,7 +1701,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   89
             Left            =   2520
-            TabIndex        =   457
+            TabIndex        =   462
             Top             =   750
             Width           =   600
          End
@@ -1700,7 +1710,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   84
             Left            =   240
-            TabIndex        =   455
+            TabIndex        =   460
             Top             =   750
             Width           =   1455
          End
@@ -1709,7 +1719,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   93
             Left            =   240
-            TabIndex        =   461
+            TabIndex        =   466
             Top             =   1470
             Width           =   1575
          End
@@ -1719,7 +1729,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   2280
          Index           =   0
          Left            =   -74760
-         TabIndex        =   402
+         TabIndex        =   407
          Top             =   1920
          Width           =   5415
          Begin VB.TextBox txtToleranceRefinementFilter 
@@ -1727,7 +1737,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   2
             Left            =   1680
-            TabIndex        =   418
+            TabIndex        =   423
             Text            =   "0"
             Top             =   1880
             Width           =   615
@@ -1737,7 +1747,7 @@ Begin VB.Form frmEditAnalysisSettings
             Index           =   0
             Left            =   2520
             Style           =   2  'Dropdown List
-            TabIndex        =   410
+            TabIndex        =   415
             Top             =   640
             Width           =   2775
          End
@@ -1747,7 +1757,7 @@ Begin VB.Form frmEditAnalysisSettings
             Index           =   4
             Left            =   4200
             Locked          =   -1  'True
-            TabIndex        =   422
+            TabIndex        =   427
             Text            =   "0"
             Top             =   1920
             Width           =   615
@@ -1758,7 +1768,7 @@ Begin VB.Form frmEditAnalysisSettings
             Index           =   3
             Left            =   4200
             Locked          =   -1  'True
-            TabIndex        =   420
+            TabIndex        =   425
             Text            =   "0"
             Top             =   1635
             Width           =   615
@@ -1767,7 +1777,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Use UMC class stats"
             Height          =   255
             Left            =   2520
-            TabIndex        =   412
+            TabIndex        =   417
             Top             =   1275
             Width           =   2500
          End
@@ -1776,7 +1786,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   1
             Left            =   1680
-            TabIndex        =   416
+            TabIndex        =   421
             Text            =   "0"
             Top             =   1580
             Width           =   615
@@ -1785,7 +1795,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Include Internal Standard matches"
             Height          =   375
             Left            =   2520
-            TabIndex        =   411
+            TabIndex        =   416
             Top             =   960
             Value           =   1  'Checked
             Width           =   2775
@@ -1795,7 +1805,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   285
             Index           =   0
             Left            =   1680
-            TabIndex        =   414
+            TabIndex        =   419
             Text            =   "0"
             Top             =   1280
             Width           =   615
@@ -1805,7 +1815,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   975
             Index           =   39
             Left            =   120
-            TabIndex        =   403
+            TabIndex        =   408
             Top             =   240
             Width           =   2175
             Begin VB.OptionButton optAutoToleranceRefinementDBSearchTolType 
@@ -1813,7 +1823,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   1020
-               TabIndex        =   407
+               TabIndex        =   412
                Top             =   600
                Width           =   855
             End
@@ -1822,7 +1832,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   0
                Left            =   1020
-               TabIndex        =   406
+               TabIndex        =   411
                Top             =   240
                Value           =   -1  'True
                Width           =   855
@@ -1831,7 +1841,7 @@ Begin VB.Form frmEditAnalysisSettings
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   160
-               TabIndex        =   405
+               TabIndex        =   410
                Text            =   "25"
                ToolTipText     =   "Database search tolerance"
                Top             =   525
@@ -1842,7 +1852,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   91
                Left            =   165
-               TabIndex        =   404
+               TabIndex        =   409
                Top             =   240
                Width           =   855
             End
@@ -1851,7 +1861,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3720
-            TabIndex        =   409
+            TabIndex        =   414
             Text            =   "0.1"
             Top             =   300
             Width           =   735
@@ -1861,7 +1871,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   157
             Left            =   120
-            TabIndex        =   417
+            TabIndex        =   422
             Top             =   1900
             Width           =   1545
          End
@@ -1871,7 +1881,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   225
             Index           =   14
             Left            =   2520
-            TabIndex        =   421
+            TabIndex        =   426
             Top             =   1940
             Width           =   1575
          End
@@ -1881,7 +1891,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   225
             Index           =   11
             Left            =   2520
-            TabIndex        =   419
+            TabIndex        =   424
             Top             =   1665
             Width           =   1695
          End
@@ -1890,7 +1900,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   144
             Left            =   120
-            TabIndex        =   415
+            TabIndex        =   420
             Top             =   1600
             Width           =   1545
          End
@@ -1899,7 +1909,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   135
             Left            =   120
-            TabIndex        =   413
+            TabIndex        =   418
             Top             =   1300
             Width           =   1185
          End
@@ -1908,7 +1918,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   92
             Left            =   2520
-            TabIndex        =   408
+            TabIndex        =   413
             Top             =   300
             Width           =   1095
          End
@@ -1918,14 +1928,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1695
          Index           =   1
          Left            =   -74760
-         TabIndex        =   431
+         TabIndex        =   436
          Top             =   5760
          Width           =   5415
          Begin VB.TextBox txtRefineMassCalibrationOverridePPM 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3600
-            TabIndex        =   440
+            TabIndex        =   445
             Text            =   "0"
             Top             =   1200
             Width           =   615
@@ -1934,7 +1944,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Re-calibrate (shift mass) using mass error plot"
             Height          =   375
             Left            =   240
-            TabIndex        =   432
+            TabIndex        =   437
             Top             =   240
             Width           =   3765
          End
@@ -1942,7 +1952,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2040
-            TabIndex        =   437
+            TabIndex        =   442
             Text            =   "0"
             Top             =   1200
             Width           =   615
@@ -1952,7 +1962,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   855
             Index           =   25
             Left            =   240
-            TabIndex        =   433
+            TabIndex        =   438
             Top             =   720
             Width           =   1455
             Begin VB.OptionButton optRefineMassCalibrationMassType 
@@ -1960,7 +1970,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   120
-               TabIndex        =   435
+               TabIndex        =   440
                Top             =   520
                Value           =   -1  'True
                Width           =   855
@@ -1970,7 +1980,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   0
                Left            =   120
-               TabIndex        =   434
+               TabIndex        =   439
                Top             =   240
                Width           =   855
             End
@@ -1980,7 +1990,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   139
             Left            =   4320
-            TabIndex        =   441
+            TabIndex        =   446
             Top             =   1230
             Width           =   600
          End
@@ -1989,7 +1999,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   138
             Left            =   3600
-            TabIndex        =   439
+            TabIndex        =   444
             Top             =   960
             Width           =   1700
          End
@@ -1998,7 +2008,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   77
             Left            =   2040
-            TabIndex        =   436
+            TabIndex        =   441
             Top             =   960
             Width           =   1455
          End
@@ -2006,7 +2016,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "ppm"
             Height          =   255
             Left            =   2760
-            TabIndex        =   438
+            TabIndex        =   443
             Top             =   1230
             Width           =   600
          End
@@ -2016,7 +2026,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   735
          Index           =   45
          Left            =   -70440
-         TabIndex        =   479
+         TabIndex        =   484
          Top             =   840
          Width           =   375
          Begin VB.CommandButton cmdAddRemove 
@@ -2024,7 +2034,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   300
             Index           =   1
             Left            =   0
-            TabIndex        =   481
+            TabIndex        =   486
             Top             =   360
             Width           =   375
          End
@@ -2033,7 +2043,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   300
             Index           =   0
             Left            =   0
-            TabIndex        =   480
+            TabIndex        =   485
             Top             =   0
             Width           =   375
          End
@@ -2042,14 +2052,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   315
          Left            =   -74760
          Style           =   2  'Dropdown List
-         TabIndex        =   465
+         TabIndex        =   470
          Top             =   1260
          Width           =   4095
       End
       Begin VB.ListBox lstDBSearchModes 
          Height          =   1035
          Left            =   -69960
-         TabIndex        =   482
+         TabIndex        =   487
          Top             =   720
          Width           =   4215
       End
@@ -2057,7 +2067,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Disable all saving and exporting"
          Height          =   255
          Left            =   -74760
-         TabIndex        =   463
+         TabIndex        =   468
          Top             =   600
          Width           =   3015
       End
@@ -2066,14 +2076,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   3735
          Index           =   29
          Left            =   -70680
-         TabIndex        =   484
+         TabIndex        =   489
          Top             =   2160
          Width           =   6735
          Begin VB.TextBox txtDBSearchMinimumPeptideProphetProbability 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   4200
-            TabIndex        =   595
+            TabIndex        =   600
             Text            =   "0"
             Top             =   2400
             Width           =   615
@@ -2082,7 +2092,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   4200
-            TabIndex        =   507
+            TabIndex        =   512
             Text            =   "0"
             Top             =   2100
             Width           =   615
@@ -2091,7 +2101,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   4200
-            TabIndex        =   506
+            TabIndex        =   511
             Text            =   "0"
             Top             =   1800
             Width           =   615
@@ -2100,7 +2110,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   315
             Left            =   120
             Style           =   2  'Dropdown List
-            TabIndex        =   505
+            TabIndex        =   510
             Top             =   2160
             Width           =   2415
          End
@@ -2109,7 +2119,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   1530
             Index           =   42
             Left            =   120
-            TabIndex        =   485
+            TabIndex        =   490
             Top             =   240
             Width           =   6375
             Begin VB.CheckBox chkMTAdditionalMass 
@@ -2117,7 +2127,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   0
                Left            =   120
-               TabIndex        =   486
+               TabIndex        =   491
                Top             =   360
                Width           =   975
             End
@@ -2126,7 +2136,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   120
-               TabIndex        =   487
+               TabIndex        =   492
                Top             =   720
                Width           =   975
             End
@@ -2135,7 +2145,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   2
                Left            =   120
-               TabIndex        =   488
+               TabIndex        =   493
                Top             =   1080
                Width           =   975
             End
@@ -2144,7 +2154,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   3
                Left            =   1320
-               TabIndex        =   489
+               TabIndex        =   494
                ToolTipText     =   "Check to add the alkylation mass correction below to all MT tag masses (added to each cys residue)"
                Top             =   360
                Width           =   1095
@@ -2153,7 +2163,7 @@ Begin VB.Form frmEditAnalysisSettings
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   1440
-               TabIndex        =   491
+               TabIndex        =   496
                Text            =   "57.0215"
                Top             =   960
                Width           =   855
@@ -2164,7 +2174,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   855
                Index           =   49
                Left            =   4160
-               TabIndex        =   496
+               TabIndex        =   501
                Top             =   360
                Width           =   1095
                Begin VB.OptionButton optDBSearchModType 
@@ -2172,7 +2182,7 @@ Begin VB.Form frmEditAnalysisSettings
                   Height          =   255
                   Index           =   0
                   Left            =   120
-                  TabIndex        =   498
+                  TabIndex        =   503
                   Top             =   240
                   Width           =   750
                End
@@ -2181,7 +2191,7 @@ Begin VB.Form frmEditAnalysisSettings
                   Height          =   255
                   Index           =   1
                   Left            =   120
-                  TabIndex        =   499
+                  TabIndex        =   504
                   Top             =   525
                   Value           =   -1  'True
                   Width           =   975
@@ -2192,7 +2202,7 @@ Begin VB.Form frmEditAnalysisSettings
                   Height          =   255
                   Index           =   100
                   Left            =   120
-                  TabIndex        =   497
+                  TabIndex        =   502
                   Top             =   0
                   Width           =   900
                End
@@ -2203,7 +2213,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   855
                Index           =   47
                Left            =   5400
-               TabIndex        =   500
+               TabIndex        =   505
                Top             =   360
                Width           =   800
                Begin VB.OptionButton optDBSearchNType 
@@ -2211,7 +2221,7 @@ Begin VB.Form frmEditAnalysisSettings
                   Height          =   255
                   Index           =   1
                   Left            =   0
-                  TabIndex        =   503
+                  TabIndex        =   508
                   Top             =   525
                   Width           =   700
                End
@@ -2220,7 +2230,7 @@ Begin VB.Form frmEditAnalysisSettings
                   Height          =   255
                   Index           =   0
                   Left            =   0
-                  TabIndex        =   502
+                  TabIndex        =   507
                   Top             =   240
                   Value           =   -1  'True
                   Width           =   700
@@ -2231,7 +2241,7 @@ Begin VB.Form frmEditAnalysisSettings
                   Height          =   255
                   Index           =   103
                   Left            =   0
-                  TabIndex        =   501
+                  TabIndex        =   506
                   Top             =   0
                   Width           =   600
                End
@@ -2240,7 +2250,7 @@ Begin VB.Form frmEditAnalysisSettings
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2760
-               TabIndex        =   495
+               TabIndex        =   500
                Text            =   "0"
                Top             =   1080
                Width           =   855
@@ -2249,7 +2259,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   315
                Left            =   2760
                Style           =   2  'Dropdown List
-               TabIndex        =   493
+               TabIndex        =   498
                Top             =   480
                Width           =   1095
             End
@@ -2259,7 +2269,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   108
                Left            =   1320
-               TabIndex        =   490
+               TabIndex        =   495
                Top             =   720
                Width           =   1215
             End
@@ -2297,7 +2307,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   107
                Left            =   2640
-               TabIndex        =   494
+               TabIndex        =   499
                Top             =   840
                Width           =   975
             End
@@ -2307,7 +2317,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   101
                Left            =   2640
-               TabIndex        =   492
+               TabIndex        =   497
                Top             =   240
                Width           =   1335
             End
@@ -2316,7 +2326,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Browse"
             Height          =   255
             Left            =   5700
-            TabIndex        =   515
+            TabIndex        =   520
             Top             =   3360
             Width           =   855
          End
@@ -2325,7 +2335,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   825
             Index           =   46
             Left            =   5040
-            TabIndex        =   508
+            TabIndex        =   513
             Top             =   1800
             Visible         =   0   'False
             Width           =   1500
@@ -2334,7 +2344,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   0
                Left            =   120
-               TabIndex        =   509
+               TabIndex        =   514
                ToolTipText     =   "MT tags are not labeled (mass in DB is the mass of the unmodified sequence)"
                Top             =   240
                Value           =   -1  'True
@@ -2345,7 +2355,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   120
-               TabIndex        =   510
+               TabIndex        =   515
                ToolTipText     =   "MT tags are labeled (mass in DB is already modified)"
                Top             =   500
                Width           =   1215
@@ -2355,7 +2365,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Export search results to database"
             Height          =   255
             Left            =   180
-            TabIndex        =   511
+            TabIndex        =   516
             Top             =   2820
             Width           =   3015
          End
@@ -2363,7 +2373,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Write search results to text file"
             Height          =   255
             Left            =   3240
-            TabIndex        =   512
+            TabIndex        =   517
             Top             =   2820
             Value           =   1  'Checked
             Width           =   3015
@@ -2371,7 +2381,7 @@ Begin VB.Form frmEditAnalysisSettings
          Begin VB.TextBox txtDBSearchAlternateOutputFolderPath 
             Height          =   285
             Left            =   180
-            TabIndex        =   514
+            TabIndex        =   519
             Top             =   3360
             Width           =   5295
          End
@@ -2380,7 +2390,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   161
             Left            =   2760
-            TabIndex        =   594
+            TabIndex        =   599
             Top             =   1820
             Width           =   1185
          End
@@ -2389,7 +2399,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   143
             Left            =   2760
-            TabIndex        =   593
+            TabIndex        =   598
             Top             =   2120
             Width           =   1545
          End
@@ -2398,7 +2408,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   134
             Left            =   2760
-            TabIndex        =   592
+            TabIndex        =   597
             Top             =   2420
             Width           =   1545
          End
@@ -2408,7 +2418,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   112
             Left            =   180
-            TabIndex        =   504
+            TabIndex        =   509
             Top             =   1880
             Width           =   2415
          End
@@ -2417,7 +2427,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   40
             Left            =   180
-            TabIndex        =   513
+            TabIndex        =   518
             Top             =   3105
             Width           =   4905
          End
@@ -2427,7 +2437,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   255
          Index           =   2
          Left            =   -69960
-         TabIndex        =   483
+         TabIndex        =   488
          Top             =   1800
          Width           =   1335
       End
@@ -2436,7 +2446,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   2715
          Index           =   26
          Left            =   -74760
-         TabIndex        =   466
+         TabIndex        =   471
          Top             =   1740
          Width           =   3855
          Begin VB.ComboBox cboSearchRegionShape 
@@ -2444,7 +2454,7 @@ Begin VB.Form frmEditAnalysisSettings
             Index           =   1
             Left            =   240
             Style           =   2  'Dropdown List
-            TabIndex        =   590
+            TabIndex        =   595
             Top             =   2320
             Width           =   3000
          End
@@ -2452,7 +2462,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Use Class NET for UMC's"
             Height          =   495
             Left            =   2280
-            TabIndex        =   471
+            TabIndex        =   476
             ToolTipText     =   $"frmEditAnalysisSettings.frx":43D50
             Top             =   600
             Width           =   1365
@@ -2461,7 +2471,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2520
-            TabIndex        =   478
+            TabIndex        =   483
             Text            =   "0.1"
             Top             =   1830
             Width           =   735
@@ -2471,14 +2481,14 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   925
             Index           =   28
             Left            =   240
-            TabIndex        =   472
+            TabIndex        =   477
             Top             =   1340
             Width           =   2175
             Begin VB.TextBox txtDBSearchMWTol 
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   160
-               TabIndex        =   474
+               TabIndex        =   479
                Text            =   "10"
                Top             =   525
                Width           =   735
@@ -2488,7 +2498,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   0
                Left            =   1020
-               TabIndex        =   475
+               TabIndex        =   480
                Top             =   300
                Value           =   -1  'True
                Width           =   855
@@ -2498,7 +2508,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   1020
-               TabIndex        =   476
+               TabIndex        =   481
                Top             =   560
                Width           =   855
             End
@@ -2507,7 +2517,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   57
                Left            =   165
-               TabIndex        =   473
+               TabIndex        =   478
                Top             =   240
                Width           =   855
             End
@@ -2517,7 +2527,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   1095
             Index           =   27
             Left            =   240
-            TabIndex        =   467
+            TabIndex        =   472
             Top             =   200
             Width           =   1935
             Begin VB.OptionButton optDBSearchMWField 
@@ -2525,7 +2535,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   0
                Left            =   80
-               TabIndex        =   468
+               TabIndex        =   473
                Top             =   240
                Width           =   1455
             End
@@ -2534,7 +2544,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   80
-               TabIndex        =   469
+               TabIndex        =   474
                Top             =   500
                Value           =   -1  'True
                Width           =   1455
@@ -2544,7 +2554,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   2
                Left            =   80
-               TabIndex        =   470
+               TabIndex        =   475
                Top             =   760
                Width           =   1815
             End
@@ -2554,7 +2564,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   69
             Left            =   2520
-            TabIndex        =   477
+            TabIndex        =   482
             Top             =   1580
             Width           =   1095
          End
@@ -2564,14 +2574,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1485
          Index           =   30
          Left            =   -70680
-         TabIndex        =   522
+         TabIndex        =   527
          Top             =   6000
          Width           =   5295
          Begin VB.CheckBox chkExportResultsFileUsesJobNumber 
             Caption         =   "Export results file uses job number instead of dataset name"
             Height          =   255
             Left            =   360
-            TabIndex        =   526
+            TabIndex        =   531
             Top             =   1080
             Value           =   1  'Checked
             Width           =   4515
@@ -2580,7 +2590,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Set Is_Confirmed = 1 for database search matches"
             Height          =   255
             Left            =   360
-            TabIndex        =   523
+            TabIndex        =   528
             Top             =   300
             Value           =   1  'Checked
             Width           =   4000
@@ -2589,7 +2599,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Add Quantitation Description Entry"
             Height          =   255
             Left            =   360
-            TabIndex        =   524
+            TabIndex        =   529
             Top             =   560
             Value           =   1  'Checked
             Width           =   4000
@@ -2598,7 +2608,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Export UMC's with no database matches"
             Height          =   255
             Left            =   360
-            TabIndex        =   525
+            TabIndex        =   530
             Top             =   820
             Width           =   4000
          End
@@ -2608,14 +2618,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   1935
          Index           =   33
          Left            =   -74760
-         TabIndex        =   539
+         TabIndex        =   544
          Top             =   3120
          Width           =   6255
          Begin VB.CheckBox chkSaveErrorGraphicMass 
             Caption         =   "Save mass error plot"
             Height          =   255
             Left            =   240
-            TabIndex        =   540
+            TabIndex        =   545
             Top             =   300
             Width           =   2400
          End
@@ -2623,7 +2633,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Save GANET error plot"
             Height          =   255
             Left            =   3360
-            TabIndex        =   541
+            TabIndex        =   546
             Top             =   240
             Width           =   2400
          End
@@ -2631,7 +2641,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Save 3D error plot (Mass vs. GANET)"
             Height          =   255
             Left            =   240
-            TabIndex        =   542
+            TabIndex        =   547
             Top             =   600
             Width           =   3015
          End
@@ -2639,7 +2649,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2040
-            TabIndex        =   544
+            TabIndex        =   549
             Text            =   "100"
             Top             =   1080
             Width           =   735
@@ -2648,7 +2658,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2040
-            TabIndex        =   550
+            TabIndex        =   555
             Text            =   "0.3"
             Top             =   1440
             Width           =   735
@@ -2657,7 +2667,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   4920
-            TabIndex        =   552
+            TabIndex        =   557
             Text            =   "0.005"
             Top             =   1440
             Width           =   735
@@ -2666,7 +2676,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   4920
-            TabIndex        =   547
+            TabIndex        =   552
             Text            =   "1"
             Top             =   1080
             Width           =   735
@@ -2677,7 +2687,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   9
             Left            =   240
-            TabIndex        =   543
+            TabIndex        =   548
             Top             =   1110
             Width           =   1575
          End
@@ -2687,7 +2697,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   10
             Left            =   2880
-            TabIndex        =   545
+            TabIndex        =   550
             Top             =   1080
             Width           =   495
          End
@@ -2697,7 +2707,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   73
             Left            =   240
-            TabIndex        =   549
+            TabIndex        =   554
             Top             =   1470
             Width           =   1575
          End
@@ -2707,7 +2717,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   74
             Left            =   3480
-            TabIndex        =   551
+            TabIndex        =   556
             Top             =   1440
             Width           =   1335
          End
@@ -2717,7 +2727,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   82
             Left            =   5760
-            TabIndex        =   548
+            TabIndex        =   553
             Top             =   1110
             Width           =   405
          End
@@ -2727,7 +2737,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   71
             Left            =   3480
-            TabIndex        =   546
+            TabIndex        =   551
             Top             =   1080
             Width           =   1335
          End
@@ -2737,14 +2747,14 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   2055
          Index           =   32
          Left            =   -74760
-         TabIndex        =   528
+         TabIndex        =   533
          Top             =   960
          Width           =   5535
          Begin VB.CheckBox chkSaveGelFile 
             Caption         =   "Save Gel File (raw data and DB Search Results)"
             Height          =   255
             Left            =   240
-            TabIndex        =   529
+            TabIndex        =   534
             Top             =   240
             Width           =   3855
          End
@@ -2752,7 +2762,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Save graphic of 2D display"
             Height          =   375
             Left            =   240
-            TabIndex        =   532
+            TabIndex        =   537
             Top             =   1200
             Width           =   3015
          End
@@ -2760,7 +2770,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   315
             Left            =   1080
             Style           =   2  'Dropdown List
-            TabIndex        =   533
+            TabIndex        =   538
             Top             =   1560
             Width           =   2415
          End
@@ -2768,7 +2778,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   4680
-            TabIndex        =   536
+            TabIndex        =   541
             Text            =   "1024"
             Top             =   1320
             Width           =   615
@@ -2777,7 +2787,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   4680
-            TabIndex        =   538
+            TabIndex        =   543
             Text            =   "768"
             Top             =   1680
             Width           =   615
@@ -2786,7 +2796,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Include UMC's with the raw data when saving"
             Height          =   255
             Left            =   600
-            TabIndex        =   530
+            TabIndex        =   535
             Top             =   510
             Width           =   4095
          End
@@ -2794,7 +2804,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Save gel file if an error occurs"
             Height          =   255
             Left            =   240
-            TabIndex        =   531
+            TabIndex        =   536
             Top             =   800
             Width           =   3855
          End
@@ -2803,7 +2813,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   6
             Left            =   240
-            TabIndex        =   564
+            TabIndex        =   569
             Top             =   1590
             Width           =   975
          End
@@ -2812,7 +2822,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   5
             Left            =   3960
-            TabIndex        =   535
+            TabIndex        =   540
             Top             =   1350
             Width           =   615
          End
@@ -2821,7 +2831,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   4
             Left            =   3960
-            TabIndex        =   537
+            TabIndex        =   542
             Top             =   1710
             Width           =   615
          End
@@ -2830,27 +2840,27 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   3
             Left            =   4680
-            TabIndex        =   534
+            TabIndex        =   539
             Top             =   1080
             Width           =   615
          End
       End
       Begin TabDlg.SSTab tbsUMCRefinementOptions 
-         Height          =   2880
-         Left            =   -69360
+         Height          =   3120
+         Left            =   5640
          TabIndex        =   155
          Top             =   480
          Width           =   5295
          _ExtentX        =   9340
-         _ExtentY        =   5080
+         _ExtentY        =   5503
          _Version        =   393216
          Style           =   1
-         Tab             =   2
          TabHeight       =   520
          TabCaption(0)   =   "Auto-Refine Options"
          TabPicture(0)   =   "frmEditAnalysisSettings.frx":43DE7
-         Tab(0).ControlEnabled=   0   'False
+         Tab(0).ControlEnabled=   -1  'True
          Tab(0).Control(0)=   "fraOptionFrame(10)"
+         Tab(0).Control(0).Enabled=   0   'False
          Tab(0).ControlCount=   1
          TabCaption(1)   =   "Split UMC's Options"
          TabPicture(1)   =   "frmEditAnalysisSettings.frx":43E03
@@ -2859,16 +2869,221 @@ Begin VB.Form frmEditAnalysisSettings
          Tab(1).ControlCount=   1
          TabCaption(2)   =   "Adv Class Stats"
          TabPicture(2)   =   "frmEditAnalysisSettings.frx":43E1F
-         Tab(2).ControlEnabled=   -1  'True
+         Tab(2).ControlEnabled=   0   'False
          Tab(2).Control(0)=   "fraOptionFrame(55)"
-         Tab(2).Control(0).Enabled=   0   'False
          Tab(2).ControlCount=   1
+         Begin VB.Frame fraOptionFrame 
+            Height          =   2700
+            Index           =   10
+            Left            =   120
+            TabIndex        =   605
+            Top             =   320
+            Width           =   4545
+            Begin VB.TextBox txtAutoRefineTextbox 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Index           =   7
+               Left            =   3000
+               TabIndex        =   173
+               Text            =   "15"
+               Top             =   1520
+               Width           =   495
+            End
+            Begin VB.CheckBox chkAutoRefineCheckbox 
+               Caption         =   "Remove cls. with length over"
+               Height          =   255
+               Index           =   7
+               Left            =   240
+               TabIndex        =   172
+               Top             =   1520
+               Width           =   2535
+            End
+            Begin VB.TextBox txtAutoRefineTextbox 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Index           =   5
+               Left            =   3000
+               TabIndex        =   176
+               Text            =   "33"
+               Top             =   1840
+               Width           =   495
+            End
+            Begin VB.TextBox txtAutoRefineTextbox 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Index           =   6
+               Left            =   3480
+               TabIndex        =   180
+               Text            =   "3"
+               Top             =   2300
+               Width           =   495
+            End
+            Begin VB.CheckBox chkAutoRefineCheckbox 
+               Caption         =   "Test UMC length using scan range"
+               Height          =   375
+               Index           =   4
+               Left            =   240
+               TabIndex        =   178
+               ToolTipText     =   "If True, then considers scan range for the length tests; otherwise, considers member count"
+               Top             =   2200
+               Value           =   1  'Checked
+               Width           =   1695
+            End
+            Begin VB.CheckBox chkAutoRefineCheckbox 
+               Caption         =   "Remove low intensity classes"
+               Height          =   255
+               Index           =   0
+               Left            =   240
+               TabIndex        =   160
+               Top             =   240
+               Width           =   2550
+            End
+            Begin VB.TextBox txtAutoRefineTextbox 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Index           =   0
+               Left            =   3000
+               TabIndex        =   161
+               Text            =   "30"
+               Top             =   240
+               Width           =   495
+            End
+            Begin VB.CheckBox chkAutoRefineCheckbox 
+               Caption         =   "Remove high intensity classes"
+               Height          =   255
+               Index           =   1
+               Left            =   240
+               TabIndex        =   163
+               Top             =   560
+               Width           =   2550
+            End
+            Begin VB.TextBox txtAutoRefineTextbox 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Index           =   1
+               Left            =   3000
+               TabIndex        =   164
+               Text            =   "30"
+               Top             =   560
+               Width           =   495
+            End
+            Begin VB.CheckBox chkAutoRefineCheckbox 
+               Caption         =   "Remove cls. with less than"
+               Height          =   255
+               Index           =   2
+               Left            =   240
+               TabIndex        =   166
+               Top             =   880
+               Width           =   2295
+            End
+            Begin VB.TextBox txtAutoRefineTextbox 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Index           =   2
+               Left            =   3000
+               TabIndex        =   167
+               Text            =   "3"
+               Top             =   880
+               Width           =   495
+            End
+            Begin VB.CheckBox chkAutoRefineCheckbox 
+               Caption         =   "Remove cls. with length over"
+               Height          =   255
+               Index           =   3
+               Left            =   240
+               TabIndex        =   169
+               Top             =   1200
+               Width           =   2535
+            End
+            Begin VB.TextBox txtAutoRefineTextbox 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Index           =   3
+               Left            =   3000
+               TabIndex        =   170
+               Text            =   "500"
+               Top             =   1200
+               Width           =   495
+            End
+            Begin VB.Label lblAutoRefineLengthLabel 
+               Caption         =   "%"
+               Height          =   255
+               Index           =   5
+               Left            =   3600
+               TabIndex        =   165
+               Top             =   590
+               Width           =   270
+            End
+            Begin VB.Label lblAutoRefineLengthLabel 
+               Caption         =   "%"
+               Height          =   255
+               Index           =   4
+               Left            =   3600
+               TabIndex        =   162
+               Top             =   270
+               Width           =   270
+            End
+            Begin VB.Label lblAutoRefineLengthLabel 
+               Caption         =   "% all scans"
+               Height          =   255
+               Index           =   3
+               Left            =   3600
+               TabIndex        =   174
+               Top             =   1545
+               Width           =   855
+            End
+            Begin VB.Label lblAutoRefineLengthLabel 
+               Caption         =   "%"
+               Height          =   255
+               Index           =   2
+               Left            =   3600
+               TabIndex        =   177
+               Top             =   1870
+               Width           =   285
+            End
+            Begin VB.Label lblAutoRefineSpecialLabel 
+               Caption         =   "Percent max abu for gauging width"
+               Height          =   240
+               Index           =   0
+               Left            =   360
+               TabIndex        =   175
+               Top             =   1845
+               Width           =   2565
+            End
+            Begin VB.Label lblAutoRefineSpecialLabel 
+               Caption         =   "Minimum member count:"
+               Height          =   375
+               Index           =   1
+               Left            =   2280
+               TabIndex        =   179
+               Top             =   2200
+               Width           =   1125
+            End
+            Begin VB.Label lblAutoRefineLengthLabel 
+               Caption         =   "members"
+               Height          =   255
+               Index           =   0
+               Left            =   3600
+               TabIndex        =   168
+               Top             =   915
+               Width           =   900
+            End
+            Begin VB.Label lblAutoRefineLengthLabel 
+               Caption         =   "members"
+               Height          =   255
+               Index           =   1
+               Left            =   3600
+               TabIndex        =   171
+               Top             =   1230
+               Width           =   900
+            End
+         End
          Begin VB.Frame fraOptionFrame 
             Caption         =   "Class Abundance Top X"
             Height          =   1215
             Index           =   17
             Left            =   -74760
-            TabIndex        =   573
+            TabIndex        =   578
             Top             =   360
             Width           =   4095
             Begin VB.TextBox txtClassAbuTopXMinMaxAbu 
@@ -2876,7 +3091,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   0
                Left            =   2880
-               TabIndex        =   576
+               TabIndex        =   581
                Text            =   "0"
                Top             =   240
                Width           =   900
@@ -2886,7 +3101,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   1
                Left            =   2880
-               TabIndex        =   575
+               TabIndex        =   580
                Text            =   "0"
                ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
                Top             =   540
@@ -2896,7 +3111,7 @@ Begin VB.Form frmEditAnalysisSettings
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2880
-               TabIndex        =   574
+               TabIndex        =   579
                Text            =   "3"
                Top             =   840
                Width           =   900
@@ -2907,7 +3122,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   88
                Left            =   120
-               TabIndex        =   579
+               TabIndex        =   584
                Top             =   270
                Width           =   2535
             End
@@ -2917,7 +3132,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   104
                Left            =   120
-               TabIndex        =   578
+               TabIndex        =   583
                Top             =   560
                Width           =   2535
             End
@@ -2926,7 +3141,7 @@ Begin VB.Form frmEditAnalysisSettings
                Caption         =   "Minimum members to include"
                Height          =   255
                Left            =   120
-               TabIndex        =   577
+               TabIndex        =   582
                Top             =   870
                Width           =   2535
             End
@@ -2935,15 +3150,15 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Class Mass Top X"
             Height          =   1215
             Index           =   55
-            Left            =   240
-            TabIndex        =   566
+            Left            =   -74760
+            TabIndex        =   571
             Top             =   1600
             Width           =   4095
             Begin VB.TextBox txtClassMassTopXMinMembers 
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2880
-               TabIndex        =   569
+               TabIndex        =   574
                Text            =   "3"
                Top             =   840
                Width           =   900
@@ -2953,7 +3168,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   1
                Left            =   2880
-               TabIndex        =   568
+               TabIndex        =   573
                Text            =   "0"
                ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
                Top             =   540
@@ -2964,7 +3179,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   0
                Left            =   2880
-               TabIndex        =   567
+               TabIndex        =   572
                Text            =   "0"
                Top             =   240
                Width           =   900
@@ -2974,7 +3189,7 @@ Begin VB.Form frmEditAnalysisSettings
                Caption         =   "Minimum members to include"
                Height          =   255
                Left            =   120
-               TabIndex        =   572
+               TabIndex        =   577
                Top             =   870
                Width           =   2535
             End
@@ -2984,7 +3199,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   106
                Left            =   120
-               TabIndex        =   571
+               TabIndex        =   576
                Top             =   560
                Width           =   2535
             End
@@ -2994,7 +3209,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   105
                Left            =   120
-               TabIndex        =   570
+               TabIndex        =   575
                Top             =   270
                Width           =   2535
             End
@@ -3004,14 +3219,14 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   2340
             Index           =   15
             Left            =   -74760
-            TabIndex        =   170
+            TabIndex        =   156
             Top             =   440
             Width           =   4260
             Begin VB.CheckBox chkSplitUMCsByExaminingAbundance 
                Caption         =   "Split UMC's by examining abundance"
                Height          =   255
                Left            =   0
-               TabIndex        =   171
+               TabIndex        =   157
                Top             =   0
                Width           =   3015
             End
@@ -3019,7 +3234,7 @@ Begin VB.Form frmEditAnalysisSettings
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2760
-               TabIndex        =   173
+               TabIndex        =   159
                Text            =   "4"
                Top             =   330
                Width           =   495
@@ -3028,7 +3243,7 @@ Begin VB.Form frmEditAnalysisSettings
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2760
-               TabIndex        =   178
+               TabIndex        =   183
                Text            =   "6"
                Top             =   660
                Width           =   495
@@ -3037,7 +3252,7 @@ Begin VB.Form frmEditAnalysisSettings
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2760
-               TabIndex        =   181
+               TabIndex        =   186
                Text            =   "15"
                Top             =   990
                Width           =   495
@@ -3046,7 +3261,7 @@ Begin VB.Form frmEditAnalysisSettings
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2760
-               TabIndex        =   184
+               TabIndex        =   189
                Text            =   "4"
                Top             =   1320
                Width           =   495
@@ -3056,7 +3271,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   1
                Left            =   2760
-               TabIndex        =   187
+               TabIndex        =   192
                Text            =   "3"
                Top             =   1650
                Width           =   495
@@ -3065,7 +3280,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   315
                Left            =   1680
                Style           =   2  'Dropdown List
-               TabIndex        =   190
+               TabIndex        =   195
                Top             =   1980
                Width           =   2295
             End
@@ -3074,7 +3289,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   131
                Left            =   3360
-               TabIndex        =   174
+               TabIndex        =   181
                Top             =   360
                Width           =   600
             End
@@ -3083,7 +3298,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   114
                Left            =   0
-               TabIndex        =   172
+               TabIndex        =   158
                Top             =   360
                Width           =   2700
             End
@@ -3092,7 +3307,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   127
                Left            =   3360
-               TabIndex        =   179
+               TabIndex        =   184
                Top             =   690
                Width           =   600
             End
@@ -3101,7 +3316,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   122
                Left            =   0
-               TabIndex        =   175
+               TabIndex        =   182
                Top             =   720
                Width           =   2700
             End
@@ -3110,7 +3325,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   128
                Left            =   3360
-               TabIndex        =   182
+               TabIndex        =   187
                Top             =   1020
                Width           =   705
             End
@@ -3119,7 +3334,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   123
                Left            =   0
-               TabIndex        =   180
+               TabIndex        =   185
                Top             =   1020
                Width           =   2700
             End
@@ -3128,7 +3343,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   129
                Left            =   3360
-               TabIndex        =   185
+               TabIndex        =   190
                Top             =   1350
                Width           =   600
             End
@@ -3137,7 +3352,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   124
                Left            =   0
-               TabIndex        =   183
+               TabIndex        =   188
                Top             =   1350
                Width           =   2700
             End
@@ -3147,7 +3362,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   125
                Left            =   0
-               TabIndex        =   186
+               TabIndex        =   191
                Top             =   1680
                Width           =   2655
             End
@@ -3156,7 +3371,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   130
                Left            =   3360
-               TabIndex        =   188
+               TabIndex        =   193
                Top             =   1680
                Width           =   600
             End
@@ -3165,169 +3380,18 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   126
                Left            =   0
-               TabIndex        =   189
+               TabIndex        =   194
                Top             =   2010
                Width           =   1620
-            End
-         End
-         Begin VB.Frame fraOptionFrame 
-            Height          =   2520
-            Index           =   10
-            Left            =   -74880
-            TabIndex        =   156
-            Top             =   330
-            Width           =   4300
-            Begin VB.TextBox txtAutoRefineTextbox 
-               Alignment       =   1  'Right Justify
-               Height          =   285
-               Index           =   5
-               Left            =   2640
-               TabIndex        =   177
-               Text            =   "25"
-               Top             =   1680
-               Width           =   495
-            End
-            Begin VB.TextBox txtAutoRefineTextbox 
-               Alignment       =   1  'Right Justify
-               Height          =   285
-               Index           =   6
-               Left            =   3600
-               TabIndex        =   169
-               Text            =   "3"
-               Top             =   2145
-               Width           =   495
-            End
-            Begin VB.CheckBox chkAutoRefineCheckbox 
-               Caption         =   "Test UMC length using scan range"
-               Height          =   375
-               Index           =   4
-               Left            =   240
-               TabIndex        =   167
-               ToolTipText     =   "If True, then considers scan range for the length tests; otherwise, considers member count"
-               Top             =   2040
-               Value           =   1  'Checked
-               Width           =   1935
-            End
-            Begin VB.TextBox txtAutoRefineTextbox 
-               Alignment       =   1  'Right Justify
-               Height          =   285
-               Index           =   3
-               Left            =   2640
-               TabIndex        =   165
-               Text            =   "300"
-               Top             =   1320
-               Width           =   495
-            End
-            Begin VB.CheckBox chkAutoRefineCheckbox 
-               Caption         =   "Remove cls. with more than"
-               Height          =   255
-               Index           =   3
-               Left            =   240
-               TabIndex        =   164
-               Top             =   1320
-               Width           =   2295
-            End
-            Begin VB.TextBox txtAutoRefineTextbox 
-               Alignment       =   1  'Right Justify
-               Height          =   285
-               Index           =   2
-               Left            =   2640
-               TabIndex        =   162
-               Text            =   "3"
-               Top             =   960
-               Width           =   495
-            End
-            Begin VB.CheckBox chkAutoRefineCheckbox 
-               Caption         =   "Remove cls. with less than"
-               Height          =   255
-               Index           =   2
-               Left            =   240
-               TabIndex        =   161
-               Top             =   960
-               Width           =   2295
-            End
-            Begin VB.TextBox txtAutoRefineTextbox 
-               Alignment       =   1  'Right Justify
-               Height          =   285
-               Index           =   1
-               Left            =   3120
-               TabIndex        =   160
-               Text            =   "30"
-               Top             =   600
-               Width           =   615
-            End
-            Begin VB.CheckBox chkAutoRefineCheckbox 
-               Caption         =   "Remove high intensity classes(%)"
-               Height          =   255
-               Index           =   1
-               Left            =   240
-               TabIndex        =   159
-               Top             =   600
-               Width           =   2775
-            End
-            Begin VB.TextBox txtAutoRefineTextbox 
-               Alignment       =   1  'Right Justify
-               Height          =   285
-               Index           =   0
-               Left            =   3120
-               TabIndex        =   158
-               Text            =   "30"
-               Top             =   240
-               Width           =   615
-            End
-            Begin VB.CheckBox chkAutoRefineCheckbox 
-               Caption         =   "Remove low intensity classes(%)"
-               Height          =   255
-               Index           =   0
-               Left            =   240
-               TabIndex        =   157
-               Top             =   240
-               Width           =   2775
-            End
-            Begin VB.Label lblAutoRefineSpecialLabel 
-               Caption         =   "Percent max abundance to use to gauge width"
-               Height          =   405
-               Index           =   0
-               Left            =   720
-               TabIndex        =   176
-               Top             =   1560
-               Width           =   1845
-            End
-            Begin VB.Label lblAutoRefineSpecialLabel 
-               Caption         =   "Minimum member count:"
-               Height          =   375
-               Index           =   1
-               Left            =   2400
-               TabIndex        =   168
-               Top             =   2040
-               Width           =   1125
-            End
-            Begin VB.Label lblAutoRefineLengthLabel 
-               Caption         =   "members"
-               Height          =   255
-               Index           =   1
-               Left            =   3240
-               TabIndex        =   166
-               Top             =   1360
-               Width           =   1000
-            End
-            Begin VB.Label lblAutoRefineLengthLabel 
-               Caption         =   "members"
-               Height          =   255
-               Index           =   0
-               Left            =   3240
-               TabIndex        =   163
-               Top             =   1000
-               Width           =   1000
             End
          End
       End
       Begin VB.Frame fraUMCIonNetOptions 
          Caption         =   "UMC Ion Network Options"
          Height          =   4095
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   104
-         Top             =   3360
+         Top             =   3600
          Width           =   9135
          Begin VB.Frame fraOptionFrame 
             Height          =   3050
@@ -3792,7 +3856,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.CheckBox chkInterpolateMissingIons 
          Caption         =   "Interpolate abundances across gaps"
          Height          =   375
-         Left            =   -71760
+         Left            =   3240
          TabIndex        =   77
          Top             =   1680
          Width           =   2055
@@ -3800,7 +3864,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.TextBox txtInterpolateMaxGapSize 
          Alignment       =   1  'Right Justify
          Height          =   285
-         Left            =   -70200
+         Left            =   4800
          TabIndex        =   79
          Text            =   "0"
          Top             =   2280
@@ -3809,7 +3873,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.ComboBox cmbUMCAbu 
          Height          =   315
          ItemData        =   "frmEditAnalysisSettings.frx":43E3B
-         Left            =   -74760
+         Left            =   240
          List            =   "frmEditAnalysisSettings.frx":43E3D
          Style           =   2  'Dropdown List
          TabIndex        =   74
@@ -3819,7 +3883,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.ComboBox cmbUMCMW 
          Height          =   315
          ItemData        =   "frmEditAnalysisSettings.frx":43E3F
-         Left            =   -74760
+         Left            =   240
          List            =   "frmEditAnalysisSettings.frx":43E41
          Style           =   2  'Dropdown List
          TabIndex        =   72
@@ -3829,9 +3893,9 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.Frame fraUMCSearch200x 
          Caption         =   "UMC 2002/2003 Options"
          Height          =   3855
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   81
-         Top             =   3360
+         Top             =   3600
          Width           =   6375
          Begin VB.ComboBox cmbCountType 
             Height          =   315
@@ -4038,8 +4102,8 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "MT Tag Database Settings"
          Height          =   3015
          Index           =   44
-         Left            =   120
-         TabIndex        =   191
+         Left            =   -74880
+         TabIndex        =   196
          Top             =   480
          Width           =   6735
          Begin VB.TextBox txtCurrentDBScoreThreshold 
@@ -4047,7 +4111,7 @@ Begin VB.Form frmEditAnalysisSettings
             Index           =   2
             Left            =   5040
             Locked          =   -1  'True
-            TabIndex        =   599
+            TabIndex        =   604
             Text            =   "0"
             Top             =   2520
             Width           =   495
@@ -4056,7 +4120,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Limit to MT tags from Dataset for Job"
             Height          =   375
             Left            =   480
-            TabIndex        =   201
+            TabIndex        =   206
             Top             =   1440
             Width           =   1815
          End
@@ -4065,7 +4129,7 @@ Begin VB.Form frmEditAnalysisSettings
             Index           =   1
             Left            =   5040
             Locked          =   -1  'True
-            TabIndex        =   204
+            TabIndex        =   209
             Text            =   "0"
             Top             =   2220
             Width           =   495
@@ -4074,7 +4138,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   315
             Left            =   1560
             Locked          =   -1  'True
-            TabIndex        =   193
+            TabIndex        =   198
             Top             =   240
             Width           =   5055
          End
@@ -4082,7 +4146,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "AMT's Only"
             Height          =   255
             Left            =   120
-            TabIndex        =   199
+            TabIndex        =   204
             Top             =   1400
             Width           =   1455
          End
@@ -4090,7 +4154,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   615
             Left            =   3360
             Locked          =   -1  'True
-            TabIndex        =   202
+            TabIndex        =   207
             Top             =   1200
             Width           =   3255
          End
@@ -4098,7 +4162,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Confirmed Only"
             Height          =   255
             Left            =   120
-            TabIndex        =   198
+            TabIndex        =   203
             Top             =   1160
             Width           =   1455
          End
@@ -4106,7 +4170,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Lockers Only"
             Height          =   255
             Left            =   120
-            TabIndex        =   200
+            TabIndex        =   205
             Top             =   1640
             Width           =   1455
          End
@@ -4114,7 +4178,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "&Select MT tags"
             Height          =   375
             Left            =   4920
-            TabIndex        =   196
+            TabIndex        =   201
             ToolTipText     =   "Select the MT tags to use"
             Top             =   720
             Width           =   1695
@@ -4124,7 +4188,7 @@ Begin VB.Form frmEditAnalysisSettings
             Index           =   0
             Left            =   5040
             Locked          =   -1  'True
-            TabIndex        =   203
+            TabIndex        =   208
             Text            =   "0"
             Top             =   1920
             Width           =   495
@@ -4134,7 +4198,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   162
             Left            =   3360
-            TabIndex        =   598
+            TabIndex        =   603
             Top             =   1935
             Width           =   2025
          End
@@ -4143,7 +4207,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   145
             Left            =   3360
-            TabIndex        =   597
+            TabIndex        =   602
             Top             =   2240
             Width           =   1545
          End
@@ -4152,7 +4216,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   119
             Left            =   3360
-            TabIndex        =   596
+            TabIndex        =   601
             Top             =   2540
             Width           =   1545
          End
@@ -4160,7 +4224,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Explicit Internal Standard:"
             Height          =   255
             Left            =   120
-            TabIndex        =   197
+            TabIndex        =   202
             Top             =   900
             Width           =   5175
          End
@@ -4168,7 +4232,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Avg Obs NET - from DB"
             Height          =   255
             Left            =   120
-            TabIndex        =   206
+            TabIndex        =   211
             Top             =   2280
             Width           =   2535
          End
@@ -4177,7 +4241,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   120
             Left            =   120
-            TabIndex        =   205
+            TabIndex        =   210
             Top             =   2040
             Width           =   1575
          End
@@ -4186,7 +4250,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   116
             Left            =   120
-            TabIndex        =   192
+            TabIndex        =   197
             Top             =   300
             Width           =   1455
          End
@@ -4195,7 +4259,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   117
             Left            =   120
-            TabIndex        =   194
+            TabIndex        =   199
             Top             =   660
             Width           =   3255
          End
@@ -4203,7 +4267,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "0"
             Height          =   255
             Left            =   3480
-            TabIndex        =   195
+            TabIndex        =   200
             Top             =   660
             Width           =   735
          End
@@ -4211,23 +4275,23 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.CommandButton cmdSelectOtherDB 
          Caption         =   "&Select other DB"
          Height          =   375
-         Left            =   120
-         TabIndex        =   208
+         Left            =   -74880
+         TabIndex        =   213
          ToolTipText     =   "Select the MT tags to use"
          Top             =   3960
          Width           =   1695
       End
       Begin VB.Frame fraSelectingMassTags 
          Height          =   1800
-         Left            =   5400
-         TabIndex        =   215
+         Left            =   -69600
+         TabIndex        =   220
          Top             =   4320
          Width           =   4695
          Begin VB.CommandButton cmdSelectingMassTagsOK 
             Caption         =   "&Ok"
             Height          =   375
             Left            =   1920
-            TabIndex        =   218
+            TabIndex        =   223
             ToolTipText     =   "Select MT tags to load for search"
             Top             =   1200
             Width           =   975
@@ -4236,7 +4300,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "&Cancel"
             Height          =   375
             Left            =   720
-            TabIndex        =   217
+            TabIndex        =   222
             ToolTipText     =   "Select MT tags to load for search"
             Top             =   1200
             Width           =   975
@@ -4245,7 +4309,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   $"frmEditAnalysisSettings.frx":43E47
             Height          =   1095
             Left            =   120
-            TabIndex        =   216
+            TabIndex        =   221
             Top             =   240
             Width           =   4215
          End
@@ -4254,15 +4318,15 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "General Database options"
          Height          =   1515
          Index           =   16
-         Left            =   120
-         TabIndex        =   209
+         Left            =   -74880
+         TabIndex        =   214
          Top             =   4560
          Width           =   4815
          Begin VB.TextBox txtDBConnectionTimeoutSeconds 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3720
-            TabIndex        =   214
+            TabIndex        =   219
             Text            =   "30"
             Top             =   1080
             Width           =   615
@@ -4271,7 +4335,7 @@ Begin VB.Form frmEditAnalysisSettings
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3720
-            TabIndex        =   212
+            TabIndex        =   217
             Text            =   "5"
             Top             =   720
             Width           =   615
@@ -4280,7 +4344,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Use MT tags with Null NET"
             Height          =   255
             Left            =   240
-            TabIndex        =   210
+            TabIndex        =   215
             Top             =   360
             Width           =   3615
          End
@@ -4289,7 +4353,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   1
             Left            =   240
-            TabIndex        =   213
+            TabIndex        =   218
             Top             =   1110
             Width           =   3375
          End
@@ -4298,14 +4362,14 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   0
             Left            =   240
-            TabIndex        =   211
+            TabIndex        =   216
             Top             =   750
             Width           =   3375
          End
       End
       Begin VB.ComboBox cboUMCSearchMode 
          Height          =   315
-         Left            =   -73080
+         Left            =   1920
          Style           =   2  'Dropdown List
          TabIndex        =   70
          Top             =   960
@@ -4864,7 +4928,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin TabDlg.SSTab tbsNETOptions 
          Height          =   3405
          Left            =   -70800
-         TabIndex        =   322
+         TabIndex        =   327
          Top             =   480
          Width           =   6645
          _ExtentX        =   11721
@@ -4904,7 +4968,7 @@ Begin VB.Form frmEditAnalysisSettings
             Left            =   -72960
             List            =   "frmEditAnalysisSettings.frx":43F70
             Style           =   2  'Dropdown List
-            TabIndex        =   589
+            TabIndex        =   594
             Top             =   2880
             Width           =   3165
          End
@@ -4913,7 +4977,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   2175
             Index           =   35
             Left            =   -71880
-            TabIndex        =   369
+            TabIndex        =   374
             Top             =   600
             Width           =   2775
             Begin VB.TextBox txtRobustNETOption 
@@ -4921,7 +4985,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   17
                Left            =   1920
-               TabIndex        =   377
+               TabIndex        =   382
                Text            =   "100"
                Top             =   1400
                Width           =   735
@@ -4931,7 +4995,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   16
                Left            =   1920
-               TabIndex        =   375
+               TabIndex        =   380
                Text            =   "20"
                Top             =   960
                Width           =   735
@@ -4941,7 +5005,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   15
                Left            =   1920
-               TabIndex        =   373
+               TabIndex        =   378
                Text            =   "2"
                Top             =   600
                Width           =   735
@@ -4951,7 +5015,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   14
                Left            =   1920
-               TabIndex        =   371
+               TabIndex        =   376
                Text            =   "50"
                Top             =   240
                Width           =   735
@@ -4961,7 +5025,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   18
                Left            =   1920
-               TabIndex        =   379
+               TabIndex        =   384
                Text            =   "50"
                Top             =   1800
                Width           =   735
@@ -4971,7 +5035,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   154
                Left            =   120
-               TabIndex        =   370
+               TabIndex        =   375
                Top             =   270
                Width           =   2145
             End
@@ -4980,7 +5044,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   153
                Left            =   120
-               TabIndex        =   376
+               TabIndex        =   381
                Top             =   1430
                Width           =   1785
             End
@@ -4989,7 +5053,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   152
                Left            =   120
-               TabIndex        =   374
+               TabIndex        =   379
                Top             =   990
                Width           =   1785
             End
@@ -4998,7 +5062,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   151
                Left            =   120
-               TabIndex        =   372
+               TabIndex        =   377
                Top             =   630
                Width           =   2145
             End
@@ -5007,7 +5071,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   150
                Left            =   120
-               TabIndex        =   378
+               TabIndex        =   383
                Top             =   1830
                Width           =   1785
             End
@@ -5017,7 +5081,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   2175
             Index           =   34
             Left            =   -74880
-            TabIndex        =   358
+            TabIndex        =   363
             Top             =   600
             Width           =   2775
             Begin VB.TextBox txtRobustNETOption 
@@ -5025,7 +5089,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   13
                Left            =   1920
-               TabIndex        =   368
+               TabIndex        =   373
                Text            =   "2"
                Top             =   1800
                Width           =   735
@@ -5035,7 +5099,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   9
                Left            =   1920
-               TabIndex        =   360
+               TabIndex        =   365
                Text            =   "100"
                Top             =   240
                Width           =   735
@@ -5045,7 +5109,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   10
                Left            =   1920
-               TabIndex        =   362
+               TabIndex        =   367
                Text            =   "3"
                Top             =   600
                Width           =   735
@@ -5055,7 +5119,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   11
                Left            =   1920
-               TabIndex        =   364
+               TabIndex        =   369
                Text            =   "2"
                Top             =   960
                Width           =   735
@@ -5065,7 +5129,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   12
                Left            =   1920
-               TabIndex        =   366
+               TabIndex        =   371
                Text            =   "5"
                Top             =   1400
                Width           =   735
@@ -5075,7 +5139,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   118
                Left            =   120
-               TabIndex        =   367
+               TabIndex        =   372
                Top             =   1830
                Width           =   1785
             End
@@ -5084,7 +5148,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   12
                Left            =   120
-               TabIndex        =   361
+               TabIndex        =   366
                Top             =   630
                Width           =   2145
             End
@@ -5093,7 +5157,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   13
                Left            =   120
-               TabIndex        =   363
+               TabIndex        =   368
                Top             =   990
                Width           =   1785
             End
@@ -5102,7 +5166,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   495
                Index           =   158
                Left            =   120
-               TabIndex        =   365
+               TabIndex        =   370
                Top             =   1300
                Width           =   1785
             End
@@ -5111,7 +5175,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   159
                Left            =   120
-               TabIndex        =   359
+               TabIndex        =   364
                Top             =   270
                Width           =   2145
             End
@@ -5121,7 +5185,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   855
             Index           =   54
             Left            =   -74880
-            TabIndex        =   347
+            TabIndex        =   352
             Top             =   480
             Width           =   6015
             Begin VB.CheckBox chkCS 
@@ -5129,7 +5193,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   0
                Left            =   240
-               TabIndex        =   349
+               TabIndex        =   354
                Top             =   480
                Value           =   1  'Checked
                Width           =   495
@@ -5139,7 +5203,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   840
-               TabIndex        =   350
+               TabIndex        =   355
                Top             =   480
                Value           =   1  'Checked
                Width           =   495
@@ -5149,7 +5213,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   2
                Left            =   1440
-               TabIndex        =   351
+               TabIndex        =   356
                Top             =   480
                Value           =   1  'Checked
                Width           =   495
@@ -5159,7 +5223,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   3
                Left            =   2040
-               TabIndex        =   352
+               TabIndex        =   357
                Top             =   480
                Width           =   495
             End
@@ -5168,7 +5232,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   4
                Left            =   2640
-               TabIndex        =   353
+               TabIndex        =   358
                Top             =   480
                Width           =   495
             End
@@ -5177,7 +5241,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   5
                Left            =   3240
-               TabIndex        =   354
+               TabIndex        =   359
                Top             =   480
                Width           =   495
             End
@@ -5186,7 +5250,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   6
                Left            =   3720
-               TabIndex        =   355
+               TabIndex        =   360
                Top             =   480
                Width           =   855
             End
@@ -5195,7 +5259,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   375
                Index           =   7
                Left            =   4560
-               TabIndex        =   356
+               TabIndex        =   361
                Top             =   410
                Width           =   1215
             End
@@ -5204,7 +5268,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   132
                Left            =   240
-               TabIndex        =   348
+               TabIndex        =   353
                Top             =   240
                Width           =   2535
             End
@@ -5214,7 +5278,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   975
             Index           =   24
             Left            =   120
-            TabIndex        =   339
+            TabIndex        =   344
             Top             =   1980
             Width           =   3015
             Begin VB.TextBox txtRobustNETOption 
@@ -5222,7 +5286,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   8
                Left            =   1920
-               TabIndex        =   345
+               TabIndex        =   350
                Text            =   "6"
                Top             =   540
                Width           =   900
@@ -5232,7 +5296,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   7
                Left            =   900
-               TabIndex        =   343
+               TabIndex        =   348
                Text            =   "6"
                Top             =   540
                Width           =   700
@@ -5242,7 +5306,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   6
                Left            =   900
-               TabIndex        =   341
+               TabIndex        =   346
                Text            =   "-6"
                Top             =   240
                Width           =   700
@@ -5252,7 +5316,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   2
                Left            =   1920
-               TabIndex        =   344
+               TabIndex        =   349
                Top             =   300
                Width           =   825
             End
@@ -5261,7 +5325,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   149
                Left            =   120
-               TabIndex        =   342
+               TabIndex        =   347
                Top             =   560
                Width           =   705
             End
@@ -5270,7 +5334,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   148
                Left            =   120
-               TabIndex        =   340
+               TabIndex        =   345
                Top             =   260
                Width           =   705
             End
@@ -5280,7 +5344,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   1335
             Index           =   21
             Left            =   3360
-            TabIndex        =   332
+            TabIndex        =   337
             Top             =   540
             Width           =   1935
             Begin VB.TextBox txtRobustNETOption 
@@ -5288,7 +5352,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   5
                Left            =   900
-               TabIndex        =   338
+               TabIndex        =   343
                Text            =   "0.2"
                Top             =   840
                Width           =   700
@@ -5298,7 +5362,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   4
                Left            =   900
-               TabIndex        =   336
+               TabIndex        =   341
                Text            =   "0.3"
                Top             =   540
                Width           =   700
@@ -5308,7 +5372,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   3
                Left            =   900
-               TabIndex        =   334
+               TabIndex        =   339
                Text            =   "-0.5"
                Top             =   240
                Width           =   700
@@ -5318,7 +5382,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   85
                Left            =   120
-               TabIndex        =   333
+               TabIndex        =   338
                Top             =   255
                Width           =   705
             End
@@ -5327,7 +5391,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   44
                Left            =   120
-               TabIndex        =   335
+               TabIndex        =   340
                Top             =   555
                Width           =   705
             End
@@ -5336,7 +5400,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   120
-               TabIndex        =   337
+               TabIndex        =   342
                Top             =   855
                Width           =   825
             End
@@ -5346,7 +5410,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   1335
             Index           =   20
             Left            =   120
-            TabIndex        =   323
+            TabIndex        =   328
             Top             =   540
             Width           =   3015
             Begin VB.OptionButton optRobustNETSlopeIncrement 
@@ -5354,7 +5418,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   1
                Left            =   1920
-               TabIndex        =   331
+               TabIndex        =   336
                Top             =   960
                Width           =   855
             End
@@ -5363,7 +5427,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   0
                Left            =   1920
-               TabIndex        =   330
+               TabIndex        =   335
                Top             =   720
                Value           =   -1  'True
                Width           =   975
@@ -5373,7 +5437,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   2
                Left            =   900
-               TabIndex        =   329
+               TabIndex        =   334
                Text            =   "75"
                Top             =   840
                Width           =   900
@@ -5383,7 +5447,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   1
                Left            =   900
-               TabIndex        =   327
+               TabIndex        =   332
                Text            =   "0.005"
                Top             =   540
                Width           =   900
@@ -5393,7 +5457,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   285
                Index           =   0
                Left            =   900
-               TabIndex        =   325
+               TabIndex        =   330
                Text            =   "0.00001"
                Top             =   240
                Width           =   900
@@ -5403,7 +5467,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   43
                Left            =   120
-               TabIndex        =   328
+               TabIndex        =   333
                Top             =   860
                Width           =   825
             End
@@ -5412,7 +5476,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   42
                Left            =   120
-               TabIndex        =   326
+               TabIndex        =   331
                Top             =   560
                Width           =   705
             End
@@ -5421,7 +5485,7 @@ Begin VB.Form frmEditAnalysisSettings
                Height          =   255
                Index           =   41
                Left            =   120
-               TabIndex        =   324
+               TabIndex        =   329
                Top             =   260
                Width           =   705
             End
@@ -5431,7 +5495,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   155
             Left            =   -74760
-            TabIndex        =   380
+            TabIndex        =   385
             Top             =   2880
             Width           =   1665
          End
@@ -5440,7 +5504,7 @@ Begin VB.Form frmEditAnalysisSettings
             Height          =   255
             Index           =   160
             Left            =   -74880
-            TabIndex        =   357
+            TabIndex        =   362
             Top             =   360
             Width           =   6345
          End
@@ -5448,7 +5512,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Predicted Iteration Count:"
             Height          =   495
             Left            =   3360
-            TabIndex        =   346
+            TabIndex        =   351
             Top             =   1980
             Width           =   2985
          End
@@ -5457,7 +5521,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Skip GANET Slope and Intercept Computation"
          Height          =   255
          Left            =   -74760
-         TabIndex        =   285
+         TabIndex        =   290
          Top             =   480
          Width           =   3735
       End
@@ -5466,7 +5530,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   240
          Index           =   156
          Left            =   -68400
-         TabIndex        =   382
+         TabIndex        =   387
          Top             =   3960
          Width           =   1695
       End
@@ -5474,7 +5538,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Mass Calibration Refinement Description"
          Height          =   975
          Left            =   -69120
-         TabIndex        =   587
+         TabIndex        =   592
          Top             =   6480
          Width           =   4695
       End
@@ -5484,7 +5548,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   375
          Index           =   136
          Left            =   -74760
-         TabIndex        =   580
+         TabIndex        =   585
          Top             =   5160
          Width           =   9855
       End
@@ -5493,7 +5557,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Most Abu Charge State Group Type"
          Height          =   255
          Index           =   61
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   75
          Top             =   2640
          Width           =   2775
@@ -5503,7 +5567,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   255
          Index           =   16
          Left            =   -74760
-         TabIndex        =   223
+         TabIndex        =   228
          Top             =   720
          Width           =   3375
       End
@@ -5511,7 +5575,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Tolerance Refinement explanation"
          Height          =   1215
          Left            =   -74685
-         TabIndex        =   401
+         TabIndex        =   406
          Top             =   600
          Width           =   9495
       End
@@ -5520,7 +5584,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   255
          Index           =   70
          Left            =   -74760
-         TabIndex        =   464
+         TabIndex        =   469
          Top             =   1020
          Width           =   1695
       End
@@ -5529,7 +5593,7 @@ Begin VB.Form frmEditAnalysisSettings
          ForeColor       =   &H00000080&
          Height          =   615
          Left            =   -74760
-         TabIndex        =   565
+         TabIndex        =   570
          Top             =   4560
          Width           =   3855
       End
@@ -5537,7 +5601,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Saving and exporting is enabled."
          Height          =   255
          Left            =   -74760
-         TabIndex        =   527
+         TabIndex        =   532
          Top             =   600
          Width           =   5535
       End
@@ -5545,7 +5609,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Maximum size of gap to interpolate:"
          Height          =   420
          Index           =   58
-         Left            =   -71760
+         Left            =   3240
          TabIndex        =   78
          Top             =   2160
          Width           =   1455
@@ -5554,7 +5618,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Class Molecular Mass"
          Height          =   255
          Index           =   64
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   71
          Top             =   1320
          Width           =   1575
@@ -5563,7 +5627,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Class Abundance"
          Height          =   255
          Index           =   63
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   73
          Top             =   1965
          Width           =   1335
@@ -5572,8 +5636,8 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "The above settings are overridden during PRISM-initiated VIPER Analysis by the values in T_Peak_Matching_Task"
          Height          =   255
          Index           =   121
-         Left            =   120
-         TabIndex        =   207
+         Left            =   -74880
+         TabIndex        =   212
          Top             =   3720
          Width           =   8415
       End
@@ -5581,7 +5645,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "UMC Search Mode"
          Height          =   255
          Index           =   115
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   69
          Top             =   980
          Width           =   1695
@@ -5602,14 +5666,14 @@ Begin VB.Form frmEditAnalysisSettings
       Index           =   43
       Left            =   120
       OLEDropMode     =   1  'Manual
-      TabIndex        =   553
+      TabIndex        =   558
       Top             =   8400
       Width           =   11055
       Begin VB.CommandButton cmdRevert 
          Caption         =   "Revert"
          Height          =   375
          Left            =   9480
-         TabIndex        =   561
+         TabIndex        =   566
          Top             =   0
          Width           =   1455
       End
@@ -5617,7 +5681,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Read from Settings File"
          Height          =   375
          Left            =   7320
-         TabIndex        =   559
+         TabIndex        =   564
          Top             =   0
          Width           =   2055
       End
@@ -5625,7 +5689,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Save to Settings File"
          Height          =   375
          Left            =   7320
-         TabIndex        =   560
+         TabIndex        =   565
          Top             =   480
          Width           =   2055
       End
@@ -5633,7 +5697,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Set to Defaults"
          Height          =   375
          Left            =   240
-         TabIndex        =   556
+         TabIndex        =   561
          Top             =   960
          Width           =   1455
       End
@@ -5641,7 +5705,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Close"
          Height          =   375
          Left            =   9480
-         TabIndex        =   562
+         TabIndex        =   567
          Top             =   480
          Width           =   1455
       End
@@ -5649,7 +5713,7 @@ Begin VB.Form frmEditAnalysisSettings
          Height          =   315
          Left            =   2280
          Style           =   2  'Dropdown List
-         TabIndex        =   558
+         TabIndex        =   563
          Top             =   360
          Width           =   4695
       End
@@ -5657,7 +5721,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Apply to Selected Gel"
          Height          =   375
          Left            =   0
-         TabIndex        =   555
+         TabIndex        =   560
          Top             =   480
          Width           =   2055
       End
@@ -5665,7 +5729,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Read from Selected Gel"
          Height          =   375
          Left            =   0
-         TabIndex        =   554
+         TabIndex        =   559
          Top             =   0
          Width           =   2055
       End
@@ -5673,7 +5737,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Gel file (in memory) to read or update"
          Height          =   255
          Left            =   2280
-         TabIndex        =   557
+         TabIndex        =   562
          Top             =   120
          Width           =   2775
       End
@@ -5682,7 +5746,7 @@ Begin VB.Form frmEditAnalysisSettings
       Caption         =   "Loading settings from .Ini file"
       Height          =   675
       Left            =   240
-      TabIndex        =   563
+      TabIndex        =   568
       Top             =   0
       Width           =   11055
    End
@@ -5766,6 +5830,7 @@ Private Enum uarUMCAutoRefineOptionsConstants
     uarTestLengthUsingScanRange = 4
     uarPercentMaxAbuToUseToGaugeLength = 5
     uarMinimumMemberCount = 6
+    uarRemoveMaxLengthPctAllScans = 7
 End Enum
 
 Private Enum eosEvenOddScanConstants
@@ -6112,8 +6177,12 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
         With .PrefsExpanded.UMCAutoRefineOptions
             SetCheckBox chkAutoRefineCheckbox(uarRemoveShort), .UMCAutoRefineRemoveCountLow
             SetCheckBox chkAutoRefineCheckbox(uarRemoveLong), .UMCAutoRefineRemoveCountHigh
+            SetCheckBox chkAutoRefineCheckbox(uarRemoveMaxLengthPctAllScans), .UMCAutoRefineRemoveMaxLengthPctAllScans
+            
             txtAutoRefineTextbox(uarRemoveShort) = Trim(.UMCAutoRefineMinLength)
             txtAutoRefineTextbox(uarRemoveLong) = Trim(.UMCAutoRefineMaxLength)
+            txtAutoRefineTextbox(uarRemoveMaxLengthPctAllScans) = Trim(.UMCAutoRefineMaxLengthPctAllScans)
+            
             txtAutoRefineTextbox(uarPercentMaxAbuToUseToGaugeLength) = Trim(.UMCAutoRefinePercentMaxAbuToUseForLength)
             
             SetCheckBox chkAutoRefineCheckbox(uarTestLengthUsingScanRange), .TestLengthUsingScanRange
@@ -7899,10 +7968,10 @@ On Error GoTo UpdateDynamicControlsErrorHandler
     
     ' Update the UMC auto refine length labels
     If mCurrentSettings.PrefsExpanded.UMCAutoRefineOptions.TestLengthUsingScanRange Then
-        chkAutoRefineCheckbox(uarRemoveShort).Caption = "Remove classes less than"
-        chkAutoRefineCheckbox(uarRemoveLong).Caption = "Remove classes more than"
-        lblAutoRefineLengthLabel(0) = "scans wide"
-        lblAutoRefineLengthLabel(1) = "scans wide"
+        chkAutoRefineCheckbox(uarRemoveShort).Caption = "Remove cls. with less than"
+        chkAutoRefineCheckbox(uarRemoveLong).Caption = "Remove cls. with length over"
+        lblAutoRefineLengthLabel(0) = "scans"
+        lblAutoRefineLengthLabel(1) = "scans"
         lblAutoRefineSpecialLabel(0).Enabled = True
     Else
         chkAutoRefineCheckbox(uarRemoveShort).Caption = "Remove cls. with less than"
@@ -8613,6 +8682,8 @@ Private Sub chkAutoRefineCheckbox_Click(Index As Integer)
     Case uarTestLengthUsingScanRange
         mCurrentSettings.PrefsExpanded.UMCAutoRefineOptions.TestLengthUsingScanRange = cChkBox(chkAutoRefineCheckbox(Index))
         UpdateDynamicControls
+    Case uarRemoveMaxLengthPctAllScans
+        mCurrentSettings.PrefsExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveMaxLengthPctAllScans = cChkBox(chkAutoRefineCheckbox(Index))
     Case Else
         Debug.Assert False
     End Select
@@ -9333,6 +9404,9 @@ Private Sub txtAutoRefineTextbox_LostFocus(Index As Integer)
     Case uarRemoveLong
         ValidateTextboxValueLng txtAutoRefineTextbox(Index), 1, 100000, 300
         mCurrentSettings.PrefsExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLength = CLngSafe(txtAutoRefineTextbox(Index))
+    Case uarRemoveMaxLengthPctAllScans
+        ValidateTextboxValueLng txtAutoRefineTextbox(Index), 1, 100, 20
+        mCurrentSettings.PrefsExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLengthPctAllScans = CLngSafe(txtAutoRefineTextbox(Index))
     Case uarPercentMaxAbuToUseToGaugeLength
         ValidateTextboxValueLng txtAutoRefineTextbox(Index), 1, 100, 25
         mCurrentSettings.PrefsExpanded.UMCAutoRefineOptions.UMCAutoRefinePercentMaxAbuToUseForLength = CLngSafe(txtAutoRefineTextbox(Index))

@@ -1,5 +1,17 @@
 VIPER Change Log
 
+Version 3.41 - Build 352; November 2, 2006
+	- Updated pair searching to enable "Require overlap at UMC Apexes" by default
+		- Increased the default range for overlap at apexes and overlap at edges to be 15 scans
+	- Updated the default weighting values used in the UMC Ion Networks UMC finding window
+		- Old defaults were set in 2003
+		- New defaults use 10 ppm instead of 0.025 Da for the mass constraint
+		- New defaults use Generic NET with weight factor 15 instead of Scan with weight factor 0.01
+		- New defaults also allow for more gaps in UMCs, which is consistent with much of the data we process; this should cut down on the number of "split UMCs"
+		- New defaults test the maximum UMC length using 15% of the total scans in the dataset, rather than using a fixed value (which was 400 by default)
+	- Added option Invert Visible points
+	- Updated MassTagsAccess.dll to specify Minimum PMT Quality Score of 1 by default
+
 Version 3.41 - Build 351; October 17, 2006
 	- Updated "Copy UMCs in View" to now include Peptide Prophet Probability for PMT tag matches
 	- Renamed several menu items to use LC-MS Features instead of (or in addition to) UMCs

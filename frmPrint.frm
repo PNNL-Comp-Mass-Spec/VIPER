@@ -2,7 +2,7 @@ VERSION 5.00
 Begin VB.Form frmPrint 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Print"
-   ClientHeight    =   2280
+   ClientHeight    =   2265
    ClientLeft      =   45
    ClientTop       =   330
    ClientWidth     =   5145
@@ -10,7 +10,7 @@ Begin VB.Form frmPrint
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   2280
+   ScaleHeight     =   2265
    ScaleWidth      =   5145
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  'CenterScreen
@@ -135,7 +135,7 @@ Dim CallerID As Long  'index of the calling gel
 Dim iCallType As Integer  '0 call from gel, 1 call from data, 2 call from data info
 
 Private Sub chkSetFND_Click()
-If chkSetFND.value = vbChecked Then
+If chkSetFND.Value = vbChecked Then
    bSetFileNameDate = True
 Else
    bSetFileNameDate = False
@@ -150,15 +150,15 @@ Private Sub cmdOK_Click()
 Dim i As Long
 Select Case lPrtRange
 Case 0  'print current only
-     If chkPrintWhat(0).value = vbChecked Then GelDrawPrinter CallerID
-     If chkPrintWhat(1).value = vbChecked Then PrintData1 CallerID
-     If chkPrintWhat(2).value = vbChecked Then PrintFileInfo CallerID, 3
+     If chkPrintWhat(0).Value = vbChecked Then GelDrawPrinter CallerID
+     If chkPrintWhat(1).Value = vbChecked Then PrintData1 CallerID
+     If chkPrintWhat(2).Value = vbChecked Then PrintFileInfo CallerID, 3
 Case 1  'print all
     For i = 1 To UBound(GelBody)
         If Not GelStatus(i).Deleted Then
-           If chkPrintWhat(0).value = vbChecked Then GelDrawPrinter i
-           If chkPrintWhat(1).value = vbChecked Then PrintData1 i
-           If chkPrintWhat(2).value = vbChecked Then PrintFileInfo i, 3
+           If chkPrintWhat(0).Value = vbChecked Then GelDrawPrinter i
+           If chkPrintWhat(1).Value = vbChecked Then PrintData1 i
+           If chkPrintWhat(2).Value = vbChecked Then PrintFileInfo i, 3
         End If
     Next i
 End Select
@@ -181,14 +181,14 @@ Select Case iCallType
 Case 0  'no restrictions
 Case 1  'data
      optRange(1).Enabled = False
-     chkPrintWhat(0).value = vbUnchecked
-     chkPrintWhat(1).value = vbChecked
+     chkPrintWhat(0).Value = vbUnchecked
+     chkPrintWhat(1).Value = vbChecked
      chkPrintWhat(0).Enabled = False
      chkPrintWhat(2).Enabled = False
 Case 2  'file info
      optRange(1).Enabled = False
-     chkPrintWhat(0).value = vbUnchecked
-     chkPrintWhat(2).value = vbChecked
+     chkPrintWhat(0).Value = vbUnchecked
+     chkPrintWhat(2).Value = vbChecked
      chkPrintWhat(0).Enabled = False
      chkPrintWhat(1).Enabled = False
 End Select

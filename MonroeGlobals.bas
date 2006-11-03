@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "October 17, 2006"
+Public Const APP_BUILD_DATE As String = "November 2, 2006"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -701,9 +701,13 @@ End Type
 Public Type udtUMCAutoRefineOptionsType
     UMCAutoRefineRemoveCountLow As Boolean
     UMCAutoRefineRemoveCountHigh As Boolean
+    UMCAutoRefineRemoveMaxLengthPctAllScans As Boolean
+    
     UMCAutoRefineMinLength As Long
     UMCAutoRefineMaxLength As Long                      ' Maximum UMC size in number of members or in scan width, depending on TestLengthUsingScanRange
+    UMCAutoRefineMaxLengthPctAllScans As Long           ' A percentage, between 1 and 100, that is multiplied by the total scan range (MaxScan - MinScan) to determine the maximum allowable UMC length; only used if .UMCAutoRefineRemoveMaxLengthPctAllScans = True
     UMCAutoRefinePercentMaxAbuToUseForLength As Long    ' The maximum abundance of the UMC is taken times this value; we then find the left-most and right-most points in the UMC that are greater than this value.  Those locations are used to judge the UMC width during auto refinement
+    
     TestLengthUsingScanRange As Boolean
     MinMemberCountWhenUsingScanRange As Long
     

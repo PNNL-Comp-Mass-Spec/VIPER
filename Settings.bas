@@ -647,8 +647,12 @@ On Error GoTo LoadSettingsFileHandler
     With udtPrefsExpanded.UMCAutoRefineOptions
         .UMCAutoRefineRemoveCountLow = GetIniFileSettingBln(IniStuff, "UMCDef", "UMCAutoRefineRemoveCountLow", .UMCAutoRefineRemoveCountLow)
         .UMCAutoRefineRemoveCountHigh = GetIniFileSettingBln(IniStuff, "UMCDef", "UMCAutoRefineRemoveCountHigh", .UMCAutoRefineRemoveCountHigh)
+        .UMCAutoRefineRemoveMaxLengthPctAllScans = GetIniFileSettingBln(IniStuff, "UMCDef", "UMCAutoRefineRemoveMaxLengthPctAllScans", .UMCAutoRefineRemoveMaxLengthPctAllScans)
+        
         .UMCAutoRefineMinLength = GetIniFileSettingLng(IniStuff, "UMCDef", "UMCAutoRefineMinLength", .UMCAutoRefineMinLength)
         .UMCAutoRefineMaxLength = GetIniFileSettingLng(IniStuff, "UMCDef", "UMCAutoRefineMaxLength", .UMCAutoRefineMaxLength)
+        .UMCAutoRefineMaxLengthPctAllScans = GetIniFileSettingLng(IniStuff, "UMCDef", "UMCAutoRefineMaxLengthPctAllScans", .UMCAutoRefineMaxLengthPctAllScans)
+        
         .UMCAutoRefinePercentMaxAbuToUseForLength = GetIniFileSettingLng(IniStuff, "UMCDef", "UMCAutoRefinePercentMaxAbuToUseForLength", .UMCAutoRefinePercentMaxAbuToUseForLength)
         .TestLengthUsingScanRange = GetIniFileSettingBln(IniStuff, "UMCDef", "TestLengthUsingScanRange", .TestLengthUsingScanRange)
         .MinMemberCountWhenUsingScanRange = GetIniFileSettingLng(IniStuff, "UMCDef", "MinMemberCountWhenUsingScanRange", .MinMemberCountWhenUsingScanRange)
@@ -1629,8 +1633,8 @@ On Error GoTo SaveSettingsFileHandler
     ' I don't check for errors again after this
     If Not blnSuccess Then GoTo SaveSettingsFileHandler
     
-    ReDim strKeys(0 To 39)
-    ReDim strValues(0 To 39)
+    ReDim strKeys(0 To 41)
+    ReDim strValues(0 To 41)
         
     ' UMC options stored in udtPrefsExpanded.AutoAnalysisOptions
     With udtPrefsExpanded.AutoAnalysisOptions
@@ -1665,24 +1669,28 @@ On Error GoTo SaveSettingsFileHandler
     With udtPrefsExpanded.UMCAutoRefineOptions
         strKeys(21) = "UMCAutoRefineRemoveCountLow": strValues(21) = .UMCAutoRefineRemoveCountLow
         strKeys(22) = "UMCAutoRefineRemoveCountHigh": strValues(22) = .UMCAutoRefineRemoveCountHigh
-        strKeys(23) = "UMCAutoRefineMinLength": strValues(23) = .UMCAutoRefineMinLength
-        strKeys(24) = "UMCAutoRefineMaxLength": strValues(24) = .UMCAutoRefineMaxLength
-        strKeys(25) = "UMCAutoRefinePercentMaxAbuToUseForLength": strValues(25) = .UMCAutoRefinePercentMaxAbuToUseForLength
-        strKeys(26) = "TestLengthUsingScanRange": strValues(26) = .TestLengthUsingScanRange
-        strKeys(27) = "MinMemberCountWhenUsingScanRange": strValues(27) = .MinMemberCountWhenUsingScanRange
-        strKeys(28) = "UMCAutoRefineRemoveAbundanceLow": strValues(28) = .UMCAutoRefineRemoveAbundanceLow
-        strKeys(29) = "UMCAutoRefineRemoveAbundanceHigh": strValues(29) = .UMCAutoRefineRemoveAbundanceHigh
-        strKeys(30) = "UMCAutoRefinePctLowAbundance": strValues(30) = .UMCAutoRefinePctLowAbundance
-        strKeys(31) = "UMCAutoRefinePctHighAbundance": strValues(31) = .UMCAutoRefinePctHighAbundance
-        strKeys(32) = "SplitUMCsByAbundance": strValues(32) = .SplitUMCsByAbundance
+        strKeys(23) = "UMCAutoRefineRemoveMaxLengthPctAllScans": strValues(23) = .UMCAutoRefineRemoveMaxLengthPctAllScans
+        
+        strKeys(24) = "UMCAutoRefineMinLength": strValues(24) = .UMCAutoRefineMinLength
+        strKeys(25) = "UMCAutoRefineMaxLength": strValues(25) = .UMCAutoRefineMaxLength
+        strKeys(26) = "UMCAutoRefineMaxLengthPctAllScans": strValues(26) = .UMCAutoRefineMaxLengthPctAllScans
+        
+        strKeys(27) = "UMCAutoRefinePercentMaxAbuToUseForLength": strValues(27) = .UMCAutoRefinePercentMaxAbuToUseForLength
+        strKeys(28) = "TestLengthUsingScanRange": strValues(28) = .TestLengthUsingScanRange
+        strKeys(29) = "MinMemberCountWhenUsingScanRange": strValues(29) = .MinMemberCountWhenUsingScanRange
+        strKeys(30) = "UMCAutoRefineRemoveAbundanceLow": strValues(30) = .UMCAutoRefineRemoveAbundanceLow
+        strKeys(31) = "UMCAutoRefineRemoveAbundanceHigh": strValues(31) = .UMCAutoRefineRemoveAbundanceHigh
+        strKeys(32) = "UMCAutoRefinePctLowAbundance": strValues(32) = .UMCAutoRefinePctLowAbundance
+        strKeys(33) = "UMCAutoRefinePctHighAbundance": strValues(33) = .UMCAutoRefinePctHighAbundance
+        strKeys(34) = "SplitUMCsByAbundance": strValues(34) = .SplitUMCsByAbundance
         With .SplitUMCOptions
-            strKeys(33) = "MinimumDifferenceInAveragePpmMassToSplit": strValues(33) = .MinimumDifferenceInAveragePpmMassToSplit
-            strKeys(34) = "MaximumPeakCountToSplitUMC": strValues(34) = .MaximumPeakCountToSplitUMC
-            strKeys(35) = "PeakDetectIntensityThresholdPercentageOfMaximum": strValues(35) = .PeakDetectIntensityThresholdPercentageOfMaximum
-            strKeys(36) = "PeakDetectIntensityThresholdAbsoluteMinimum": strValues(36) = .PeakDetectIntensityThresholdAbsoluteMinimum
-            strKeys(37) = "PeakWidthPointsMinimum": strValues(37) = .PeakWidthPointsMinimum
-            strKeys(38) = "PeakWidthInSigma": strValues(38) = .PeakWidthInSigma
-            strKeys(39) = "ScanGapBehavior": strValues(39) = .ScanGapBehavior
+            strKeys(35) = "MinimumDifferenceInAveragePpmMassToSplit": strValues(35) = .MinimumDifferenceInAveragePpmMassToSplit
+            strKeys(36) = "MaximumPeakCountToSplitUMC": strValues(36) = .MaximumPeakCountToSplitUMC
+            strKeys(37) = "PeakDetectIntensityThresholdPercentageOfMaximum": strValues(37) = .PeakDetectIntensityThresholdPercentageOfMaximum
+            strKeys(38) = "PeakDetectIntensityThresholdAbsoluteMinimum": strValues(38) = .PeakDetectIntensityThresholdAbsoluteMinimum
+            strKeys(39) = "PeakWidthPointsMinimum": strValues(39) = .PeakWidthPointsMinimum
+            strKeys(40) = "PeakWidthInSigma": strValues(40) = .PeakWidthInSigma
+            strKeys(41) = "ScanGapBehavior": strValues(41) = .ScanGapBehavior
         End With
     End With
     IniStuff.WriteSection "UMCDef", strKeys(), strValues()
@@ -3418,10 +3426,10 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .MaxDifferenceInNumberOfLightHeavyLabels = 1
                 
                     .RequireUMCOverlap = True
-                    .RequireUMCOverlapAtApex = False
+                    .RequireUMCOverlapAtApex = True
                     
-                    .ScanTolerance = 5
-                    .ScanToleranceAtApex = 10
+                    .ScanTolerance = 15
+                    .ScanToleranceAtApex = 15
                     
                     .ERInclusionMin = -5
                     .ERInclusionMax = 5
@@ -3730,13 +3738,18 @@ Public Sub ResetUMCAutoRefineOptions(udtAutoRefineOptions As udtUMCAutoRefineOpt
     
     With udtAutoRefineOptions
         .UMCAutoRefineRemoveCountLow = True
-        .UMCAutoRefineRemoveCountHigh = True
-        .UMCAutoRefineMinLength = 2
+        .UMCAutoRefineMinLength = 3
+        
+        .UMCAutoRefineRemoveCountHigh = False
         .UMCAutoRefineMaxLength = 400
+        
+        .UMCAutoRefineRemoveMaxLengthPctAllScans = True
+        .UMCAutoRefineMaxLengthPctAllScans = 15
+        
         .UMCAutoRefinePercentMaxAbuToUseForLength = 33
         
         .TestLengthUsingScanRange = True
-        .MinMemberCountWhenUsingScanRange = 2
+        .MinMemberCountWhenUsingScanRange = 3
         
         .UMCAutoRefineRemoveAbundanceLow = False
         .UMCAutoRefineRemoveAbundanceHigh = False

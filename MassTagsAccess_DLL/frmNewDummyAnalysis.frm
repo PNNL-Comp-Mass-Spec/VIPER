@@ -131,6 +131,21 @@ Private MTDBInfo() As udtMTDBInfoType
 Private MTDBCntVisible As Long
 Private MTDBNameListPointers() As Long          ' Used to display database names sorted properly
 
+Private Sub EditAddName(ByRef objCol As Collection, ByVal PairName As String, ByVal NewValue As String)
+'-------------------------------------------------------------------------
+'modifies value of name value pair; if pair does not exist adds it
+'-------------------------------------------------------------------------
+Dim nv As NameValue
+On Error Resume Next
+objCol.Item(PairName).Value = NewValue
+If Err Then
+   Set nv = New NameValue
+   nv.Name = PairName
+   nv.Value = NewValue
+   objCol.Add nv, nv.Name
+End If
+End Sub
+
 Private Sub PopulateDatabaseCombobox()
     Dim i As Long
     Dim blnShowFrozenDBs As Boolean
@@ -269,6 +284,10 @@ If ArgCnt > 0 Then
        End If   'do nothing if name is missing
    Next i
 End If
+
+Const NAME_MINIMUM_PMT_QUALITY_SCORE As String = "MinimumPMTQualityScore"
+EditAddName fAnalysis.MTDB.DBStuff, NAME_MINIMUM_PMT_QUALITY_SCORE, "1"
+
 End Sub
 
 Private Function InitDBConnection() As Boolean

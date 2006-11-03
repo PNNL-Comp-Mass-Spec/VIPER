@@ -644,6 +644,9 @@ Begin VB.Form frmGraph
       Begin VB.Menu mnu2lsShowUMCOnly 
          Caption         =   "Show &UMC Points"
       End
+      Begin VB.Menu mnu2lsInvertVisiblePoints 
+         Caption         =   "Invert &Visible Points"
+      End
       Begin VB.Menu mnu2lsSel 
          Caption         =   "S&election"
          Begin VB.Menu mnu2lsAddVisiblePointsToSelected 
@@ -1175,6 +1178,51 @@ End If
 csMyCooSys.InitFNType
 csMyCooSys.CoordinateDraw
 picGraph.Refresh
+End Sub
+
+Private Sub PointVisiblilityShowAll()
+    Dim i As Integer
+    lAction = glNoAction
+    
+    ' Set all points to visible (positive ids) and clear selection
+    With GelData(nMyIndex)
+         For i = 1 To MAX_FILTER_COUNT
+            .DataFilter(i, 0) = False
+         Next i
+         .DataFilter(fltID, 1) = 0      'identity
+         
+         GelCSIncludeAll (nMyIndex)
+         GelIsoIncludeAll (nMyIndex)
+    End With
+    picGraph.Refresh
+End Sub
+
+Private Sub PointVisibilityShowUMCPoints()
+    lAction = glNoAction
+    
+    If GelUMC(nMyIndex).UMCCnt > 0 Then
+       Call fUMCSpotsOnly(nMyIndex)
+       picGraph.Refresh
+    Else
+       MsgBox "UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
+    End If
+End Sub
+
+Private Sub PointVisiblilityInvert()
+    Dim i As Integer
+    lAction = glNoAction
+    
+    ' Invert the visible points and clear selection
+    With GelData(nMyIndex)
+         For i = 1 To MAX_FILTER_COUNT
+            .DataFilter(i, 0) = False
+         Next i
+         .DataFilter(fltID, 1) = 0      'identity
+         
+         GelCSInvertVisible (nMyIndex)
+         GelIsoInvertVisible (nMyIndex)
+    End With
+    picGraph.Refresh
 End Sub
 
 Public Sub SetXAxisLabelType(blnNETLabels As Boolean)
@@ -2020,6 +2068,10 @@ Private Sub mnu2lsFilterPointsByMass_Click()
     frmExcludeMassRange.Show vbModal
 End Sub
 
+Private Sub mnu2lsInvertVisiblePoints_Click()
+    PointVisiblilityInvert
+End Sub
+
 Private Sub mnu2lsLockSelection_Click()
 mnu2lsLockSelection.Checked = Not mnu2lsLockSelection.Checked
 fgSelProtected = mnu2lsLockSelection.Checked
@@ -2625,18 +2677,7 @@ End If
 End Sub
 
 Private Sub mnu2lsShowAll_Click()
-Dim i As Integer
-lAction = glNoAction
-'set all points to visible (positive ids) and clear selection
-With GelData(nMyIndex)
-     For i = 1 To MAX_FILTER_COUNT
-        .DataFilter(i, 0) = False
-     Next i
-     .DataFilter(fltID, 1) = 0      'identity
-     GelCSIncludeAll (nMyIndex)
-     GelIsoIncludeAll (nMyIndex)
-End With
-picGraph.Refresh
+    PointVisiblilityShowAll
 End Sub
 
 Private Sub mnu2lsShowAllData_Click()
@@ -2679,13 +2720,7 @@ Private Sub mnu2lsShowSpectrumForLastSelectedPt_Click()
 End Sub
 
 Private Sub mnu2lsShowUMCOnly_Click()
-lAction = glNoAction
-If GelUMC(nMyIndex).UMCCnt > 0 Then
-   Call fUMCSpotsOnly(nMyIndex)
-   picGraph.Refresh
-Else
-   MsgBox "UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
-End If
+    PointVisibilityShowUMCPoints
 End Sub
 
 Private Sub mnu2LsZoomIn_Click()

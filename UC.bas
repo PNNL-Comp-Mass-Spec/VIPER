@@ -548,7 +548,9 @@ On Error GoTo AutoRefineUMCsErrorHandler
     With glbPreferencesExpanded.UMCAutoRefineOptions
         If GelUMC(lngGelIndex).UMCCnt > 0 And _
            (.UMCAutoRefineRemoveAbundanceHigh Or .UMCAutoRefineRemoveAbundanceLow Or _
-            .UMCAutoRefineRemoveCountLow Or .UMCAutoRefineRemoveCountHigh) Then
+            .UMCAutoRefineRemoveCountLow Or .UMCAutoRefineRemoveCountHigh Or _
+            .UMCAutoRefineRemoveMaxLengthPctAllScans) Then
+            
             ' Auto refine the results
             ' Use frmVisUMC to do this
             
@@ -2476,6 +2478,13 @@ With GelUMC(IndDis)
       End With
   Next i
 End With
+
+If False Then
+    For i = 1 To GelDraw(IndDis).IsoCount
+        GelDraw(IndDis).IsoID(i) = -(GelDraw(IndDis).IsoID(i))
+    Next i
+End If
+
 fUMCSpotsOnly = True
 exit_fUMCSpotsOnly:
 End Function

@@ -1431,7 +1431,7 @@ With udtUMCDef
     .UMCMinCnt = 3
     .UMCMaxCnt = 100
     .InterpolateGaps = True
-    .InterpolateMaxGapSize = 3
+    .InterpolateMaxGapSize = 4
     .InterpolationType = 0            ' Currently only one interpolation method: 0
     
     .ChargeStateStatsRepType = UMCChargeStateGroupConstants.UMCCSGHighestSum
@@ -1440,19 +1440,21 @@ End With
 End Sub
 
 Public Sub SetDefaultUMCIonNetDef(ByRef udtUMCIonNetDef As UMCIonNetDefinition)
-With udtUMCIonNetDef
-    .MetricType = METRIC_EUCLIDEAN
-    .NETType = Net_SPIDER_66
-    .NetDim = 5
-    .NetActualDim = 5
-    .TooDistant = 0.1
-    ReDim .MetricData(.NetDim - 1)
-    .MetricData(0).Use = True:  .MetricData(0).DataType = DATA_MONO_MW:   .MetricData(0).WeightFactor = 0.5:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 0.025: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_DA
-    .MetricData(1).Use = True:  .MetricData(1).DataType = DATA_AVG_MW:    .MetricData(1).WeightFactor = 0.5:   .MetricData(1).ConstraintType = Net_CT_LT:       .MetricData(1).ConstraintValue = 0.025: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_DA
-    .MetricData(2).Use = True:  .MetricData(2).DataType = DATA_LOG_ABU:   .MetricData(2).WeightFactor = 0.1:   .MetricData(2).ConstraintType = Net_CT_None:     .MetricData(2).ConstraintValue = 0.1:   .MetricData(2).ConstraintUnits = DATA_UNITS_MASS_DA
-    .MetricData(3).Use = True:  .MetricData(3).DataType = DATA_SCAN:      .MetricData(3).WeightFactor = 0.01:   .MetricData(3).ConstraintType = Net_CT_None:    .MetricData(3).ConstraintValue = 0.01:  .MetricData(3).ConstraintUnits = DATA_UNITS_MASS_DA
-    .MetricData(4).Use = True:  .MetricData(4).DataType = DATA_FIT:       .MetricData(4).WeightFactor = 0.1:    .MetricData(4).ConstraintType = Net_CT_None:    .MetricData(4).ConstraintValue = 0.01:  .MetricData(4).ConstraintUnits = DATA_UNITS_MASS_DA
-End With
+    ' These defaults were set in November 2006
+    ' See SetOldDefaultUMCIonNetDef for the previous defaults
+    With udtUMCIonNetDef
+        .MetricType = METRIC_EUCLIDEAN
+        .NETType = Net_SPIDER_66
+        .NetDim = 5
+        .NetActualDim = 5
+        .TooDistant = 0.1
+        ReDim .MetricData(.NetDim - 1)
+        .MetricData(0).Use = True:  .MetricData(0).DataType = DATA_MONO_MW:   .MetricData(0).WeightFactor = 0.01:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 10: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_PPM
+        .MetricData(1).Use = False:  .MetricData(1).DataType = DATA_AVG_MW:    .MetricData(1).WeightFactor = 0.01:   .MetricData(1).ConstraintType = Net_CT_LT:       .MetricData(1).ConstraintValue = 10: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_PPM
+        .MetricData(2).Use = True:  .MetricData(2).DataType = DATA_LOG_ABU:   .MetricData(2).WeightFactor = 0.1:   .MetricData(2).ConstraintType = Net_CT_None:     .MetricData(2).ConstraintValue = 0.1:   .MetricData(2).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(3).Use = True:  .MetricData(3).DataType = DATA_GENERIC_NET:      .MetricData(3).WeightFactor = 15:   .MetricData(3).ConstraintType = Net_CT_None:    .MetricData(3).ConstraintValue = 0.01:  .MetricData(3).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(4).Use = True:  .MetricData(4).DataType = DATA_FIT:       .MetricData(4).WeightFactor = 0.1:    .MetricData(4).ConstraintType = Net_CT_None:    .MetricData(4).ConstraintValue = 0.01:  .MetricData(4).ConstraintUnits = DATA_UNITS_MASS_DA
+    End With
 End Sub
 
 Public Sub SetDefaultSearchAMTDef(ByRef udtAMTDef As SearchAMTDefinition, ByRef udtUMCNetAdjDef As NetAdjDefinition)

@@ -3,16 +3,16 @@ Begin VB.Form frmUMCDltPairs
    BackColor       =   &H00C0FFC0&
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "UMC Delta Pairing Analysis"
-   ClientHeight    =   7830
+   ClientHeight    =   9210
    ClientLeft      =   45
    ClientTop       =   615
-   ClientWidth     =   5535
+   ClientWidth     =   5445
    Icon            =   "frmUMCDltPairs.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   7830
-   ScaleWidth      =   5535
+   ScaleHeight     =   9210
+   ScaleWidth      =   5445
    ShowInTaskbar   =   0   'False
    StartUpPosition =   1  'CenterOwner
    Begin VB.CommandButton cmdResetToDefaults 
@@ -155,7 +155,7 @@ Begin VB.Form frmUMCDltPairs
       Height          =   975
       Left            =   120
       TabIndex        =   37
-      Top             =   4080
+      Top             =   4680
       Width           =   5175
       Begin VB.TextBox txtERMin 
          Alignment       =   1  'Right Justify
@@ -211,7 +211,7 @@ Begin VB.Form frmUMCDltPairs
       Height          =   2535
       Left            =   120
       TabIndex        =   43
-      Top             =   5160
+      Top             =   5760
       Width           =   5175
       Begin VB.CheckBox chkOutlierRemovalUsesSymmetricERs 
          BackColor       =   &H00C0FFC0&
@@ -323,7 +323,7 @@ Begin VB.Form frmUMCDltPairs
    Begin VB.Frame fraToleranceOptions 
       BackColor       =   &H00C0FFC0&
       Caption         =   "Tolerance Options"
-      Height          =   1335
+      Height          =   1935
       Left            =   120
       TabIndex        =   29
       Top             =   2640
@@ -342,8 +342,8 @@ Begin VB.Form frmUMCDltPairs
          Height          =   285
          Left            =   3840
          TabIndex        =   36
-         Text            =   "10"
-         Top             =   945
+         Text            =   "15"
+         Top             =   1560
          Width           =   495
       End
       Begin VB.TextBox txtPairsScanTolEdge 
@@ -351,7 +351,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   285
          Left            =   3840
          TabIndex        =   34
-         Text            =   "5"
+         Text            =   "15"
          Top             =   600
          Width           =   495
       End
@@ -362,7 +362,8 @@ Begin VB.Form frmUMCDltPairs
          Left            =   120
          TabIndex        =   35
          ToolTipText     =   "If checked pair classes have to show at least once in the same scan"
-         Top             =   960
+         Top             =   1560
+         Value           =   1  'Checked
          Width           =   3600
       End
       Begin VB.CheckBox chkPairsRequireOverlapAtEdge 
@@ -375,6 +376,16 @@ Begin VB.Form frmUMCDltPairs
          Top             =   615
          Value           =   1  'Checked
          Width           =   3600
+      End
+      Begin VB.Label lblPairsRequireOverlapAtEdge 
+         BackStyle       =   0  'Transparent
+         Caption         =   $"frmUMCDltPairs.frx":030A
+         Height          =   615
+         Index           =   0
+         Left            =   240
+         TabIndex        =   58
+         Top             =   920
+         Width           =   4815
       End
       Begin VB.Label lblUnits 
          BackStyle       =   0  'Transparent
@@ -554,7 +565,7 @@ Begin VB.Form frmUMCDltPairs
       Height          =   840
       Left            =   120
       TabIndex        =   54
-      Top             =   7680
+      Top             =   8280
       Width           =   5295
    End
    Begin VB.Menu mnuFunction 
