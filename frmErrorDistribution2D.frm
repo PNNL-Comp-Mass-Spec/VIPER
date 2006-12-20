@@ -1,14 +1,14 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmErrorDistribution2DLoadedData 
    BackColor       =   &H00FFFFFF&
    Caption         =   "Tolerance Refinement (Mass and GANET Error Plots)"
-   ClientHeight    =   8400
+   ClientHeight    =   8730
    ClientLeft      =   165
-   ClientTop       =   840
+   ClientTop       =   855
    ClientWidth     =   13155
    LinkTopic       =   "Form1"
-   ScaleHeight     =   8400
+   ScaleHeight     =   8730
    ScaleWidth      =   13155
    StartUpPosition =   3  'Windows Default
    Begin VB.Frame fraControlsAndPlotContainer 
@@ -17,14 +17,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
       Caption         =   "Frame1"
       Height          =   6200
       Left            =   5880
-      TabIndex        =   51
+      TabIndex        =   68
       Top             =   0
       Width           =   7000
       Begin VB.TextBox txtMaximumAbundance 
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   5640
-         TabIndex        =   59
+         TabIndex        =   76
          Text            =   "0"
          Top             =   960
          Width           =   855
@@ -33,7 +33,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   5640
-         TabIndex        =   57
+         TabIndex        =   74
          Text            =   "0"
          Top             =   600
          Width           =   855
@@ -43,7 +43,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Use UMC class stats"
          Height          =   255
          Left            =   3720
-         TabIndex        =   55
+         TabIndex        =   72
          Top             =   240
          Width           =   2535
       End
@@ -52,7 +52,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Include Internal Standard matches"
          Height          =   255
          Left            =   3720
-         TabIndex        =   54
+         TabIndex        =   71
          Top             =   0
          Value           =   1  'Checked
          Width           =   3015
@@ -62,7 +62,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Options"
          Height          =   2295
          Left            =   -120
-         TabIndex        =   64
+         TabIndex        =   81
          Top             =   1200
          Width           =   6615
          Begin VB.CheckBox chkShowPeakEdges 
@@ -70,14 +70,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Peak Edges"
             Height          =   255
             Left            =   2520
-            TabIndex        =   71
+            TabIndex        =   88
             Top             =   960
             Width           =   2175
          End
          Begin VB.TextBox txtMassRangePPM 
             Height          =   285
             Left            =   2040
-            TabIndex        =   77
+            TabIndex        =   94
             Text            =   "100"
             Top             =   1200
             Width           =   735
@@ -85,7 +85,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtButterworthFrequency 
             Height          =   285
             Left            =   2760
-            TabIndex        =   87
+            TabIndex        =   104
             Text            =   "0.15"
             Top             =   1920
             Width           =   735
@@ -95,7 +95,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Smoothed Data"
             Height          =   255
             Left            =   240
-            TabIndex        =   68
+            TabIndex        =   85
             Top             =   960
             Width           =   2175
          End
@@ -104,7 +104,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Center Y Axis"
             Height          =   255
             Left            =   2520
-            TabIndex        =   70
+            TabIndex        =   87
             Top             =   480
             Value           =   1  'Checked
             Width           =   1335
@@ -114,7 +114,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Connect Points with Line"
             Height          =   255
             Left            =   240
-            TabIndex        =   67
+            TabIndex        =   84
             Top             =   720
             Value           =   1  'Checked
             Width           =   2175
@@ -124,7 +124,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Gridlines"
             Height          =   255
             Left            =   2520
-            TabIndex        =   69
+            TabIndex        =   86
             Top             =   240
             Value           =   1  'Checked
             Width           =   1455
@@ -132,7 +132,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGANETRange 
             Height          =   285
             Left            =   2040
-            TabIndex        =   83
+            TabIndex        =   100
             Text            =   "0.3"
             Top             =   1560
             Width           =   735
@@ -140,7 +140,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGANETBinSize 
             Height          =   285
             Left            =   5280
-            TabIndex        =   85
+            TabIndex        =   102
             Text            =   "0.005"
             Top             =   1560
             Width           =   735
@@ -148,7 +148,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtMassBinSizePPM 
             Height          =   285
             Left            =   5280
-            TabIndex        =   80
+            TabIndex        =   97
             Text            =   "0.5"
             Top             =   1200
             Width           =   735
@@ -156,7 +156,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGraphPointSize 
             Height          =   285
             Left            =   5280
-            TabIndex        =   73
+            TabIndex        =   90
             Text            =   "2"
             Top             =   240
             Width           =   735
@@ -164,7 +164,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGraphLineWidth 
             Height          =   285
             Left            =   5280
-            TabIndex        =   75
+            TabIndex        =   92
             Text            =   "3"
             Top             =   600
             Width           =   735
@@ -174,7 +174,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Auto Scale X Range"
             Height          =   255
             Left            =   240
-            TabIndex        =   65
+            TabIndex        =   82
             Top             =   240
             Value           =   1  'Checked
             Width           =   1815
@@ -184,7 +184,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Point Symbols"
             Height          =   255
             Left            =   240
-            TabIndex        =   66
+            TabIndex        =   83
             Top             =   480
             Value           =   1  'Checked
             Width           =   1815
@@ -194,7 +194,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Butterworth Sampling Frequency"
             Height          =   255
             Left            =   240
-            TabIndex        =   86
+            TabIndex        =   103
             Top             =   1950
             Width           =   2415
          End
@@ -203,7 +203,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Mass Range (± 0)"
             Height          =   255
             Left            =   240
-            TabIndex        =   76
+            TabIndex        =   93
             Top             =   1230
             Width           =   1575
          End
@@ -212,7 +212,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Left            =   2880
-            TabIndex        =   78
+            TabIndex        =   95
             Top             =   1230
             Width           =   495
          End
@@ -221,7 +221,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "GANET Range (± 0)"
             Height          =   255
             Left            =   240
-            TabIndex        =   82
+            TabIndex        =   99
             Top             =   1590
             Width           =   1575
          End
@@ -230,7 +230,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "GANET Bin Size"
             Height          =   255
             Left            =   3840
-            TabIndex        =   84
+            TabIndex        =   101
             Top             =   1590
             Width           =   1335
          End
@@ -239,7 +239,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Left            =   6120
-            TabIndex        =   81
+            TabIndex        =   98
             Top             =   1230
             Width           =   495
          End
@@ -248,7 +248,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Mass Bin Size"
             Height          =   255
             Left            =   3840
-            TabIndex        =   79
+            TabIndex        =   96
             Top             =   1230
             Width           =   1335
          End
@@ -257,7 +257,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Point Size"
             Height          =   255
             Left            =   4080
-            TabIndex        =   72
+            TabIndex        =   89
             Top             =   270
             Width           =   855
          End
@@ -266,7 +266,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Line Width"
             Height          =   255
             Left            =   4080
-            TabIndex        =   74
+            TabIndex        =   91
             Top             =   630
             Width           =   975
          End
@@ -276,7 +276,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Show Tolerance Refinement Controls"
          Height          =   255
          Left            =   0
-         TabIndex        =   53
+         TabIndex        =   70
          Top             =   400
          Value           =   1  'Checked
          Width           =   3015
@@ -285,14 +285,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Height          =   315
          Left            =   0
          Style           =   2  'Dropdown List
-         TabIndex        =   52
+         TabIndex        =   69
          Top             =   0
          Width           =   3015
       End
       Begin VIPER.ctlSpectraPlotter ctlPlotter 
          Height          =   4815
          Left            =   0
-         TabIndex        =   63
+         TabIndex        =   80
          Top             =   1320
          Width           =   6855
          _ExtentX        =   12091
@@ -304,7 +304,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Maximum Abundance"
          Height          =   195
          Left            =   3840
-         TabIndex        =   58
+         TabIndex        =   75
          Top             =   960
          Width           =   1695
       End
@@ -314,7 +314,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Minimum SLiC"
          Height          =   195
          Left            =   4320
-         TabIndex        =   56
+         TabIndex        =   73
          Top             =   630
          Width           =   1215
       End
@@ -323,7 +323,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Loading..."
          Height          =   495
          Left            =   1080
-         TabIndex        =   61
+         TabIndex        =   78
          Top             =   720
          Width           =   3375
       End
@@ -332,7 +332,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "MTDB Status:"
          Height          =   255
          Left            =   0
-         TabIndex        =   60
+         TabIndex        =   77
          ToolTipText     =   "Status of the MT tag database"
          Top             =   720
          Width           =   1095
@@ -342,7 +342,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Ready"
          Height          =   255
          Left            =   0
-         TabIndex        =   62
+         TabIndex        =   79
          Top             =   960
          Width           =   3735
       End
@@ -360,7 +360,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Relative Risk Statistics"
          Height          =   735
          Left            =   120
-         TabIndex        =   95
+         TabIndex        =   107
          Top             =   6120
          Width           =   3015
          Begin VB.TextBox txtRelativeRiskStatistics 
@@ -369,7 +369,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   96
+            TabIndex        =   108
             Top             =   220
             Width           =   2835
          End
@@ -379,7 +379,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "UMC Mass Statistics"
          Height          =   1395
          Left            =   3240
-         TabIndex        =   88
+         TabIndex        =   105
          Top             =   4680
          Width           =   2550
          Begin VB.TextBox txtUMCMassStatistics 
@@ -388,7 +388,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   89
+            TabIndex        =   106
             Text            =   "frmErrorDistribution2D.frx":0000
             Top             =   280
             Width           =   2355
@@ -399,7 +399,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Current DB Search Tolerances"
          Height          =   745
          Left            =   3240
-         TabIndex        =   45
+         TabIndex        =   62
          Top             =   6120
          Width           =   2535
          Begin VB.TextBox txtDBSearchMassTolerances 
@@ -408,7 +408,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   46
+            TabIndex        =   63
             Text            =   "frmErrorDistribution2D.frx":0051
             Top             =   220
             Width           =   2355
@@ -417,18 +417,18 @@ Begin VB.Form frmErrorDistribution2DLoadedData
       Begin VB.Frame fraNETCalibrationPlotStatus 
          BackColor       =   &H00FFFFFF&
          Caption         =   "NET Calibration Plot Status"
-         Height          =   1300
+         Height          =   1425
          Left            =   3240
-         TabIndex        =   49
+         TabIndex        =   66
          Top             =   6960
          Width           =   2550
          Begin VB.TextBox txtNETCalibrationPeakCenter 
             BorderStyle     =   0  'None
-            Height          =   1000
+            Height          =   1110
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   50
+            TabIndex        =   67
             Text            =   "frmErrorDistribution2D.frx":0088
             Top             =   220
             Width           =   2355
@@ -437,19 +437,19 @@ Begin VB.Form frmErrorDistribution2DLoadedData
       Begin VB.Frame fraMassCalibrationStatus 
          BackColor       =   &H00FFFFFF&
          Caption         =   "Mass Calibration Plot Status"
-         Height          =   1300
+         Height          =   1425
          Left            =   120
-         TabIndex        =   47
+         TabIndex        =   64
          Top             =   6960
          Width           =   3015
          Begin VB.TextBox txtMassCalibrationPeakCenter 
             BorderStyle     =   0  'None
-            Height          =   1000
+            Height          =   1110
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   48
-            Text            =   "frmErrorDistribution2D.frx":00E0
+            TabIndex        =   65
+            Text            =   "frmErrorDistribution2D.frx":00FE
             Top             =   220
             Width           =   2835
          End
@@ -459,14 +459,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Criteria To Use Peak For Refinement"
          Height          =   1335
          Left            =   120
-         TabIndex        =   37
+         TabIndex        =   54
          Top             =   4680
          Width           =   3015
          Begin VB.TextBox txtToleranceRefinementMinimumSignalToNoiseForLowAbuPeaks 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2280
-            TabIndex        =   44
+            TabIndex        =   61
             Text            =   "2.5"
             Top             =   920
             Width           =   615
@@ -475,7 +475,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   1320
-            TabIndex        =   39
+            TabIndex        =   56
             Text            =   "25"
             Top             =   300
             Width           =   615
@@ -484,7 +484,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2280
-            TabIndex        =   42
+            TabIndex        =   59
             Text            =   "60"
             Top             =   600
             Width           =   615
@@ -495,7 +495,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   255
             Index           =   1
             Left            =   120
-            TabIndex        =   43
+            TabIndex        =   60
             Top             =   940
             Width           =   2055
          End
@@ -505,7 +505,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   255
             Index           =   0
             Left            =   2040
-            TabIndex        =   40
+            TabIndex        =   57
             Top             =   330
             Width           =   840
          End
@@ -515,7 +515,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   255
             Index           =   8
             Left            =   120
-            TabIndex        =   38
+            TabIndex        =   55
             Top             =   330
             Width           =   1215
          End
@@ -525,19 +525,19 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   255
             Index           =   10
             Left            =   120
-            TabIndex        =   41
+            TabIndex        =   58
             Top             =   640
             Width           =   2055
          End
       End
       Begin TabDlg.SSTab tbsRefinement 
-         Height          =   4605
+         Height          =   4485
          Left            =   120
          TabIndex        =   1
-         Top             =   0
-         Width           =   4335
-         _ExtentX        =   7646
-         _ExtentY        =   8123
+         Top             =   60
+         Width           =   5415
+         _ExtentX        =   9551
+         _ExtentY        =   7911
          _Version        =   393216
          Style           =   1
          Tabs            =   2
@@ -546,24 +546,39 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabHeight       =   520
          BackColor       =   16777215
          TabCaption(0)   =   "Mass Calibration Refinement"
-         TabPicture(0)   =   "frmErrorDistribution2D.frx":0138
+         TabPicture(0)   =   "frmErrorDistribution2D.frx":0177
          Tab(0).ControlEnabled=   0   'False
          Tab(0).Control(0)=   "lblMassCalibrationRefinementDescription"
+         Tab(0).Control(0).Enabled=   0   'False
          Tab(0).Control(1)=   "lblMassCalibrationRefinementUnits(2)"
+         Tab(0).Control(1).Enabled=   0   'False
          Tab(0).Control(2)=   "lblMassCalibrationAdjustment"
+         Tab(0).Control(2).Enabled=   0   'False
          Tab(0).Control(3)=   "lblMassCalibrationRefinementUnits(1)"
+         Tab(0).Control(3).Enabled=   0   'False
          Tab(0).Control(4)=   "lblMassCalibrationOverallAdjustment"
+         Tab(0).Control(4).Enabled=   0   'False
          Tab(0).Control(5)=   "cmdMassCalibrationRefinementStart"
+         Tab(0).Control(5).Enabled=   0   'False
          Tab(0).Control(6)=   "fraMassCalibrationRefinement"
+         Tab(0).Control(6).Enabled=   0   'False
          Tab(0).Control(7)=   "cmdMassCalibrationManual"
+         Tab(0).Control(7).Enabled=   0   'False
          Tab(0).Control(8)=   "txtMassCalibrationNewIncrementalAdjustment"
+         Tab(0).Control(8).Enabled=   0   'False
          Tab(0).Control(9)=   "txtMassCalibrationOverallAdjustment"
+         Tab(0).Control(9).Enabled=   0   'False
          Tab(0).Control(10)=   "cmdMassCalibrationRevert"
+         Tab(0).Control(10).Enabled=   0   'False
          Tab(0).Control(11)=   "cmdRecomputeHistograms"
-         Tab(0).Control(12)=   "cmdAbortProcessing"
-         Tab(0).ControlCount=   13
+         Tab(0).Control(11).Enabled=   0   'False
+         Tab(0).Control(12)=   "cmdAbortProcessing(0)"
+         Tab(0).Control(12).Enabled=   0   'False
+         Tab(0).Control(13)=   "cmdResetToDefaults"
+         Tab(0).Control(13).Enabled=   0   'False
+         Tab(0).ControlCount=   14
          TabCaption(1)   =   "Tolerance Refinement"
-         TabPicture(1)   =   "frmErrorDistribution2D.frx":0154
+         TabPicture(1)   =   "frmErrorDistribution2D.frx":0193
          Tab(1).ControlEnabled=   -1  'True
          Tab(1).Control(0)=   "cmdMassToleranceRefinementStart"
          Tab(1).Control(0).Enabled=   0   'False
@@ -573,30 +588,172 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Tab(1).Control(2).Enabled=   0   'False
          Tab(1).Control(3)=   "cmdNETToleranceRefinementStart"
          Tab(1).Control(3).Enabled=   0   'False
-         Tab(1).ControlCount=   4
+         Tab(1).Control(4)=   "cmdAbortProcessing(1)"
+         Tab(1).Control(4).Enabled=   0   'False
+         Tab(1).Control(5)=   "cboToleranceRefinementMethod"
+         Tab(1).Control(5).Enabled=   0   'False
+         Tab(1).Control(6)=   "fraExpecationMaximizationOptions"
+         Tab(1).Control(6).Enabled=   0   'False
+         Tab(1).Control(7)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
+         Tab(1).Control(7).Enabled=   0   'False
+         Tab(1).ControlCount=   8
+         Begin VB.CommandButton cmdResetToDefaults 
+            Caption         =   "Set to Defaults"
+            Height          =   375
+            Left            =   -71160
+            TabIndex        =   110
+            Top             =   600
+            Width           =   1455
+         End
+         Begin VB.CheckBox chkRefineDBSearchTolUseMinMaxIfOutOfRange 
+            Caption         =   "Use min or max tol if out of range"
+            Height          =   375
+            Left            =   3720
+            TabIndex        =   109
+            Top             =   1920
+            Value           =   1  'Checked
+            Width           =   1575
+         End
+         Begin VB.Frame fraExpecationMaximizationOptions 
+            Caption         =   "Expectation Maximization Options"
+            Height          =   2055
+            Left            =   120
+            TabIndex        =   40
+            Top             =   2330
+            Width           =   3495
+            Begin VB.CheckBox chkEMRefineNETTolForceUseAllDataPointErrors 
+               Caption         =   "Use single data point errors for NET"
+               Height          =   255
+               Left            =   120
+               TabIndex        =   50
+               Top             =   1680
+               Value           =   1  'Checked
+               Width           =   3015
+            End
+            Begin VB.CheckBox chkEMRefineMassTolForceUseAllDataPointErrors 
+               Caption         =   "Use single data point errors for Mass"
+               Height          =   255
+               Left            =   120
+               TabIndex        =   49
+               Top             =   1360
+               Value           =   1  'Checked
+               Width           =   3015
+            End
+            Begin VB.TextBox txtEMRefinePercentOfDataToExclude 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Left            =   2400
+               TabIndex        =   47
+               Text            =   "10"
+               Top             =   960
+               Width           =   495
+            End
+            Begin VB.TextBox txtEMRefineNETErrorPeakToleranceEstimate 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Left            =   2160
+               TabIndex        =   45
+               Text            =   "0.01"
+               Top             =   600
+               Width           =   615
+            End
+            Begin VB.TextBox txtEMRefineMassErrorPeakToleranceEstimatePPM 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Left            =   2160
+               TabIndex        =   42
+               Text            =   "6"
+               Top             =   240
+               Width           =   615
+            End
+            Begin VB.Label lblUnits 
+               Caption         =   "%"
+               Height          =   255
+               Index           =   3
+               Left            =   3000
+               TabIndex        =   48
+               Top             =   990
+               Width           =   195
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "Data to exclude from extremes"
+               Height          =   255
+               Index           =   6
+               Left            =   120
+               TabIndex        =   46
+               Top             =   960
+               Width           =   2175
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "NETerror tol. estimate"
+               Height          =   255
+               Index           =   5
+               Left            =   120
+               TabIndex        =   44
+               Top             =   600
+               Width           =   1695
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "Mass error tol. estimate"
+               Height          =   255
+               Index           =   4
+               Left            =   120
+               TabIndex        =   41
+               Top             =   240
+               Width           =   1695
+            End
+            Begin VB.Label lblUnits 
+               Caption         =   "ppm"
+               Height          =   255
+               Index           =   1
+               Left            =   2880
+               TabIndex        =   43
+               Top             =   270
+               Width           =   540
+            End
+         End
+         Begin VB.ComboBox cboToleranceRefinementMethod 
+            Height          =   315
+            Left            =   120
+            Style           =   2  'Dropdown List
+            TabIndex        =   39
+            Top             =   1920
+            Width           =   3495
+         End
          Begin VB.CommandButton cmdAbortProcessing 
             Caption         =   "Abort Processing"
             Height          =   375
-            Left            =   -74160
-            TabIndex        =   93
-            Top             =   4200
+            Index           =   1
+            Left            =   3720
+            TabIndex        =   53
+            Top             =   3960
+            Visible         =   0   'False
+            Width           =   1575
+         End
+         Begin VB.CommandButton cmdAbortProcessing 
+            Caption         =   "Abort Processing"
+            Height          =   375
+            Index           =   0
+            Left            =   -73920
+            TabIndex        =   19
+            Top             =   4080
             Visible         =   0   'False
             Width           =   2055
          End
          Begin VB.CommandButton cmdRecomputeHistograms 
             Caption         =   "&Recompute Histograms"
             Height          =   375
-            Left            =   -74160
-            TabIndex        =   94
-            Top             =   4200
+            Left            =   -73920
+            TabIndex        =   20
+            Top             =   4080
             Width           =   2055
          End
          Begin VB.CommandButton cmdMassCalibrationRevert 
             Caption         =   "Revert to Original"
             Height          =   375
             Left            =   -73920
-            TabIndex        =   90
-            Top             =   2040
+            TabIndex        =   11
+            Top             =   2160
             Width           =   1575
          End
          Begin VB.TextBox txtMassCalibrationOverallAdjustment 
@@ -604,18 +761,18 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   285
             Left            =   -72960
             Locked          =   -1  'True
-            TabIndex        =   12
+            TabIndex        =   13
             Text            =   "0"
-            Top             =   2430
+            Top             =   2550
             Width           =   1100
          End
          Begin VB.TextBox txtMassCalibrationNewIncrementalAdjustment 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   -72960
-            TabIndex        =   15
+            TabIndex        =   16
             Text            =   "0"
-            Top             =   2790
+            Top             =   2910
             Width           =   1100
          End
          Begin VB.CommandButton cmdMassCalibrationManual 
@@ -623,23 +780,23 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   375
             Left            =   -73080
             TabIndex        =   10
-            Top             =   1620
+            Top             =   1740
             Width           =   1815
          End
          Begin VB.CommandButton cmdNETToleranceRefinementStart 
             Caption         =   "Start NET Tol Refinement"
             Height          =   615
-            Left            =   2160
-            TabIndex        =   36
-            Top             =   3840
+            Left            =   3720
+            TabIndex        =   52
+            Top             =   3240
             Width           =   1575
          End
          Begin VB.Frame fraMassCalibrationRefinement 
             Caption         =   "Mass Calibration Refinement"
             Height          =   1215
-            Left            =   -74760
+            Left            =   -74880
             TabIndex        =   2
-            Top             =   360
+            Top             =   480
             Width           =   3500
             Begin VB.TextBox txtRefineMassCalibrationMaximumShift 
                Alignment       =   1  'Right Justify
@@ -697,16 +854,16 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          End
          Begin VB.Frame fraToleranceRefinementGANET 
             Caption         =   "NET Tolerance Refinement"
-            Height          =   1335
-            Left            =   240
-            TabIndex        =   28
-            Top             =   2400
-            Width           =   3735
+            Height          =   1350
+            Left            =   2760
+            TabIndex        =   30
+            Top             =   480
+            Width           =   2535
             Begin VB.TextBox txtRefineDBSearchNETToleranceAdjustmentMultiplier 
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   1800
-               TabIndex        =   91
+               TabIndex        =   38
                Text            =   "1"
                Top             =   960
                Width           =   615
@@ -714,8 +871,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Begin VB.TextBox txtRefineDBSearchNETToleranceMinimum 
                Alignment       =   1  'Right Justify
                Height          =   285
-               Left            =   1800
-               TabIndex        =   30
+               Left            =   1200
+               TabIndex        =   32
                Text            =   "0"
                Top             =   240
                Width           =   615
@@ -723,87 +880,79 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Begin VB.TextBox txtRefineDBSearchNETToleranceMaximum 
                Alignment       =   1  'Right Justify
                Height          =   285
-               Left            =   1800
-               TabIndex        =   33
+               Left            =   1200
+               TabIndex        =   35
                Text            =   "0"
                Top             =   600
                Width           =   615
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "Minimum Tol."
+               Height          =   255
+               Index           =   3
+               Left            =   120
+               TabIndex        =   31
+               Top             =   270
+               Width           =   1065
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "Maximum Tol."
+               Height          =   255
+               Index           =   2
+               Left            =   120
+               TabIndex        =   34
+               Top             =   630
+               Width           =   1065
             End
             Begin VB.Label lblDescription 
                Caption         =   "Adjustment multiplier"
                Height          =   255
                Index           =   0
                Left            =   120
-               TabIndex        =   92
+               TabIndex        =   37
                Top             =   990
-               Width           =   1575
-            End
-            Begin VB.Label lblDescription 
-               Caption         =   "Minimum Tolerance"
-               Height          =   255
-               Index           =   84
-               Left            =   120
-               TabIndex        =   29
-               Top             =   270
-               Width           =   1455
+               Width           =   1600
             End
             Begin VB.Label lblUnits 
                Caption         =   "NET"
                Height          =   255
                Index           =   8
-               Left            =   2520
-               TabIndex        =   31
+               Left            =   1920
+               TabIndex        =   33
                Top             =   270
-               Width           =   600
-            End
-            Begin VB.Label lblDescription 
-               Caption         =   "Maximum Tolerance"
-               Height          =   255
-               Index           =   83
-               Left            =   120
-               TabIndex        =   32
-               Top             =   630
-               Width           =   1455
+               Width           =   540
             End
             Begin VB.Label lblUnits 
                Caption         =   "NET"
                Height          =   255
                Index           =   7
-               Left            =   2520
-               TabIndex        =   34
+               Left            =   1920
+               TabIndex        =   36
                Top             =   630
-               Width           =   600
+               Width           =   540
             End
          End
          Begin VB.Frame fraToleranceRefinementMass 
             Caption         =   "Mass Tolerance Refinement"
-            Height          =   1815
-            Left            =   240
-            TabIndex        =   18
+            Height          =   1350
+            Left            =   120
+            TabIndex        =   21
             Top             =   480
-            Width           =   3735
+            Width           =   2535
             Begin VB.TextBox txtRefineDBSearchMassToleranceAdjustmentMultiplier 
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   1800
-               TabIndex        =   26
+               TabIndex        =   29
                Text            =   "1"
                Top             =   960
                Width           =   615
             End
-            Begin VB.ComboBox cboMassToleranceRefinementMethod 
-               Height          =   315
-               Left            =   120
-               Style           =   2  'Dropdown List
-               TabIndex        =   27
-               Top             =   1320
-               Width           =   3495
-            End
             Begin VB.TextBox txtRefineDBSearchMassToleranceMaximum 
                Alignment       =   1  'Right Justify
                Height          =   285
-               Left            =   1800
-               TabIndex        =   23
+               Left            =   1200
+               TabIndex        =   26
                Text            =   "0"
                Top             =   600
                Width           =   615
@@ -811,8 +960,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Begin VB.TextBox txtRefineDBSearchMassToleranceMinimum 
                Alignment       =   1  'Right Justify
                Height          =   285
-               Left            =   1800
-               TabIndex        =   20
+               Left            =   1200
+               TabIndex        =   23
                Text            =   "0"
                Top             =   240
                Width           =   615
@@ -822,86 +971,86 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   94
                Left            =   120
-               TabIndex        =   25
+               TabIndex        =   28
                Top             =   990
-               Width           =   1695
+               Width           =   1605
             End
             Begin VB.Label lblUnits 
                Caption         =   "ppm"
                Height          =   255
                Index           =   6
-               Left            =   2520
-               TabIndex        =   24
+               Left            =   1920
+               TabIndex        =   27
                Top             =   630
-               Width           =   600
+               Width           =   540
             End
             Begin VB.Label lblDescription 
-               Caption         =   "Maximum Tolerance"
+               Caption         =   "Maximum Tol."
                Height          =   255
                Index           =   76
                Left            =   120
-               TabIndex        =   22
+               TabIndex        =   25
                Top             =   630
-               Width           =   1455
+               Width           =   1060
             End
             Begin VB.Label lblUnits 
                Caption         =   "ppm"
                Height          =   255
                Index           =   5
-               Left            =   2520
-               TabIndex        =   21
+               Left            =   1920
+               TabIndex        =   24
                Top             =   270
-               Width           =   600
+               Width           =   540
             End
             Begin VB.Label lblDescription 
-               Caption         =   "Minimum Tolerance"
+               Caption         =   "Minimum Tol."
                Height          =   255
                Index           =   72
                Left            =   120
-               TabIndex        =   19
+               TabIndex        =   22
                Top             =   270
-               Width           =   1455
+               Width           =   1060
             End
          End
          Begin VB.CommandButton cmdMassToleranceRefinementStart 
             Caption         =   "Start Mass Tol Refinement"
             Height          =   615
-            Left            =   360
-            TabIndex        =   35
-            Top             =   3840
-            Width           =   1455
+            Left            =   3720
+            TabIndex        =   51
+            Top             =   2520
+            Width           =   1575
          End
          Begin VB.CommandButton cmdMassCalibrationRefinementStart 
             Caption         =   "Auto recalibrate"
             Height          =   375
             Left            =   -74760
             TabIndex        =   9
-            Top             =   1620
+            Top             =   1740
             Width           =   1575
          End
          Begin VB.Label lblMassCalibrationOverallAdjustment 
             Caption         =   "Overall Adjustment"
             Height          =   255
             Left            =   -74760
-            TabIndex        =   11
-            Top             =   2460
-            Width           =   1700
+            TabIndex        =   12
+            Top             =   2580
+            Width           =   1695
          End
          Begin VB.Label lblMassCalibrationRefinementUnits 
             Caption         =   "ppm"
             Height          =   255
             Index           =   1
             Left            =   -71760
-            TabIndex        =   13
-            Top             =   2460
+            TabIndex        =   14
+            Top             =   2580
             Width           =   600
          End
          Begin VB.Label lblMassCalibrationAdjustment 
             Caption         =   "New Adjustment (relative to overall)"
             Height          =   375
             Left            =   -74760
-            TabIndex        =   14
-            Top             =   2710
+            TabIndex        =   15
+            Top             =   2835
             Width           =   1695
          End
          Begin VB.Label lblMassCalibrationRefinementUnits 
@@ -909,17 +1058,17 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   255
             Index           =   2
             Left            =   -71760
-            TabIndex        =   16
-            Top             =   2820
+            TabIndex        =   17
+            Top             =   2940
             Width           =   600
          End
          Begin VB.Label lblMassCalibrationRefinementDescription 
             Caption         =   "Mass Calibration Refinement Description"
-            Height          =   855
+            Height          =   735
             Left            =   -74880
-            TabIndex        =   17
-            Top             =   3200
-            Width           =   4005
+            TabIndex        =   18
+            Top             =   3315
+            Width           =   4605
          End
       End
    End
@@ -1038,13 +1187,25 @@ Private Const MASS_PPM_ADJUSTMENT_PRECISION = 4
 Private Const MASS_DA_ADJUSTMENT_PRECISION = 8
 Private Const GANET_ADJUSTMENT_PRECISION = 4
 
+Private Const MINIMUM_DATA_COUNT_FOR_EM As Long = 100
+Private Const SIGMA_WIDTH_AT_BASE As Single = 5
+
 Public CallerID As Long
 
-Private mErrorsCount As Long
-Private mErrorsCountDimmed As Long
+Private mRawErrorsCount As Long
 Private mRawMassErrorsPPM() As Single        ' 0-based array, in PPM
 Private mRawMassErrorsDa() As Single         ' 0-based array, in Da
-Private mRAWGanetErrors() As Single          ' 0-based array
+Private mRawNETErrors() As Single            ' 0-based array
+
+' Note: These arrays are initially empty
+' They are populated using ComputeErrorsIndividualPoints, which should be called
+'  if the mRawMassErrorsPPM(), mRawMassErrorsDa(), and mRawNETErrors() arrays were
+'  populated using UMC-based stats.  This data is then used by
+'  RefineDBSearchMassToleranceStart & RefineDBSearchNETToleranceStart
+Private mRawErrorsIndividualPointsCount As Long             ' Initially set to 0
+Private mRawMassErrorsIndividualPointsPPM() As Single       ' 0-based array, in PPM
+Private mRawMassErrorsIndividualPointsDa() As Single        ' 0-based array, in Da
+Private mRawNETErrorsIndividualPoints() As Single           ' 0-based array
 
 Private mMassPPMErrors As udtBinnedDataType
 Private mMassDaErrors As udtBinnedDataType
@@ -1059,6 +1220,7 @@ Private mInternalStdIDSorted() As Long                 ' 0-based array
 Private mInternalStdIDSortedInd() As Long              ' 0-based array
 
 Private mAMTIndicesInitialized As Boolean
+
 Private mUpdatingControls As Boolean
 Private mCalculating As Boolean
 Private mFormInitialized As Boolean
@@ -1075,12 +1237,14 @@ Private MinFN As Long
 Private MaxFN As Long
 
 Private objHistogram As New clsHistogram
+Private WithEvents mNormUnifEM As clsNormUnifEM
+Attribute mNormUnifEM.VB_VarHelpID = -1
 
 Private mGelAnalysisIsValid As Boolean
 Private mAbortProcessing As Boolean
 '
 
-Private Function AddNewErrValues(ByRef Refs() As String, ByVal RefsCnt As Long, ByVal dblIonMass As Double, ByVal sngIonGANET As Single, ByVal dblIonAbundance As Double, ByVal dblMassErrPPMCorrection As Double, ByVal blnInternalStdMatch As Boolean) As Boolean
+Private Function AddNewErrValues(ByRef sngRawMassErrorsPPM() As Single, ByRef sngRawMassErrorsDa() As Single, ByRef sngRawNETErrors() As Single, ByRef lngRawErrorsCount As Long, ByRef Refs() As String, ByVal RefsCnt As Long, ByVal dblIonMass As Double, ByVal sngIonGANET As Single, ByVal dblIonAbundance As Double, ByVal dblMassErrPPMCorrection As Double, ByVal blnInternalStdMatch As Boolean) As Boolean
     
     Dim strRefID As String
     Dim strPPMMassError As String
@@ -1088,6 +1252,7 @@ Private Function AddNewErrValues(ByRef Refs() As String, ByVal RefsCnt As Long, 
     Dim lngMatchIndex As Long
     Dim lngIndexPointer As Long
     Dim lngMTIndex As Long, lngInternalStdIndex As Long
+    Dim lngNewDataCount As Long
     
     Dim dblRefMW As Double, dblRefNET As Double
     
@@ -1221,22 +1386,22 @@ On Error GoTo AddNewErrValuesErrorHandler
                         sngGANETError = sngIonGANET - dblRefNET
                     End If
                     
-                    
-                    ' Add Errors to mRawMassErrorsPPM(), mRawMassErrorsDa(), and mRAWGanetErrors()
-                    mRawMassErrorsPPM(mErrorsCount) = CSng(MassToPPM(dblMassErrorDa, dblIonMass))
-                    mRawMassErrorsDa(mErrorsCount) = CSng(dblMassErrorDa)
-                    mRAWGanetErrors(mErrorsCount) = sngGANETError
-                    
-                    ''mDataSourceIonIndex(mErrorsCount) = lngIonIndex
-                    
-                    mErrorsCount = mErrorsCount + 1
-                    If mErrorsCount >= mErrorsCountDimmed Then
-                        mErrorsCountDimmed = mErrorsCountDimmed + 100
-                        ReDim Preserve mRawMassErrorsPPM(mErrorsCountDimmed)
-                        ReDim Preserve mRawMassErrorsDa(mErrorsCountDimmed)
-                        ReDim Preserve mRAWGanetErrors(mErrorsCountDimmed)
-                        ''ReDim Preserve mDataSourceIonIndex(mErrorsCountDimmed)
+                    If lngRawErrorsCount >= UBound(sngRawMassErrorsPPM) + 1 Then
+                        lngNewDataCount = (UBound(sngRawMassErrorsPPM) + 1) * 2
+                        ReDim Preserve sngRawMassErrorsPPM(lngNewDataCount - 1)
+                        ReDim Preserve sngRawMassErrorsDa(lngNewDataCount - 1)
+                        ReDim Preserve sngRawNETErrors(lngNewDataCount - 1)
+                        ''ReDim Preserve mDataSourceIonIndex(lngNewDataCount - 1)
                     End If
+                    
+                    ' Add Errors to sngRawMassErrorsPPM(), sngRawMassErrorsDa(), and sngRawNETErrors()
+                    sngRawMassErrorsPPM(lngRawErrorsCount) = CSng(MassToPPM(dblMassErrorDa, dblIonMass))
+                    sngRawMassErrorsDa(lngRawErrorsCount) = CSng(dblMassErrorDa)
+                    sngRawNETErrors(lngRawErrorsCount) = sngGANETError
+                    
+                    lngRawErrorsCount = lngRawErrorsCount + 1
+                    
+                    ''mDataSourceIonIndex(lngRawErrorsCount) = lngIonIndex
                     
                     blnHitFound = True
                 Else
@@ -1267,16 +1432,207 @@ AddNewErrValuesErrorHandler:
     
 End Function
 
+Private Function CalcDistributionViaExpectationMaximation(ByRef sngValues() As Single, ByVal lngDataCount As Long, ByRef dblVariance As Double, ByRef dblMean As Double, ByRef dblNormFraction As Double) As Boolean
+    ' Note: Set dblVariance to the estimated initial variance
+    ' This value will also be updated with the final variance value
+    
+    Dim lngIndex As Long
+    
+    Dim dblValues() As Double
+    Dim blnSuccess As Boolean
+    Dim lngDataCountToUse As Long
+    
+    Dim sngMaximumValueToUseAbs As Single
+    
+    ' Note: When debugging, you can set this to a positive value to exclude some of the data
+    sngMaximumValueToUseAbs = 0
+    
+On Error GoTo CalcDistributionViaExpectationMaximationErrorHandler
+
+    If lngDataCount <= 0 Then
+        CalcDistributionViaExpectationMaximation = False
+        Exit Function
+    End If
+    
+    ReDim dblValues(lngDataCount - 1)
+    
+    If sngMaximumValueToUseAbs = 0 Then
+        For lngIndex = 0 To lngDataCount - 1
+            dblValues(lngIndex) = sngValues(lngIndex)
+        Next lngIndex
+    Else
+        ' Only use the values in sngValues with absolute values <= sngMaximumValueToUseAbs
+        lngDataCountToUse = 0
+        For lngIndex = 0 To lngDataCount - 1
+            If Abs(sngValues(lngIndex)) <= sngMaximumValueToUseAbs Then
+                dblValues(lngDataCountToUse) = sngValues(lngIndex)
+                lngDataCountToUse = lngDataCountToUse + 1
+            End If
+        Next lngIndex
+        
+        If lngDataCountToUse <= 0 Then
+            CalcDistributionViaExpectationMaximation = False
+            Exit Function
+        End If
+        
+        ReDim Preserve dblValues(lngDataCountToUse - 1)
+    End If
+    
+    If mNormUnifEM Is Nothing Then
+        Set mNormUnifEM = New clsNormUnifEM
+    End If
+    
+    mNormUnifEM.IterationCount = glbPreferencesExpanded.RefineMSDataOptions.EMIterationCount
+    mNormUnifEM.PercentOfDataToExclude = glbPreferencesExpanded.RefineMSDataOptions.EMPercentOfDataToExclude
+    blnSuccess = mNormUnifEM.ComputeDistribution(dblValues, dblVariance)
+    
+    dblVariance = mNormUnifEM.Variance
+    dblMean = mNormUnifEM.Mean
+    dblNormFraction = mNormUnifEM.NormFraction
+
+    CalcDistributionViaExpectationMaximation = blnSuccess
+    Exit Function
+
+CalcDistributionViaExpectationMaximationErrorHandler:
+    Debug.Assert False
+    
+    CalcDistributionViaExpectationMaximation = False
+    
+End Function
+
+Private Sub ClearDataArrays()
+    ClearRawDataArrays
+    ClearRawDataIndividualPointsArrays
+    ClearBinnedDataArrays
+    
+    ''ClearAmtIndexLookupArrays
+    ''ClearIntStdIndexLookupArrays
+End Sub
+
+Private Sub ClearRawDataArrays()
+    mRawErrorsCount = 0
+    ReDim mRawMassErrorsPPM(0)
+    ReDim mRawMassErrorsDa(0)
+    ReDim mRawNETErrors(0)
+End Sub
+
+Private Sub ClearRawDataIndividualPointsArrays()
+    mRawErrorsIndividualPointsCount = 0
+    ReDim mRawMassErrorsIndividualPointsPPM(0)
+    ReDim mRawMassErrorsIndividualPointsDa(0)
+    ReDim mRawNETErrorsIndividualPoints(0)
+End Sub
+
+Private Sub ClearBinnedDataArrays()
+    mMassPPMErrors.BinnedCount = 0
+    mMassDaErrors.BinnedCount = 0
+    mGanetErrors.BinnedCount = 0
+    
+    ReDim mMassPPMErrors.Binned(0)
+    ReDim mMassDaErrors.Binned(0)
+    ReDim mGanetErrors.Binned(0)
+    
+    ReDim mMassPPMErrors.SmoothedBins(0)
+    ReDim mMassDaErrors.SmoothedBins(0)
+    ReDim mGanetErrors.SmoothedBins(0)
+End Sub
+
+Private Sub ClearAmtIndexLookupArrays()
+    mAMTIndicesInitialized = False
+    ReDim mAMTIDSorted(0)
+    ReDim mAMTIDSortedInd(0)
+End Sub
+
+Private Sub ClearIntStdIndexLookupArrays()
+    ReDim mInternalStdIDSorted(0)
+    ReDim mInternalStdIDSortedInd(0)
+End Sub
+
+Private Sub ComputeCurrentUMCStats()
+    ' Update UMC Statistics
+    
+    Dim lngIndex As Long
+    
+    Dim dblMassWidthsPPM() As Double
+    Dim dblMassWidthsDa() As Double
+    Dim dblMassStDevPPM() As Double
+    Dim dblMassStDevDa() As Double
+    
+    Dim objStats As New StatDoubles
+    
+On Error GoTo ComputeCurrentUMCStatsErrorHandler
+
+    With GelUMC(CallerID)
+        mUMCStats.Count = .UMCCnt
+        If .UMCCnt > 0 Then
+            
+            ReDim dblMassWidthsPPM(0 To .UMCCnt - 1)
+            ReDim dblMassWidthsDa(0 To .UMCCnt - 1)
+            
+            ReDim dblMassStDevPPM(0 To .UMCCnt - 1)
+            ReDim dblMassStDevDa(0 To .UMCCnt - 1)
+                         
+            For lngIndex = 0 To .UMCCnt - 1
+                With .UMCs(lngIndex)
+                    dblMassWidthsDa(lngIndex) = .MaxMW - .MinMW
+                    dblMassWidthsPPM(lngIndex) = MassToPPM(dblMassWidthsDa(lngIndex), .ClassMW)
+                    
+                    dblMassStDevDa(lngIndex) = .ClassMWStD
+                    dblMassStDevPPM(lngIndex) = MassToPPM(dblMassStDevDa(lngIndex), .ClassMW)
+                End With
+            Next lngIndex
+        End If
+    End With
+    
+    With mUMCStats
+        If .Count > 0 Then
+            With .PPMStats
+                objStats.Fill dblMassWidthsPPM()
+                .MassWidthMedian = objStats.Median
+                .MassWidthMaximum = objStats.Maximum
+                
+                objStats.Fill dblMassStDevPPM()
+                .MassStDevMedian = objStats.Median
+                .MassStDevMaximum = objStats.Maximum
+            End With
+            
+            With .DaStats
+                objStats.Fill dblMassWidthsDa()
+                .MassWidthMedian = objStats.Median
+                .MassWidthMaximum = objStats.Maximum
+                
+                objStats.Fill dblMassStDevDa()
+                .MassStDevMedian = objStats.Median
+                .MassStDevMaximum = objStats.Maximum
+            End With
+            
+        Else
+            With .PPMStats
+                .MassWidthMedian = 0
+                .MassWidthMaximum = 0
+                .MassStDevMedian = 0
+                .MassStDevMaximum = 0
+            End With
+            .DaStats = .PPMStats
+        End If
+    End With
+    
+    DisplayCurrentUMCStats
+
+    Exit Sub
+
+ComputeCurrentUMCStatsErrorHandler:
+    Debug.Print "Error in DisplayUMCStats: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "ComputeCurrentUMCStats"
+    
+End Sub
+
 Private Sub ComputeErrors(blnForceUpdate As Boolean)
     
     Dim lngIndex As Long
-    Dim lngCSDataIndex As Long
-    Dim lngIsoDataIndex As Long
     
-    Dim IsoField As Integer
     Dim lngDataWithHits As Long
-
-    Dim dblMassErrPPMCorrection As Double
 
     If mUpdatingControls Then
         Exit Sub
@@ -1286,6 +1642,8 @@ Private Sub ComputeErrors(blnForceUpdate As Boolean)
         Exit Sub
     End If
     
+On Error GoTo ComputeMassErrorsErrorHandler
+
     If CallerID < 1 Or CallerID > UBound(GelData()) Then Exit Sub
     
     If AMTCnt <= 0 Then
@@ -1303,94 +1661,18 @@ Private Sub ComputeErrors(blnForceUpdate As Boolean)
         End If
     End If
     
-    UpdateStatus "Populating mass error bins"
+    UpdateStatus "Extracting mass/NET errors"
     EnableDisableCalculating True, True
     mAbortProcessing = False
     
-On Error GoTo ComputeMassErrorsErrorHandler
-    
-    mErrorsCountDimmed = 100
-    ReDim mRawMassErrorsPPM(mErrorsCountDimmed)
-    ReDim mRawMassErrorsDa(mErrorsCountDimmed)
-    ReDim mRAWGanetErrors(mErrorsCountDimmed)
-    ''ReDim mDataSourceIonIndex(mErrorsCountDimmed)
-    mErrorsCount = 0
-    
-    IsoField = GelData(CallerID).Preferences.IsoDataField
-    If IsoField < isfMWavg Or IsoField > isfMWavg Then IsoField = isfMWMono
-    
-    
-    ' First fill mRawMassErrorsPPM(), mRawMassErrorsDa(), and mRAWGanetErrors() with all of the observed errors
-    If glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats Then
-        ' Working with UMCs
-        With GelUMC(CallerID)
-            For lngIndex = 0 To .UMCCnt - 1
-                With .UMCs(lngIndex)
-                    ' Just examine the class rep for each UMC
-                    Select Case .ClassRepType
-                    Case gldtCS
-                        ' Note: Since the match to the MT tag is stored with a mass error value relative to a given data point's mass,
-                        '       we need to compute the difference in mass between the class rep and the class mass (converted to ppm)
-                        dblMassErrPPMCorrection = MassToPPM(.ClassMW - GelData(CallerID).CSData(.ClassRepInd).AverageMW, .ClassMW)
-                        If ComputeErrorsExtractValues(GelData(CallerID).CSData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, GelData(CallerID).CSData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
-                           ' Hit found
-                           lngDataWithHits = lngDataWithHits + 1
-                       End If
-                    Case gldtIS
-                        ' See note above
-                        dblMassErrPPMCorrection = MassToPPM(.ClassMW - GetIsoMass(GelData(CallerID).IsoData(.ClassRepInd), IsoField), .ClassMW)
-                        If ComputeErrorsExtractValues(GelData(CallerID).IsoData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, GelData(CallerID).IsoData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
-                            ' Hit found
-                            lngDataWithHits = lngDataWithHits + 1
-                        End If
-                    Case Else
-                        Debug.Assert False
-                    End Select
-                End With
-                If lngIndex Mod 500 = 0 Then
-                    UpdateStatus "Populating mass error bins: " & Trim(lngIndex) & " / " & Trim(.UMCCnt)
-                    If mAbortProcessing Then Exit For
-                End If
-            Next lngIndex
-        End With
-    Else
-        ' Working with individual data points
-        With GelData(CallerID)
-            ' Charge state data
-            For lngCSDataIndex = 1 To .CSLines
-                With .CSData(lngCSDataIndex)
-                    If ComputeErrorsExtractValues(.MTID, .AverageMW, .Abundance, .ScanNumber, 0) Then
-                        ' Hit found
-                        lngDataWithHits = lngDataWithHits + 1
-                    End If
-                End With
-                If lngCSDataIndex Mod 1000 = 0 Then
-                    UpdateStatus "Populating mass error bins: " & Trim(lngCSDataIndex) & " / " & Trim(.CSLines)
-                    If mAbortProcessing Then Exit For
-                End If
-            Next lngCSDataIndex
-            
-            ' Isotopic data
-            For lngIsoDataIndex = 1 To .IsoLines
-                With .IsoData(lngIsoDataIndex)
-                    If ComputeErrorsExtractValues(.MTID, GetIsoMass(GelData(CallerID).IsoData(lngIsoDataIndex), IsoField), .Abundance, .ScanNumber, 0) Then
-                        ' Hit found
-                        lngDataWithHits = lngDataWithHits + 1
-                    End If
-                End With
-                If lngIsoDataIndex Mod 1000 = 0 Then
-                    UpdateStatus "Populating mass error bins: " & Trim(lngIsoDataIndex) & " / " & Trim(.IsoLines)
-                    If mAbortProcessing Then Exit For
-                End If
-            Next lngIsoDataIndex
-        End With
+    ' Reset mRawErrorsIndividualPointsCount to 0 before calling ComputeErrorsWork
+    If mRawErrorsIndividualPointsCount <> 0 Then
+        ClearRawDataIndividualPointsArrays
     End If
     
-    If mAbortProcessing Then
-        mErrorsCount = 0
-    End If
+    ComputeErrorsWork mRawMassErrorsPPM, mRawMassErrorsDa, mRawNETErrors, mRawErrorsCount, glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats, lngDataWithHits
     
-    If mErrorsCount > 0 Then
+    If mRawErrorsCount > 0 Then
         UpdateStatus "Binning data"
         
         ' Initialize the histogram object
@@ -1406,7 +1688,7 @@ On Error GoTo ComputeMassErrorsErrorHandler
             objHistogram.DefaultBinSize = 0.5
             objHistogram.StartBinDigitsAfterDecimal = 0
             
-            If Not objHistogram.BinData(mRawMassErrorsPPM, mErrorsCount, .Binned, .BinnedCount) Then
+            If Not objHistogram.BinData(mRawMassErrorsPPM, mRawErrorsCount, .Binned, .BinnedCount) Then
                 LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors"
             End If
             
@@ -1426,7 +1708,7 @@ On Error GoTo ComputeMassErrorsErrorHandler
             objHistogram.DefaultBinSize = 0.005
             objHistogram.StartBinDigitsAfterDecimal = 3
             
-            If Not objHistogram.BinData(mRawMassErrorsDa, mErrorsCount, .Binned, .BinnedCount) Then
+            If Not objHistogram.BinData(mRawMassErrorsDa, mRawErrorsCount, .Binned, .BinnedCount) Then
                 LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors"
             End If
             
@@ -1446,7 +1728,7 @@ On Error GoTo ComputeMassErrorsErrorHandler
             objHistogram.DefaultBinSize = 0.005
             objHistogram.StartBinDigitsAfterDecimal = 1
         
-            If Not objHistogram.BinData(mRAWGanetErrors, mErrorsCount, .Binned, .BinnedCount) Then
+            If Not objHistogram.BinData(mRawNETErrors, mRawErrorsCount, .Binned, .BinnedCount) Then
                 LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors"
             End If
             
@@ -1463,14 +1745,7 @@ On Error GoTo ComputeMassErrorsErrorHandler
     Else
         ' This will happen if there were no matches found when searching the database
         '  or if the user aborted processing
-        mMassPPMErrors.BinnedCount = 0
-        mMassDaErrors.BinnedCount = 0
-        mGanetErrors.BinnedCount = 0
-        
-        ReDim mMassPPMErrors.SmoothedBins(1)
-        ReDim mMassDaErrors.SmoothedBins(1)
-        ReDim mGanetErrors.SmoothedBins(1)
-        
+        ClearBinnedDataArrays
     End If
     
     EnableDisableCalculating False
@@ -1497,6 +1772,149 @@ ComputeMassErrorsErrorHandler:
 
 End Sub
 
+Private Sub ComputeErrorsIndividualPoints(ByVal blnForceUpdate As Boolean)
+
+    Dim lngIndex As Long
+    Dim lngCSDataIndex As Long
+    Dim lngIsoDataIndex As Long
+    
+    Dim IsoField As Integer
+    Dim lngDataWithHits As Long
+
+    Dim dblMassErrPPMCorrection As Double
+
+    If Not blnForceUpdate And mRawErrorsIndividualPointsCount > 0 Then
+        ' Only update if mRawErrorsIndividualPointsCount = 0
+        Exit Sub
+    End If
+    
+On Error GoTo ComputeErrorsIndividualPointsErrorHandler
+
+    If CallerID < 1 Or CallerID > UBound(GelData()) Then Exit Sub
+    
+    If AMTCnt <= 0 Then
+        UpdateStatus "Warning: MT tags not loaded; only mass errors will be shown"
+    End If
+    
+    UpdateStatus "Populating individual point error arrays"
+    
+    ComputeErrorsWork mRawMassErrorsIndividualPointsPPM, mRawMassErrorsIndividualPointsDa, mRawNETErrorsIndividualPoints, mRawErrorsIndividualPointsCount, False, 0
+    
+    Exit Sub
+    
+ComputeErrorsIndividualPointsErrorHandler:
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Unexpected error in ComputeErrorsIndividualPoints" & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    LogErrors Err.Number, "ComputeErrorsIndividualPoints"
+    
+End Sub
+
+Private Sub ComputeErrorsWork(ByRef sngRawMassErrorsPPM() As Single, ByRef sngRawMassErrorsDa() As Single, ByRef sngRawNETErrors() As Single, ByRef lngRawErrorsCount As Long, ByVal blnUseUMCClassStats As Boolean, ByRef lngDataWithHits As Long)
+
+    Dim IsoField As Integer
+    Dim lngIndex As Long
+    Dim lngCSDataIndex As Long
+    Dim lngIsoDataIndex As Long
+    
+    Dim dblMassErrPPMCorrection As Double
+    
+On Error GoTo ComputeMassErrorsErrorWorkHandler
+    
+    Const INITIAL_DATA_COUNT As Integer = 100
+    
+    lngRawErrorsCount = 0
+    ReDim sngRawMassErrorsPPM(INITIAL_DATA_COUNT - 1)
+    ReDim sngRawMassErrorsDa(INITIAL_DATA_COUNT - 1)
+    ReDim sngRawNETErrors(INITIAL_DATA_COUNT - 1)
+    ''ReDim sngDataSourceIonIndex(INITIAL_DATA_COUNT - 1)
+    
+    IsoField = GelData(CallerID).Preferences.IsoDataField
+    If IsoField < isfMWavg Or IsoField > isfMWavg Then IsoField = isfMWMono
+
+    lngDataWithHits = 0
+    
+    ' First fill sngRawMassErrorsPPM(), sngRawMassErrorsDa(), and sngRawNETErrors() with all of the observed errors
+    If blnUseUMCClassStats Then
+        ' Working with UMCs
+        With GelUMC(CallerID)
+            For lngIndex = 0 To .UMCCnt - 1
+                With .UMCs(lngIndex)
+                    ' Just examine the class rep for each UMC
+                    Select Case .ClassRepType
+                    Case gldtCS
+                        ' Note: Since the match to the MT tag is stored with a mass error value relative to a given data point's mass,
+                        '       we need to compute the difference in mass between the class rep and the class mass (converted to ppm)
+                        dblMassErrPPMCorrection = MassToPPM(.ClassMW - GelData(CallerID).CSData(.ClassRepInd).AverageMW, .ClassMW)
+                        If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, GelData(CallerID).CSData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, GelData(CallerID).CSData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
+                           ' Hit found
+                           lngDataWithHits = lngDataWithHits + 1
+                       End If
+                    Case gldtIS
+                        ' See note above
+                        dblMassErrPPMCorrection = MassToPPM(.ClassMW - GetIsoMass(GelData(CallerID).IsoData(.ClassRepInd), IsoField), .ClassMW)
+                        If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, GelData(CallerID).IsoData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, GelData(CallerID).IsoData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
+                            ' Hit found
+                            lngDataWithHits = lngDataWithHits + 1
+                        End If
+                    Case Else
+                        Debug.Assert False
+                    End Select
+                End With
+                If lngIndex Mod 500 = 0 Then
+                    UpdateStatus "Extracting mass/NET errors: " & Trim(lngIndex) & " / " & Trim(.UMCCnt)
+                    If mAbortProcessing Then Exit For
+                End If
+            Next lngIndex
+        End With
+    Else
+        ' Working with individual data points
+        With GelData(CallerID)
+            ' Charge state data
+            For lngCSDataIndex = 1 To .CSLines
+                With .CSData(lngCSDataIndex)
+                    If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, .MTID, .AverageMW, .Abundance, .ScanNumber, 0) Then
+                        ' Hit found
+                        lngDataWithHits = lngDataWithHits + 1
+                    End If
+                End With
+                If lngCSDataIndex Mod 1000 = 0 Then
+                    UpdateStatus "Extracting mass/NET errors: " & Trim(lngCSDataIndex) & " / " & Trim(.CSLines)
+                    If mAbortProcessing Then Exit For
+                End If
+            Next lngCSDataIndex
+            
+            ' Isotopic data
+            For lngIsoDataIndex = 1 To .IsoLines
+                With .IsoData(lngIsoDataIndex)
+                    If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, .MTID, GetIsoMass(GelData(CallerID).IsoData(lngIsoDataIndex), IsoField), .Abundance, .ScanNumber, 0) Then
+                        ' Hit found
+                        lngDataWithHits = lngDataWithHits + 1
+                    End If
+                End With
+                If lngIsoDataIndex Mod 1000 = 0 Then
+                    UpdateStatus "Extracting mass/NET errors: " & Trim(lngIsoDataIndex) & " / " & Trim(.IsoLines)
+                    If mAbortProcessing Then Exit For
+                End If
+            Next lngIsoDataIndex
+        End With
+    End If
+    
+    If mAbortProcessing Then
+        lngRawErrorsCount = 0
+    End If
+    
+    Exit Sub
+
+    
+ComputeMassErrorsErrorWorkHandler:
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Unexpected error in ComputeErrorsWork" & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    LogErrors Err.Number, "ComputeErrorsWork"
+    
+End Sub
+
 '''Private Function ComputeErrorsExtractValuesCS(ByVal lngCSDataIndex As Long, ByVal dblMass As Double) As Boolean
 '''    Dim blnSuccess As Boolean
 '''    With GelData(CallerID)
@@ -1513,7 +1931,7 @@ End Sub
 '''    ComputeErrorsExtractValuesIso = blnSuccess
 '''End Function
 
-Private Function ComputeErrorsExtractValues(ByVal strRefString As String, ByVal dblIonMass As Double, ByVal dblIonAbundance As Double, ByVal lngScanNumber As Long, dblMassErrPPMCorrection As Double) As Boolean
+Private Function ComputeErrorsExtractValues(ByRef sngRawMassErrorsPPM() As Single, ByRef sngRawMassErrorsDa() As Single, ByRef sngRawNETErrors() As Single, ByRef lngRawErrorsCount As Long, ByVal strRefString As String, ByVal dblIonMass As Double, ByVal dblIonAbundance As Double, ByVal lngScanNumber As Long, dblMassErrPPMCorrection As Double) As Boolean
     Dim sngIonGANET As Single
     
     Dim Refs() As String         ' 1-based array
@@ -1526,8 +1944,8 @@ Private Function ComputeErrorsExtractValues(ByVal strRefString As String, ByVal 
         sngIonGANET = ConvertScanToNET(lngScanNumber)
         
         ' Compute mass error in ppm between AMT and actual data
-        ' Record in mRawMassErrorsPPM(), mRawMassErrorsDa(), and mRAWGanetErrors()
-        blnHitFound = AddNewErrValues(Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, False)
+        ' Record in sngRawMassErrorsPPM(), sngRawMassErrorsDa(), and sngRawNETErrors()
+        blnHitFound = AddNewErrValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, False)
     End If
     
     If glbPreferencesExpanded.RefineMSDataOptions.IncludeInternalStdMatches Then
@@ -1538,7 +1956,7 @@ Private Function ComputeErrorsExtractValues(ByVal strRefString As String, ByVal 
                 sngIonGANET = ConvertScanToNET(lngScanNumber)
             End If
         
-            blnHitFound = AddNewErrValues(Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, True)
+            blnHitFound = AddNewErrValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, True)
         End If
     End If
     
@@ -1570,12 +1988,10 @@ On Error GoTo ConstructAMTIndexLookupArrayErrorHandler
             If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                 MsgBox "Error while constructing the MT tag ID index arrays", vbInformation + vbOKOnly, "Error"
             End If
-            ReDim mAMTIDSorted(0)
-            ReDim mAMTIDSortedInd(0)
+            ClearAmtIndexLookupArrays
         End If
     Else
-        ReDim mAMTIDSorted(0)
-        ReDim mAMTIDSortedInd(0)
+        ClearAmtIndexLookupArrays
     End If
     
     If UMCInternalStandards.Count > 0 Then
@@ -1594,13 +2010,11 @@ On Error GoTo ConstructAMTIndexLookupArrayErrorHandler
                 If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                     MsgBox "Error while constructing the InternalStdID index arrays", vbInformation + vbOKOnly, "Error"
                 End If
-                ReDim mInternalStdIDSorted(0)
-                ReDim mInternalStdIDSortedInd(0)
+                ClearIntStdIndexLookupArrays
             End If
         End With
     Else
-        ReDim mInternalStdIDSorted(0)
-        ReDim mInternalStdIDSortedInd(0)
+        ClearIntStdIndexLookupArrays
     End If
     
     Set objQSLong = Nothing
@@ -1624,103 +2038,71 @@ Private Function ConvertScanToNET(lngScanNumber As Long) As Double
 
 End Function
 
-Private Sub EnableDisableCalculating(ByVal blnCalculating As Boolean, Optional ByVal blnShowAbortButton As Boolean = False)
-    Dim blnEnableOptions As Boolean
+Private Sub DisplayCurrentDBSearchTolerances()
     
-    blnEnableOptions = Not blnCalculating
+    Dim strTolerances As String
     
-    mCalculating = blnCalculating
-    cmdAbortProcessing.Visible = blnCalculating And blnShowAbortButton
-    
-    chkIncludeInternalStandards.Enabled = blnEnableOptions
-    txtMassRangePPM.Enabled = blnEnableOptions
-    txtGANETRange.Enabled = blnEnableOptions
-    txtMassBinSizePPM.Enabled = blnEnableOptions
-    txtGANETBinSize.Enabled = blnEnableOptions
-    txtButterworthFrequency.Enabled = blnEnableOptions
-    
-    cboErrorDisplayMode.Enabled = blnEnableOptions
-    chkUseUMCClassStats.Enabled = blnEnableOptions
-    txtMinimumSLiC.Enabled = blnEnableOptions
-    
-    If blnCalculating Then
-        Me.MousePointer = vbHourglass
-    Else
-        Me.MousePointer = vbDefault
-    End If
-    
-    DoEvents
+On Error GoTo DisplayCurrentDBSearchTolerancesErrorHandler
 
+    With GelSearchDef(CallerID).AMTSearchOnUMCs
+        strTolerances = "DB Mass Tolerance: " & .MWTol & " " & GetSearchToleranceUnitText(CInt(.TolType)) & vbCrLf
+        strTolerances = strTolerances & "DB NET Tolerance: " & .NETTol & " NET"
+    End With
+
+    txtDBSearchMassTolerances = strTolerances
+    
+    Exit Sub
+    
+DisplayCurrentDBSearchTolerancesErrorHandler:
+    Debug.Print "DisplayCurrentDBSearchTolerances: " & Err.Description
+    Debug.Assert False
+    
 End Sub
 
-Private Function ExportErrorsToClipboardOrFile(Optional strFilePath As String = "", Optional blnShowMessages As Boolean = True) As Boolean
-    ' Returns True if success, False if failure
+Private Sub DisplayCurrentUMCStats()
+    ' Note: Call ComputeCurrentUMCStats before calling this sub
+    
+    Dim strUMCStats As String, strUnits As String
+    Dim udtUMCStatDetails As udtUMCStatsDetailsType
+    Dim lngDigitsToroundTo As Long
+    Dim lngMultiplier As Long
+    
+On Error GoTo DisplayCurrentUMCStatsErrorHandler
 
-    Dim strErrorData() As String
-    Dim strTextToCopy As String
-    
-    Dim OutFileNum As Integer
-    Dim lngIndex As Long, lngOutputArrayCount As Long
-    
-    If mErrorsCount = 0 Then
-        If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "No data found to copy", vbInformation + vbOKOnly, "No data"
-        End If
-        ExportErrorsToClipboardOrFile = False
-        Exit Function
-    End If
-    
-On Error GoTo ExportMassErrorsErrorHandler
-
-    Me.MousePointer = vbHourglass
-    UpdateStatus "Exporting"
-    
-    ' Header row is strErrorData(0)
-    ' Data is from strErrorData(1) to strErrorData(mMassPPMErrors.BinnedCount + mGANETErrors.BinnedCount)
-    ReDim strErrorData(0 To mErrorsCount)
-    
-    ' Fill strErrorData() with the Mass Errors and GANET errors
-    strErrorData(0) = "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError"
-    
-    For lngIndex = 0 To mErrorsCount - 1
-        strErrorData(lngIndex + 1) = Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRAWGanetErrors(lngIndex))
-        
-        If lngIndex Mod 1000 = 0 Then UpdateStatus "Exporting: " & Trim(lngIndex) & " / " & mErrorsCount
-    Next lngIndex
-    lngOutputArrayCount = mErrorsCount + 1
-    
-    If Len(strFilePath) > 0 Then
-        OutFileNum = FreeFile()
-        Open strFilePath For Output As #OutFileNum
-        
-        For lngIndex = 0 To lngOutputArrayCount - 1
-            Print #OutFileNum, strErrorData(lngIndex)
-        Next lngIndex
-        
-        Close #OutFileNum
+    strUMCStats = "Count: " & mUMCStats.Count & " UMC's"
+    If cboErrorDisplayMode.ListIndex = mdmMassErrorDa Then
+        udtUMCStatDetails = mUMCStats.DaStats
+        strUnits = " mDa"       ' Millidaltons
+        lngDigitsToroundTo = MASS_DA_ADJUSTMENT_PRECISION - 5
+        If lngDigitsToroundTo < 0 Then lngDigitsToroundTo = 0
+        lngMultiplier = 1000
     Else
-        UpdateStatus "Exporting: Preparing for clipboard"
-        strTextToCopy = FlattenStringArray(strErrorData(), lngOutputArrayCount, vbCrLf, False)
-        Clipboard.Clear
-        Clipboard.SetText strTextToCopy, vbCFText
+        ' Show stats in ppm
+        udtUMCStatDetails = mUMCStats.PPMStats
+        strUnits = " " & GetSearchToleranceUnitText(gltPPM)
+        lngDigitsToroundTo = MASS_PPM_ADJUSTMENT_PRECISION - 1
+        lngMultiplier = 1
+    End If
+        
+    If mUMCStats.Count > 0 Then
+        With udtUMCStatDetails
+            strUMCStats = strUMCStats & vbCrLf & "Median Width: " & Round(.MassWidthMedian * lngMultiplier, lngDigitsToroundTo) & strUnits
+            strUMCStats = strUMCStats & vbCrLf & "Maximum Width: " & Round(.MassWidthMaximum * lngMultiplier, lngDigitsToroundTo) & strUnits
+            strUMCStats = strUMCStats & vbCrLf & "Median StDev: " & Round(.MassStDevMedian * lngMultiplier, lngDigitsToroundTo) & strUnits
+            strUMCStats = strUMCStats & vbCrLf & "Maximum StDev: " & Round(.MassStDevMaximum * lngMultiplier, lngDigitsToroundTo) & strUnits
+        End With
     End If
     
-    Me.MousePointer = vbDefault
-    UpdateStatus "Ready"
-    
-    ExportErrorsToClipboardOrFile = True
-    Exit Function
-    
-ExportMassErrorsErrorHandler:
-    If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox "Error exporting data: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
-    End If
-    
-    Me.MousePointer = vbDefault
-    UpdateStatus "Ready"
-    ExportErrorsToClipboardOrFile = False
+    txtUMCMassStatistics = strUMCStats
 
-End Function
+    Exit Sub
+    
+DisplayCurrentUMCStatsErrorHandler:
+    Debug.Print "DisplayCurrentUMCStats: " & Err.Description
+    Debug.Assert False
+    
+End Sub
+
 
 Private Sub DisplayErrorPlotPeakStats()
         
@@ -1739,6 +2121,7 @@ Private Sub DisplayErrorPlotPeakStats()
     Dim sngSignalToNoise As Single
     
     Dim strRelativeRisk As String
+    Dim strNoiseLevel As String
     Dim strSignalToNoise As String
     
 On Error GoTo DisplayErrorPlotPeakStatsErrorHandler
@@ -1823,7 +2206,20 @@ On Error GoTo DisplayErrorPlotPeakStatsErrorHandler
         Else
             strSignalToNoise = Round(sngSignalToNoise, 1)
         End If
-        txtMassCalibrationPeakCenter = "Peak Center: " & Round(dblPeakCenter * lngMultiplier, 3) & " " & strUnits & vbCrLf & "Peak Width: " & Round(dblPeakWidth * lngMultiplier, 3) & " " & strUnits & vbCrLf & "Peak Height: " & Round(dblPeakHeight, 0) & " counts/bin" & vbCrLf & "S/N: " & strSignalToNoise & vbCrLf & "Single good peak: " & blnSingleGoodPeakFound
+        
+        If sngSignalToNoise <> 0 Then
+            strNoiseLevel = Round(dblPeakHeight / sngSignalToNoise, 0)
+        Else
+            strNoiseLevel = "0"
+        End If
+        
+        txtMassCalibrationPeakCenter = _
+            "Peak Center: " & Round(dblPeakCenter * lngMultiplier, 3) & " " & strUnits & vbCrLf & _
+            "Peak Width: " & Round(dblPeakWidth * lngMultiplier, 3) & " " & strUnits & vbCrLf & _
+            "Peak Height: " & Round(dblPeakHeight, 0) & " counts/bin" & vbCrLf & _
+            "Noise: " & strNoiseLevel & " counts" & vbCrLf & _
+            "S/N: " & strSignalToNoise & vbCrLf & _
+            "Single good peak: " & blnSingleGoodPeakFound
         
         With mMassCalErrorPeakCached
             strRelativeRisk = DisplayErrorPlotRelativeRisk("Mass: ", .PeakStats.TruePositiveArea, .PeakStats.FalsePositiveArea) & vbCrLf
@@ -1853,7 +2249,20 @@ On Error GoTo DisplayErrorPlotPeakStatsErrorHandler
         Else
             strSignalToNoise = Round(sngSignalToNoise, 1)
         End If
-        txtNETCalibrationPeakCenter = "Peak Center: " & Round(dblPeakCenter, 4) & " NET" & vbCrLf & "Peak Width: " & Round(dblPeakWidth, 4) & " NET" & vbCrLf & "Peak Height: " & Round(dblPeakHeight, 0) & " counts/bin" & vbCrLf & "S/N: " & strSignalToNoise & vbCrLf & "Single good peak: " & blnSingleGoodPeakFound
+        
+        If sngSignalToNoise <> 0 Then
+            strNoiseLevel = Round(dblPeakHeight / sngSignalToNoise, 0)
+        Else
+            strNoiseLevel = "0"
+        End If
+        
+        txtNETCalibrationPeakCenter = _
+            "Peak Center: " & Round(dblPeakCenter, 4) & " NET" & vbCrLf & _
+            "Peak Width: " & Round(dblPeakWidth, 4) & " NET" & vbCrLf & _
+            "Peak Height: " & Round(dblPeakHeight, 0) & " counts/bin" & vbCrLf & _
+            "Noise: " & strNoiseLevel & " counts" & vbCrLf & _
+            "S/N: " & strSignalToNoise & vbCrLf & _
+            "Single good peak: " & blnSingleGoodPeakFound
     Else
         txtNETCalibrationPeakCenter = "A valid peak could not be found"
         strRelativeRisk = strRelativeRisk & "Valid NET error peak not found"
@@ -1887,152 +2296,6 @@ Private Function DisplayErrorPlotRelativeRisk(ByVal strLineLabel As String, ByVa
     
 End Function
 
-Private Sub ComputeCurrentUMCStats()
-    ' Update UMC Statistics
-    
-    Dim lngIndex As Long
-    
-    Dim dblMassWidthsPPM() As Double
-    Dim dblMassWidthsDa() As Double
-    Dim dblMassStDevPPM() As Double
-    Dim dblMassStDevDa() As Double
-    
-    Dim objStats As New StatDoubles
-    
-On Error GoTo ComputeCurrentUMCStatsErrorHandler
-
-    With GelUMC(CallerID)
-        mUMCStats.Count = .UMCCnt
-        If .UMCCnt > 0 Then
-            
-            ReDim dblMassWidthsPPM(0 To .UMCCnt - 1)
-            ReDim dblMassWidthsDa(0 To .UMCCnt - 1)
-            
-            ReDim dblMassStDevPPM(0 To .UMCCnt - 1)
-            ReDim dblMassStDevDa(0 To .UMCCnt - 1)
-                          
-            
-            For lngIndex = 0 To .UMCCnt - 1
-                With .UMCs(lngIndex)
-                    dblMassWidthsDa(lngIndex) = .MaxMW - .MinMW
-                    dblMassWidthsPPM(lngIndex) = MassToPPM(dblMassWidthsDa(lngIndex), .ClassMW)
-                    
-                    dblMassStDevDa(lngIndex) = .ClassMWStD
-                    dblMassStDevPPM(lngIndex) = MassToPPM(dblMassStDevDa(lngIndex), .ClassMW)
-                End With
-            Next lngIndex
-        End If
-    End With
-    
-    With mUMCStats
-        If .Count > 0 Then
-            With .PPMStats
-                objStats.Fill dblMassWidthsPPM()
-                .MassWidthMedian = objStats.Median
-                .MassWidthMaximum = objStats.Maximum
-                
-                objStats.Fill dblMassStDevPPM()
-                .MassStDevMedian = objStats.Median
-                .MassStDevMaximum = objStats.Maximum
-            End With
-            
-            With .DaStats
-                objStats.Fill dblMassWidthsDa()
-                .MassWidthMedian = objStats.Median
-                .MassWidthMaximum = objStats.Maximum
-                
-                objStats.Fill dblMassStDevDa()
-                .MassStDevMedian = objStats.Median
-                .MassStDevMaximum = objStats.Maximum
-            End With
-            
-        Else
-            With .PPMStats
-                .MassWidthMedian = 0
-                .MassWidthMaximum = 0
-                .MassStDevMedian = 0
-                .MassStDevMaximum = 0
-            End With
-            .DaStats = .PPMStats
-        End If
-    End With
-    
-    DisplayCurrentUMCStats
-
-    Exit Sub
-
-ComputeCurrentUMCStatsErrorHandler:
-    Debug.Print "Error in DisplayUMCStats: " & Err.Description
-    Debug.Assert False
-    LogErrors Err.Number, "ComputeCurrentUMCStats"
-    
-End Sub
-
-Private Sub DisplayCurrentDBSearchTolerances()
-    
-    Dim strTolerances As String
-    
-On Error GoTo DisplayCurrentDBSearchTolerancesErrorHandler
-
-    With GelSearchDef(CallerID).AMTSearchOnUMCs
-        strTolerances = "DB Mass Tolerance: " & .MWTol & " " & GetSearchToleranceUnitText(CInt(.TolType)) & vbCrLf
-        strTolerances = strTolerances & "DB NET Tolerance: " & .NETTol & " NET"
-    End With
-
-    txtDBSearchMassTolerances = strTolerances
-    
-    Exit Sub
-    
-DisplayCurrentDBSearchTolerancesErrorHandler:
-    Debug.Print "DisplayCurrentDBSearchTolerances: " & Err.Description
-    Debug.Assert False
-    
-End Sub
-
-Private Sub DisplayCurrentUMCStats()
-    ' Note: Call ComputeCurrentUMCStats before calling this sub
-    
-    Dim strUMCStats As String, strUnits As String
-    Dim udtUMCStatDetails As udtUMCStatsDetailsType
-    Dim lngDigitsToroundTo As Long
-    Dim lngMultiplier As Long
-    
-On Error GoTo DisplayCurrentUMCStatsErrorHandler
-
-    strUMCStats = "Count: " & mUMCStats.Count & " UMC's"
-    If cboErrorDisplayMode.ListIndex = mdmMassErrorDa Then
-        udtUMCStatDetails = mUMCStats.DaStats
-        strUnits = " mDa"       ' Millidaltons
-        lngDigitsToroundTo = MASS_DA_ADJUSTMENT_PRECISION - 5
-        If lngDigitsToroundTo < 0 Then lngDigitsToroundTo = 0
-        lngMultiplier = 1000
-    Else
-        ' Show stats in ppm
-        udtUMCStatDetails = mUMCStats.PPMStats
-        strUnits = " " & GetSearchToleranceUnitText(gltPPM)
-        lngDigitsToroundTo = MASS_PPM_ADJUSTMENT_PRECISION - 1
-        lngMultiplier = 1
-    End If
-        
-    If mUMCStats.Count > 0 Then
-        With udtUMCStatDetails
-            strUMCStats = strUMCStats & vbCrLf & "Median Width: " & Round(.MassWidthMedian * lngMultiplier, lngDigitsToroundTo) & strUnits
-            strUMCStats = strUMCStats & vbCrLf & "Maximum Width: " & Round(.MassWidthMaximum * lngMultiplier, lngDigitsToroundTo) & strUnits
-            strUMCStats = strUMCStats & vbCrLf & "Median StDev: " & Round(.MassStDevMedian * lngMultiplier, lngDigitsToroundTo) & strUnits
-            strUMCStats = strUMCStats & vbCrLf & "Maximum StDev: " & Round(.MassStDevMaximum * lngMultiplier, lngDigitsToroundTo) & strUnits
-        End With
-    End If
-    
-    txtUMCMassStatistics = strUMCStats
-
-    Exit Sub
-    
-DisplayCurrentUMCStatsErrorHandler:
-    Debug.Print "DisplayCurrentUMCStats: " & Err.Description
-    Debug.Assert False
-    
-End Sub
-
 Private Function Elution(FN As Long, MinFN As Long, MaxFN As Long) As Double
 '---------------------------------------------------
 'this function does not care are we using NET or RT
@@ -2041,6 +2304,108 @@ VarVals(1) = FN
 VarVals(2) = MinFN
 VarVals(3) = MaxFN
 Elution = MyExprEva.ExprVal(VarVals())
+End Function
+
+Private Sub EnableDisableCalculating(ByVal blnCalculating As Boolean, Optional ByVal blnShowAbortButton As Boolean = False)
+    Dim blnEnableOptions As Boolean
+    
+    blnEnableOptions = Not blnCalculating
+    
+    mCalculating = blnCalculating
+    cmdAbortProcessing(0).Visible = blnCalculating And blnShowAbortButton
+    cmdAbortProcessing(1).Visible = cmdAbortProcessing(0).Visible
+    
+    cmdMassToleranceRefinementStart.Visible = Not blnCalculating
+    cmdNETToleranceRefinementStart.Visible = Not blnCalculating
+    
+    chkIncludeInternalStandards.Enabled = blnEnableOptions
+    txtMassRangePPM.Enabled = blnEnableOptions
+    txtGANETRange.Enabled = blnEnableOptions
+    txtMassBinSizePPM.Enabled = blnEnableOptions
+    txtGANETBinSize.Enabled = blnEnableOptions
+    txtButterworthFrequency.Enabled = blnEnableOptions
+    
+    cboErrorDisplayMode.Enabled = blnEnableOptions
+    chkUseUMCClassStats.Enabled = blnEnableOptions
+    txtMinimumSLiC.Enabled = blnEnableOptions
+    
+    If blnCalculating Then
+        Me.MousePointer = vbHourglass
+    Else
+        Me.MousePointer = vbDefault
+    End If
+    
+    DoEvents
+
+End Sub
+
+Private Function ExportErrorsToClipboardOrFile(Optional strFilePath As String = "", Optional blnShowMessages As Boolean = True) As Boolean
+    ' Returns True if success, False if failure
+
+    Dim strErrorData() As String
+    Dim strTextToCopy As String
+    
+    Dim OutFileNum As Integer
+    Dim lngIndex As Long, lngOutputArrayCount As Long
+    
+    If mRawErrorsCount = 0 Then
+        If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox "No data found to copy", vbInformation + vbOKOnly, "No data"
+        End If
+        ExportErrorsToClipboardOrFile = False
+        Exit Function
+    End If
+    
+On Error GoTo ExportMassErrorsErrorHandler
+
+    Me.MousePointer = vbHourglass
+    UpdateStatus "Exporting"
+    
+    ' Header row is strErrorData(0)
+    ' Data is from strErrorData(1) to strErrorData(mMassPPMErrors.BinnedCount + mGANETErrors.BinnedCount)
+    ReDim strErrorData(0 To mRawErrorsCount)
+    
+    ' Fill strErrorData() with the Mass Errors and GANET errors
+    strErrorData(0) = "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError"
+    
+    For lngIndex = 0 To mRawErrorsCount - 1
+        strErrorData(lngIndex + 1) = Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRawNETErrors(lngIndex))
+        
+        If lngIndex Mod 1000 = 0 Then UpdateStatus "Exporting: " & Trim(lngIndex) & " / " & mRawErrorsCount
+    Next lngIndex
+    lngOutputArrayCount = mRawErrorsCount + 1
+    
+    If Len(strFilePath) > 0 Then
+        OutFileNum = FreeFile()
+        Open strFilePath For Output As #OutFileNum
+        
+        For lngIndex = 0 To lngOutputArrayCount - 1
+            Print #OutFileNum, strErrorData(lngIndex)
+        Next lngIndex
+        
+        Close #OutFileNum
+    Else
+        UpdateStatus "Exporting: Preparing for clipboard"
+        strTextToCopy = FlattenStringArray(strErrorData(), lngOutputArrayCount, vbCrLf, False)
+        Clipboard.Clear
+        Clipboard.SetText strTextToCopy, vbCFText
+    End If
+    
+    Me.MousePointer = vbDefault
+    UpdateStatus "Ready"
+    
+    ExportErrorsToClipboardOrFile = True
+    Exit Function
+    
+ExportMassErrorsErrorHandler:
+    If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error exporting data: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    
+    Me.MousePointer = vbDefault
+    UpdateStatus "Ready"
+    ExportErrorsToClipboardOrFile = False
+
 End Function
 
 Public Function ExportErrorsBinnedToClipboardOrFile(strFilePath As String, blnShowMessages As Boolean, blnVisibleDifferencesOnly As Boolean) As Long
@@ -2249,6 +2614,28 @@ ExportMassErrorsBinnedErrorHandler:
     
 End Function
 
+Private Function GetEMSettings(udtRefineMSDataOptions As udtRefineMSDataOptionsType, ByVal dblVarianceEstimate As Double, dblVariance As Double, ByVal dblMean As Double, ByVal dblNormFraction As Double, ByVal blnRefiningMass As Boolean) As String
+    Dim strMessage As String
+    
+    With udtRefineMSDataOptions
+        If blnRefiningMass Then
+            strMessage = "EM Mass Error Peak Tolerance Estimate = " & Trim(.EMMassErrorPeakToleranceEstimatePPM) & " ppm; "
+        Else
+            strMessage = "EM NET Error Peak Tolerance Estimate = " & Trim(.EMNETErrorPeakToleranceEstimate) & "; "
+        End If
+        
+        strMessage = strMessage & _
+                        "EM Percent Of Data To Exclude = " & Trim(.EMPercentOfDataToExclude) & "%; " & _
+                        "EM Iteration Count = " & Trim(.EMIterationCount) & "; " & _
+                        "EM Variance Estimate = " & Round(dblVarianceEstimate, 8) & "; " & _
+                        "Variance = " & Round(dblVariance, 8) & "; " & _
+                        "Mean = " & Round(dblMean, 8) & "; " & _
+                        "Norm Fraction = " & Round(dblNormFraction * 100, 2) & "%"
+    End With
+    
+    GetEMSettings = strMessage
+End Function
+
 Public Sub RecordMassCalPeakStatsNow()
     glbPreferencesExpanded.AutoAnalysisCachedData.MassCalErrorPeakCached = mMassCalErrorPeakCached
 End Sub
@@ -2284,26 +2671,22 @@ Public Sub InitializeForm()
     
     If GelAnalysis(CallerID) Is Nothing Then
        If AMTCnt > 0 Then    'something is loaded
-          If (Len(CurrMTDatabase) > 0 Or Len(CurrLegacyMTDatabase) > 0) And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-             'MT tag data; we dont know is it appropriate; warn user
-             WarnUserUnknownMassTags CallerID
-          End If
-          lblMTStatus.Caption = ConstructMTStatusText(False)
-       
-          If Not mAMTIndicesInitialized Then
-              ConstructLookupArrays
-              mAMTIndicesInitialized = True
-          End If
+            If (Len(CurrMTDatabase) > 0 Or Len(CurrLegacyMTDatabase) > 0) And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                'MT tag data; we dont know is it appropriate; warn user
+                WarnUserUnknownMassTags CallerID
+            End If
+            lblMTStatus.Caption = ConstructMTStatusText(False)
+            
+            If Not mAMTIndicesInitialized Then
+                ConstructLookupArrays
+                mAMTIndicesInitialized = True
+            End If
        
        Else                  'nothing is loaded
-          lblMTStatus.Caption = "No MT tags loaded"
+            lblMTStatus.Caption = "No MT tags loaded"
        
-        ReDim mAMTIDSorted(0)
-        ReDim mAMTIDSortedInd(0)
-
-        ReDim mInternalStdIDSorted(0)
-        ReDim mInternalStdIDSortedInd(0)
-       
+            ClearAmtIndexLookupArrays
+            ClearIntStdIndexLookupArrays
        End If
        
        ' Can't use the GelAnalysis() object to determine slope and intercept
@@ -2327,72 +2710,7 @@ Public Sub InitializeForm()
        LoadMTDB False
     End If
     
-    mUpdatingControls = True
-    
-    ' Update the controls with the values in .ErrorPlottingOptions
-    With glbPreferencesExpanded.ErrorPlottingOptions
-        txtMassRangePPM = .MassRangePPM
-        txtMassBinSizePPM = .MassBinSizePPM
-        txtGANETRange = .GANETRange
-        txtGANETBinSize = .GANETBinSize
-        
-        txtButterworthFrequency = .ButterWorthFrequency
-        
-        With .Graph2DOptions
-            SetCheckBox chkAutoScaleXRange, .AutoScaleXAxis
-            SetCheckBox chkShowPointSymbols, .ShowPointSymbols
-            SetCheckBox chkDrawLinesBetweenPoints, .DrawLinesBetweenPoints
-            SetCheckBox chkShowGridlines, .ShowGridLines
-            SetCheckBox chkCenterYAxis, .CenterYAxis
-            SetCheckBox chkShowSmoothedData, .ShowSmoothedData
-            SetCheckBox chkShowPeakEdges, .ShowPeakEdges
-
-            txtGraphPointSize = .PointSizePixels
-            txtGraphLineWidth = .LineWidthPixels
-        End With
-    End With
-    
-    With glbPreferencesExpanded.RefineMSDataOptions
-        txtToleranceRefinementMinimumPeakHeight = Trim(.MinimumPeakHeight)
-        txtToleranceRefinementPercentageOfMaxForWidth = Trim(.PercentageOfMaxForFindingWidth)
-        txtToleranceRefinementMinimumSignalToNoiseForLowAbuPeaks = Trim(.MinimumSignalToNoiseRatioForLowAbundancePeaks)
-        
-        txtRefineMassCalibrationMaximumShift = Trim(.MassCalibrationMaximumShift)
-        If .MassCalibrationTolType = gltPPM Then
-            optRefineMassCalibrationMassType(0).Value = True
-        Else
-            optRefineMassCalibrationMassType(1).Value = True
-        End If
-        cboMassToleranceRefinementMethod.ListIndex = .MassToleranceRefinementMethod
-        txtRefineDBSearchMassToleranceMinimum = Trim(.MassToleranceMinimum)
-        txtRefineDBSearchMassToleranceMaximum = Trim(.MassToleranceMaximum)
-        txtRefineDBSearchMassToleranceAdjustmentMultiplier = Trim(.MassToleranceAdjustmentMultiplier)
-        txtRefineDBSearchNETToleranceMinimum = Trim(.NETToleranceMinimum)
-        txtRefineDBSearchNETToleranceMaximum = Trim(.NETToleranceMaximum)
-        txtRefineDBSearchNETToleranceAdjustmentMultiplier = Trim(.NETToleranceAdjustmentMultiplier)
-        SetCheckBox chkIncludeInternalStandards, .IncludeInternalStdMatches
-        SetCheckBox chkUseUMCClassStats, .UseUMCClassStats
-        txtMinimumSLiC = Trim(.MinimumSLiC)
-        txtMaximumAbundance = Trim(.MaximumAbundance)
-    End With
-    
-    With GelSearchDef(CallerID).MassCalibrationInfo
-        If .AdjustmentHistoryCount > 0 Then
-            If .MassUnits = gltPPM Then
-                If optRefineMassCalibrationMassType(0).Value <> True Then
-                    optRefineMassCalibrationMassType(0).Value = True
-                End If
-            Else
-                If optRefineMassCalibrationMassType(1).Value <> True Then
-                    optRefineMassCalibrationMassType(1).Value = True
-                End If
-            End If
-        End If
-    End With
-    
-    mUpdatingControls = False
-    
-    UpdateDynamicControls
+    UpdateControlsWithSettings
     
     ComputeErrors True
     
@@ -2430,6 +2748,10 @@ Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
         Else
             lblMTStatus.Caption = "Using cached MT data"
         End If
+    End If
+    
+    If blnAMTsWereLoaded Or blnForceReload Then
+        mAMTIndicesInitialized = False
     End If
     
     If Not mAMTIndicesInitialized Then
@@ -2519,10 +2841,30 @@ Public Function ManualRefineMassCalibration(Optional blnOverrideValue As Boolean
     If blnSuccess Then
         UpdateUMCStatsAndRecomputeErrors
     End If
-
     
     ManualRefineMassCalibration = blnSuccess
 
+End Function
+
+Private Function PeakWidthToVariance(dblPeakWidth As Double, sngSigma As Single) As Double
+    ' Converts from a peak width at the given sigma value to peak variance
+    ' Note: Variance = StDev^2
+    ' So, divide dblPeakWidth by sngSigma to get StDev, then compute StDev^2
+    
+    If sngSigma = 0 Then
+        ' This shouldn't happen
+        Debug.Assert False
+        sngSigma = 1
+    End If
+    
+    PeakWidthToVariance = (dblPeakWidth / sngSigma) ^ 2
+End Function
+
+Private Function VarianceToPeakWidth(dblVariance As Double, sngSigma As Single) As Double
+    ' Converts from variance to peak width at the given sigma value
+    ' Note: Variance = StDev^2
+    
+    VarianceToPeakWidth = sngSigma * Sqr(dblVariance)
 End Function
 
 Private Sub PopulateComboBoxes()
@@ -2536,14 +2878,15 @@ Private Sub PopulateComboBoxes()
         .ListIndex = mdmMassErrorDisplayModeConstants.mdmMassErrorPPM
     End With
     
-    With cboMassToleranceRefinementMethod
+    With cboToleranceRefinementMethod
         .Clear
+        .AddItem "Expectation Maximization"
         .AddItem "Mass Error Plot Width at % of Max"
         .AddItem "Median UMC Mass StDev"
         .AddItem "Maximum UMC Mass StDev"
         .AddItem "Median UMC Mass Width"
         .AddItem "Maximum UMC Mass Width"
-        .ListIndex = mtrMassErrorPlotWidthAtPctOfMax
+        .ListIndex = mtrExpectationMaximization
     End With
     
     mUpdatingControls = False
@@ -2808,77 +3151,170 @@ End Function
 
 Public Function RefineDBSearchMassToleranceStart(Optional ByRef blnValidPeakFound As Boolean, Optional ByRef blnPeakTooWide As Boolean) As Boolean
     
-    ' Note that blnValidPeakFound is will be set to True even when the .MassToleranceRefinementMethod
-    '  is not mtrMassErrorPlotWidthAtPctOfMax; this is done since the other methods rely on UMC statistics
+    ' Note that blnValidPeakFound will always be set to True even when the .ToleranceRefinementMethod is not
+    '  mtrMassErrorPlotWidthAtPctOfMax or mtrExpectationMaximization; this is done since the other methods rely on UMC statistics
     ' It will only be set to False if the UMC stats are empty
     
     Dim udtPeak As udtPeakStatsType
     
+    Dim eToleranceRefinementMethod As mtrMassToleranceRefinementConstants
+    
     Dim eMassType As glMassToleranceConstants
-    Dim dblPeakCenter As Double, dblPeakWidth As Double, dblPeakHeight As Double
+    
+    Dim lngDataPointsAvailable As Long
+    
+    Dim dblPeakCenter As Double, dblPeakHalfWidth As Double, dblPeakHeight As Double
+    Dim dblVarianceEstimate As Double, dblVariance As Double
+    Dim dblMean As Double, dblNormFraction As Double
+
     Dim sngSignalToNoise As Single
     Dim strMethodName As String, strMessage As String
     Dim strPeakOptionsMsg As String
     Dim strFilterOptionsMsg As String
+    Dim strStatusSaved As String
     
+    Dim blnUsingUMCClassStats As Boolean
+    Dim blnUpdateSearchTolerance As Boolean
     Dim blnSuccess As Boolean
-    Dim blnUsingMassErrorPlot As Boolean
     Dim blnSingleGoodPeakFound As Boolean
     
 On Error GoTo RefineDBSearchMassToleranceStartErrorHandler
 
     If Not mFormInitialized Then Exit Function
     
-    EnableDisableCalculating True, False
+    strStatusSaved = lblStatus.Caption
+    UpdateStatus "Refining mass tolerance"
+    
+    EnableDisableCalculating True, True
+    mAbortProcessing = False
     blnPeakTooWide = False
     
     ' Set eMassType; this is not changed below
     eMassType = gltPPM
     
-    ' Set this to true in case the .MassToleranceRefinementMethod is not mtrMassErrorPlotWidthAtPctOfMax
+    ' Set this to true in case the .ToleranceRefinementMethod is not mtrMassErrorPlotWidthAtPctOfMax or mtrExpectationMaximization
     ' This only affects the setting of the error bit during auto analysis
     blnValidPeakFound = True
     
-    Select Case glbPreferencesExpanded.RefineMSDataOptions.MassToleranceRefinementMethod
+    If eToleranceRefinementMethod = mtrExpectationMaximization And _
+       glbPreferencesExpanded.RefineMSDataOptions.EMMassTolRefineForceUseSingleDataPointErrors And _
+       glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats Then
+    
+        ' Even though we're plotting UMC class stats-based data, we want to compute the tolerances using individual data points
+        ' Assure that the IndividualPoints error arrays are populated
+        ComputeErrorsIndividualPoints False
+        
+        If mAbortProcessing Then
+            EnableDisableCalculating False
+            RefineDBSearchMassToleranceStart = False
+            Exit Function
+        End If
+        
+        blnUsingUMCClassStats = False
+        lngDataPointsAvailable = mRawErrorsIndividualPointsCount
+    Else
+        blnUsingUMCClassStats = glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats
+        lngDataPointsAvailable = mRawErrorsCount
+    End If
+    
+    eToleranceRefinementMethod = glbPreferencesExpanded.RefineMSDataOptions.ToleranceRefinementMethod
+    If eToleranceRefinementMethod = mtrExpectationMaximization Then
+        ' Validate that we have enough data to use Expectation Minimization
+        ' Do not refine the mass tolerance if we do not have enough data
+        If lngDataPointsAvailable < MINIMUM_DATA_COUNT_FOR_EM Then
+            AddToAnalysisHistory CallerID, "Warning: There are only " & Trim(lngDataPointsAvailable) & " mass & NET error points in memory; the minimum required to use Expectation Maximization is " & MINIMUM_DATA_COUNT_FOR_EM
+            EnableDisableCalculating False
+            RefineDBSearchMassToleranceStart = False
+            Exit Function
+        End If
+    End If
+    
+    Select Case eToleranceRefinementMethod
+    Case mtrExpectationMaximization
+        ' Adjust tolerance using expectation maximization of the mass error data
+        strMethodName = "expectation maximization"
+        UpdateStatus "Applying " & strMethodName
+        
+        ' Define the initial variance
+        With glbPreferencesExpanded.RefineMSDataOptions
+            If .EMMassErrorPeakToleranceEstimatePPM = 0 Then .EMMassErrorPeakToleranceEstimatePPM = 6
+            dblVarianceEstimate = PeakWidthToVariance(.EMMassErrorPeakToleranceEstimatePPM * 2, SIGMA_WIDTH_AT_BASE)
+        End With
+        
+        If eMassType = gltABS Then
+            ' Convert dblVarianceEstimate from ppm to Da
+            dblVarianceEstimate = PPMToMass(dblVarianceEstimate, 1000)
+        End If
+    
+        dblVariance = dblVarianceEstimate
+        If glbPreferencesExpanded.RefineMSDataOptions.EMMassTolRefineForceUseSingleDataPointErrors And _
+           glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats Then
+            If eMassType = gltPPM Then
+                blnValidPeakFound = CalcDistributionViaExpectationMaximation(mRawMassErrorsIndividualPointsPPM, mRawErrorsIndividualPointsCount, dblVariance, dblMean, dblNormFraction)
+            Else
+                blnValidPeakFound = CalcDistributionViaExpectationMaximation(mRawMassErrorsIndividualPointsDa, mRawErrorsIndividualPointsCount, dblVariance, dblMean, dblNormFraction)
+            End If
+        Else
+            If eMassType = gltPPM Then
+                blnValidPeakFound = CalcDistributionViaExpectationMaximation(mRawMassErrorsPPM, mRawErrorsCount, dblVariance, dblMean, dblNormFraction)
+            Else
+                blnValidPeakFound = CalcDistributionViaExpectationMaximation(mRawMassErrorsDa, mRawErrorsCount, dblVariance, dblMean, dblNormFraction)
+            End If
+        End If
+        
+        blnSingleGoodPeakFound = blnValidPeakFound
+        
+        If blnValidPeakFound Then
+            ' Convert from variance to SIGMA_WIDTH_AT_BASE/2 width
+            ' Note that dblPeakHalfWidth will also be multplied by .MassToleranceAdjustmentMultiplier below
+            dblPeakHalfWidth = VarianceToPeakWidth(dblVariance, SIGMA_WIDTH_AT_BASE / 2)
+            
+            If eMassType = gltPPM Then
+                dblPeakHalfWidth = Round(dblPeakHalfWidth, 3)
+            Else
+                dblPeakHalfWidth = Round(dblPeakHalfWidth, 5)
+            End If
+        End If
+        
     Case mtrMassErrorPlotWidthAtPctOfMax
-        ' Adjust using the mass error plot
+        ' Adjust by examining the width of the mass error plot
+
+        strMethodName = "the mass error plot width at Pct of Max"
+        UpdateStatus "Examining " & strMethodName
+        
         If eMassType = gltPPM Then
             blnValidPeakFound = FindPeakStatsUsingBinnedErrorData(mMassPPMErrors, udtPeak, blnSingleGoodPeakFound)
         Else
             blnValidPeakFound = FindPeakStatsUsingBinnedErrorData(mMassDaErrors, udtPeak, blnSingleGoodPeakFound)
         End If
         
-        strMethodName = "mass error plot"
-        blnUsingMassErrorPlot = True
-        
         If blnValidPeakFound Then
             If eMassType = gltPPM Then
-                GetPeakStats mMassPPMErrors, udtPeak, dblPeakCenter, dblPeakWidth, dblPeakHeight, sngSignalToNoise, MASS_PPM_ADJUSTMENT_PRECISION
+                GetPeakStats mMassPPMErrors, udtPeak, dblPeakCenter, dblPeakHalfWidth, dblPeakHeight, sngSignalToNoise, MASS_PPM_ADJUSTMENT_PRECISION
             Else
-                GetPeakStats mMassDaErrors, udtPeak, dblPeakCenter, dblPeakWidth, dblPeakHeight, sngSignalToNoise, MASS_DA_ADJUSTMENT_PRECISION
+                GetPeakStats mMassDaErrors, udtPeak, dblPeakCenter, dblPeakHalfWidth, dblPeakHeight, sngSignalToNoise, MASS_DA_ADJUSTMENT_PRECISION
             End If
         End If
-    
     Case mtrMedianUMCMassStDev
-        dblPeakWidth = Round(mUMCStats.PPMStats.MassStDevMedian, MASS_PPM_ADJUSTMENT_PRECISION)
+        dblPeakHalfWidth = Round(mUMCStats.PPMStats.MassStDevMedian, MASS_PPM_ADJUSTMENT_PRECISION)
         If mUMCStats.Count > 0 Then blnValidPeakFound = True
         strMethodName = "median UMC mass StDev"
         
     Case mtrMaximumUMCMassStDev
-        dblPeakWidth = Round(mUMCStats.PPMStats.MassStDevMaximum, MASS_PPM_ADJUSTMENT_PRECISION)
+        dblPeakHalfWidth = Round(mUMCStats.PPMStats.MassStDevMaximum, MASS_PPM_ADJUSTMENT_PRECISION)
         If mUMCStats.Count > 0 Then blnValidPeakFound = True
         strMethodName = "maximum UMC mass StDev"
     
     Case mtrMedianUMCMassWidth
-        dblPeakWidth = Round(mUMCStats.PPMStats.MassWidthMedian, MASS_PPM_ADJUSTMENT_PRECISION)
+        dblPeakHalfWidth = Round(mUMCStats.PPMStats.MassWidthMedian, MASS_PPM_ADJUSTMENT_PRECISION)
         If mUMCStats.Count > 0 Then blnValidPeakFound = True
         strMethodName = "median UMC mass width"
     
     Case mtrMaximumUMCMassWidth
-        dblPeakWidth = Round(mUMCStats.PPMStats.MassWidthMaximum, MASS_PPM_ADJUSTMENT_PRECISION)
+        dblPeakHalfWidth = Round(mUMCStats.PPMStats.MassWidthMaximum, MASS_PPM_ADJUSTMENT_PRECISION)
         If mUMCStats.Count > 0 Then blnValidPeakFound = True
         strMethodName = "maximum UMC mass width"
-        
+    
     Case Else
         ' Invalid (or un-coded) method
         Debug.Assert False
@@ -2887,99 +3323,135 @@ On Error GoTo RefineDBSearchMassToleranceStartErrorHandler
     With glbPreferencesExpanded.RefineMSDataOptions
         strPeakOptionsMsg = "Percentage of peak max for finding peak width = " & .PercentageOfMaxForFindingWidth & "%"
         
-        strFilterOptionsMsg = "Use UMC class stats = " & Trim(.UseUMCClassStats)
+        strFilterOptionsMsg = "Use UMC class stats = " & Trim(blnUsingUMCClassStats)
         strFilterOptionsMsg = strFilterOptionsMsg & "; Minimum SLiC Score = " & Trim(.MinimumSLiC)
         If .MaximumAbundance > 0 Then
             strFilterOptionsMsg = strFilterOptionsMsg & "; Maximum Abundance = " & Trim(.MaximumAbundance)
         End If
     End With
     
-    If blnValidPeakFound Then
-        
-        With glbPreferencesExpanded.RefineMSDataOptions
-        
-            ' Multiply dblPeakWidth by .MassToleranceAdjustmentMultiplier
-            If .MassToleranceAdjustmentMultiplier <= 0 Then
-                Debug.Assert False
-                .MassToleranceAdjustmentMultiplier = 1
-            End If
+    If mAbortProcessing Then
+        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox "Processing Aborted", vbExclamation + vbOKOnly, "Aborted"
+        End If
+    Else
+        If blnValidPeakFound Then
             
-            dblPeakWidth = dblPeakWidth * .MassToleranceAdjustmentMultiplier
+            With glbPreferencesExpanded.RefineMSDataOptions
             
-            ' Make sure dblPeakWidth is within the minimum and maximum limits defined
-            If dblPeakWidth < .MassToleranceMinimum Or dblPeakWidth > .MassToleranceMaximum Then
-                strMessage = "The mass tolerance determined from the " & strMethodName & " was " & dblPeakWidth & " " & GetSearchToleranceUnitText(eMassType) & "; This value is outside of the defined limits for mass tolerance refinement.  Thus, the mass tolerance was not changed."
-                If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-                    MsgBox strMessage, vbInformation + vbOKOnly, "Outside Limits"
-                Else
-                    AddToAnalysisHistory CallerID, strMessage
+                ' Multiply dblPeakHalfWidth by .MassToleranceAdjustmentMultiplier
+                If .MassToleranceAdjustmentMultiplier <= 0 Then
+                    Debug.Assert False
+                    .MassToleranceAdjustmentMultiplier = 1
                 End If
                 
-                ' This is a warning, not an error
-                ' Set blnSuccess to True and blnPeakTooWide to True
-                blnSuccess = True
-                If dblPeakWidth > .MassToleranceMaximum Then blnPeakTooWide = True
-            Else
-                blnSuccess = True
-            End If
-        End With
-        
-        If blnSuccess And Not blnPeakTooWide Then
-            With GelSearchDef(CallerID)
-                .AMTSearchOnIons.MWTol = dblPeakWidth
-                .AMTSearchOnIons.TolType = eMassType
+                dblPeakHalfWidth = dblPeakHalfWidth * .MassToleranceAdjustmentMultiplier
+                blnUpdateSearchTolerance = True
                 
-                .AMTSearchOnUMCs.MWTol = dblPeakWidth
-                .AMTSearchOnUMCs.TolType = eMassType
-                
-                .AMTSearchOnPairs.MWTol = dblPeakWidth
-                .AMTSearchOnPairs.TolType = eMassType
-                
-                samtDef = .AMTSearchOnUMCs
+                ' Make sure dblPeakHalfWidth is within the minimum and maximum limits defined
+                If dblPeakHalfWidth < .MassToleranceMinimum Or dblPeakHalfWidth > .MassToleranceMaximum Then
+                    strMessage = "The mass tolerance determined from " & strMethodName & " was " & dblPeakHalfWidth & " " & GetSearchToleranceUnitText(eMassType) & "; This value is outside of the defined limits for mass tolerance refinement. "
+                    If .UseMinMaxIfOutOfRange Then
+                        ' Use the minimum or maximum threshold value as the peak half width value
+                        If dblPeakHalfWidth < .MassToleranceMinimum Then
+                            strMessage = strMessage & "Will use the minimum tolerance threshold: " & Trim(.MassToleranceMinimum)
+                            dblPeakHalfWidth = .MassToleranceMinimum
+                        Else
+                            strMessage = strMessage & "Will use the maximum tolerance threshold: " & Trim(.MassToleranceMaximum)
+                            dblPeakHalfWidth = .MassToleranceMaximum
+                        End If
+                    Else
+                        strMessage = strMessage & "Thus, the mass tolerance was not changed."
+                        blnUpdateSearchTolerance = False
+                    End If
+                    
+                    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                        MsgBox strMessage, vbInformation + vbOKOnly, "Outside Limits"
+                    Else
+                        AddToAnalysisHistory CallerID, strMessage
+                    End If
+                    
+                    ' This is a warning, not an error
+                    ' Set blnSuccess to True and possibly set blnPeakTooWide to True
+                    blnSuccess = True
+                    If dblPeakHalfWidth > .MassToleranceMaximum Then blnPeakTooWide = True
+                Else
+                    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                        MsgBox "The mass tolerance determined using " & strMethodName & " was " & dblPeakHalfWidth & " " & GetSearchToleranceUnitText(eMassType) & "; the search tolerance has been updated.", vbInformation + vbOKOnly, "Tolerance Updated"
+                    End If
+                    
+                    blnSuccess = True
+                End If
             End With
             
+            If blnSuccess And blnUpdateSearchTolerance Then
+                With GelSearchDef(CallerID)
+                    .AMTSearchOnIons.MWTol = dblPeakHalfWidth
+                    .AMTSearchOnIons.TolType = eMassType
+                    
+                    .AMTSearchOnUMCs.MWTol = dblPeakHalfWidth
+                    .AMTSearchOnUMCs.TolType = eMassType
+                    
+                    .AMTSearchOnPairs.MWTol = dblPeakHalfWidth
+                    .AMTSearchOnPairs.TolType = eMassType
+                    
+                    samtDef = .AMTSearchOnUMCs
+                End With
+                
+                UpdateStatus "New mass tolerance determined"
+            
+                strMessage = SEARCH_MASS_TOL_DETERMINED & " using " & strMethodName & "; tolerance = " & dblPeakHalfWidth & " " & GetSearchToleranceUnitText(eMassType)
+                
+                If eToleranceRefinementMethod = mtrExpectationMaximization Then
+                    strMessage = strMessage & "; " & GetEMSettings(glbPreferencesExpanded.RefineMSDataOptions, dblVarianceEstimate, dblVariance, dblMean, dblNormFraction, True)
+                ElseIf eToleranceRefinementMethod = mtrMassErrorPlotWidthAtPctOfMax Then
+                    strMessage = strMessage & "; " & strPeakOptionsMsg
+                End If
+                strMessage = strMessage & "; " & strFilterOptionsMsg
+                strMessage = strMessage & "; Single good peak found = " & CStr(blnSingleGoodPeakFound)
+                
+                AddToAnalysisHistory CallerID, strMessage
+            End If
+            
+        Else
+            UpdateStatus "Unable to determine an optimal tolerance"
+            Select Case eToleranceRefinementMethod
+            Case mtrMassErrorPlotWidthAtPctOfMax
+                strMessage = "Unable to determine an optimal mass tolerance since no valid peaks could be found in the mass error plot"
+            Case mtrExpectationMaximization
+                strMessage = "Unable to determine an optimal mass tolerance via expectation minimization"
+                If lngDataPointsAvailable > 1 Then
+                    strMessage = strMessage & "; unknown error"
+                Else
+                    strMessage = strMessage & "; must have 2 or more data points to use expectation maximization"
+                End If
+            Case Else
+                strMessage = "Unable to determine an optimal mass tolerance since there are no UMC's in memory"
+            End Select
+            
             If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-                MsgBox "The mass tolerance determined using the " & strMethodName & " was " & dblPeakWidth & " " & GetSearchToleranceUnitText(eMassType) & "; the search tolerance has been updated.", vbInformation + vbOKOnly, "Tolerance Updated"
+                MsgBox strMessage & ".", vbExclamation + vbOKOnly, "Adjustment Not Performed"
+            Else
+                If eToleranceRefinementMethod = mtrExpectationMaximization Then
+                    strMessage = strMessage & "; " & GetEMSettings(glbPreferencesExpanded.RefineMSDataOptions, dblVarianceEstimate, dblVariance, dblMean, dblNormFraction, True)
+                ElseIf eToleranceRefinementMethod = mtrMassErrorPlotWidthAtPctOfMax Then
+                    strMessage = strMessage & "; Minimum peak height = " & glbPreferencesExpanded.RefineMSDataOptions.MinimumPeakHeight & " counts/bin; " & strPeakOptionsMsg
+                End If
+                strMessage = strMessage & "; " & strFilterOptionsMsg
+                
+                strMessage = "Warning - " & strMessage
+                AddToAnalysisHistory CallerID, strMessage
             End If
-        
-            strMessage = SEARCH_MASS_TOL_DETERMINED & " using " & strMethodName & "; tolerance = " & dblPeakWidth & " " & GetSearchToleranceUnitText(eMassType)
-            If blnUsingMassErrorPlot Then
-                strMessage = strMessage & "; " & strPeakOptionsMsg
-            End If
-            strMessage = strMessage & "; " & strFilterOptionsMsg
-                            
-            strMessage = strMessage & "; Single good peak found = " & CStr(blnSingleGoodPeakFound)
             
-            AddToAnalysisHistory CallerID, strMessage
-            
+            ' Set blnSuccess to True since this is a warning, not an error
+            blnSuccess = True
         End If
-        
-    Else
-        If blnUsingMassErrorPlot Then
-            strMessage = "Unable to determine an optimal mass tolerance since no valid peaks could be found in the mass error plot"
-        Else
-            strMessage = "Unable to determine an optimal mass tolerance since there are no UMC's in memory"
-        End If
-        
-        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox strMessage & ".", vbExclamation + vbOKOnly, "Adjustment Not Performed"
-        Else
-            If blnUsingMassErrorPlot Then
-                strMessage = strMessage & "; Minimum peak height = " & glbPreferencesExpanded.RefineMSDataOptions.MinimumPeakHeight & " counts/bin; " & strPeakOptionsMsg
-            End If
-            strMessage = strMessage & "; " & strFilterOptionsMsg
-            
-            strMessage = "Warning - " & strMessage
-            AddToAnalysisHistory CallerID, strMessage
-        End If
-        
-        ' Set blnSuccess to True since this is a warning, not an error
-        blnSuccess = True
     End If
     
     DisplayCurrentDBSearchTolerances
     
     EnableDisableCalculating False
+    UpdateStatus strStatusSaved
     
     RefineDBSearchMassToleranceStart = blnSuccess
     Exit Function
@@ -2996,12 +3468,23 @@ Public Function RefineDBSearchNETToleranceStart(Optional ByRef blnValidPeakFound
     
     Dim udtPeak As udtPeakStatsType
     
-    Dim dblPeakCenter As Double, dblPeakWidth As Double, dblPeakHeight As Double
+    Dim eToleranceRefinementMethod As mtrMassToleranceRefinementConstants
+    
+    Dim lngDataPointsAvailable As Long
+    
+    Dim dblPeakCenter As Double, dblPeakHalfWidth As Double, dblPeakHeight As Double
+    Dim dblVarianceEstimate As Double, dblVariance As Double
+    Dim dblMean As Double, dblNormFraction As Double
     Dim sngSignalToNoise As Single
-    Dim strMessage As String
+    
+    Dim strMethodName As String, strMessage As String
     Dim strPeakOptionsMsg As String
     Dim strFilterOptionsMsg As String
+    Dim strNETTolPeakStats As String
+    Dim strStatusSaved As String
     
+    Dim blnUsingUMCClassStats As Boolean
+    Dim blnUpdateSearchTolerance As Boolean
     Dim blnSuccess As Boolean
     Dim blnSingleGoodPeakFound As Boolean
     
@@ -3009,96 +3492,214 @@ On Error GoTo RefineDBSearchNETToleranceStartErrorHandler
 
     If Not mFormInitialized Then Exit Function
     
-    EnableDisableCalculating True, False
+    strStatusSaved = lblStatus.Caption
+    UpdateStatus "Refining NET tolerance"
+    
+    EnableDisableCalculating True, True
+    mAbortProcessing = False
     blnPeakTooWide = False
     
-    ' Adjust using the NET error plot
-    blnValidPeakFound = FindPeakStatsUsingBinnedErrorData(mGanetErrors, udtPeak, blnSingleGoodPeakFound)
-    If blnValidPeakFound Then
-        GetPeakStats mGanetErrors, udtPeak, dblPeakCenter, dblPeakWidth, dblPeakHeight, sngSignalToNoise, GANET_ADJUSTMENT_PRECISION
+    If eToleranceRefinementMethod = mtrExpectationMaximization And _
+       glbPreferencesExpanded.RefineMSDataOptions.EMNETTolRefineForceUseSingleDataPointErrors And _
+       glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats Then
+    
+        ' Even though we're plotting UMC class stats-based data, we want to compute the tolerances using individual data points
+        ' Assure that the IndividualPoints error arrays are populated
+        ComputeErrorsIndividualPoints False
+        
+        If mAbortProcessing Then
+            EnableDisableCalculating False
+            RefineDBSearchNETToleranceStart = False
+            Exit Function
+        End If
+        
+        blnUsingUMCClassStats = False
+        lngDataPointsAvailable = mRawErrorsIndividualPointsCount
+    Else
+        blnUsingUMCClassStats = glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats
+        lngDataPointsAvailable = mRawErrorsCount
+    End If
+        
+    eToleranceRefinementMethod = glbPreferencesExpanded.RefineMSDataOptions.ToleranceRefinementMethod
+    If eToleranceRefinementMethod = mtrExpectationMaximization Then
+        ' Validate that we have enough data to use Expectation Minimization
+        ' Do not refine the NET tolerance if we do not have enough data
+        If lngDataPointsAvailable < MINIMUM_DATA_COUNT_FOR_EM Then
+            AddToAnalysisHistory CallerID, "Warning: There are only " & Trim(lngDataPointsAvailable) & " mass & NET error points in memory; the minimum required to use Expectation Maximization is " & MINIMUM_DATA_COUNT_FOR_EM
+            EnableDisableCalculating False
+            RefineDBSearchNETToleranceStart = False
+            Exit Function
+        End If
     End If
     
+    ' Initially adjust by examining the width of the NET error plot
+    ' We need to do this to determine the peak stats (which are stored in the analysis history and are queried elsewhere in the application)
+    strMethodName = "the NET error plot width at Pct of Max"
+    
+    blnValidPeakFound = FindPeakStatsUsingBinnedErrorData(mGanetErrors, udtPeak, blnSingleGoodPeakFound)
+    If blnValidPeakFound Then
+        GetPeakStats mGanetErrors, udtPeak, dblPeakCenter, dblPeakHalfWidth, dblPeakHeight, sngSignalToNoise, GANET_ADJUSTMENT_PRECISION
+    End If
+    
+    strNETTolPeakStats = NET_TOL_PEAK_STATS_START & " = " & dblPeakHeight & ", " & dblPeakHalfWidth & ", " & dblPeakCenter & ", " & sngSignalToNoise & " " & NET_TOL_PEAK_STATS_END
+
+    If eToleranceRefinementMethod = mtrExpectationMaximization Then
+        ' Adjust tolerance using expectation maximization of the NET error data
+        strMethodName = "expectation maximization"
+        UpdateStatus "Applying " & strMethodName
+        
+        ' Define the initial variance
+        With glbPreferencesExpanded.RefineMSDataOptions
+            If .EMNETErrorPeakToleranceEstimate = 0 Then .EMNETErrorPeakToleranceEstimate = 0.05
+            dblVarianceEstimate = PeakWidthToVariance(.EMNETErrorPeakToleranceEstimate * 2, SIGMA_WIDTH_AT_BASE)
+        End With
+        
+        dblVariance = dblVarianceEstimate
+        If glbPreferencesExpanded.RefineMSDataOptions.EMNETTolRefineForceUseSingleDataPointErrors And _
+           glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats Then
+            blnValidPeakFound = CalcDistributionViaExpectationMaximation(mRawNETErrorsIndividualPoints, mRawErrorsIndividualPointsCount, dblVariance, dblMean, dblNormFraction)
+        Else
+            blnValidPeakFound = CalcDistributionViaExpectationMaximation(mRawNETErrors, mRawErrorsCount, dblVariance, dblMean, dblNormFraction)
+        End If
+        
+        blnSingleGoodPeakFound = blnValidPeakFound
+        
+        If blnValidPeakFound Then
+            ' Convert from variance to SIGMA_WIDTH_AT_BASE/2 width
+            ' Note that dblPeakHalfWidth will also be multplied by .NETToleranceAdjustmentMultiplier below
+            dblPeakHalfWidth = VarianceToPeakWidth(dblVariance, SIGMA_WIDTH_AT_BASE / 2)
+            dblPeakHalfWidth = Round(dblPeakHalfWidth, 5)
+        End If
+    Else
+        UpdateStatus "Examining " & strMethodName
+    End If
+     
     With glbPreferencesExpanded.RefineMSDataOptions
         strPeakOptionsMsg = "Percentage of peak max for finding peak width = " & .PercentageOfMaxForFindingWidth & "%"
     
-        strFilterOptionsMsg = "Use UMC class stats = " & Trim(.UseUMCClassStats)
+        strFilterOptionsMsg = "Use UMC class stats = " & Trim(blnUsingUMCClassStats)
         strFilterOptionsMsg = strFilterOptionsMsg & "; Minimum SLiC Score = " & Trim(.MinimumSLiC)
         If .MaximumAbundance > 0 Then
             strFilterOptionsMsg = strFilterOptionsMsg & "; Maximum Abundance = " & Trim(.MaximumAbundance)
         End If
     End With
     
-    If blnValidPeakFound Then
-        
-        With glbPreferencesExpanded.RefineMSDataOptions
-        
-            ' Multiply dblPeakWidth by .NETToleranceAdjustmentMultiplier
-            If .NETToleranceAdjustmentMultiplier <= 0 Then
-                Debug.Assert False
-                .NETToleranceAdjustmentMultiplier = 1
-            End If
-
-            dblPeakWidth = dblPeakWidth * .NETToleranceAdjustmentMultiplier
+    If mAbortProcessing Then
+        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox "Processing Aborted", vbExclamation + vbOKOnly, "Aborted"
+        End If
+    Else
+        If blnValidPeakFound Then
             
-            ' Make sure dblPeakWidth is within the minimum and maximum limits defined
-            If dblPeakWidth < .NETToleranceMinimum Or dblPeakWidth > .NETToleranceMaximum Then
-                blnSuccess = False
-                
-                strMessage = "The NET tolerance determined from the NET error plot was " & dblPeakWidth & " NET; This value is outside of the defined limits for NET tolerance refinement.  Thus, the NET tolerance was not changed."
-                If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-                    MsgBox strMessage, vbInformation + vbOKOnly, "Outside Limits"
-                Else
-                    AddToAnalysisHistory CallerID, strMessage
+            With glbPreferencesExpanded.RefineMSDataOptions
+            
+                ' Multiply dblPeakHalfWidth by .NETToleranceAdjustmentMultiplier
+                If .NETToleranceAdjustmentMultiplier <= 0 Then
+                    Debug.Assert False
+                    .NETToleranceAdjustmentMultiplier = 1
                 End If
+    
+                dblPeakHalfWidth = dblPeakHalfWidth * .NETToleranceAdjustmentMultiplier
+                blnUpdateSearchTolerance = True
                 
-                ' This is a warning, not an error
-                ' Set blnSuccess to True and blnPeakTooWide to True
-                blnSuccess = True
-                blnPeakTooWide = True
-            Else
-                blnSuccess = True
-            End If
-        End With
-        
-        If blnSuccess And Not blnPeakTooWide Then
-            With GelSearchDef(CallerID)
-                .AMTSearchOnIons.NETTol = dblPeakWidth
-                .AMTSearchOnUMCs.NETTol = dblPeakWidth
-                .AMTSearchOnPairs.NETTol = dblPeakWidth
-                samtDef = .AMTSearchOnUMCs
+                ' Make sure dblPeakHalfWidth is within the minimum and maximum limits defined
+                If dblPeakHalfWidth < .NETToleranceMinimum Or dblPeakHalfWidth > .NETToleranceMaximum Then
+                    strMessage = "The NET tolerance determined from " & strMethodName & " was " & dblPeakHalfWidth & " NET; This value is outside of the defined limits for NET tolerance refinement. "
+                    If .UseMinMaxIfOutOfRange Then
+                        ' Use the minimum or maximum threshold value as the peak half width value
+                        If dblPeakHalfWidth < .NETToleranceMinimum Then
+                            strMessage = strMessage & "Will use the minimum tolerance threshold: " & Trim(.NETToleranceMinimum)
+                            dblPeakHalfWidth = .NETToleranceMinimum
+                        Else
+                            strMessage = strMessage & "Will use the maximum tolerance threshold: " & Trim(.NETToleranceMaximum)
+                            dblPeakHalfWidth = .NETToleranceMaximum
+                        End If
+                    Else
+                        strMessage = strMessage & "Thus, the NET tolerance was not changed."
+                        blnUpdateSearchTolerance = False
+                    End If
+
+                    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                        MsgBox strMessage, vbInformation + vbOKOnly, "Outside Limits"
+                    Else
+                        AddToAnalysisHistory CallerID, strMessage
+                    End If
+                    
+                    ' This is a warning, not an error
+                     ' Set blnSuccess to True and possibly set blnPeakTooWide to True
+                    blnSuccess = True
+                    If dblPeakHalfWidth > .NETToleranceMaximum Then blnPeakTooWide = True
+                Else
+                    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                        MsgBox "The NET tolerance determined from " & strMethodName & " was " & dblPeakHalfWidth & " NET; The search tolerance has been updated.", vbInformation + vbOKOnly, "Tolerance Updated"
+                    End If
+
+                    blnSuccess = True
+                End If
             End With
             
-            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-                MsgBox "The NET tolerance determined using the NET error plot was " & dblPeakWidth & " NET; The search tolerance has been updated.", vbInformation + vbOKOnly, "Tolerance Updated"
-            End If
-        
-            strMessage = SEARCH_NET_TOL_DETERMINED & " using the NET error plot; tolerance = " & dblPeakWidth & " NET"
-            strMessage = strMessage & "; " & NET_TOL_PEAK_STATS_START & " = " & dblPeakHeight & ", " & dblPeakWidth & ", " & dblPeakCenter & ", " & sngSignalToNoise & " " & NET_TOL_PEAK_STATS_END
-
-            strMessage = strMessage & "; " & strPeakOptionsMsg & "; " & strFilterOptionsMsg
-            strMessage = strMessage & "; Single good peak found = " & CStr(blnSingleGoodPeakFound)
-            AddToAnalysisHistory CallerID, strMessage
+            If blnSuccess And blnUpdateSearchTolerance Then
+                With GelSearchDef(CallerID)
+                    .AMTSearchOnIons.NETTol = dblPeakHalfWidth
+                    .AMTSearchOnUMCs.NETTol = dblPeakHalfWidth
+                    .AMTSearchOnPairs.NETTol = dblPeakHalfWidth
+                    samtDef = .AMTSearchOnUMCs
+                End With
+                
+                UpdateStatus "New NET tolerance determined"
             
-        End If
-        
-    Else
-        strMessage = "Unable to determine an optimal NET tolerance since no valid peaks could be found in the NET error plot."
-        
-        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox strMessage, vbExclamation + vbOKOnly, "Adjustment Not Performed"
+                strMessage = SEARCH_NET_TOL_DETERMINED & " using " & strMethodName & "; tolerance = " & dblPeakHalfWidth & " NET"
+                strMessage = strMessage & "; " & strNETTolPeakStats
+    
+                If eToleranceRefinementMethod = mtrExpectationMaximization Then
+                    strMessage = strMessage & "; " & GetEMSettings(glbPreferencesExpanded.RefineMSDataOptions, dblVarianceEstimate, dblVariance, dblMean, dblNormFraction, False)
+                Else
+                    strMessage = strMessage & "; " & strPeakOptionsMsg & "; " & strFilterOptionsMsg
+                End If
+                strMessage = strMessage & "; Single good peak found = " & CStr(blnSingleGoodPeakFound)
+                
+                AddToAnalysisHistory CallerID, strMessage
+            End If
+            
         Else
-            strMessage = strMessage & "; Minimum peak height = " & glbPreferencesExpanded.RefineMSDataOptions.MinimumPeakHeight & " counts/bin; " & strPeakOptionsMsg & "; " & strFilterOptionsMsg
-            strMessage = "Warning - " & strMessage
-            AddToAnalysisHistory CallerID, strMessage
+            UpdateStatus "Unable to determine an optimal tolerance"
+            Select Case eToleranceRefinementMethod
+            Case mtrMassErrorPlotWidthAtPctOfMax
+                strMessage = "Unable to determine an optimal NET tolerance since no valid peaks could be found in the NET error plot."
+            Case mtrExpectationMaximization
+                strMessage = "Unable to determine an optimal NET tolerance via expectation minimization"
+                If lngDataPointsAvailable > 1 Then
+                    strMessage = strMessage & "; unknown error"
+                Else
+                    strMessage = strMessage & "; must have 2 or more data points to use expectation maximization"
+                End If
+            Case Else
+                strMessage = "Unable to determine an optimal NET tolerance since there are no UMC's in memory"
+            End Select
+            
+            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                MsgBox strMessage & ".", vbExclamation + vbOKOnly, "Adjustment Not Performed"
+            Else
+                If eToleranceRefinementMethod = mtrExpectationMaximization Then
+                    strMessage = strMessage & "; " & GetEMSettings(glbPreferencesExpanded.RefineMSDataOptions, dblVarianceEstimate, dblVariance, dblMean, dblNormFraction, False)
+                Else
+                    strMessage = strMessage & "; Minimum peak height = " & glbPreferencesExpanded.RefineMSDataOptions.MinimumPeakHeight & " counts/bin; " & strPeakOptionsMsg
+                End If
+                strMessage = strMessage & "; " & strFilterOptionsMsg
+                
+                strMessage = "Warning - " & strMessage
+                AddToAnalysisHistory CallerID, strMessage
+            End If
+            
+            ' Set blnSuccess to True since this is a warning, not an error
+            blnSuccess = True
         End If
-        
-        ' Set blnSuccess to True since this is a warning, not an error
-        blnSuccess = True
     End If
     
     DisplayCurrentDBSearchTolerances
     
     EnableDisableCalculating False
+    UpdateStatus strStatusSaved
     
     RefineDBSearchNETToleranceStart = blnSuccess
     Exit Function
@@ -3108,7 +3709,22 @@ RefineDBSearchNETToleranceStartErrorHandler:
     Debug.Assert False
     LogErrors Err.Number, "RefineDBSearchNETToleranceStart"
     EnableDisableCalculating False
+    
 End Function
+
+Private Sub ResetToDefaults()
+    Dim blnUseUMCStatsSaved As Boolean
+    
+    blnUseUMCStatsSaved = glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats
+    
+    ResetExpandedPreferences glbPreferencesExpanded, "RefineMSDataOptions"
+    UpdateControlsWithSettings
+    
+    If glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats <> blnUseUMCStatsSaved Then
+        ComputeErrors True
+    End If
+    
+End Sub
 
 Public Function SaveChartPictureToFile(blnSaveAsPNG As Boolean, Optional strFilePath As String = "", Optional blnShowMessages As Boolean = True) As Long
     ' If blnSaveAsPNG = True, then saves a PNG file
@@ -3198,7 +3814,7 @@ Public Function ShowOrCompute3DErrorDistributions(blnShowCumulativeData As Boole
     
 On Error GoTo ShowOrCompute3DErrorDistribErrorHandler
 
-    If mErrorsCount > 0 Then
+    If mRawErrorsCount > 0 Then
         With glbPreferencesExpanded.ErrorPlottingOptions
             If .MassBinSizePPM <= 0 Then .MassBinSizePPM = DEFAULT_MASS_BIN_SIZE_PPM
             If .GANETBinSize <= 0 Then .GANETBinSize = DEFAULT_GANET_BIN_SIZE
@@ -3224,7 +3840,7 @@ On Error GoTo ShowOrCompute3DErrorDistribErrorHandler
                 End If
             Loop
             
-            ShowOrCompute3DErrorDistributions = frmErrorDistribution3DFromFile.InitializeDataUsingArrays(mRawMassErrorsPPM(), mRAWGanetErrors(), mErrorsCount, sngMassBinSizePPM, sngGANETBinSize, 200, mGraphTitle, blnShowCumulativeData, Me, blnShowForm)
+            ShowOrCompute3DErrorDistributions = frmErrorDistribution3DFromFile.InitializeDataUsingArrays(mRawMassErrorsPPM(), mRawNETErrors(), mRawErrorsCount, sngMassBinSizePPM, sngGANETBinSize, 200, mGraphTitle, blnShowCumulativeData, Me, blnShowForm)
             
         End With
     Else
@@ -3267,6 +3883,88 @@ Private Sub StartMassCalibrationRevert()
             UpdateUMCStatsAndRecomputeErrors
         End If
     End If
+End Sub
+
+Private Sub UpdateControlsWithSettings()
+
+    mUpdatingControls = True
+    
+    ' Update the controls with the values in .ErrorPlottingOptions
+    With glbPreferencesExpanded.ErrorPlottingOptions
+        txtMassRangePPM = .MassRangePPM
+        txtMassBinSizePPM = .MassBinSizePPM
+        txtGANETRange = .GANETRange
+        txtGANETBinSize = .GANETBinSize
+        
+        txtButterworthFrequency = .ButterWorthFrequency
+        
+        With .Graph2DOptions
+            SetCheckBox chkAutoScaleXRange, .AutoScaleXAxis
+            SetCheckBox chkShowPointSymbols, .ShowPointSymbols
+            SetCheckBox chkDrawLinesBetweenPoints, .DrawLinesBetweenPoints
+            SetCheckBox chkShowGridlines, .ShowGridLines
+            SetCheckBox chkCenterYAxis, .CenterYAxis
+            SetCheckBox chkShowSmoothedData, .ShowSmoothedData
+            SetCheckBox chkShowPeakEdges, .ShowPeakEdges
+
+            txtGraphPointSize = .PointSizePixels
+            txtGraphLineWidth = .LineWidthPixels
+        End With
+    End With
+    
+    With glbPreferencesExpanded.RefineMSDataOptions
+        txtToleranceRefinementMinimumPeakHeight = Trim(.MinimumPeakHeight)
+        txtToleranceRefinementPercentageOfMaxForWidth = Trim(.PercentageOfMaxForFindingWidth)
+        txtToleranceRefinementMinimumSignalToNoiseForLowAbuPeaks = Trim(.MinimumSignalToNoiseRatioForLowAbundancePeaks)
+        
+        txtRefineMassCalibrationMaximumShift = Trim(.MassCalibrationMaximumShift)
+        If .MassCalibrationTolType = gltPPM Then
+            optRefineMassCalibrationMassType(0).Value = True
+        Else
+            optRefineMassCalibrationMassType(1).Value = True
+        End If
+        txtRefineDBSearchMassToleranceMinimum = Trim(.MassToleranceMinimum)
+        txtRefineDBSearchMassToleranceMaximum = Trim(.MassToleranceMaximum)
+        txtRefineDBSearchMassToleranceAdjustmentMultiplier = Trim(.MassToleranceAdjustmentMultiplier)
+        
+        txtRefineDBSearchNETToleranceMinimum = Trim(.NETToleranceMinimum)
+        txtRefineDBSearchNETToleranceMaximum = Trim(.NETToleranceMaximum)
+        txtRefineDBSearchNETToleranceAdjustmentMultiplier = Trim(.NETToleranceAdjustmentMultiplier)
+        
+        cboToleranceRefinementMethod.ListIndex = .ToleranceRefinementMethod
+        SetCheckBox chkRefineDBSearchTolUseMinMaxIfOutOfRange, .UseMinMaxIfOutOfRange
+        
+        txtEMRefineMassErrorPeakToleranceEstimatePPM.Text = Trim(.EMMassErrorPeakToleranceEstimatePPM)
+        txtEMRefineNETErrorPeakToleranceEstimate.Text = Trim(.EMNETErrorPeakToleranceEstimate)
+        txtEMRefinePercentOfDataToExclude.Text = Trim(.EMPercentOfDataToExclude)
+        
+        SetCheckBox chkEMRefineMassTolForceUseAllDataPointErrors, .EMMassTolRefineForceUseSingleDataPointErrors
+        SetCheckBox chkEMRefineNETTolForceUseAllDataPointErrors, .EMNETTolRefineForceUseSingleDataPointErrors
+        
+        
+        SetCheckBox chkIncludeInternalStandards, .IncludeInternalStdMatches
+        SetCheckBox chkUseUMCClassStats, .UseUMCClassStats
+        txtMinimumSLiC = Trim(.MinimumSLiC)
+        txtMaximumAbundance = Trim(.MaximumAbundance)
+    End With
+    
+    With GelSearchDef(CallerID).MassCalibrationInfo
+        If .AdjustmentHistoryCount > 0 Then
+            If .MassUnits = gltPPM Then
+                If optRefineMassCalibrationMassType(0).Value <> True Then
+                    optRefineMassCalibrationMassType(0).Value = True
+                End If
+            Else
+                If optRefineMassCalibrationMassType(1).Value <> True Then
+                    optRefineMassCalibrationMassType(1).Value = True
+                End If
+            End If
+        End If
+    End With
+    
+    mUpdatingControls = False
+    
+    UpdateDynamicControls
 End Sub
 
 Private Sub UpdateDynamicControls()
@@ -3611,8 +4309,8 @@ Private Sub cboErrorDisplayMode_Click()
     mnuEditCopyVisibleBinnedDifferences.Caption = "&Copy Binned Differences; " & cboErrorDisplayMode.Text
 End Sub
 
-Private Sub cboMassToleranceRefinementMethod_Click()
-    glbPreferencesExpanded.RefineMSDataOptions.MassToleranceRefinementMethod = cboMassToleranceRefinementMethod.ListIndex
+Private Sub cboToleranceRefinementMethod_Click()
+    glbPreferencesExpanded.RefineMSDataOptions.ToleranceRefinementMethod = cboToleranceRefinementMethod.ListIndex
 End Sub
 
 Private Sub chkAutoScaleXRange_Click()
@@ -3630,9 +4328,21 @@ Private Sub chkDrawLinesBetweenPoints_Click()
     UpdatePlot
 End Sub
 
+Private Sub chkEMRefineMassTolForceUseAllDataPointErrors_Click()
+    glbPreferencesExpanded.RefineMSDataOptions.EMMassTolRefineForceUseSingleDataPointErrors = cChkBox(chkEMRefineMassTolForceUseAllDataPointErrors)
+End Sub
+
+Private Sub chkEMRefineNETTolForceUseAllDataPointErrors_Click()
+    glbPreferencesExpanded.RefineMSDataOptions.EMNETTolRefineForceUseSingleDataPointErrors = cChkBox(chkEMRefineNETTolForceUseAllDataPointErrors)
+End Sub
+
 Private Sub chkIncludeInternalStandards_Click()
     glbPreferencesExpanded.RefineMSDataOptions.IncludeInternalStdMatches = cChkBox(chkIncludeInternalStandards)
     ComputeErrors False
+End Sub
+
+Private Sub chkRefineDBSearchTolUseMinMaxIfOutOfRange_Click()
+    glbPreferencesExpanded.RefineMSDataOptions.UseMinMaxIfOutOfRange = cChkBox(chkRefineDBSearchTolUseMinMaxIfOutOfRange)
 End Sub
 
 Private Sub chkShowGridlines_Click()
@@ -3664,7 +4374,7 @@ Private Sub chkUseUMCClassStats_Click()
     ComputeErrors False
 End Sub
 
-Private Sub cmdAbortProcessing_Click()
+Private Sub cmdAbortProcessing_Click(Index As Integer)
     mAbortProcessing = True
 End Sub
 
@@ -3690,6 +4400,10 @@ End Sub
 
 Private Sub cmdRecomputeHistograms_Click()
     ComputeErrors False
+End Sub
+
+Private Sub cmdResetToDefaults_Click()
+    ResetToDefaults
 End Sub
 
 Private Sub Form_Activate()
@@ -3741,8 +4455,31 @@ Private Sub Form_Load()
     
 End Sub
 
+Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
+    If UnloadMode = vbFormControlMenu Then
+        ClearDataArrays
+    End If
+End Sub
+
 Private Sub Form_Resize()
     PositionControls
+End Sub
+
+Private Sub mNormUnifEM_ProgessComplete()
+    UpdateStatus "Expectation Maximization complete"
+    DoEvents
+End Sub
+
+Private Sub mNormUnifEM_ProgessReset()
+    UpdateStatus "Expectation Maximization working: 0%"
+    DoEvents
+    If mAbortProcessing Then mNormUnifEM.AbortProcessingNow
+End Sub
+
+Private Sub mNormUnifEM_ProgessUpdate()
+    UpdateStatus "Expectation Maximization working: " & Round(mNormUnifEM.ProgressPercentComplete, 0) & "%"
+    DoEvents
+    If mAbortProcessing Then mNormUnifEM.AbortProcessingNow
 End Sub
 
 Private Sub mnuCopyChart_Click(Index As Integer)
@@ -3770,6 +4507,7 @@ Private Sub mnuEditCopyVisibleBinnedDifferences_Click()
 End Sub
 
 Private Sub mnuExit_Click()
+    ClearDataArrays
     Unload Me
 End Sub
 
@@ -3873,6 +4611,33 @@ Private Sub txtButterworthFrequency_Validate(Cancel As Boolean)
             .ButterWorthFrequency = CSngSafe(txtButterworthFrequency)
         End If
     End With
+End Sub
+
+Private Sub txtEMRefineMassErrorPeakToleranceEstimatePPM_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtEMRefineMassErrorPeakToleranceEstimatePPM, KeyAscii, True, True
+End Sub
+
+Private Sub txtEMRefineMassErrorPeakToleranceEstimatePPM_LostFocus()
+    ValidateTextboxValueDbl txtEMRefineMassErrorPeakToleranceEstimatePPM, 0.0001, 10000, 6
+    glbPreferencesExpanded.RefineMSDataOptions.EMMassErrorPeakToleranceEstimatePPM = CSngSafe(txtEMRefineMassErrorPeakToleranceEstimatePPM)
+End Sub
+
+Private Sub txtEMRefineNETErrorPeakToleranceEstimate_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtEMRefineNETErrorPeakToleranceEstimate, KeyAscii, True, True
+End Sub
+
+Private Sub txtEMRefineNETErrorPeakToleranceEstimate_LostFocus()
+    ValidateTextboxValueDbl txtEMRefineNETErrorPeakToleranceEstimate, 0.00001, 1, 0.05
+    glbPreferencesExpanded.RefineMSDataOptions.EMNETErrorPeakToleranceEstimate = CSngSafe(txtEMRefineNETErrorPeakToleranceEstimate)
+End Sub
+
+Private Sub txtEMRefinePercentOfDataToExclude_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtEMRefinePercentOfDataToExclude, KeyAscii, True, False
+End Sub
+
+Private Sub txtEMRefinePercentOfDataToExclude_LostFocus()
+    ValidateTextboxValueDbl txtEMRefinePercentOfDataToExclude, 0, 100, 10
+    glbPreferencesExpanded.RefineMSDataOptions.EMPercentOfDataToExclude = CIntSafe(txtEMRefinePercentOfDataToExclude)
 End Sub
 
 Private Sub txtGANETBinSize_KeyDown(KeyCode As Integer, Shift As Integer)
@@ -4041,7 +4806,7 @@ Private Sub txtToleranceRefinementMinimumPeakHeight_LostFocus()
 End Sub
 
 Private Sub txtToleranceRefinementMinimumSignalToNoiseForLowAbuPeaks_Change()
-    ' Yes, I want this code to be in a _Change procedure
+    ' Note: This needs to fire on Change and not on LostFocus.
     If IsNumeric(txtToleranceRefinementMinimumSignalToNoiseForLowAbuPeaks) Then
         If val(txtToleranceRefinementMinimumSignalToNoiseForLowAbuPeaks) >= 0 And val(txtToleranceRefinementMinimumSignalToNoiseForLowAbuPeaks) <= 100000 Then
             glbPreferencesExpanded.RefineMSDataOptions.MinimumSignalToNoiseRatioForLowAbundancePeaks = CSngSafe(txtToleranceRefinementMinimumSignalToNoiseForLowAbuPeaks)
@@ -4056,7 +4821,7 @@ Private Sub txtToleranceRefinementMinimumSignalToNoiseForLowAbuPeaks_LostFocus()
 End Sub
 
 Private Sub txtToleranceRefinementPercentageOfMaxForWidth_Change()
-    ' Yes, I want this code to be in a _Change procedure
+    ' Note: This needs to fire on Change and not on LostFocus.
     If IsNumeric(txtToleranceRefinementPercentageOfMaxForWidth) Then
         If val(txtToleranceRefinementPercentageOfMaxForWidth) >= 0 And val(txtToleranceRefinementPercentageOfMaxForWidth) <= 100 Then
             glbPreferencesExpanded.RefineMSDataOptions.PercentageOfMaxForFindingWidth = CLngSafe(txtToleranceRefinementPercentageOfMaxForWidth)

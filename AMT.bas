@@ -119,8 +119,8 @@ Public Type SearchAMTDefinition
     TolType As Integer           'ppm or Dalton; represented by 0 = ppm = gltPPM or 2 = Da = gltABS (actually type glMassToleranceConstants)
     NETorRT As Integer           'Use NET or use RT (on some forms, use NET or use PNET)
     Formula As String            'Formula to calculate NET
-    MWTol As Double              'actual MW Tolerance
-    NETTol As Double             'NET Tolerance
+    MWTol As Double              'actual MW Tolerance (search is +/- this tolerance)
+    NETTol As Double             'NET Tolerance (search is +/- this tolerance)
     MassTag As Double            'if used special search is performed
     MaxMassTags As Long          'maximum number of MT tags
     SkipReferenced As Boolean    'if True skip data points already referenced by AMT ID

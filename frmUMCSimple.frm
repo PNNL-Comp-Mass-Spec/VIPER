@@ -4,7 +4,7 @@ Begin VB.Form frmUMCSimple
    BackColor       =   &H00FF8080&
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Unique Molecular Mass Classes Definition"
-   ClientHeight    =   6225
+   ClientHeight    =   6390
    ClientLeft      =   45
    ClientTop       =   405
    ClientWidth     =   9270
@@ -12,7 +12,7 @@ Begin VB.Form frmUMCSimple
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   6225
+   ScaleHeight     =   6390
    ScaleWidth      =   9270
    ShowInTaskbar   =   0   'False
    StartUpPosition =   1  'CenterOwner
@@ -850,7 +850,7 @@ Begin VB.Form frmUMCSimple
       Height          =   285
       Left            =   120
       TabIndex        =   86
-      Top             =   5880
+      Top             =   6100
       Width           =   4455
    End
    Begin VB.Label lblGelName 

@@ -2624,8 +2624,10 @@ With GelUMCIon(Ind).ThisNetDef
                         ' Do not append the units
                     End Select
                End If
-               Definition = Definition & strLineSeparator
+            Else
+                Definition = Definition & "Unused"
             End If
+            Definition = Definition & strLineSeparator
         Next i
      Else
         Definition = Definition & "Metric definition not dimensioned"
@@ -2662,6 +2664,8 @@ If DataCnt < 2 Then
    Exit Function
 End If
 MyDef.NetDim = chkUse.Count
+
+' Update .NetActualDim
 MyDef.NetActualDim = 0
 For i = 0 To chkUse.Count - 1
     If chkUse(i).Value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1

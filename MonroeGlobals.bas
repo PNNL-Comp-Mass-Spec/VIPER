@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "November 2, 2006"
+Public Const APP_BUILD_DATE As String = "November 16, 2006"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -100,11 +100,12 @@ End Enum
 
 Public Const MASS_TOLERANCE_REFINEMENT_METHOD_COUNT = 5
 Public Enum mtrMassToleranceRefinementConstants
-    mtrMassErrorPlotWidthAtPctOfMax = 0                 ' Width at .PercentageOfMaxForFindingWidth
-    mtrMedianUMCMassStDev = 1
-    mtrMaximumUMCMassStDev = 2
-    mtrMedianUMCMassWidth = 3
-    mtrMaximumUMCMassWidth = 4
+    mtrExpectationMaximization = 0                      ' Use Expectation Maximization
+    mtrMassErrorPlotWidthAtPctOfMax = 1                 ' Use width at .PercentageOfMaxForFindingWidth
+    mtrMedianUMCMassStDev = 2
+    mtrMaximumUMCMassStDev = 3
+    mtrMedianUMCMassWidth = 4
+    mtrMaximumUMCMassWidth = 5
 End Enum
 
 Public Enum wscWindowSizeConstants
@@ -922,7 +923,9 @@ Public Type udtRefineMSDataOptionsType
     MassCalibrationMaximumShift As Double                   ' ppm or Da, depending on MassCalibrationTolType
     MassCalibrationTolType As glMassToleranceConstants
     
-    MassToleranceRefinementMethod As mtrMassToleranceRefinementConstants
+    ToleranceRefinementMethod As mtrMassToleranceRefinementConstants            ' This applies to both Mass and NET tolerance refinement
+    UseMinMaxIfOutOfRange As Boolean                        ' If True, then uses MassToleranceMinimum or MassToleranceMaximum if the new tolerance defined is out-of-range
+    
     MassToleranceMinimum As Double              ' ppm
     MassToleranceMaximum As Double              ' ppm
     MassToleranceAdjustmentMultiplier As Double
@@ -936,6 +939,14 @@ Public Type udtRefineMSDataOptionsType
     UseUMCClassStats As Boolean
     MinimumSLiC As Single
     MaximumAbundance As Double                  ' When UseUMCClassStats = True, then the UMC class abundances are tested against MaximumAbundance; when UseUMCClassStats = False, we're using individual data points and thus the individual data point abundances are tested against MaximumAbundance
+    
+    EMMassErrorPeakToleranceEstimatePPM As Single       ' Used to compute the initial variance value to send to the Expectation Maximization algorithm; this is estimated peak half width at 5 sigma
+    EMNETErrorPeakToleranceEstimate As Single           ' Used to compute the initial variance value to send to the Expectation Maximization algorithm; this is estimated peak half width at 5 sigma
+    EMIterationCount As Integer                         ' Number of iterations to perform for Expectation Maximization; must be >= 5
+    EMPercentOfDataToExclude As Integer                 ' Value between 0 and 75; used when determining minimum and maximum values in the range of data to use for Expectation Maximization; excludes EMPercentOfDataToExclude of the data (by removing DataCount*EMPercentOfDataToExclude/100/2 values from the extremes of the array)
+    
+    EMMassTolRefineForceUseSingleDataPointErrors As Boolean    ' When True, then sends individual data point errors to the Expectation Maximization algorithm
+    EMNETTolRefineForceUseSingleDataPointErrors As Boolean     ' When True, then sends individual data point errors to the Expectation Maximization algorithm
 End Type
 
 Public Type udtAutoToleranceRefinementType
@@ -1044,6 +1055,7 @@ Public Type udtAutoAnalysisOptionsType
     DBSearchRegionShape As srsSearchRegionShapeConstants
     
     UseLegacyDBForMTs As Boolean
+    IgnoreNETAdjustmentFailure As Boolean               ' If True, then ignores NET Adjustment Failures that occur prior to tolerance refinement
     
     AutoToleranceRefinement As udtAutoToleranceRefinementType
     

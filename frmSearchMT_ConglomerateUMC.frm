@@ -10,6 +10,15 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
    ScaleHeight     =   6915
    ScaleWidth      =   7605
    StartUpPosition =   1  'CenterOwner
+   Begin VB.CommandButton cmdSetDefaultsForToleranceRefinement 
+      Cancel          =   -1  'True
+      Caption         =   "Set to Tolerance Refinement Defaults"
+      Height          =   495
+      Left            =   5640
+      TabIndex        =   54
+      Top             =   2280
+      Width           =   1695
+   End
    Begin VB.TextBox txtDBSearchMinimumPeptideProphetProbability 
       Alignment       =   1  'Right Justify
       Height          =   285
@@ -20,13 +29,12 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Width           =   615
    End
    Begin VB.CommandButton cmdSetDefaults 
-      Cancel          =   -1  'True
       Caption         =   "Set to Defaults"
       Height          =   375
-      Left            =   6000
+      Left            =   5640
       TabIndex        =   52
       Top             =   1800
-      Width           =   1335
+      Width           =   1695
    End
    Begin VB.TextBox txtUniqueMatchStats 
       Height          =   285
@@ -867,17 +875,40 @@ Call ManageCurrID(MNG_ERASE)
 End Sub
 
 Private Sub DestroySearchStructures()
-On Error Resume Next
-mMTCnt = 0
-Erase mMTInd
-Erase mMTOrInd
-Erase mMTMWN14
-Erase mMTMWN15
-Erase mMTNET
-Erase mMTMods
-Erase mInternalStdIndexPointers
-Set MWFastSearch = Nothing
-Set InternalStdFastSearch = Nothing
+    On Error Resume Next
+    mMTCnt = 0
+    Erase mMTInd
+    Erase mMTOrInd
+    Erase mMTMWN14
+    Erase mMTMWN15
+    Erase mMTNET
+    Erase mMTMods
+    Erase mInternalStdIndexPointers
+    Set MWFastSearch = Nothing
+    Set InternalStdFastSearch = Nothing
+End Sub
+
+Private Sub DisplayCurrentSearchTolerances()
+    With samtDef
+        txtMWTol.Text = .MWTol
+    
+        Select Case .TolType
+        Case gltPPM
+          optTolType(0).Value = True
+        Case gltABS
+          optTolType(1).Value = True
+        Case Else
+          Debug.Assert False
+        End Select
+        
+        'NETTol is used both for NET and RT
+        If .NETTol >= 0 Then
+           txtNETTol.Text = .NETTol
+           txtNETTol_Validate False
+        Else
+           txtNETTol.Text = ""
+        End If
+    End With
 End Sub
 
 Private Sub GenerateUniqueMatchStats(ByRef lngUniqueUMCCount As Long, ByRef lngUniquePMTTagCount As Long, ByRef lngUniqueInternalStdCount As Long)
@@ -3170,15 +3201,27 @@ Public Sub SetDBSearchNType(blnUseN15 As Boolean)
     End If
 End Sub
 
-Private Sub SetDefaultOptions()
+Private Sub SetDefaultOptions(blnUseToleranceRefinementSettings As Boolean)
 
     Dim udtSearchDef As SearchAMTDefinition
     SetDefaultSearchAMTDef udtSearchDef, UMCNetAdjDef
     
+    If blnUseToleranceRefinementSettings Then
+        With udtSearchDef
+            .MWTol = DEFAULT_TOLERANCE_REFINEMENT_MW_TOL
+            .TolType = DEFAULT_TOLERANCE_REFINEMENT_MW_TOL_TYPE
+            .NETTol = DEFAULT_TOLERANCE_REFINEMENT_NET_TOL
+        End With
+    End If
+    
     SetCheckBox chkUpdateGelDataWithSearchResults, True
     cboAMTSearchResultsBehavior.ListIndex = asrbAMTSearchResultsBehaviorConstants.asrbAutoRemoveExisting
     
-    cboSearchRegionShape.ListIndex = srsSearchRegionShapeConstants.srsElliptical
+    If blnUseToleranceRefinementSettings Then
+        cboSearchRegionShape.ListIndex = srsSearchRegionShapeConstants.srsRectangular
+    Else
+        cboSearchRegionShape.ListIndex = srsSearchRegionShapeConstants.srsElliptical
+    End If
     
     If APP_BUILD_DISABLE_MTS Then
         cboInternalStdSearchMode.ListIndex = issmInternalStandardSearchModeConstants.issmFindOnlyMassTags
@@ -3304,6 +3347,9 @@ End Sub
 Private Sub ShowErrorDistribution2DForm()
     frmErrorDistribution2DLoadedData.CallerID = CallerID
     frmErrorDistribution2DLoadedData.Show vbModal
+    
+    ' Make sure the search tolerances displayed match those now in memory (in case the user performed tolerance refinement)
+    DisplayCurrentSearchTolerances
 End Sub
 
 Private Sub ShowHidePNNLMenus()
@@ -4309,7 +4355,11 @@ Private Sub cmdSearchAllUMCs_Click()
 End Sub
 
 Private Sub cmdSetDefaults_Click()
-    SetDefaultOptions
+    SetDefaultOptions False
+End Sub
+
+Private Sub cmdSetDefaultsForToleranceRefinement_Click()
+    SetDefaultOptions True
 End Sub
 
 Private Sub Form_Activate()
@@ -4336,9 +4386,9 @@ End If
 ShowHidePNNLMenus
 
 'set current Search Definition values
-With samtDef
-    txtMWTol.Text = .MWTol
+DisplayCurrentSearchTolerances
 
+With samtDef
     If glbPreferencesExpanded.AMTSearchResultsBehavior = asrbKeepExistingAndSkip Then
         .SkipReferenced = True
     Else
@@ -4346,24 +4396,10 @@ With samtDef
     End If
     
     optNETorRT(.NETorRT).Value = True
-    Select Case .TolType
-    Case gltPPM
-      optTolType(0).Value = True
-    Case gltABS
-      optTolType(1).Value = True
-    Case Else
-      Debug.Assert False
-    End Select
+    
     'save old value and set search on "search all"
     OldSearchFlag = .SearchFlag
     .SearchFlag = 0         'search all
-    'NETTol is used both for NET and RT
-    If .NETTol >= 0 Then
-       txtNETTol.Text = .NETTol
-       txtNETTol_Validate False
-    Else
-       txtNETTol.Text = ""
-    End If
     
     mnuET(etGANET).Checked = True
 End With

@@ -7,6 +7,10 @@ Attribute VB_Name = "Module6"
 'Registry will remember
 Option Explicit
 
+Public Const DEFAULT_TOLERANCE_REFINEMENT_MW_TOL As Double = 25
+Public Const DEFAULT_TOLERANCE_REFINEMENT_MW_TOL_TYPE As Integer = gltPPM
+Public Const DEFAULT_TOLERANCE_REFINEMENT_NET_TOL As Double = 0.05
+
 Private Const RECENT_DB_CONNECTIONS_MAX_COUNT = 25
 Private Const RECENT_DB_CONNECTIONS_SECTION_NAME = "RecentDBConnections"
 Private Const RECENT_DB_CONNECTIONS_KEY_COUNT_NAME = "ConnectionCount"
@@ -690,7 +694,7 @@ On Error GoTo LoadSettingsFileHandler
             Debug.Assert False
             .NetDim = UBound(.MetricData()) + 1
         End If
-        
+            
         For intIndex = 0 To .NetDim - 1
             strKeyPrefix = "Dim" & Trim(intIndex + 1)
         
@@ -710,11 +714,6 @@ On Error GoTo LoadSettingsFileHandler
             End If
         Next intIndex
         
-        ' Set .Use = False for the remaining entries
-        For intIndex = .NetActualDim To .NetDim - 1
-            .MetricData(intIndex).Use = False
-        Next intIndex
-    
     End With
     
     ' UMCIonNetDef Options stored in udtPrefsExpanded
@@ -1085,7 +1084,13 @@ On Error GoTo LoadSettingsFileHandler
         .PercentageOfMaxForFindingWidth = GetIniFileSettingLng(IniStuff, "RefineMSDataOptions", "PercentageOfMaxForFindingWidth", .PercentageOfMaxForFindingWidth)
         .MassCalibrationMaximumShift = GetIniFileSettingDbl(IniStuff, "RefineMSDataOptions", "MassCalibrationMaximumShift", .MassCalibrationMaximumShift)
         .MassCalibrationTolType = GetIniFileSettingInt(IniStuff, "RefineMSDataOptions", "MassCalibrationTolType", CInt(.MassCalibrationTolType))
-        .MassToleranceRefinementMethod = GetIniFileSettingInt(IniStuff, "RefineMSDataOptions", "MassToleranceRefinementMethod", CInt(.MassToleranceRefinementMethod))
+        
+        ' Note: MassToleranceRefinementMethod was renamed to ToleranceRefinementMethod in November 2006; allowing for both names here, with ToleranceRefinementMethod taking precedence
+        .ToleranceRefinementMethod = GetIniFileSettingInt(IniStuff, "RefineMSDataOptions", "MassToleranceRefinementMethod", CInt(.ToleranceRefinementMethod))
+        .ToleranceRefinementMethod = GetIniFileSettingInt(IniStuff, "RefineMSDataOptions", "ToleranceRefinementMethod", CInt(.ToleranceRefinementMethod))
+        
+        .UseMinMaxIfOutOfRange = GetIniFileSettingBln(IniStuff, "RefineMSDataOptions", "UseMinMaxIfOutOfRange", CInt(.UseMinMaxIfOutOfRange))
+        
         .MassToleranceMinimum = GetIniFileSettingDbl(IniStuff, "RefineMSDataOptions", "MassToleranceMinimum", .MassToleranceMinimum)
         .MassToleranceMaximum = GetIniFileSettingDbl(IniStuff, "RefineMSDataOptions", "MassToleranceMaximum", .MassToleranceMaximum)
         .MassToleranceAdjustmentMultiplier = GetIniFileSettingDbl(IniStuff, "RefineMSDataOptions", "MassToleranceAdjustmentMultiplier", .MassToleranceAdjustmentMultiplier)
@@ -1100,6 +1105,14 @@ On Error GoTo LoadSettingsFileHandler
         .UseUMCClassStats = GetIniFileSettingBln(IniStuff, "RefineMSDataOptions", "UseUMCClassStats", .UseUMCClassStats)
         .MinimumSLiC = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "MinimumSLiC", .MinimumSLiC)
         .MaximumAbundance = GetIniFileSettingDbl(IniStuff, "RefineMSDataOptions", "MaximumAbundance", .MaximumAbundance)
+        
+        .EMMassErrorPeakToleranceEstimatePPM = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "EMMassErrorPeakToleranceEstimatePPM", .EMMassErrorPeakToleranceEstimatePPM)
+        .EMNETErrorPeakToleranceEstimate = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "EMNETErrorPeakToleranceEstimate", .EMNETErrorPeakToleranceEstimate)
+        .EMIterationCount = GetIniFileSettingInt(IniStuff, "RefineMSDataOptions", "EMIterationCount", .EMIterationCount)
+        .EMPercentOfDataToExclude = GetIniFileSettingInt(IniStuff, "RefineMSDataOptions", "EMPercentOfDataToExclude", .EMPercentOfDataToExclude)
+        
+        .EMMassTolRefineForceUseSingleDataPointErrors = GetIniFileSettingBln(IniStuff, "RefineMSDataOptions", "EMMassTolRefineForceUseSingleDataPointErrors", .EMMassTolRefineForceUseSingleDataPointErrors)
+        .EMNETTolRefineForceUseSingleDataPointErrors = GetIniFileSettingBln(IniStuff, "RefineMSDataOptions", "EMNETTolRefineForceUseSingleDataPointErrors", .EMNETTolRefineForceUseSingleDataPointErrors)
     End With
     
     ' TIC and BPI Plotting Options
@@ -1379,6 +1392,7 @@ On Error GoTo LoadSettingsFileHandler
             
             .DBSearchRegionShape = GetIniFileSettingInt(IniStuff, "AutoAnalysisOptions", "DBSearchRegionShape", CInt(.DBSearchRegionShape))
             .UseLegacyDBForMTs = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "UseLegacyDBForMTs", .UseLegacyDBForMTs)
+            .IgnoreNETAdjustmentFailure = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "IgnoreNETAdjustmentFailure", .IgnoreNETAdjustmentFailure)
             
             .AutoAnalysisSearchModeCount = GetIniFileSettingInt(IniStuff, "AutoAnalysisOptions", "AutoAnalysisSearchModeCount", .AutoAnalysisSearchModeCount)
             If .AutoAnalysisSearchModeCount > MAX_AUTO_SEARCH_MODE_COUNT Then .AutoAnalysisSearchModeCount = MAX_AUTO_SEARCH_MODE_COUNT
@@ -2118,25 +2132,33 @@ On Error GoTo SaveSettingsFileHandler
     frmProgress.UpdateProgressBar 2
     
     ' Write the Refine MS Data options
-    ReDim strKeys(0 To 15)
-    ReDim strValues(0 To 15)
+    ReDim strKeys(0 To 22)
+    ReDim strValues(0 To 22)
     With udtPrefsExpanded.RefineMSDataOptions
         strKeys(0) = "MinimumPeakHeight": strValues(0) = .MinimumPeakHeight
         strKeys(1) = "MinimumSignalToNoiseRatioForLowAbundancePeaks": strValues(1) = .MinimumSignalToNoiseRatioForLowAbundancePeaks
         strKeys(2) = "PercentageOfMaxForFindingWidth": strValues(2) = .PercentageOfMaxForFindingWidth
         strKeys(3) = "MassCalibrationMaximumShift": strValues(3) = .MassCalibrationMaximumShift
         strKeys(4) = "MassCalibrationTolType": strValues(4) = .MassCalibrationTolType
-        strKeys(5) = "MassToleranceRefinementMethod": strValues(5) = .MassToleranceRefinementMethod
-        strKeys(6) = "MassToleranceMinimum": strValues(6) = .MassToleranceMinimum
-        strKeys(7) = "MassToleranceMaximum": strValues(7) = .MassToleranceMaximum
-        strKeys(8) = "MassToleranceAdjustmentMultiplier": strValues(8) = .MassToleranceAdjustmentMultiplier
-        strKeys(9) = "NETToleranceMinimum": strValues(9) = .NETToleranceMinimum
-        strKeys(10) = "NETToleranceMaximum": strValues(10) = .NETToleranceMaximum
-        strKeys(11) = "NETToleranceAdjustmentMultiplier": strValues(11) = .NETToleranceAdjustmentMultiplier
-        strKeys(12) = "IncludeInternalStdMatches": strValues(12) = .IncludeInternalStdMatches
-        strKeys(13) = "UseUMCClassStats": strValues(13) = .UseUMCClassStats
-        strKeys(14) = "MinimumSLiC": strValues(14) = .MinimumSLiC
-        strKeys(15) = "MaximumAbundance": strValues(15) = .MaximumAbundance
+        strKeys(5) = "ToleranceRefinementMethod": strValues(5) = .ToleranceRefinementMethod
+        strKeys(6) = "UseMinMaxIfOutOfRange": strValues(6) = .UseMinMaxIfOutOfRange
+        strKeys(7) = "MassToleranceMinimum": strValues(7) = .MassToleranceMinimum
+        strKeys(8) = "MassToleranceMaximum": strValues(8) = .MassToleranceMaximum
+        strKeys(9) = "MassToleranceAdjustmentMultiplier": strValues(9) = .MassToleranceAdjustmentMultiplier
+        strKeys(10) = "NETToleranceMinimum": strValues(10) = .NETToleranceMinimum
+        strKeys(11) = "NETToleranceMaximum": strValues(11) = .NETToleranceMaximum
+        strKeys(12) = "NETToleranceAdjustmentMultiplier": strValues(12) = .NETToleranceAdjustmentMultiplier
+        strKeys(13) = "IncludeInternalStdMatches": strValues(13) = .IncludeInternalStdMatches
+        strKeys(14) = "UseUMCClassStats": strValues(14) = .UseUMCClassStats
+        strKeys(15) = "MinimumSLiC": strValues(15) = .MinimumSLiC
+        strKeys(16) = "MaximumAbundance": strValues(16) = .MaximumAbundance
+    
+        strKeys(17) = "EMMassErrorPeakToleranceEstimatePPM": strValues(17) = .EMMassErrorPeakToleranceEstimatePPM
+        strKeys(18) = "EMNETErrorPeakToleranceEstimate": strValues(18) = .EMNETErrorPeakToleranceEstimate
+        strKeys(19) = "EMIterationCount": strValues(19) = .EMIterationCount
+        strKeys(20) = "EMPercentOfDataToExclude": strValues(20) = .EMPercentOfDataToExclude
+        strKeys(21) = "EMMassTolRefineForceUseSingleDataPointErrors": strValues(21) = .EMMassTolRefineForceUseSingleDataPointErrors
+        strKeys(22) = "EMNETTolRefineForceUseSingleDataPointErrors": strValues(22) = .EMNETTolRefineForceUseSingleDataPointErrors
     End With
     IniStuff.WriteSection "RefineMSDataOptions", strKeys(), strValues()
         
@@ -2379,8 +2401,8 @@ On Error GoTo SaveSettingsFileHandler
     
     
     ' Write the Auto Analysis Options
-    ReDim strKeys(0 To 42)
-    ReDim strValues(0 To 42)
+    ReDim strKeys(0 To 43)
+    ReDim strValues(0 To 43)
     With udtPrefsExpanded.AutoAnalysisOptions
         strKeys(0) = "MDType": strValues(0) = "1"
         strKeys(1) = "AutoRemoveNoiseStreaks": strValues(1) = .AutoRemoveNoiseStreaks
@@ -2427,10 +2449,11 @@ On Error GoTo SaveSettingsFileHandler
         strKeys(39) = "ExportUMCsWithNoMatches": strValues(39) = .ExportUMCsWithNoMatches
         strKeys(40) = "DBSearchRegionShape": strValues(40) = .DBSearchRegionShape
         strKeys(41) = "UseLegacyDBForMTs": strValues(41) = .UseLegacyDBForMTs
+        strKeys(42) = "IgnoreNETAdjustmentFailure": strValues(42) = .IgnoreNETAdjustmentFailure
         
         If .AutoAnalysisSearchModeCount < 0 Then .AutoAnalysisSearchModeCount = 0
         If .AutoAnalysisSearchModeCount > MAX_AUTO_SEARCH_MODE_COUNT Then .AutoAnalysisSearchModeCount = MAX_AUTO_SEARCH_MODE_COUNT
-        strKeys(42) = "AutoAnalysisSearchModeCount": strValues(42) = .AutoAnalysisSearchModeCount
+        strKeys(43) = "AutoAnalysisSearchModeCount": strValues(43) = .AutoAnalysisSearchModeCount
     End With
     IniStuff.WriteSection "AutoAnalysisOptions", strKeys(), strValues()
     
@@ -3249,9 +3272,9 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
         
         If Len(strSingleSectionToReset) = 0 Or strSingleSectionToReset = "ErrorPlottingOptions" Then
             With .ErrorPlottingOptions
-                .MassRangePPM = 50          ' Range +-; full range is .MassRangePPM x 2
+                .MassRangePPM = 40          ' Range +-; full range is .MassRangePPM x 2
                 .MassBinSizePPM = DEFAULT_MASS_BIN_SIZE_PPM
-                .GANETRange = 0.2
+                .GANETRange = 0.15
                 .GANETBinSize = DEFAULT_GANET_BIN_SIZE
                 .ButterWorthFrequency = 0.2
                 
@@ -3304,22 +3327,33 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
         
         If Len(strSingleSectionToReset) = 0 Or strSingleSectionToReset = "RefineMSDataOptions" Then
             With .RefineMSDataOptions
-                .MinimumPeakHeight = 15                                 ' counts/bin
+                .MinimumPeakHeight = 10                                 ' counts/bin
                 .MinimumSignalToNoiseRatioForLowAbundancePeaks = 2.5    ' signal to noise ratio; only applies to peaks with intensity <= .MinimumPeakHeight
-                .PercentageOfMaxForFindingWidth = 60        ' percentage of maximum; Take the Maximum times this value to find the intensity at which to estimate the peak width
+                .PercentageOfMaxForFindingWidth = 60        ' percentage of maximum; Take the Maximum times this value to find the intensity at which to estimate the peak width; only used when .ToleranceRefinementMethod = mtrMassErrorPlotWidthAtPctOfMax
                 .MassCalibrationMaximumShift = 15           ' ppm
                 .MassCalibrationTolType = gltPPM
-                .MassToleranceRefinementMethod = mtrMassErrorPlotWidthAtPctOfMax       ' Width at .PercentageOfMaxForFindingWidth
-                .MassToleranceMinimum = 1                   ' ppm
-                .MassToleranceMaximum = 10                  ' ppm
-                .MassToleranceAdjustmentMultiplier = 1      ' Whatever tolerance adjustment is determined using mtrMassErrorPlotWidthAtPctOfMax is multiplied by this value
-                .NETToleranceMinimum = 0.01                 ' NET
+                
+                .ToleranceRefinementMethod = mtrExpectationMaximization
+                .UseMinMaxIfOutOfRange = True               ' If True, then uses MassToleranceMinimum or MassToleranceMaximum if the new tolerance defined is out-of-range
+                
+                .MassToleranceMinimum = 0.75                ' ppm
+                .MassToleranceMaximum = 15                  ' ppm
+                .MassToleranceAdjustmentMultiplier = 1      ' Whatever tolerance adjustment is determined using .ToleranceRefinementMethod is multiplied by this value
+                
+                .NETToleranceMinimum = 0.0075               ' NET
                 .NETToleranceMaximum = 0.2                  ' NET
                 .NETToleranceAdjustmentMultiplier = 1
                 .IncludeInternalStdMatches = True
                 .UseUMCClassStats = True
                 .MinimumSLiC = 0
                 .MaximumAbundance = 0
+                
+                .EMMassTolRefineForceUseSingleDataPointErrors = True
+                .EMNETTolRefineForceUseSingleDataPointErrors = True
+                .EMMassErrorPeakToleranceEstimatePPM = 6
+                .EMNETErrorPeakToleranceEstimate = 0.05
+                .EMIterationCount = 32
+                .EMPercentOfDataToExclude = 10
             End With
         End If
         
@@ -3482,7 +3516,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
             With .MassTagStalenessOptions
                 .MaximumAgeLoadedMassTagsHours = 8          ' 8 hours
                 .MaximumFractionAMTsWithNulls = 0.1         ' 10%
-                .MaximumCountAMTsWithNulls = 500            ' 500 AMTs
+                .MaximumCountAMTsWithNulls = 2500           ' 2500 AMTs
                 .MinimumTimeBetweenReloadMinutes = 30       ' 30 minutes
                 
                 ' Do not reset the other values here since MT tags could already be in memory
@@ -3532,7 +3566,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 
                 .RestrictIsoByMZ = True
                 .RestrictIsoMZMin = 400
-                .RestrictIsoMZMax = 2000
+                .RestrictIsoMZMax = 3000
                 
                 .RestrictIsoByChargeState = True
                 .RestrictIsoChargeStateMin = 1
@@ -3621,19 +3655,20 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .ExportUMCsWithNoMatches = False
                 .DBSearchRegionShape = srsElliptical
                 .UseLegacyDBForMTs = APP_BUILD_DISABLE_MTS
+                .IgnoreNETAdjustmentFailure = True
                 
                 With .AutoToleranceRefinement
-                    .DBSearchMWTol = 25
+                    .DBSearchMWTol = DEFAULT_TOLERANCE_REFINEMENT_MW_TOL
                     .DBSearchTolType = gltPPM
-                    .DBSearchNETTol = 0.1
-                    .DBSearchRegionShape = srsElliptical
-                    .DBSearchMinimumHighNormalizedScore = 2.5
+                    .DBSearchNETTol = DEFAULT_TOLERANCE_REFINEMENT_NET_TOL
+                    .DBSearchRegionShape = srsRectangular
+                    .DBSearchMinimumHighNormalizedScore = 0
                     .DBSearchMinimumHighDiscriminantScore = 0.5
                     .DBSearchMinimumPeptideProphetProbability = 0.5
                     .RefineMassCalibration = True
                     .RefineMassCalibrationOverridePPM = 0
-                    .RefineDBSearchMassTolerance = False
-                    .RefineDBSearchNETTolerance = False
+                    .RefineDBSearchMassTolerance = True
+                    .RefineDBSearchNETTolerance = True
                 End With
                 
                 Erase .AutoAnalysisSearchMode()

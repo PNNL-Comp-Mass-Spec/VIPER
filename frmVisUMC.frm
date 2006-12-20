@@ -1091,6 +1091,7 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
     Exit Sub
 
 AutoRemoveUMCsWorkErrorHandler:
+    Debug.Assert False
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox "Error in AutoRemoveUMCsWork: " & Err.Description, vbExclamation Or vbOKOnly, "Error"
     Else
@@ -1100,7 +1101,7 @@ AutoRemoveUMCsWorkErrorHandler:
 End Sub
 
 Private Sub AutoRemoveUMCsCheckLongScanLength(ByRef tmp As UMCListType, ByRef udtAutoRefine As udtUMCAutoRefineOptionsType, ByVal lngMaxLengthScans As Long)
-    Dim i As Integer
+    Dim i As Long
     
     Dim lngMemberIndex As Long
     Dim lngScanStart As Long

@@ -90,6 +90,12 @@ Public Enum dbsmDatabaseSearchModeConstants
     dbsmConglomerateUMCsLightPairsPlusUnpaired = 13
 End Enum
 
+Private Enum ehmErrorHistogramModeConstants
+    ehmBeforeRefinement = 0
+    ehmAfterLCMSWARP = 1
+    ehmFinalTolerances = 2
+End Enum
+
 Private mRedirectedOutputFolderMessage As String
 
 ' mMemoryLog holds all of the data sent to AutoAnalysisLog
@@ -240,8 +246,11 @@ Public Function AutoAnalysisStart(ByRef udtAutoParams As udtAutoAnalysisParamete
     Dim blnSuccess As Boolean
     Dim blnDBReadyToLoad As Boolean, blnDBLoaded As Boolean
     Dim blnToleranceRefinementComplete As Boolean
-    Dim blnRefinementWillBePerformed As Boolean
     Dim strErrorMessage As String
+    
+    Dim blnRefinementWasPerformed As Boolean
+    Dim blnAbortSinceNETNotDefined As Boolean
+    Dim intHtmlFileColumnOverride As Integer
     
 On Error GoTo AutoAnalysis_ErrorHandler
     
@@ -354,17 +363,32 @@ On Error GoTo AutoAnalysis_ErrorHandler
             
             If udtAutoParams.ExitViperASAP Then GoTo AutoAnalysis_CleanUp
             
-            If Not udtWorkingParams.NETDefined Then
+            If udtWorkingParams.NETDefined Then
+                blnAbortSinceNETNotDefined = False
+            Else
+                blnAbortSinceNETNotDefined = True
+                If glbPreferencesExpanded.AutoAnalysisOptions.IgnoreNETAdjustmentFailure Then
+                    If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineMassCalibration And _
+                       GelUMCNETAdjDef(udtWorkingParams.GelIndex).UseRobustNETAdjustment And _
+                       GelUMCNETAdjDef(udtWorkingParams.GelIndex).RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass And _
+                       Not APP_BUILD_DISABLE_ADVANCED Then
+                        blnAbortSinceNETNotDefined = False
+                    End If
+                End If
+            End If
+
+            If blnAbortSinceNETNotDefined Then
                 ' NET could not be defined; typically due to an error
                 ' Cannot search the data
                 AutoAnalysisLog udtAutoParams, udtWorkingParams, "Error - NET mapping not defined; unable to proceed with DB search"
                 udtWorkingParams.ErrorBits = udtWorkingParams.ErrorBits Or GANET_ERROR_BIT
             Else
-            
-                ' 14. Search for Internal Standards and save Picture and UMC text file to disk
-                If blnPrintDebugInfo Then Debug.Print Now() & " = " & "Search for Internal Standards"
-                AutoAnalysisSaveInternalStdHits udtWorkingParams, udtAutoParams, fso
-            
+                If udtWorkingParams.NETDefined Then
+                    ' 14. Search for Internal Standards and save Picture and UMC text file to disk
+                    If blnPrintDebugInfo Then Debug.Print Now() & " = " & "Search for Internal Standards"
+                    AutoAnalysisSaveInternalStdHits udtWorkingParams, udtAutoParams, fso
+                End If
+                
                 ' 15. Tolerance Refinement
                 If Not blnToleranceRefinementComplete Then
                     If blnPrintDebugInfo Then Debug.Print Now() & " = " & "Tolerance Refinement"
@@ -389,9 +413,14 @@ On Error GoTo AutoAnalysis_ErrorHandler
             ' 17. Possibly save a graphical picture of the data
             AutoAnalysisSavePictureGraphic udtWorkingParams, udtAutoParams, fso
             
-            ' 18. Possibly save a picture or text file of the mass and GANET error distribution
-            blnRefinementWillBePerformed = CheckAutoToleranceRefinementEnabled(glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement, udtAutoParams, udtWorkingParams, False)
-            AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, False, Not blnRefinementWillBePerformed
+            ' 18. Possibly save a picture or text file of the mass and NET error distribution
+            blnRefinementWasPerformed = CheckAutoToleranceRefinementEnabled(glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement, udtAutoParams, udtWorkingParams, False)
+            If GelUMCNETAdjDef(udtWorkingParams.GelIndex).RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETIterative Then
+                intHtmlFileColumnOverride = 2
+            Else
+                intHtmlFileColumnOverride = 0
+            End If
+            AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, False, Not blnRefinementWasPerformed, ehmErrorHistogramModeConstants.ehmFinalTolerances, intHtmlFileColumnOverride
         End If
         
     ' 19. Possibly save the Points and/or UMC's to disk
@@ -901,14 +930,14 @@ On Error GoTo FindUMCsErrorHandler
         End If
     Else
         ' Note: If you want to alter the UMC finding mode while debugging, here is your chance to do so
-        '       (change from False to True in the following If statement)
+        '       (change from False to True in the following If statement, or just move the cursor to the .UMCSearchMode = AUTO_ANALYSIS_UMC2003 line)
         Debug.Assert False
         If False Then
             ' For example, change to UMC2003 using:
             glbPreferencesExpanded.AutoAnalysisOptions.UMCSearchMode = AUTO_ANALYSIS_UMC2003
             
             ' Also, use this to assure the data is not exported to the database
-            glbPreferencesExpanded.AutoAnalysisOptions.AutoAnalysisSearchMode(0).ExportResultsToDatabase = False
+            glbPreferencesExpanded.AutoAnalysisOptions.AutoAnalysisSearchMode(0).ExportResultsToDatabase = True
         End If
         
         ' Find the UMC's (Note: Using LCase to avoid case conversion problems)
@@ -1350,7 +1379,7 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
         tsOutput.WriteLine ""
         
         ' Write the graphic files
-        ' First determine the maximum number of rows
+        ' First determine the maximum number of rows and maximum number of columns
         With udtWorkingParams
             intMaxRowIndex = 0
             intMaxColIndex = 0
@@ -2755,7 +2784,7 @@ On Error GoTo PerformNETAdjustmentErrorHandler
             DoEvents
             
             ' Perform NET Alignment using MS Warp
-            ' For now, just perform NET alignment and not mass recalibration (done in AutoAnalysisToleranceRefinement)
+            ' For now, just perform NET alignment and not mass recalibration (which is done in AutoAnalysisToleranceRefinement)
             
             strLastGoodLocation = "Set objMSAlign.CallerID"
             objMSAlign.CallerID = udtWorkingParams.GelIndex
@@ -3720,16 +3749,23 @@ SaveChromatogramsErrorHandler:
 
 End Sub
 
-Private Sub AutoAnalysisSaveErrorDistributions(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject, blnSavingDataDuringToleranceRefinement As Boolean, Optional blnUpdateCachedErrorPeakStats As Boolean = True)
+Private Sub AutoAnalysisSaveErrorDistributions(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject, ByVal blnSavingDataDuringToleranceRefinement As Boolean, ByVal blnUpdateCachedErrorPeakStats As Boolean, ByVal eErrorHistogramMode As ehmErrorHistogramModeConstants, ByVal intHtmlFileColumnOverride As Integer)
     ' Note: blnUpdateCachedErrorPeakStats is only valid if blnSavingDataDuringToleranceRefinement = False
+    ' Note: strFileNameSuffix is only valid if blnSavingDataDuringToleranceRefinement = True
+    ' If intHtmlFileColumnOverride is <> 0, then will save the graphic in the given column
+    
+    Const SAVE_FINAL_TOLERANCE_PLOTS As Boolean = True
     
     Dim strFilePath As String
     Dim strGraphicExtension As String
     Dim strMessage As String
-    Dim strPreRefinementAddon As String
+    Dim strFileNameSuffix As String
     
     Dim lngError As Long
     Dim lngWidthTwips As Long, lngHeightTwips As Long
+    
+    Dim intRowToUse As Integer, intColumnToUse As Integer
+    Dim strFigureCaption As String
     
 On Error GoTo SaveErrorGraphicErrorHandler
     
@@ -3738,11 +3774,18 @@ On Error GoTo SaveErrorGraphicErrorHandler
         Exit Sub
     End If
     
-    If blnSavingDataDuringToleranceRefinement Then
-        strPreRefinementAddon = "_BeforeRefinement"
-    Else
-        strPreRefinementAddon = ""
-    End If
+    Select Case eErrorHistogramMode
+    Case ehmErrorHistogramModeConstants.ehmBeforeRefinement
+        strFileNameSuffix = "_BeforeRefinement"
+    Case ehmErrorHistogramModeConstants.ehmAfterLCMSWARP
+        strFileNameSuffix = "_AfterLCMSWARP"
+    Case ehmErrorHistogramModeConstants.ehmFinalTolerances
+        strFileNameSuffix = ""
+    Case Else
+        ' Unknown mode
+        Debug.Assert False
+        strFileNameSuffix = ""
+    End Select
     
     lngError = 0
     With glbPreferencesExpanded.AutoAnalysisOptions
@@ -3775,7 +3818,7 @@ On Error GoTo SaveErrorGraphicErrorHandler
                 End If
             End Select
             
-            strFilePath = udtWorkingParams.ResultsFileNameBase & "_MassAndGANETErrors" & strPreRefinementAddon & ".txt"
+            strFilePath = udtWorkingParams.ResultsFileNameBase & "_MassAndGANETErrors" & strFileNameSuffix & ".txt"
             strFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strFilePath)
             lngError = frmErrorDistribution2DLoadedData.ExportErrorsBinnedToClipboardOrFile(strFilePath, False, False)
             If lngError = -1 Then
@@ -3805,24 +3848,46 @@ On Error GoTo SaveErrorGraphicErrorHandler
             
             If (.SaveErrorGraphicMass Or blnSavingDataDuringToleranceRefinement) And lngError = 0 Then
                 frmErrorDistribution2DLoadedData.SetPlotMode mdmMassErrorPPM
-                strFilePath = udtWorkingParams.ResultsFileNameBase & "_MassErrors" & strPreRefinementAddon & strGraphicExtension
+                strFilePath = udtWorkingParams.ResultsFileNameBase & "_MassErrors" & strFileNameSuffix & strGraphicExtension
                 strFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strFilePath)
                 If .SaveErrorGraphicFileType = pftPictureFileTypeConstants.pftJPG Then
                     lngError = frmErrorDistribution2DLoadedData.SaveChartPictureToFile(False, strFilePath, False)
                 Else
                     lngError = frmErrorDistribution2DLoadedData.SaveChartPictureToFile(True, strFilePath, False)
                 End If
+                
+                intRowToUse = 2
+                Select Case eErrorHistogramMode
+                Case ehmErrorHistogramModeConstants.ehmBeforeRefinement
+                    strFigureCaption = "Mass Errors Before Refinement"
+                    intColumnToUse = 1
+                Case ehmErrorHistogramModeConstants.ehmAfterLCMSWARP
+                    strFigureCaption = "Mass Errors After LCMSWARP"
+                    intColumnToUse = 2
+                Case ehmErrorHistogramModeConstants.ehmFinalTolerances
+                    strFigureCaption = "Mass Errors with Final Tolerances"
+                    If SAVE_FINAL_TOLERANCE_PLOTS Then
+                        intColumnToUse = 3
+                    Else
+                        intColumnToUse = 0
+                    End If
+                Case Else
+                    ' Unknown mode
+                    Debug.Assert False
+                End Select
+                        
+                If intHtmlFileColumnOverride <> 0 Then
+                    intColumnToUse = intHtmlFileColumnOverride
+                End If
             
-                If blnSavingDataDuringToleranceRefinement Then
-                    AddNewOutputFileForHtml udtWorkingParams, fso.GetFileName(strFilePath), "Mass Errors Before Refinement", 2, 1
-                Else
-                    AddNewOutputFileForHtml udtWorkingParams, fso.GetFileName(strFilePath), "Mass Errors After Refinement", 2, 2
+                If intColumnToUse <> 0 Then
+                    AddNewOutputFileForHtml udtWorkingParams, fso.GetFileName(strFilePath), strFigureCaption, intRowToUse, intColumnToUse
                 End If
             End If
             
             If (.SaveErrorGraphicGANET Or blnSavingDataDuringToleranceRefinement) And lngError = 0 Then
                 frmErrorDistribution2DLoadedData.SetPlotMode mdmGanetError
-                strFilePath = udtWorkingParams.ResultsFileNameBase & "_GANETErrors" & strPreRefinementAddon & strGraphicExtension
+                strFilePath = udtWorkingParams.ResultsFileNameBase & "_GANETErrors" & strFileNameSuffix & strGraphicExtension
                 strFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strFilePath)
                 If .SaveErrorGraphicFileType = pftPictureFileTypeConstants.pftJPG Then
                     lngError = frmErrorDistribution2DLoadedData.SaveChartPictureToFile(False, strFilePath, False)
@@ -3830,10 +3895,32 @@ On Error GoTo SaveErrorGraphicErrorHandler
                     lngError = frmErrorDistribution2DLoadedData.SaveChartPictureToFile(True, strFilePath, False)
                 End If
             
-                If blnSavingDataDuringToleranceRefinement Then
-                    AddNewOutputFileForHtml udtWorkingParams, fso.GetFileName(strFilePath), "NET Errors Before Refinement", 3, 1
-                Else
-                    AddNewOutputFileForHtml udtWorkingParams, fso.GetFileName(strFilePath), "NET Errors After Refinement", 3, 2
+                intRowToUse = 3
+                Select Case eErrorHistogramMode
+                Case ehmErrorHistogramModeConstants.ehmBeforeRefinement
+                    strFigureCaption = "NET Errors Before Refinement"
+                    intColumnToUse = 1
+                Case ehmErrorHistogramModeConstants.ehmAfterLCMSWARP
+                    strFigureCaption = "NET Errors After LCMSWARP"
+                    intColumnToUse = 2
+                Case ehmErrorHistogramModeConstants.ehmFinalTolerances
+                    strFigureCaption = "NET Errors with Final Tolerances"
+                    If SAVE_FINAL_TOLERANCE_PLOTS Then
+                        intColumnToUse = 3
+                    Else
+                        intColumnToUse = 0
+                    End If
+                Case Else
+                    ' Unknown mode
+                    Debug.Assert False
+                End Select
+                        
+                If intHtmlFileColumnOverride <> 0 Then
+                    intColumnToUse = intHtmlFileColumnOverride
+                End If
+            
+                If intColumnToUse <> 0 Then
+                    AddNewOutputFileForHtml udtWorkingParams, fso.GetFileName(strFilePath), strFigureCaption, intRowToUse, intColumnToUse
                 End If
             End If
             
@@ -4750,6 +4837,10 @@ Private Sub AutoAnalysisToleranceRefinement(ByRef udtWorkingParams As udtAutoAna
     Dim lngWindowWidthTwips As Long
     Dim lngWindowHeightTwips As Long
     
+    Dim dblRefinedMassTol As Double
+    Dim dblRefinedNETTol As Double
+    Dim eRefinedTolType As glMassToleranceConstants
+    
     Dim lngDefaultMaxMontageWidth As Long
     Dim lngDefaultMaxMontageHeight As Long
     
@@ -4757,6 +4848,9 @@ Private Sub AutoAnalysisToleranceRefinement(ByRef udtWorkingParams As udtAutoAna
     
     Dim objMSAlign As frmMSAlign
     
+    Dim blnSearchMassTolRefinedByMSWarp As Boolean
+    Dim blnSearchNETTolRefinedByMSWarp As Boolean
+
 On Error GoTo AutoAnalysisToleranceRefinementErrorHandler
 
     ' Check if Tolerance Refinement is enabled
@@ -4795,49 +4889,30 @@ On Error GoTo AutoAnalysisToleranceRefinementErrorHandler
         .AutoAnalysisSearchMode(0).ExportResultsToDatabase = False
     End With
     
-    ' 1b. Save the current value for .MinimumSLiC,then force .MinimumSLiC to 0
+    ' 1b. Save the current value for .MinimumSLiC, then force .MinimumSLiC to 0
     With glbPreferencesExpanded.RefineMSDataOptions
         sngSLiCSaved = .MinimumSLiC
         .MinimumSLiC = 0
     End With
     
-    ' 2. Call AutoAnalysisSearchDatabase
-    '    We will restore the samtDef values later in this function
-    AutoAnalysisSearchDatabase udtWorkingParams, udtAutoParams, fso, True
-    
-    ' 3. Save the error distributions before tolerance refinement
+    If udtWorkingParams.NETDefined Then
+        ' 2. Call AutoAnalysisSearchDatabase
+        '    We will restore the samtDef values later in this function
+        AutoAnalysisSearchDatabase udtWorkingParams, udtAutoParams, fso, True
+    End If
+
+    ' Initialize frmErrorDistribution2DLoadedData (since we need it whether or not dtWorkingParams.NETDefined is True)
     With frmErrorDistribution2DLoadedData
-        ' 3a. Initialize the tolerance refinement form
         .CallerID = udtWorkingParams.GelIndex
         ' Note: Must use vbModeless to prevent App from waiting for form to close
         .Show vbModeless
         .InitializeForm
-        
-        ' Make sure the tolerance refinement controls are hidden
-        .ShowHideToleranceRefinementControls False
-        
-        If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineMassCalibration Then
-            ' Save a mass error plot (picture and .txt file) so that we have a record of the mass errors before mass calibration
-            If glbPreferencesExpanded.RefineMSDataOptions.MassCalibrationTolType = gltPPM Then
-                .SetPlotMode mdmMassErrorPPM
-            Else
-                .SetPlotMode mdmMassErrorDa
-            End If
-        Else
-            .SetPlotMode mdmMassErrorPPM
-        End If
-        
-        ' 3b. Save the error distributions
-        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, True
-        
-        ' Make sure the tolerance refinement controls are shown
-        .ShowHideToleranceRefinementControls True
-        .SetPlotMode mdmMassErrorPPM
-        
-        ' 3c. Update the cached error peak stats
-        .RecordMassCalPeakStatsNow
-        .RecordNETTolPeakStatsNow
     End With
+    
+    If udtWorkingParams.NETDefined Then
+        ' 3. Save the error distributions before tolerance refinement
+        AutoAnalysisToleranceRefinementSaveErrorDistributions frmErrorDistribution2DLoadedData, udtAutoParams, udtWorkingParams, fso, True, ehmErrorHistogramModeConstants.ehmBeforeRefinement
+    End If
     
     ' 4. Perform mass calibration refinement
     If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineMassCalibration Then
@@ -5089,19 +5164,22 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
                     ' Alignment failed
                     blnSuccess = False
                 End If
-            
-                ' 4b. Possibly update the DB Search mass tolerance
+               
+                ' 4b. Possibly update the DB Search mass tolerance using LCMSWarp
+                blnSearchMassTolRefinedByMSWarp = False
                 If blnSuccess And glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchMassTolerance Then
                     ' Possible future task: use frmMSAlign to auto-determine the mass tolerance to use
-                    Debug.Assert False
+                    '' blnSearchMassTolRefinedByMSWarp = True
                 End If
                 
-                ' 4c. Possibly update the DB Search NET tolerance
+                ' 4c. Possibly update the DB Search NET tolerance using LCMSWarp
+                blnSearchNETTolRefinedByMSWarp = False
                 If blnSuccess And glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchNETTolerance Then
                     ' Possible future task: use frmMSAlign to auto-determine the NET tolerance to use
-                    Debug.Assert False
+                    '' blnSearchNETTolRefinedByMSWarp = True
                 End If
-                
+                               
+                               
                 strLastGoodLocation = "Unload objMSAlign"
                 Unload objMSAlign
 
@@ -5113,50 +5191,50 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
                 End If
 
                 With frmErrorDistribution2DLoadedData
-                    ' Use frmErrorDistribution2DLoadedData to update the peak stats
+                    ' 4e. Use frmErrorDistribution2DLoadedData to update the peak stats
                     ' If APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT then also apply an additional linear adjustment if needed
                     .UpdateUMCStatsAndRecomputeErrors
                     blnSuccess = .RefineMassCalibrationStart(blnValidPeakFound, blnMassShiftTooLarge, blnPeakTooWide, Not APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT)
                 End With
+
+                ' 5. Save the error distributions after refinement (but using the wider search tolerances)
+                AutoAnalysisToleranceRefinementSaveErrorDistributions frmErrorDistribution2DLoadedData, udtAutoParams, udtWorkingParams, fso, False, ehmErrorHistogramModeConstants.ehmAfterLCMSWARP
+
+                ' 6a. Possibly update the DB Search mass tolerance
+                If blnSuccess And glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchMassTolerance Then
+                    If blnSearchMassTolRefinedByMSWarp Then
+                        blnSuccess = True
+                    Else
+                        blnSuccess = AutoAnalysisToleranceRefinementRefineDBSearchMass(frmErrorDistribution2DLoadedData, udtWorkingParams, strErrorMessage)
+                    End If
+                End If
+                
+                ' 6b. Possibly update the DB Search NET tolerance
+                If blnSuccess And glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchNETTolerance Then
+                    If blnSearchNETTolRefinedByMSWarp Then
+                        blnSuccess = True
+                    Else
+                        blnSuccess = AutoAnalysisToleranceRefinementRefineDBSearchNET(frmErrorDistribution2DLoadedData, udtWorkingParams, strErrorMessage)
+                    End If
+                End If
                 
             Else
                 With frmErrorDistribution2DLoadedData
                     ' 4a. Use frmErrorDistribution2DLoadedData
                     strLastGoodLocation = "Call RefineMassCalibrationStart"
                     blnSuccess = .RefineMassCalibrationStart(blnValidPeakFound, blnMassShiftTooLarge, blnPeakTooWide, False)
-                
-                   ' 4b. Possibly update the DB Search mass tolerance
-                    If blnSuccess And glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchMassTolerance Then
-                        blnSuccess = .RefineDBSearchMassToleranceStart(blnValidPeakFound, blnPeakTooWide)
-                        If Not blnSuccess Then
-                            strErrorMessage = "Tolerance Refinement error occured while refining the DB search mass tolerance"
-                        Else
-                            If Not blnValidPeakFound Then
-                                ' A valid peak was not found; flag this as a warning, not an error
-                                udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_PEAK_NOT_FOUND_BIT
-                            ElseIf blnPeakTooWide Then
-                                ' A peak was found, but it was too wide; flag this as a warning, not an error
-                                udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_BIT_PEAK_TOO_WIDE
-                            End If
-                        End If
-                    End If
-                    
-                    ' 4c. Possibly update the DB Search NET tolerance
-                    If blnSuccess And glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchNETTolerance Then
-                        blnSuccess = .RefineDBSearchNETToleranceStart(blnValidPeakFound, blnPeakTooWide)
-                        If Not blnSuccess Then
-                            strErrorMessage = "Tolerance Refinement error occured while refining the DB search NET tolerance"
-                        Else
-                            If Not blnValidPeakFound Then
-                                ' A valid peak was not found; flag this as a warning, not an error
-                                udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_PEAK_NOT_FOUND_BIT
-                            ElseIf blnPeakTooWide Then
-                                ' A peak was found, but it was too wide; flag this as a warning, not an error
-                                udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_BIT_PEAK_TOO_WIDE
-                            End If
-                        End If
-                    End If
                 End With
+            
+               ' 4b. Possibly update the DB Search mass tolerance
+                If blnSuccess And glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchMassTolerance Then
+                    blnSuccess = AutoAnalysisToleranceRefinementRefineDBSearchMass(frmErrorDistribution2DLoadedData, udtWorkingParams, strErrorMessage)
+                End If
+                
+                ' 4c. Possibly update the DB Search NET tolerance
+                If blnSuccess And glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchNETTolerance Then
+                    blnSuccess = AutoAnalysisToleranceRefinementRefineDBSearchNET(frmErrorDistribution2DLoadedData, udtWorkingParams, strErrorMessage)
+                End If
+                
             End If
         End If
         
@@ -5178,21 +5256,45 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
     
     Unload frmErrorDistribution2DLoadedData
     
-    ' 5a. Restore samtDef and the other search definitions
+    If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchMassTolerance Then
+        ' Cache the newly determined mass tolerance
+        dblRefinedMassTol = samtDef.MWTol
+        eRefinedTolType = samtDef.TolType
+    End If
+    
+    If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchNETTolerance Then
+        ' Cache the newly determined NET tolerance
+        dblRefinedNETTol = samtDef.NETTol
+    End If
+    
+    ' 5a. Restore samtDef
     samtDef = udtAMTDefSaved
+    
+    If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchMassTolerance Then
+        ' Update .MWTol to the refined mass tolerance
+        samtDef.MWTol = dblRefinedMassTol
+        samtDef.TolType = eRefinedTolType
+    End If
+    
+    If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchNETTolerance Then
+        ' Update .NETTol to the refined NET tolerance
+        samtDef.NETTol = dblRefinedNETTol
+    End If
+    
+    ' 5b. Copy samtDef to the other search definitions
     With GelSearchDef(udtWorkingParams.GelIndex)
         .AMTSearchOnIons = samtDef
         .AMTSearchOnUMCs = samtDef
         .AMTSearchOnPairs = samtDef
     End With
     
-    ' 5b. Restore .AutoAnalysisOptions
+    ' 5c. Restore .AutoAnalysisOptions
     glbPreferencesExpanded.AutoAnalysisOptions = udtAutoAnalysisOptionsSaved
     
-    ' 5c. Restore .MinimumSLiC
+    ' 5d. Restore .MinimumSLiC
     glbPreferencesExpanded.RefineMSDataOptions.MinimumPeakHeight = sngSLiCSaved
     
-    ' 5d. Write the latest AnalysisHistory information to the log
+    ' 5e. Write the latest AnalysisHistory information to the log
     AutoAnalysisAppendLatestHistoryToLog udtAutoParams, udtWorkingParams
 
     If Not blnSuccess Then
@@ -5265,6 +5367,82 @@ Private Sub AutoAnalysisValidateToleranceRefinementSearchMode(ByRef udtWorkingPa
     
 End Sub
 
+Private Function AutoAnalysisToleranceRefinementRefineDBSearchMass(ByRef objErrorDistribution2DLoadedData As frmErrorDistribution2DLoadedData, ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef strErrorMessage As String) As Boolean
+    Dim blnSuccess As Boolean
+    Dim blnValidPeakFound As Boolean, blnPeakTooWide As Boolean
+    
+    blnSuccess = objErrorDistribution2DLoadedData.RefineDBSearchMassToleranceStart(blnValidPeakFound, blnPeakTooWide)
+    If Not blnSuccess Then
+        strErrorMessage = "Tolerance Refinement error occured while refining the DB search mass tolerance"
+    Else
+        If Not blnValidPeakFound Then
+            ' A valid peak was not found; flag this as a warning, not an error
+            udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_PEAK_NOT_FOUND_BIT
+        ElseIf blnPeakTooWide Then
+            ' A peak was found, but it was too wide; flag this as a warning, not an error
+            udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_BIT_PEAK_TOO_WIDE
+        End If
+    End If
+    
+    AutoAnalysisToleranceRefinementRefineDBSearchMass = blnSuccess
+
+End Function
+                    
+Private Function AutoAnalysisToleranceRefinementRefineDBSearchNET(ByRef objErrorDistribution2DLoadedData As frmErrorDistribution2DLoadedData, ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef strErrorMessage As String) As Boolean
+    Dim blnSuccess As Boolean
+    Dim blnValidPeakFound As Boolean, blnPeakTooWide As Boolean
+    
+    blnSuccess = objErrorDistribution2DLoadedData.RefineDBSearchNETToleranceStart(blnValidPeakFound, blnPeakTooWide)
+    If Not blnSuccess Then
+        strErrorMessage = "Tolerance Refinement error occured while refining the DB search NET tolerance"
+    Else
+        If Not blnValidPeakFound Then
+            ' A valid peak was not found; flag this as a warning, not an error
+            udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_PEAK_NOT_FOUND_BIT
+        ElseIf blnPeakTooWide Then
+            ' A peak was found, but it was too wide; flag this as a warning, not an error
+            udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_BIT_PEAK_TOO_WIDE
+        End If
+    End If
+    
+    AutoAnalysisToleranceRefinementRefineDBSearchNET = blnSuccess
+End Function
+
+Private Sub AutoAnalysisToleranceRefinementSaveErrorDistributions(ByRef objErrorDistribution2DLoadedData As frmErrorDistribution2DLoadedData, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef fso As FileSystemObject, ByVal blnUpdateCachedErrorPeakStats As Boolean, ByVal eErrorHistogramMode As ehmErrorHistogramModeConstants)
+
+    ' Save the error distributions
+    With objErrorDistribution2DLoadedData
+        
+        ' Make sure the tolerance refinement controls are hidden
+        .ShowHideToleranceRefinementControls False
+        
+        If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineMassCalibration Then
+            ' Save a mass error plot (picture and .txt file) so that we have a record of the mass errors before mass calibration
+            If glbPreferencesExpanded.RefineMSDataOptions.MassCalibrationTolType = gltPPM Then
+                .SetPlotMode mdmMassErrorPPM
+            Else
+                .SetPlotMode mdmMassErrorDa
+            End If
+        Else
+            .SetPlotMode mdmMassErrorPPM
+        End If
+        
+        ' 3. Save the error distributions (Note that blnUpdateCachedErrorPeakStats is ignored here since blnSavingDataDuringToleranceRefinement = True
+        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, True, blnUpdateCachedErrorPeakStats, eErrorHistogramMode, 0
+        
+        ' Make sure the tolerance refinement controls are shown
+        .ShowHideToleranceRefinementControls True
+        .SetPlotMode mdmMassErrorPPM
+        
+        ' Possibly Update the cached error peak stats
+        If blnUpdateCachedErrorPeakStats Then
+            .RecordMassCalPeakStatsNow
+            .RecordNETTolPeakStatsNow
+        End If
+    End With
+
+End Sub
+ 
 Private Sub AutoAnalysisZoomOut(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, blnRemoveFilters As Boolean)
     
     ' If the data falls in a range less than this, then the Gel is zoomed to at least these values
@@ -5457,7 +5635,7 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
         AutoAnalysisSavePictureGraphic udtWorkingParams, udtAutoParams, fso, False, True
 
         ' Create the mass and NET error plots
-        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, False, False
+        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, False, False, ehmErrorHistogramModeConstants.ehmFinalTolerances, 2
 
 ''        ' First, save the current overall adjustment value
 ''        With GelSearchDef(udtWorkingParams.GelIndex).MassCalibrationInfo
@@ -5472,7 +5650,7 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
 ''        End With
 ''
 ''        ' Next, save a picture or text file of the mass and GANET error distribution "before refinement"
-''        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, True, True
+''        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, True, True, ehmErrorHistogramModeConstants.ehmBeforeRefinement, 1
 ''
 ''        If True Then
 ''            frmErrorDistribution2DLoadedData.CallerID = udtWorkingParams.GelIndex
@@ -5489,7 +5667,7 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
 ''            blnSuccess = MassCalibrationApplyBulkAdjustment(udtWorkingParams.GelIndex, dblMassErrorOverallSaved, eMassUnitsSaved, False)
 ''
 ''            ' Finally, save a picture or text file of the mass and GANET error distribution "after refinement"
-''            AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, False, False
+''            AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, False, False, ehmErrorHistogramModeConstants.ehmFinalTolerances, 2
 ''        End If
         
     End If

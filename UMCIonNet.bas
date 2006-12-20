@@ -233,19 +233,21 @@ Public Sub LookupUMCIonNetMassTolerances(ByRef dblTolPPM As Double, ByRef eTolTy
     
     With udtUMCIonNetDef
         ' Find the Mass field, if any
-        For intIndex = 0 To .NetActualDim - 1
+        For intIndex = 0 To .NetDim - 1
             With .MetricData(intIndex)
-                If .DataType = DATA_MONO_MW Or .DataType = DATA_AVG_MW Or .DataType = DATA_TMA_MW Then
-                    If .ConstraintType = Net_CT_LT Then
-                        dblTestTol = .ConstraintValue
-                        If .ConstraintUnits = DATA_UNITS_MASS_DA Then
-                            eTopTypeActual = gltABS
-                            ' Need to convert dblTolPPM to ppm, since it is stored in the database in ppm
-                            dblTestTol = MassToPPM(dblTestTol, dblPPMConversionMass)
-                        End If
-                        
-                        If dblTestTol > dblTolPPM Then
-                            dblTolPPM = dblTestTol
+                If .Use Then
+                    If .DataType = DATA_MONO_MW Or .DataType = DATA_AVG_MW Or .DataType = DATA_TMA_MW Then
+                        If .ConstraintType = Net_CT_LT Then
+                            dblTestTol = .ConstraintValue
+                            If .ConstraintUnits = DATA_UNITS_MASS_DA Then
+                                eTopTypeActual = gltABS
+                                ' Need to convert dblTolPPM to ppm, since it is stored in the database in ppm
+                                dblTestTol = MassToPPM(dblTestTol, dblPPMConversionMass)
+                            End If
+                            
+                            If dblTestTol > dblTolPPM Then
+                                dblTolPPM = dblTestTol
+                            End If
                         End If
                     End If
                 End If

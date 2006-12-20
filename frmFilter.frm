@@ -41,8 +41,8 @@ Begin VB.Form frmFilter
       TabCaption(0)   =   "Tolerances"
       TabPicture(0)   =   "frmFilter.frx":000C
       Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "fraExcludeDuplicatesOrFit"
-      Tab(0).Control(1)=   "fraTolerances"
+      Tab(0).Control(0)=   "fraTolerances"
+      Tab(0).Control(1)=   "fraExcludeDuplicatesOrFit"
       Tab(0).ControlCount=   2
       TabCaption(1)   =   "Identity and Comparative Display"
       TabPicture(1)   =   "frmFilter.frx":0028
@@ -1158,7 +1158,7 @@ End Function
 Public Function Filter2CloseGuesses() As Boolean
 Dim aWorseGuesses As Variant
 Dim WorseGuessesCount As Long
-Dim i As Integer
+Dim i As Long
 On Error Resume Next
 With GelData(CallerID)
     If .DataFilter(fltCase2CloseResults, 0) Then

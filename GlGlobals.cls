@@ -29,7 +29,7 @@ End Enum
 
 ' Note: Update CSVAR_FIELD_COUNT if changing this enum
 Public Enum glDocDataCSVarFields
-    csvfIsotopeLabel = 1           'AMT NET
+    csvfIsotopeLabel = 1    'AMT NET
     csvfMTDDRatio = 2       'When reading .Pek file, this is filled with isotopic ratio values determined by ICR-2LS (if they exist, aka DD ratio); Later, if pairs are searched for, then filled with Expression Ratio values by function FillUMC_ERs
     csvfMTID = 3            'MT tag ID description (could contain multiple ID's, of the form AMT:12345); can also contain NETLK: entries
 End Enum

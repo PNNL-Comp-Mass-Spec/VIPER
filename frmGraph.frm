@@ -194,7 +194,7 @@ Begin VB.Form frmGraph
    Begin VB.Menu mnuSteps 
       Caption         =   "&Steps"
       Begin VB.Menu mnuStepsFile 
-         Caption         =   "1a. &Load PEK File"
+         Caption         =   "&1a. Load PEK File"
          Begin VB.Menu mnuStepsFileNew 
             Caption         =   "&New (Choose any PEK file)"
          End
@@ -206,7 +206,7 @@ Begin VB.Form frmGraph
          Caption         =   "1b. &Filter"
       End
       Begin VB.Menu mnuStepsUMCs 
-         Caption         =   "2. Find LC-MS Features (&UMCs)"
+         Caption         =   "&2. Find LC-MS Features (UMCs)"
          Begin VB.Menu mnuStepsUMCMode 
             Caption         =   "UMC 2003 (faster)"
             Index           =   0
@@ -217,10 +217,10 @@ Begin VB.Form frmGraph
          End
       End
       Begin VB.Menu mnuStepsSelectMassTags 
-         Caption         =   "3. Select &MT Tags (Connect to DB)"
+         Caption         =   "&3. Select MT Tags (Connect to DB)"
       End
       Begin VB.Menu mnuStepsFindPairs 
-         Caption         =   "4. Find &Pairs"
+         Caption         =   "&4. Find Pairs"
          Begin VB.Menu mnuStepsFindPairsMode 
             Caption         =   "Delta (UMC) - N14/N15 or O16/O18"
             Index           =   0
@@ -236,7 +236,7 @@ Begin VB.Form frmGraph
          End
       End
       Begin VB.Menu mnuStepsNETAdjustment 
-         Caption         =   "5. NET &Adjustment"
+         Caption         =   "&5. NET Adjustment"
          Begin VB.Menu mnuStepsNETAdjustmentMode 
             Caption         =   "Align and Warp data Using MS Warp (preferred)"
             Index           =   0
@@ -247,16 +247,16 @@ Begin VB.Form frmGraph
          End
       End
       Begin VB.Menu mnuStepsDBSearch 
-         Caption         =   "6. &Database Search"
+         Caption         =   "&6. Database Search"
          Begin VB.Menu mnuStepsDBSearchConglomerateMass 
             Caption         =   "UMC Single Mass"
          End
       End
       Begin VB.Menu mnuStepsToleranceRefinement 
-         Caption         =   "7. Mass Calibration and &Tolerance Refinement"
+         Caption         =   "&7. Mass Calibration and Tolerance Refinement"
       End
       Begin VB.Menu mnuStepsPairsDBSearch 
-         Caption         =   "8. Database Search using Pairs"
+         Caption         =   "&8. Database Search using Pairs"
          Begin VB.Menu mnuStepsPairsDBSearchUsingPairs 
             Caption         =   "UMC N14/N15 Pairs"
             Index           =   0
@@ -271,7 +271,7 @@ Begin VB.Form frmGraph
          End
       End
       Begin VB.Menu mnuStepsSaveQCPlots 
-         Caption         =   "9. Save &QC Plots..."
+         Caption         =   "&9. Save QC Plots..."
       End
       Begin VB.Menu mnuStepsSep1 
          Caption         =   "-"
@@ -824,8 +824,8 @@ Begin VB.Form frmGraph
          Caption         =   "O&ptions"
       End
    End
-   Begin VB.Menu mnuS 
-      Caption         =   "&Special"
+   Begin VB.Menu mnuSpecial 
+      Caption         =   "Special"
       Begin VB.Menu mnuSLoadScope 
          Caption         =   "&Load Scope"
       End

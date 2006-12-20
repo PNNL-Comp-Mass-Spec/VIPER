@@ -1,5 +1,35 @@
 VIPER Change Log
 
+Version 3.41 - build 357; November 16, 2006
+	- Added option IgnoreNETAdjustmentFailure, which allows processing to continue even if the initial NET adjustment with LCMSWARP fails (as sometimes happens for huge input files)
+	- Fixed bug involving UMC refinement when > 32000 UMCs exist
+
+Version 3.41 - Build 356; November 8, 2006
+	- Now saving and loading the various Expectation Maximization parameters from the .Ini file:
+	- Updated the Expectation Maximization algorithm to more reliably process data with outliers far away from the majority of the data
+		- Use parameter EMPercentOfDataToExclude to define the percentage of data to exclude (excluding DataCount*EMPercentOfDataToExclude/100/2 data points from the minimum and DataCount*EMPercentOfDataToExclude/100/2 data points from the maximum)
+		- Added the Expectation Maximization parameters to the .Ini file and added GUI controls to edit them
+	- Added parameter EMMassTolRefineForceUseSingleDataPointErrors and EMNETTolRefineForceUseSingleDataPointErrors
+		- When enabled, then Expectation Maximization tolerance refinement will use the individual mass and/or NET error values for every data point, rather than using UMC-based errors
+	- Added parameter UseMinMaxIfOutOfRange to Tolerance Refinement
+		- When true, then if the tolerance determined is outside the acceptable range, then the nearest range boundary tolerance is used
+		- For example, if the allowable range is 1 to 10 ppm, and the value determined is 0.5 ppm, then 1 ppm is used; or, if the value determined is 14 ppm, then 10 ppm is used
+	- Renamed parameter MassToleranceRefinementMethod to ToleranceRefinementMethod since it applies to both mass and NET refinement
+	- Updated numerous default settings to revised values
+
+Version 3.41 - Build 355; November 8, 2006
+	- Added option to use Expectation Maximization to determine the optimal mass and NET error tolerances using the mass and NET error histograms
+	- Restored inclusion of the final Mass and NET histograms in the Index.html file created during auto analysis
+
+Version 3.41 - Build 354; November 7, 2006
+	- Updated to save the Mass and NET histograms after LCMSWARP, but using the wide search tolerances
+		- The Index.html file created in the output folder now shows the AfterLCMSWARP histograms rather than the final histograms
+
+Version 3.41 - Build 353; November 6, 2006
+	- If RefineDBSearchMassTolerance or RefineDBSearchNETTolerance is enabled, then now calling frmErrorDistribution2D to refine the Mass and NET tol after using MSWarp to align the data and adjust the mass calibration
+	- Fixed bug that inadvertently disabled some of the UMC Ion Networks settings when loading a .Ini file containing NetActualDim < 5
+	- Fixed log file description displayed when a dimension of UMC Ion Networks is disabled
+
 Version 3.41 - Build 352; November 2, 2006
 	- Updated pair searching to enable "Require overlap at UMC Apexes" by default
 		- Increased the default range for overlap at apexes and overlap at edges to be 15 scans
