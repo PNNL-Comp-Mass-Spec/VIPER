@@ -937,7 +937,7 @@ On Error GoTo FindUMCsErrorHandler
             glbPreferencesExpanded.AutoAnalysisOptions.UMCSearchMode = AUTO_ANALYSIS_UMC2003
             
             ' Also, use this to assure the data is not exported to the database
-            glbPreferencesExpanded.AutoAnalysisOptions.AutoAnalysisSearchMode(0).ExportResultsToDatabase = True
+            glbPreferencesExpanded.AutoAnalysisOptions.AutoAnalysisSearchMode(0).ExportResultsToDatabase = False
         End If
         
         ' Find the UMC's (Note: Using LCase to avoid case conversion problems)

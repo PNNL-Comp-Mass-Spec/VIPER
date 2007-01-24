@@ -1,5 +1,8 @@
 VIPER Change Log
 
+Version 3.41 - build 358; January 22, 2007
+	- Fixed bug that prevented processing with a .Par file
+
 Version 3.41 - build 357; November 16, 2006
 	- Added option IgnoreNETAdjustmentFailure, which allows processing to continue even if the initial NET adjustment with LCMSWARP fails (as sometimes happens for huge input files)
 	- Fixed bug involving UMC refinement when > 32000 UMCs exist

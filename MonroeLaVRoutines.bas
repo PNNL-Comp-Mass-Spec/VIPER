@@ -3697,20 +3697,25 @@ On Error GoTo ParseCommandLineErrorHandler
     End If
     
     If Len(strParameterFilePath) > 0 Then
+     ' Make sure strParameterFilePath ends in .par and points to a valid file
+        If FileExists(strParameterFilePath) Then
+            If UCase(GetFileExtension(strParameterFilePath, True)) = ".PAR" Then
+                blnAutoProcess = True
+            Else
+                MsgBox "Parameter file must be a text file with a name ending in .Par"
+                blnShowHelp = True
+            End If
+        Else
+            MsgBox "Parameter file not found: " & strParameterFilePath, vbInformation + vbOKOnly, "File not Found"
+            blnShowHelp = True
+        End If
+    Else
         If Len(strInputFilePathSingle) = 0 Then
             blnShowHelp = True
         Else
             ' Make sure strInputFilePathSingle points to a known file type
             If Not DetermineFileType(strInputFilePathSingle, eFileType) Then
                 blnShowHelp = True
-            Else
-                ' Make sure strParameterFilePath points to a valid file
-                If FileExists(strParameterFilePath) Then
-                    blnAutoProcess = True
-                Else
-                    MsgBox "Parameter file not found: " & strParameterFilePath, vbInformation + vbOKOnly, "File not Found"
-                    blnShowHelp = True
-                End If
             End If
         End If
     End If
