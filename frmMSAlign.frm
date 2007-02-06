@@ -1,10 +1,10 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "Tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Object = "{C02A7541-5364-11D2-9373-00A02411EBE6}#1.6#0"; "cw3dgrph.ocx"
 Begin VB.Form frmMSAlign 
    BackColor       =   &H00FFFFFF&
-   Caption         =   "MS Warp"
+   Caption         =   "LCMSWARP"
    ClientHeight    =   10410
    ClientLeft      =   165
    ClientTop       =   855
@@ -97,12 +97,13 @@ Begin VB.Form frmMSAlign
       _Version        =   393216
       Style           =   1
       Tabs            =   6
+      Tab             =   4
       TabsPerRow      =   6
       TabHeight       =   520
       BackColor       =   -2147483643
       TabCaption(0)   =   "NET Options"
       TabPicture(0)   =   "frmMSAlign.frx":0000
-      Tab(0).ControlEnabled=   -1  'True
+      Tab(0).ControlEnabled=   0   'False
       Tab(0).Control(0)=   "fraNETWarpOptions"
       Tab(0).Control(0).Enabled=   0   'False
       Tab(0).ControlCount=   1
@@ -124,14 +125,19 @@ Begin VB.Form frmMSAlign
       TabPicture(3)   =   "frmMSAlign.frx":0054
       Tab(3).ControlEnabled=   0   'False
       Tab(3).Control(0)=   "fraMassCalibType"
+      Tab(3).Control(0).Enabled=   0   'False
       Tab(3).ControlCount=   1
       TabCaption(4)   =   "Advanced"
       TabPicture(4)   =   "frmMSAlign.frx":0070
-      Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "txtWarpMassZScoreTolerance"
-      Tab(4).Control(1)=   "Frame1"
-      Tab(4).Control(2)=   "chkWarpMassUseLSQ"
-      Tab(4).Control(3)=   "Label21"
+      Tab(4).ControlEnabled=   -1  'True
+      Tab(4).Control(0)=   "Label21"
+      Tab(4).Control(0).Enabled=   0   'False
+      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(1).Enabled=   0   'False
+      Tab(4).Control(2)=   "Frame1"
+      Tab(4).Control(2).Enabled=   0   'False
+      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
+      Tab(4).Control(3).Enabled=   0   'False
       Tab(4).ControlCount=   4
       TabCaption(5)   =   "Plots"
       TabPicture(5)   =   "frmMSAlign.frx":008C
@@ -279,7 +285,7 @@ Begin VB.Form frmMSAlign
       End
       Begin VB.TextBox txtWarpMassZScoreTolerance 
          Height          =   285
-         Left            =   -69840
+         Left            =   5160
          TabIndex        =   48
          Text            =   "3"
          Top             =   420
@@ -288,7 +294,7 @@ Begin VB.Form frmMSAlign
       Begin VB.Frame Frame1 
          Caption         =   "LSQ Options"
          Height          =   855
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   49
          Top             =   720
          Width           =   6015
@@ -328,7 +334,7 @@ Begin VB.Form frmMSAlign
       Begin VB.CheckBox chkWarpMassUseLSQ 
          Caption         =   "Use LSQ (least squares fit)"
          Height          =   255
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   46
          Top             =   420
          Value           =   1  'Checked
@@ -346,7 +352,7 @@ Begin VB.Form frmMSAlign
             Height          =   255
             Left            =   240
             TabIndex        =   43
-            Top             =   300
+            Top             =   260
             Value           =   -1  'True
             Width           =   5800
          End
@@ -355,15 +361,15 @@ Begin VB.Form frmMSAlign
             Height          =   255
             Left            =   240
             TabIndex        =   44
-            Top             =   600
+            Top             =   560
             Width           =   5800
          End
          Begin VB.OptionButton optMassRecalHybrid 
-            Caption         =   "Hybrid Recalibration (Recalibrate m/z coefficients followed by Time drift)"
-            Height          =   255
+            Caption         =   "Hybrid Recalibration (Algorithm by Navdeep Jaitly); recalibrate m/z coefficients followed by time drift"
+            Height          =   375
             Left            =   240
             TabIndex        =   45
-            Top             =   900
+            Top             =   860
             Width           =   5800
          End
       End
@@ -579,7 +585,7 @@ Begin VB.Form frmMSAlign
       Begin VB.Frame fraNETWarpOptions 
          Caption         =   "NET Warp Options"
          Height          =   1335
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   8
          Top             =   360
          Width           =   6135
@@ -687,7 +693,7 @@ Begin VB.Form frmMSAlign
       Begin VB.Label Label21 
          Caption         =   "z-score tolerance:"
          Height          =   210
-         Left            =   -71520
+         Left            =   3480
          TabIndex        =   47
          Top             =   450
          Width           =   1695
@@ -2204,8 +2210,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   3.83451891510423E-295
-         DataMax_5       =   3.83451891510423E-295
+         DataMin_5       =   3.98406509787428E-295
+         DataMax_5       =   3.98406509787428E-295
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2271,8 +2277,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   3.84286602491007E-295
-         DataMax_14      =   3.84286602491007E-295
+         DataMin_14      =   4.04245006986144E-295
+         DataMax_14      =   4.04245006986144E-295
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2340,8 +2346,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   3.85372174732302E-295
-         DataMax_23      =   3.85372174732302E-295
+         DataMin_23      =   4.06299680169119E-295
+         DataMax_23      =   4.06299680169119E-295
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -6266,8 +6272,15 @@ End Sub
 Private Sub ShowAboutBox()
     Dim strMessage As String
     
-    strMessage = "Algorithm and Implementation: Deep Jaitly and Matthew Monroe"
-    MsgBox strMessage, vbInformation Or vbOKOnly, "About MS Warp"
+    strMessage = "Algorithm developed by Navdeep Jaitly.  " & vbCrLf & vbCrLf & _
+                 "Journal Article: " & _
+                 "'Robust Algorithm for Alignment of Liquid Chromatography-Mass Spectrometry " & _
+                 "Analyses in an Accurate Mass and Time Tag Data Analysis Pipeline', " & _
+                 "N. Jaitly, M.E. Monroe, V.A. Petyuk, T.R.W. Clauss, J.N. Adkins, and R.D. Smith.  " & _
+                 "Analytical Chemistry, 78 (21), 7397-7409 (2006).  " & vbCrLf & vbCrLf & _
+                 "Implementation by Navdeep Jaitly and Matthew Monroe"
+    
+    MsgBox strMessage, vbInformation Or vbOKOnly, "About LCMSWARP"
 End Sub
 
 Public Sub StartAlignment()

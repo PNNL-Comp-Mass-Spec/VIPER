@@ -2684,9 +2684,9 @@ Dim Cnt As Long
 On Error GoTo exit_ManageClasses
 With GelUMC(Ind)
     Select Case eManageType
-    Case UMCManageConstants.UMCMngInitialize             'prepare room for the half data count classes
-        Cnt = CLng(GelData(Ind).DataLines / 2)
-        If Cnt < 1 Then Cnt = 1
+    Case UMCManageConstants.UMCMngInitialize             ' Initially reserve space for .DataLines / 100 UMCs
+        Cnt = CLng(GelData(Ind).DataLines / 100)
+        If Cnt < 10 Then Cnt = 10
         ReDim .UMCs(Cnt)
         .UMCCnt = 0
         .MassCorrectionValuesDefined = False
@@ -2702,9 +2702,9 @@ With GelUMC(Ind)
         .UMCCnt = 0
         Erase .UMCs
         .MassCorrectionValuesDefined = False
-    Case UMCManageConstants.UMCMngAdd                    'add room for tenth data count classes
-        Cnt = CLng(GelData(Ind).DataLines / 10)
-        If Cnt < 1 Then Cnt = 1
+    Case UMCManageConstants.UMCMngAdd                    ' Increase space reserved by 50%
+        Cnt = CLng(UBound(.UMCs) / 2)
+        If Cnt < 5 Then Cnt = 5
         ReDim Preserve .UMCs(.UMCCnt + Cnt)
     End Select
 End With

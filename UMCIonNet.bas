@@ -17,15 +17,17 @@ Option Explicit
 '''Public Const REC_PLOT_DRAW_MAP = 0
 '''Public Const REC_PLOT_DRAW_DIRECT = 1
 
-Public Const DATA_MONO_MW = 0
-Public Const DATA_AVG_MW = 1
-Public Const DATA_TMA_MW = 2
-Public Const DATA_SCAN = 3
-Public Const DATA_FIT = 4
-Public Const DATA_MOVERZ = 5
-Public Const DATA_GENERIC_NET = 6
-Public Const DATA_CHARGE_STATE = 7
-Public Const DATA_LOG_ABU = 8           'up to here used for UMCIonNet
+Public Enum uindUMCIonNetDimConstants
+    uindMonoMW = 0
+    uindAvgMW = 1
+    uindTmaMW = 2
+    uindScan = 3
+    uindFit = 4
+    uindMZ = 5
+    uindGenericNET = 6
+    uindChargeState = 7
+    uindLogAbundance = 8
+End Enum
 
 Public Const DATA_UNITS_MASS_DA = 0
 Public Const DATA_UNITS_MASS_PPM = 1
@@ -236,7 +238,7 @@ Public Sub LookupUMCIonNetMassTolerances(ByRef dblTolPPM As Double, ByRef eTolTy
         For intIndex = 0 To .NetDim - 1
             With .MetricData(intIndex)
                 If .Use Then
-                    If .DataType = DATA_MONO_MW Or .DataType = DATA_AVG_MW Or .DataType = DATA_TMA_MW Then
+                    If .DataType = uindUMCIonNetDimConstants.uindMonoMW Or .DataType = uindUMCIonNetDimConstants.uindAvgMW Or .DataType = uindUMCIonNetDimConstants.uindTmaMW Then
                         If .ConstraintType = Net_CT_LT Then
                             dblTestTol = .ConstraintValue
                             If .ConstraintUnits = DATA_UNITS_MASS_DA Then

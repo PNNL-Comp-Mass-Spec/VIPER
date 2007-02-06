@@ -1,5 +1,22 @@
 VIPER Change Log
 
+Version 3.42 - Build 361; February 5, 2007
+	- Now using the LCMSFeatureFinder external application to find UMCs
+		- The algorithm in LCMSFeatureFinder.exe is identical to the interal algorithm in Viper, but runs ~25 times faster (including the time to save out the data to disk and load the results into memory)
+		- Example stats:
+			- VB6 version takes 4.5 minutes for 74000 points (finds 7423 UMCs)
+			- C++ version takes 10 seconds for 74000 points (finds 7423 UMCs)
+		- Note that LCMSFeatureFinder.exe requires that the .NET framework v1.1 be installed; see http://www.microsoft.com/downloads/details.aspx?FamilyID=262d25e3-f589-4842-8157-034d1e7cf3a3&displaylang=en
+	- Added reference to LCMSWarp article:
+		"Robust Algorithm for Alignment of Liquid Chromatography-Mass Spectrometry Analyses in an Accurate Mass and Time Tag Data Analysis Pipeline"
+		N. Jaitly, M.E. Monroe, V.A. Petyuk, T.R.W. Clauss, J.N. Adkins, and R.D. Smith.
+		Analytical Chemistry, 78 (21), 7397-7409 (2006).
+	- Updated loading of data from CSV files to read the m/z and mass values as double precision values instead of single precision values
+
+Version 3.41 - build 360; January 29, 2007
+	- Fixed bug that failed to check whether new internal standards should be loaded when a new job is being processed during auto analysis
+	- Fixed bug that always showed the VIPER syntax dialog when starting the program with a blank command line
+
 Version 3.41 - build 358; January 22, 2007
 	- Fixed bug that prevented processing with a .Par file
 

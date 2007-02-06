@@ -208,11 +208,11 @@ Begin VB.Form frmGraph
       Begin VB.Menu mnuStepsUMCs 
          Caption         =   "&2. Find LC-MS Features (UMCs)"
          Begin VB.Menu mnuStepsUMCMode 
-            Caption         =   "UMC 2003 (faster)"
+            Caption         =   "UMC 2003 (fast but less accurate)"
             Index           =   0
          End
          Begin VB.Menu mnuStepsUMCMode 
-            Caption         =   "UMC Ion Networks (better)"
+            Caption         =   "UMC Ion Networks (more accurate)"
             Index           =   1
          End
       End
@@ -2313,7 +2313,11 @@ End Sub
 ''End Sub
 
 Private Sub mnuSplitUMCs_Click()
-    SplitUMCsByAbundance nMyIndex, Me, True, False
+    Dim objSplitUMCs As clsSplitUMCsByAbundance
+    
+    Set objSplitUMCs = New clsSplitUMCsByAbundance
+    objSplitUMCs.ExamineUMCs nMyIndex, Me, True, False
+    Set objSplitUMCs = Nothing
 End Sub
 
 Private Sub mnuStepsAnalysisHistoryLog_Click()

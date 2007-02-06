@@ -1450,11 +1450,11 @@ Public Sub SetDefaultUMCIonNetDef(ByRef udtUMCIonNetDef As UMCIonNetDefinition)
         .NetDim = 5
         .TooDistant = 0.1
         ReDim .MetricData(.NetDim - 1)
-        .MetricData(0).Use = True:  .MetricData(0).DataType = DATA_MONO_MW:   .MetricData(0).WeightFactor = 0.01:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 10: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_PPM
-        .MetricData(1).Use = False:  .MetricData(1).DataType = DATA_AVG_MW:    .MetricData(1).WeightFactor = 0.01:   .MetricData(1).ConstraintType = Net_CT_LT:       .MetricData(1).ConstraintValue = 10: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_PPM
-        .MetricData(2).Use = True:  .MetricData(2).DataType = DATA_LOG_ABU:   .MetricData(2).WeightFactor = 0.1:   .MetricData(2).ConstraintType = Net_CT_None:     .MetricData(2).ConstraintValue = 0.1:   .MetricData(2).ConstraintUnits = DATA_UNITS_MASS_DA
-        .MetricData(3).Use = True:  .MetricData(3).DataType = DATA_GENERIC_NET:      .MetricData(3).WeightFactor = 15:   .MetricData(3).ConstraintType = Net_CT_None:    .MetricData(3).ConstraintValue = 0.01:  .MetricData(3).ConstraintUnits = DATA_UNITS_MASS_DA
-        .MetricData(4).Use = True:  .MetricData(4).DataType = DATA_FIT:       .MetricData(4).WeightFactor = 0.1:    .MetricData(4).ConstraintType = Net_CT_None:    .MetricData(4).ConstraintValue = 0.01:  .MetricData(4).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(0).Use = True:  .MetricData(0).DataType = uindUMCIonNetDimConstants.uindMonoMW:   .MetricData(0).WeightFactor = 0.01:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 10: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_PPM
+        .MetricData(1).Use = False:  .MetricData(1).DataType = uindUMCIonNetDimConstants.uindAvgMW:    .MetricData(1).WeightFactor = 0.01:   .MetricData(1).ConstraintType = Net_CT_LT:       .MetricData(1).ConstraintValue = 10: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_PPM
+        .MetricData(2).Use = True:  .MetricData(2).DataType = uindUMCIonNetDimConstants.uindLogAbundance:   .MetricData(2).WeightFactor = 0.1:   .MetricData(2).ConstraintType = Net_CT_None:     .MetricData(2).ConstraintValue = 0.1:   .MetricData(2).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(3).Use = True:  .MetricData(3).DataType = uindUMCIonNetDimConstants.uindGenericNET:      .MetricData(3).WeightFactor = 15:   .MetricData(3).ConstraintType = Net_CT_None:    .MetricData(3).ConstraintValue = 0.01:  .MetricData(3).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(4).Use = True:  .MetricData(4).DataType = uindUMCIonNetDimConstants.uindFit:       .MetricData(4).WeightFactor = 0.1:    .MetricData(4).ConstraintType = Net_CT_None:    .MetricData(4).ConstraintValue = 0.01:  .MetricData(4).ConstraintUnits = DATA_UNITS_MASS_DA
     
         .NetActualDim = 0
         For intIndex = 0 To .NetDim - 1

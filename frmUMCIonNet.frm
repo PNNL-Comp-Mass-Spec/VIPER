@@ -3,14 +3,14 @@ Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmUMCIonNet 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "UMC Ion Networks"
-   ClientHeight    =   5685
+   ClientHeight    =   5400
    ClientLeft      =   2760
    ClientTop       =   3750
    ClientWidth     =   11355
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   5685
+   ScaleHeight     =   5400
    ScaleWidth      =   11355
    ShowInTaskbar   =   0   'False
    Begin VB.CommandButton cmdClose 
@@ -36,24 +36,40 @@ Begin VB.Form frmUMCIonNet
       TabCaption(0)   =   "1. Find Connections"
       TabPicture(0)   =   "frmUMCIonNet.frx":0000
       Tab(0).ControlEnabled=   -1  'True
-      Tab(0).Control(0)=   "fraNet(0)"
+      Tab(0).Control(0)=   "lblLCMSFeatureFinderInfo"
       Tab(0).Control(0).Enabled=   0   'False
-      Tab(0).Control(1)=   "fraUMCScope"
+      Tab(0).Control(1)=   "fraNet(0)"
       Tab(0).Control(1).Enabled=   0   'False
-      Tab(0).Control(2)=   "cmdFindConnectionsThenUMCs"
+      Tab(0).Control(2)=   "fraUMCScope"
       Tab(0).Control(2).Enabled=   0   'False
-      Tab(0).ControlCount=   3
+      Tab(0).Control(3)=   "cmdFindConnectionsThenUMCs"
+      Tab(0).Control(3).Enabled=   0   'False
+      Tab(0).Control(4)=   "chkUseLCMSFeatureFinder"
+      Tab(0).Control(4).Enabled=   0   'False
+      Tab(0).ControlCount=   5
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "Frame1"
-      Tab(1).Control(1)=   "lblFilterConnections"
+      Tab(1).Control(0)=   "lblFilterConnections"
+      Tab(1).Control(0).Enabled=   0   'False
+      Tab(1).Control(1)=   "Frame1"
+      Tab(1).Control(1).Enabled=   0   'False
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define UMC's using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
       Tab(2).ControlEnabled=   0   'False
       Tab(2).Control(0)=   "fraNet(1)"
+      Tab(2).Control(0).Enabled=   0   'False
       Tab(2).ControlCount=   1
+      Begin VB.CheckBox chkUseLCMSFeatureFinder 
+         Caption         =   "Use LCMSFeatureFinder external app"
+         Height          =   255
+         Left            =   240
+         TabIndex        =   141
+         Top             =   3840
+         Value           =   1  'Checked
+         Width           =   2985
+      End
       Begin VB.CommandButton cmdFindConnectionsThenUMCs 
          Caption         =   "&Find Connections then UMC's"
          Height          =   375
@@ -323,8 +339,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassMassTopX"
-            Tab(2).Control(1)=   "fraClassAbundanceTopX"
+            Tab(2).Control(0)=   "fraClassAbundanceTopX"
+            Tab(2).Control(1)=   "fraClassMassTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -1294,8 +1310,16 @@ Begin VB.Form frmUMCIonNet
             Width           =   855
          End
       End
-      Begin VB.Label lblFilterConnections 
+      Begin VB.Label lblLCMSFeatureFinderInfo 
          Caption         =   $"frmUMCIonNet.frx":00AC
+         Height          =   400
+         Left            =   240
+         TabIndex        =   142
+         Top             =   4080
+         Width           =   5415
+      End
+      Begin VB.Label lblFilterConnections 
+         Caption         =   $"frmUMCIonNet.frx":013D
          Height          =   615
          Left            =   -74640
          TabIndex        =   55
@@ -1312,7 +1336,7 @@ Begin VB.Form frmUMCIonNet
       Left            =   1200
       TabIndex        =   136
       Top             =   4980
-      Width           =   7095
+      Width           =   9855
    End
 End
 Attribute VB_Name = "frmUMCIonNet"
@@ -1335,67 +1359,316 @@ Attribute VB_Exposed = False
 '----------------------------------------------------------------------
 Option Explicit
 
-Const MAX_NET_SIZE = 1000000
+Private Const MAX_NET_SIZE = 1000000
 
-Const NET_ADD_RATE = 5000
+Private Const NET_ADD_RATE = 5000
 
-Const NET_EDIT_REJECT_LONG = 0
+Private Const NET_EDIT_REJECT_LONG = 0
 
-Const HUMCNotUsed As Byte = 0
-Const HUMCInUse As Byte = 1
-Const HUMCUsed As Byte = 2
+Private Const HUMCNotUsed As Byte = 0
+Private Const HUMCInUse As Byte = 1
+Private Const HUMCUsed As Byte = 2
 
-Dim CallerID As Long
-Dim bLoading As Boolean
+Private Const LCMS_FEATURE_FINDER_APP_NAME As String = "LCMSFeatureFinder.exe"
+Private Const LCMS_FEATURE_FINDER_ISOTOPE_FEATURES_FILE As String = "Tmp_Export_LCMSFeaturesToSearch.txt"
+Private Const LCMS_FEATURE_FINDER_INI_FILE As String = "Tmp_Export_LCMSFeaturesToSearch.ini"
 
-Dim DataCnt As Long         'count of isotopic data
+Private CallerID As Long
+Private bLoading As Boolean
+
+Private DataCnt As Long     'count of isotopic data
                             ' If only finding UMC's on data "in current view", then this value may be
                             ' less than the actual data count in the file
 
 ' Unused variable
 '''Dim DataWeightFactor() As Double    'weighting factor for each dimension
-Dim DataOInd() As Long              'original index in IsoData array
-Dim DataVal() As Double             'values to be used in calculations
+Private DataOInd() As Long              'original index in IsoData array
+Private DataVal() As Double             'values to be used in calculations
 'this values are dimensioned and weighted to improve calculation speed
 
-Dim ResCnt As Long
-Dim ResInd1() As Long
-Dim ResInd2() As Long
-Dim ResDist() As Double
-Dim ResEliminate() As Boolean
+Private ResCnt As Long
+Private ResInd1() As Long
+Private ResInd2() As Long
+Private ResDist() As Double
+Private ResEliminate() As Boolean
 
-Dim MinScan As Long
-Dim MaxScan As Long
+Private MinScan As Long
+Private MaxScan As Long
 
 'following arrays are used to optimize calculations by indexing first dimension
-Dim OptIndO() As Long         'indexes in original data arrays
-Dim OptValO() As Double       'values in first data dimension used in optimization
+Private OptIndO() As Long         'indexes in original data arrays
+Private OptValO() As Double       'values in first data dimension used in optimization
 
 Dim MyDef As UMCIonNetDefinition
 
 
 'settings used to define UMCs from Net
-Dim UMCMakeSingleMemberClasses As Boolean
-Dim UMCRepresentative As Long
+Private UMCMakeSingleMemberClasses As Boolean
+Private UMCRepresentative As Long
 
 'helper variables used to fill classes
-Dim HUMCIsoCnt As Long        'number of Isotopic distributions in a current 2D display
-Dim HUMCNetCnt As Long        'number of connections in Net
-Dim HUMCIsoUsed() As Byte     'array parallel with IsoData array indicating should isotopic
+Private HUMCIsoCnt As Long        'number of Isotopic distributions in a current 2D display
+Private HUMCNetCnt As Long        'number of connections in Net
+Private HUMCIsoUsed() As Byte     'array parallel with IsoData array indicating should isotopic
                               'distribution be included in the current class; it also helps
                               'if unconnected nodes should be made to classes
-Dim HUMCEquClsWk() As Long    'array of the same size as IsoData array used to construct each class
+Private HUMCEquClsWk() As Long    'array of the same size as IsoData array used to construct each class
                               'this is working array that is never reinitialized to optimize
                               'performance; that means be very careful with it's content
-Dim HUMCEquClsCnt As Long     'actual size of the current class
-Dim HUMCEquCls() As Long      'array that will hold actual class of equivalency
+Private HUMCEquClsCnt As Long     'actual size of the current class
+Private HUMCEquCls() As Long      'array that will hold actual class of equivalency
 Dim HUMCNetUsed() As Byte     'array parallel with NetInd arrays indicating if net connection
                               'was already used in classification
-Dim DummyInd() As Long        'never to be initialized; used in sort function
-                              
+Private DummyInd() As Long        'never to be initialized; used in sort function
+
+Private mLCMSResultsMappingCount As Long
+Private mLCMSResultsMappingUMCs() As Long
+Private mLCMSResultsMappingDataIndices() As Long
+
+Private mSplitUMCs As clsSplitUMCsByAbundance
+
 Private mAbortProcess As Boolean
 Private mCalculating As Boolean
 Private mOneSecond As Double
+
+Private Sub AbortProcessing()
+    mAbortProcess = True
+    
+    On Error Resume Next
+    If Not mSplitUMCs Is Nothing Then
+        mSplitUMCs.AbortProcessingNow
+    End If
+End Sub
+
+Private Function BuildCurrentClass() As Boolean
+'---------------------------------------------------------------------------------------
+'builds class for the current settings in the HUMCEquCls array; returns True on success
+'class has to be sorted if more than 2 elements(to preserve scan order)
+'---------------------------------------------------------------------------------------
+Dim i As Long
+Dim BestInd As Long
+'Dim MySort As New QSLong
+On Error GoTo err_BuildCurrentClass
+
+' ToDo: Maybe add parameter blnSortFeatures to this function and don't sort if blnSortFeatures=false
+If HUMCEquClsCnt > 2 Then
+   ShellSortLong HUMCEquCls, 0, HUMCEquClsCnt - 1
+   'If Not MySort.QSAsc(HUMCEquCls(), DummyInd()) Then GoTo err_BuildCurrentClass
+   'Set MySort = Nothing
+End If
+
+With GelUMC(CallerID)
+        
+    If .UMCCnt > UBound(.UMCs) Then             'add room if neccessary
+        If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_BuildCurrentClass
+    End If
+    
+    With .UMCs(.UMCCnt)
+          ' ToDo: Consider only expanding the memory used, never contracting
+          
+          ReDim .ClassMInd(HUMCEquClsCnt - 1)
+          ReDim .ClassMType(HUMCEquClsCnt - 1)
+          For i = 0 To HUMCEquClsCnt - 1
+              .ClassCount = .ClassCount + 1
+              .ClassMInd(.ClassCount - 1) = HUMCEquCls(i)
+              .ClassMType(.ClassCount - 1) = glIsoType
+          Next i
+                    
+          ' Note: This code has been moved to UMCIonNet.Bas->FindUMCClassRepIndex
+          BestInd = FindUMCClassRepIndex(CallerID, GelUMC(CallerID).UMCCnt, CInt(UMCRepresentative))
+          
+          .ClassRepInd = .ClassMInd(BestInd)
+          .ClassRepType = glIsoType
+     End With
+      .UMCCnt = .UMCCnt + 1
+      
+     BuildCurrentClass = True
+     Exit Function
+End With
+
+err_BuildCurrentClass:
+ChangeStatus " Error building UMC."
+End Function
+
+Private Function BuildUMCsUsingmLCMSResultsMapping(ByVal blnShowMessages As Boolean) As Boolean
+    Dim lngIndex As Long
+    Dim lngCurrentUMC As Long
+    Dim intScopeUsedForConnections As Integer
+    
+    Dim strBaseStatus As String
+    Dim strMessage As String
+    
+    Dim blnSuccess As Boolean
+    
+On Error GoTo BuildUMCsUsingmLCMSResultsMappingErrorHandler
+    blnSuccess = False
+    
+    If mLCMSResultsMappingCount = 0 Then
+        strMessage = "LC-MS results mapping data not in memory; unable to continue"
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            AddToAnalysisHistory CallerID, strMessage
+        ElseIf blnShowMessages Then
+            MsgBox strMessage, vbExclamation + vbOKOnly, "Invalid Options"
+        End If
+    ElseIf Not ValidateClassStatOptions() Then
+        strMessage = "Invalid class stat options, unable to continue"
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            AddToAnalysisHistory CallerID, strMessage
+        ElseIf blnShowMessages Then
+            MsgBox strMessage, vbExclamation + vbOKOnly, "Invalid Options"
+        End If
+    Else
+        ' Update GelUMC(CallerID).def now, prior to processing
+        With GelUMC(CallerID)
+            ' Save the Scope used when finding the connections since
+            '  the user may have changed it since then, thus affecting UMCDef
+            intScopeUsedForConnections = .def.DefScope
+            
+            ' Copy the def
+            .def = UMCDef
+            
+            ' Make sure the scope in GelUMC() is correct
+            .def.DefScope = intScopeUsedForConnections
+        End With
+            
+        ChangeStatus " Initializing UMC structures..."
+        
+        If Not ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
+            strMessage = "Error initializing UMC structures, unable to continue"
+            If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                AddToAnalysisHistory CallerID, strMessage
+            ElseIf blnShowMessages Then
+                MsgBox strMessage, vbExclamation + vbOKOnly, "Error"
+            End If
+            blnSuccess = False
+        Else
+            strBaseStatus = "Defining LC-MS Feature members"
+            ChangeStatus strBaseStatus
+            
+            HUMCEquClsCnt = 0
+            ReDim HUMCEquCls(999)
+            
+            lngCurrentUMC = mLCMSResultsMappingUMCs(0)
+            For lngIndex = 0 To mLCMSResultsMappingCount - 1
+                  
+                If mLCMSResultsMappingUMCs(lngIndex) <> lngCurrentUMC Then
+                    BuildCurrentClass
+                    
+                    lngCurrentUMC = mLCMSResultsMappingUMCs(lngIndex)
+                    HUMCEquClsCnt = 0
+                End If
+                
+                If HUMCEquClsCnt = UBound(HUMCEquCls) Then
+                    ReDim Preserve HUMCEquCls((UBound(HUMCEquCls) + 1) * 2 - 1)
+                End If
+                
+                HUMCEquCls(HUMCEquClsCnt) = mLCMSResultsMappingDataIndices(lngIndex)
+                HUMCEquClsCnt = HUMCEquClsCnt + 1
+                
+                If lngIndex Mod 1000 = 999 Then
+                    ChangeStatus strBaseStatus & ": " & (lngIndex + 1) & " / " & mLCMSResultsMappingCount
+                End If
+                
+                If mAbortProcess Then Exit For
+            Next lngIndex
+                
+            If mAbortProcess Then
+                ChangeStatus "Processing aborted."
+                blnSuccess = False
+            Else
+                If HUMCEquClsCnt > 0 Then
+                    ' Store the data for the final UMC
+                    BuildCurrentClass
+                End If
+            
+                ' Refine the UMCs and compute class stats
+                blnSuccess = FinalizeNewUMCs()
+                
+                If blnSuccess Then
+                    ChangeStatus "Number of UMCs: " & GelUMC(CallerID).UMCCnt
+                Else
+                    ChangeStatus "Error creating UMCs."
+                End If
+            End If
+            
+            
+            If GelUMCDraw(CallerID).Visible Then
+                GelBody(CallerID).RequestRefreshPlot
+                GelBody(CallerID).csMyCooSys.CoordinateDraw
+            End If
+        End If
+    End If
+    
+    BuildUMCsUsingmLCMSResultsMapping = blnSuccess
+    Exit Function
+    
+BuildUMCsUsingmLCMSResultsMappingErrorHandler:
+    Debug.Print "Error in BuildUMCsUsingmLCMSResultsMapping: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "frmUMCIonNet->BuildUMCsUsingmLCMSResultsMapping"
+    
+    BuildUMCsUsingmLCMSResultsMapping = False
+
+End Function
+
+Private Sub ChangeStatus(ByVal StatusMsg As String)
+    lblStatus.Caption = StatusMsg
+    DoEvents
+End Sub
+
+Private Sub CreateNet()
+'------------------------------------------------------------------------------
+'fills permanent GelUMCIon structures with indexes;
+'before filling permanent GelUMCIon structures results are sorted on Ind1/Ind2;
+'this will optimize class creation and reduce the total entropy in the Universe
+'------------------------------------------------------------------------------
+Dim i As Long
+Dim TmpCnt As Long
+Dim Ind1() As Long, Ind2() As Long, Dist() As Double, SortInd() As Long
+
+On Error GoTo CreateNetErrorHandler
+
+ChangeStatus " Creating Net structure..."
+If ResCnt > 0 Then
+   TmpCnt = 0
+   ReDim Ind1(ResCnt - 1):   ReDim Ind2(ResCnt - 1):
+   ReDim Dist(ResCnt - 1):   ReDim SortInd(ResCnt - 1)
+   For i = 0 To ResCnt - 1
+       If Not ResEliminate(i) Then
+          TmpCnt = TmpCnt + 1
+          Ind1(TmpCnt - 1) = DataOInd(ResInd1(i)):   Ind2(TmpCnt - 1) = DataOInd(ResInd2(i))
+          Dist(TmpCnt - 1) = ResDist(i):             SortInd(TmpCnt - 1) = TmpCnt - 1
+       End If
+   Next i
+   Call ManageResArrays(amtErase)           'don't need results arrays anymore
+   If TmpCnt > 0 Then
+      ReDim Preserve Ind1(TmpCnt - 1):   ReDim Preserve Ind2(TmpCnt - 1):
+      ReDim Preserve Dist(TmpCnt - 1):   ReDim Preserve SortInd(TmpCnt - 1)
+      ChangeStatus "Sorting connections..."
+      Call Sort2LongArrays(Ind1(), Ind2(), SortInd())   'sort results on Ind1, Ind2
+      With GelUMCIon(CallerID)
+         .NetCount = TmpCnt
+         ReDim .NetInd1(TmpCnt - 1):   ReDim .NetInd2(TmpCnt - 1):   ReDim .NetDist(TmpCnt - 1)
+         .MinDist = glHugeDouble:      .MaxDist = -glHugeDouble
+         For i = 0 To TmpCnt - 1
+             .NetInd1(i) = Ind1(SortInd(i)):   .NetInd2(i) = Ind2(SortInd(i)):   .NetDist(i) = Dist(SortInd(i))
+             If Dist(SortInd(i)) < .MinDist Then .MinDist = Dist(SortInd(i))
+             If Dist(SortInd(i)) > .MaxDist Then .MaxDist = Dist(SortInd(i))
+         Next i
+      End With
+   End If
+End If
+ChangeStatus " Number of connections: " & GelUMCIon(CallerID).NetCount
+lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
+Exit Sub
+
+CreateNetErrorHandler:
+Debug.Print "Error in CreateNet: " & Err.Description
+Debug.Assert False
+LogErrors Err.Number, "frmUMCIonNet->CreateNet"
+Resume Next
+
+End Sub
 
 Private Sub DisplayCurrentOptions()
     Dim blnLoadingSaved As Boolean
@@ -1454,666 +1727,6 @@ Private Sub DisplayCurrentOptions()
 
 End Sub
 
-Public Sub InitializeUMCSearch()
-    
-    ' MonroeMod: This code was in Form_Activate
-    
-On Error GoTo InitializeUMCSearchErrorHandler
-
-    Dim ScanRange As Long
-    If bLoading Then
-        CallerID = Me.Tag
-        lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
-        
-        ' Copy Def from GelSearchDef(CallerID).UMCDef to UMCDef
-        ' Copy Def from GelSearchDef(CallerID).UMCIonNetDef to UMCIonNetDef
-        If CallerID >= 1 And CallerID <= UBound(GelBody) Then
-            UMCDef = GelSearchDef(CallerID).UMCDef
-            UMCIonNetDef = GelSearchDef(CallerID).UMCIonNetDef
-        End If
-        
-        If GelUMCIon(CallerID).NetCount > 0 Then                     'accept settings from caller
-           MyDef = GelUMCIon(CallerID).ThisNetDef
-           ChangeStatus " Number of lines: " & GelUMCIon(CallerID).NetCount
-        Else                                                         'accept setting from UMCIonNetDef (default Def, or last Def used when form was Unloaded)
-           MyDef = UMCIonNetDef
-           ChangeStatus " No net structure found."
-        End If
-        
-        ' MonroeMod: copy value from .UMCDrawType to .DrawType
-        GelUMCDraw(CallerID).DrawType = glbPreferencesExpanded.UMCDrawType
-        
-        DisplayCurrentOptions
-        
-        bLoading = False
-        GetScanRange CallerID, MinScan, MaxScan, ScanRange
-        
-        tbsTabStrip.Tab = 0
-        tbsUMCRefinementOptions.Tab = 0
-    End If
-
-    Exit Sub
-
-InitializeUMCSearchErrorHandler:
-    Debug.Print "Error in InitializeUMCSearch: " & Err.Description
-    Debug.Assert False
-    LogErrors Err.Number, "frmUMCIonNet->InitializeUMCSearch"
-    Resume Next
-    
-End Sub
-
-Public Function StartUMCSearch() As Boolean
-    ' This sub should be called after calling InitializeUMCSearch
-    ' It is intended to be called during AutoAnalysis
-    '
-    ' Returns True if Success, False if Error
-    
-    Dim blnSuccess As Boolean
-    Dim blnAbortedProcessDuringAutoAnalysis As Boolean
-    
-On Error GoTo StartUMCSearchErrorHandler
-
-    ' 1. Find the connections
-    tbsTabStrip.Tab = 0
-    FindIonNetConnections
-    
-    ' If auto-analyzing, ignore the mAbortProcess state
-    If glbPreferencesExpanded.AutoAnalysisStatus.Enabled And mAbortProcess Then
-        blnAbortedProcessDuringAutoAnalysis = True
-        mAbortProcess = False
-    End If
-    
-    If Not mAbortProcess Then
-        ' 2. Find the UMC's
-        tbsTabStrip.Tab = 2
-        blnSuccess = FormClassesFromNETsWrapper(False)
-    End If
-    
-    With GelP_D_L(CallerID)
-        If .DltLblType <> ptS_Dlt And .DltLblType <> ptS_Lbl And .DltLblType <> ptS_DltLbl Then
-            .SyncWithUMC = False
-        End If
-    End With
-    
-    mAbortProcess = mAbortProcess Or blnAbortedProcessDuringAutoAnalysis
-    StartUMCSearch = Not mAbortProcess And blnSuccess
-    
-    Exit Function
-    
-StartUMCSearchErrorHandler:
-    Debug.Print "Error in frmUMCIonNet.StartUMCSearch: " & Err.Description
-    Debug.Assert False
-    LogErrors Err.Number, "frmUMCIonNet->StartUMCSearch"
-    ' Do not attempt to resume
-    StartUMCSearch = False
-    
-End Function
-
-Private Sub PopulateComboBoxes()
-    
-    ' MonroeMod: The comboboxes are initialized here, rather than hard-coding their members
-    
-    Dim intIndex As Integer
-    
-    With cmbMetricType
-        .Clear
-        .AddItem "Euclidean"
-        .AddItem "Honduras"
-        .AddItem "Infinity"
-    End With
-    
-    For intIndex = 0 To chkUse.Count - 1
-        With cmbData(intIndex)
-            .Clear
-            .AddItem "Monoisotopic Mass"
-            .AddItem "Average Mass"
-            .AddItem "The Most Abundant Mass"
-            .AddItem "SCAN"
-            .AddItem "Fit"
-            .AddItem "m/z"
-            .AddItem "Generic NET"
-            .AddItem "Charge STATE"
-            .AddItem "Log (Abundance)"
-        End With
-    
-        With cmbConstraint(intIndex)
-            .Clear
-            .AddItem "None"
-            .AddItem "L.T."
-            .AddItem "G.T."
-        End With
-    
-        With cmbConstraintUnits(intIndex)
-            .Clear
-            .AddItem "Da"
-            .AddItem "ppm"
-            .Visible = False
-        End With
-    
-    Next intIndex
-    
-    With cmbUMCRepresentative
-        .Clear
-        .AddItem "Highest Abundance"
-        .AddItem "Best Isotopic Fit"
-        .AddItem "First Scan Distribution"
-        .AddItem "Last Scan Distribution"
-        .AddItem "Median Scan Distribution"
-    End With
-    
-    With cmbUMCAbu
-        .Clear
-        .AddItem "Average of Class Abu."
-        .AddItem "Sum of Class Abu."
-        .AddItem "Abu. of Class Representative"
-        .AddItem "Median of Class Abundance"
-        .AddItem "Max of Class Abu."
-        .AddItem "Sum of Top X Members of Class"
-    End With
-    
-    With cmbUMCMW
-        .Clear
-        .AddItem "Class Average"
-        .AddItem "Mol.Mass Of Class Representative"
-        .AddItem "Class Median"
-        .AddItem "Average of Top X Members of Class"
-        .AddItem "Median of Top X Members of Class"
-    End With
-    
-    With cmbUMCDrawType
-        .Clear
-        .AddItem "Actual UMC"
-        .AddItem "UMC Full Region"
-        .AddItem "UMC Intensity"
-    End With
-    
-    With cboChargeStateAbuType
-        .Clear
-        .AddItem "Highest Abu Sum"
-        .AddItem "Most Abu Member"
-        .AddItem "Most Members"
-    End With
-    
-    With cboSplitUMCsScanGapBehavior
-        .Clear
-        .AddItem "Ignore scan gaps"
-        .AddItem "Split if mass difference"
-        .AddItem "Always split"
-    End With
-    
-End Sub
-
-Private Sub cboChargeStateAbuType_Click()
-If mCalculating Then
-    cboChargeStateAbuType.ListIndex = UMCDef.ChargeStateStatsRepType
-Else
-    UMCDef.ChargeStateStatsRepType = cboChargeStateAbuType.ListIndex
-End If
-End Sub
-
-Private Sub cboSplitUMCsScanGapBehavior_Click()
-    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.ScanGapBehavior = cboSplitUMCsScanGapBehavior.ListIndex
-End Sub
-
-Private Sub chkInterpolateMissingIons_Click()
-If mCalculating Then
-    SetCheckBox chkInterpolateMissingIons, UMCDef.InterpolateGaps
-Else
-    UMCDef.InterpolateGaps = cChkBox(chkInterpolateMissingIons)
-End If
-End Sub
-
-Private Sub chkRemoveMaxLengthPctAllScans_Click()
-     glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveMaxLengthPctAllScans = cChkBox(chkRemoveMaxLengthPctAllScans)
-End Sub
-
-Private Sub chkRefineUMCLengthByScanRange_Click()
-    glbPreferencesExpanded.UMCAutoRefineOptions.TestLengthUsingScanRange = cChkBox(chkRefineUMCLengthByScanRange)
-    UpdateDynamicControls
-End Sub
-
-Private Sub chkRemoveHiAbu_Click()
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveAbundanceHigh = cChkBox(chkRemoveHiAbu)
-End Sub
-
-Private Sub chkRemoveHiCnt_Click()
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveCountHigh = cChkBox(chkRemoveHiCnt)
-End Sub
-
-Private Sub chkRemoveLoAbu_Click()
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveAbundanceLow = cChkBox(chkRemoveLoAbu)
-End Sub
-
-Private Sub chkRemoveLoCnt_Click()
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveCountLow = cChkBox(chkRemoveLoCnt)
-End Sub
-
-Private Sub chkSplitUMCsByExaminingAbundance_Click()
-    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance = cChkBox(chkSplitUMCsByExaminingAbundance)
-End Sub
-
-Private Sub chkUse_Click(Index As Integer)
-On Error Resume Next
-If mCalculating Then
-    SetCheckBox chkUse(Index), MyDef.MetricData(Index).Use
-Else
-    MyDef.MetricData(Index).Use = (chkUse(Index).Value = vbChecked)
-End If
-End Sub
-
-Private Sub chkUseMostAbuChargeStateStatsForClassStats_Click()
-If mCalculating Then
-    SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, UMCDef.UMCClassStatsUseStatsFromMostAbuChargeState
-Else
-    UMCDef.UMCClassStatsUseStatsFromMostAbuChargeState = cChkBox(chkUseMostAbuChargeStateStatsForClassStats)
-End If
-End Sub
-
-Private Sub chkUseUntangledAsSingle_Click()
-If mCalculating Then
-    SetCheckBox chkUseUntangledAsSingle, UMCMakeSingleMemberClasses
-Else
-    UMCMakeSingleMemberClasses = (chkUseUntangledAsSingle.Value = vbChecked)
-    glbPreferencesExpanded.UMCIonNetOptions.MakeSingleMemberClasses = UMCMakeSingleMemberClasses
-End If
-End Sub
-
-Private Sub cmbConstraint_Click(Index As Integer)
-On Error Resume Next
-If mCalculating Then
-    cmbConstraint(Index).ListIndex = MyDef.MetricData(Index).ConstraintType
-Else
-    MyDef.MetricData(Index).ConstraintType = cmbConstraint(Index).ListIndex
-    DisplayDynamicUnits
-End If
-End Sub
-
-Private Sub cmbData_Click(Index As Integer)
-On Error Resume Next
-If mCalculating Then
-    cmbData(Index).ListIndex = MyDef.MetricData(Index).DataType
-Else
-    MyDef.MetricData(Index).DataType = cmbData(Index).ListIndex
-    DisplayDynamicUnits
-End If
-End Sub
-
-Private Sub cmbConstraintUnits_Click(Index As Integer)
-On Error Resume Next
-If mCalculating Then
-    cmbConstraintUnits(Index).ListIndex = MyDef.MetricData(Index).ConstraintUnits
-Else
-    MyDef.MetricData(Index).ConstraintUnits = cmbConstraintUnits(Index).ListIndex
-    
-    If Not bLoading Then
-        If cmbConstraintUnits(Index).ListIndex = DATA_UNITS_MASS_DA Then
-            ' Convert the constraint tolerance from ppm to Da, assuming 1000 m/z
-            txtConstraint(Index) = PPMToMass(txtConstraint(Index), 1000)
-        Else
-            ' Convert the constraint tolerance from Da to ppm, assuming 1000 m/z
-            txtConstraint(Index) = MassToPPM(txtConstraint(Index), 1000)
-        End If
-        If IsNumeric(txtConstraint(Index).Text) Then
-            MyDef.MetricData(Index).ConstraintValue = CDbl(txtConstraint(Index).Text)
-        End If
-    End If
-End If
-
-End Sub
-
-Private Sub cmbMetricType_Click()
-If mCalculating Then
-    cmbMetricType.ListIndex = MyDef.MetricType
-Else
-    MyDef.MetricType = cmbMetricType.ListIndex
-End If
-End Sub
-
-Private Sub cmbUMCAbu_Click()
-If mCalculating Then
-    cmbUMCAbu.ListIndex = UMCDef.ClassAbu
-Else
-    UMCDef.ClassAbu = cmbUMCAbu.ListIndex
-End If
-End Sub
-
-Private Sub cmbUMCDrawType_Click()
-If mCalculating Then
-    cmbUMCDrawType.ListIndex = GelUMCDraw(CallerID).DrawType
-Else
-    GelUMCDraw(CallerID).DrawType = cmbUMCDrawType.ListIndex
-    glbPreferencesExpanded.UMCDrawType = cmbUMCDrawType.ListIndex
-End If
-End Sub
-
-Private Sub cmbUMCMW_Click()
-If mCalculating Then
-    cmbUMCMW.ListIndex = UMCDef.ClassMW
-Else
-    UMCDef.ClassMW = cmbUMCMW.ListIndex
-End If
-End Sub
-
-Private Sub cmbUMCRepresentative_Click()
-If mCalculating Then
-    cmbUMCRepresentative.ListIndex = UMCRepresentative
-Else
-    UMCRepresentative = cmbUMCRepresentative.ListIndex
-End If
-End Sub
-
-Private Function ManageResArrays(ByVal ManageType As ArrayManagementType) As Boolean
-Dim MaxResCount As Long
-Dim IsoCnt As Long
-Dim strMessage As String
-
-On Error GoTo ManageResArraysErrorHandler
-
-'''ChangeStatus " Managing results arrays..."
-IsoCnt = GelData(CallerID).IsoLines
-If IsoCnt <= 0 Then Exit Function
-Select Case ManageType
-Case amtErase
-    ResCnt = 0
-    Erase ResInd1:       Erase ResInd2:       Erase ResDist:      Erase ResEliminate
-Case amtInitialize
-    If MyDef.NETType < 10 Then
-       MaxResCount = IsoCnt * MyDef.NETType
-       If MaxResCount > MAX_NET_SIZE Then
-          strMessage = "Net would be too big. Select lower Net type."
-          If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-             MsgBox strMessage, vbOKOnly, glFGTU
-          Else
-             Debug.Assert False
-             LogErrors Err.Number, "frmUMCIonNET->ManageResArrays, amtInitialize"
-             AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
-          End If
-          Exit Function
-       Else
-          ResCnt = 0
-          ReDim ResInd1(MaxResCount - 1):        ReDim ResInd2(MaxResCount - 1)
-          ReDim ResDist(MaxResCount - 1):        ReDim ResEliminate(MaxResCount - 1)
-       End If
-    Else                              'some other type of net; start with
-       ResCnt = 0
-       ReDim ResInd1(IsoCnt - 1):        ReDim ResInd2(IsoCnt - 1)
-       ReDim ResDist(IsoCnt - 1):        ReDim ResEliminate(IsoCnt - 1)
-    End If
-Case amtAdd
-    ReDim Preserve ResInd1(ResCnt + NET_ADD_RATE)
-    ReDim Preserve ResInd2(ResCnt + NET_ADD_RATE)
-    ReDim Preserve ResDist(ResCnt + NET_ADD_RATE)
-    ReDim Preserve ResEliminate(ResCnt + NET_ADD_RATE)
-Case amtTrim
-    If ResCnt > 0 Then
-        ReDim Preserve ResInd1(ResCnt - 1)
-        ReDim Preserve ResInd2(ResCnt - 1)
-        ReDim Preserve ResDist(ResCnt - 1)
-        ReDim Preserve ResEliminate(ResCnt - 1)
-    Else
-        ReDim Preserve ResInd1(0)
-        ReDim Preserve ResInd2(0)
-        ReDim Preserve ResDist(0)
-        ReDim Preserve ResEliminate(0)
-    End If
-End Select
-ManageResArrays = True
-Exit Function
-
-ManageResArraysErrorHandler:
-Debug.Print "Error in ManageResArrays: " & Err.Description
-Debug.Assert False
-LogErrors Err.Number, "frmUMCIonNet->ManageResArrays"
-Resume Next
-
-End Function
-
-Private Sub cmdAbortFindConnections_Click()
-    mAbortProcess = True
-End Sub
-
-Private Sub cmdAbortProcessing_Click()
-    mAbortProcess = True
-End Sub
-
-Private Sub cmdClose_Click()
-    Dim eResponse As VbMsgBoxResult
-    
-    If mCalculating And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        eResponse = MsgBox("Calculations are currently in progress.  Abort them and close the window?", vbQuestion + vbYesNoCancel + vbDefaultButton2, "Abort Processing")
-        If eResponse <> vbYes Then Exit Sub
-        mAbortProcess = True
-    End If
-    
-    Unload Me
-End Sub
-
-Private Sub cmdFindConnections_Click()
-    If mCalculating Then Exit Sub
-    FindIonNetConnections
-End Sub
-
-Private Sub cmdFindConnectionsThenUMCs_Click()
-    If mCalculating Then Exit Sub
-    FindIonNetConnections
-    If Not mAbortProcess Then
-        tbsTabStrip.Tab = 2
-        FormClassesFromNETsWrapper False
-    End If
-End Sub
-
-Private Sub cmdFindUMCsUsingNETConnections_Click()
-    If mCalculating Then Exit Sub
-    FormClassesFromNETsWrapper True
-End Sub
-
-Private Sub cmdRemoveLongConnections_Click()
-    If mCalculating Then Exit Sub
-    RemoveLongConnections NET_EDIT_REJECT_LONG
-End Sub
-
-Private Sub cmdReportUMC_Click()
-If mCalculating Then Exit Sub
-Me.MousePointer = vbHourglass
-ChangeStatus "Generating UMC report..."
-Call ReportUMC(CallerID, "UMCIonNet" & vbCrLf & GetUMCIsoDefinitionText(CallerID))
-ChangeStatus ""
-Me.MousePointer = vbDefault
-End Sub
-
-Private Sub cmdResetToDefaults_Click(Index As Integer)
-    ResetToDefaults
-End Sub
-
-Private Sub cmdResetToOldDefaults_Click(Index As Integer)
-    ResetToOldDefaults
-End Sub
-
-Private Sub Form_Activate()
-    InitializeUMCSearch
-End Sub
-
-Private Sub Form_Load()
-    mOneSecond = 1 / 24 / 60 / 60
-    bLoading = True
-    mCalculating = False
-    mAbortProcess = False
-    PopulateComboBoxes
-End Sub
-
-' Note: Status is called by AutoRefineUMCs and by SplitUMCsByAbundance
-Public Sub Status(ByVal StatusMsg As String)
-    ChangeStatus StatusMsg
-End Sub
-
-Private Sub ChangeStatus(ByVal StatusMsg As String)
-lblStatus.Caption = StatusMsg
-DoEvents
-End Sub
-
-Private Sub Form_Unload(Cancel As Integer)
-UMCIonNetDef = MyDef
-End Sub
-
-Private Sub optDefScope_Click(Index As Integer)
-UMCDef.DefScope = Index
-End Sub
-
-Private Sub txtAutoRefineMinimumMemberCount_LostFocus()
-If IsNumeric(txtAutoRefineMinimumMemberCount.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.MinMemberCountWhenUsingScanRange = Abs(CLng(txtAutoRefineMinimumMemberCount.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtAutoRefineMinimumMemberCount.SetFocus
-End If
-End Sub
-
-Private Sub txtClassAbuTopXMaxAbu_Change()
-    UpdateDynamicControls
-End Sub
-
-Private Sub txtClassAbuTopXMaxAbu_Lostfocus()
-    ValidateTextboxValueDbl txtClassAbuTopXMaxAbu, 0, 1E+300, 0
-    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassAbuTopXMaxAbu = CDblSafe(txtClassAbuTopXMaxAbu)
-End Sub
-
-Private Sub txtClassAbuTopXMinAbu_Change()
-    UpdateDynamicControls
-End Sub
-
-Private Sub txtClassAbuTopXMinAbu_Lostfocus()
-    ValidateTextboxValueDbl txtClassAbuTopXMinAbu, 0, 1E+300, 0
-    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassAbuTopXMinAbu = CDblSafe(txtClassAbuTopXMinAbu)
-End Sub
-
-Private Sub txtClassAbuTopXMinMembers_Lostfocus()
-    ValidateTextboxValueLng txtClassAbuTopXMinMembers, 0, 100000, 3
-    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassAbuTopXMinMembers = CLngSafe(txtClassAbuTopXMinMembers)
-End Sub
-
-Private Sub txtClassMassTopXMaxAbu_Change()
-    UpdateDynamicControls
-End Sub
-
-Private Sub txtClassMassTopXMaxAbu_Lostfocus()
-    ValidateTextboxValueDbl txtClassMassTopXMaxAbu, 0, 1E+300, 0
-    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassMassTopXMaxAbu = CDblSafe(txtClassMassTopXMaxAbu)
-End Sub
-
-Private Sub txtClassMassTopXMinAbu_Change()
-    UpdateDynamicControls
-End Sub
-
-Private Sub txtClassMassTopXMinAbu_Lostfocus()
-    ValidateTextboxValueDbl txtClassMassTopXMinAbu, 0, 1E+300, 0
-    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassMassTopXMinAbu = CDblSafe(txtClassMassTopXMinAbu)
-End Sub
-
-Private Sub txtClassMassTopXMinMembers_Lostfocus()
-    ValidateTextboxValueLng txtClassMassTopXMinMembers, 0, 100000, 3
-    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassMassTopXMinMembers = CLngSafe(txtClassMassTopXMinMembers)
-End Sub
-
-Private Sub txtConstraint_KeyDown(Index As Integer, KeyCode As Integer, Shift As Integer)
-If mCalculating Then KeyCode = 0
-End Sub
-
-Private Sub txtConstraint_KeyPress(Index As Integer, KeyAscii As Integer)
-If mCalculating Then KeyAscii = 0
-End Sub
-
-Private Sub txtConstraint_LostFocus(Index As Integer)
-On Error Resume Next
-If IsNumeric(txtConstraint(Index).Text) Then
-   MyDef.MetricData(Index).ConstraintValue = CDbl(txtConstraint(Index).Text)
-Else
-   MsgBox "This argument should be positive number.", vbOKOnly, glFGTU
-   txtConstraint(Index).SetFocus
-End If
-End Sub
-
-Private Sub txtHiAbuPct_LostFocus()
-If IsNumeric(txtHiAbuPct.Text) Then
-   glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctHighAbundance = Abs(CDbl(txtHiAbuPct.Text))
-Else
-   MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
-   txtHiAbuPct.SetFocus
-End If
-End Sub
-
-Private Sub txtHiCnt_LostFocus()
-If IsNumeric(txtHiCnt.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLength = Abs(CLng(txtHiCnt.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtHiCnt.SetFocus
-End If
-End Sub
-
-Private Sub txtHoleSize_LostFocus()
-If IsNumeric(txtHoleSize.Text) Then
-   UMCDef.GapMaxSize = CLng(txtHoleSize.Text)
-Else
-   MsgBox "This argument should be integer value.", vbOKOnly
-   txtHoleSize.SetFocus
-End If
-End Sub
-
-Private Sub txtInterpolateMaxGapSize_LostFocus()
-If IsNumeric(txtInterpolateMaxGapSize.Text) Then
-   UMCDef.InterpolateMaxGapSize = CLng(txtInterpolateMaxGapSize.Text)
-Else
-   MsgBox "This argument should be integer value.", vbOKOnly
-   txtInterpolateMaxGapSize.SetFocus
-End If
-End Sub
-
-Private Sub txtLoAbuPct_LostFocus()
-If IsNumeric(txtLoAbuPct.Text) Then
-   glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctLowAbundance = Abs(CDbl(txtLoAbuPct.Text))
-Else
-   MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
-   txtLoAbuPct.SetFocus
-End If
-End Sub
-
-Private Sub txtLoCnt_LostFocus()
-If IsNumeric(txtLoCnt.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMinLength = Abs(CLng(txtLoCnt.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtLoCnt.SetFocus
-End If
-End Sub
-
-Private Sub txtMaxLengthPctAllScans_Lostfocus()
-If IsNumeric(txtMaxLengthPctAllScans.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLengthPctAllScans = Abs(CLng(txtMaxLengthPctAllScans.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtMaxLengthPctAllScans.SetFocus
-End If
-End Sub
-
-Private Sub txtNetEditTooDistant_Lostfocus()
-If IsNumeric(txtNetEditTooDistant.Text) Then
-    glbPreferencesExpanded.UMCIonNetOptions.ConnectionLengthPostFilterMaxNET = Abs(txtNetEditTooDistant.Text)
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtNetEditTooDistant.SetFocus
-End If
-End Sub
-
-Private Sub txtNETType_LostFocus()
-On Error Resume Next
-If IsNumeric(txtNETType.Text) Then
-   MyDef.NETType = CLng(txtNETType.Text)
-Else
-   MsgBox "This argument should be positive integer.", vbOKOnly, glFGTU
-   txtNETType.SetFocus
-End If
-End Sub
-
 Private Sub DisplayDynamicUnits()
     Dim intIndex As Integer
     Dim blnShowConstraints As Boolean
@@ -2123,7 +1736,7 @@ On Error GoTo DisplayDynamicUnitsErrorHandler
 
     For intIndex = 0 To cmbData.Count - 1
         Select Case cmbData(intIndex).ListIndex
-        Case DATA_MONO_MW, DATA_AVG_MW, DATA_TMA_MW
+        Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
             cmbConstraintUnits(intIndex).Visible = True
             cmbConstraintUnits(intIndex).ListIndex = MyDef.MetricData(intIndex).ConstraintUnits
             blnMassBasedDataDim = True
@@ -2152,6 +1765,428 @@ DisplayDynamicUnitsErrorHandler:
     Resume Next
     
 End Sub
+
+Private Function EliminateLongConnections(ByVal TooLong As Double) As Long
+'------------------------------------------------------------
+'mark long connections for elimination
+'returns the number of connections eliminated
+'------------------------------------------------------------
+Dim i As Long
+Dim Count As Long
+On Error Resume Next
+ChangeStatus " Rejecting long connections..."
+For i = 0 To ResCnt - 1
+    If ResDist(i) > TooLong Then
+       ResEliminate(i) = True
+       Count = Count + 1
+    End If
+Next i
+ChangeStatus " Long connections eliminated: " & Count
+EliminateLongConnections = Count
+End Function
+
+' Unused function (July 2003)
+Private Sub EliminateRedundantConnectionsDirect()
+'-----------------------------------------------------------------------------------
+'marks redundant connections for eliminations; if we have ResInd1(i)=m, ResInd2(i)=n
+'and ResInd1(j)=n, ResInd2(j)=m for some i,j then eliminate i if m>n or j if m<=n
+'-----------------------------------------------------------------------------------
+Dim i As Long, j As Long
+Dim Count As Long
+On Error Resume Next
+ChangeStatus " Eliminating redundancy..."
+For i = 0 To DataCnt - 1
+    If Not ResEliminate(i) Then
+       For j = i + 1 To DataCnt - 1
+           If Not ResEliminate(j) Then
+              If ResInd1(i) = ResInd2(j) Then
+                 If ResInd2(i) = ResInd1(j) Then
+                    Count = Count + 1
+                    'mark for elimination one where ResInd1>ResInd2
+                    If ResInd1(i) > ResInd2(i) Then
+                       ResEliminate(i) = True
+                    Else
+                       ResEliminate(j) = True
+                    End If
+                 End If
+              End If
+           End If
+       Next j
+    End If
+Next i
+ChangeStatus " Redundant connections eliminated: " & Count
+End Sub
+
+
+Public Function EliminateLongConnections_Net(TooLongConnection As Double) As Long
+'--------------------------------------------------------------------
+'eliminates long connections dirtectly from the GelUMCIon structures
+'NOTE: this function is used for Net editing purposes different from
+'EliminateLongConnections which is used when Net is created
+'returns the number of connections eliminated
+'--------------------------------------------------------------------
+Dim i As Long
+Dim TmpCnt As Long
+Dim lngOriginalConnectionCount As Long
+
+On Error GoTo EliminateLongConnectionsNetErrorHandler
+
+ChangeStatus " Eliminating long connections..."
+With GelUMCIon(CallerID)
+    lngOriginalConnectionCount = .NetCount
+    If .NetCount > 0 Then
+       .MinDist = glHugeDouble:     .MaxDist = -glHugeDouble
+       For i = 0 To .NetCount - 1
+           If .NetDist(i) <= TooLongConnection Then
+              TmpCnt = TmpCnt + 1
+              .NetInd1(TmpCnt - 1) = .NetInd1(i)
+              .NetInd2(TmpCnt - 1) = .NetInd2(i)
+              .NetDist(TmpCnt - 1) = .NetDist(i)
+              If .NetDist(TmpCnt - 1) < .MinDist Then .MinDist = .NetDist(TmpCnt - 1)
+              If .NetDist(TmpCnt - 1) > .MaxDist Then .MaxDist = .NetDist(TmpCnt - 1)
+           End If
+       Next i
+       If TmpCnt > 0 Then
+          ReDim Preserve .NetInd1(TmpCnt - 1)
+          ReDim Preserve .NetInd2(TmpCnt - 1)
+          ReDim Preserve .NetDist(TmpCnt - 1)
+       Else
+          Erase .NetDist:   Erase .NetInd1:   Erase .NetInd2
+       End If
+       .NetCount = TmpCnt
+       .ThisNetDef.TooDistant = TooLongConnection
+    End If
+End With
+GelSearchDef(CallerID).UMCIonNetDef = GelUMCIon(CallerID).ThisNetDef
+ChangeStatus " Number of connections: " & GelUMCIon(CallerID).NetCount
+lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
+EliminateLongConnections_Net = lngOriginalConnectionCount - GelUMCIon(CallerID).NetCount
+
+Exit Function
+
+EliminateLongConnectionsNetErrorHandler:
+Debug.Print "Error in EliminateLongConnectionsNet: " & Err.Description
+Debug.Assert False
+LogErrors Err.Number, "frmUMCIonNet->EliminateLongConnections_NET"
+Resume Next
+End Function
+
+Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef strLCMSFeaturesFilePath As String, ByRef strIniFilePath As String) As Boolean
+    Const COL_DELIMITER As String = vbTab
+    
+    Dim lngIndex As Long
+    Dim ISInd() As Long         ' In-scope index
+    
+    Dim tsOutfile As TextStream
+    Dim fso As New FileSystemObject
+    
+    Dim strMessage As String
+    
+    Dim strLineOut As String
+    Dim strDimensionName As String
+    Dim strConstraint As String
+    
+    Dim strBaseStatus As String
+    
+    Dim lngGelScanNumberMin As Long
+    Dim lngGelScanNumberMax As Long
+    Dim intMinLength As Integer
+    
+    Dim blnMonoMassDefined As Boolean
+    Dim blnAvgMassDefined As Boolean
+    Dim blnLogAbundanceDefined As Boolean
+    Dim blnScanDefined As Boolean
+    Dim blnNETDefined As Boolean
+    Dim blnFitDefined As Boolean
+    
+    Dim blnUseGenericNET As Boolean
+
+On Error GoTo ExportPeaksForUMCFindingErrorHandler
+
+    strBaseStatus = "Exporting loaded peaks to find LC-MS features with external application"
+    ChangeStatus strBaseStatus
+
+    If Not GetDataInScope(ISInd(), DataCnt) Then
+        mAbortProcess = True
+        ExportPeaksForUMCFinding = False
+        Exit Function
+    End If
+    
+    ' Update MyDef.NetDim & MyDef.NetActualDim
+    If Not UpdateNetDimInfo() Then
+        mAbortProcess = True
+        ExportPeaksForUMCFinding = False
+        Exit Function
+    End If
+
+    ' Write out the data in view
+    strLCMSFeaturesFilePath = fso.BuildPath(strOutputFolder, LCMS_FEATURE_FINDER_ISOTOPE_FEATURES_FILE)
+    Set tsOutfile = fso.CreateTextFile(strLCMSFeaturesFilePath, True)
+    
+    ' Write the header line
+    strLineOut = "scan_num" & COL_DELIMITER & _
+                 "charge" & COL_DELIMITER & _
+                 "abundance" & COL_DELIMITER & _
+                 "mz" & COL_DELIMITER & _
+                 "fit" & COL_DELIMITER & _
+                 "average_mw" & COL_DELIMITER & _
+                 "monoisotopic_mw" & COL_DELIMITER & _
+                 "mostabundant_mw" & COL_DELIMITER & _
+                 "fwhm" & COL_DELIMITER & _
+                 "signal_noise" & COL_DELIMITER & _
+                 "mono_abundance" & COL_DELIMITER & _
+                 "mono_plus2_abundance" & COL_DELIMITER & _
+                 "index"
+                 
+    tsOutfile.WriteLine strLineOut
+    
+    With GelData(CallerID)
+        For lngIndex = 1 To DataCnt
+            With .IsoData(ISInd(lngIndex))
+                strLineOut = Trim(.ScanNumber) & COL_DELIMITER & _
+                             Trim(.Charge) & COL_DELIMITER & _
+                             Trim(.Abundance) & COL_DELIMITER & _
+                             Trim(.MZ) & COL_DELIMITER & _
+                             Trim(.Fit) & COL_DELIMITER & _
+                             Trim(.AverageMW) & COL_DELIMITER & _
+                             Trim(.MonoisotopicMW) & COL_DELIMITER & _
+                             Trim(.MostAbundantMW) & COL_DELIMITER & _
+                             Trim(.FWHM) & COL_DELIMITER & _
+                             Trim(.SignalToNoise) & COL_DELIMITER & _
+                             Trim(.IntensityMono) & COL_DELIMITER & _
+                             Trim(.IntensityMonoPlus2) & COL_DELIMITER & _
+                             Trim(ISInd(lngIndex))
+
+                tsOutfile.WriteLine strLineOut
+            End With
+            
+            If lngIndex Mod 5000 = 0 Then
+                ChangeStatus strBaseStatus & ": " & Trim(lngIndex) & " / " & Trim(DataCnt)
+            End If
+            
+            If mAbortProcess Then Exit For
+        Next lngIndex
+    End With
+   
+    tsOutfile.Close
+    Set tsOutfile = Nothing
+    
+    If mAbortProcess Then
+        ExportPeaksForUMCFinding = False
+        Exit Function
+    End If
+    
+    ChangeStatus "Exporting parameters for finding LC-MS features with external application"
+    
+     ' Write out the parameters to use to find the UMCs
+    strIniFilePath = fso.BuildPath(strOutputFolder, LCMS_FEATURE_FINDER_INI_FILE)
+    Set tsOutfile = fso.CreateTextFile(strIniFilePath, True)
+    
+    tsOutfile.WriteLine "[UMCCreationOptions]"
+    
+    blnMonoMassDefined = False
+    blnAvgMassDefined = False
+    blnLogAbundanceDefined = False
+    blnScanDefined = False
+    blnNETDefined = False
+    blnFitDefined = False
+    
+    blnUseGenericNET = False
+    
+    For lngIndex = 0 To MyDef.NetDim - 1
+        strDimensionName = ""
+        strConstraint = ""
+        
+        With MyDef.MetricData(lngIndex)
+            Select Case .DataType
+               Case uindUMCIonNetDimConstants.uindMonoMW
+                    strDimensionName = "MonoMass"
+                    strConstraint = strDimensionName & "Constraint=" & Trim(.ConstraintValue)
+                    blnMonoMassDefined = True
+                    
+               Case uindUMCIonNetDimConstants.uindAvgMW
+                    strDimensionName = "AvgMass"
+                    strConstraint = strDimensionName & "Constraint=" & Trim(.ConstraintValue)
+                    blnAvgMassDefined = True
+                    
+               Case uindUMCIonNetDimConstants.uindTmaMW
+                    ' The most abundant mass; not valid with the LCMSFeatureFinder
+                    Debug.Assert False
+                    
+               Case uindUMCIonNetDimConstants.uindScan
+                    strDimensionName = "Scan"
+                    blnScanDefined = True
+                    
+               Case uindUMCIonNetDimConstants.uindFit
+                    strDimensionName = "Fit"
+                    blnFitDefined = True
+                    
+               Case uindUMCIonNetDimConstants.uindMZ
+                    ' m/z; not valid with the LCMSFeatureFinder
+                    Debug.Assert False
+                    
+               Case uindUMCIonNetDimConstants.uindGenericNET
+                    strDimensionName = "NET"
+                    blnNETDefined = True
+                    blnUseGenericNET = .Use
+                    
+               Case uindUMCIonNetDimConstants.uindChargeState
+                    ' charge; not valid with the LCMSFeatureFinder
+                    Debug.Assert False
+                    
+               Case uindUMCIonNetDimConstants.uindLogAbundance
+                    strDimensionName = "LogAbundance"
+                    blnLogAbundanceDefined = True
+                    
+            End Select
+        
+            If Len(strDimensionName) > 0 Then
+                strLineOut = strDimensionName & "Weight="
+                If .Use Then
+                    strLineOut = strLineOut & Trim(.WeightFactor)
+                Else
+                    strLineOut = strLineOut & Trim(0)
+                End If
+                tsOutfile.WriteLine strLineOut
+                
+                If Len(strConstraint) > 0 Then
+                    tsOutfile.WriteLine strConstraint
+                    
+                    strLineOut = strDimensionName & "ConstraintIsPPM="
+                    If .ConstraintUnits = DATA_UNITS_MASS_DA Then
+                        strLineOut = strLineOut & "False"
+                    Else
+                        strLineOut = strLineOut & "True"
+                    End If
+                    tsOutfile.WriteLine strLineOut
+                End If
+                
+            ElseIf .Use Then
+                ' Unknown or inappropriate parameter; this is unexpected
+                Debug.Assert False
+            End If
+        End With
+    Next lngIndex
+
+    If Not blnMonoMassDefined Then tsOutfile.WriteLine "MonoMassWeight=0"
+    If Not blnAvgMassDefined Then tsOutfile.WriteLine "AvgMassWeight=0"
+    If Not blnLogAbundanceDefined Then tsOutfile.WriteLine "LogAbundanceWeight=0"
+    If Not blnScanDefined Then tsOutfile.WriteLine "ScanWeight=0"
+    If Not blnNETDefined Then tsOutfile.WriteLine "NETWeight=0"
+    If Not blnFitDefined Then tsOutfile.WriteLine "FitWeight=0"
+
+    ' Write out some additional settings
+    tsOutfile.WriteLine "MaxDistance=" & Trim(MyDef.TooDistant)
+    
+    strLineOut = "UseGenericNET="
+    If blnUseGenericNET Then
+        strLineOut = strLineOut & "True"
+    Else
+        strLineOut = strLineOut & "False"
+    End If
+    tsOutfile.WriteLine strLineOut
+    
+    GetScanRange CallerID, lngGelScanNumberMin, lngGelScanNumberMax, 0, 0
+    tsOutfile.WriteLine "MinScan=" & Trim(lngGelScanNumberMin)
+    tsOutfile.WriteLine "MaxScan=" & Trim(lngGelScanNumberMax)
+    
+    If UMCMakeSingleMemberClasses Then
+        intMinLength = 1
+    Else
+        intMinLength = 2
+    End If
+    strLineOut = "MinFeatureLengthPoints=" & Trim(intMinLength)
+    tsOutfile.WriteLine strLineOut
+
+    tsOutfile.Close
+    Set tsOutfile = Nothing
+    
+    ExportPeaksForUMCFinding = True
+    Exit Function
+
+ExportPeaksForUMCFindingErrorHandler:
+Debug.Print "Error in ExportPeaksForUMCFinding: " & Err.Description
+Debug.Assert False
+LogErrors Err.Number, "frmUMCIonNet->ExportPeaksForUMCFinding"
+
+ExportPeaksForUMCFinding = False
+
+End Function
+
+Private Function FinalizeNewUMCs() As Boolean
+    
+    Dim dblTolPPM As Double
+    Dim eTolType As glMassToleranceConstants
+    
+    Dim blnUMCIndicesUpdated As Boolean
+    Dim blnSuccess As Boolean
+    
+On Error GoTo FinalizeNewUMCsErrorHandler
+    blnSuccess = False
+    
+    ChangeStatus " Managing UMC structures..."
+    If ManageClasses(CallerID, UMCManageConstants.UMCMngTrim) Then
+        
+        ' Examine GelUMCIon(CallerID).ThisNetDef to determine the appropriate .Tol and .TolType
+        '  to record in GelUMC(Callerid).Def
+        LookupUMCIonNetMassTolerances dblTolPPM, eTolType, GelUMCIon(CallerID).ThisNetDef, UMC_IONNET_PPM_CONVERSION_MASS
+        
+        'set various Unique Mass Classes parameters
+        With GelUMC(CallerID).def
+            .UMCType = glUMC_TYPE_FROM_NET
+            .MWField = GelData(CallerID).Preferences.IsoDataField
+            .UMCSharing = False
+            .Tol = dblTolPPM            ' IonNet searching doesn't really use ppm, but we'll store ppm here anyway so that it gets exported to the database
+            .TolType = eTolType
+        End With
+        
+        ' Make sure UMCDef and GelUMC(CallerID).def are synchronized
+        UMCDef = GelUMC(CallerID).def
+        
+        ' Store UMCDef in GelSearchDef() so that it gets saved to disk
+        GelSearchDef(CallerID).UMCDef = UMCDef
+        GelSearchDef(CallerID).UMCIonNetDef = GelUMCIon(CallerID).ThisNetDef
+        
+        glbPreferencesExpanded.UMCIonNetOptions.UMCRepresentative = UMCRepresentative
+        GelUMCDraw(CallerID).DrawType = cmbUMCDrawType.ListIndex
+        
+        AddToAnalysisHistory CallerID, ConstructUMCDefDescription(CallerID, AUTO_ANALYSIS_UMCIonNet, UMCDef, glbPreferencesExpanded.UMCAdvancedStatsOptions, False, True)
+        
+        ChangeStatus "Calculating UMC parameters..."
+        
+        ' Possibly Auto-Refine the UMC's
+        blnUMCIndicesUpdated = AutoRefineUMCs(CallerID, Me)
+        
+        If Not blnUMCIndicesUpdated Then
+            ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
+            blnSuccess = UpdateUMCStatArrays(CallerID, False, Me)
+        Else
+            blnSuccess = True
+        End If
+      
+        If glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance Then
+            Set mSplitUMCs = New clsSplitUMCsByAbundance
+            mSplitUMCs.ExamineUMCs CallerID, Me, False, True
+            
+            Set mSplitUMCs = Nothing
+        End If
+        
+    Else
+       ChangeStatus " Error managing UMC structures."
+    End If
+    
+    FinalizeNewUMCs = blnSuccess
+    
+    Exit Function
+      
+FinalizeNewUMCsErrorHandler:
+    Debug.Print "Error in FinalizeNewUMCs: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "frmUMCIonNet->FinalizeNewUMCs"
+    
+    FinalizeNewUMCs = False
+    
+End Function
 
 Private Sub FindBestMatches()
 Dim i As Long, j As Long                'loop controlers
@@ -2427,916 +2462,154 @@ End Select
 End Sub
 
 
-Private Function EliminateLongConnections(ByVal TooLong As Double) As Long
-'------------------------------------------------------------
-'mark long connections for elimination
-'returns the number of connections eliminated
-'------------------------------------------------------------
-Dim i As Long
-Dim Count As Long
-On Error Resume Next
-ChangeStatus " Rejecting long connections..."
-For i = 0 To ResCnt - 1
-    If ResDist(i) > TooLong Then
-       ResEliminate(i) = True
-       Count = Count + 1
-    End If
-Next i
-ChangeStatus " Long connections eliminated: " & Count
-EliminateLongConnections = Count
-End Function
+Private Function FindUMCsUsingLCMSFeatureFinder(ByVal blnShowMessages As Boolean) As Boolean
+    ' Find UMCs using LCMSFeatureFinder.exe
+    ' If the .Exe isn't found or if a problem occurs while finding UMCs, then this function will return False
+    
+    Const DEFAULT_MAXIMUM_PROCESSING_TIME_MINUTES As Single = 60
+    
+    Const APP_MONITOR_INTERVAL_MSEC As Integer = 100
+    Const STATUS_UPDATE_INTERVAL_MSEC As Integer = 500
+    
+    Dim strWorkingDirPath As String
+    Dim strFeatureFinderAppPath As String
+    Dim strArguments As String
+    
+    Dim strLCMSFeaturesFilePath As String
+    Dim strIniFilePath As String
+    
+    Dim strMessage As String
+    Dim strStatusBase As String
+    
+    Dim fso As New FileSystemObject
+    Dim objProgRunner As clsProgRunner
+    
+    Dim sngProcessingTimeSeconds As Single
+    Dim sngMaxProcessingTimeMinutes As Single
+    Dim dtProcessingStartTime As Date
+    
+    Dim lngIteration As Long
+    Dim lngStatusUpdateIterationCount As Long
+        
+    Dim blnAbortProcessing As Boolean
+    Dim blnSuccess As Boolean
 
-' Unused function (July 2003)
-Private Sub EliminateRedundantConnectionsDirect()
-'-----------------------------------------------------------------------------------
-'marks redundant connections for eliminations; if we have ResInd1(i)=m, ResInd2(i)=n
-'and ResInd1(j)=n, ResInd2(j)=m for some i,j then eliminate i if m>n or j if m<=n
-'-----------------------------------------------------------------------------------
-Dim i As Long, j As Long
-Dim Count As Long
-On Error Resume Next
-ChangeStatus " Eliminating redundancy..."
-For i = 0 To DataCnt - 1
-    If Not ResEliminate(i) Then
-       For j = i + 1 To DataCnt - 1
-           If Not ResEliminate(j) Then
-              If ResInd1(i) = ResInd2(j) Then
-                 If ResInd2(i) = ResInd1(j) Then
-                    Count = Count + 1
-                    'mark for elimination one where ResInd1>ResInd2
-                    If ResInd1(i) > ResInd2(i) Then
-                       ResEliminate(i) = True
+On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
+    
+    sngMaxProcessingTimeMinutes = DEFAULT_MAXIMUM_PROCESSING_TIME_MINUTES
+    If sngMaxProcessingTimeMinutes < 1 Then sngMaxProcessingTimeMinutes = 1
+    If sngMaxProcessingTimeMinutes > 300 Then sngMaxProcessingTimeMinutes = 300
+    
+    blnSuccess = False
+    blnAbortProcessing = False
+  
+    ' Check for the existence of LCMSFeatureFinder.exe
+    strFeatureFinderAppPath = fso.BuildPath(App.Path, LCMS_FEATURE_FINDER_APP_NAME)
+    strWorkingDirPath = App.Path
+        
+    If Not fso.FileExists(strFeatureFinderAppPath) Then
+        strMessage = "LCMS Feature Finder app not found, unable to continue: " & vbCrLf & strFeatureFinderAppPath
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            AddToAnalysisHistory CallerID, strMessage
+        ElseIf blnShowMessages Then
+            MsgBox strMessage, vbExclamation + vbOKOnly, "File Not Found"
+        End If
+    Else
+        mAbortProcess = False
+        mCalculating = True
+        ShowHideCommandButtons mCalculating
+        
+        ' Create two text files for LCMSFeatureFinder.exe to read
+        blnSuccess = ExportPeaksForUMCFinding(strWorkingDirPath, strLCMSFeaturesFilePath, strIniFilePath)
+                
+        If Not blnSuccess Or mAbortProcess Then
+            GoTo FindUMCsUsingLCMSFeatureFinderCleanup
+        End If
+        
+        strStatusBase = "Calling " & LCMS_FEATURE_FINDER_APP_NAME & " to find the LC-MS Features"
+        ChangeStatus strStatusBase
+                
+        strArguments = strLCMSFeaturesFilePath
+        If InStr(strArguments, " ") > 0 Then
+            strArguments = """" & strArguments & """"
+        End If
+        strArguments = "/I:" & strArguments
+
+        Set objProgRunner = New clsProgRunner
+        dtProcessingStartTime = Now()
+        
+        If objProgRunner.StartProgram(strFeatureFinderAppPath, strArguments, vbNormalNoFocus) Then
+        
+            lngStatusUpdateIterationCount = CInt(STATUS_UPDATE_INTERVAL_MSEC / CSng(APP_MONITOR_INTERVAL_MSEC))
+            If lngStatusUpdateIterationCount < 1 Then lngStatusUpdateIterationCount = 1
+            
+            Do While objProgRunner.AppRunning
+                Sleep APP_MONITOR_INTERVAL_MSEC
+                
+                sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
+                If sngProcessingTimeSeconds / 60# >= sngMaxProcessingTimeMinutes Then
+                    blnAbortProcessing = True
+                    strMessage = "UMC Finding using the LCMS Feature Finder was aborted because over " & Trim(sngMaxProcessingTimeMinutes) & " minutes has elapsed."
+                ElseIf mAbortProcess Then
+                    blnAbortProcessing = True
+                    strMessage = "UMC Finding using the LCMS Feature Finder was manually aborted by the user after " & Trim(sngProcessingTimeSeconds) & " seconds of processing."
+                End If
+                
+                If blnAbortProcessing Then
+                    objProgRunner.AbortProcessing
+                    DoEvents
+                    
+                    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                       MsgBox strMessage, vbOKOnly, glFGTU
                     Else
-                       ResEliminate(j) = True
+                       Debug.Assert False
+                       LogErrors Err.Number, "frmUMCIonNet->FindUMCsUsingLCMSFeatureFinder", strMessage
+                       AddToAnalysisHistory CallerID, strMessage
                     End If
-                 End If
-              End If
-           End If
-       Next j
-    End If
-Next i
-ChangeStatus " Redundant connections eliminated: " & Count
-End Sub
+                    
+                    ChangeStatus strMessage
+                    Exit Do
+                End If
+                
+                If lngIteration Mod lngStatusUpdateIterationCount = 0 Then
+                    ChangeStatus strStatusBase & ": " & Round(sngProcessingTimeSeconds, 1) & " seconds elapsed"
+                End If
+                DoEvents
+                
+                lngIteration = lngIteration + 1
+            Loop
 
-
-Private Sub CreateNet()
-'------------------------------------------------------------------------------
-'fills permanent GelUMCIon structures with indexes;
-'before filling permanent GelUMCIon structures results are sorted on Ind1/Ind2;
-'this will optimize class creation and reduce the total entropy in the Universe
-'------------------------------------------------------------------------------
-Dim i As Long
-Dim TmpCnt As Long
-Dim Ind1() As Long, Ind2() As Long, Dist() As Double, SortInd() As Long
-
-On Error GoTo CreateNetErrorHandler
-
-ChangeStatus " Creating Net structure..."
-If ResCnt > 0 Then
-   TmpCnt = 0
-   ReDim Ind1(ResCnt - 1):   ReDim Ind2(ResCnt - 1):
-   ReDim Dist(ResCnt - 1):   ReDim SortInd(ResCnt - 1)
-   For i = 0 To ResCnt - 1
-       If Not ResEliminate(i) Then
-          TmpCnt = TmpCnt + 1
-          Ind1(TmpCnt - 1) = DataOInd(ResInd1(i)):   Ind2(TmpCnt - 1) = DataOInd(ResInd2(i))
-          Dist(TmpCnt - 1) = ResDist(i):             SortInd(TmpCnt - 1) = TmpCnt - 1
-       End If
-   Next i
-   Call ManageResArrays(amtErase)           'don't need results arrays anymore
-   If TmpCnt > 0 Then
-      ReDim Preserve Ind1(TmpCnt - 1):   ReDim Preserve Ind2(TmpCnt - 1):
-      ReDim Preserve Dist(TmpCnt - 1):   ReDim Preserve SortInd(TmpCnt - 1)
-      ChangeStatus "Sorting connections..."
-      Call Sort2LongArrays(Ind1(), Ind2(), SortInd())   'sort results on Ind1, Ind2
-      With GelUMCIon(CallerID)
-         .NetCount = TmpCnt
-         ReDim .NetInd1(TmpCnt - 1):   ReDim .NetInd2(TmpCnt - 1):   ReDim .NetDist(TmpCnt - 1)
-         .MinDist = glHugeDouble:      .MaxDist = -glHugeDouble
-         For i = 0 To TmpCnt - 1
-             .NetInd1(i) = Ind1(SortInd(i)):   .NetInd2(i) = Ind2(SortInd(i)):   .NetDist(i) = Dist(SortInd(i))
-             If Dist(SortInd(i)) < .MinDist Then .MinDist = Dist(SortInd(i))
-             If Dist(SortInd(i)) > .MaxDist Then .MaxDist = Dist(SortInd(i))
-         Next i
-      End With
-   End If
-End If
-ChangeStatus " Number of connections: " & GelUMCIon(CallerID).NetCount
-lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
-Exit Sub
-
-CreateNetErrorHandler:
-Debug.Print "Error in CreateNet: " & Err.Description
-Debug.Assert False
-LogErrors Err.Number, "frmUMCIonNet->CreateNet"
-Resume Next
-
-End Sub
-
-Private Function GetMetricDataMassUnits(lngMetricDataUnits As Long) As String
-    Select Case lngMetricDataUnits
-    Case DATA_UNITS_MASS_DA
-        GetMetricDataMassUnits = "Da"
-    Case DATA_UNITS_MASS_PPM
-        GetMetricDataMassUnits = "ppm"
-    Case Else
-        Debug.Assert False
-        GetMetricDataMassUnits = "??"
-    End Select
-End Function
-
-Private Function GetUMCIsoDefinitionText(Ind As Long, Optional blnMultipleLines As Boolean = True) As String
-'-----------------------------------------------------------------------
-'returns formatted definition of the IonNet for 2D display with index Ind
-'-----------------------------------------------------------------------
-Dim i As Long
-Dim strLineSeparator As String
-
-If blnMultipleLines Then
-    strLineSeparator = vbCrLf
-Else
-    strLineSeparator = "; "
-End If
-
-On Error Resume Next
-Dim Definition As String
-With GelUMCIon(Ind).ThisNetDef
-     Select Case .MetricType
-     Case METRIC_EUCLIDEAN
-          Definition = "Metric type: Euclidean" & strLineSeparator
-     Case METRIC_HONDURAS
-          Definition = "Metric type: Honduras (a.k.a. Taxicab)" & strLineSeparator
-     Case METRIC_INFINITY
-          Definition = "Metric type: Infinity" & strLineSeparator
-     End Select
-     Definition = Definition & "Net type: " & .NETType & strLineSeparator
-     Definition = Definition & "Max distance: " & .TooDistant & strLineSeparator
-     If .NetActualDim > 0 Then
-        If blnMultipleLines Then
-            Definition = Definition & "Metric dimensions description:" & strLineSeparator
-        Else
-            Definition = Definition & "Metric dimensions description; "
-        End If
-        For i = 0 To .NetDim - 1
-            If Not blnMultipleLines Then
-                Definition = Definition & "Dimension" & Trim(i + 1) & " = "
-            End If
+            blnSuccess = Not blnAbortProcessing
             
-            If .MetricData(i).Use Then
-               Select Case .MetricData(i).DataType
-               Case DATA_MONO_MW
-                    Definition = Definition & "Monoisotopic mass; "
-               Case DATA_AVG_MW
-                    Definition = Definition & "Average mass; "
-               Case DATA_TMA_MW
-                    Definition = Definition & "The most abundant mass; "
-               Case DATA_SCAN
-                    Definition = Definition & "Scan; "
-               Case DATA_FIT
-                    Definition = Definition & "Isotopic fit; "
-               Case DATA_MOVERZ
-                    Definition = Definition & "m/z; "
-               Case DATA_GENERIC_NET
-                    Definition = Definition & "Generic NET; "
-               Case DATA_CHARGE_STATE
-                    Definition = Definition & "Charge state; "
-               Case DATA_LOG_ABU
-                    Definition = Definition & "Log(Abundance); "
-               End Select
-               Definition = Definition & "Weight factor: " & .MetricData(i).WeightFactor & "; "
-               Definition = Definition & "Constraint: "
-               Select Case .MetricData(i).ConstraintType
-               Case Net_CT_None
-                    Definition = Definition & "none"
-               Case Net_CT_LT
-                    Definition = Definition & "Distance < " & .MetricData(i).ConstraintValue
-               Case Net_CT_GT
-                    Definition = Definition & "Distance > " & .MetricData(i).ConstraintValue
-               Case Net_CT_EQ
-                    Definition = Definition & "Distance equal to " & .MetricData(i).ConstraintValue
-               End Select
-               
-               If .MetricData(i).ConstraintType <> Net_CT_None Then
-                    Select Case .MetricData(i).DataType
-                    Case DATA_MONO_MW, DATA_AVG_MW, DATA_TMA_MW
-                        Definition = Definition & " " & GetMetricDataMassUnits(.MetricData(i).ConstraintUnits)
-                    Case Else
-                        ' Do not append the units
-                    End Select
-               End If
-            Else
-                Definition = Definition & "Unused"
+            If blnSuccess Then
+                ' Read the data from the _Features.txt & _PeakToFeatureMap.txt files
+                
+                blnSuccess = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages)
+                If mAbortProcess Then blnSuccess = False
+                
+                If blnSuccess Then
+                    blnSuccess = BuildUMCsUsingmLCMSResultsMapping(blnShowMessages)
+                End If
             End If
-            Definition = Definition & strLineSeparator
-        Next i
-     Else
-        Definition = Definition & "Metric definition not dimensioned"
-     End If
-     
-     Definition = Definition & vbCrLf
-End With
-GetUMCIsoDefinitionText = Definition
-End Function
+        End If
+    End If
 
-Private Function PrepareDataArrays() As Boolean
-'------------------------------------------------------------------------
-'prepares data arrays and returns True if successful
-'------------------------------------------------------------------------
-On Error GoTo err_PrepareDataArrays
-Dim i As Long, j As Long
-Dim strMessage As String
-Dim ISInd() As Long         ' In-scope index
+FindUMCsUsingLCMSFeatureFinderCleanup:
+    mCalculating = False
+    ShowHideCommandButtons mCalculating
 
-ChangeStatus " Preparing arrays..."
+    FindUMCsUsingLCMSFeatureFinder = blnSuccess
+    
+    Exit Function
 
-GelUMC(CallerID).def.DefScope = UMCDef.DefScope
-DataCnt = GetISScope(CallerID, ISInd(), UMCDef.DefScope)
-
-If DataCnt < 2 Then
-   strMessage = "Insufficient number of isotopic data points."
-   If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-       MsgBox strMessage, vbOKOnly, glFGTU
-   Else
-       Debug.Assert False
-       LogErrors Err.Number, "frmUMCIonNet->PrepareDataArrays, DataCnt < 2"
-       AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
-   End If
-   Exit Function
-End If
-MyDef.NetDim = chkUse.Count
-
-' Update .NetActualDim
-MyDef.NetActualDim = 0
-For i = 0 To chkUse.Count - 1
-    If chkUse(i).Value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
-Next i
-If MyDef.NetActualDim < 1 Then
-   strMessage = "At least one data dimension has to be selected."
-   If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-      MsgBox strMessage, vbOKOnly, glFGTU
-   Else
-      Debug.Assert False
-      LogErrors Err.Number, "frmUMCIonNet->PrepareDataArrays, MyDef.NetActualDim < 1"
-      AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
-   End If
-   Exit Function
-End If
-
-ReDim DataOInd(DataCnt - 1)
-ReDim DataVal(DataCnt - 1, MyDef.NetDim - 1)
-
-Select Case MyDef.MetricType
-Case METRIC_EUCLIDEAN, METRIC_HONDURAS, METRIC_INFINITY
-    With GelData(CallerID)
-       For j = 0 To MyDef.NetDim - 1
-           If MyDef.MetricData(j).Use Then
-              Select Case MyDef.MetricData(j).DataType
-              Case DATA_MONO_MW
-                  For i = 1 To DataCnt
-                      DataOInd(i - 1) = ISInd(i)
-                      DataVal(i - 1, j) = .IsoData(ISInd(i)).MonoisotopicMW * MyDef.MetricData(j).WeightFactor
-                  Next i
-              Case DATA_AVG_MW
-                  For i = 1 To DataCnt
-                      DataOInd(i - 1) = ISInd(i)
-                      DataVal(i - 1, j) = .IsoData(ISInd(i)).AverageMW * MyDef.MetricData(j).WeightFactor
-                  Next i
-              Case DATA_TMA_MW
-                  For i = 1 To DataCnt
-                      DataOInd(i - 1) = ISInd(i)
-                      DataVal(i - 1, j) = .IsoData(ISInd(i)).MostAbundantMW * MyDef.MetricData(j).WeightFactor
-                  Next i
-              Case DATA_SCAN
-                  For i = 1 To DataCnt
-                      DataOInd(i - 1) = ISInd(i)
-                      DataVal(i - 1, j) = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(i)).ScanNumber) * MyDef.MetricData(j).WeightFactor
-                  Next i
-              Case DATA_FIT
-                  For i = 1 To DataCnt
-                      DataOInd(i - 1) = ISInd(i)
-                      DataVal(i - 1, j) = .IsoData(ISInd(i)).Fit * MyDef.MetricData(j).WeightFactor
-                  Next i
-              Case DATA_MOVERZ
-                  For i = 1 To DataCnt
-                      DataOInd(i - 1) = ISInd(i)
-                      DataVal(i - 1, j) = .IsoData(ISInd(i)).MZ * MyDef.MetricData(j).WeightFactor
-                  Next i
-              Case DATA_GENERIC_NET
-                  For i = 1 To DataCnt
-                      DataOInd(i - 1) = ISInd(i)
-                      DataVal(i - 1, j) = ((.IsoData(ISInd(i)).ScanNumber - MinScan) / (MaxScan - MinScan)) * MyDef.MetricData(j).WeightFactor
-                  Next i
-              Case DATA_CHARGE_STATE
-                  For i = 1 To DataCnt
-                      DataOInd(i - 1) = ISInd(i)
-                      DataVal(i - 1, j) = .IsoData(ISInd(i)).Charge * MyDef.MetricData(j).WeightFactor
-                  Next i
-              Case DATA_LOG_ABU
-                  For i = 1 To DataCnt
-                      DataOInd(i - 1) = ISInd(i)
-                      If .IsoData(ISInd(i)).Abundance > 0 Then
-                        DataVal(i - 1, j) = Log(.IsoData(ISInd(i)).Abundance) / Log(10#) * MyDef.MetricData(j).WeightFactor
-                      Else
-                        ' Cannot perform Log(0)
-                        DataVal(i - 1, j) = 0
-                      End If
-                  Next i
-              End Select
-           End If
-       Next j
-    End With
-Case Else
-    ' This shouldn't get reached
+FindUMCsUsingLCMSFeatureFinderErrorHandler:
+    Debug.Print "Error in FindUMCsUsingLCMSFeatureFinder: " & Err.Description
     Debug.Assert False
-End Select
-PrepareDataArrays = True
-Exit Function
+    LogErrors Err.Number, "frmUMCIonNet->FindUMCsUsingLCMSFeatureFinder"
 
-err_PrepareDataArrays:
-LogErrors Err.Number, "frmUMCIonNet.PrepareArrays"
-ChangeStatus "Error preparing calculation structures."
-End Function
-
-
-Private Function PrepareOptimization() As Boolean
-'-----------------------------------------------------------------
-'creates and sorts optimization arrays; returns True if successful
-'-----------------------------------------------------------------
-Dim i As Long
-Dim qsdMySort As New QSDouble
-On Error GoTo err_PrepareOptimization
-ChangeStatus " Creating optimization structures..."
-ReDim OptIndO(DataCnt - 1)
-ReDim OptValO(DataCnt - 1)
-For i = 0 To DataCnt - 1
-    OptIndO(i) = i
-    OptValO(i) = DataVal(i, 0)
-Next i
-PrepareOptimization = qsdMySort.QSAsc(OptValO, OptIndO)
-Exit Function
-
-
-err_PrepareOptimization:
-LogErrors Err.Number, "frmUMCIonNet.PrepareOptimization"
-ChangeStatus " Error preparing optimization structures."
-End Function
-
-
-Private Function MetricEuclid(i As Long, j As Long) As Double
-'------------------------------------------------------------------
-'returns Euclidean distance between two points in MyDef.NetDim-dim space
-'i and j are indexes in data arrays; -1 on any error
-'------------------------------------------------------------------
-Dim k As Long
-Dim TmpSum As Double
-On Error GoTo err_MetricEuclid
-For k = 0 To MyDef.NetDim - 1
-    TmpSum = TmpSum + (DataVal(i, k) - DataVal(j, k)) ^ 2
-Next k
-MetricEuclid = Sqr(TmpSum)
-Exit Function
-
-err_MetricEuclid:
-MetricEuclid = -1
-End Function
-
-
-Private Function MetricEuclidDim1(i As Long, j As Long) As Double
-'------------------------------------------------------------------------
-'returns Euclidean distance between two points for the optimization array
-'------------------------------------------------------------------------
-On Error Resume Next
-MetricEuclidDim1 = Abs(OptValO(i) - OptValO(j))
-End Function
-
-
-Private Function MetricEuclidDim1Any(DimInd As Long, i As Long, j As Long) As Double
-'----------------------------------------------------------------------------------
-'returns Euclidean distance between two points for the data dimension DimInd
-'----------------------------------------------------------------------------------
-On Error Resume Next
-MetricEuclidDim1Any = Abs(DataVal(i, DimInd) - DataVal(j, DimInd))
-End Function
-
-
-Private Function MetricHonduras(i As Long, j As Long) As Double
-'----------------------------------------------------------------------
-'returns Honduras distance between two points in MyDef.NetDim-dim space
-'i and j are indexes in data arrays; -1 on any error
-'----------------------------------------------------------------------
-Dim k As Long
-Dim TmpSum As Double
-On Error GoTo err_MetricHonduras
-For k = 0 To MyDef.NetDim - 1
-    TmpSum = TmpSum + Abs(DataVal(i, k) - DataVal(j, k))
-Next k
-MetricHonduras = TmpSum
-Exit Function
-
-err_MetricHonduras:
-MetricHonduras = -1
-End Function
-
-
-'One dimensional Honduras metric is the same as Euclidean
-Private Function MetricHondurasDim1(i As Long, j As Long) As Double
-'------------------------------------------------------------------------
-'returns Honduras distance between two points for the optimization array
-'------------------------------------------------------------------------
-On Error Resume Next
-MetricHondurasDim1 = Abs(OptValO(i) - OptValO(j))
-End Function
-
-
-Private Function MetricHondurasDim1Any(DimInd As Long, i As Long, j As Long) As Double
-'------------------------------------------------------------------------------------
-'returns Honduras distance between two points for the data dimension DimInd
-'------------------------------------------------------------------------------------
-On Error Resume Next
-MetricHondurasDim1Any = Abs(DataVal(i, DimInd) - DataVal(j, DimInd))
-End Function
-
-
-Private Function MetricInfinity(i As Long, j As Long) As Double
-'----------------------------------------------------------------------
-'returns Infinity distance between two points in MyDef.NetDim-dim space
-'i and j are indexes in data arrays; -1 on any error
-'----------------------------------------------------------------------
-Dim k As Long
-Dim tmpMax As Double
-Dim AbsDistance As Double
-On Error GoTo err_MetricInfinity
-tmpMax = 0
-For k = 0 To MyDef.NetDim - 1
-    AbsDistance = Abs(DataVal(i, k) - DataVal(j, k))
-    If AbsDistance > tmpMax Then tmpMax = AbsDistance
-Next k
-MetricInfinity = tmpMax
-Exit Function
-
-err_MetricInfinity:
-MetricInfinity = -1
-End Function
-
-
-'One dimensional Infinity metric is the same as Euclidean
-Private Function MetricInfinityDim1(i As Long, j As Long) As Double
-'------------------------------------------------------------------------
-'returns Infinity distance between two points for the optimization array
-'------------------------------------------------------------------------
-On Error Resume Next
-MetricInfinityDim1 = Abs(OptValO(i) - OptValO(j))
-End Function
-
-
-Private Function MetricInfinityDim1Any(DimInd As Long, i As Long, j As Long) As Double
-'------------------------------------------------------------------------------------
-'returns Infinity distance between two points for the data dimension DimInd
-'------------------------------------------------------------------------------------
-On Error Resume Next
-MetricInfinityDim1Any = Abs(DataVal(i, DimInd) - DataVal(j, DimInd))
-End Function
-
-Private Function PPMToDaIfNeeded(dblConstraintValue As Double, DimInd As Long, lngDataIndex As Long) As Double
+Resume FindUMCsUsingLCMSFeatureFinderCleanup
+    blnSuccess = False
     
-    ' If .DataType is a mass type, and if .ContraintUnits is ppm, then convert
-    '  dblConstraintValue from Da to ppm, using DataVal(lngDataIndex, DimInd) as
-    '  the basis for the conversion
-    
-    Select Case MyDef.MetricData(DimInd).DataType
-    Case DATA_MONO_MW, DATA_AVG_MW, DATA_TMA_MW
-        If MyDef.MetricData(DimInd).ConstraintUnits = DATA_UNITS_MASS_PPM Then
-            PPMToDaIfNeeded = dblConstraintValue / 1000000# * DataVal(lngDataIndex, DimInd)
-        Else
-            PPMToDaIfNeeded = dblConstraintValue
-        End If
-    Case Else
-        PPMToDaIfNeeded = dblConstraintValue
-    End Select
-    
-End Function
-
-Private Function SubjectToConstraintEuclid(i As Long, j As Long) As Boolean
-'-------------------------------------------------------------------------
-'returns True if any used dimension is subject to constraint rule
-'-------------------------------------------------------------------------
-Dim DimInd As Long
-
-On Error GoTo exit_SubjectToConstrainEuclid
-For DimInd = 0 To MyDef.NetDim - 1
-  With MyDef.MetricData(DimInd)
-    If .Use Then
-       Select Case .ConstraintType
-       Case Net_CT_None         'no constraint
-       Case Net_CT_LT           'distance in this dimension has to be less than constraint value
-            If MetricEuclidDim1Any(DimInd, i, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
-               SubjectToConstraintEuclid = True
-               Exit Function
-            End If
-       Case Net_CT_GT           'distance in this dimension has to be more than constraint value
-            If MetricEuclidDim1Any(DimInd, i, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
-               SubjectToConstraintEuclid = True
-               Exit Function
-            End If
-       End Select
-    End If
-  End With
-Next DimInd
-exit_SubjectToConstrainEuclid:
-End Function
-
-Private Sub RemoveLongConnections(Optional intEditType As Integer = NET_EDIT_REJECT_LONG)
-'--------------------------------------------------------------
-'does editing of current display GelUMCIon structure
-'--------------------------------------------------------------
-On Error GoTo RemoveLongConnectionsErrorHandler
-Dim strMessage As String
-Dim lngConnectionsEliminated As Long
-
-cmdRemoveLongConnections.Visible = False
-mCalculating = True
-
-Select Case intEditType
-Case NET_EDIT_REJECT_LONG
-    Dim TooLongConnection As Double
-    If IsNumeric(txtNetEditTooDistant.Text) Then
-       TooLongConnection = CDbl(txtNetEditTooDistant.Text)
-       lngConnectionsEliminated = EliminateLongConnections_Net(TooLongConnection)
-       
-       AddToAnalysisHistory CallerID, "Removed long connections (" & AUTO_ANALYSIS_UMCIonNet & "); New connection count = " & Trim(GelUMCIon(CallerID).NetCount) & "; Connections removed = " & Trim(lngConnectionsEliminated)
-       
-       txtRejectLongConnections = CDbl(GelUMCIon(CallerID).ThisNetDef.TooDistant)
-    Else
-       strMessage = "This argument should be positive number. (txtNetEditTooDistant textbox)"
-       If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-          MsgBox strMessage, vbOKOnly, glFGTU
-          txtNetEditTooDistant.SetFocus
-       Else
-          Debug.Assert False
-          LogErrors Err.Number, "frmUMCIonNet->RemoveLongConnections, txtNetEditTooDistant is not numeric"
-          AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
-       End If
-    End If
-End Select
-
-mCalculating = False
-cmdRemoveLongConnections.Visible = True
-
-Exit Sub
-
-RemoveLongConnectionsErrorHandler:
-Debug.Print "Error in RemoveLongConnections: " & Err.Description
-Debug.Assert False
-LogErrors Err.Number, "frmUMCIonNet->RemoveLongConnections"
-Resume Next
-End Sub
-
-Private Function SubjectToConstraintHonduras(i As Long, j As Long) As Boolean
-'-------------------------------------------------------------------------
-'returns True if any used dimension is subject to constraint rule
-'-------------------------------------------------------------------------
-Dim DimInd As Long
-On Error GoTo exit_SubjectToConstrainHonduras
-For DimInd = 0 To MyDef.NetDim - 1
-  With MyDef.MetricData(DimInd)
-    If .Use Then
-       Select Case .ConstraintType
-       Case Net_CT_None         'no constraint
-       Case Net_CT_LT           'distance in this dimension has to be less than constraint value
-            If MetricHondurasDim1Any(DimInd, i, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
-               SubjectToConstraintHonduras = True
-               Exit Function
-            End If
-       Case Net_CT_GT           'distance in this dimension has to be more than constraint value
-            If MetricHondurasDim1Any(DimInd, i, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
-               SubjectToConstraintHonduras = True
-               Exit Function
-            End If
-       End Select
-    End If
-  End With
-Next DimInd
-exit_SubjectToConstrainHonduras:
-End Function
-
-
-Private Function SubjectToConstraintInfinity(i As Long, j As Long) As Boolean
-'---------------------------------------------------------------------------
-'returns True if any used dimension is subject to constraint rule
-'---------------------------------------------------------------------------
-Dim DimInd As Long
-On Error GoTo exit_SubjectToConstrainInfinity
-For DimInd = 0 To MyDef.NetDim - 1
-  With MyDef.MetricData(DimInd)
-    If .Use Then
-       Select Case .ConstraintType
-       Case Net_CT_None         'no constraint
-       Case Net_CT_LT           'distance in this dimension has to be less than constraint value
-            If MetricInfinityDim1Any(DimInd, i, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
-               SubjectToConstraintInfinity = True
-               Exit Function
-            End If
-       Case Net_CT_GT           'distance in this dimension has to be more than constraint value
-            If MetricInfinityDim1Any(DimInd, i, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
-               SubjectToConstraintInfinity = True
-               Exit Function
-            End If
-       End Select
-    End If
-  End With
-Next DimInd
-exit_SubjectToConstrainInfinity:
-End Function
-
-Private Sub UpdateDynamicControls()
-    ' Update the UMC auto refine length labels
-    If glbPreferencesExpanded.UMCAutoRefineOptions.TestLengthUsingScanRange Then
-        chkRemoveLoCnt.Caption = "Remove cls. with less than"
-        chkRemoveHiCnt.Caption = "Remove cls. with length over"
-        lblAutoRefineLengthLabel(0) = "scans"
-        lblAutoRefineLengthLabel(1) = "scans"
-        lblAutoRefineMinimumMemberCount.Enabled = True
-    Else
-        chkRemoveLoCnt.Caption = "Remove cls. with less than"
-        chkRemoveHiCnt.Caption = "Remove cls. with more than"
-        lblAutoRefineLengthLabel(0) = "members"
-        lblAutoRefineLengthLabel(1) = "members"
-        lblAutoRefineMinimumMemberCount.Enabled = False
-    End If
-
-    txtAutoRefineMinimumMemberCount.Enabled = lblAutoRefineMinimumMemberCount.Enabled
-    lblPercentMaxAbuToUseToGaugeLength.Enabled = lblAutoRefineMinimumMemberCount.Enabled
-    txtPercentMaxAbuToUseToGaugeLength.Enabled = lblAutoRefineMinimumMemberCount.Enabled
-
-    If CDblSafe(txtClassAbuTopXMinAbu) <= 0 And CDblSafe(txtClassAbuTopXMaxAbu) <= 0 Then
-        lblClassAbuTopXMinMembers = "Maximum members to include"
-    Else
-        lblClassAbuTopXMinMembers = "Minimum members to include"
-    End If
-
-    If CDblSafe(txtClassMassTopXMinAbu) <= 0 And CDblSafe(txtClassMassTopXMaxAbu) <= 0 Then
-        lblClassMassTopXMinMembers = "Maximum members to include"
-    Else
-        lblClassMassTopXMinMembers = "Minimum members to include"
-    End If
-
-End Sub
-
-Private Sub txtPercentMaxAbuToUseToGaugeLength_LostFocus()
-If IsNumeric(txtPercentMaxAbuToUseToGaugeLength.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePercentMaxAbuToUseForLength = Abs(CLng(txtPercentMaxAbuToUseToGaugeLength.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtPercentMaxAbuToUseToGaugeLength.SetFocus
-End If
-End Sub
-
-Private Sub txtRejectLongConnections_LostFocus()
-If IsNumeric(txtRejectLongConnections.Text) Then
-   MyDef.TooDistant = CDbl(txtRejectLongConnections.Text)
-Else
-   MsgBox "This argument should be positive number.", vbOKOnly, glFGTU
-   txtRejectLongConnections.SetFocus
-End If
-End Sub
-
-Private Sub ResetToDefaults()
-    
-    With glbPreferencesExpanded
-        With .UMCIonNetOptions
-            .ConnectionLengthPostFilterMaxNET = 0.2
-            .UMCRepresentative = UMCFROMNet_REP_ABU
-            .MakeSingleMemberClasses = False
-            
-            UMCRepresentative = .UMCRepresentative
-            UMCMakeSingleMemberClasses = .MakeSingleMemberClasses
-        End With
-        
-        ResetUMCAdvancedStatsOptions .UMCAdvancedStatsOptions
-        ResetUMCAutoRefineOptions .UMCAutoRefineOptions
-        
-        .UMCDrawType = umcdt_ActualUMC
-    End With
-    
-    SetDefaultUMCDef UMCDef
-    SetDefaultUMCIonNetDef MyDef
-        
-    DisplayCurrentOptions
-    
-End Sub
-
-Private Sub ResetToOldDefaults()
-    Dim eResponse As VbMsgBoxResult
-    
-    eResponse = MsgBox("Are you sure you want to use old defaults?", vbQuestion Or vbYesNoCancel Or vbDefaultButton3, "Old Defaults")
-    If eResponse <> vbYes Then Exit Sub
-    
-    ResetToDefaults
-    
-    ' These are old defaults, set in July 2003
-    With glbPreferencesExpanded.UMCAutoRefineOptions
-        .UMCAutoRefineRemoveCountLow = True
-        .UMCAutoRefineMinLength = 2
-        
-        .UMCAutoRefineRemoveCountHigh = True
-        .UMCAutoRefineMaxLength = 400
-        
-        .UMCAutoRefineRemoveMaxLengthPctAllScans = False
-        .UMCAutoRefineMaxLengthPctAllScans = 15
-        
-        .UMCAutoRefinePercentMaxAbuToUseForLength = 33
-        .TestLengthUsingScanRange = True
-        .MinMemberCountWhenUsingScanRange = 2
-    End With
-
-    ' These are old defaults, set in July 2003
-    SetOldDefaultUMCIonNetDef MyDef
-    
-    DisplayCurrentOptions
-End Sub
-
-Private Sub SetDefinition()
-'--------------------------------------------------------------
-'sets definitions frm structures to control properties
-'--------------------------------------------------------------
-Dim i As Long
-On Error GoTo err_SetDefinition
-With MyDef
-    txtRejectLongConnections.Text = .TooDistant
-    txtNETType.Text = .NETType
-    cmbMetricType.ListIndex = .MetricType
-    For i = 0 To .NetDim - 1
-        With .MetricData(i)
-            If .Use Then
-               chkUse(i) = vbChecked
-            Else
-               chkUse(i) = vbUnchecked
-            End If
-            cmbData(i).ListIndex = .DataType
-            ' Note: cmbConstraintUnits() is updated inside DisplayDynamicUnits
-            cmbConstraint(i).ListIndex = .ConstraintType
-            txtWeightingFactor(i).Text = .WeightFactor
-            txtConstraint(i).Text = .ConstraintValue
-            cmbConstraintUnits(i).ListIndex = .ConstraintUnits
-        End With
-    Next i
-End With
-
-DisplayDynamicUnits
-
-Exit Sub
-
-err_SetDefinition:
-Debug.Print "Error in SetUMCDefinition: " & Err.Description
-Debug.Assert False
-LogErrors Err.Number, "frmUMCIonNet->SetDefinition"
-ChangeStatus "Error accepting net definition."
-End Sub
-
-Private Sub SetOldDefaultUMCIonNetDef(ByRef udtUMCIonNetDef As UMCIonNetDefinition)
-    ' These are old defaults, set in July 2003
-    With udtUMCIonNetDef
-        .MetricType = METRIC_EUCLIDEAN
-        .NETType = Net_SPIDER_66
-        .NetDim = 5
-        .NetActualDim = 5
-        .TooDistant = 0.1
-        ReDim .MetricData(.NetDim - 1)
-        .MetricData(0).Use = True:  .MetricData(0).DataType = DATA_MONO_MW:   .MetricData(0).WeightFactor = 0.5:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 0.025: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_DA
-        .MetricData(1).Use = True:  .MetricData(1).DataType = DATA_AVG_MW:    .MetricData(1).WeightFactor = 0.5:   .MetricData(1).ConstraintType = Net_CT_LT:       .MetricData(1).ConstraintValue = 0.025: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_DA
-        .MetricData(2).Use = True:  .MetricData(2).DataType = DATA_LOG_ABU:   .MetricData(2).WeightFactor = 0.1:   .MetricData(2).ConstraintType = Net_CT_None:     .MetricData(2).ConstraintValue = 0.1:   .MetricData(2).ConstraintUnits = DATA_UNITS_MASS_DA
-        .MetricData(3).Use = True:  .MetricData(3).DataType = DATA_SCAN:      .MetricData(3).WeightFactor = 0.01:   .MetricData(3).ConstraintType = Net_CT_None:    .MetricData(3).ConstraintValue = 0.01:  .MetricData(3).ConstraintUnits = DATA_UNITS_MASS_DA
-        .MetricData(4).Use = True:  .MetricData(4).DataType = DATA_FIT:       .MetricData(4).WeightFactor = 0.1:    .MetricData(4).ConstraintType = Net_CT_None:    .MetricData(4).ConstraintValue = 0.01:  .MetricData(4).ConstraintUnits = DATA_UNITS_MASS_DA
-    End With
-End Sub
-
-Private Sub SetUMCDefinition()
-'----------------------------------------------------------------------------
-'sets definitions for UMC from Net procedure based on some settings of GelUMC().def
-'----------------------------------------------------------------------------
-On Error GoTo SetUMCDefinitionErrorHandler
-
-With UMCDef
-    cmbUMCMW.ListIndex = .ClassMW
-    cmbUMCAbu.ListIndex = .ClassAbu
-    cboChargeStateAbuType.ListIndex = .ChargeStateStatsRepType
-    SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
-    
-    optDefScope(.DefScope).Value = True
-    SetCheckBox chkInterpolateMissingIons, .InterpolateGaps
-    txtInterpolateMaxGapSize = .InterpolateMaxGapSize
-    txtHoleSize = .GapMaxSize
-    
-End With
-
-' Additional UMCIonNet options
-With glbPreferencesExpanded.UMCIonNetOptions
-    If .ConnectionLengthPostFilterMaxNET = 0 Then
-        .ConnectionLengthPostFilterMaxNET = 0.2
-    End If
-    txtNetEditTooDistant.Text = .ConnectionLengthPostFilterMaxNET
-    cmbUMCRepresentative.ListIndex = .UMCRepresentative
-    SetCheckBox chkUseUntangledAsSingle, .MakeSingleMemberClasses
-End With
-
-Exit Sub
-
-SetUMCDefinitionErrorHandler:
-Debug.Print "Error in SetUMCDefinition: " & Err.Description
-Debug.Assert False
-LogErrors Err.Number, "frmUMCIonNet->SetUMCDefinition"
-Resume Next
-End Sub
-
-Private Sub txtSplitUMCsMaximumPeakCount_LostFocus()
-    ValidateTextboxValueLng txtSplitUMCsMaximumPeakCount, 2, 100, 6
-    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.MaximumPeakCountToSplitUMC = CLngSafe(txtSplitUMCsMaximumPeakCount)
-End Sub
-
-Private Sub txtSplitUMCsMinimumDifferenceInAvgPpmMass_LostFocus()
-    ValidateTextboxValueDbl txtSplitUMCsMinimumDifferenceInAvgPpmMass, 0, 10000#, 4
-    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.MinimumDifferenceInAveragePpmMassToSplit = CDblSafe(txtSplitUMCsMinimumDifferenceInAvgPpmMass)
-End Sub
-
-Private Sub txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax_LostFocus()
-    ValidateTextboxValueLng txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax, 0, 100, 15
-    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.PeakDetectIntensityThresholdPercentageOfMaximum = CLngSafe(txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax)
-End Sub
-
-Private Sub txtSplitUMCsPeakPickingMinimumWidth_LostFocus()
-    ValidateTextboxValueLng txtSplitUMCsPeakPickingMinimumWidth, 0, 1000, 4
-    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.PeakWidthPointsMinimum = CLngSafe(txtSplitUMCsPeakPickingMinimumWidth)
-End Sub
-
-Private Sub txtWeightingFactor_KeyDown(Index As Integer, KeyCode As Integer, Shift As Integer)
-If mCalculating Then KeyCode = 0
-End Sub
-
-Private Sub txtWeightingFactor_KeyPress(Index As Integer, KeyAscii As Integer)
-If mCalculating Then KeyAscii = 0
-End Sub
-
-Private Sub txtWeightingFactor_LostFocus(Index As Integer)
-On Error Resume Next
-If IsNumeric(txtWeightingFactor(Index).Text) Then
-   MyDef.MetricData(Index).WeightFactor = CDbl(txtWeightingFactor(Index).Text)
-Else
-   MsgBox "This arument should be positive number.", vbOKOnly, glFGTU
-   txtWeightingFactor(Index).SetFocus
-End If
-End Sub
-
-Public Function EliminateLongConnections_Net(TooLongConnection As Double) As Long
-'--------------------------------------------------------------------
-'eliminates long connections dirtectly from the GelUMCIon structures
-'NOTE: this function is used for Net editing purposes different from
-'EliminateLongConnections which is used when Net is created
-'returns the number of connections eliminated
-'--------------------------------------------------------------------
-Dim i As Long
-Dim TmpCnt As Long
-Dim lngOriginalConnectionCount As Long
-
-On Error GoTo EliminateLongConnectionsNetErrorHandler
-
-ChangeStatus " Eliminating long connections..."
-With GelUMCIon(CallerID)
-    lngOriginalConnectionCount = .NetCount
-    If .NetCount > 0 Then
-       .MinDist = glHugeDouble:     .MaxDist = -glHugeDouble
-       For i = 0 To .NetCount - 1
-           If .NetDist(i) <= TooLongConnection Then
-              TmpCnt = TmpCnt + 1
-              .NetInd1(TmpCnt - 1) = .NetInd1(i)
-              .NetInd2(TmpCnt - 1) = .NetInd2(i)
-              .NetDist(TmpCnt - 1) = .NetDist(i)
-              If .NetDist(TmpCnt - 1) < .MinDist Then .MinDist = .NetDist(TmpCnt - 1)
-              If .NetDist(TmpCnt - 1) > .MaxDist Then .MaxDist = .NetDist(TmpCnt - 1)
-           End If
-       Next i
-       If TmpCnt > 0 Then
-          ReDim Preserve .NetInd1(TmpCnt - 1)
-          ReDim Preserve .NetInd2(TmpCnt - 1)
-          ReDim Preserve .NetDist(TmpCnt - 1)
-       Else
-          Erase .NetDist:   Erase .NetInd1:   Erase .NetInd2
-       End If
-       .NetCount = TmpCnt
-       .ThisNetDef.TooDistant = TooLongConnection
-    End If
-End With
-GelSearchDef(CallerID).UMCIonNetDef = GelUMCIon(CallerID).ThisNetDef
-ChangeStatus " Number of connections: " & GelUMCIon(CallerID).NetCount
-lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
-EliminateLongConnections_Net = lngOriginalConnectionCount - GelUMCIon(CallerID).NetCount
-
-Exit Function
-
-EliminateLongConnectionsNetErrorHandler:
-Debug.Print "Error in EliminateLongConnectionsNet: " & Err.Description
-Debug.Assert False
-LogErrors Err.Number, "frmUMCIonNet->EliminateLongConnections_NET"
-Resume Next
 End Function
 
 Private Sub FindIonNetConnections()
@@ -3359,10 +2632,8 @@ If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
 End If
 
 mAbortProcess = False
-cmdFindConnections.Visible = False
-cmdAbortFindConnections.Visible = True
-cmdFindConnectionsThenUMCs.Visible = False
 mCalculating = True
+ShowHideCommandButtons mCalculating
 
 If PrepareDataArrays() Then
    If PrepareOptimization() Then
@@ -3396,9 +2667,7 @@ If PrepareDataArrays() Then
 End If
 
 mCalculating = False
-cmdFindConnections.Visible = True
-cmdFindConnectionsThenUMCs.Visible = True
-cmdAbortFindConnections.Visible = False
+ShowHideCommandButtons mCalculating
 
 Exit Sub
 
@@ -3410,7 +2679,7 @@ Resume Next
 
 End Sub
 
-Private Function FormClassesFromNETsWrapper(Optional blnShowMessages As Boolean = True) As Boolean
+Private Function FormClassesFromNETsWrapper(Optional ByVal blnShowMessages As Boolean = True) As Boolean
 '---------------------------------------------------------------------------
 'controls creation of Unique Mass Classes from Net
 'calls FormClassesFromNETs if not errors
@@ -3432,20 +2701,8 @@ Private Function FormClassesFromNETsWrapper(Optional blnShowMessages As Boolean 
                 If eResponse <> vbYes Then Exit Function
             End If
             
-            If UMCRepresentative < 0 Then
-               MsgBox "Class representative type not selected.", vbOKOnly, glFGTU
-               cmbUMCRepresentative.SetFocus
-               Exit Function
-            End If
-            If UMCDef.ClassMW < 0 Then
-               MsgBox "Class mass type not selected.", vbOKOnly, glFGTU
-               cmbUMCMW.SetFocus
-               Exit Function
-            End If
-            If UMCDef.ClassAbu < 0 Then
-               MsgBox "Class abundance type not selected.", vbOKOnly, glFGTU
-               cmbUMCAbu.SetFocus
-               Exit Function
+            If Not ValidateClassStatOptions Then
+                Exit Function
             End If
         End If
         
@@ -3489,18 +2746,15 @@ End Function
 Private Function FormClassesFromNets() As Boolean
 '--------------------------------------------------------------------
 'creates Unique Mass Classes from Net structure of current 2D display
-'returns True if successfull;
+'returns True if successful;
 'NOTE: if this function is called we have at least one connection in
 'GelUMCIon structure
 '--------------------------------------------------------------------
 Dim bDone As Long
 Dim CurrConnInd As Long
 Dim CurrInd1 As Long, CurrInd2 As Long
-Dim blnUMCIndicesUpdated As Boolean
 Dim intScopeUsedForConnections As Integer
 Dim i As Long
-Dim dblTolPPM As Double
-Dim eTolType As glMassToleranceConstants
 Dim lngTickCountLastUpdate As Long, lngNewTickCount As Long
 Dim dtLastUpdateTime As Date
 
@@ -3508,10 +2762,8 @@ Dim blnSuccess As Boolean
 On Error GoTo err_FormClassesFromNets
 
 mAbortProcess = False
-cmdFindUMCsUsingNETConnections.Visible = False
-cmdFindConnectionsThenUMCs.Visible = False
-cmdAbortProcessing.Visible = True
 mCalculating = True
+ShowHideCommandButtons mCalculating
 
 ' Update GelUMC(CallerID).def now, prior to processing
 With GelUMC(CallerID)
@@ -3613,64 +2865,19 @@ If ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
          Loop
       End With
       
-      'add single member classes if requested
+      ' Add single member classes if requested
       If UMCMakeSingleMemberClasses Then Call HUMCAddingSingleMemberUMCs
       
-      ChangeStatus " Managing UMC structures..."
-      If ManageClasses(CallerID, UMCManageConstants.UMCMngTrim) Then
-        
-        ' Examine GelUMCIon(CallerID).ThisNetDef to determine the appropriate .Tol and .TolType
-        '  to record in GelUMC(Callerid).Def
-        LookupUMCIonNetMassTolerances dblTolPPM, eTolType, GelUMCIon(CallerID).ThisNetDef, UMC_IONNET_PPM_CONVERSION_MASS
-        
-        'set various Unique Mass Classes parameters
-        With GelUMC(CallerID).def
-            .UMCType = glUMC_TYPE_FROM_NET
-            .MWField = GelData(CallerID).Preferences.IsoDataField
-            .UMCSharing = False
-            .Tol = dblTolPPM            ' IonNet searching doesn't really use ppm, but we'll store ppm here anyway so that it gets exported to the database
-            .TolType = eTolType
-        End With
-        
-        ' Make sure UMCDef and GelUMC(CallerID).def are synchronized
-        UMCDef = GelUMC(CallerID).def
-        
-        ' Store UMCDef in GelSearchDef() so that it gets saved to disk
-        GelSearchDef(CallerID).UMCDef = UMCDef
-        GelSearchDef(CallerID).UMCIonNetDef = GelUMCIon(CallerID).ThisNetDef
-        
-        glbPreferencesExpanded.UMCIonNetOptions.UMCRepresentative = UMCRepresentative
-        GelUMCDraw(CallerID).DrawType = cmbUMCDrawType.ListIndex
+      ' Refine the UMCs and compute class stats
+      blnSuccess = FinalizeNewUMCs()
       
-        AddToAnalysisHistory CallerID, ConstructUMCDefDescription(CallerID, AUTO_ANALYSIS_UMCIonNet, UMCDef, glbPreferencesExpanded.UMCAdvancedStatsOptions, False, True)
-      
-        ChangeStatus "Calculating UMC parameters..."
-      
-        ' Possibly Auto-Refine the UMC's
-        blnUMCIndicesUpdated = AutoRefineUMCs(CallerID, Me)
-        
-        If Not blnUMCIndicesUpdated Then
-            ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-            blnSuccess = UpdateUMCStatArrays(CallerID, False, Me)
-        Else
-            blnSuccess = True
-        End If
-      
-        If glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance Then
-           SplitUMCsByAbundance CallerID, Me, False, True
-        End If
-      
-      Else
-         ChangeStatus " Error managing UMC structures."
-      End If
    End If
 End If
 
 FormClassesFromNetsCleanup:
 mCalculating = False
-cmdFindUMCsUsingNETConnections.Visible = True
-cmdFindConnectionsThenUMCs.Visible = True
-cmdAbortProcessing.Visible = False
+ShowHideCommandButtons mCalculating
+
 FormClassesFromNets = blnSuccess
 Exit Function
 
@@ -3683,21 +2890,134 @@ Resume FormClassesFromNetsCleanup
 
 End Function
 
-Private Function PrepareHUMCArrays() As Boolean
-'--------------------------------------------------------------------
-'prepares Unique Mass Classes calculation; returns True if successful
-'--------------------------------------------------------------------
-On Error GoTo err_PrepareHUMCArrays
-HUMCIsoCnt = GelData(CallerID).IsoLines
-'use arrays with same indexing as in IsoData arrays(element 0 will not be used)
-ReDim HUMCIsoUsed(HUMCIsoCnt)
-ReDim HUMCEquClsWk(HUMCIsoCnt - 1)               'here we will use 0th element
-HUMCNetCnt = GelUMCIon(CallerID).NetCount
-ReDim HUMCNetUsed(HUMCNetCnt - 1)
-PrepareHUMCArrays = True
-err_PrepareHUMCArrays:
+Private Function GetDataInScope(ByRef ISInd() As Long, ByRef DataCnt As Long) As Boolean
+    Dim strMessage As String
+    
+    GelUMC(CallerID).def.DefScope = UMCDef.DefScope
+    DataCnt = GetISScope(CallerID, ISInd(), UMCDef.DefScope)
+
+    If DataCnt < 2 Then
+       strMessage = "Insufficient number of isotopic data points (must have 2 or more)."
+       If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+           MsgBox strMessage, vbOKOnly, glFGTU
+       Else
+           Debug.Assert False
+           LogErrors Err.Number, "frmUMCIonNet->ExportPeaksForUMCFinding, DataCnt < 2"
+           AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
+       End If
+              
+       GetDataInScope = False
+       Exit Function
+    End If
+    
+    GetDataInScope = True
+    
 End Function
 
+Private Function GetMetricDataMassUnits(lngMetricDataUnits As Long) As String
+    Select Case lngMetricDataUnits
+    Case DATA_UNITS_MASS_DA
+        GetMetricDataMassUnits = "Da"
+    Case DATA_UNITS_MASS_PPM
+        GetMetricDataMassUnits = "ppm"
+    Case Else
+        Debug.Assert False
+        GetMetricDataMassUnits = "??"
+    End Select
+End Function
+
+Private Function GetUMCIsoDefinitionText(Ind As Long, Optional ByVal blnMultipleLines As Boolean = True) As String
+'-----------------------------------------------------------------------
+'returns formatted definition of the IonNet for 2D display with index Ind
+'-----------------------------------------------------------------------
+Dim i As Long
+Dim strLineSeparator As String
+
+If blnMultipleLines Then
+    strLineSeparator = vbCrLf
+Else
+    strLineSeparator = "; "
+End If
+
+On Error Resume Next
+Dim Definition As String
+With GelUMCIon(Ind).ThisNetDef
+     Select Case .MetricType
+     Case METRIC_EUCLIDEAN
+          Definition = "Metric type: Euclidean" & strLineSeparator
+     Case METRIC_HONDURAS
+          Definition = "Metric type: Honduras (a.k.a. Taxicab)" & strLineSeparator
+     Case METRIC_INFINITY
+          Definition = "Metric type: Infinity" & strLineSeparator
+     End Select
+     Definition = Definition & "Net type: " & .NETType & strLineSeparator
+     Definition = Definition & "Max distance: " & .TooDistant & strLineSeparator
+     If .NetActualDim > 0 Then
+        If blnMultipleLines Then
+            Definition = Definition & "Metric dimensions description:" & strLineSeparator
+        Else
+            Definition = Definition & "Metric dimensions description; "
+        End If
+        For i = 0 To .NetDim - 1
+            If Not blnMultipleLines Then
+                Definition = Definition & "Dimension" & Trim(i + 1) & " = "
+            End If
+            
+            If .MetricData(i).Use Then
+               Select Case .MetricData(i).DataType
+               Case uindUMCIonNetDimConstants.uindMonoMW
+                    Definition = Definition & "Monoisotopic mass; "
+               Case uindUMCIonNetDimConstants.uindAvgMW
+                    Definition = Definition & "Average mass; "
+               Case uindUMCIonNetDimConstants.uindTmaMW
+                    Definition = Definition & "The most abundant mass; "
+               Case uindUMCIonNetDimConstants.uindScan
+                    Definition = Definition & "Scan; "
+               Case uindUMCIonNetDimConstants.uindFit
+                    Definition = Definition & "Isotopic fit; "
+               Case uindUMCIonNetDimConstants.uindMZ
+                    Definition = Definition & "m/z; "
+               Case uindUMCIonNetDimConstants.uindGenericNET
+                    Definition = Definition & "Generic NET; "
+               Case uindUMCIonNetDimConstants.uindChargeState
+                    Definition = Definition & "Charge state; "
+               Case uindUMCIonNetDimConstants.uindLogAbundance
+                    Definition = Definition & "Log(Abundance); "
+               End Select
+               Definition = Definition & "Weight factor: " & .MetricData(i).WeightFactor & "; "
+               Definition = Definition & "Constraint: "
+               Select Case .MetricData(i).ConstraintType
+               Case Net_CT_None
+                    Definition = Definition & "none"
+               Case Net_CT_LT
+                    Definition = Definition & "Distance < " & .MetricData(i).ConstraintValue
+               Case Net_CT_GT
+                    Definition = Definition & "Distance > " & .MetricData(i).ConstraintValue
+               Case Net_CT_EQ
+                    Definition = Definition & "Distance equal to " & .MetricData(i).ConstraintValue
+               End Select
+               
+               If .MetricData(i).ConstraintType <> Net_CT_None Then
+                    Select Case .MetricData(i).DataType
+                    Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
+                        Definition = Definition & " " & GetMetricDataMassUnits(.MetricData(i).ConstraintUnits)
+                    Case Else
+                        ' Do not append the units
+                    End Select
+               End If
+            Else
+                Definition = Definition & "Unused"
+            End If
+            Definition = Definition & strLineSeparator
+        Next i
+     Else
+        Definition = Definition & "Metric definition not dimensioned"
+     End If
+     
+     Definition = Definition & vbCrLf
+End With
+GetUMCIsoDefinitionText = Definition
+End Function
 
 Private Function HUMCAddingSingleMemberUMCs() As Long
 '------------------------------------------------------------------
@@ -3723,14 +3043,23 @@ With GelUMC(CallerID)
         lngOriginalIndex = ISInd(i)
         
         If HUMCIsoUsed(lngOriginalIndex) = HUMCNotUsed Then               'not used in any class
-           .UMCCnt = .UMCCnt + 1
-           .UMCs(.UMCCnt - 1).ClassCount = 1
-           With .UMCs(.UMCCnt - 1)
-               ReDim .ClassMInd(0):                 ReDim .ClassMType(0)
-               .ClassMInd(0) = lngOriginalIndex:    .ClassMType(0) = glIsoType
-               .ClassRepInd = lngOriginalIndex:     .ClassRepType = glIsoType
-           End With
-           Cnt = Cnt + 1
+            
+            If .UMCCnt > UBound(.UMCs) Then
+                 ManageClasses CallerID, UMCManageConstants.UMCMngAdd
+            End If
+            
+            With .UMCs(.UMCCnt)
+                 .ClassCount = 1
+                 ReDim .ClassMInd(0)
+                 ReDim .ClassMType(0)
+                 .ClassMInd(0) = lngOriginalIndex
+                 .ClassMType(0) = glIsoType
+                 .ClassRepInd = lngOriginalIndex
+                 .ClassRepType = glIsoType
+            End With
+            .UMCCnt = .UMCCnt + 1
+            
+            Cnt = Cnt + 1
         End If
     Next i
 
@@ -3741,11 +3070,14 @@ Exit Function
 err_HUMCAddingSingleMemberUMCs:
 Select Case Err.Number
 Case 9
-     If ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then
-        Resume
-     Else
-        LogErrors Err.Number, "frmUMCIonNet.HUMCAddingSingleMemberUMCs"
-     End If
+    ' This code should never be reached
+    Debug.Assert False
+    
+    If ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then
+       Resume
+    Else
+       LogErrors Err.Number, "frmUMCIonNet.HUMCAddingSingleMemberUMCs"
+    End If
 Case Else
     Debug.Print "Error in HUMCAddingSingleMemberUMCs: " & Err.Description
     Debug.Assert False
@@ -3754,50 +3086,1529 @@ Case Else
 End Select
 End Function
 
+Public Sub InitializeUMCSearch()
+    
+    ' MonroeMod: This code was in Form_Activate
+    
+On Error GoTo InitializeUMCSearchErrorHandler
 
-Private Function BuildCurrentClass() As Boolean
-'---------------------------------------------------------------------------------------
-'builds class for the current settings in the HUMCEquCls array; returns True on success
-'class has to be sorted if more than 2 elements(to preserve scan order)
-'---------------------------------------------------------------------------------------
-Dim i As Long
-Dim BestInd As Long
-'Dim MySort As New QSLong
-On Error GoTo err_BuildCurrentClass
+    Dim ScanRange As Long
+    If bLoading Then
+        CallerID = Me.Tag
+        lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
+        
+        ' Clear the cached LCMSResultsMapping data
+        mLCMSResultsMappingCount = 0
+        
+        ' Copy Def from GelSearchDef(CallerID).UMCDef to UMCDef
+        ' Copy Def from GelSearchDef(CallerID).UMCIonNetDef to UMCIonNetDef
+        If CallerID >= 1 And CallerID <= UBound(GelBody) Then
+            UMCDef = GelSearchDef(CallerID).UMCDef
+            UMCIonNetDef = GelSearchDef(CallerID).UMCIonNetDef
+        End If
+        
+        If GelUMCIon(CallerID).NetCount > 0 Then                     'accept settings from caller
+           MyDef = GelUMCIon(CallerID).ThisNetDef
+           ChangeStatus " Number of lines: " & GelUMCIon(CallerID).NetCount
+        Else                                                         'accept setting from UMCIonNetDef (default Def, or last Def used when form was Unloaded)
+           MyDef = UMCIonNetDef
+           ChangeStatus " No net structure found."
+        End If
+        
+        ' MonroeMod: copy value from .UMCDrawType to .DrawType
+        GelUMCDraw(CallerID).DrawType = glbPreferencesExpanded.UMCDrawType
+        
+        DisplayCurrentOptions
+        
+        bLoading = False
+        GetScanRange CallerID, MinScan, MaxScan, ScanRange
+        
+        tbsTabStrip.Tab = 0
+        tbsUMCRefinementOptions.Tab = 0
+    End If
 
-If HUMCEquClsCnt > 2 Then
-   ShellSortLong HUMCEquCls, 0, UBound(HUMCEquCls)
-   'If Not MySort.QSAsc(HUMCEquCls(), DummyInd()) Then GoTo err_BuildCurrentClass
-   'Set MySort = Nothing
-End If
+    Exit Sub
 
-With GelUMC(CallerID)
-     .UMCCnt = .UMCCnt + 1
-     If .UMCCnt > UBound(.UMCs) + 1 Then             'add room if neccessary
-          If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_BuildCurrentClass
-     End If
-     With .UMCs(.UMCCnt - 1)
-          ReDim .ClassMInd(HUMCEquClsCnt - 1)
-          ReDim .ClassMType(HUMCEquClsCnt - 1)
-          For i = 0 To HUMCEquClsCnt - 1
-              .ClassCount = .ClassCount + 1
-              .ClassMInd(.ClassCount - 1) = HUMCEquCls(i)
-              .ClassMType(.ClassCount - 1) = glIsoType
-          Next i
-          ReDim Preserve .ClassMInd(.ClassCount - 1)
-          ReDim Preserve .ClassMType(.ClassCount - 1)
+InitializeUMCSearchErrorHandler:
+    Debug.Print "Error in InitializeUMCSearch: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "frmUMCIonNet->InitializeUMCSearch"
+    Resume Next
+    
+End Sub
+
+Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, ByVal strWorkingDirPath As String, ByVal strLCMSFeaturesFilePath As String, blnShowMessages As Boolean) As Boolean
+
+    Dim strMessage As String
+    Dim strResultsFilePath As String
+    Dim strResultingMappingFilePath As String
+    
+    Dim strLineIn As String
+    Dim strSplitLine() As String
+    Dim strUMCIsoDefinition As String
+    
+    Dim tsInFile As TextStream
+    Dim objFile As File
+    
+    Dim lngFileSizeBytes As Long
+    Dim lngBytesRead As Long
+    Dim lngSpaceToReserve As Long
+    
+    Dim sngPercentComplete As Single
+    
+    Dim blnSuccess As Boolean
+
+    blnSuccess = False
+    
+    
+    'strResultsFilePath = fso.BuildPath(strWorkingDirPath, fso.GetBaseName(strLCMSFeaturesFilePath) & "_Features.txt")
+    
+    strResultingMappingFilePath = fso.BuildPath(strWorkingDirPath, fso.GetBaseName(strLCMSFeaturesFilePath) & "_PeakToFeatureMap.txt")
+    If Not fso.FileExists(strResultingMappingFilePath) Then
+        strMessage = "LCMS feature to peak map file not found, unable to continue: " & vbCrLf & strResultingMappingFilePath
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            AddToAnalysisHistory CallerID, strMessage
+        ElseIf blnShowMessages Then
+            MsgBox strMessage, vbExclamation + vbOKOnly, "File Not Found"
+        End If
+        blnSuccess = False
+    Else
+        Set objFile = fso.GetFile(strResultingMappingFilePath)
+        lngFileSizeBytes = objFile.Size
+        If lngFileSizeBytes < 1 Then lngFileSizeBytes = 1
+        
+        Set tsInFile = fso.OpenTextFile(strResultingMappingFilePath, ForReading, False)
+        
+        lngBytesRead = 0
+
+        ' Populate mLCMSResultsMappingUMCs() with each item from the _PeakToFeatureMap file
+        lngSpaceToReserve = GelData(CallerID).IsoLines - 1
+        If lngSpaceToReserve < 10 Then lngSpaceToReserve = 10
+        
+        mLCMSResultsMappingCount = 0
+        ReDim mLCMSResultsMappingUMCs(lngSpaceToReserve - 1)
+        ReDim mLCMSResultsMappingDataIndices(lngSpaceToReserve - 1)
+        
+        Do While Not tsInFile.AtEndOfStream
+            strLineIn = tsInFile.ReadLine
+            lngBytesRead = lngBytesRead + Len(strLineIn) + 2
+            
+            If Len(strLineIn) > 0 Then
+                strSplitLine = Split(strLineIn, vbTab, 3)
+                If UBound(strSplitLine) >= 1 Then
+                    If IsNumeric(strSplitLine(0)) Then
+                        ' Parse this line
+                        
+                        If mLCMSResultsMappingCount = UBound(mLCMSResultsMappingUMCs) Then
+                            ReDim Preserve mLCMSResultsMappingUMCs((UBound(mLCMSResultsMappingUMCs) + 1) * 2 - 1)
+                            ReDim Preserve mLCMSResultsMappingDataIndices(UBound(mLCMSResultsMappingUMCs))
+                        End If
+                        
+                        mLCMSResultsMappingUMCs(mLCMSResultsMappingCount) = CLng(strSplitLine(0))
+                        mLCMSResultsMappingDataIndices(mLCMSResultsMappingCount) = CLng(strSplitLine(1))
+                        mLCMSResultsMappingCount = mLCMSResultsMappingCount + 1
                     
-          ' Note: This code has been moved to UMCIonNet.Bas->FindUMCClassRepIndex
-          BestInd = FindUMCClassRepIndex(CallerID, GelUMC(CallerID).UMCCnt - 1, CInt(UMCRepresentative))
-          
-          .ClassRepInd = .ClassMInd(BestInd)
-          .ClassRepType = glIsoType
-     End With
-     BuildCurrentClass = True
-     Exit Function
+                        If mLCMSResultsMappingCount Mod 5000 = 0 Then
+                            sngPercentComplete = lngBytesRead / lngFileSizeBytes * 100
+                            ChangeStatus "Loading features from disk: " & Round(sngPercentComplete, 1) & "% complete"
+                        End If
+                    
+                    End If
+                End If
+            End If
+        Loop
+        tsInFile.Close
+        
+        ChangeStatus "Loading features from disk: 100% complete"
+        
+        If mLCMSResultsMappingCount > 0 Then
+            blnSuccess = True
+            
+            ' Copy current settings to caller structures
+            GelUMCIon(CallerID).ThisNetDef = MyDef
+            GelSearchDef(CallerID).UMCIonNetDef = MyDef
+            
+            strUMCIsoDefinition = GetUMCIsoDefinitionText(CallerID, False)
+            strUMCIsoDefinition = Replace(strUMCIsoDefinition, ": ", " = ")
+            strUMCIsoDefinition = Trim(Replace(strUMCIsoDefinition, vbCrLf, ""))
+            If Right(strUMCIsoDefinition, 1) = ";" Then
+               strUMCIsoDefinition = Left(strUMCIsoDefinition, Len(strUMCIsoDefinition) - 1)
+            End If
+            
+            AddToAnalysisHistory CallerID, "Loaded features found using LCMSFeatureFinder.exe (" & AUTO_ANALYSIS_UMCIonNet & "); Mapping count = " & Trim(mLCMSResultsMappingCount) & "; " & strUMCIsoDefinition
+
+        Else
+            strMessage = "Empty data file (" & fso.GetFileName(strResultingMappingFilePath) & "); unable to continue"
+            ChangeStatus strMessage
+            
+            If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                AddToAnalysisHistory CallerID, strMessage
+            End If
+        End If
+        
+    End If
+    
+    LoadFeatureInfoFromDisk = blnSuccess
+    
+End Function
+
+Private Function ManageResArrays(ByVal ManageType As ArrayManagementType) As Boolean
+Dim MaxResCount As Long
+Dim IsoCnt As Long
+Dim strMessage As String
+
+On Error GoTo ManageResArraysErrorHandler
+
+'''ChangeStatus " Managing results arrays..."
+IsoCnt = GelData(CallerID).IsoLines
+If IsoCnt <= 0 Then Exit Function
+Select Case ManageType
+Case amtErase
+    ResCnt = 0
+    Erase ResInd1:       Erase ResInd2:       Erase ResDist:      Erase ResEliminate
+Case amtInitialize
+    If MyDef.NETType < 10 Then
+       MaxResCount = IsoCnt * MyDef.NETType
+       If MaxResCount > MAX_NET_SIZE Then
+          strMessage = "Net would be too big. Select lower Net type."
+          If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+             MsgBox strMessage, vbOKOnly, glFGTU
+          Else
+             Debug.Assert False
+             LogErrors Err.Number, "frmUMCIonNET->ManageResArrays, amtInitialize"
+             AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
+          End If
+          Exit Function
+       Else
+          ResCnt = 0
+          ReDim ResInd1(MaxResCount - 1):        ReDim ResInd2(MaxResCount - 1)
+          ReDim ResDist(MaxResCount - 1):        ReDim ResEliminate(MaxResCount - 1)
+       End If
+    Else                              'some other type of net; start with
+       ResCnt = 0
+       ReDim ResInd1(IsoCnt - 1):        ReDim ResInd2(IsoCnt - 1)
+       ReDim ResDist(IsoCnt - 1):        ReDim ResEliminate(IsoCnt - 1)
+    End If
+Case amtAdd
+    ReDim Preserve ResInd1(ResCnt + NET_ADD_RATE)
+    ReDim Preserve ResInd2(ResCnt + NET_ADD_RATE)
+    ReDim Preserve ResDist(ResCnt + NET_ADD_RATE)
+    ReDim Preserve ResEliminate(ResCnt + NET_ADD_RATE)
+Case amtTrim
+    If ResCnt > 0 Then
+        ReDim Preserve ResInd1(ResCnt - 1)
+        ReDim Preserve ResInd2(ResCnt - 1)
+        ReDim Preserve ResDist(ResCnt - 1)
+        ReDim Preserve ResEliminate(ResCnt - 1)
+    Else
+        ReDim Preserve ResInd1(0)
+        ReDim Preserve ResInd2(0)
+        ReDim Preserve ResDist(0)
+        ReDim Preserve ResEliminate(0)
+    End If
+End Select
+ManageResArrays = True
+Exit Function
+
+ManageResArraysErrorHandler:
+Debug.Print "Error in ManageResArrays: " & Err.Description
+Debug.Assert False
+LogErrors Err.Number, "frmUMCIonNet->ManageResArrays"
+Resume Next
+
+End Function
+
+Private Function MetricEuclid(i As Long, j As Long) As Double
+'------------------------------------------------------------------
+'returns Euclidean distance between two points in MyDef.NetDim-dim space
+'i and j are indexes in data arrays; -1 on any error
+'------------------------------------------------------------------
+Dim k As Long
+Dim TmpSum As Double
+On Error GoTo err_MetricEuclid
+For k = 0 To MyDef.NetDim - 1
+    TmpSum = TmpSum + (DataVal(i, k) - DataVal(j, k)) ^ 2
+Next k
+MetricEuclid = Sqr(TmpSum)
+Exit Function
+
+err_MetricEuclid:
+MetricEuclid = -1
+End Function
+
+
+Private Function MetricEuclidDim1(i As Long, j As Long) As Double
+'------------------------------------------------------------------------
+'returns Euclidean distance between two points for the optimization array
+'------------------------------------------------------------------------
+On Error Resume Next
+MetricEuclidDim1 = Abs(OptValO(i) - OptValO(j))
+End Function
+
+
+Private Function MetricEuclidDim1Any(DimInd As Long, i As Long, j As Long) As Double
+'----------------------------------------------------------------------------------
+'returns Euclidean distance between two points for the data dimension DimInd
+'----------------------------------------------------------------------------------
+On Error Resume Next
+MetricEuclidDim1Any = Abs(DataVal(i, DimInd) - DataVal(j, DimInd))
+End Function
+
+
+Private Function MetricHonduras(i As Long, j As Long) As Double
+'----------------------------------------------------------------------
+'returns Honduras distance between two points in MyDef.NetDim-dim space
+'i and j are indexes in data arrays; -1 on any error
+'----------------------------------------------------------------------
+Dim k As Long
+Dim TmpSum As Double
+On Error GoTo err_MetricHonduras
+For k = 0 To MyDef.NetDim - 1
+    TmpSum = TmpSum + Abs(DataVal(i, k) - DataVal(j, k))
+Next k
+MetricHonduras = TmpSum
+Exit Function
+
+err_MetricHonduras:
+MetricHonduras = -1
+End Function
+
+
+'One dimensional Honduras metric is the same as Euclidean
+Private Function MetricHondurasDim1(i As Long, j As Long) As Double
+'------------------------------------------------------------------------
+'returns Honduras distance between two points for the optimization array
+'------------------------------------------------------------------------
+On Error Resume Next
+MetricHondurasDim1 = Abs(OptValO(i) - OptValO(j))
+End Function
+
+
+Private Function MetricHondurasDim1Any(DimInd As Long, i As Long, j As Long) As Double
+'------------------------------------------------------------------------------------
+'returns Honduras distance between two points for the data dimension DimInd
+'------------------------------------------------------------------------------------
+On Error Resume Next
+MetricHondurasDim1Any = Abs(DataVal(i, DimInd) - DataVal(j, DimInd))
+End Function
+
+Private Function MetricInfinity(i As Long, j As Long) As Double
+'----------------------------------------------------------------------
+'returns Infinity distance between two points in MyDef.NetDim-dim space
+'i and j are indexes in data arrays; -1 on any error
+'----------------------------------------------------------------------
+Dim k As Long
+Dim tmpMax As Double
+Dim AbsDistance As Double
+On Error GoTo err_MetricInfinity
+tmpMax = 0
+For k = 0 To MyDef.NetDim - 1
+    AbsDistance = Abs(DataVal(i, k) - DataVal(j, k))
+    If AbsDistance > tmpMax Then tmpMax = AbsDistance
+Next k
+MetricInfinity = tmpMax
+Exit Function
+
+err_MetricInfinity:
+MetricInfinity = -1
+End Function
+
+
+'One dimensional Infinity metric is the same as Euclidean
+Private Function MetricInfinityDim1(i As Long, j As Long) As Double
+'------------------------------------------------------------------------
+'returns Infinity distance between two points for the optimization array
+'------------------------------------------------------------------------
+On Error Resume Next
+MetricInfinityDim1 = Abs(OptValO(i) - OptValO(j))
+End Function
+
+
+Private Function MetricInfinityDim1Any(DimInd As Long, i As Long, j As Long) As Double
+'------------------------------------------------------------------------------------
+'returns Infinity distance between two points for the data dimension DimInd
+'------------------------------------------------------------------------------------
+On Error Resume Next
+MetricInfinityDim1Any = Abs(DataVal(i, DimInd) - DataVal(j, DimInd))
+End Function
+
+Private Sub PopulateComboBoxes()
+    
+    ' MonroeMod: The comboboxes are initialized here, rather than hard-coding their members
+    
+    Dim intIndex As Integer
+    
+    With cmbMetricType
+        .Clear
+        .AddItem "Euclidean"
+        .AddItem "Honduras"
+        .AddItem "Infinity"
+    End With
+    
+    For intIndex = 0 To chkUse.Count - 1
+        With cmbData(intIndex)
+            .Clear
+            .AddItem "Monoisotopic Mass"
+            .AddItem "Average Mass"
+            .AddItem "The Most Abundant Mass"
+            .AddItem "SCAN"
+            .AddItem "Fit"
+            .AddItem "m/z"
+            .AddItem "Generic NET"
+            .AddItem "Charge STATE"
+            .AddItem "Log (Abundance)"
+        End With
+    
+        With cmbConstraint(intIndex)
+            .Clear
+            .AddItem "None"
+            .AddItem "L.T."
+            .AddItem "G.T."
+        End With
+    
+        With cmbConstraintUnits(intIndex)
+            .Clear
+            .AddItem "Da"
+            .AddItem "ppm"
+            .Visible = False
+        End With
+    
+    Next intIndex
+    
+    With cmbUMCRepresentative
+        .Clear
+        .AddItem "Highest Abundance"
+        .AddItem "Best Isotopic Fit"
+        .AddItem "First Scan Distribution"
+        .AddItem "Last Scan Distribution"
+        .AddItem "Median Scan Distribution"
+    End With
+    
+    With cmbUMCAbu
+        .Clear
+        .AddItem "Average of Class Abu."
+        .AddItem "Sum of Class Abu."
+        .AddItem "Abu. of Class Representative"
+        .AddItem "Median of Class Abundance"
+        .AddItem "Max of Class Abu."
+        .AddItem "Sum of Top X Members of Class"
+    End With
+    
+    With cmbUMCMW
+        .Clear
+        .AddItem "Class Average"
+        .AddItem "Mol.Mass Of Class Representative"
+        .AddItem "Class Median"
+        .AddItem "Average of Top X Members of Class"
+        .AddItem "Median of Top X Members of Class"
+    End With
+    
+    With cmbUMCDrawType
+        .Clear
+        .AddItem "Actual UMC"
+        .AddItem "UMC Full Region"
+        .AddItem "UMC Intensity"
+    End With
+    
+    With cboChargeStateAbuType
+        .Clear
+        .AddItem "Highest Abu Sum"
+        .AddItem "Most Abu Member"
+        .AddItem "Most Members"
+    End With
+    
+    With cboSplitUMCsScanGapBehavior
+        .Clear
+        .AddItem "Ignore scan gaps"
+        .AddItem "Split if mass difference"
+        .AddItem "Always split"
+    End With
+    
+End Sub
+
+Private Function PPMToDaIfNeeded(dblConstraintValue As Double, DimInd As Long, lngDataIndex As Long) As Double
+    
+    ' If .DataType is a mass type, and if .ContraintUnits is ppm, then convert
+    '  dblConstraintValue from Da to ppm, using DataVal(lngDataIndex, DimInd) as
+    '  the basis for the conversion
+    
+    Select Case MyDef.MetricData(DimInd).DataType
+    Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
+        If MyDef.MetricData(DimInd).ConstraintUnits = DATA_UNITS_MASS_PPM Then
+            PPMToDaIfNeeded = dblConstraintValue / 1000000# * DataVal(lngDataIndex, DimInd)
+        Else
+            PPMToDaIfNeeded = dblConstraintValue
+        End If
+    Case Else
+        PPMToDaIfNeeded = dblConstraintValue
+    End Select
+    
+End Function
+
+Private Function PrepareDataArrays() As Boolean
+'------------------------------------------------------------------------
+'prepares data arrays and returns True if successful
+'------------------------------------------------------------------------
+    Dim i As Long, j As Long
+    Dim strMessage As String
+    Dim ISInd() As Long         ' In-scope index
+
+On Error GoTo err_PrepareDataArrays
+
+    ChangeStatus " Preparing arrays..."
+
+    If Not GetDataInScope(ISInd(), DataCnt) Then
+        PrepareDataArrays = False
+        Exit Function
+    End If
+
+    If Not UpdateNetDimInfo() Then
+        PrepareDataArrays = False
+        Exit Function
+    End If
+
+    ReDim DataOInd(DataCnt - 1)
+    ReDim DataVal(DataCnt - 1, MyDef.NetDim - 1)
+    
+    Select Case MyDef.MetricType
+    Case METRIC_EUCLIDEAN, METRIC_HONDURAS, METRIC_INFINITY
+        With GelData(CallerID)
+           For j = 0 To MyDef.NetDim - 1
+               If MyDef.MetricData(j).Use Then
+                  Select Case MyDef.MetricData(j).DataType
+                  Case uindUMCIonNetDimConstants.uindMonoMW
+                      For i = 1 To DataCnt
+                          DataOInd(i - 1) = ISInd(i)
+                          DataVal(i - 1, j) = .IsoData(ISInd(i)).MonoisotopicMW * MyDef.MetricData(j).WeightFactor
+                      Next i
+                  Case uindUMCIonNetDimConstants.uindAvgMW
+                      For i = 1 To DataCnt
+                          DataOInd(i - 1) = ISInd(i)
+                          DataVal(i - 1, j) = .IsoData(ISInd(i)).AverageMW * MyDef.MetricData(j).WeightFactor
+                      Next i
+                  Case uindUMCIonNetDimConstants.uindTmaMW
+                      For i = 1 To DataCnt
+                          DataOInd(i - 1) = ISInd(i)
+                          DataVal(i - 1, j) = .IsoData(ISInd(i)).MostAbundantMW * MyDef.MetricData(j).WeightFactor
+                      Next i
+                  Case uindUMCIonNetDimConstants.uindScan
+                      For i = 1 To DataCnt
+                          DataOInd(i - 1) = ISInd(i)
+                          DataVal(i - 1, j) = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(i)).ScanNumber) * MyDef.MetricData(j).WeightFactor
+                      Next i
+                  Case uindUMCIonNetDimConstants.uindFit
+                      For i = 1 To DataCnt
+                          DataOInd(i - 1) = ISInd(i)
+                          DataVal(i - 1, j) = .IsoData(ISInd(i)).Fit * MyDef.MetricData(j).WeightFactor
+                      Next i
+                  Case uindUMCIonNetDimConstants.uindMZ
+                      For i = 1 To DataCnt
+                          DataOInd(i - 1) = ISInd(i)
+                          DataVal(i - 1, j) = .IsoData(ISInd(i)).MZ * MyDef.MetricData(j).WeightFactor
+                      Next i
+                  Case uindUMCIonNetDimConstants.uindGenericNET
+                      For i = 1 To DataCnt
+                          DataOInd(i - 1) = ISInd(i)
+                          DataVal(i - 1, j) = ((.IsoData(ISInd(i)).ScanNumber - MinScan) / (MaxScan - MinScan)) * MyDef.MetricData(j).WeightFactor
+                      Next i
+                  Case uindUMCIonNetDimConstants.uindChargeState
+                      For i = 1 To DataCnt
+                          DataOInd(i - 1) = ISInd(i)
+                          DataVal(i - 1, j) = .IsoData(ISInd(i)).Charge * MyDef.MetricData(j).WeightFactor
+                      Next i
+                  Case uindUMCIonNetDimConstants.uindLogAbundance
+                      For i = 1 To DataCnt
+                          DataOInd(i - 1) = ISInd(i)
+                          If .IsoData(ISInd(i)).Abundance > 0 Then
+                            DataVal(i - 1, j) = Log(.IsoData(ISInd(i)).Abundance) / Log(10#) * MyDef.MetricData(j).WeightFactor
+                          Else
+                            ' Cannot perform Log(0)
+                            DataVal(i - 1, j) = 0
+                          End If
+                      Next i
+                  End Select
+               End If
+           Next j
+        End With
+    Case Else
+        ' This shouldn't get reached
+        Debug.Assert False
+    End Select
+    
+    PrepareDataArrays = True
+    Exit Function
+
+err_PrepareDataArrays:
+    LogErrors Err.Number, "frmUMCIonNet.PrepareArrays"
+    ChangeStatus "Error preparing calculation structures."
+    PrepareDataArrays = False
+    
+End Function
+
+Private Function PrepareHUMCArrays() As Boolean
+'--------------------------------------------------------------------
+'prepares Unique Mass Classes calculation; returns True if successful
+'--------------------------------------------------------------------
+On Error GoTo err_PrepareHUMCArrays
+HUMCIsoCnt = GelData(CallerID).IsoLines
+'use arrays with same indexing as in IsoData arrays(element 0 will not be used)
+ReDim HUMCIsoUsed(HUMCIsoCnt)
+ReDim HUMCEquClsWk(HUMCIsoCnt - 1)               'here we will use 0th element
+HUMCNetCnt = GelUMCIon(CallerID).NetCount
+ReDim HUMCNetUsed(HUMCNetCnt - 1)
+PrepareHUMCArrays = True
+err_PrepareHUMCArrays:
+End Function
+
+Private Function PrepareOptimization() As Boolean
+'-----------------------------------------------------------------
+'creates and sorts optimization arrays; returns True if successful
+'-----------------------------------------------------------------
+Dim i As Long
+Dim qsdMySort As New QSDouble
+On Error GoTo err_PrepareOptimization
+ChangeStatus " Creating optimization structures..."
+ReDim OptIndO(DataCnt - 1)
+ReDim OptValO(DataCnt - 1)
+For i = 0 To DataCnt - 1
+    OptIndO(i) = i
+    OptValO(i) = DataVal(i, 0)
+Next i
+PrepareOptimization = qsdMySort.QSAsc(OptValO, OptIndO)
+Exit Function
+
+
+err_PrepareOptimization:
+LogErrors Err.Number, "frmUMCIonNet.PrepareOptimization"
+ChangeStatus " Error preparing optimization structures."
+End Function
+
+Private Sub ResetToDefaults()
+    With glbPreferencesExpanded
+        With .UMCIonNetOptions
+            .ConnectionLengthPostFilterMaxNET = 0.2
+            .UMCRepresentative = UMCFROMNet_REP_ABU
+            .MakeSingleMemberClasses = False
+            
+            UMCRepresentative = .UMCRepresentative
+            UMCMakeSingleMemberClasses = .MakeSingleMemberClasses
+        End With
+        
+        ResetUMCAdvancedStatsOptions .UMCAdvancedStatsOptions
+        ResetUMCAutoRefineOptions .UMCAutoRefineOptions
+        
+        .UMCDrawType = umcdt_ActualUMC
+    End With
+    
+    SetDefaultUMCDef UMCDef
+    SetDefaultUMCIonNetDef MyDef
+        
+    DisplayCurrentOptions
+    
+End Sub
+
+Private Sub ResetToOldDefaults()
+    Dim eResponse As VbMsgBoxResult
+    
+    eResponse = MsgBox("Are you sure you want to use old defaults?", vbQuestion Or vbYesNoCancel Or vbDefaultButton3, "Old Defaults")
+    If eResponse <> vbYes Then Exit Sub
+    
+    ResetToDefaults
+    
+    ' These are old defaults, set in July 2003
+    With glbPreferencesExpanded.UMCAutoRefineOptions
+        .UMCAutoRefineRemoveCountLow = True
+        .UMCAutoRefineMinLength = 2
+        
+        .UMCAutoRefineRemoveCountHigh = True
+        .UMCAutoRefineMaxLength = 400
+        
+        .UMCAutoRefineRemoveMaxLengthPctAllScans = False
+        .UMCAutoRefineMaxLengthPctAllScans = 15
+        
+        .UMCAutoRefinePercentMaxAbuToUseForLength = 33
+        .TestLengthUsingScanRange = True
+        .MinMemberCountWhenUsingScanRange = 2
+    End With
+
+    ' These are old defaults, set in July 2003
+    SetOldDefaultUMCIonNetDef MyDef
+    
+    DisplayCurrentOptions
+End Sub
+
+Private Sub RemoveLongConnections(Optional intEditType As Integer = NET_EDIT_REJECT_LONG)
+'--------------------------------------------------------------
+'does editing of current display GelUMCIon structure
+'--------------------------------------------------------------
+On Error GoTo RemoveLongConnectionsErrorHandler
+Dim strMessage As String
+Dim lngConnectionsEliminated As Long
+
+mCalculating = True
+ShowHideCommandButtons mCalculating
+
+Select Case intEditType
+Case NET_EDIT_REJECT_LONG
+    Dim TooLongConnection As Double
+    If IsNumeric(txtNetEditTooDistant.Text) Then
+       TooLongConnection = CDbl(txtNetEditTooDistant.Text)
+       lngConnectionsEliminated = EliminateLongConnections_Net(TooLongConnection)
+       
+       AddToAnalysisHistory CallerID, "Removed long connections (" & AUTO_ANALYSIS_UMCIonNet & "); New connection count = " & Trim(GelUMCIon(CallerID).NetCount) & "; Connections removed = " & Trim(lngConnectionsEliminated)
+       
+       txtRejectLongConnections = CDbl(GelUMCIon(CallerID).ThisNetDef.TooDistant)
+    Else
+       strMessage = "This argument should be positive number. (txtNetEditTooDistant textbox)"
+       If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+          MsgBox strMessage, vbOKOnly, glFGTU
+          txtNetEditTooDistant.SetFocus
+       Else
+          Debug.Assert False
+          LogErrors Err.Number, "frmUMCIonNet->RemoveLongConnections, txtNetEditTooDistant is not numeric"
+          AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
+       End If
+    End If
+End Select
+
+mCalculating = False
+ShowHideCommandButtons mCalculating
+
+Exit Sub
+
+RemoveLongConnectionsErrorHandler:
+Debug.Print "Error in RemoveLongConnections: " & Err.Description
+Debug.Assert False
+LogErrors Err.Number, "frmUMCIonNet->RemoveLongConnections"
+Resume Next
+End Sub
+
+Private Sub SetDefinition()
+'--------------------------------------------------------------
+'sets definitions frm structures to control properties
+'--------------------------------------------------------------
+Dim i As Long
+On Error GoTo err_SetDefinition
+With MyDef
+    txtRejectLongConnections.Text = .TooDistant
+    txtNETType.Text = .NETType
+    cmbMetricType.ListIndex = .MetricType
+    For i = 0 To .NetDim - 1
+        With .MetricData(i)
+            If .Use Then
+               chkUse(i) = vbChecked
+            Else
+               chkUse(i) = vbUnchecked
+            End If
+            cmbData(i).ListIndex = .DataType
+            ' Note: cmbConstraintUnits() is updated inside DisplayDynamicUnits
+            cmbConstraint(i).ListIndex = .ConstraintType
+            txtWeightingFactor(i).Text = .WeightFactor
+            txtConstraint(i).Text = .ConstraintValue
+            cmbConstraintUnits(i).ListIndex = .ConstraintUnits
+        End With
+    Next i
 End With
 
-err_BuildCurrentClass:
-ChangeStatus " Error building UMC."
+DisplayDynamicUnits
+
+Exit Sub
+
+err_SetDefinition:
+Debug.Print "Error in SetUMCDefinition: " & Err.Description
+Debug.Assert False
+LogErrors Err.Number, "frmUMCIonNet->SetDefinition"
+ChangeStatus "Error accepting net definition."
+End Sub
+
+Private Sub SetOldDefaultUMCIonNetDef(ByRef udtUMCIonNetDef As UMCIonNetDefinition)
+    ' These are old defaults, set in July 2003
+    With udtUMCIonNetDef
+        .MetricType = METRIC_EUCLIDEAN
+        .NETType = Net_SPIDER_66
+        .NetDim = 5
+        .NetActualDim = 5
+        .TooDistant = 0.1
+        ReDim .MetricData(.NetDim - 1)
+        .MetricData(0).Use = True:  .MetricData(0).DataType = uindUMCIonNetDimConstants.uindMonoMW:   .MetricData(0).WeightFactor = 0.5:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 0.025: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(1).Use = True:  .MetricData(1).DataType = uindUMCIonNetDimConstants.uindAvgMW:    .MetricData(1).WeightFactor = 0.5:   .MetricData(1).ConstraintType = Net_CT_LT:       .MetricData(1).ConstraintValue = 0.025: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(2).Use = True:  .MetricData(2).DataType = uindUMCIonNetDimConstants.uindLogAbundance:   .MetricData(2).WeightFactor = 0.1:   .MetricData(2).ConstraintType = Net_CT_None:     .MetricData(2).ConstraintValue = 0.1:   .MetricData(2).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(3).Use = True:  .MetricData(3).DataType = uindUMCIonNetDimConstants.uindScan:      .MetricData(3).WeightFactor = 0.01:   .MetricData(3).ConstraintType = Net_CT_None:    .MetricData(3).ConstraintValue = 0.01:  .MetricData(3).ConstraintUnits = DATA_UNITS_MASS_DA
+        .MetricData(4).Use = True:  .MetricData(4).DataType = uindUMCIonNetDimConstants.uindFit:       .MetricData(4).WeightFactor = 0.1:    .MetricData(4).ConstraintType = Net_CT_None:    .MetricData(4).ConstraintValue = 0.01:  .MetricData(4).ConstraintUnits = DATA_UNITS_MASS_DA
+    End With
+End Sub
+
+Private Sub SetUMCDefinition()
+'----------------------------------------------------------------------------
+'sets definitions for UMC from Net procedure based on some settings of GelUMC().def
+'----------------------------------------------------------------------------
+On Error GoTo SetUMCDefinitionErrorHandler
+
+With UMCDef
+    cmbUMCMW.ListIndex = .ClassMW
+    cmbUMCAbu.ListIndex = .ClassAbu
+    cboChargeStateAbuType.ListIndex = .ChargeStateStatsRepType
+    SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
+    
+    optDefScope(.DefScope).Value = True
+    SetCheckBox chkInterpolateMissingIons, .InterpolateGaps
+    txtInterpolateMaxGapSize = .InterpolateMaxGapSize
+    txtHoleSize = .GapMaxSize
+    
+End With
+
+' Additional UMCIonNet options
+With glbPreferencesExpanded.UMCIonNetOptions
+    If .ConnectionLengthPostFilterMaxNET = 0 Then
+        .ConnectionLengthPostFilterMaxNET = 0.2
+    End If
+    txtNetEditTooDistant.Text = .ConnectionLengthPostFilterMaxNET
+    cmbUMCRepresentative.ListIndex = .UMCRepresentative
+    SetCheckBox chkUseUntangledAsSingle, .MakeSingleMemberClasses
+End With
+
+Exit Sub
+
+SetUMCDefinitionErrorHandler:
+Debug.Print "Error in SetUMCDefinition: " & Err.Description
+Debug.Assert False
+LogErrors Err.Number, "frmUMCIonNet->SetUMCDefinition"
+Resume Next
+End Sub
+
+Private Sub ShowHideCommandButtons(blnCalculating As Boolean)
+    Dim blnShowConnectionsButtons As Boolean
+
+    blnShowConnectionsButtons = Not cChkBox(chkUseLCMSFeatureFinder.Value)
+    
+    cmdFindConnections.Visible = blnShowConnectionsButtons
+        
+    cmdFindConnections.Visible = blnShowConnectionsButtons And Not blnCalculating
+    cmdFindConnectionsThenUMCs.Visible = Not blnCalculating
+    cmdRemoveLongConnections.Visible = Not blnCalculating
+    cmdFindUMCsUsingNETConnections.Visible = Not blnCalculating
+    cmdClose.Visible = Not blnCalculating
+    
+    cmdAbortFindConnections.Visible = blnCalculating
+    cmdAbortProcessing.Visible = blnCalculating
+    
+    chkUseLCMSFeatureFinder.Enabled = Not blnCalculating
+
+End Sub
+
+Public Function StartUMCSearch() As Boolean
+    ' This sub should be called after calling InitializeUMCSearch
+    ' It is intended to be called during AutoAnalysis
+    '
+    ' Returns True if Success, False if Error
+    
+    Dim blnSuccess As Boolean
+    Dim blnAbortedProcessDuringAutoAnalysis As Boolean
+    
+On Error GoTo StartUMCSearchErrorHandler
+
+    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
+        blnSuccess = FindUMCsUsingLCMSFeatureFinder(False)
+        
+        If Not blnSuccess And Not mAbortProcess Then
+            ' Search failed; try to find UMCs using the built-in UMC finding code
+            AddToAnalysisHistory CallerID, "Warning: Unable to find UMCs using the LCMS Feature Finder; will instead use the built-in finder"
+        End If
+    Else
+        blnSuccess = False
+    End If
+    
+    If Not blnSuccess Then
+        ' 1. Find the connections
+        tbsTabStrip.Tab = 0
+        FindIonNetConnections
+        
+        ' If auto-analyzing, ignore the mAbortProcess state
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled And mAbortProcess Then
+            blnAbortedProcessDuringAutoAnalysis = True
+            mAbortProcess = False
+        End If
+        
+        If Not mAbortProcess Then
+            ' 2. Find the UMC's
+            tbsTabStrip.Tab = 2
+            blnSuccess = FormClassesFromNETsWrapper(False)
+        End If
+    End If
+    
+    With GelP_D_L(CallerID)
+        If .DltLblType <> ptS_Dlt And .DltLblType <> ptS_Lbl And .DltLblType <> ptS_DltLbl Then
+            .SyncWithUMC = False
+        End If
+    End With
+    
+    mAbortProcess = mAbortProcess Or blnAbortedProcessDuringAutoAnalysis
+    StartUMCSearch = Not mAbortProcess And blnSuccess
+    
+    Exit Function
+    
+StartUMCSearchErrorHandler:
+    Debug.Print "Error in frmUMCIonNet.StartUMCSearch: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "frmUMCIonNet->StartUMCSearch"
+    ' Do not attempt to resume
+    StartUMCSearch = False
+    
 End Function
+
+' Note: Status is called by AutoRefineUMCs and by SplitUMCsByAbundance
+Public Sub Status(ByVal StatusMsg As String)
+    ChangeStatus StatusMsg
+End Sub
+
+Private Function SubjectToConstraintEuclid(i As Long, j As Long) As Boolean
+'-------------------------------------------------------------------------
+'returns True if any used dimension is subject to constraint rule
+'-------------------------------------------------------------------------
+Dim DimInd As Long
+
+On Error GoTo exit_SubjectToConstrainEuclid
+For DimInd = 0 To MyDef.NetDim - 1
+  With MyDef.MetricData(DimInd)
+    If .Use Then
+       Select Case .ConstraintType
+       Case Net_CT_None         'no constraint
+       Case Net_CT_LT           'distance in this dimension has to be less than constraint value
+            If MetricEuclidDim1Any(DimInd, i, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+               SubjectToConstraintEuclid = True
+               Exit Function
+            End If
+       Case Net_CT_GT           'distance in this dimension has to be more than constraint value
+            If MetricEuclidDim1Any(DimInd, i, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+               SubjectToConstraintEuclid = True
+               Exit Function
+            End If
+       End Select
+    End If
+  End With
+Next DimInd
+exit_SubjectToConstrainEuclid:
+End Function
+
+Private Function SubjectToConstraintHonduras(i As Long, j As Long) As Boolean
+'-------------------------------------------------------------------------
+'returns True if any used dimension is subject to constraint rule
+'-------------------------------------------------------------------------
+Dim DimInd As Long
+On Error GoTo exit_SubjectToConstrainHonduras
+For DimInd = 0 To MyDef.NetDim - 1
+  With MyDef.MetricData(DimInd)
+    If .Use Then
+       Select Case .ConstraintType
+       Case Net_CT_None         'no constraint
+       Case Net_CT_LT           'distance in this dimension has to be less than constraint value
+            If MetricHondurasDim1Any(DimInd, i, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+               SubjectToConstraintHonduras = True
+               Exit Function
+            End If
+       Case Net_CT_GT           'distance in this dimension has to be more than constraint value
+            If MetricHondurasDim1Any(DimInd, i, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+               SubjectToConstraintHonduras = True
+               Exit Function
+            End If
+       End Select
+    End If
+  End With
+Next DimInd
+exit_SubjectToConstrainHonduras:
+End Function
+
+
+Private Function SubjectToConstraintInfinity(i As Long, j As Long) As Boolean
+'---------------------------------------------------------------------------
+'returns True if any used dimension is subject to constraint rule
+'---------------------------------------------------------------------------
+Dim DimInd As Long
+On Error GoTo exit_SubjectToConstrainInfinity
+For DimInd = 0 To MyDef.NetDim - 1
+  With MyDef.MetricData(DimInd)
+    If .Use Then
+       Select Case .ConstraintType
+       Case Net_CT_None         'no constraint
+       Case Net_CT_LT           'distance in this dimension has to be less than constraint value
+            If MetricInfinityDim1Any(DimInd, i, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+               SubjectToConstraintInfinity = True
+               Exit Function
+            End If
+       Case Net_CT_GT           'distance in this dimension has to be more than constraint value
+            If MetricInfinityDim1Any(DimInd, i, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+               SubjectToConstraintInfinity = True
+               Exit Function
+            End If
+       End Select
+    End If
+  End With
+Next DimInd
+exit_SubjectToConstrainInfinity:
+End Function
+
+Private Sub UpdateDynamicControls()
+    ' Update the UMC auto refine length labels
+    If glbPreferencesExpanded.UMCAutoRefineOptions.TestLengthUsingScanRange Then
+        chkRemoveLoCnt.Caption = "Remove cls. with less than"
+        chkRemoveHiCnt.Caption = "Remove cls. with length over"
+        lblAutoRefineLengthLabel(0) = "scans"
+        lblAutoRefineLengthLabel(1) = "scans"
+        lblAutoRefineMinimumMemberCount.Enabled = True
+    Else
+        chkRemoveLoCnt.Caption = "Remove cls. with less than"
+        chkRemoveHiCnt.Caption = "Remove cls. with more than"
+        lblAutoRefineLengthLabel(0) = "members"
+        lblAutoRefineLengthLabel(1) = "members"
+        lblAutoRefineMinimumMemberCount.Enabled = False
+    End If
+
+    txtAutoRefineMinimumMemberCount.Enabled = lblAutoRefineMinimumMemberCount.Enabled
+    lblPercentMaxAbuToUseToGaugeLength.Enabled = lblAutoRefineMinimumMemberCount.Enabled
+    txtPercentMaxAbuToUseToGaugeLength.Enabled = lblAutoRefineMinimumMemberCount.Enabled
+
+    If CDblSafe(txtClassAbuTopXMinAbu) <= 0 And CDblSafe(txtClassAbuTopXMaxAbu) <= 0 Then
+        lblClassAbuTopXMinMembers = "Maximum members to include"
+    Else
+        lblClassAbuTopXMinMembers = "Minimum members to include"
+    End If
+
+    If CDblSafe(txtClassMassTopXMinAbu) <= 0 And CDblSafe(txtClassMassTopXMaxAbu) <= 0 Then
+        lblClassMassTopXMinMembers = "Maximum members to include"
+    Else
+        lblClassMassTopXMinMembers = "Minimum members to include"
+    End If
+
+End Sub
+
+Private Function UpdateNetDimInfo() As Boolean
+
+    Dim strMessage As String
+    Dim i As Integer
+    
+    MyDef.NetDim = chkUse.Count
+
+    ' Update .NetActualDim
+    MyDef.NetActualDim = 0
+    For i = 0 To chkUse.Count - 1
+        If chkUse(i).Value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
+    Next i
+    
+    If MyDef.NetActualDim < 1 Then
+       strMessage = "At least one data dimension has to be selected."
+       If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+          MsgBox strMessage, vbOKOnly, glFGTU
+       Else
+          Debug.Assert False
+          LogErrors Err.Number, "frmUMCIonNet->UpdateNetDimInfo, MyDef.NetActualDim < 1"
+          AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
+       End If
+       UpdateNetDimInfo = False
+       Exit Function
+    End If
+    
+    UpdateNetDimInfo = True
+
+End Function
+
+Private Function ValidateClassStatOptions() As Boolean
+    If UMCRepresentative < 0 Then
+       MsgBox "Class representative type not selected.", vbOKOnly, glFGTU
+       cmbUMCRepresentative.SetFocus
+        ValidateClassStatOptions = False
+       Exit Function
+    End If
+    If UMCDef.ClassMW < 0 Then
+       MsgBox "Class mass type not selected.", vbOKOnly, glFGTU
+       cmbUMCMW.SetFocus
+        ValidateClassStatOptions = False
+       Exit Function
+    End If
+    If UMCDef.ClassAbu < 0 Then
+       MsgBox "Class abundance type not selected.", vbOKOnly, glFGTU
+       cmbUMCAbu.SetFocus
+        ValidateClassStatOptions = False
+       Exit Function
+    End If
+    
+    ValidateClassStatOptions = True
+End Function
+
+Private Sub Form_Activate()
+    InitializeUMCSearch
+End Sub
+
+Private Sub Form_Load()
+    mOneSecond = 1 / 24 / 60 / 60
+    bLoading = True
+    mCalculating = False
+    mAbortProcess = False
+    PopulateComboBoxes
+    ShowHideCommandButtons False
+End Sub
+
+Private Sub Form_Unload(Cancel As Integer)
+    UMCIonNetDef = MyDef
+End Sub
+
+Private Sub optDefScope_Click(Index As Integer)
+    UMCDef.DefScope = Index
+End Sub
+
+Private Sub txtAutoRefineMinimumMemberCount_LostFocus()
+If IsNumeric(txtAutoRefineMinimumMemberCount.Text) Then
+    glbPreferencesExpanded.UMCAutoRefineOptions.MinMemberCountWhenUsingScanRange = Abs(CLng(txtAutoRefineMinimumMemberCount.Text))
+Else
+   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+   txtAutoRefineMinimumMemberCount.SetFocus
+End If
+End Sub
+
+Private Sub txtClassAbuTopXMaxAbu_Change()
+    UpdateDynamicControls
+End Sub
+
+Private Sub txtClassAbuTopXMaxAbu_Lostfocus()
+    ValidateTextboxValueDbl txtClassAbuTopXMaxAbu, 0, 1E+300, 0
+    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassAbuTopXMaxAbu = CDblSafe(txtClassAbuTopXMaxAbu)
+End Sub
+
+Private Sub txtClassAbuTopXMinAbu_Change()
+    UpdateDynamicControls
+End Sub
+
+Private Sub txtClassAbuTopXMinAbu_Lostfocus()
+    ValidateTextboxValueDbl txtClassAbuTopXMinAbu, 0, 1E+300, 0
+    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassAbuTopXMinAbu = CDblSafe(txtClassAbuTopXMinAbu)
+End Sub
+
+Private Sub txtClassAbuTopXMinMembers_Lostfocus()
+    ValidateTextboxValueLng txtClassAbuTopXMinMembers, 0, 100000, 3
+    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassAbuTopXMinMembers = CLngSafe(txtClassAbuTopXMinMembers)
+End Sub
+
+Private Sub txtClassMassTopXMaxAbu_Change()
+    UpdateDynamicControls
+End Sub
+
+Private Sub txtClassMassTopXMaxAbu_Lostfocus()
+    ValidateTextboxValueDbl txtClassMassTopXMaxAbu, 0, 1E+300, 0
+    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassMassTopXMaxAbu = CDblSafe(txtClassMassTopXMaxAbu)
+End Sub
+
+Private Sub txtClassMassTopXMinAbu_Change()
+    UpdateDynamicControls
+End Sub
+
+Private Sub txtClassMassTopXMinAbu_Lostfocus()
+    ValidateTextboxValueDbl txtClassMassTopXMinAbu, 0, 1E+300, 0
+    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassMassTopXMinAbu = CDblSafe(txtClassMassTopXMinAbu)
+End Sub
+
+Private Sub txtClassMassTopXMinMembers_Lostfocus()
+    ValidateTextboxValueLng txtClassMassTopXMinMembers, 0, 100000, 3
+    glbPreferencesExpanded.UMCAdvancedStatsOptions.ClassMassTopXMinMembers = CLngSafe(txtClassMassTopXMinMembers)
+End Sub
+
+Private Sub txtConstraint_KeyDown(Index As Integer, KeyCode As Integer, Shift As Integer)
+If mCalculating Then KeyCode = 0
+End Sub
+
+Private Sub txtConstraint_KeyPress(Index As Integer, KeyAscii As Integer)
+If mCalculating Then KeyAscii = 0
+End Sub
+
+Private Sub txtConstraint_LostFocus(Index As Integer)
+On Error Resume Next
+If IsNumeric(txtConstraint(Index).Text) Then
+   MyDef.MetricData(Index).ConstraintValue = CDbl(txtConstraint(Index).Text)
+Else
+   MsgBox "This argument should be positive number.", vbOKOnly, glFGTU
+   txtConstraint(Index).SetFocus
+End If
+End Sub
+
+Private Sub txtHiAbuPct_LostFocus()
+If IsNumeric(txtHiAbuPct.Text) Then
+   glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctHighAbundance = Abs(CDbl(txtHiAbuPct.Text))
+Else
+   MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
+   txtHiAbuPct.SetFocus
+End If
+End Sub
+
+Private Sub txtHiCnt_LostFocus()
+If IsNumeric(txtHiCnt.Text) Then
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLength = Abs(CLng(txtHiCnt.Text))
+Else
+   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+   txtHiCnt.SetFocus
+End If
+End Sub
+
+Private Sub txtHoleSize_LostFocus()
+If IsNumeric(txtHoleSize.Text) Then
+   UMCDef.GapMaxSize = CLng(txtHoleSize.Text)
+Else
+   MsgBox "This argument should be integer value.", vbOKOnly
+   txtHoleSize.SetFocus
+End If
+End Sub
+
+Private Sub txtInterpolateMaxGapSize_LostFocus()
+If IsNumeric(txtInterpolateMaxGapSize.Text) Then
+   UMCDef.InterpolateMaxGapSize = CLng(txtInterpolateMaxGapSize.Text)
+Else
+   MsgBox "This argument should be integer value.", vbOKOnly
+   txtInterpolateMaxGapSize.SetFocus
+End If
+End Sub
+
+Private Sub txtLoAbuPct_LostFocus()
+If IsNumeric(txtLoAbuPct.Text) Then
+   glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctLowAbundance = Abs(CDbl(txtLoAbuPct.Text))
+Else
+   MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
+   txtLoAbuPct.SetFocus
+End If
+End Sub
+
+Private Sub txtLoCnt_LostFocus()
+If IsNumeric(txtLoCnt.Text) Then
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMinLength = Abs(CLng(txtLoCnt.Text))
+Else
+   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+   txtLoCnt.SetFocus
+End If
+End Sub
+
+Private Sub txtMaxLengthPctAllScans_Lostfocus()
+If IsNumeric(txtMaxLengthPctAllScans.Text) Then
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLengthPctAllScans = Abs(CLng(txtMaxLengthPctAllScans.Text))
+Else
+   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+   txtMaxLengthPctAllScans.SetFocus
+End If
+End Sub
+
+Private Sub txtNetEditTooDistant_Lostfocus()
+If IsNumeric(txtNetEditTooDistant.Text) Then
+    glbPreferencesExpanded.UMCIonNetOptions.ConnectionLengthPostFilterMaxNET = Abs(txtNetEditTooDistant.Text)
+Else
+   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+   txtNetEditTooDistant.SetFocus
+End If
+End Sub
+
+Private Sub txtNETType_LostFocus()
+On Error Resume Next
+If IsNumeric(txtNETType.Text) Then
+   MyDef.NETType = CLng(txtNETType.Text)
+Else
+   MsgBox "This argument should be positive integer.", vbOKOnly, glFGTU
+   txtNETType.SetFocus
+End If
+End Sub
+
+Private Sub txtPercentMaxAbuToUseToGaugeLength_LostFocus()
+If IsNumeric(txtPercentMaxAbuToUseToGaugeLength.Text) Then
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePercentMaxAbuToUseForLength = Abs(CLng(txtPercentMaxAbuToUseToGaugeLength.Text))
+Else
+   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+   txtPercentMaxAbuToUseToGaugeLength.SetFocus
+End If
+End Sub
+
+Private Sub txtRejectLongConnections_LostFocus()
+If IsNumeric(txtRejectLongConnections.Text) Then
+   MyDef.TooDistant = CDbl(txtRejectLongConnections.Text)
+Else
+   MsgBox "This argument should be positive number.", vbOKOnly, glFGTU
+   txtRejectLongConnections.SetFocus
+End If
+End Sub
+    
+Private Sub txtSplitUMCsMaximumPeakCount_LostFocus()
+    ValidateTextboxValueLng txtSplitUMCsMaximumPeakCount, 2, 100, 6
+    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.MaximumPeakCountToSplitUMC = CLngSafe(txtSplitUMCsMaximumPeakCount)
+End Sub
+
+Private Sub txtSplitUMCsMinimumDifferenceInAvgPpmMass_LostFocus()
+    ValidateTextboxValueDbl txtSplitUMCsMinimumDifferenceInAvgPpmMass, 0, 10000#, 4
+    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.MinimumDifferenceInAveragePpmMassToSplit = CDblSafe(txtSplitUMCsMinimumDifferenceInAvgPpmMass)
+End Sub
+
+Private Sub txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax_LostFocus()
+    ValidateTextboxValueLng txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax, 0, 100, 15
+    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.PeakDetectIntensityThresholdPercentageOfMaximum = CLngSafe(txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax)
+End Sub
+
+Private Sub txtSplitUMCsPeakPickingMinimumWidth_LostFocus()
+    ValidateTextboxValueLng txtSplitUMCsPeakPickingMinimumWidth, 0, 1000, 4
+    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.PeakWidthPointsMinimum = CLngSafe(txtSplitUMCsPeakPickingMinimumWidth)
+End Sub
+
+Private Sub txtWeightingFactor_KeyDown(Index As Integer, KeyCode As Integer, Shift As Integer)
+If mCalculating Then KeyCode = 0
+End Sub
+
+Private Sub txtWeightingFactor_KeyPress(Index As Integer, KeyAscii As Integer)
+If mCalculating Then KeyAscii = 0
+End Sub
+
+Private Sub txtWeightingFactor_LostFocus(Index As Integer)
+On Error Resume Next
+If IsNumeric(txtWeightingFactor(Index).Text) Then
+   MyDef.MetricData(Index).WeightFactor = CDbl(txtWeightingFactor(Index).Text)
+Else
+   MsgBox "This arument should be positive number.", vbOKOnly, glFGTU
+   txtWeightingFactor(Index).SetFocus
+End If
+End Sub
+
+Private Sub cmdAbortFindConnections_Click()
+    AbortProcessing
+End Sub
+
+Private Sub cmdAbortProcessing_Click()
+    AbortProcessing
+End Sub
+
+Private Sub cmdClose_Click()
+    Dim eResponse As VbMsgBoxResult
+    
+    If mCalculating And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        eResponse = MsgBox("Calculations are currently in progress.  Abort them and close the window?", vbQuestion + vbYesNoCancel + vbDefaultButton2, "Abort Processing")
+        If eResponse <> vbYes Then Exit Sub
+        AbortProcessing
+    End If
+    
+    Unload Me
+End Sub
+
+Private Sub cmdFindConnections_Click()
+    If mCalculating Then Exit Sub
+    
+    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
+        MsgBox "Finding connections is not available when the LCMS Feature Finder external app mode is enabled", vbExclamation + vbOKOnly, "Not Applicable"
+    Else
+        FindIonNetConnections
+    End If
+End Sub
+
+Private Sub cmdFindConnectionsThenUMCs_Click()
+    If mCalculating Then Exit Sub
+    
+    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
+        FindUMCsUsingLCMSFeatureFinder True
+    Else
+        FindIonNetConnections
+        If Not mAbortProcess Then
+            tbsTabStrip.Tab = 2
+            FormClassesFromNETsWrapper False
+        End If
+    End If
+End Sub
+
+Private Sub cmdFindUMCsUsingNETConnections_Click()
+    If mCalculating Then Exit Sub
+    
+    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
+        If mLCMSResultsMappingCount > 0 Then
+            BuildUMCsUsingmLCMSResultsMapping True
+        Else
+            FindUMCsUsingLCMSFeatureFinder True
+        End If
+    Else
+        FormClassesFromNETsWrapper True
+    End If
+
+End Sub
+
+Private Sub cmdRemoveLongConnections_Click()
+    If mCalculating Then Exit Sub
+    RemoveLongConnections NET_EDIT_REJECT_LONG
+End Sub
+
+Private Sub cmdReportUMC_Click()
+If mCalculating Then Exit Sub
+Me.MousePointer = vbHourglass
+ChangeStatus "Generating UMC report..."
+Call ReportUMC(CallerID, "UMCIonNet" & vbCrLf & GetUMCIsoDefinitionText(CallerID))
+ChangeStatus ""
+Me.MousePointer = vbDefault
+End Sub
+
+Private Sub cmdResetToDefaults_Click(Index As Integer)
+    ResetToDefaults
+End Sub
+
+Private Sub cmdResetToOldDefaults_Click(Index As Integer)
+    ResetToOldDefaults
+End Sub
+
+Private Sub cboChargeStateAbuType_Click()
+If mCalculating Then
+    cboChargeStateAbuType.ListIndex = UMCDef.ChargeStateStatsRepType
+Else
+    UMCDef.ChargeStateStatsRepType = cboChargeStateAbuType.ListIndex
+End If
+End Sub
+
+Private Sub cboSplitUMCsScanGapBehavior_Click()
+    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.ScanGapBehavior = cboSplitUMCsScanGapBehavior.ListIndex
+End Sub
+
+Private Sub chkInterpolateMissingIons_Click()
+If mCalculating Then
+    SetCheckBox chkInterpolateMissingIons, UMCDef.InterpolateGaps
+Else
+    UMCDef.InterpolateGaps = cChkBox(chkInterpolateMissingIons)
+End If
+End Sub
+
+Private Sub chkRemoveMaxLengthPctAllScans_Click()
+     glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveMaxLengthPctAllScans = cChkBox(chkRemoveMaxLengthPctAllScans)
+End Sub
+
+Private Sub chkRefineUMCLengthByScanRange_Click()
+    glbPreferencesExpanded.UMCAutoRefineOptions.TestLengthUsingScanRange = cChkBox(chkRefineUMCLengthByScanRange)
+    UpdateDynamicControls
+End Sub
+
+Private Sub chkRemoveHiAbu_Click()
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveAbundanceHigh = cChkBox(chkRemoveHiAbu)
+End Sub
+
+Private Sub chkRemoveHiCnt_Click()
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveCountHigh = cChkBox(chkRemoveHiCnt)
+End Sub
+
+Private Sub chkRemoveLoAbu_Click()
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveAbundanceLow = cChkBox(chkRemoveLoAbu)
+End Sub
+
+Private Sub chkRemoveLoCnt_Click()
+    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveCountLow = cChkBox(chkRemoveLoCnt)
+End Sub
+
+Private Sub chkSplitUMCsByExaminingAbundance_Click()
+    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance = cChkBox(chkSplitUMCsByExaminingAbundance)
+End Sub
+
+Private Sub chkUse_Click(Index As Integer)
+On Error Resume Next
+If mCalculating Then
+    SetCheckBox chkUse(Index), MyDef.MetricData(Index).Use
+Else
+    MyDef.MetricData(Index).Use = (chkUse(Index).Value = vbChecked)
+End If
+End Sub
+
+Private Sub chkUseLCMSFeatureFinder_Click()
+    If mCalculating Then Exit Sub
+    ShowHideCommandButtons False
+End Sub
+
+Private Sub chkUseMostAbuChargeStateStatsForClassStats_Click()
+If mCalculating Then
+    SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, UMCDef.UMCClassStatsUseStatsFromMostAbuChargeState
+Else
+    UMCDef.UMCClassStatsUseStatsFromMostAbuChargeState = cChkBox(chkUseMostAbuChargeStateStatsForClassStats)
+End If
+End Sub
+
+Private Sub chkUseUntangledAsSingle_Click()
+If mCalculating Then
+    SetCheckBox chkUseUntangledAsSingle, UMCMakeSingleMemberClasses
+Else
+    UMCMakeSingleMemberClasses = cChkBox(chkUseUntangledAsSingle.Value)
+    glbPreferencesExpanded.UMCIonNetOptions.MakeSingleMemberClasses = UMCMakeSingleMemberClasses
+End If
+End Sub
+
+Private Sub cmbConstraint_Click(Index As Integer)
+On Error Resume Next
+If mCalculating Then
+    cmbConstraint(Index).ListIndex = MyDef.MetricData(Index).ConstraintType
+Else
+    MyDef.MetricData(Index).ConstraintType = cmbConstraint(Index).ListIndex
+    DisplayDynamicUnits
+End If
+End Sub
+
+Private Sub cmbData_Click(Index As Integer)
+On Error Resume Next
+If mCalculating Then
+    cmbData(Index).ListIndex = MyDef.MetricData(Index).DataType
+Else
+    MyDef.MetricData(Index).DataType = cmbData(Index).ListIndex
+    DisplayDynamicUnits
+End If
+End Sub
+
+Private Sub cmbConstraintUnits_Click(Index As Integer)
+On Error Resume Next
+If mCalculating Then
+    cmbConstraintUnits(Index).ListIndex = MyDef.MetricData(Index).ConstraintUnits
+Else
+    MyDef.MetricData(Index).ConstraintUnits = cmbConstraintUnits(Index).ListIndex
+    
+    If Not bLoading Then
+        If cmbConstraintUnits(Index).ListIndex = DATA_UNITS_MASS_DA Then
+            ' Convert the constraint tolerance from ppm to Da, assuming 1000 m/z
+            txtConstraint(Index) = PPMToMass(txtConstraint(Index), 1000)
+        Else
+            ' Convert the constraint tolerance from Da to ppm, assuming 1000 m/z
+            txtConstraint(Index) = MassToPPM(txtConstraint(Index), 1000)
+        End If
+        If IsNumeric(txtConstraint(Index).Text) Then
+            MyDef.MetricData(Index).ConstraintValue = CDbl(txtConstraint(Index).Text)
+        End If
+    End If
+End If
+
+End Sub
+
+Private Sub cmbMetricType_Click()
+If mCalculating Then
+    cmbMetricType.ListIndex = MyDef.MetricType
+Else
+    MyDef.MetricType = cmbMetricType.ListIndex
+End If
+End Sub
+
+Private Sub cmbUMCAbu_Click()
+If mCalculating Then
+    cmbUMCAbu.ListIndex = UMCDef.ClassAbu
+Else
+    UMCDef.ClassAbu = cmbUMCAbu.ListIndex
+End If
+End Sub
+
+Private Sub cmbUMCDrawType_Click()
+If mCalculating Then
+    cmbUMCDrawType.ListIndex = GelUMCDraw(CallerID).DrawType
+Else
+    GelUMCDraw(CallerID).DrawType = cmbUMCDrawType.ListIndex
+    glbPreferencesExpanded.UMCDrawType = cmbUMCDrawType.ListIndex
+End If
+End Sub
+
+Private Sub cmbUMCMW_Click()
+If mCalculating Then
+    cmbUMCMW.ListIndex = UMCDef.ClassMW
+Else
+    UMCDef.ClassMW = cmbUMCMW.ListIndex
+End If
+End Sub
+
+Private Sub cmbUMCRepresentative_Click()
+If mCalculating Then
+    cmbUMCRepresentative.ListIndex = UMCRepresentative
+Else
+    UMCRepresentative = cmbUMCRepresentative.ListIndex
+End If
+End Sub
+
 

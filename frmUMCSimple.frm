@@ -910,6 +910,9 @@ Dim CurrMWRangeInd_O() As Long  'indexes in original arrays of potential class m
 Dim CurrMWRangeCnt As Long      'and their number
 Dim CurrRepMWRangeInd As Long   'index of current class representative in MWRange arrays(potential in fact)
 
+Dim mSplitUMCs As clsSplitUMCsByAbundance
+    
+
 Private Sub FillComboBoxes()
     With cmbCountType
         .Clear
@@ -1113,6 +1116,9 @@ End Sub
 
 Private Sub cmdAbortProcessing_Click()
     glAbortUMCProcessing = True
+    If Not mSplitUMCs Is Nothing Then
+        mSplitUMCs.AbortProcessingNow
+    End If
 End Sub
 
 Private Sub cmdResetToDefaults_Click()
@@ -1403,7 +1409,10 @@ On Error GoTo UMCSearchErrorHandler
        GelSearchDef(CallerID).UMCDef = UMCDef
        
        If glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance Then
-            SplitUMCsByAbundance CallerID, Me, False, True
+            Set mSplitUMCs = New clsSplitUMCsByAbundance
+            mSplitUMCs.ExamineUMCs CallerID, Me, False, True
+            
+            Set mSplitUMCs = Nothing
        End If
        
        If GelUMCDraw(CallerID).Visible Then

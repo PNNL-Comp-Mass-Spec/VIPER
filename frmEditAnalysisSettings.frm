@@ -7340,7 +7340,7 @@ Private Sub LookupDefaultUMCIonNetValues(ByVal intControlIndex As Integer, ByRef
     dblMaximum = 100
 
     Select Case cmbData(intControlIndex).ListIndex
-    Case DATA_MONO_MW, DATA_AVG_MW, DATA_TMA_MW
+    Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
         If blnReturnDefaultWeightFactor Then
             dblDefault = 0.5
         Else
@@ -7352,7 +7352,7 @@ Private Sub LookupDefaultUMCIonNetValues(ByVal intControlIndex As Integer, ByRef
                 dblMaximum = 100000
             End If
         End If
-    Case DATA_SCAN
+    Case uindUMCIonNetDimConstants.uindScan
         If blnReturnDefaultWeightFactor Then
             dblDefault = 0.01
         Else
@@ -7361,7 +7361,7 @@ Private Sub LookupDefaultUMCIonNetValues(ByVal intControlIndex As Integer, ByRef
             dblMinimum = 1
             dblMaximum = max_scan
         End If
-    Case DATA_FIT
+    Case uindUMCIonNetDimConstants.uindFit
         If blnReturnDefaultWeightFactor Then
             dblDefault = 0.1
         Else
@@ -7369,7 +7369,7 @@ Private Sub LookupDefaultUMCIonNetValues(ByVal intControlIndex As Integer, ByRef
             dblDefault = 0.2
             dblMaximum = 1
         End If
-    Case DATA_MOVERZ
+    Case uindUMCIonNetDimConstants.uindMZ
         If blnReturnDefaultWeightFactor Then
             dblDefault = 0.1
         Else
@@ -7377,7 +7377,7 @@ Private Sub LookupDefaultUMCIonNetValues(ByVal intControlIndex As Integer, ByRef
             dblDefault = 1
             dblMaximum = 100
         End If
-    Case DATA_GENERIC_NET
+    Case uindUMCIonNetDimConstants.uindGenericNET
         If blnReturnDefaultWeightFactor Then
             dblDefault = 0.1
         Else
@@ -7385,7 +7385,7 @@ Private Sub LookupDefaultUMCIonNetValues(ByVal intControlIndex As Integer, ByRef
             dblDefault = 0.1
             dblMaximum = 100
         End If
-    Case DATA_CHARGE_STATE
+    Case uindUMCIonNetDimConstants.uindChargeState
         If blnReturnDefaultWeightFactor Then
             dblDefault = 0.1
         Else
@@ -7393,7 +7393,7 @@ Private Sub LookupDefaultUMCIonNetValues(ByVal intControlIndex As Integer, ByRef
             dblDefault = 1
             dblMaximum = 100
         End If
-    Case DATA_LOG_ABU
+    Case uindUMCIonNetDimConstants.uindLogAbundance
         If blnReturnDefaultWeightFactor Then
             dblDefault = 0.1
         Else
@@ -8128,7 +8128,7 @@ On Error GoTo UpdateDynamicControlsErrorHandler
     ' UMCIonNetDef Controls
     For intIndex = 0 To cmbData.Count - 1
         Select Case cmbData(intIndex).ListIndex
-        Case DATA_MONO_MW, DATA_AVG_MW, DATA_TMA_MW
+        Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
             cmbConstraintUnits(intIndex).Visible = True
             cmbConstraintUnits(intIndex).ListIndex = mCurrentSettings.UMCIonNetDef.MetricData(intIndex).ConstraintUnits
             blnMassBasedDataDim = True

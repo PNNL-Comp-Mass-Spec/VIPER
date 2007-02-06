@@ -18,7 +18,7 @@ Public Type udtInternalStandardEntryType
     MonoisotopicMass As Double      ' Expected Monoisotopic Mass
     NET As Double                   ' Expected NET
     ChargeMinimum As Integer        ' Minimum expected charge; set to 0 to allow any charge
-    ChargeMaximum As Integer
+    ChargeMaximum As Integer        ' Maximum expected charge; set to 10 to essentially allow any charge
     ChargeMostAbundant As Integer
 End Type
 

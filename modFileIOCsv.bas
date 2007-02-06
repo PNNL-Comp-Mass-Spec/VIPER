@@ -7,6 +7,7 @@ Public Const CSV_SCANS_FILE_SUFFIX As String = "scans.csv"
 Public Const CSV_COLUMN_HEADER_UNKNOWN_WARNING As String = "Warning: unknown column headers"
 Public Const CSV_COLUMN_HEADER_MISSING_WARNING As String = "Warning: expected important column headers"
 
+' Note: These should all be lowercase string values
 Private Const ISOS_COLUMN_SCAN_NUM As String = "scan_num"
 Private Const ISOS_COLUMN_CHARGE As String = "charge"
 Private Const ISOS_COLUMN_ABUNDANCE As String = "abundance"
@@ -20,6 +21,7 @@ Private Const ISOS_COLUMN_SIGNAL_NOISE As String = "signal_noise"
 Private Const ISOS_COLUMN_MONO_ABUNDANCE As String = "mono_abundance"
 Private Const ISOS_COLUMN_MONO_PLUS2_ABUNDANCE As String = "mono_plus2_abundance"
 
+' Note: These should all be lowercase string values
 Private Const SCANS_COLUMN_SCAN_NUM As String = "scan_num"
 Private Const SCANS_COLUMN_TIME As String = "time"
 Private Const SCANS_COLUMN_TYPE As String = "type"
@@ -94,6 +96,23 @@ Private mSubtaskMessage As String
 
 Private mReadMode As rmReadModeConstants
 Private mCurrentProgressStep As Integer
+
+Private Function GetColumnValueDbl(ByRef strData() As String, ByVal intColumnIndex As Integer, Optional ByVal dblDefaultValue As Double = 0) As Double
+    On Error GoTo GetColumnValueErrorHandler
+    
+    If intColumnIndex >= 0 Then
+        GetColumnValueDbl = CDbl(strData(intColumnIndex))
+    Else
+        GetColumnValueDbl = dblDefaultValue
+    End If
+    
+    Exit Function
+    
+GetColumnValueErrorHandler:
+    Debug.Assert False
+    GetColumnValueDbl = 0
+    
+End Function
 
 Private Function GetColumnValueLng(ByRef strData() As String, ByVal intColumnIndex As Integer, Optional ByVal lngDefaultValue As Long = 0) As Long
     
@@ -689,7 +708,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
             strData = Split(strLineIn, ",")
             
             If UBound(strData) >= 0 Then
-                lngScanNumber = GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.ScanNumber), 0)
+                lngScanNumber = GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.ScanNumber), -1)
             Else
                 lngScanNumber = -1
             End If
@@ -764,11 +783,11 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                     .ScanNumber = lngScanNumber
                                     .Charge = CInt(GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.Charge), 1))
                                     .Abundance = sngAbundance
-                                    .MZ = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MZ), 0)
+                                    .MZ = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MZ), 0)
                                     .Fit = sngFit
-                                    .AverageMW = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.AverageMW), 0)
-                                    .MonoisotopicMW = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoisotopicMW), 0)
-                                    .MostAbundantMW = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MostAbundantMW), 0)
+                                    .AverageMW = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.AverageMW), 0)
+                                    .MonoisotopicMW = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MonoisotopicMW), 0)
+                                    .MostAbundantMW = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MostAbundantMW), 0)
                                     .FWHM = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.FWHM), 0)
                                     .SignalToNoise = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.SignalToNoise), 0)
                                     .IntensityMono = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoAbundance), 0)
