@@ -235,8 +235,8 @@ Private Sub UpdateMessages()
     strMessage = strMessage & "E-mail: matthew.monroe@pnl.gov or matt@alchemistmatt.com" & vbCrLf
     strMessage = strMessage & "Website: http://ncrr.pnl.gov/ or http://www.sysbio.org/resources/staff/" & vbCrLf & vbCrLf
     
-    If APP_BUILD_DISABLE_ADVANCED Then
-        strMessage = strMessage & "Public Distribution Version" & vbCrLf & vbCrLf
+    If APP_BUILD_DISABLE_LCMSWARP Then
+        strMessage = strMessage & "Linear NET Version" & vbCrLf & vbCrLf
     ElseIf APP_BUILD_DISABLE_MTS Then
         strMessage = strMessage & "PNNL Internal Use Version (MTS Disabled)" & vbCrLf & vbCrLf
     Else
@@ -277,7 +277,7 @@ End Sub
 Private Sub lblDescription_Click()
     mAdvancedMessageDisplayed = Not mAdvancedMessageDisplayed
     If mAdvancedMessageDisplayed Then
-        If APP_BUILD_DISABLE_ADVANCED Then
+        If APP_BUILD_DISABLE_LCMSWARP Then
             lblDescription.Caption = "Note: Advanced Warping features are disabled in this release of VIPER"
         End If
     Else

@@ -630,7 +630,7 @@ End Sub
 
 Private Sub ShowHidePNNLMenus()
     Dim blnVisible As Boolean
-    blnVisible = Not APP_BUILD_DISABLE_ADVANCED
+    blnVisible = Not APP_BUILD_DISABLE_MTS
     
     mnuToolsGenerateIndexHtmlFiles.Visible = blnVisible
     mnuInitiatePRISMAutomation.Visible = blnVisible

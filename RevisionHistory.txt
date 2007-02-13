@@ -1,6 +1,15 @@
 VIPER Change Log
 
-Version 3.42 - Build 361; February 5, 2007
+Version 3.42 - Build 363; February 12, 2007
+	- Now including LCMSWarp (aka MassMatchCOM.dll) in the public distribution version of Viper
+		- The public distribution version disables MTS access and hides obsolete menus
+	- Now calling RegAsm.exe (e.g. at C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\) to register the UMCCreation.dll and UMCManipulation.dll DLLs if needed
+		- Registration info is tracked in file DotNET_DLL_Registration.ini
+
+Version 3.42 - Build 362; February 7, 2007
+	- Renamed column num_isotopic_signatures to num_deisotoped when reading Decon2LS _scans.csv files
+
+Version 3.42 - Build 361; February 5, 2007viper_mts
 	- Now using the LCMSFeatureFinder external application to find UMCs
 		- The algorithm in LCMSFeatureFinder.exe is identical to the interal algorithm in Viper, but runs ~25 times faster (including the time to save out the data to disk and load the results into memory)
 		- Example stats:

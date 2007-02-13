@@ -9,7 +9,7 @@ Public glTracking As Boolean            'True for coordinates tracking On. False
 ''Public glUpdateGel As Boolean           'True when gel needs updates after it receives focus
 Public glInitFile As String
 Public glWriteFreqShift As Boolean      'When True frequency shift information will be
-                                        'transfered when writing PEH fiel from gel file
+                                        'transfered when writing PEH field from gel file
 Public glAbortUMCProcessing As Boolean
 
 'DEFAULT LOCAL PREFERENCES - loaded from Registry
@@ -324,6 +324,7 @@ SetDDRColorObjects
 InitICR2LS
 ' Unused function (September 2006)
 ''InitMwtWin
+ValidateDotNETDLLs
 InitDisplay0
 ParseCommandLine
 End Sub
@@ -1519,7 +1520,7 @@ With udtUMCNetAdjDef
     
     .UseRobustNETAdjustment = True
     
-    If APP_BUILD_DISABLE_ADVANCED Then
+    If APP_BUILD_DISABLE_LCMSWARP Then
         .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETIterative
     Else
         .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass

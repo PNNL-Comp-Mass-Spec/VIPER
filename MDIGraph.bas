@@ -308,7 +308,7 @@ Public Type udtScanInfoType
     ScanFileName As String      ' Data file names (used to be in .DFN())
     ScanPI As Double            ' Data file PI number (used to be in .DFPI())
 
-    NumIsotopicSignatures As Long   ' New for this version; used to generate chromatogram tbcDeisotopingPeakCounts: RawIntensity
+    NumDeisotoped As Long           ' New for this version; used to generate chromatogram tbcDeisotopingPeakCounts: RawIntensity
     NumPeaks As Long                ' New for this version; used to generate chromatogram tbcDeisotopingPeakCounts: NormalizedIntensity
     TIC As Single                   ' New for this version; used to generate chromatogram tbcTICFromRawData
     BPI As Single                   ' New for this version; used to generate chromatogram tbcBPIFromRawData

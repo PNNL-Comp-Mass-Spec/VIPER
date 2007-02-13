@@ -1,6 +1,8 @@
 Attribute VB_Name = "MonroeLaVRoutines"
 Option Explicit
 
+Private Const DotNET_DLL_REGISTRATION_FILE As String = "DotNET_DLL_Registration.ini"
+
 Public Enum sdcSqlDecimalConstants
     sdcSqlDecimal9x4 = 0
     sdcSqlDecimal9x5 = 1
@@ -397,7 +399,11 @@ Public Function ConfirmMassTagsAndInternalStdsLoaded(frmCallingForm As VB.Form, 
     TraceLog 5, "ConfirmMassTagsAndInternalStdsLoaded", "Check if MT tags are loaded"
        
     ' Set the connection string
-    tmpConnStr = GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString
+    If APP_BUILD_DISABLE_MTS Then
+        tmpConnStr = ""
+    Else
+        tmpConnStr = GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString
+    End If
 
     ' Possibly load data from database if neccessary
     ' First see if new MT tags need to be loaded
@@ -3302,7 +3308,7 @@ GetMassTagMatchCountErrorHandler:
     Resume GetMassTagMatchCountCleanup
     
  End Function
-
+    
 Public Sub InitializePairMatchStats(ByRef udtPairMatchStats As udtPairMatchStatsType, Optional ByVal dblValueIfERNotDefined As Double = ER_NO_RATIO)
     udtPairMatchStats.PairIndex = -1
     udtPairMatchStats.ExpressionRatio = dblValueIfERNotDefined
@@ -4726,6 +4732,134 @@ CustomNETsValidateStatusErrorHandler:
     LogErrors Err.Number, "MonroeLaVRoutines->CustomNETsValidateStatus"
 
 End Sub
+
+Public Sub ValidateDotNETDLLs()
+    ' Makes sure that the VB.NET DLLs have been registered on this computer
+    ' Looks for file DotNET_DLL_Registration.ini in the program folder
+    ' If found, then opens it and reads it line-by-line, looking for entries for the required DLLs
+    ' If any DLLs are missing, then looks for the file, if it exists, then registers it by calling
+    '  C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\regasm.exe and makes an entry in the .Ini file
+    
+    Dim IniStuff As New clsIniStuff
+    Dim strIniFilePath As String
+    Dim blnSuccess As Boolean
+    
+    Dim fso As New FileSystemObject
+
+On Error GoTo ValidateDotNETDLLsErrorHandler
+
+    strIniFilePath = fso.BuildPath(App.Path, DotNET_DLL_REGISTRATION_FILE)
+
+    IniStuff.FileName = strIniFilePath
+    
+    blnSuccess = ValidateDOTNETDllWork(IniStuff, fso, "UMCManipulation.dll", 1, 1)
+    blnSuccess = ValidateDOTNETDllWork(IniStuff, fso, "UMCCreation.dll", 1, 1)
+    
+    
+    Set IniStuff = Nothing
+    
+    Exit Sub
+    
+ValidateDotNETDLLsErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "MonroeLaVRoutines->ValidateDotNETDLLs"
+    Resume Next
+    
+End Sub
+
+Private Function ValidateDOTNETDllWork(ByRef IniStuff As clsIniStuff, ByRef fso As FileSystemObject, ByVal strDLLName As String, ByVal intDOTNetVersionMajor As Integer, ByVal intDOTNETVersionMinor As Integer) As Boolean
+
+    Const SECTION_NAME As String = "DOTNET_DLLs"
+    Const REG_ASM_EXE As String = "RegAsm.exe"
+
+    Dim strDOTNetInstanceFolderName As String
+    Dim strDOTNetInstanceFolderFromIni As String
+    
+    Dim strDLLPath As String
+    Dim strDOTNetFolderPath As String
+    Dim strTemp As String
+    Dim strAssmRegCommand As String
+    
+    Dim objFolder As Folder
+    Dim objSubFolder As Folder
+    
+    Dim intNameMatchLength As Integer
+    Dim lngCurrentBuild As Long
+    
+    Dim strBestMatch As String
+    Dim lngBestMatchBuild As Long
+    
+    Dim blnSuccess As Boolean
+        
+    strDOTNetInstanceFolderName = "v" & Trim(intDOTNetVersionMajor) & "." & Trim(intDOTNETVersionMinor)
+    intNameMatchLength = Len(strDOTNetInstanceFolderName)
+    
+    strDOTNetInstanceFolderFromIni = GetIniFileSetting(IniStuff, SECTION_NAME, strDLLName, "")
+    
+    If strDOTNetInstanceFolderFromIni = strDOTNetInstanceFolderName Then
+        ' The DLL is already registered; nothing to do
+        ValidateDOTNETDllWork = True
+        Exit Function
+    End If
+    
+    ' The DLL is not registered (according to the .Ini file)
+    ' Call RegAsm.exe to register it
+    
+    blnSuccess = False
+
+    strDOTNetFolderPath = GetSystemRoot()
+    If Len(strDOTNetFolderPath) = 0 Then
+        strDOTNetFolderPath = "C:\Windows\"
+    End If
+    
+    strDOTNetFolderPath = fso.BuildPath(strDOTNetFolderPath, "Microsoft.NET\Framework")
+    
+    If Not fso.FolderExists(strDOTNetFolderPath) Then
+        ' .NET Framework Folder not found
+        LogErrors 0, "ValidateDOTNETDllWork", ".NET Folder Path not found: " & strDOTNetFolderPath, 0
+        Debug.Assert False
+        blnSuccess = False
+    Else
+        ' Look for the newest folder in strDOTNetFolderPath that starts with strDOTNetInstanceFolderName
+        Set objFolder = fso.GetFolder(strDOTNetFolderPath)
+        For Each objSubFolder In objFolder.SubFolders
+            If LCase(Left(objSubFolder.Name, intNameMatchLength)) = LCase(strDOTNetInstanceFolderName) Then
+                strTemp = Mid(objSubFolder.Name, intNameMatchLength + 2)
+                If IsNumeric(strTemp) Then
+                    lngCurrentBuild = CLng(strTemp)
+                Else
+                    lngCurrentBuild = 0
+                End If
+                
+                If strBestMatch = "" Then
+                    strBestMatch = objSubFolder.Name
+                    lngBestMatchBuild = lngCurrentBuild
+                Else
+                    If lngCurrentBuild > lngBestMatchBuild Then
+                        strBestMatch = objSubFolder.Name
+                        lngBestMatchBuild = lngCurrentBuild
+                    End If
+                End If
+            End If
+        Next objSubFolder
+        
+        If Len(strBestMatch) > 0 Then
+            strDOTNetFolderPath = fso.BuildPath(strDOTNetFolderPath, strBestMatch)
+            strAssmRegCommand = fso.BuildPath(strDOTNetFolderPath, REG_ASM_EXE)
+            
+            strDLLPath = fso.BuildPath(App.Path, strDLLName)
+            strAssmRegCommand = """" & strAssmRegCommand & """" & " " & """" & strDLLPath & """"
+            
+            Shell strAssmRegCommand, vbNormalFocus
+            
+            blnSuccess = IniStuff.WriteValue(SECTION_NAME, strDLLName, strDOTNetInstanceFolderName)
+
+        End If
+    
+    End If
+        
+    ValidateDOTNETDllWork = blnSuccess
+End Function
 
 Public Sub ValidateMTMinimimumHighNormalizedScore(ByRef udtAMTData() As udtAMTDataType, ByVal lngIndexStart As Long, ByVal lngIndexEnd As Long, ByRef sngMTMinimumHighNormalizedScore As Single, Optional ByVal lngMinMatchCount As Long = 1)
     ' Make sure at least lngMinMatchCount of the loaded MT tags have score values >= mMTMinimumHighNormalizedScore

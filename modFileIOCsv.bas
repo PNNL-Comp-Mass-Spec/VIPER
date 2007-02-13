@@ -25,7 +25,7 @@ Private Const ISOS_COLUMN_MONO_PLUS2_ABUNDANCE As String = "mono_plus2_abundance
 Private Const SCANS_COLUMN_SCAN_NUM As String = "scan_num"
 Private Const SCANS_COLUMN_TIME As String = "time"
 Private Const SCANS_COLUMN_TYPE As String = "type"
-Private Const SCANS_COLUMN_NUM_ISOTOPIC_SIGNATURES As String = "num_isotopic_signatures"
+Private Const SCANS_COLUMN_NUM_DEISOTOPED As String = "num_deisotoped"
 Private Const SCANS_COLUMN_NUM_PEAKS As String = "num_peaks"
 Private Const SCANS_COLUMN_TIC As String = "tic"
 Private Const SCANS_COLUMN_BPI_MZ As String = "bpi_mz"
@@ -43,7 +43,7 @@ Private Enum ScanFileColumnConstants
     ScanNumber = 0
     ScanTime = 1
     ScanType = 2
-    NumIsotopicSignatures = 3
+    NumDeisotoped = 3
     NumPeaks = 4
     TIC = 5
     BPImz = 6
@@ -184,7 +184,7 @@ Private Function GetDefaultScansColumnHeaders(blnRequiredColumnsOnly As Boolean)
     strHeaders = strHeaders & ", " & SCANS_COLUMN_TYPE
     
     If Not blnRequiredColumnsOnly Then
-        strHeaders = strHeaders & ", " & SCANS_COLUMN_NUM_ISOTOPIC_SIGNATURES
+        strHeaders = strHeaders & ", " & SCANS_COLUMN_NUM_DEISOTOPED
         strHeaders = strHeaders & ", " & SCANS_COLUMN_NUM_PEAKS
         strHeaders = strHeaders & ", " & SCANS_COLUMN_TIC
         strHeaders = strHeaders & ", " & SCANS_COLUMN_BPI_MZ
@@ -883,7 +883,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
                         intColumnMapping(ScanFileColumnConstants.ScanNumber) = ScanFileColumnConstants.ScanNumber
                         intColumnMapping(ScanFileColumnConstants.ScanTime) = ScanFileColumnConstants.ScanTime
                         intColumnMapping(ScanFileColumnConstants.ScanType) = ScanFileColumnConstants.ScanType
-                        intColumnMapping(ScanFileColumnConstants.NumIsotopicSignatures) = ScanFileColumnConstants.NumIsotopicSignatures
+                        intColumnMapping(ScanFileColumnConstants.NumDeisotoped) = ScanFileColumnConstants.NumDeisotoped
                         intColumnMapping(ScanFileColumnConstants.NumPeaks) = ScanFileColumnConstants.NumPeaks
                         intColumnMapping(ScanFileColumnConstants.TIC) = ScanFileColumnConstants.TIC
                         intColumnMapping(ScanFileColumnConstants.BPImz) = ScanFileColumnConstants.BPImz
@@ -912,7 +912,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
                             Case SCANS_COLUMN_SCAN_NUM: intColumnMapping(ScanFileColumnConstants.ScanNumber) = lngIndex
                             Case SCANS_COLUMN_TIME: intColumnMapping(ScanFileColumnConstants.ScanTime) = lngIndex
                             Case SCANS_COLUMN_TYPE: intColumnMapping(ScanFileColumnConstants.ScanType) = lngIndex
-                            Case SCANS_COLUMN_NUM_ISOTOPIC_SIGNATURES: intColumnMapping(ScanFileColumnConstants.NumIsotopicSignatures) = lngIndex
+                            Case SCANS_COLUMN_NUM_DEISOTOPED: intColumnMapping(ScanFileColumnConstants.NumDeisotoped) = lngIndex
                             Case SCANS_COLUMN_NUM_PEAKS: intColumnMapping(ScanFileColumnConstants.NumPeaks) = lngIndex
                             Case SCANS_COLUMN_TIC: intColumnMapping(ScanFileColumnConstants.TIC) = lngIndex
                             Case SCANS_COLUMN_BPI_MZ: intColumnMapping(ScanFileColumnConstants.BPImz) = lngIndex
@@ -980,7 +980,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
                         .ScanFileName = strBaseName & "." & Format(.ScanNumber, "00000")
                         .ScanPI = 0
     
-                        .NumIsotopicSignatures = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.NumIsotopicSignatures), 0)
+                        .NumDeisotoped = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.NumDeisotoped), 0)
                         .NumPeaks = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.NumPeaks), 0)
                         
                         .TIC = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.TIC), 0)

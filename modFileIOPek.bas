@@ -1057,7 +1057,7 @@ On Error GoTo ReadPEKFileErrorHandler
         Case LINE_NUMBER_OF_ISOTOPIC_DISTRIBUTIONS
             If mReadMode = rmReadModeConstants.rmStoreData Then
                 If IsNumeric(varData(1)) Then
-                    GelData(mGelIndex).ScanInfo(mScanInfoCount).NumIsotopicSignatures = CLng(varData(1))
+                    GelData(mGelIndex).ScanInfo(mScanInfoCount).NumDeisotoped = CLng(varData(1))
                 End If
             End If
        End Select

@@ -4,7 +4,7 @@ Begin VB.Form frmTICAndBPIPlots
    Caption         =   "TIC and BPI Plots"
    ClientHeight    =   5805
    ClientLeft      =   165
-   ClientTop       =   840
+   ClientTop       =   855
    ClientWidth     =   8625
    KeyPreview      =   -1  'True
    LinkTopic       =   "Form1"
@@ -601,7 +601,7 @@ On Error GoTo ComputeAndDisplayChromatogramErrorHandler
                 .NormalizedIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).PeptideIntensityThreshold
             End With
             With .Chromatograms(tbcDeisotopingPeakCounts)
-                .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).NumIsotopicSignatures
+                .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).NumDeisotoped
                 .NormalizedIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).NumPeaks
             End With
 

@@ -371,7 +371,7 @@ On Error GoTo AutoAnalysis_ErrorHandler
                     If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineMassCalibration And _
                        GelUMCNETAdjDef(udtWorkingParams.GelIndex).UseRobustNETAdjustment And _
                        GelUMCNETAdjDef(udtWorkingParams.GelIndex).RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass And _
-                       Not APP_BUILD_DISABLE_ADVANCED Then
+                       Not APP_BUILD_DISABLE_LCMSWARP Then
                         blnAbortSinceNETNotDefined = False
                     End If
                 End If
@@ -2746,7 +2746,7 @@ On Error GoTo PerformNETAdjustmentErrorHandler
             .UseNET = True
             .IterationAcceptLast = True
             
-            If APP_BUILD_DISABLE_ADVANCED Then
+            If APP_BUILD_DISABLE_LCMSWARP Then
                 If .RobustNETAdjustmentMode <> UMCRobustNETModeConstants.UMCRobustNETIterative Then
                     .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETIterative
                 End If
@@ -2771,7 +2771,7 @@ On Error GoTo PerformNETAdjustmentErrorHandler
             Debug.Assert False
         End If
         
-        If blnUseRobustNETWarping And Not APP_BUILD_DISABLE_ADVANCED Then
+        If blnUseRobustNETWarping And Not APP_BUILD_DISABLE_LCMSWARP Then
             With GelUMCNETAdjDef(udtWorkingParams.GelIndex)
                 eRobustNETAdjustmentModeSaved = .RobustNETAdjustmentMode
                 .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTime
@@ -4926,7 +4926,7 @@ On Error GoTo AutoAnalysisToleranceRefinementErrorHandler
             
 Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
 
-            If APP_BUILD_DISABLE_ADVANCED Then
+            If APP_BUILD_DISABLE_LCMSWARP Then
                 With GelUMCNETAdjDef(udtWorkingParams.GelIndex)
                     If .RobustNETAdjustmentMode <> UMCRobustNETModeConstants.UMCRobustNETIterative Then
                         .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETIterative
@@ -4936,7 +4936,7 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
 
             If GelUMCNETAdjDef(udtWorkingParams.GelIndex).UseRobustNETAdjustment And _
                GelUMCNETAdjDef(udtWorkingParams.GelIndex).RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass And _
-               Not APP_BUILD_DISABLE_ADVANCED Then
+               Not APP_BUILD_DISABLE_LCMSWARP Then
                
                 ' 4a. Perform NET and Mass Alignment using MS Warp
         
@@ -5547,7 +5547,7 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
             End If
         End If
     
-        If APP_BUILD_DISABLE_ADVANCED Then
+        If APP_BUILD_DISABLE_LCMSWARP Then
             blnGenerateRobustNETPlots = False
         End If
     End With

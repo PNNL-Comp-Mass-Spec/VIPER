@@ -1986,7 +1986,7 @@ If bLoading Then
     UpdateStatus "Pairs Count: " & GelP_D_L(CallerID).PCnt
     
     chkDisableCustomNETs.Enabled = GelData(CallerID).CustomNETsDefined
-    If APP_BUILD_DISABLE_ADVANCED Then
+    If APP_BUILD_DISABLE_LCMSWARP Then
         chkDisableCustomNETs.Visible = chkDisableCustomNETs.Enabled
     End If
     
@@ -3760,7 +3760,7 @@ ts.WriteLine strLineOut
         
         With GelData(CallerID).ScanInfo(lngScanIndex)
             strLineOutEnd = strLineOutEnd & strSepChar & Round(.TIC, 1)
-            strLineOutEnd = strLineOutEnd & strSepChar & .NumIsotopicSignatures
+            strLineOutEnd = strLineOutEnd & strSepChar & .NumDeisotoped
         End With
         
         lngPairIndex = -1
@@ -4379,7 +4379,7 @@ bLoading = True
 If IsWinLoaded(TrackerCaption) Then Unload frmTracker
 If CallerID >= 1 And CallerID <= UBound(GelBody) Then samtDef = GelSearchDef(CallerID).AMTSearchOnUMCs
 
-If APP_BUILD_DISABLE_ADVANCED Then
+If APP_BUILD_DISABLE_LCMSWARP Then
     chkDisableCustomNETs.Visible = False
 End If
 

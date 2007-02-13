@@ -272,7 +272,7 @@ On Error GoTo BinaryLoadDataErrorHandler
             SetDefaultUMCNETAdjDef GelUMCNETAdjDef(lngGelIndex)
         End If
         
-        If sngVersionsInFile(fioUMCNetAdjDef) <= 5# And Not APP_BUILD_DISABLE_ADVANCED Then
+        If sngVersionsInFile(fioUMCNetAdjDef) <= 5# And Not APP_BUILD_DISABLE_LCMSWARP Then
             ' Force RobustNetAdjustment with warping to be enabled if the version is <= 5#
             With GelUMCNETAdjDef(lngGelIndex)
                 .UseRobustNETAdjustment = True

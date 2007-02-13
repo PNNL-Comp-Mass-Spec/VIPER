@@ -1270,7 +1270,7 @@ End Sub
 
 Private Sub ShowHidePNNLMenus()
     Dim blnVisible As Boolean
-    blnVisible = Not APP_BUILD_DISABLE_ADVANCED
+    blnVisible = Not APP_BUILD_DISABLE_MTS
     
     mnuExpMTDB.Visible = blnVisible
     mnuMTLoadMT.Visible = blnVisible

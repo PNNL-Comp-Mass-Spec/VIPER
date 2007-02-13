@@ -1332,7 +1332,7 @@ End Sub
 Private Sub ShowMSAlignForm()
     Dim objMSAlign As frmMSAlign
 
-    If APP_BUILD_DISABLE_ADVANCED Then
+    If APP_BUILD_DISABLE_LCMSWARP Then
         MsgBox "Function not enabled in this version; action cancelled.", vbExclamation + vbOKOnly, "Not enabled"
         Exit Sub
     End If
@@ -4766,7 +4766,7 @@ On Error GoTo UpdateVisibleMenusErrorHandler
 
     glbPreferencesExpanded.MenuModeIncludeObsolete = mnuVMenuModeIncludeObsolete.Checked
     
-    If APP_BUILD_DISABLE_ADVANCED Then
+    If APP_BUILD_DISABLE_OBSOLETE Then
         glbPreferencesExpanded.MenuModeIncludeObsolete = False
         mnuVMenuModeIncludeObsolete.Visible = False
         mnuVMenuModeSep.Visible = False
@@ -4807,18 +4807,18 @@ On Error GoTo UpdateVisibleMenusErrorHandler
     
     If blnBasic Then
         mnuEditNETAdjustment(enaEditNETAdjustmentMenuConstants.enaIndividualPoints).Visible = False
-        mnuEditNETAdjustment(enaEditNETAdjustmentMenuConstants.enaUMCIterative).Visible = APP_BUILD_DISABLE_ADVANCED
-        mnuEditNETAdjustment(enaEditNETAdjustmentMenuConstants.enaMSAlign).Visible = Not APP_BUILD_DISABLE_ADVANCED
+        mnuEditNETAdjustment(enaEditNETAdjustmentMenuConstants.enaUMCIterative).Visible = APP_BUILD_DISABLE_LCMSWARP
+        mnuEditNETAdjustment(enaEditNETAdjustmentMenuConstants.enaMSAlign).Visible = Not APP_BUILD_DISABLE_LCMSWARP
     
-        mnuStepsNETAdjustmentMode(namStepsNETAdjustmentModeConstants.namUMCIterative).Visible = APP_BUILD_DISABLE_ADVANCED
-        mnuStepsNETAdjustmentMode(namStepsNETAdjustmentModeConstants.namMSAlign).Visible = Not APP_BUILD_DISABLE_ADVANCED
+        mnuStepsNETAdjustmentMode(namStepsNETAdjustmentModeConstants.namUMCIterative).Visible = APP_BUILD_DISABLE_LCMSWARP
+        mnuStepsNETAdjustmentMode(namStepsNETAdjustmentModeConstants.namMSAlign).Visible = Not APP_BUILD_DISABLE_LCMSWARP
     Else
         mnuEditNETAdjustment(enaEditNETAdjustmentMenuConstants.enaIndividualPoints).Visible = glbPreferencesExpanded.MenuModeIncludeObsolete
         mnuEditNETAdjustment(enaEditNETAdjustmentMenuConstants.enaUMCIterative).Visible = True
-        mnuEditNETAdjustment(enaEditNETAdjustmentMenuConstants.enaMSAlign).Visible = Not APP_BUILD_DISABLE_ADVANCED
+        mnuEditNETAdjustment(enaEditNETAdjustmentMenuConstants.enaMSAlign).Visible = Not APP_BUILD_DISABLE_LCMSWARP
     
         mnuStepsNETAdjustmentMode(namStepsNETAdjustmentModeConstants.namUMCIterative).Visible = True
-        mnuStepsNETAdjustmentMode(namStepsNETAdjustmentModeConstants.namMSAlign).Visible = Not APP_BUILD_DISABLE_ADVANCED
+        mnuStepsNETAdjustmentMode(namStepsNETAdjustmentModeConstants.namMSAlign).Visible = Not APP_BUILD_DISABLE_LCMSWARP
     End If
    
     mnuEditClear.Visible = Not blnBasic
@@ -4830,7 +4830,7 @@ On Error GoTo UpdateVisibleMenusErrorHandler
     
     mnu2lsToleranceRefinement.Visible = Not blnBasic
     
-    mnuViewSepOverlay.Visible = Not APP_BUILD_DISABLE_ADVANCED
+    mnuViewSepOverlay.Visible = Not APP_BUILD_DISABLE_OBSOLETE
     mnuVOverlay.Visible = mnuViewSepOverlay.Visible
     mnu2lsOverlaysManager.Visible = mnuViewSepOverlay.Visible
  
@@ -4889,7 +4889,7 @@ On Error GoTo UpdateVisibleMenusErrorHandler
     mnuSLoadScope.Visible = blnFull
     
     ' Obsolete menus
-    ' Note: If APP_BUILD_DISABLE_ADVANCED = True, then .MenuModeIncludeObsolete will be False
+    ' Note: If APP_BUILD_DISABLE_OBSOLETE = True, then .MenuModeIncludeObsolete will be False
     With glbPreferencesExpanded
         mnu2lsORFCenteredSearchPRISM.Visible = .MenuModeIncludeObsolete
         mnu2lsORFCenteredSearchFASTA.Visible = .MenuModeIncludeObsolete

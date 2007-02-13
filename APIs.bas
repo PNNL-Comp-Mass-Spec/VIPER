@@ -880,6 +880,7 @@ Public Declare Function GetViewportOrgEx Lib "gdi32" (ByVal hDC As Long, lpPoint
 'Private Declare Function GetWindowExtEx Lib "gdi32" (ByVal hDC As Long, lpSize As Size) As Long
 'Private Declare Function GetWindowOrgEx Lib "gdi32" (ByVal hDC As Long, lpPoint As POINTAPI) As Long
 'Private Declare Function GetWindowRect Lib "user32" (ByVal hwnd As Long, lpRect As Rect) As Long
+Public Declare Function GetWindowsDirectoryB Lib "kernel32" Alias "GetWindowsDirectoryA" (ByVal lpBuffer As String, ByVal nSize As Long) As Long
 Public Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
 Public Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
 Public Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long

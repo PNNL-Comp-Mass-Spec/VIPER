@@ -787,7 +787,7 @@ On Error GoTo LoadSettingsFileHandler
         .UseRobustNETAdjustment = GetIniFileSettingBln(IniStuff, strUMCNetAdjDefSectionName, "UseRobustNETAdjustment", .UseRobustNETAdjustment)
         .RobustNETAdjustmentMode = GetIniFileSettingInt(IniStuff, strUMCNetAdjDefSectionName, "RobustNETAdjustmentMode", .RobustNETAdjustmentMode)
         
-        If APP_BUILD_DISABLE_ADVANCED Then
+        If APP_BUILD_DISABLE_LCMSWARP Then
             If .RobustNETAdjustmentMode <> UMCRobustNETModeConstants.UMCRobustNETIterative Then
                 .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETIterative
             End If
@@ -806,7 +806,7 @@ On Error GoTo LoadSettingsFileHandler
         .RobustNETMassShiftPPMEnd = GetIniFileSettingSng(IniStuff, strUMCNetAdjDefSectionName, "RobustNETMassShiftPPMEnd", .RobustNETMassShiftPPMEnd)
         .RobustNETMassShiftPPMIncrement = GetIniFileSettingSng(IniStuff, strUMCNetAdjDefSectionName, "RobustNETMassShiftPPMIncrement", .RobustNETMassShiftPPMIncrement)
         
-        If Not APP_BUILD_DISABLE_ADVANCED Then
+        If Not APP_BUILD_DISABLE_LCMSWARP Then
             strSectionName = NET_ADJ_MS_WARP_SECTION
             With .MSWarpOptions
                 .MassCalibrationType = GetIniFileSettingInt(IniStuff, strSectionName, "MassCalibrationType", .MassCalibrationType)
@@ -1838,7 +1838,7 @@ On Error GoTo SaveSettingsFileHandler
         Next intIndex
     End With
 
-    If Not APP_BUILD_DISABLE_ADVANCED Then
+    If Not APP_BUILD_DISABLE_LCMSWARP Then
         ReDim strKeys(0 To 15)
         ReDim strValues(0 To 15)
         With udtUMCNetAdjDef.MSWarpOptions

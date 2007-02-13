@@ -845,6 +845,62 @@ Public Function GetMostRecentTextBoxValue() As String
     GetMostRecentTextBoxValue = mTextBoxValueSaved
 End Function
 
+Public Function GetSystemRoot(Optional ByVal blnFavorAPI As Boolean = True) As String
+    ' Returns the path defined by the SystemRoot environment variable
+    
+    Dim strSystemRootDirViaEnviron As String, strSystemRootDirViaAPI As String
+    Dim strResult As String
+    Dim lngCount As Long
+    Const MAX_LENGTH = 512
+        
+    ' Get Windows directory using the Environ() Function
+    strSystemRootDirViaEnviron = Environ("SystemRoot")
+    If Len(strSystemRootDirViaEnviron) = 0 Then
+        strSystemRootDirViaEnviron = Environ("WinDir")
+    End If
+    
+    If Len(strSystemRootDirViaEnviron) > 0 Then
+        If Right(strSystemRootDirViaEnviron, 1) <> "\" Then
+            strSystemRootDirViaEnviron = strSystemRootDirViaEnviron & "\"
+        End If
+    End If
+        
+    ' Get temp directory using an API call
+    strResult = Space(MAX_LENGTH)
+    lngCount = GetWindowsDirectoryB(strResult, MAX_LENGTH)
+    
+    If lngCount > 0 Then
+        If lngCount > Len(strResult) Then
+            strResult = Space(lngCount + 1)
+            lngCount = GetWindowsDirectoryB(strResult, MAX_LENGTH)
+        End If
+    End If
+    
+    If lngCount > 0 Then
+        strSystemRootDirViaAPI = Left(strResult, lngCount)
+    
+        If Len(strSystemRootDirViaAPI) > 0 Then
+            If Right(strSystemRootDirViaAPI, 1) <> "\" Then
+                strSystemRootDirViaAPI = strSystemRootDirViaAPI & "\"
+            End If
+        End If
+    Else
+        strSystemRootDirViaAPI = ""
+    End If
+
+    If strSystemRootDirViaAPI = strSystemRootDirViaEnviron Then
+        GetSystemRoot = strSystemRootDirViaAPI
+    Else
+        If blnFavorAPI Then
+            GetSystemRoot = strSystemRootDirViaAPI
+        Else
+            GetSystemRoot = strSystemRootDirViaEnviron
+        End If
+            
+    End If
+        
+End Function
+
 Public Function GetTemporaryDir(Optional blnFavorAPI As Boolean = True) As String
     ' Uses two different methods to get the temporary directory path
     
@@ -878,6 +934,12 @@ Public Function GetTemporaryDir(Optional blnFavorAPI As Boolean = True) As Strin
     
     If lngCount > 0 Then
         strTempDirViaAPI = Left(strResult, lngCount)
+    
+        If Len(strTempDirViaAPI) > 0 Then
+            If Right(strTempDirViaAPI, 1) <> "\" Then
+                strTempDirViaAPI = strTempDirViaAPI & "\"
+            End If
+        End If
     Else
         strTempDirViaAPI = ""
     End If
