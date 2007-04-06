@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "February 12, 2007"
+Public Const APP_BUILD_DATE As String = "April 6, 2007"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -31,8 +31,8 @@ Public Const DEFAULT_PEK_FILE_EXTENSION_ORDER As String = CSV_ISOS_IC_FILE_SUFFI
 Public Const KNOWN_FILE_EXTENSIONS As String = ".Pek, .CSV, .mzXML, mzxml.xml, .mzData, or mzdata.xml"
 Public Const KNOWN_FILE_EXTENSIONS_WITH_GEL As String = ".Pek, .CSV, .mzXML, mzxml.xml, .mzData, mzdata.xml, or .Gel"
 
-Public Const UMC_NET_ADJ_UMCs_IN_TOLERANCE = "UMCs in tolerance"
-Public Const UMC_NET_ADJ_UMCs_WITH_DB_HITS = "UMC Count with DB hits"
+Public Const UMC_NET_ADJ_UMCs_IN_TOLERANCE = "LC-MS Features in tolerance"
+Public Const UMC_NET_ADJ_UMCs_WITH_DB_HITS = "LC-MS Feature Count with DB hits"
 Public Const UMC_NET_ADJ_ITERATION_COUNT = "Iteration Count"
 
 Public Const SEARCH_MASS_TOL_DETERMINED = "Search mass tolerance determined"
@@ -47,10 +47,10 @@ Public Const NET_TOL_PEAK_STATS_END = "(height, width, center, S/N)"
 Public Const SEPARATION_CHARACTER_TAB_STRING = "<TAB>"
 
 Public Const UMC_INDICATOR_BIT_SPLIT_UMC = 16
-Public Const UMC_INDICATOR_BIT_USED_FOR_NET_ADJ = 32                    ' UMC's used for NET adjustment have this bit turned on
-Public Const UMC_INDICATOR_BIT_LOWSEGMENTCOUNT_ADDITION = 64            ' UMC's added due to low segment count values have this bit turned on
-Public Const UMC_INDICATOR_BIT_NET_ADJ_DB_HIT = 128                     ' UMC's used for NET adjustment that matched one or more MT tags in the database
-Public Const UMC_INDICATOR_BIT_NET_ADJ_LOCKER_HIT = 256                 ' UMC's used for Net adjustment that matched one of the Internal Standards (aka NET adjustment lockers)
+Public Const UMC_INDICATOR_BIT_USED_FOR_NET_ADJ = 32                    ' LC-MS Features used for NET adjustment have this bit turned on
+Public Const UMC_INDICATOR_BIT_LOWSEGMENTCOUNT_ADDITION = 64            ' LC-MS Features added due to low segment count values have this bit turned on
+Public Const UMC_INDICATOR_BIT_NET_ADJ_DB_HIT = 128                     ' LC-MS Features used for NET adjustment that matched one or more MT tags in the database
+Public Const UMC_INDICATOR_BIT_NET_ADJ_LOCKER_HIT = 256                 ' LC-MS Features used for Net adjustment that matched one of the Internal Standards (aka NET adjustment lockers)
 
 Public Const GEL_DATA_STATUS_BIT_IREPORT = 2        ' When the gel data contains IReport data, this this bit is turned on
 
@@ -183,7 +183,7 @@ Public Const MAX_AUTO_SEARCH_MODE_COUNT = 4
 
 ' Auto Analysis Search Mode Constants
 Public Const AUTO_SEARCH_NONE = "None"
-Public Const AUTO_SEARCH_EXPORT_UMCS_ONLY = "ExportUMCsOnly"                ' No DB Search, simply export the UMC's
+Public Const AUTO_SEARCH_EXPORT_UMCS_ONLY = "ExportUMCsOnly"                ' No DB Search, simply export the LC-MS Features
 Public Const AUTO_SEARCH_ORGANISM_MTDB = "IndividualPeaks"
 Public Const AUTO_SEARCH_UMC_MTDB = "IndividualPeaksInUMCsWithoutNET"
 Public Const AUTO_SEARCH_UMC_HERETIC = "IndividualPeaksInUMCsWithNET"                       ' No longer supported (June 2004)
@@ -208,7 +208,7 @@ Public Const AUTO_FIND_PAIRS_DELTA = "DeltaPairs"
 Public Const AUTO_FIND_PAIRS_LABEL = "LabelPairs"
 
 ' Auto Analysis UMC Mode Constants
-Public Const UMC_SEARCH_MODE_SETTING_TEXT = "UMC Search Mode"
+Public Const UMC_SEARCH_MODE_SETTING_TEXT = "LC-MS Feature Search Mode"
 Public Const AUTO_ANALYSIS_UMCListType2002 = "UMCListType2002"      ' Uses frmUMCWithAutoRefine; No longer supported (July 2004)
 Public Const AUTO_ANALYSIS_UMC2003 = "UMC2003"      ' Uses frmUMCSimple
 Public Const AUTO_ANALYSIS_UMCIonNet = "UMCIonNet"  ' Uses frmUMCIonNet
@@ -320,7 +320,7 @@ Public Type udtIonToUMCLookupEntryType
 End Type
 
 ' This data type is used to hold various lookup values
-'   CSUMCs() and IsoUMCs() are used to hold the indices of the UMC's that each of the ions are members of
+'   CSUMCs() and IsoUMCs() are used to hold the indices of the LC-MS Features that each of the ions are members of
 '     The number of data points in CSUMCs() and IsoUMCs() should be equal to GelData().IsoLines
 '   AdjacentScanNumberNext() and AdjacentScanNumberPrevious() contain the next or previous possible scan number, for all scans with scan numbers between 0 and 1 million
 Public Type udtGelDataLookupIndexType
@@ -331,7 +331,7 @@ Public Type udtGelDataLookupIndexType
     ScanNumberRelativeIndex() As Long
 End Type
 
-' The following structures are used to keep track of the ORF's in memory, along with
+' The following structures are used to keep track of the Proteins in memory, along with
 '  the loaded ions that match them
 ' Note that an ion can match more than one ORF
 Public Type udtORFDefinitionType
@@ -343,7 +343,7 @@ Public Type udtORFDefinitionType
     DateDataObtained As String              ' Date the data was obtained from the database
     DataParsedCompletely As Boolean
     OtherInfo As String                     ' Reserved for future expansion
-                                            ' Contains the string UMCCountLastRecordIonMatchCall=   which keeps track of the number of UMC's present the last time RecordIonMatchesInORFMassTags was called
+                                            ' Contains the string UMCCountLastRecordIonMatchCall=   which keeps track of the number of LC-MS Features present the last time RecordIonMatchesInORFMassTags was called
 End Type
 
 Public Type udtIonMatchType
@@ -452,7 +452,7 @@ End Type
 '''  that are to be available for display in the ORF Viewer
 ''' Each instance of frmORFViewer contains it's own variable of type udtORFViewerGroupListType
 ''' This allows multiple gels to be displayed in the ORF Viewer
-''' Note that the gels need not have the the exact same ORF's, but it would make
+''' Note that the gels need not have the the exact same Proteins, but it would make
 '''  the best sense for comparison if they do
 ''Public Type udtORFViewerGroupItemType
 ''    GelIndex As Long            ' Pointer to be used to dereference x in GelORFData(x)
@@ -495,12 +495,12 @@ End Type
 ''
 ''    LogarithmicIntensityPlotting As Boolean
 ''    IntensityScalar As Double                       ' Value to divide all intensities by when listing in the ListViews
-''    IonToUMCPlottingIntensityRatio As Double        ' Value to multiply Ion intensities by when plotting both ions and UMC's on the same graph
+''    IonToUMCPlottingIntensityRatio As Double        ' Value to multiply Ion intensities by when plotting both ions and LC-MS Features on the same graph
 ''
 ''    LoadPMTs As Boolean
 ''    IncludeUnobservedTrypticMassTags As Boolean
 ''    ShowNonTrypticMassTagsWithoutIonHits As Boolean
-''    HideEmptyMassTagPictures As Boolean                 ' Hides a single MT tag in the ORF Viewer if no ions or UMC's are within the view range
+''    HideEmptyMassTagPictures As Boolean                 ' Hides a single MT tag in the ORF Viewer if no ions or LC-MS Features are within the view range
 ''
 ''    OnlyUseTop50PctForAveraging As Boolean          ' Only sum the intensities of the MT tags whose observed intensities are at least 50% of the maximum observed MT tag intensity (for the given ORF)
 ''
@@ -631,7 +631,7 @@ Public Type udtSearchDefinition2003dGroupType
     AMTSearchOnIons As SearchAMTDefinition
     AMTSearchOnUMCs As SearchAMTDefinition
     AMTSearchOnPairs As SearchAMTDefinition
-    AnalysisHistory() As String                                         ' History (log) of the searches and steps performed for this gel; an entry is made whenever UMC's are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
+    AnalysisHistory() As String                                         ' History (log) of the searches and steps performed for this gel; an entry is made whenever LC-MS Features are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
     AnalysisHistoryCount As Long
     MassCalibrationInfo As udtMassCalibrationInfoType
     AMTSearchMassMods As udtDBSearchMassModificationOptions2003dType     ' New for this version
@@ -645,7 +645,7 @@ Public Type udtSearchDefinition2003eGroupType
     AMTSearchOnIons As SearchAMTDefinition
     AMTSearchOnUMCs As SearchAMTDefinition
     AMTSearchOnPairs As SearchAMTDefinition
-    AnalysisHistory() As String                                     ' History (log) of the searches and steps performed for this gel; an entry is made whenever UMC's are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
+    AnalysisHistory() As String                                     ' History (log) of the searches and steps performed for this gel; an entry is made whenever LC-MS Features are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
     AnalysisHistoryCount As Long
     MassCalibrationInfo As udtMassCalibrationInfoType
     AMTSearchMassMods As udtDBSearchMassModificationOptionsType     ' Updated for this version (added ResidueToModify and ResidueMassModification)
@@ -659,7 +659,7 @@ Public Type udtSearchDefinitionGroupType
     AMTSearchOnIons As SearchAMTDefinition
     AMTSearchOnUMCs As SearchAMTDefinition
     AMTSearchOnPairs As SearchAMTDefinition
-    AnalysisHistory() As String                                     ' History (log) of the searches and steps performed for this gel; an entry is made whenever UMC's are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
+    AnalysisHistory() As String                                     ' History (log) of the searches and steps performed for this gel; an entry is made whenever LC-MS Features are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
     AnalysisHistoryCount As Long
     MassCalibrationInfo As udtMassCalibrationInfoType
     AMTSearchMassMods As udtDBSearchMassModificationOptionsType
@@ -691,6 +691,7 @@ End Type
 
 Public Type udtSplitUMCsByAbundanceOptionsType
     MinimumDifferenceInAveragePpmMassToSplit As Double
+    StdDevMultiplierForSplitting As Double                  ' If 0, then Standard Deviation is not considered when determining whether or not to split a UMC based on abundance differences
     MaximumPeakCountToSplitUMC As Long
     PeakDetectIntensityThresholdPercentageOfMaximum As Long
     PeakDetectIntensityThresholdAbsoluteMinimum As Double
@@ -738,9 +739,9 @@ Public Type udtUMCAdvancedStatsOptionsType
 End Type
 
 Public Type udtNETAdjustmentUMCDistributionOptionsType
-    RequireDispersedUMCSelection As Boolean         ' When True, makes sure the UMC's used for NET adjustment
+    RequireDispersedUMCSelection As Boolean         ' When True, makes sure the LC-MS Features used for NET adjustment
     SegmentCount As Long                            ' Number of segments to divide the Gel into for NET adjustment
-    MinimumUMCsPerSegmentPctTopAbuPct As Integer    ' Percentage, ranging from 0 to 100; Defines the minimum number of UMC's that must be present in each segment.  The Top Abu Pct value is taken times this percentage to get the minimum UMC's to use
+    MinimumUMCsPerSegmentPctTopAbuPct As Integer    ' Percentage, ranging from 0 to 100; Defines the minimum number of LC-MS Features that must be present in each segment.  The Top Abu Pct value is taken times this percentage to get the minimum LC-MS Features to use
     ScanPctStart As Integer                         ' Percentage, ranging from 0 to 100; Total Scan Count is taken times this number to obtain the scan number of the start of the first segment
     ScanPctEnd As Integer                           ' Percentage, ranging from 0 to 100; Total Scan Count is taken times this number to obtain the scan number of the end of the last segment
 End Type
@@ -858,7 +859,7 @@ End Type
 Public Type udtUMCMassTagMatchStats
     UMCIndex As Long                ' Index of the UMC in GelUMCs().UMCs()  (Form frmSearchMT_ConglomerateUMC)
     PairIndex As Long               ' Index of the Pair                     (Form frmSearchMTPairs)
-    IDIndex As Long                 ' Index of the AMT match in AMTData() or index in UMCInternalStandards.InternalStandards(); for some forms (namely frmSearchMT_ConglomerateUMC and frmSearchMTPairs) this is actually a pointer to an array that contains the actual index (mMT arrays); lastly, when copying UMC's in view, this is the actual Mass_Tag_ID value
+    IDIndex As Long                 ' Index of the AMT match in AMTData() or index in UMCInternalStandards.InternalStandards(); for some forms (namely frmSearchMT_ConglomerateUMC and frmSearchMTPairs) this is actually a pointer to an array that contains the actual index (mMT arrays); lastly, when copying LC-MS Features in view, this is the actual Mass_Tag_ID value
     IDIsInternalStd As Boolean      ' True if the ID is an Internal Std, False if a MT tag
     AMTMods As String               ' Mods, if any (Like PEO, ICAT, etc.); only applies to AMT's
     MemberHitCount As Long          ' The number of members of a given UMC that matched the given MT tag or Internal Standard
@@ -972,7 +973,7 @@ Public Type udtAutoAnalysisSearchModeOptionsType
     ExportResultsToDatabase As Boolean
     ExportUMCMembers As Boolean
     PairSearchAssumeMassTagsAreLabeled As Boolean                       ' Currently not used (June 2004)
-    InternalStdSearchMode As issmInternalStandardSearchModeConstants    ' Note: if APP_BUILD_DISABLE_MTS = True, then this is set to issmFindOnlyMassTags when searching the UMCs
+    InternalStdSearchMode As issmInternalStandardSearchModeConstants    ' Note: if APP_BUILD_DISABLE_MTS = True, then this is set to issmFindOnlyMassTags when searching the LC-MS Features
     DBSearchMinimumHighNormalizedScore As Single
     DBSearchMinimumHighDiscriminantScore As Single
     DBSearchMinimumPeptideProphetProbability As Single
@@ -1200,7 +1201,7 @@ Public Type udtPreferencesExpandedType
     UseMassTagsWithNullMass As Boolean      ' Can only be set in the .Ini file
     UseMassTagsWithNullNET As Boolean
     
-    UseUMCConglomerateNET As Boolean        ' When true, then uses the NET of the UMC's class rep, rather than using the NET of each member of the UMC
+    UseUMCConglomerateNET As Boolean        ' When true, then uses the NET of the LC-MS Features class rep, rather than using the NET of each member of the LC-MS Feature
     NetAdjustmentUsesN15AMTMasses As Boolean
     NetAdjustmentMinHighNormalizedScore As Single
     NetAdjustmentMinHighDiscriminantScore As Single
@@ -1333,11 +1334,11 @@ Public GelUMCNETAdjDef() As NetAdjDefinition
 Public GelSearchDef() As udtSearchDefinitionGroupType
 
 ' GelDataLookupArrays() allows one to quickly lookup certain values to
-' determine the UMC's that a given ion belongs to
+' determine the LC-MS Features that a given ion belongs to
 Public GelDataLookupArrays() As udtGelDataLookupIndexType
 
 ' These arrays were used by the ORF Viewer; No longer supported (March 2006)
-''' GelORFData contains the ORF's in memory for each gel, along with
+''' GelORFData contains the Proteins in memory for each gel, along with
 '''  the loaded ions that match them
 ''' It is saved to disk
 '''  The .Orfs() arrays in GelORFMassTags() are parallel arrays to those in GelORFData(),

@@ -206,7 +206,7 @@ BinarySearchDblFindNearestErrorHandler:
     
 End Function
 
-Public Function BinarySearchLng(lngArrayToSearch() As Long, ByVal lngItemToSearchFor As Long, Optional ByVal lngFirstIndex As Long = -1, Optional ByVal lngLastIndex As Long = -1) As Long
+Public Function BinarySearchLng(ByRef lngArrayToSearch() As Long, ByVal lngItemToSearchFor As Long, Optional ByVal lngFirstIndex As Long = -1, Optional ByVal lngLastIndex As Long = -1) As Long
     ' Looks through lngArrayToSearch() for lngItemToSearchFor, returning
     '  the index of the item if found, or -1 if not found
     ' Assumes lngArrayToSearch() is already sorted
@@ -254,7 +254,7 @@ BinarySearchLngErrorHandler:
     Exit Function
 End Function
 
-Private Function BinarySearchStr(strArrayToSearch() As String, strItemToSearchFor As String, Optional ByVal lngFirstIndex As Long = -1, Optional ByVal lngLastIndex As Long = -1) As Long
+Private Function BinarySearchStr(ByRef strArrayToSearch() As String, ByVal strItemToSearchFor As String, Optional ByVal lngFirstIndex As Long = -1, Optional ByVal lngLastIndex As Long = -1) As Long
     ' Looks through strArrayToSearch() for strItemToSearchFor, returning
     '  the index of the item if found, or -1 if not found
     ' Assumes strArrayToSearch() is already sorted
@@ -541,7 +541,7 @@ Public Function ConfirmMassTagsAndInternalStdsLoaded(frmCallingForm As VB.Form, 
                 End With
             
             ElseIf Len(GelData(lngGelIndex).PathtoDatabase) > 0 Then
-                MassTagsLoaded = ConnectToLegacyAMTDB(frmCallingForm, lngGelIndex, False, False, False)
+                MassTagsLoaded = ConnectToLegacyAMTDB(frmCallingForm, lngGelIndex, False, True, False)
                 blnAMTsWereLoaded = MassTagsLoaded
             Else
                 If blnShowMessages Then
@@ -917,8 +917,8 @@ Public Function ConstructUMCDefDescription(lngGelIndex As Long, strSearchModeTyp
     On Error GoTo ConstructUMCDefDescriptionErrorHandler
     
     strDesc = ""
-    strDesc = strDesc & "Identified UMC's (" & UMC_SEARCH_MODE_SETTING_TEXT & ": " & strSearchModeTypeDesc & ")"
-    strDesc = strDesc & "; UMC Count = " & Trim(GelUMC(lngGelIndex).UMCCnt)
+    strDesc = strDesc & "Identified LC-MS Features (" & UMC_SEARCH_MODE_SETTING_TEXT & ": " & strSearchModeTypeDesc & ")"
+    strDesc = strDesc & "; LC-MS Feature Count = " & Trim(GelUMC(lngGelIndex).UMCCnt)
     strDesc = strDesc & "; Mass Tolerance = ±" & Trim(udtUMCDef.Tol) & " " & GetSearchToleranceUnitText(CInt(udtUMCDef.TolType))
     
     If blnUMCIonNet Then
@@ -1420,7 +1420,7 @@ Public Function LookupNETValueTypeDescription(eNetValueType As nvtNetValueTypeCo
 End Function
 
 Public Function LookupORFNamesForMTIDusingMTDBNamer(ByRef objMTDBNameLookupClass As mtdbMTNames, ByVal lngMassTagID As Long, ByRef ORFNames() As String) As Long
-    ' Looks up all of the ORF's containing lngMassTagID, returning their names in ORFNames()
+    ' Looks up all of the Proteins containing lngMassTagID, returning their names in ORFNames()
     ' The function returns the number of ORFs in ORFNames()
     
     Dim MTNames() As String
@@ -1466,7 +1466,7 @@ End Function
 
 ' May 2003: This function has been replaced by LookupORFNamesForMTIDusingMTtoORFMapOptimized
 '''Public Function LookupORFNamesForMTIDusingMTtoORFMap(ByVal lngMassTagID As Long, ByRef ORFNameMatches() As String) As Long
-'''    ' Looks up all of the ORF's mapped to lngMassTagID, returning their names in ORFNameMatches() -- a 0-based array
+'''    ' Looks up all of the Proteins mapped to lngMassTagID, returning their names in ORFNameMatches() -- a 0-based array
 '''    ' The function returns the number of ORFs in ORFNameMatches()
 '''
 '''    Dim ORFIDMatches() As Long                                ' 0-based array holding ORF ref ID's
@@ -1503,8 +1503,8 @@ End Function
 '''End Function
 
 Public Function LookupORFNamesForMTIDusingMTtoORFMapOptimized(ByVal lngMassTagID As Long, ByRef ORFNameMatches() As String, ByRef objORFNameFastSearch As FastSearchArrayLong) As Long
-    ' Looks up all of the ORF's mapped to lngMassTagID, returning their names in ORFNameMatches() -- a 0-based array
-    ' The function returns the number of ORFs in ORFNameMatches()
+    ' Looks up all of the Proteins mapped to lngMassTagID, returning their names in ORFNameMatches() -- a 0-based array
+    ' The function returns the number of Proteins in ORFNameMatches()
     ' Requires that objORFNameFastSearch be initialized using .Fill() before calling this function
     
     Dim blnSuccess As Boolean, blnMatched As Boolean
@@ -1974,7 +1974,7 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
         Next lngMemberIndex
         
         If lngCurrIDCnt = 0 And Not blnFindInternalStdRefs Then
-            ' We want to copy UMC's without matches too
+            ' We want to copy LC-MS Features without matches too
             ' Thus, bump up to 1
             lngCurrIDCnt = 1
             blnNoMatchesForCurrID = True
@@ -4330,9 +4330,9 @@ On Error GoTo UpdateIonToUMCIndicesErrorHandler
     
     If blnUseProgressForm Then
         If lngGelIndexStart = lngGelIndexEnd Then
-            frmProgress.InitializeSubtask "Updating Ion to UMC Indices", 0, 1
+            frmProgress.InitializeSubtask "Updating Ion to LC-MS Feature Indices", 0, 1
         Else
-            frmProgress.InitializeSubtask "Updating Ion to UMC Indices (0 of " & lngGelIndexEnd - lngGelIndexStart + 1 & ")", 0, 1
+            frmProgress.InitializeSubtask "Updating Ion to LC-MS Feature Indices (0 of " & lngGelIndexEnd - lngGelIndexStart + 1 & ")", 0, 1
         End If
     Else
         If Not frmCallingForm Is Nothing Then
@@ -4352,9 +4352,9 @@ On Error GoTo UpdateIonToUMCIndicesErrorHandler
         
         With GelUMC(lngGelIndex)
             If lngGelIndexStart = lngGelIndexEnd Then
-                frmProgress.InitializeSubtask "Updating Ion to UMC Indices", 0, .UMCCnt
+                frmProgress.InitializeSubtask "Updating Ion to LC-MS Feature Indices", 0, .UMCCnt
             Else
-                frmProgress.InitializeSubtask "Updating Ion to UMC Indices (" & Trim(lngGelIndex - lngGelIndexStart + 1) & " of " & lngGelIndexEnd - lngGelIndexStart + 1 & ")", 0, .UMCCnt
+                frmProgress.InitializeSubtask "Updating Ion to LC-MS Feature Indices (" & Trim(lngGelIndex - lngGelIndexStart + 1) & " of " & lngGelIndexEnd - lngGelIndexStart + 1 & ")", 0, .UMCCnt
             End If
                 
             For lngUMCIndex = 0 To .UMCCnt - 1
@@ -4399,7 +4399,7 @@ On Error GoTo UpdateIonToUMCIndicesErrorHandler
                 
                 If lngUMCIndex Mod 500 = 0 Then
                    If blnShowProgressUsingFormCaption Then
-                       frmCallingForm.Caption = "Updating Ion to UMC Indices: " & Trim(lngUMCIndex) & " / " & (.UMCCnt)
+                       frmCallingForm.Caption = "Updating Ion to LC-MS Feature Indices: " & Trim(lngUMCIndex) & " / " & (.UMCCnt)
                    ElseIf blnUseProgressForm Then
                        frmProgress.UpdateSubtaskProgressBar lngUMCIndex
                    End If
@@ -4417,7 +4417,7 @@ On Error GoTo UpdateIonToUMCIndicesErrorHandler
 UpdateIonToUMCIndicesErrorHandler:
     Debug.Assert False
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox "An error occurred while updating the Ion <--> UMC Indices: " & Err.Description, vbExclamation + vbOKOnly, glFGTU
+        MsgBox "An error occurred while updating the Ion <--> LC-MS Feature Indices: " & Err.Description, vbExclamation + vbOKOnly, glFGTU
     Else
         LogErrors Err.Number, "UpdateIonToUMCIndices"
     End If

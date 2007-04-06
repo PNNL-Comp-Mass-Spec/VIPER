@@ -642,14 +642,14 @@ With samtDef
       Debug.Assert False
     End Select
     'check do we have retention time in this database
-    If AMTGeneration < glAMT_GENERATION0800 Then .NETorRT = glAMT_NET
+    If AMTGeneration < dbgGeneration0800 Then .NETorRT = glAMT_NET
     optNETorRT(.NETorRT).Value = True
     If .NETorRT = glAMT_NET Then
        lblSec.Visible = False
     Else
        lblSec.Visible = True
     End If
-    If AMTGeneration < glAMT_GENERATION0800 Then optNETorRT(glAMT_RT_or_PNET).Enabled = False
+    If AMTGeneration < dbgGeneration0800 Then optNETorRT(glAMT_RT_or_PNET).Enabled = False
     'NETTol is used both for NET and RT
     If .NETTol >= 0 Then
        txtNETTol.Text = .NETTol
@@ -667,7 +667,7 @@ With samtDef
     Else
        chkSkipAMTReferenced.Value = vbUnchecked
     End If
-    If AMTGeneration < glAMT_GENERATION0900 Then    'disable N atoms
+    If AMTGeneration < dbgGeneration0900 Then    'disable N atoms
        .SaveNCnt = False                            'count option
        chkSaveNCnt.Enabled = False                  'if db too old
     End If
@@ -715,7 +715,7 @@ End Sub
 Private Function GetConnectedStatus(ByVal AMTConnected As Boolean) As String
 Dim sTmp As String
 If AMTConnected Then
-   sTmp = "Connected; MT Count: " & AMTCnt & "; ORF Count: " & ORFCnt
+   sTmp = "Connected; MT Count: " & AMTCnt & "; Protein Count: " & ORFCnt
 Else
    sTmp = "Not connected;"
 End If

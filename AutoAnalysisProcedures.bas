@@ -308,8 +308,8 @@ On Error GoTo AutoAnalysis_ErrorHandler
     ' 8. Possibly filter out noise streaks
         AutoAnalysisFilterNoiseStreaks udtWorkingParams, udtAutoParams
         
-    ' 9. Possibly (typically) Find the UMC's
-        If blnPrintDebugInfo Then Debug.Print Now() & " = " & "Find UMCs"
+    ' 9. Possibly (typically) Find the LC-MS Features
+        If blnPrintDebugInfo Then Debug.Print Now() & " = " & "Find LC-MS Features"
         AutoAnalysisFindUMCs udtWorkingParams, udtAutoParams
                 
         ' Flush the log file
@@ -339,8 +339,8 @@ On Error GoTo AutoAnalysis_ErrorHandler
             AutoAnalysisLog udtAutoParams, udtWorkingParams, strErrorMessage
             udtWorkingParams.ErrorBits = udtWorkingParams.ErrorBits Or DATABASE_ERROR_BIT
         ElseIf GelUMC(udtWorkingParams.GelIndex).UMCCnt <= 0 Then
-            ' No UMC's: Log the error
-            AutoAnalysisLog udtAutoParams, udtWorkingParams, "Error - No UMC's were found; unable to proceed with NET adjustment and DB search"
+            ' No LC-MS Features: Log the error
+            AutoAnalysisLog udtAutoParams, udtWorkingParams, "Error - No LC-MS Features were found; unable to proceed with NET adjustment and DB search"
             udtWorkingParams.ErrorBits = udtWorkingParams.ErrorBits Or UMC_COUNT_ERROR_BIT
         Else
         
@@ -423,7 +423,7 @@ On Error GoTo AutoAnalysis_ErrorHandler
             AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, False, Not blnRefinementWasPerformed, ehmErrorHistogramModeConstants.ehmFinalTolerances, intHtmlFileColumnOverride
         End If
         
-    ' 19. Possibly save the Points and/or UMC's to disk
+    ' 19. Possibly save the Points and/or LC-MS Features to disk
         AutoAnalysisSaveUMCsToDisk udtWorkingParams, udtAutoParams, fso
 
     ' 20. Possibly save a picture and text file of the various chromatograms
@@ -676,6 +676,7 @@ On Error GoTo AutoAnalysisDefineFilePathsErrorHandler
     
         ' Update the caption to reflect the target path (even if the gel will actually never get saved)
         GelBody(.GelIndex).Caption = .GelFilePath
+        GelStatus(.GelIndex).GelFilePathFull = GetFilePathFull(.GelFilePath)
     End With
     
     ' Copy the .Ini file to the output folder
@@ -920,12 +921,12 @@ On Error GoTo FindUMCsErrorHandler
     
     If glbPreferencesExpanded.AutoAnalysisOptions.SkipFindUMCs Then
         If GelUMC(udtWorkingParams.GelIndex).UMCCnt = 0 Then
-            ' No UMC's are present in memory
-            strMessage = "The option SkipFindUMCs was set to True, but no UMC's are present in memory -- unable to continue auto analysis."
+            ' No LC-MS Features are present in memory
+            strMessage = "The option SkipFindUMCs was set to True, but no LC-MS Features are present in memory -- unable to continue auto analysis."
             AutoAnalysisLog udtAutoParams, udtWorkingParams, strMessage
-            If udtAutoParams.ShowMessages Then MsgBox strMessage, vbExclamation + vbOKOnly, "No UMC's"
+            If udtAutoParams.ShowMessages Then MsgBox strMessage, vbExclamation + vbOKOnly, "No LC-MS Features"
         Else
-            AutoAnalysisLog udtAutoParams, udtWorkingParams, "Warning - Skipped searching for UMCs (" & Trim(GelUMC(udtWorkingParams.GelIndex).UMCCnt) & " UMCs already in memory)"
+            AutoAnalysisLog udtAutoParams, udtWorkingParams, "Warning - Skipped searching for LC-MS Features (" & Trim(GelUMC(udtWorkingParams.GelIndex).UMCCnt) & " LC-MS Features already in memory)"
             blnSuccess = True
         End If
     Else
@@ -940,7 +941,7 @@ On Error GoTo FindUMCsErrorHandler
             glbPreferencesExpanded.AutoAnalysisOptions.AutoAnalysisSearchMode(0).ExportResultsToDatabase = False
         End If
         
-        ' Find the UMC's (Note: Using LCase to avoid case conversion problems)
+        ' Find the LC-MS Features (Note: Using LCase to avoid case conversion problems)
         Select Case LCase(glbPreferencesExpanded.AutoAnalysisOptions.UMCSearchMode)
         Case LCase(AUTO_ANALYSIS_UMCListType2002)
             ' Old mass-window-limited search method; no longer supported by auto-analysis; use frmUMCSimple instead
@@ -972,13 +973,13 @@ On Error GoTo FindUMCsErrorHandler
         AutoAnalysisAppendLatestHistoryToLog udtAutoParams, udtWorkingParams
         
         If GelUMC(udtWorkingParams.GelIndex).UMCCnt = 0 Then
-            ' No UMC's were found
-            strMessage = "No UMC's were found -- unable to continue auto analysis.  Perhaps the filter parameters were inappropriate for this dataset."
+            ' No LC-MS Features were found
+            strMessage = "No LC-MS Features were found -- unable to continue auto analysis.  Perhaps the filter parameters were inappropriate for this dataset."
             AutoAnalysisLog udtAutoParams, udtWorkingParams, strMessage
-            If udtAutoParams.ShowMessages Then MsgBox strMessage, vbExclamation + vbOKOnly, "No UMC's"
+            If udtAutoParams.ShowMessages Then MsgBox strMessage, vbExclamation + vbOKOnly, "No LC-MS Features"
         Else
             If Not blnSuccess Then
-                AutoAnalysisLog udtAutoParams, udtWorkingParams, "Warning - UMC search was aborted prematurely"
+                AutoAnalysisLog udtAutoParams, udtWorkingParams, "Warning - LC-MS Feature search was aborted prematurely"
                 udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or UMC_SEARCH_ABORTED_WARNING_BIT
             End If
         End If
@@ -988,7 +989,7 @@ On Error GoTo FindUMCsErrorHandler
     
 FindUMCsErrorHandler:
     Debug.Assert False
-    strMessage = "Error - An error has occurred while finding UMC's during auto analysis: " & Err.Description
+    strMessage = "Error - An error has occurred while finding LC-MS Features during auto analysis: " & Err.Description
     If udtWorkingParams.ts Is Nothing And udtAutoParams.ShowMessages Then
         MsgBox strMessage, vbExclamation + vbOKOnly, "Error"
     Else
@@ -1245,8 +1246,8 @@ Private Sub AutoAnalysisGenerateHTMLBrowsingFile(ByRef udtWorkingParams As udtAu
     Dim strExtension As String
     
     Dim blnLookupStatsInDB As Boolean
-    Dim lngUMCCount As Long
-    Dim lngUMCCountWithHits As Long
+    Dim lngLCMSFeatureCount As Long
+    Dim lngLCMSFeatureCountWithHits As Long
     Dim lngUniqueMassTagCount As Long
     
     Dim intPicFilesCount As Integer
@@ -1290,7 +1291,9 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
         tsOutput.WriteLine "  </HEAD>"
         tsOutput.WriteLine "  <BODY>"
         tsOutput.WriteLine "    <P>"
-        tsOutput.WriteLine "        Report name: " & fso.GetFileName(udtWorkingParams.GelOutputFolder) & "<BR>"
+        If Len(udtWorkingParams.GelOutputFolder) > 0 Then
+            tsOutput.WriteLine "        Report name: " & fso.GetFileName(udtWorkingParams.GelOutputFolder) & "<BR>"
+        End If
         tsOutput.WriteLine "        " & HTML_INDEX_FILE_DATA_FILE_LINE_START & " " & fso.GetFileName(udtAutoParams.FilePaths.InputFilePath) & "<BR>"
         
         strTempPath = udtAutoParams.FilePaths.InputFilePath
@@ -1302,8 +1305,8 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
         tsOutput.WriteLine "        Source folder: <A HREF=" & strQ & strTempPath & strQ & ">" & strTempPath & "</a><BR>"
         tsOutput.WriteLine "    </P>"
         
-        lngUMCCount = -1
-        lngUMCCountWithHits = -1
+        lngLCMSFeatureCount = -1
+        lngLCMSFeatureCountWithHits = -1
         lngUniqueMassTagCount = -1
         
         blnLookupStatsInDB = False
@@ -1324,8 +1327,8 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
                                                    udtAutoParams.MTDBOverride.MTDBName, _
                                                    udtAutoParams.MTDBOverride.PeakMatchingTaskID, _
                                                    0, _
-                                                   lngUMCCount, _
-                                                   lngUMCCountWithHits, _
+                                                   lngLCMSFeatureCount, _
+                                                   lngLCMSFeatureCountWithHits, _
                                                    lngUniqueMassTagCount) Then
                 ' Success looking up stats from DB
             Else
@@ -1338,7 +1341,7 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
         If Not blnLookupStatsInDB Then
             If udtWorkingParams.GelIndex > 0 Then
                 ' Examine the data in memory to determine the match stats
-                LookupMatchingUMCStats udtWorkingParams.GelIndex, lngUMCCount, lngUMCCountWithHits, lngUniqueMassTagCount
+                LookupMatchingUMCStats udtWorkingParams.GelIndex, lngLCMSFeatureCount, lngLCMSFeatureCountWithHits, lngUniqueMassTagCount
             Else
                 ' Data is not in memory and task ID is undefined
                 ' Cannot obtain these values from anywhere
@@ -1351,8 +1354,8 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
         ReDim strRows(2)
         
         strRightAlign = "<TD align=" & strQ & "right" & strQ & ">"
-        strRows(0) = "<TD>Total UMC count:" & strRightAlign & Trim(lngUMCCount) & "<TD width=100>"
-        strRows(1) = "<TD>UMC count with hits:" & strRightAlign & Trim(lngUMCCountWithHits) & "<TD width=100>"
+        strRows(0) = "<TD>Total LC-MS Feature count:" & strRightAlign & Trim(lngLCMSFeatureCount) & "<TD width=100>"
+        strRows(1) = "<TD>Feature count with hits:" & strRightAlign & Trim(lngLCMSFeatureCountWithHits) & "<TD width=100>"
         strRows(2) = "<TD>Unique mass tag count:" & strRightAlign & Trim(lngUniqueMassTagCount) & "<TD width=100>"
       
         ' Write out the Mass Error and NET Error peak stats
@@ -2862,7 +2865,7 @@ On Error GoTo PerformNETAdjustmentErrorHandler
                 
                 ' Check that the number of IDs was at least .NETAdjustmentMinIDCount
                 If .GetNETAdjustmentIDCount() < glbPreferencesExpanded.AutoAnalysisOptions.NETAdjustmentMinIDCount Then
-                    strWarningMessage = "Warning - Number of UMC's used for NET adjustment is low: " & Trim(.GetNETAdjustmentIDCount) & " vs. expected minimum of " & Trim(glbPreferencesExpanded.AutoAnalysisOptions.NETAdjustmentMinIDCount)
+                    strWarningMessage = "Warning - Number of LC-MS Features used for NET adjustment is low: " & Trim(.GetNETAdjustmentIDCount) & " vs. expected minimum of " & Trim(glbPreferencesExpanded.AutoAnalysisOptions.NETAdjustmentMinIDCount)
                     udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or NET_ADJUSTMENT_LOW_ID_COUNT_WARNING_BIT
                 Else
                     ' Check if the number of iterations was too low
@@ -3317,7 +3320,7 @@ Private Sub AutoAnalysisRemovePairMemberHits(ByRef udtWorkingParams As udtAutoAn
 On Error GoTo RemovePairMemberHitsErrorHandler
 
     If GelUMC(udtWorkingParams.GelIndex).UMCCnt <= 0 Then
-        ' No UMC's; nothing to do
+        ' No LC-MS Features; nothing to do
         Exit Sub
     End If
     
@@ -3368,17 +3371,17 @@ On Error GoTo RemovePairMemberHitsErrorHandler
     End If
     
             
-    strMessage = "Removed members of pairs with DB hits; UMC's removed = " & Trim(lngUMCCountToRemove)
+    strMessage = "Removed members of pairs with DB hits; LC-MS Features removed = " & Trim(lngUMCCountToRemove)
     If glbPreferencesExpanded.PairSearchOptions.AutoAnalysisRemovePairMemberHitsRemoveHeavy Then
-        strMessageSuffix = "; Removed UMC's that were heavy members of pairs with DB hits"
+        strMessageSuffix = "; Removed LC-MS Features that were heavy members of pairs with DB hits"
     Else
-        strMessageSuffix = "; Removed UMC's that were light members of pairs with DB hits"
+        strMessageSuffix = "; Removed LC-MS Features that were light members of pairs with DB hits"
     End If
             
     If lngUMCCountToRemove <= 0 Then
         AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage & strMessageSuffix
     Else
-        ' Remove the UMC's
+        ' Remove the LC-MS Features
         With GelUMC(udtWorkingParams.GelIndex)
         
             If lngUMCCountToRemove < .UMCCnt Then
@@ -3406,13 +3409,13 @@ On Error GoTo RemovePairMemberHitsErrorHandler
             
         End With
 
-        strMessage = strMessage & "; New UMC count = " & Trim(lngNewUMCCount)
+        strMessage = strMessage & "; New LC-MS Feature count = " & Trim(lngNewUMCCount)
         AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage & strMessageSuffix
                     
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
         UpdateUMCStatArrays udtWorkingParams.GelIndex, False
         
-        ' Now that we have removed some UMC's, we need to remove any pairs that used those UMC's
+        ' Now that we have removed some LC-MS Features, we need to remove any pairs that used those LC-MS Features
         With GelP_D_L(udtWorkingParams.GelIndex)
             If .PCnt > 0 Then
                 lngNewPairCount = 0
@@ -3427,7 +3430,7 @@ On Error GoTo RemovePairMemberHitsErrorHandler
                     End If
                 Next lngPairIndex
                 
-                strMessage = "Removed pairs that contained deleted UMC's; Pairs removed = " & Trim(.PCnt - lngNewPairCount) & "; New pair count = " & Trim(lngNewPairCount)
+                strMessage = "Removed pairs that contained deleted LC-MS Features; Pairs removed = " & Trim(.PCnt - lngNewPairCount) & "; New pair count = " & Trim(lngNewPairCount)
                 AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage
                 
                 If .PCnt <> lngNewPairCount Then
@@ -3976,7 +3979,7 @@ End Sub
 
 Private Sub AutoAnalysisSaveInternalStdHits(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject)
     ' Search for Internal Standard using AutoAnalysisSearchDatabase
-    ' Export the matching UMC's to a text file, but not to the database
+    ' Export the matching LC-MS Features to a text file, but not to the database
     ' After searching, use AutoAnalysisSavePictureGraphic to save a graphic of the hits
     
     Dim udtAutoAnalysisOptionsSaved As udtAutoAnalysisOptionsType
@@ -4301,7 +4304,7 @@ On Error GoTo SaveUMCsToDiskErrorHandler
     If Not glbPreferencesExpanded.AutoAnalysisOptions.DoNotSaveOrExport Then
         If glbPreferencesExpanded.AutoAnalysisOptions.SaveUMCStatisticsToTextFile Then
             
-            ' Make sure the gel is zoomed out and remove the filters to make sure all of the UMC's are shown
+            ' Make sure the gel is zoomed out and remove the filters to make sure all of the LC-MS Features are shown
             AutoAnalysisZoomOut udtWorkingParams, True
             
             strOutputFilePath = udtWorkingParams.ResultsFileNameBase & "_UMCs.txt"
@@ -4322,7 +4325,7 @@ On Error GoTo SaveUMCsToDiskErrorHandler
     
 SaveUMCsToDiskErrorHandler:
     Debug.Assert False
-    strMessage = "Error - An error has occurred while saving UMC's to disk during auto analysis: " & Err.Description
+    strMessage = "Error - An error has occurred while saving LC-MS Features to disk during auto analysis: " & Err.Description
     If udtWorkingParams.ts Is Nothing And udtAutoParams.ShowMessages Then
         MsgBox strMessage, vbExclamation + vbOKOnly, "Error"
     Else
@@ -4601,7 +4604,7 @@ On Error GoTo SearchDatabaseErrorHandler
                         If Not blnToleranceRefinementSearch And _
                           (eDBSearchMode = dbsmConglomerateUMCsPaired Or eDBSearchMode = dbsmConglomerateUMCsUnpaired Or eDBSearchMode = dbsmConglomerateUMCsLightPairsPlusUnpaired) Then
                             If glbPreferencesExpanded.PairSearchOptions.AutoExcludeAmbiguous Then
-                                ' Find the ambiguous pairs (those containing UMCs shared across several pairs)
+                                ' Find the ambiguous pairs (those containing LC-MS Features shared across several pairs)
                                 '  and mark them as Excluded
                                 .ExcludeAmbiguousPairsWrapper True
                                 
@@ -4670,7 +4673,7 @@ On Error GoTo SearchDatabaseErrorHandler
                         If Not glbPreferencesExpanded.AutoAnalysisOptions.DoNotSaveOrExport Then
                             If Not blnToleranceRefinementSearch Then
                                 If glbPreferencesExpanded.PairSearchOptions.AutoExcludeAmbiguous Then
-                                    ' Find the ambiguous pairs (those containing UMCs shared across several pairs)
+                                    ' Find the ambiguous pairs (those containing LC-MS Features shared across several pairs)
                                     '  and mark them as Excluded
                                     .ExcludeAmbiguousPairsWrapper True
                                     
@@ -4739,7 +4742,7 @@ On Error GoTo SearchDatabaseErrorHandler
             
             If glbPreferencesExpanded.PairSearchOptions.AutoAnalysisRemovePairMemberHitsAfterDBSearch Then
                 If intAutoSearchIndex = intLastPairsBasedSearchModeIndex Then
-                    ' Remove the UMC's that are light or heavy members of pairs that had DB hits
+                    ' Remove the LC-MS Features that are light or heavy members of pairs that had DB hits
                     AutoAnalysisRemovePairMemberHits udtWorkingParams, udtAutoParams
                 End If
             End If
@@ -5715,7 +5718,7 @@ Private Function CheckAutoToleranceRefinementEnabled(ByRef udtAutoToleranceRefin
         Else
             If LookupDBSearchModeIndex(glbPreferencesExpanded.AutoAnalysisOptions.AutoAnalysisSearchMode(0).SearchMode) = dbsmExportUMCsOnly Then
                 If blnLogWarnings Then
-                    AutoAnalysisLog udtAutoParams, udtWorkingParams, "Warning - Tolerance Refinement is enabled, but the database search mode is Export UMC's Only; skipping tolerance refinement"
+                    AutoAnalysisLog udtAutoParams, udtWorkingParams, "Warning - Tolerance Refinement is enabled, but the database search mode is Export UMCs Only; skipping tolerance refinement"
                     udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_PEAK_NOT_FOUND_BIT
                 End If
                 blnPerformRefinement = False
@@ -6366,7 +6369,7 @@ Private Function LookupErrorBitDescription(lngErrorBits As Long) As String
     CheckMessageBit lngErrorBits, DATAFILE_LOAD_ERROR_BIT, strMessage, "Datafile (" & KNOWN_FILE_EXTENSIONS_WITH_GEL & ") load error"
     CheckMessageBit lngErrorBits, INIFILE_LOAD_ERROR_BIT, strMessage, "Ini file load error"
     CheckMessageBit lngErrorBits, DATABASE_ERROR_BIT, strMessage, "Database MT tag retrieval error"
-    CheckMessageBit lngErrorBits, UMC_COUNT_ERROR_BIT, strMessage, "UMC search error"
+    CheckMessageBit lngErrorBits, UMC_COUNT_ERROR_BIT, strMessage, "LC-MS Feature search error"
     CheckMessageBit lngErrorBits, GANET_ERROR_BIT, strMessage, "NET adjustment error"
     CheckMessageBit lngErrorBits, SEARCH_ERROR_BIT, strMessage, "DB search error"
     CheckMessageBit lngErrorBits, EXPORTRESULTS_ERROR_BIT, strMessage, "Export results to DB error"
@@ -6381,7 +6384,7 @@ Private Function LookupErrorBitDescription(lngErrorBits As Long) As String
 End Function
 
 Private Sub LookupMatchingUMCStats(ByVal lngGelIndex As Long, ByRef lngUMCCount As Long, ByRef lngUMCCountWithHits As Long, ByRef lngUniqueMassTagCount As Long)
-    ' Step through the UMCs for lngGelIndex and count the number with hits
+    ' Step through the LC-MS Features for lngGelIndex and count the number with hits
     ' Also keep track of the number of unique MT tag hits
     ' Using a dictionary object as a hashtable
     
@@ -6409,7 +6412,7 @@ On Error GoTo LookupMatchingUMCStatsErrorHandler
         htMTHitList.RemoveAll
         
         For lngUMCIndex = 0 To .UMCCnt - 1
-            ' We don't need to cache the results for all UMC's in memory; thus, reset this to zero for each UMC examined
+            ' We don't need to cache the results for all LC-MS Features in memory; thus, reset this to zero for each UMC examined
             
             lngUMCListCount = 0
             ExtractMTHitsFromUMCMembers lngGelIndex, lngUMCIndex, False, udtUMCList(), lngUMCListCount, lngUMCListCountDimmed, False, False
@@ -6436,7 +6439,7 @@ On Error GoTo LookupMatchingUMCStatsErrorHandler
 
 LookupMatchingUMCStatsErrorHandler:
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox "Error examining UMCs in memory to determine number with matches: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+        MsgBox "Error examining LC-MS Features in memory to determine number with matches: " & Err.Description, vbExclamation + vbOKOnly, "Error"
     Else
         LogErrors Err.Number, "LookupMatchingUMCStats"
     End If
@@ -6544,7 +6547,7 @@ Private Function LookupWarningBitDescription(lngWarningBits As Long) As String
     
     strMessage = ""
     
-    CheckMessageBit lngWarningBits, UMC_SEARCH_ABORTED_WARNING_BIT, strMessage, "UMC Search aborted"
+    CheckMessageBit lngWarningBits, UMC_SEARCH_ABORTED_WARNING_BIT, strMessage, "LC-MS Feature Search aborted"
     CheckMessageBit lngWarningBits, NET_ADJUSTMENT_SKIPPED_WARNING_BIT, strMessage, "NET Adjustment skipped"
     CheckMessageBit lngWarningBits, GANET_SLOPE_WARNING_BIT, strMessage, "NET slope outside expected range"
     CheckMessageBit lngWarningBits, GANET_INTERCEPT_WARNING_BIT, strMessage, "NET intercept outside expected range"

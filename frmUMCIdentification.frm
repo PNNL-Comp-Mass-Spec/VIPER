@@ -2,7 +2,7 @@ VERSION 5.00
 Begin VB.Form frmUMCIdentification 
    BackColor       =   &H00C0FFC0&
    BorderStyle     =   3  'Fixed Dialog
-   Caption         =   "Database Search On UMC"
+   Caption         =   "Database Search On LC-MS Feature"
    ClientHeight    =   4980
    ClientLeft      =   2760
    ClientTop       =   3750
@@ -604,7 +604,7 @@ End Function
 ''End With
 ''
 ''' MonroeMod
-''AddToAnalysisHistory CallerID, "Export to Peak Results table details: UMC Peaks Match Count = " & ExpCnt
+''AddToAnalysisHistory CallerID, "Export to Peak Results table details: LC-MS Feature Peaks Match Count = " & ExpCnt
 ''
 ''ExportMTDB = ExpCnt & " associations between MT tags and FTICR peaks exported."
 ''Set cmdPutNewPeak.ActiveConnection = Nothing
@@ -687,7 +687,7 @@ End If
 If blnShowMessages Then MsgBox "Number of MT tags hits: " & SRCount, vbOKOnly, glFGTU
 
 GelSearchDef(CallerID).AMTSearchOnUMCs = samtDef
-AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched UMC's for MT tags (searched ion by ion, only examining ions belonging to UMC's)", SRCount, 0, 0, 0, samtDef, False, False) & " Note: NET Information was not used in the search"
+AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched LC-MS Features for MT tags (searched ion by ion, only examining ions belonging to LC-MS Features)", SRCount, 0, 0, 0, samtDef, False, False) & " Note: NET Information was not used in the search"
 
 exit_cmdSearch_Click:
 TrimSRArrays

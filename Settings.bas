@@ -673,6 +673,7 @@ On Error GoTo LoadSettingsFileHandler
         .SplitUMCsByAbundance = GetIniFileSettingBln(IniStuff, "UMCDef", "SplitUMCsByAbundance", .SplitUMCsByAbundance)
         With .SplitUMCOptions
             .MinimumDifferenceInAveragePpmMassToSplit = GetIniFileSettingDbl(IniStuff, "UMCDef", "MinimumDifferenceInAveragePpmMassToSplit", .MinimumDifferenceInAveragePpmMassToSplit)
+            .StdDevMultiplierForSplitting = GetIniFileSettingDbl(IniStuff, "UMCDef", "StdDevMultiplierForSplitting", .StdDevMultiplierForSplitting)
             .MaximumPeakCountToSplitUMC = GetIniFileSettingLng(IniStuff, "UMCDef", "MaximumPeakCountToSplitUMC", .MaximumPeakCountToSplitUMC)
             .PeakDetectIntensityThresholdPercentageOfMaximum = GetIniFileSettingLng(IniStuff, "UMCDef", "PeakDetectIntensityThresholdPercentageOfMaximum", .PeakDetectIntensityThresholdPercentageOfMaximum)
             .PeakDetectIntensityThresholdAbsoluteMinimum = GetIniFileSettingDbl(IniStuff, "UMCDef", "PeakDetectIntensityThresholdAbsoluteMinimum", .PeakDetectIntensityThresholdAbsoluteMinimum)
@@ -1647,8 +1648,8 @@ On Error GoTo SaveSettingsFileHandler
     ' I don't check for errors again after this
     If Not blnSuccess Then GoTo SaveSettingsFileHandler
     
-    ReDim strKeys(0 To 41)
-    ReDim strValues(0 To 41)
+    ReDim strKeys(0 To 42)
+    ReDim strValues(0 To 42)
         
     ' UMC options stored in udtPrefsExpanded.AutoAnalysisOptions
     With udtPrefsExpanded.AutoAnalysisOptions
@@ -1699,12 +1700,13 @@ On Error GoTo SaveSettingsFileHandler
         strKeys(34) = "SplitUMCsByAbundance": strValues(34) = .SplitUMCsByAbundance
         With .SplitUMCOptions
             strKeys(35) = "MinimumDifferenceInAveragePpmMassToSplit": strValues(35) = .MinimumDifferenceInAveragePpmMassToSplit
-            strKeys(36) = "MaximumPeakCountToSplitUMC": strValues(36) = .MaximumPeakCountToSplitUMC
-            strKeys(37) = "PeakDetectIntensityThresholdPercentageOfMaximum": strValues(37) = .PeakDetectIntensityThresholdPercentageOfMaximum
-            strKeys(38) = "PeakDetectIntensityThresholdAbsoluteMinimum": strValues(38) = .PeakDetectIntensityThresholdAbsoluteMinimum
-            strKeys(39) = "PeakWidthPointsMinimum": strValues(39) = .PeakWidthPointsMinimum
-            strKeys(40) = "PeakWidthInSigma": strValues(40) = .PeakWidthInSigma
-            strKeys(41) = "ScanGapBehavior": strValues(41) = .ScanGapBehavior
+            strKeys(36) = "StdDevMultiplierForSplitting": strValues(36) = .StdDevMultiplierForSplitting
+            strKeys(37) = "MaximumPeakCountToSplitUMC": strValues(37) = .MaximumPeakCountToSplitUMC
+            strKeys(38) = "PeakDetectIntensityThresholdPercentageOfMaximum": strValues(38) = .PeakDetectIntensityThresholdPercentageOfMaximum
+            strKeys(39) = "PeakDetectIntensityThresholdAbsoluteMinimum": strValues(39) = .PeakDetectIntensityThresholdAbsoluteMinimum
+            strKeys(40) = "PeakWidthPointsMinimum": strValues(40) = .PeakWidthPointsMinimum
+            strKeys(41) = "PeakWidthInSigma": strValues(41) = .PeakWidthInSigma
+            strKeys(42) = "ScanGapBehavior": strValues(42) = .ScanGapBehavior
         End With
     End With
     IniStuff.WriteSection "UMCDef", strKeys(), strValues()
@@ -3794,6 +3796,7 @@ Public Sub ResetUMCAutoRefineOptions(udtAutoRefineOptions As udtUMCAutoRefineOpt
         .SplitUMCsByAbundance = True
         With .SplitUMCOptions
             .MinimumDifferenceInAveragePpmMassToSplit = 4
+            .StdDevMultiplierForSplitting = 1
             .MaximumPeakCountToSplitUMC = 6
             .PeakDetectIntensityThresholdPercentageOfMaximum = 15
             .PeakDetectIntensityThresholdAbsoluteMinimum = 0

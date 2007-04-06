@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin VB.Form frmSearchMT_ConglomerateUMC 
    BackColor       =   &H00FFFFFF&
-   Caption         =   "Search MT tag DB - Single UMC Mass"
+   Caption         =   "Search MT tag DB - Single LC-MS Feature Mass"
    ClientHeight    =   6915
    ClientLeft      =   60
    ClientTop       =   630
@@ -89,7 +89,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Width           =   2535
    End
    Begin VB.CommandButton cmdSearchAllUMCs 
-      Caption         =   "Search All UMC's"
+      Caption         =   "Search All LC-MS Features"
       Height          =   615
       Left            =   120
       TabIndex        =   3
@@ -97,7 +97,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Width           =   1815
    End
    Begin VB.CommandButton cmdRemoveAMTMatchesFromUMCs 
-      Caption         =   "Remove existing MT matches from UMC's"
+      Caption         =   "Remove existing MT matches from features"
       Height          =   615
       Left            =   2160
       TabIndex        =   5
@@ -331,18 +331,18 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Left            =   2640
          TabIndex        =   18
-         Top             =   480
+         Top             =   600
          Width           =   2400
       End
       Begin VB.CheckBox chkUseUMCConglomerateNET 
          BackColor       =   &H00FFFFFF&
-         Caption         =   "Use Class NET for UMCs"
-         Height          =   255
+         Caption         =   "Use Class NET of LC-MS Features"
+         Height          =   375
          Left            =   2640
          TabIndex        =   21
          ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0000
-         Top             =   240
-         Width           =   2205
+         Top             =   180
+         Width           =   1965
       End
       Begin VB.TextBox txtNETTol 
          Alignment       =   1  'Right Justify
@@ -510,11 +510,10 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
    End
    Begin VB.Label lblUMCMassMode 
       BackStyle       =   0  'Transparent
-      Caption         =   "UMC Mass = ??"
+      Caption         =   "LC-MS Feature Mass = ??"
       Height          =   375
       Left            =   120
       TabIndex        =   2
-      ToolTipText     =   "Status of the MT Tag database"
       Top             =   480
       Width           =   3855
    End
@@ -559,16 +558,16 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
    Begin VB.Menu mnuF 
       Caption         =   "&Function"
       Begin VB.Menu mnuFSearchAll 
-         Caption         =   "Search &All UMCs"
+         Caption         =   "Search &All LC-MS Features (UMCs)"
       End
       Begin VB.Menu mnuFSearchPaired 
-         Caption         =   "Search Paired UMCs (skips excluded pairs)"
+         Caption         =   "Search Paired LC-MS Features (skips excluded pairs)"
       End
       Begin VB.Menu mnuFSearchPairedPlusNonPaired 
-         Caption         =   "Search Light Members of Pairs &Plus Non-paired UMCs (skips excluded)"
+         Caption         =   "Search Light Members of Pairs &Plus Non-paired LC-MS Features (skips excluded)"
       End
       Begin VB.Menu mnuFSearchNonPaired 
-         Caption         =   "Search &Non-paired UMCs"
+         Caption         =   "Search &Non-paired LC-MS Features"
       End
       Begin VB.Menu mnuFSep1 
          Caption         =   "-"
@@ -589,23 +588,23 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "-"
       End
       Begin VB.Menu mnuFReportByUMC 
-         Caption         =   "Report Results by &UMCs..."
+         Caption         =   "Report Results by &UMCs (LC-MS Features)..."
       End
       Begin VB.Menu mnuFReportByIon 
          Caption         =   "Report Results by &Ions..."
       End
       Begin VB.Menu mnuFReportIncludeORFs 
-         Caption         =   "Include ORFs in Report"
+         Caption         =   "Include Proteins (ORFs) in Report"
          Checked         =   -1  'True
       End
       Begin VB.Menu mnuFSepExportToDatabase 
          Caption         =   "-"
       End
       Begin VB.Menu mnuFExportResultsToDBbyUMC 
-         Caption         =   "Export Results to MT Tag DB (by UMC)"
+         Caption         =   "Export Results to MT Tag DB (by LC-MS Feature)"
       End
       Begin VB.Menu mnuFExportDetailedMemberInformation 
-         Caption         =   "Export detailed member information for each UMC"
+         Caption         =   "Export detailed member information for each LC-MS Feature"
       End
       Begin VB.Menu mnuFSep4 
          Caption         =   "-"
@@ -660,8 +659,8 @@ Attribute VB_Exposed = False
 'which UMC to include in search
 '---------------------------------------------------------------
 'Elution is not corrected for N15 versions of peptides (???)
-'When looking for N14; UMCs that are heavy members of pairs only
-'are not search; neither are UMCs light only pair members when
+'When looking for N14; LC-MS Features that are heavy members of pairs only
+'are not search; neither are LC-MS Features light only pair members when
 'N15 search is performed
 '---------------------------------------------------------------
 'created: 10/10/2002 nt
@@ -730,13 +729,13 @@ Private mSearchRegionShape As srsSearchRegionShapeConstants
 Private LastSearchTypeN14N15 As Long
 Private NTypeStr As String
 
-'following arrays are parallel to the UMCs
+'following arrays are parallel to the LC-MS Features
 Private ClsCnt As Long              'this is not actually neccessary except
 Private ClsStat() As Double         'to create nice reports; necessary to use this since we report the Min/Max Charge stats and Average Fit stats
 Private eClsPaired() As umcpUMCPairMembershipConstants      ' Keeps track of whether UMC is member of 1 or more pairs
 
                                 
-'mUMCMatchStats contains all possible identifications for all UMCs with scores
+'mUMCMatchStats contains all possible identifications for all LC-MS Features with scores
 'as count of each identification hits within the UMC
 Private mMatchStatsCount As Long                                'count of UMC-ID matches
 Private mUMCMatchStats() As udtUMCMassTagMatchStats             ' 0-based array
@@ -912,7 +911,7 @@ Private Sub DisplayCurrentSearchTolerances()
 End Sub
 
 Private Sub GenerateUniqueMatchStats(ByRef lngUniqueUMCCount As Long, ByRef lngUniquePMTTagCount As Long, ByRef lngUniqueInternalStdCount As Long)
-    ' Determine the number of UMCs with at least one match,
+    ' Determine the number of LC-MS Features with at least one match,
     ' the unique number of MT tags matched, and the unique number of Internal Standards matched
     
     Dim blnUMCHasMatch() As Boolean
@@ -1003,17 +1002,17 @@ Private Function DisplayHitSummary(strSearchScope As String) As String
     End Select
     strMessage = strMessage & " " & strSearchItems
     
-    ' Determine the unique number of UMCs with matches, the unique MT tag count, and the unique Internal Standard Count
+    ' Determine the unique number of LC-MS Features with matches, the unique MT tag count, and the unique Internal Standard Count
     
     If mUMCCountSkippedSinceRefPresent > 0 Then
-        strMessage = strMessage & " (" & Trim(mUMCCountSkippedSinceRefPresent) & " UMC's skipped)"
+        strMessage = strMessage & " (" & Trim(mUMCCountSkippedSinceRefPresent) & " LC-MS Features skipped)"
     End If
     
     UpdateStatus strMessage
     
     GelSearchDef(CallerID).AMTSearchOnUMCs = samtDef
     
-    AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched " & strSearchScope & " UMC's for " & strSearchItems & " (searched by UMC conglomerate mass, " & lblUMCMassMode & "; however, all members of a UMC are assigned all matches found for the UMC)", mMatchStatsCount, mMTMinimumHighNormalizedScore, mMTMinimumHighDiscriminantScore, mMTMinimumPeptideProphetProbability, samtDef, True, mSearchUsedCustomNETs)
+    AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText("Searched " & strSearchScope & " LC-MS Features for " & strSearchItems & " (searched by LC-MS Feature conglomerate mass, " & lblUMCMassMode & "; however, all members of a LC-MS Feature are assigned all matches found for the UMC)", mMatchStatsCount, mMTMinimumHighNormalizedScore, mMTMinimumHighDiscriminantScore, mMTMinimumPeptideProphetProbability, samtDef, True, mSearchUsedCustomNETs)
     
     strModMassDescription = ConstructMassTagModMassDescription(GelSearchDef(CallerID).AMTSearchMassMods)
     If Len(strModMassDescription) > 0 Then
@@ -1027,7 +1026,7 @@ Private Function DisplayHitSummary(strSearchScope As String) As String
         sngUMCMatchPercentage = 0
     End If
     
-    strStats = "UMCs with match = " & LongToStringWithCommas(lngUniqueUMCCount) & " (" & Trim(Round(sngUMCMatchPercentage, 0)) & "%)"
+    strStats = "LC-MS Features with match = " & LongToStringWithCommas(lngUniqueUMCCount) & " (" & Trim(Round(sngUMCMatchPercentage, 0)) & "%)"
     If eInternalStdSearchMode <> issmFindOnlyInternalStandards Then
         strStats = strStats & "; Unique MT tags matched = " & LongToStringWithCommas(lngUniquePMTTagCount) & " / " & LongToStringWithCommas(mMTCnt)
         If mMTCnt > AMTCnt Then
@@ -1111,7 +1110,7 @@ Public Function ExportMTDBbyUMC(Optional blnUpdateGANETForAnalysisInDB As Boolea
             blnExportUMCsWithNoMatches = .ExportUMCsWithNoMatches
         End With
     Else
-        eResponse = MsgBox("Export UMC's that do not have any database matches?", vbQuestion + vbYesNo + vbDefaultButton2, "Export Non-Matching UMC's")
+        eResponse = MsgBox("Export LC-MS Features that do not have any database matches?", vbQuestion + vbYesNo + vbDefaultButton2, "Export Non-Matching LC-MS Features")
         blnExportUMCsWithNoMatches = (eResponse = vbYes)
     End If
     
@@ -1370,7 +1369,7 @@ End Function
 ''
 ''Me.Caption = strCaptionSaved
 ''
-''strExportStatus = ExpCnt & " associations between MT tags and UMC's exported to peak results table."
+''strExportStatus = ExpCnt & " associations between MT tags and LC-MS Features exported to peak results table."
 ''Set cmdPutNewPeak.ActiveConnection = Nothing
 ''cnNew.Close
 ''
@@ -1497,7 +1496,7 @@ End If
 
 If blnCreateNewEntryInMMDTable Or mMatchStatsCount > 0 Or blnExportUMCsWithNoMatches Then
     ' MonroeMod
-    AddToAnalysisHistory CallerID, "Exported UMC Identification results (single UMC mass) to UMC Results table in database (" & ExtractDBNameFromConnectionString(GelAnalysis(CallerID).MTDB.cn.ConnectionString) & "); MMD_ID = " & lngMDID
+    AddToAnalysisHistory CallerID, "Exported LC-MS Feature Identification results (single UMC mass) to UMC Results table in database (" & ExtractDBNameFromConnectionString(GelAnalysis(CallerID).MTDB.cn.ConnectionString) & "); MMD_ID = " & lngMDID
     If blnCreateNewEntryInMMDTable Then
         AddToAnalysisHistory CallerID, "Export to MMD table details: Reference Job = " & GelAnalysis(CallerID).MD_Reference_Job & "; MD_File = " & GelAnalysis(CallerID).MD_file
     End If
@@ -1535,7 +1534,7 @@ End Select
 lngPeakFPRTypeLight = PairsLookupFPRType(CallerID, False)
 lngPeakFPRTypeHeavy = PairsLookupFPRType(CallerID, True)
 
-Me.Caption = "Exporting UMC's to DB: 0 / " & Trim(mMatchStatsCount)
+Me.Caption = "Exporting LC-MS Features to DB: 0 / " & Trim(mMatchStatsCount)
 
 'now export data
 MassTagExpCnt = 0
@@ -1548,14 +1547,14 @@ InternalStdExpCnt = 0
     ' Thus, we need to keep track of whether or not an entry has been made to T_FTICR_UMC_Results
     ' Luckily, results are stored to mUMCMatchStats() in order of UMC Index
     
-    ' We need to keep track of which UMC's are exported to the results table
+    ' We need to keep track of which LC-MS Features are exported to the results table
     ReDim blnUMCMatchFound(GelUMC(CallerID).UMCCnt)
     
     lngUMCIndexOriginalLastStored = -1
     
     For lngPointer = 0 To mMatchStatsCount - 1
         If lngPointer Mod 25 = 0 Then
-            Me.Caption = "Exporting UMC's to DB: " & Trim(lngPointer) & " / " & Trim(mMatchStatsCount)
+            Me.Caption = "Exporting LC-MS Features to DB: " & Trim(lngPointer) & " / " & Trim(mMatchStatsCount)
             DoEvents
             If mKeyPressAbortProcess = 2 Then Exit For
         End If
@@ -1563,7 +1562,7 @@ InternalStdExpCnt = 0
         lngUMCIndexOriginal = mUMCMatchStats(lngPointer).UMCIndex
         If lngUMCIndexOriginal <> lngUMCIndexOriginalLastStored Then
             ' Add a new row to T_FTICR_UMC_Results
-            ' Note: If we searched only paired UMC's, then record both members of the pairs and set lngPeakFPRType to FPR_Type_N14_N15_L
+            ' Note: If we searched only paired LC-MS Features, then record both members of the pairs and set lngPeakFPRType to FPR_Type_N14_N15_L
             '       Additionally, record the pair index in the database and record the opposite pair member
             
             ' Need to perform a look-ahead to determine the number of Internal Standard matches for this UMC Index
@@ -1669,13 +1668,13 @@ InternalStdExpCnt = 0
     Next lngPointer
 
     If blnExportUMCsWithNoMatches And mKeyPressAbortProcess < 2 Then
-        ' Also export the UMC's that do not have any hits
-        ' If SearchType = SEARCH_PAIRED or SEARCH_NON_PAIRED then only export paired or unpaired UMC's without matches
+        ' Also export the LC-MS Features that do not have any hits
+        ' If SearchType = SEARCH_PAIRED or SEARCH_NON_PAIRED then only export paired or unpaired LC-MS Features without matches
         
         With GelUMC(CallerID)
             For lngUMCIndex = 0 To .UMCCnt - 1
                 If lngUMCIndex Mod 25 = 0 Then
-                    Me.Caption = "Exporting non-matching UMC's: " & Trim(lngUMCIndex) & " / " & Trim(.UMCCnt)
+                    Me.Caption = "Exporting non-matching LC-MS Features: " & Trim(lngUMCIndex) & " / " & Trim(.UMCCnt)
                     DoEvents
                     If mKeyPressAbortProcess = 2 Then Exit For
                 End If
@@ -1723,11 +1722,11 @@ InternalStdExpCnt = 0
     End If
 
 ' MonroeMod
-AddToAnalysisHistory CallerID, "Export to UMC Results table details: MT tags Match Count = " & MassTagExpCnt & "; Internal Std Match Count = " & InternalStdExpCnt
+AddToAnalysisHistory CallerID, "Export to LC-MS Feature Results table details: MT tags Match Count = " & MassTagExpCnt & "; Internal Std Match Count = " & InternalStdExpCnt
 
 Me.Caption = strCaptionSaved
 
-strExportStatus = MassTagExpCnt & " associations between MT tags and UMC's exported (" & Trim(InternalStdExpCnt) & " Internal Standards)."
+strExportStatus = MassTagExpCnt & " associations between MT tags and LC-MS Features exported (" & Trim(InternalStdExpCnt) & " Internal Standards)."
 Set cmdPutNewUMC.ActiveConnection = Nothing
 Set cmdPutNewUMCMatch.ActiveConnection = Nothing
 cnNew.Close
@@ -1756,7 +1755,7 @@ err_ExportMTDBbyUMC:
 Debug.Assert False
 LogErrors Err.Number, "ExportMTDBbyUMCToUMCResultsTable"
 If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-    MsgBox "Error exporting matches to the UMC results table: " & Err.Description, vbExclamation + vbOKOnly, glFGTU
+    MsgBox "Error exporting matches to the LC-MS Feature results table: " & Err.Description, vbExclamation + vbOKOnly, glFGTU
 End If
 
 err_Cleanup:
@@ -1898,7 +1897,7 @@ Private Function InitializeORFInfo(blnForceDataReload As Boolean) As Boolean
     
     With objMTDBNameLookupClass
         'loading protein names
-        UpdateStatus "Loading ORF info"
+        UpdateStatus "Loading Protein info"
         
         If Not GelAnalysis(CallerID) Is Nothing Then
             If Len(GelAnalysis(CallerID).MTDB.cn.ConnectionString) > 0 And Not APP_BUILD_DISABLE_MTS Then
@@ -1929,20 +1928,20 @@ Dim eResponse As VbMsgBoxResult
 On Error Resume Next
 Me.MousePointer = vbHourglass
 If bLoading Then
-    ' Update lblUMCMassMode to reflect the mass mode used to identify the UMC's
+    ' Update lblUMCMassMode to reflect the mass mode used to identify the LC-MS Features
     Select Case GelUMC(CallerID).def.ClassMW
     Case UMCClassMassConstants.UMCMassAvg
-        lblUMCMassMode = "UMC Mass = Average of the masses of the UMC members"
+        lblUMCMassMode = "LC-MS Feature Mass = Average of the masses of the UMC members"
     Case UMCClassMassConstants.UMCMassRep
-        lblUMCMassMode = "UMC Mass = Mass of the UMC Class Representative"
+        lblUMCMassMode = "LC-MS Feature Mass = Mass of the UMC Class Representative"
     Case UMCClassMassConstants.UMCMassMed
-        lblUMCMassMode = "UMC Mass = Median of the masses of the UMC members"
+        lblUMCMassMode = "LC-MS Feature Mass = Median of the masses of the UMC members"
     Case UMCMassAvgTopX
-        lblUMCMassMode = "UMC Mass = Average of top X members of the UMC"
+        lblUMCMassMode = "LC-MS Feature Mass = Average of top X members of the UMC"
     Case UMCMassMedTopX
-        lblUMCMassMode = "UMC Mass = Median of top X members of the UMC"
+        lblUMCMassMode = "LC-MS Feature Mass = Median of top X members of the UMC"
     Case Else
-        lblUMCMassMode = "UMC Mass = ?? Unable to determine; is it a new mass mode?"
+        lblUMCMassMode = "LC-MS Feature Mass = ?? Unable to determine; is it a new mass mode?"
     End Select
     
     If GelAnalysis(CallerID) Is Nothing Then
@@ -1981,7 +1980,7 @@ If bLoading Then
     Else         'have to have MT tag database loaded
         Call LoadMTDB
     End If
-    UpdateStatus "Generating UMC statistics ..."
+    UpdateStatus "Generating LC-MS Feature statistics ..."
     ClsCnt = UMCStatistics1(CallerID, ClsStat())
     UpdateStatus "Pairs Count: " & GelP_D_L(CallerID).PCnt
     
@@ -1994,7 +1993,7 @@ If bLoading Then
     
     SetETMode etGANET
    
-    UpdateStatus "UMCs pairing status ..."
+    UpdateStatus "LC-MS Features pairing status ..."
     UpdateUMCsPairingStatusNow
     UpdateStatus "Ready"
     
@@ -2239,8 +2238,8 @@ On Error GoTo PopulateComboBoxesErrorHandler
     With cboAMTSearchResultsBehavior
         .Clear
         .AddItem "Auto remove existing results prior to search", asrbAMTSearchResultsBehaviorConstants.asrbAutoRemoveExisting
-        .AddItem "Keep existing results; do not skip UMC's", asrbAMTSearchResultsBehaviorConstants.asrbKeepExisting
-        .AddItem "Keep existing results; skip UMC's with results", asrbAMTSearchResultsBehaviorConstants.asrbKeepExistingAndSkip
+        .AddItem "Keep existing results; do not skip LC-MS Features", asrbAMTSearchResultsBehaviorConstants.asrbKeepExisting
+        .AddItem "Keep existing results; skip LC-MS Features with results", asrbAMTSearchResultsBehaviorConstants.asrbKeepExistingAndSkip
         .ListIndex = asrbAutoRemoveExisting
     End With
     
@@ -2769,7 +2768,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
     End With
     
     If KeyPressAbortProcess <= 1 Then
-        AddToAnalysisHistory CallerID, "Stored search results in ions; recorded all MT tag hits for each UMC in all members of the UMC; total ions updated = " & Trim(lngIonCountUpdated)
+        AddToAnalysisHistory CallerID, "Stored search results in ions; recorded all MT tag hits for each LC-MS Feature in all members of the UMC; total ions updated = " & Trim(lngIonCountUpdated)
     End If
     
     Exit Sub
@@ -2978,7 +2977,7 @@ SearchUMCSingleMass = -1
 End Function
 
 Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTol As Double, ByVal dblNETTol As Double)
-    ' Compare this UMC's mass, NET, and charge with the MT tags
+    ' Compare this LC-MS Feature's mass, NET, and charge with the MT tags
 
     Dim FastSearchMatchInd As Long
     Dim MatchInd1 As Long, MatchInd2 As Long
@@ -3008,7 +3007,7 @@ Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTo
 End Sub
 
 Private Sub SearchUMCSingleMassInternalStd(ByRef udtTestUMC As udtUMCType, ByVal dblMWTol As Double, ByVal dblNETTol As Double)
-    ' Compare this UMC's mass, NET, and charge with the Internal Standard in UMCInternalStandards
+    ' Compare this LC-MS Feature's mass, NET, and charge with the Internal Standard in UMCInternalStandards
 
     Dim FastSearchMatchInd As Long
     Dim MatchInd1 As Long, MatchInd2 As Long
@@ -3068,8 +3067,8 @@ Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal 
         If glbPreferencesExpanded.UseUMCConglomerateNET Then
             If SearchUMCTestNET(.ClassRepType, .ClassRepInd, dblMassTagNET, dblNETTol, dblNETDifference) Then
                 
-                ' Either: AMT Matches this UMC's median mass and Class Rep NET
-                ' Or:     Internal Standard Matches this UMC's median mass, Class Rep NET, and charge
+                ' Either: AMT Matches this LC-MS Feature's median mass and Class Rep NET
+                ' Or:     Internal Standard Matches this LC-MS Feature's median mass, Class Rep NET, and charge
                 ' Thus:   Add to mCurrIDMatches()
                 
                 If mCurrIDCnt > UBound(mCurrIDMatches) Then ManageCurrID (MNG_ADD_START_SIZE)
@@ -3413,7 +3412,7 @@ Dim blnSuccess As Boolean
 On Error GoTo err_ShowOrSaveResultsByIon
 
 If blnIncludeORFInfo Then
-    UpdateStatus "Sorting ORF lookup arrays"
+    UpdateStatus "Sorting Protein lookup arrays"
     If MTtoORFMapCount = 0 Then
         blnIncludeORFInfo = InitializeORFInfo(False)
     Else
@@ -3609,7 +3608,7 @@ Dim udtPairMatchStats() As udtPairMatchStatsType
 On Error GoTo ShowOrSaveResultsByUMCErrorHandler
 
 If blnIncludeORFInfo Then
-    UpdateStatus "Sorting ORF lookup arrays"
+    UpdateStatus "Sorting Protein lookup arrays"
     If MTtoORFMapCount = 0 Then
         blnIncludeORFInfo = InitializeORFInfo(False)
     Else

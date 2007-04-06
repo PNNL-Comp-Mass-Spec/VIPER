@@ -188,7 +188,7 @@ Public Type NetAdjDefinition2003
     MinUMCCount As Long             'minimum number of peaks in UMC
     MinScanRange As Long            'minimum number of different scans
     MaxScanPct  As Double           'maximum percentage of UMC scan range in total scans (unused)
-    TopAbuPct As Double             'if > 0 use only top TopAbuPct UMCs
+    TopAbuPct As Double             'if > 0 use only top TopAbuPct LC-MS Features
     PeakSelection As Long           'before/at/after highest abundance; first peak; last peak
     PeakMaxAbuPct As Double         'used together with PeakMaxAbuSelection to
                                     'select actual peak
@@ -219,7 +219,7 @@ Public Type NetAdjDefinition2004
     MinUMCCount As Long             'minimum number of peaks in UMC
     MinScanRange As Long            'minimum number of different scans
     MaxScanPct  As Double           'maximum percentage of UMC scan range in total scans (unused)
-    TopAbuPct As Double             'if > 0 use only top TopAbuPct UMCs
+    TopAbuPct As Double             'if > 0 use only top TopAbuPct LC-MS Features
     PeakSelection As Long           'before/at/after highest abundance; first peak; last peak
     PeakMaxAbuPct As Double         'used together with PeakMaxAbuSelection to
                                     'select actual peak
@@ -258,7 +258,7 @@ Public Type NetAdjDefinition2005a
     MinUMCCount As Long             'minimum number of peaks in UMC
     MinScanRange As Long            'minimum number of different scans
     MaxScanPct  As Double           'maximum percentage of UMC scan range in total scans (unused)
-    TopAbuPct As Double             'if > 0 use only top TopAbuPct UMCs
+    TopAbuPct As Double             'if > 0 use only top TopAbuPct LC-MS Features
     PeakSelection As Long           'Ignored: before/at/after highest abundance; first peak; last peak; no longer used (always assume at Max abu)
     PeakMaxAbuPct As Double         'Ignored: used together with PeakMaxAbuSelection to select actual peak
     PeakCSSelection(7) As Boolean   'acceptable charge states 1-6,6+,Any
@@ -319,7 +319,7 @@ Public Type NetAdjDefinition2005b
     MinUMCCount As Long             'minimum number of peaks in UMC
     MinScanRange As Long            'minimum number of different scans
     MaxScanPct  As Double           'maximum percentage of UMC scan range in total scans (unused)
-    TopAbuPct As Double             'if > 0 use only top TopAbuPct UMCs
+    TopAbuPct As Double             'if > 0 use only top TopAbuPct LC-MS Features
     PeakSelection As Long           'Ignored: before/at/after highest abundance; first peak; last peak; no longer used (always assume at Max abu)
     PeakMaxAbuPct As Double         'Ignored: used together with PeakMaxAbuSelection to select actual peak
     PeakCSSelection(7) As Boolean   'acceptable charge states 1-6,6+,Any
@@ -431,7 +431,7 @@ Public Type NetAdjDefinition
     MinUMCCount As Long             'minimum number of peaks in UMC
     MinScanRange As Long            'minimum number of different scans
     MaxScanPct  As Double           'maximum percentage of UMC scan range in total scans (unused)
-    TopAbuPct As Double             'if > 0 use only top TopAbuPct UMCs
+    TopAbuPct As Double             'if > 0 use only top TopAbuPct LC-MS Features
     PeakSelection As Long           'Ignored: before/at/after highest abundance; first peak; last peak; no longer used (always assume at Max abu)
     PeakMaxAbuPct As Double         'Ignored: used together with PeakMaxAbuSelection to select actual peak
     PeakCSSelection(7) As Boolean   'acceptable charge states 1-6,6+,Any
@@ -555,7 +555,7 @@ On Error GoTo AutoRefineUMCsErrorHandler
             ' Use frmVisUMC to do this
             
             ' Initialize frmVisUMC
-            frmCallingForm.Status "Auto-refining UMC's: Initializing"
+            frmCallingForm.Status "Auto-refining LC-MS Features: Initializing"
         
             frmVisUMC.Tag = lngGelIndex
             frmVisUMC.InitializeUMCs
@@ -564,10 +564,10 @@ On Error GoTo AutoRefineUMCsErrorHandler
             frmVisUMC.chkRemovePairedHUMC = vbUnchecked
         
             glbPreferencesExpanded.AutoAnalysisStatus.AutoRefiningUMCs = True
-            frmCallingForm.Status "Auto-refining UMC's: Refining"
+            frmCallingForm.Status "Auto-refining LC-MS Features: Refining"
             frmVisUMC.AutoRemoveUMCsWork
         
-            frmCallingForm.Status "Auto-refining UMC's: Cleaning up"
+            frmCallingForm.Status "Auto-refining LC-MS Features: Cleaning up"
             Unload frmVisUMC
             
             glbPreferencesExpanded.AutoAnalysisStatus.AutoRefiningUMCs = False
@@ -2339,7 +2339,7 @@ End Function
 ''   End With
 ''End If
 ''UMCsDone = GelUMC(Ind).UMCCnt
-''If UMCsDone Mod 25 = 0 Then frmCallingForm.Status "UMCs Done: " & Trim(UMCsDone) & " / " & Trim(TtlCnt) & " with " & Trim(ShrunkBoxes) & " shrunk boxes"
+''If UMCsDone Mod 25 = 0 Then frmCallingForm.Status "LC-MS Features Done: " & Trim(UMCsDone) & " / " & Trim(TtlCnt) & " with " & Trim(ShrunkBoxes) & " shrunk boxes"
 ''HolePatternsIShrinkingBox = True
 ''End Function
 
@@ -2456,7 +2456,7 @@ End Function
 
 Public Function fUMCSpotsOnly(ByVal IndDis As Long) As Boolean
 '------------------------------------------------------------------
-'makes only spots belonging to the UMCs visible; returns True if OK
+'makes only spots belonging to the LC-MS Features visible; returns True if OK
 '------------------------------------------------------------------
 Dim i As Long, j As Long
 On Error GoTo exit_fUMCSpotsOnly
@@ -2491,7 +2491,7 @@ End Function
 
 Public Function ShowNetAdjUMCPoints(ByVal lngGelIndex As Long, ByVal lngUMCIndicatorBit As Long) As Boolean
 '------------------------------------------------------------------
-'makes only spots belonging to UMCs that were used for Net Adjustment visible; returns True if OK
+'makes only spots belonging to LC-MS Features that were used for Net Adjustment visible; returns True if OK
 '------------------------------------------------------------------
 Dim i As Long, j As Long
 On Error GoTo exit_ShowNetAdjUMCPoints
@@ -2521,7 +2521,7 @@ End Function
 
 Public Function ShowSplitUMCPoints(ByVal lngGelIndex As Long) As Boolean
 '------------------------------------------------------------------
-'makes only spots belonging to UMCs that have been split visible; returns True if OK
+'makes only spots belonging to LC-MS Features that have been split visible; returns True if OK
 '------------------------------------------------------------------
 Dim i As Long, j As Long
 On Error GoTo exit_ShowSplitUMCPoints
@@ -2684,7 +2684,7 @@ Dim Cnt As Long
 On Error GoTo exit_ManageClasses
 With GelUMC(Ind)
     Select Case eManageType
-    Case UMCManageConstants.UMCMngInitialize             ' Initially reserve space for .DataLines / 100 UMCs
+    Case UMCManageConstants.UMCMngInitialize             ' Initially reserve space for .DataLines / 100 LC-MS Features
         Cnt = CLng(GelData(Ind).DataLines / 100)
         If Cnt < 10 Then Cnt = 10
         ReDim .UMCs(Cnt)
@@ -2738,11 +2738,11 @@ Dim i As Long, j As Long
 Dim lngMaxMemberIndex As Long
 
 Dim UMCMembersMaxIndex As Long
-Dim UMCMembersMW() As Double                   ' 0-based array; MW values for each of the UMC's members
-Dim UMCMembersAbu() As Double                  ' 0-based array; Abu values for each of the UMC's members
-Dim UMCMembersScan() As Long                   ' 0-based array; Scan numbers for each of the UMC's members
-Dim UMCMembersFit() As Double                  ' 0-based array; Fit values for each of the UMC's members
-Dim UMCMembersCharge() As Integer              ' 0-based array; Charge states for each of the UMC's members
+Dim UMCMembersMW() As Double                   ' 0-based array; MW values for each of the LC-MS Features members
+Dim UMCMembersAbu() As Double                  ' 0-based array; Abu values for each of the LC-MS Features members
+Dim UMCMembersScan() As Long                   ' 0-based array; Scan numbers for each of the LC-MS Features members
+Dim UMCMembersFit() As Double                  ' 0-based array; Fit values for each of the LC-MS Features members
+Dim UMCMembersCharge() As Integer              ' 0-based array; Charge states for each of the LC-MS Features members
 
 Dim intUMCRepresentativeType As Integer
 Dim intChargeState As Integer
@@ -2777,7 +2777,7 @@ Dim blnShowProgressUsingFormCaption As Boolean
 On Error GoTo err_CalculateClasses
 
 If blnUseProgressForm Then
-    frmProgress.InitializeSubtask "Updating UMC Stats", 0, GelUMC(Ind).UMCCnt
+    frmProgress.InitializeSubtask "Updating LC-MS Feature Stats", 0, GelUMC(Ind).UMCCnt
 Else
     If Not frmCallingForm Is Nothing Then
         blnShowProgressUsingFormCaption = True
@@ -2790,7 +2790,7 @@ With glbPreferencesExpanded.UMCAdvancedStatsOptions
     If .ClassAbuTopXMinMembers < 1 Then .ClassAbuTopXMinMembers = 1
 End With
 
-' Initially reserve space for UMCs with INITIAL_RESERVE_COUNT members
+' Initially reserve space for LC-MS Features with INITIAL_RESERVE_COUNT members
 UMCMembersMaxIndex = 0
 ReDim UMCMembersMW(INITIAL_RESERVE_COUNT)
 ReDim UMCMembersAbu(INITIAL_RESERVE_COUNT)
@@ -3063,7 +3063,7 @@ With GelUMC(Ind)
            End If
            If i Mod 500 = 0 Then
               If blnShowProgressUsingFormCaption Then
-                  frmCallingForm.Caption = "Updating UMC Stats: " & Trim(i) & " / " & (.UMCCnt)
+                  frmCallingForm.Caption = "Updating LC-MS Feature Stats: " & Trim(i) & " / " & (.UMCCnt)
               ElseIf blnUseProgressForm Then
                   frmProgress.UpdateSubtaskProgressBar i
               End If
@@ -3442,7 +3442,7 @@ Public Function GetUMCList(ByVal Ind As Long, _
                            MW1 As Double, MW2 As Double, _
                            ResList() As Long) As Long
 '----------------------------------------------------------------------------------
-'fills ResList with indexes of UMCs that have at least one member in a elution/mass
+'fills ResList with indexes of LC-MS Features that have at least one member in a elution/mass
 'window (Scan1, Scan2) x (MW1,MW2); returns number of it, -1 on any error
 '----------------------------------------------------------------------------------
 Dim Cnt As Long
@@ -3541,7 +3541,7 @@ If GelUMC(lngGelIndex).UMCCnt > 0 Then
       frmDataInfo.Tag = "UMC"
       frmDataInfo.Show vbModal
    Else
-     MsgBox "Error generating report for Unique Mass Classes. Make sure that UMC was at least once generated and try again.", vbOKOnly
+     MsgBox "Error generating report for LC-MS Features. Make sure that LC-MS Feature was at least once generated and try again.", vbOKOnly
    End If
 Else
    MsgBox "No Unique Mass Classes found.", vbOKOnly

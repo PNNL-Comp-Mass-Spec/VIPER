@@ -179,7 +179,7 @@ If LCase(sCommand) = "getmasstagsganet" Then
 End If
 
 On Error GoTo err_LoadMassTags
-AMTGeneration = glAMT_GENERATION_MT_1
+AMTGeneration = dbgMTSOnline
 Screen.MousePointer = vbHourglass
 AMTCnt = 0
 lngMassTagsParseCount = 0
@@ -314,6 +314,10 @@ frmCallingForm.Caption = "Loading data: "
 DoEvents
 ' MonroeMod Finish
 
+''' Uncomment the following to limit the NET range of the loaded AMT tags
+''Dim blnSkipNETSOutOfRange As Boolean
+''blnSkipNETSOutOfRange = True
+
 
 With rsMassTags
     
@@ -377,6 +381,13 @@ With rsMassTags
                lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
            End If
            
+           
+''           If blnSkipNETSOutOfRange Then
+''                If AMTData(AMTCnt).NET < 0 Or AMTData(AMTCnt).NET > 1 Then
+''                    blnSkipMassTag = True
+''                End If
+''           End If
+        
            If blnSkipMassTag Then
                AMTCnt = AMTCnt - 1
            End If
@@ -677,7 +688,7 @@ Case 13, 94                  'Type Mismatch or Invalid Use of Null
 Case 3265, 3704              'two errors I have encountered
     '2nd attempt will probably work so let user know it should try again
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox "Error loading mapping between MT tags and ORFs from the database. Error could " _
+        MsgBox "Error loading mapping between MT tags and Proteins from the database. Error could " _
              & "have been caused by network/server issues(timeout) so you " _
              & "might try loading again with Refresh function.", vbOKOnly, glFGTU
     End If
@@ -717,7 +728,7 @@ End Function
 
 Public Function LoadORFs(ByVal Ind As Long) As Boolean
 '--------------------------------------------------------------
-'executes command that retrieves list of ORFs from Organism
+'executes command that retrieves list of Proteins (ORFs) from Organism
 'MT tag database; returns True if at least one ORF loaded.
 '--------------------------------------------------------------
 Dim cnNew As New ADODB.Connection
@@ -781,7 +792,7 @@ Case 13, 94                  'Type Mismatch or Invalid Use of Null
 Case 3265, 3704              'two errors I have encountered
     '2nd attempt will probably work so let user know it should try again
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox "Error loading ORFs from the database. Error could " _
+        MsgBox "Error loading Proteins from the database. Error could " _
              & "have been caused by network/server issues(timeout) so you " _
              & "might try loading again with Refresh function.", vbOKOnly, glFGTU
     End If

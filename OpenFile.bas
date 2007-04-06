@@ -1585,7 +1585,7 @@ err_AllUnidentified:
 AllUnidentified = True
 End Function
 
-Public Function ReadGelFile(ByVal FileName As String, Optional ByRef lngGelIndexToForce As Long = 0) As Long
+Public Function ReadGelFile(ByVal strFileName As String, Optional ByRef lngGelIndexToForce As Long = 0) As Long
 ' If lngGelIndexToForce is > 0 then the data will be loaded into the gel with the given index;
 '  otherwise, the next available index will be used
 '
@@ -1617,9 +1617,9 @@ If fIndex > glMaxGels Then
 End If
 
 Screen.MousePointer = vbHourglass
-Select Case GetGelCertificate(FileName)
+Select Case GetGelCertificate(strFileName)
 Case glCERT1999
-    strMessage = "You have selected an old file format that is no longer supported.  Unable to open the file: " & FileName
+    strMessage = "You have selected an old file format that is no longer supported.  Unable to open the file: " & strFileName
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox strMessage, vbInformation + vbOKOnly, glFGTU
     Else
@@ -1634,7 +1634,7 @@ Case glCERT1999
 ''        eResponse = vbYes
 ''    End If
 ''    If eResponse <> vbYes Then GoTo exit_ReadGelFile
-''    If Not ReadGelData1999(FileName, fIndex) Then
+''    If Not ReadGelData1999(strFileName, fIndex) Then
 ''       GoTo FailedReadGelFile
 ''    Else
 ''       GelStatus(fIndex).Dirty = True
@@ -1642,7 +1642,7 @@ Case glCERT1999
 ''    End If
     
 Case glCERT2000             'still try first to read new file format!
-    strMessage = "You have selected an old file format that is no longer supported.  Unable to open the file: " & FileName
+    strMessage = "You have selected an old file format that is no longer supported.  Unable to open the file: " & strFileName
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox strMessage, vbInformation + vbOKOnly, glFGTU
     Else
@@ -1652,8 +1652,8 @@ Case glCERT2000             'still try first to read new file format!
 
 '' No longer supported (March 2006)
 ''
-''    If Not ReadGelData2003(FileName, fIndex, False) Then
-''        If Not ReadGelData2000(FileName, fIndex) Then
+''    If Not ReadGelData2003(strFileName, fIndex, False) Then
+''        If Not ReadGelData2000(strFileName, fIndex) Then
 ''            GoTo FailedReadGelFile
 ''        Else
 ''            GelStatus(fIndex).Dirty = True
@@ -1662,7 +1662,7 @@ Case glCERT2000             'still try first to read new file format!
 ''    End If
     
 Case glCERT2003
-    If Not ReadGelData2003(FileName, fIndex, True) Then
+    If Not ReadGelData2003(strFileName, fIndex, True) Then
         GoTo FailedReadGelFile
     Else
         GelStatus(fIndex).Dirty = False
@@ -1670,7 +1670,7 @@ Case glCERT2003
     End If
     
 Case glCERT2000_DB, glCERT2002_MT
-    strMessage = "You have selected an old file format that is no longer supported.  Unable to open the file: " & FileName
+    strMessage = "You have selected an old file format that is no longer supported.  Unable to open the file: " & strFileName
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox strMessage, vbInformation + vbOKOnly, glFGTU
     Else
@@ -1681,7 +1681,7 @@ Case glCERT2000_DB, glCERT2002_MT
 '' No longer supported (March 2006)
 ''
 ''    Dim sDBGelType As String
-''    If Not ReadGelData2000(FileName, fIndex) Then
+''    If Not ReadGelData2000(strFileName, fIndex) Then
 ''        GoTo FailedReadGelFile
 ''    Else
 ''        sDBGelType = GetTagValueFromText(GelData(fIndex).Comment, glCOMMENT_DBGEL)
@@ -1725,7 +1725,7 @@ Case glCERT2000_DB, glCERT2002_MT
 ''    End If
 ''
 Case glCERT2003_Modular
-    If Not BinaryLoadData(FileName, fIndex, eFileSaveMode) Then
+    If Not BinaryLoadData(strFileName, fIndex, eFileSaveMode) Then
         GoTo FailedReadGelFile
     Else
         GelStatus(fIndex).Dirty = False
@@ -1734,19 +1734,19 @@ Case glCERT2003_Modular
     End If
     
 Case glCERT_FileNotFound
-    strMessage = "File not found: " & FileName
+    strMessage = "File not found: " & strFileName
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox strMessage, vbOKOnly, glFGTU
     Else
         AddToAnalysisHistory fIndex, strMessage
     End If
     
-    RemoveFromRecentFiles FileName
+    RemoveFromRecentFiles strFileName
     GetRecentFiles
     GoTo FailedReadGelFile
     
 Case Else
-    strMessage = "Unrecognized file format.  Cannot open the file: " & FileName
+    strMessage = "Unrecognized file format.  Cannot open the file: " & strFileName
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox strMessage, vbInformation + vbOKOnly, glFGTU
     Else
@@ -1757,15 +1757,17 @@ End Select
 
 Debug.Assert Not GelStatus(fIndex).Deleted
 GelBody(fIndex).Tag = fIndex
-GelBody(fIndex).Caption = FileName              ' MonroeMod: Removed UCase()
+GelBody(fIndex).Caption = strFileName              ' MonroeMod: Removed UCase()
+GelStatus(fIndex).GelFilePathFull = GetFilePathFull(strFileName)
+
 GelBody(fIndex).Show
 If GelData(fIndex).Preferences.CooType = glNETCooSys Then
     GelBody(fIndex).SetXAxisLabelType True
 Else
     GelBody(fIndex).SetXAxisLabelType False
 End If
-
-UpdateFileMenu FileName
+    
+UpdateFileMenu strFileName
 
 exit_ReadGelFile:
 Screen.MousePointer = vbDefault
@@ -2474,7 +2476,7 @@ Dim TmpGD As DocumentData
 Dim StructureSize As Long
 Dim TmpCnt As Long
 Dim ScopeInd() As Long
-Dim lngIsoIndexNew() As Long            ' This array holds the new index values for all of the points; necessary for updating UMCs
+Dim lngIsoIndexNew() As Long            ' This array holds the new index values for all of the points; necessary for updating LC-MS Features
 Dim i As Long, j As Long, k As Long
 
 Dim lngUMCCountNew As Long
@@ -2589,7 +2591,7 @@ End With
 ' Make a backup copy of GelUMC(Ind)
 udtUMCListSaved = GelUMC(Ind)
 
-' MonroeMod: Remove invalid UMC's
+' MonroeMod: Remove invalid LC-MS Features
 With GelUMC(Ind)
     If TmpGD.DataLines = 0 Then
         .UMCCnt = 0
@@ -2639,11 +2641,12 @@ AddToAnalysisHistory Ind, "Data Trimmed: Charge State Data Points = " & Trim(Tmp
 AddToAnalysisHistory Ind, "Data Trimmed: Isotopic (deconvoluted) Data Points = " & Trim(TmpGD.IsoLines)
 BinarySaveData FileName, False, True, Ind, TmpGD, eFileSaveMode
 
-' Restore the UMCs
+' Restore the LC-MS Features
 GelUMC(Ind) = udtUMCListSaved
 
 ' Need to restore the caption on the calling window to the original file path (BinarySaveData changed it to the new file path)
 GelBody(Ind).Caption = strFilePathSaved
+GelStatus(Ind).GelFilePathFull = GetFilePathFull(strFilePathSaved)
 
 Exit Sub
 
@@ -2918,7 +2921,7 @@ End Function
 '''                               DataList() As Long, DataListType() As Long) As Long
 ''''---------------------------------------------------------------------------------------
 ''''fills data lists arrays with indexes and types of data for all data points belonging to
-''''the UMCs from the list; returns number of data; -1 on any error
+''''the LC-MS Features from the list; returns number of data; -1 on any error
 ''''NOTE: if UMC can share data remove redundancy; data is returned in no particular order
 ''''---------------------------------------------------------------------------------------
 '''Dim ClassCnt As Long

@@ -68,6 +68,7 @@ Public Type GelState
     UMC As Integer
     SourceDataRawFileType As rfcRawFileConstants
     FinniganRawFilePath As String
+    GelFilePathFull As String           ' The full path to the last place the .Gel file was opened from or saved to
 End Type
 
 Public Type GelPrefs1999            'preferences type for glCERT1999
@@ -692,7 +693,7 @@ Public Type UMCListType
   UMCCnt As Long                'number of classes
   UMCs() As udtUMCType          'actual classes                                           (0-based array)
   
-  MassCorrectionValuesDefined As Boolean        ' New for this version; True when custom mass correction values are defined for the UMCs
+  MassCorrectionValuesDefined As Boolean        ' New for this version; True when custom mass correction values are defined for the LC-MS Features
   
   AdditionalValue1 As Long          ' New for this version; use for future expansion (name can be changed in the future)
   AdditionalValue2 As Single        ' New for this version; use for future expansion (name can be changed in the future)
@@ -858,7 +859,7 @@ Public Type udtIsoPairsSearchDef2004cType
 
     RequireMatchingChargeStatesForPairMembers As Boolean
     UseIdenticalChargesForER As Boolean                         ' If UseIdenticalChargesForER = True, but RequireMatchingChargeStatesForPairMembers = False, and matching charges cannot be found, then the ER is computed using the ratio of the most abundant charge state for the members of the pair
-    ComputeERScanByScan As Boolean                              ' When true, then computes an ER value for pairwise between the two UMC's of a pair, stepping scan by scan, then averaging the values across all scans; if UseIdenticalChargesForER = True then does this for matching charge states; otherwise, sums all charge states together
+    ComputeERScanByScan As Boolean                              ' When true, then computes an ER value for pairwise between the two LC-MS Features of a pair, stepping scan by scan, then averaging the values across all scans; if UseIdenticalChargesForER = True then does this for matching charge states; otherwise, sums all charge states together
     AverageERsAllChargeStates As Boolean                        ' When true, then use a (weighted) average to combine the ER's for all matching charge states; this option is only valid if UseIdenticalChargesForER = True
     AverageERsWeightingMode As Integer                          ' Actually enum aewAverageERsWeightingModeConstants; The weighting mode to use if AverageERsAllChargeStates = True
 
@@ -867,7 +868,7 @@ End Type
 
 ' Old structure
 Public Type IsoPairsDltLbl2004cType
-    SyncWithUMC As Boolean                      ' True if the pairs are sync'd with the UMCs in GelUMC()
+    SyncWithUMC As Boolean                      ' True if the pairs are sync'd with the LC-MS Features in GelUMC()
     DltLblType As Long                          ' Actually enum glPairsType; ptNone, ptUMCDlt, ptUMCLbl, etc.
 
     SearchDef As udtIsoPairsSearchDef2004cType
@@ -920,7 +921,7 @@ Public Type udtIsoPairsSearchDef2004dType
     
     RequireMatchingChargeStatesForPairMembers As Boolean
     UseIdenticalChargesForER As Boolean                         ' If UseIdenticalChargesForER = True, but RequireMatchingChargeStatesForPairMembers = False, and matching charges cannot be found, then the ER is computed using the ratio of the most abundant charge state for the members of the pair
-    ComputeERScanByScan As Boolean                              ' When true, then computes an ER value for pairwise between the two UMC's of a pair, stepping scan by scan, then averaging the values across all scans; if UseIdenticalChargesForER = True then does this for matching charge states; otherwise, sums all charge states together
+    ComputeERScanByScan As Boolean                              ' When true, then computes an ER value for pairwise between the two LC-MS Features of a pair, stepping scan by scan, then averaging the values across all scans; if UseIdenticalChargesForER = True then does this for matching charge states; otherwise, sums all charge states together
     AverageERsAllChargeStates As Boolean                        ' When true, then use a (weighted) average to combine the ER's for all matching charge states; this option is only valid if UseIdenticalChargesForER = True
     AverageERsWeightingMode As Integer                          ' Actually enum aewAverageERsWeightingModeConstants; The weighting mode to use if AverageERsAllChargeStates = True
     
@@ -938,7 +939,7 @@ End Type
 
 ' Old structure
 Public Type IsoPairsDltLbl2004dType
-    SyncWithUMC As Boolean                      ' True if the pairs are sync'd with the UMCs in GelUMC()
+    SyncWithUMC As Boolean                      ' True if the pairs are sync'd with the LC-MS Features in GelUMC()
     DltLblType As Long                          ' Actually enum glPairsType; ptNone, ptUMCDlt, ptUMCLbl, etc.
     
     SearchDef As udtIsoPairsSearchDef2004dType
@@ -975,7 +976,7 @@ Public Type udtIsoPairsSearchDefType
     
     RequireMatchingChargeStatesForPairMembers As Boolean
     UseIdenticalChargesForER As Boolean                         ' If UseIdenticalChargesForER = True, but RequireMatchingChargeStatesForPairMembers = False, and matching charges cannot be found, then the ER is computed using the ratio of the most abundant charge state for the members of the pair
-    ComputeERScanByScan As Boolean                              ' When true, then computes an ER value for pairwise between the two UMC's of a pair, stepping scan by scan, then averaging the values across all scans; if UseIdenticalChargesForER = True then does this for matching charge states; otherwise, sums all charge states together
+    ComputeERScanByScan As Boolean                              ' When true, then computes an ER value for pairwise between the two LC-MS Features of a pair, stepping scan by scan, then averaging the values across all scans; if UseIdenticalChargesForER = True then does this for matching charge states; otherwise, sums all charge states together
     AverageERsAllChargeStates As Boolean                        ' When true, then use a (weighted) average to combine the ER's for all matching charge states; this option is only valid if UseIdenticalChargesForER = True
     AverageERsWeightingMode As Integer                          ' Actually enum aewAverageERsWeightingModeConstants; The weighting mode to use if AverageERsAllChargeStates = True
     
@@ -997,7 +998,7 @@ End Type
 'In case of individual peak pairs consideration is limited
 'to Isotopic peaks
 Public Type IsoPairsDltLblType
-    SyncWithUMC As Boolean                      ' True if the pairs are sync'd with the UMCs in GelUMC()
+    SyncWithUMC As Boolean                      ' True if the pairs are sync'd with the LC-MS Features in GelUMC()
     DltLblType As Long                          ' Actually enum glPairsType; ptNone, ptUMCDlt, ptUMCLbl, etc.
     
     SearchDef As udtIsoPairsSearchDefType
@@ -1211,6 +1212,7 @@ End If
 GelStatus(0).Dirty = True
 GelBody(0).Tag = 0
 GelBody(0).Caption = "--- MT tags Display --- "
+GelStatus(0).GelFilePathFull = App.Path
 GelBody(0).Show
 Screen.MousePointer = vbDefault
 Exit Sub
@@ -1221,7 +1223,7 @@ LogErrors Err.Number, "Display0"
 End Sub
 
 Private Sub Display0DataSource(ByVal DBGeneration As Long)
-If DBGeneration >= glAMT_GENERATION_MT_1 Then           'MT tag database
+If DBGeneration >= dbgMTSOnline Then           'MT tag database
    GelData(0).Comment = GelData(0).Comment & vbCrLf & _
         "This display created based on data from PRISM system" & CurrMTDBInfo
 Else                                'legacy database
@@ -1345,6 +1347,7 @@ If Len(sFileName) > 0 Then ' User selected a file.
       GelBody(fIndex).Tag = fIndex
       GelBody(fIndex).Caption = "Untitled:" & fIndex
       GelData(fIndex).PathtoDatabase = glbPreferencesExpanded.LegacyAMTDBPath
+      GelStatus(fIndex).GelFilePathFull = GetFilePathFull(sFileName)
       ' MonroeMod: Need to add recent files to file menu
       GetRecentFiles
       GelBody(fIndex).Show

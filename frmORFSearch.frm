@@ -180,7 +180,7 @@ Dim CallerID As Long
 Dim bLoading As Boolean
 
 Dim objORF As New dbORF
-Dim spName As String            'name of stored procedure to retrieve ORFs
+Dim spName As String            'name of stored procedure to retrieve Proteins
 Dim cnString As String          'connection string for MT tag database
 
 Private Sub Form_Activate()
@@ -224,14 +224,14 @@ End Sub
 
 Private Sub mnuOLoadMTDB_Click()
 '------------------------------------------------------------------------------------
-'load ORFs from MT tag database; CallerID display has to be associated with the DB
-'for this to work; also it has to know name of procedure that will retrieve ORFs
+'load Proteins (ORFs) from MT tag database; CallerID display has to be associated with the DB
+'for this to work; also it has to know name of procedure that will retrieve Proteins
 '------------------------------------------------------------------------------------
 Dim Resp As Long
 On Error Resume Next
 If Not GelAnalysis(CallerID) Is Nothing Then
    If objORF.ORFCount > 0 Then
-      Resp = MsgBox("ORF object already contains data. Reload anyway?", vbYesNo, glFGTU)
+      Resp = MsgBox("Protein object already contains data. Reload anyway?", vbYesNo, glFGTU)
       If Resp <> vbYes Then Exit Sub
    End If
    cnString = GelAnalysis(CallerID).MTDB.cn.ConnectionString
@@ -239,12 +239,12 @@ If Not GelAnalysis(CallerID) Is Nothing Then
    If Len(cnString) > 0 And Len(spName) > 0 Then
       UpdateStatus "Loading Protein data ..."
       If objORF.LoadORFsFromORFDB(cnString, spName) Then
-         UpdateStatus "Loaded ORFs: " & objORF.ORFCount
+         UpdateStatus "Loaded Proteins: " & objORF.ORFCount
       Else
          UpdateStatus "Error loading Protein data."
       End If
    Else
-      MsgBox "Missing parameters necessary to load ORF data.", vbOKOnly, glFGTU
+      MsgBox "Missing parameters necessary to load protein data.", vbOKOnly, glFGTU
    End If
 End If
 End Sub

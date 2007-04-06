@@ -51,14 +51,14 @@ End Function
 
 Public Function LoadORFsFromORFDB(DBConnStr As String, spGetORFs As String) As Boolean
 '-------------------------------------------------------------------------------------
-'loads ORFs from ORF database and fills data structures; returns True if successful
-'IniFileName is neccessary to retrieve name of stored procedure to retrieve ORFs;
+'loads Proteins (ORFs) from Protein database and fills data structures; returns True if successful
+'IniFileName is neccessary to retrieve name of stored procedure to retrieve Proteins;
 '-------------------------------------------------------------------------------------
 Dim cnNew As New ADODB.Connection
 Dim sCommand As String
 Dim rsORFs As New ADODB.Recordset
 Dim cmdGetORFs As New ADODB.Command
-'reserve space for 10000 ORFs; increase in chunks of 2000 after that
+'reserve space for 10000 Proteins; increase in chunks of 2000 after that
 ReDim mORFID(10000)
 ReDim mORFReference(10000)
 ReDim mORFDescription(10000)
@@ -153,7 +153,7 @@ End Function
 Public Function LoadORFsFromLegacyDB() As Boolean
 '---------------------------------------------------------------------------------------
 'loads ORFs from legacy AMT database and fills data structures; returns True if successful
-'IniFileName is neccessary to retrieve name of stored procedure to retrieve ORFs;
+'IniFileName is neccessary to retrieve name of stored procedure to retrieve Proteins;
 '---------------------------------------------------------------------------------------
 
 End Function
@@ -161,7 +161,7 @@ End Function
 
 Public Function ORFSearchMW(ByVal MW As Double, ByVal MWTol As Double, ResID() As Long) As Long
 '----------------------------------------------------------------------------------------------
-'fills array ResID with IDs of ORFs matching requirements and returns count; -1 on any error
+'fills array ResID with IDs of Proteins matching requirements and returns count; -1 on any error
 '----------------------------------------------------------------------------------------------
 On Error GoTo err_ORFSearchMW
 

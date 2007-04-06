@@ -107,7 +107,7 @@ On Error GoTo err_FillData
 If Not frmThisForm Is Nothing Then
     blnShowProgress = True
     strCaptionSaved = frmThisForm.Caption
-    frmThisForm.Caption = "Loading ORF names: Connecting to " & ExtractDBNameFromConnectionString(mDBConnString)
+    frmThisForm.Caption = "Loading Protein names: Connecting to " & ExtractDBNameFromConnectionString(mDBConnString)
 End If
 
 If Not ManageArrays(amReDim, 75000) Then GoTo err_FillData
@@ -128,7 +128,7 @@ With rsMTName
     .MoveFirst
     Do Until .EOF
        If blnShowProgress Then
-          If mCnt Mod 1000 = 0 Then frmThisForm.Caption = "Loading ORF names for MT tags: " & Trim(mCnt) & " loaded"
+          If mCnt Mod 1000 = 0 Then frmThisForm.Caption = "Loading Protein names for MT tags: " & Trim(mCnt) & " loaded"
        End If
        mCnt = mCnt + 1
        mMTID(mCnt - 1) = FixNullLng(.Fields(0).Value)

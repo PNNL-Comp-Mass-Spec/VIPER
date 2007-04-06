@@ -10,29 +10,55 @@ Attribute VB_Name = "Module13"
 '------------------------------------------------------------------------
 Option Explicit
 
-Public Const glAMT_GENERATION1 = 1      'no Retention Time; no N atoms count
-Public Const glAMT_GENERATION0800 = 2   'no N atoms
-Public Const glAMT_GENERATION0900 = 3
-Public Const glAMT_GENERATION_NEW = 4       ' field names changes; added field "AA_Cystine_Count"; added field "MSMS_Obs_Count"
-Public Const glAMT_GENERATION_MT_1 = 6
+Public Enum dbgDatabaseGenerationConstants
+    dbgUnknown = 0
+    dbgGeneration1 = 1          ' Legacy Access file DB with table [AMT]; no Retention Time; no N atoms count
+    dbgGeneration0800 = 2       ' Legacy Access file DB with table [AMT]; no N atoms
+    dbgGeneration0900 = 3       ' Legacy Access file DB with table [AMT]
+    dbgGeneration1000 = 4       ' Legacy Access file DB with table [AMT]; field names changes; added field "AA_Cystine_Count"; added field "MSMS_Obs_Count"
+    dbgMTSOffline = 5           ' Access DB with tables [T_Mass_Tags] and [T_Mass_Tags_GANET]
+    dbgMTSOnline = 6            ' Sql Server MTS Database
+End Enum
 
-Private Const glAMT_FIELD_NET = "NET"
-Private Const glAMT_FIELD_RETENTION = "RetentionTime"            ' Stored in the AMTData().PNET; ignored if field PNET is present
-Private Const glAMT_FIELD_PNET = "PNET"
-Private Const glAMT_FIELD_NitrogenAtom = "NitrogenAtom"
-Private Const glAMT_FIELD_CysCount = "AA_Cystine_Count"
-Private Const glAMT_FIELD_NEW_ID = "AMT_ID"
-Private Const glAMT_FIELD_OLD_ID = "ID"
-Private Const glAMT_FIELD_MW = "AMTMonoisotopicMass"
-Private Const glAMT_FIELD_Status = "Status"
-Private Const glAMT_FIELD_MSMSObsCount = "MSMS_Obs_Count"
-Private Const glAMT_FIELD_HighNormalizedScore = "High_Normalized_Score"
-Private Const glAMT_FIELD_HighDiscriminantScore = "High_Discriminant_Score"
-Private Const glAMT_FIELD_PeptideProphetProbability = "Peptide_Prophet_Probability"
+' These fieldes apply to dbgGeneration1 through dbgGeneration1000
+Private Const DB_FIELD_AMT_OLD_ID = "ID"
+Private Const DB_FIELD_AMT_NEW_ID = "AMT_ID"
+Private Const DB_FIELD_AMT_MW = "AMTMonoisotopicMass"
+Private Const DB_FIELD_AMT_NET = "NET"
+Private Const DB_FIELD_AMT_RETENTION = "RetentionTime"            ' Stored in the AMTData().PNET; ignored if field PNET is present
+Private Const DB_FIELD_AMT_PNET = "PNET"
+Private Const DB_FIELD_AMT_NitrogenAtom = "NitrogenAtom"
+Private Const DB_FIELD_AMT_CysCount = "AA_Cystine_Count"
+Private Const DB_FIELD_AMT_Status = "Status"
+Private Const DB_FIELD_AMT_MSMSObsCount = "MSMS_Obs_Count"
+Private Const DB_FIELD_AMT_HighNormalizedScore = "High_Normalized_Score"
+Private Const DB_FIELD_AMT_HighDiscriminantScore = "High_Discriminant_Score"
+Private Const DB_FIELD_AMT_PeptideProphetProbability = "Peptide_Prophet_Probability"
 
-Private Const PROTEIN_FIELD_AMT_ID As String = "AMT_ID"
-Private Const PROTEIN_FIELD_Protein_ID As String = "Protein_ID"
-Private Const PROTEIN_FIELD_Protein_Name As String = "Protein_Name"
+Private Const DB_FIELD_PROTEIN_AMT_ID As String = "AMT_ID"
+Private Const DB_FIELD_PROTEIN_Protein_ID As String = "Protein_ID"
+Private Const DB_FIELD_PROTEIN_Protein_Name As String = "Protein_Name"
+
+' These fields apply to dbgMTSOffline
+Private Const DB_FIELD_TMASSTAGS_MASS_TAG_ID = "Mass_Tag_ID"
+Private Const DB_FIELD_TMASSTAGS_MW = "Monoisotopic_Mass"
+Private Const DB_FIELD_TMASSTAGS_MSMSObsCount = "Peptide_Obs_Count_Passing_Filter"
+Private Const DB_FIELD_TMASSTAGS_HighNormalizedScore = "High_Normalized_Score"
+Private Const DB_FIELD_TMASSTAGS_HighDiscriminantScore = "High_Discriminant_Score"
+Private Const DB_FIELD_TMASSTAGS_PeptideProphetProbability = "High_Peptide_Prophet_Probability"
+
+Private Const DB_FIELD_TMTNET_NET = "Avg_GANET"
+Private Const DB_FIELD_TMTNET_PNET = "PNET"
+Private Const DB_FIELD_TMTNET_STDEV = "StD_GANET"
+
+Private Const DB_FIELD_TPROTEINS_Protein_ID As String = "Ref_ID"
+Private Const DB_FIELD_TPROTEINS_Protein_Name As String = "Reference"
+Private Const DB_FIELD_TPROTEINS_Protein_Description As String = "Description"
+Private Const DB_FIELD_TPROTEINS_Protein_Sequence As String = "Protein_Sequence"
+Private Const DB_FIELD_TPROTEINS_Protein_ResidueCount As String = "Protein_Residue_Count"
+Private Const DB_FIELD_TPROTEINS_Protein_Mass As String = "Monoisotopic_Mass"
+
+Private Const DB_FIELD_TMASSTAGSPROTEINMAP_MASS_TAG_Name = "Mass_Tag_Name"
 
 
 Public Const glAMT_NET = 0
@@ -103,13 +129,19 @@ Public Enum srsSearchRegionShapeConstants
     srsElliptical = 0
     srsRectangular = 1
 End Enum
-    
+
 ' MonroeMod: Used to mark ions that inherit a match from another member of a UMC
 Public Const AMTMatchInheritedMark = "(inherited)"
 
 Private Const TABLE_NAME_AMT = "AMT"
 Private Const TABLE_NAME_AMT_PROTEINS = "AMT_Proteins"
 Private Const TABLE_NAME_AMT_TO_PROTEIN_MAP = "AMT_to_Protein_Map"
+
+Private Const TABLE_NAME_T_MASS_TAGS = "T_Mass_Tags"
+Private Const TABLE_NAME_T_MASS_TAGS_NET = "T_Mass_Tags_NET"
+Private Const TABLE_NAME_T_PROTEINS = "T_Proteins"
+Private Const TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP = "T_Mass_Tags_to_Protein_Map"
+
 
 'This corresponds to FileInfoVersions(fioSearchDefinitions) version 2 through version 8
 Public Type SearchAMTDefinition
@@ -164,7 +196,26 @@ Public Type udtAMTDataType
     PeptideProphetProbability As Single ' High Peptide Prophet Probability
 End Type
 
+Private Type udtAMTFieldPresentProteinTblType
+    ID As Boolean
+    Name As Boolean
+    Description As Boolean
+    Sequence As Boolean
+    ResidueCount As Boolean
+    Mass As Boolean
+End Type
+
+Private Type udtAMTFieldPresentProteinPeptideMapTblType
+    MTID As Boolean
+    MTName As Boolean
+    ProteinID As Boolean
+End Type
+
 Private Type udtAMTFieldPresentType
+    MTID As Boolean
+    MW As Boolean
+    NET As Boolean
+    NETStDev As Boolean
     Status As Boolean
     RetentionTime As Boolean
     PNET As Boolean
@@ -174,19 +225,20 @@ Private Type udtAMTFieldPresentType
     HighNormalizedScore As Boolean
     HighDiscriminantScore As Boolean
     PeptideProphetProbability As Boolean
+    
+    ProteinInfo As udtAMTFieldPresentProteinTblType
+    ProteinPeptideMap As udtAMTFieldPresentProteinPeptideMapTblType
 End Type
 
 'once open AMT database stays open for the duration of the application
 Public dbAMT As Database
 
+' For dbgGeneration1000 and earlier, this is True if tables AMT_Proteins & AMT_to_Protein_Map exist
+' For dbgMTSOffline, this is True if tables T_Proteins & T_Mass_Tags_to_Protein_Map exist
 Private AMTProteinTablesExist As Boolean
 
 Public AMTCnt As Long         'global count of AMTs; can be used anywhere in code
-Public AMTFldCnt As Long
-Public AMTGeneration As Integer
-
-'enumeration of AMT fields
-Dim AMTFldNames() As String
+Public AMTGeneration As dbgDatabaseGenerationConstants
 
 'used to keep track of changes in Search AMT function during application run
 Public samtDef As SearchAMTDefinition
@@ -233,8 +285,8 @@ Public ORFCnt As Long               'ORF count
 Public ORFID() As Long              'ORF ids
 
 Public MTtoORFMapCount As Long      'number of MT tags - ORF mappings
-Public MTIDMap() As Long            'parallel arrays that establish MT tags - ORFs mapping; 1-based array
-Public ORFIDMap() As Long           'parallel arrays that establish MT tags - ORFs mapping; 1-based array
+Public MTIDMap() As Long            'parallel arrays that establish MT tags to Proteins mapping; 1-based array
+Public ORFIDMap() As Long           'parallel arrays that establish MT tags to Proteins mapping; 1-based array
 Public ORFRefNames() As String      'ORF ref names; 1-based array
 
 ' Unused variables (July 2003)
@@ -256,163 +308,163 @@ Dim MyExprEva As ExprEvaluator
 Dim VarVals() As Long
 
 Public Function ConnectToLegacyAMTDB(ByRef frmCallingForm As Form, ByVal lngGelIndex As Long, ByVal AskUser As Boolean, ByVal blnLoadProteinInfo As Boolean, ByVal blnIncludeProteinsForMassTagsNotImMemory As Boolean) As Boolean
-' Load AMT data from an Access database
-
-Dim lngTableRowCount As Long
-
-Dim eResponse As VbMsgBoxResult
-Dim strRequiredAMTFields As String
-Dim strRequiredProteinFields As String
-Dim udtFieldPresent As udtAMTFieldPresentType
-Dim strErrorMessage As String
-Dim blnSuccess As Boolean
-
-Static blnUserWarnedMissingProteinTables As Boolean
-Static blnUserWarnedMissingProteinTableFields As Boolean
-
+    ' Load AMT data from an Access database
+    
+    Static strLegacyDBNotifiedProteinTableFieldError As String
+    
+    Dim lngTableRowCount As Long
+    Dim eDBGeneration As dbgDatabaseGenerationConstants
+    
+    Dim eResponse As VbMsgBoxResult
+    
+    Dim udtFieldPresent As udtAMTFieldPresentType
+    Dim strErrorMessage As String
+    Dim blnSuccess As Boolean
+    Dim strDBPathFull As String
+    Dim fso As New FileSystemObject
+    
 On Error GoTo err_ConnectToLegacyAMTDB
-
-strRequiredAMTFields = "The [AMT] table should contain the fields: " & glAMT_FIELD_NEW_ID & ", " & glAMT_FIELD_MW & ", " & glAMT_FIELD_NET & ", " & glAMT_FIELD_Status & ", and " & glAMT_FIELD_RETENTION & " or " & glAMT_FIELD_PNET & ".  "
-strRequiredAMTFields = strRequiredAMTFields & "It can optionally contain the fields: " & glAMT_FIELD_MSMSObsCount & ", " & glAMT_FIELD_HighNormalizedScore & ", " & glAMT_FIELD_HighDiscriminantScore & ", " & glAMT_FIELD_PeptideProphetProbability & ", " & glAMT_FIELD_NitrogenAtom & ", and " & glAMT_FIELD_CysCount & "."
-
-strRequiredProteinFields = "The [AMT_Proteins] table should contain the fields " & PROTEIN_FIELD_Protein_ID & " and " & PROTEIN_FIELD_Protein_Name & ". "
-strRequiredProteinFields = strRequiredProteinFields & "The [AMT_to_Protein_Map] table should contain the fields " & PROTEIN_FIELD_AMT_ID & " and " & PROTEIN_FIELD_Protein_ID & "."
-
-ConnectToLegacyAMTDB = False
-If AskUser And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-    eResponse = MsgBox("2DGel will access AMT database: " & vbCrLf _
-                 & GelData(lngGelIndex).PathtoDatabase & vbCrLf & "Multiple versions of the AMT " _
-                 & "database might exist. Make sure that listed file " _
-                 & "is '" & "The AMT' database. Choose OK to continue. " _
-                 & "(To specify different database use Options dialog.)" _
-                 , vbOKCancel)
-    If eResponse <> vbOK Then
+    
+    ConnectToLegacyAMTDB = False
+    If AskUser And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        eResponse = MsgBox("2DGel will access AMT database: " & vbCrLf _
+                     & GelData(lngGelIndex).PathtoDatabase & vbCrLf & "Multiple versions of the AMT " _
+                     & "database might exist. Make sure that listed file " _
+                     & "is 'The AMT' database. Choose OK to continue. " _
+                     & "(To specify different database use Options dialog.)" _
+                     , vbOKCancel)
+        If eResponse <> vbOK Then
+            ConnectToLegacyAMTDB = False
+            Exit Function
+        End If
+    End If
+    
+    strDBPathFull = GelData(lngGelIndex).PathtoDatabase
+    If Not fso.FileExists(strDBPathFull) Then
+        ' Look for the DB in the same folder as the .Gel file
+        If Len(GelStatus(lngGelIndex).GelFilePathFull) > 0 Then
+            strDBPathFull = fso.BuildPath(fso.GetParentFolderName(GelStatus(lngGelIndex).GelFilePathFull), fso.GetFileName(strDBPathFull))
+        Else
+            strDBPathFull = fso.BuildPath(App.Path, fso.GetFileName(strDBPathFull))
+        End If
+        
+        If fso.FileExists(strDBPathFull) Then
+            GelData(lngGelIndex).PathtoDatabase = strDBPathFull
+        End If
+    End If
+    
+    If Not fso.FileExists(GelData(lngGelIndex).PathtoDatabase) Then
+        strErrorMessage = "Database file not found: " & GelData(lngGelIndex).PathtoDatabase
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            AddToAnalysisHistory lngGelIndex, strErrorMessage
+        Else
+            MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
+        End If
         ConnectToLegacyAMTDB = False
         Exit Function
     End If
-End If
-
-If Not FileExists(GelData(lngGelIndex).PathtoDatabase) Then
-    strErrorMessage = "Database file not found: " & GelData(lngGelIndex).PathtoDatabase
-    If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        AddToAnalysisHistory lngGelIndex, strErrorMessage
-    Else
-        MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
-    End If
-    ConnectToLegacyAMTDB = False
-    Exit Function
-End If
-
-Set dbAMT = DBEngine.Workspaces(0).OpenDatabase(GelData(lngGelIndex).PathtoDatabase, False, True)
-
-' Make sure table TABLE_NAME_AMT = "AMT" exists
-On Error Resume Next
-lngTableRowCount = dbAMT.TableDefs(TABLE_NAME_AMT).RecordCount
-If Err Then
-    strErrorMessage = "Error accessing AMT table. Connection with AMT database will be closed. Make sure the Access database contains a tabled named [AMT].  " & strRequiredAMTFields & vbCrLf & "File: " & GelData(lngGelIndex).PathtoDatabase
-    If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        AddToAnalysisHistory lngGelIndex, strErrorMessage
-    Else
-        MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
-    End If
-    Set dbAMT = Nothing
-    Exit Function
-End If
-
-If lngTableRowCount <= 0 Then
-    strErrorMessage = "No records found in AMT table. Connection with AMT database will be closed.  " & strRequiredAMTFields & vbCrLf & "File: " & GelData(lngGelIndex).PathtoDatabase
-    If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        AddToAnalysisHistory lngGelIndex, strErrorMessage
-    Else
-        MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
-    End If
     
-    Set dbAMT = Nothing
-    Exit Function
-End If
-
-' See if table TABLE_NAME_AMT_PROTEINS = "AMT_Proteins" exists
-On Error Resume Next
-lngTableRowCount = dbAMT.TableDefs(TABLE_NAME_AMT_PROTEINS).RecordCount
-If Err Then
-    ' AMT_Proteins table does not exist
-    AMTProteinTablesExist = False
-    Err.Clear
-Else
-    ' See if table TABLE_NAME_AMT_TO_PROTEIN_MAP = "AMT_to_Protein_Map" exists
-    On Error Resume Next
-    lngTableRowCount = dbAMT.TableDefs(TABLE_NAME_AMT_TO_PROTEIN_MAP).RecordCount
-    If Err Then
-        ' AMT_to_Protein_Map table does not exist
-        AMTProteinTablesExist = False
-        Err.Clear
-    Else
-        AMTProteinTablesExist = True
-    End If
-End If
-
-If Not AMTProteinTablesExist And Not blnUserWarnedMissingProteinTables Then
-    blnUserWarnedMissingProteinTables = True
+    Set dbAMT = DBEngine.Workspaces(0).OpenDatabase(GelData(lngGelIndex).PathtoDatabase, False, True)
     
-    strErrorMessage = "Could not find the " & TABLE_NAME_AMT_PROTEINS & " and/or " & TABLE_NAME_AMT_TO_PROTEIN_MAP & " table in the Access database.  Analysis will continue but protein information will not be loaded. To load protein information, make sure the database contains these tables.  " & strRequiredProteinFields & vbCrLf & "File: " & GelData(lngGelIndex).PathtoDatabase
-    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
-    End If
-End If
-
-If EnumerateAMTFields(GelData(lngGelIndex).PathtoDatabase, lngGelIndex, udtFieldPresent) <> AMTFldCnt Then
-    strErrorMessage = strRequiredAMTFields & vbCrLf & "File: " & GelData(lngGelIndex).PathtoDatabase
-    If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        AddToAnalysisHistory lngGelIndex, strRequiredAMTFields
-    Else
-        MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
-    End If
-
-    Set dbAMT = Nothing
-    Exit Function
-End If
-
-If AMTProteinTablesExist Then
-    If Not EnumerateProteinTableFields(GelData(lngGelIndex).PathtoDatabase, lngGelIndex) Then
-        If Not blnUserWarnedMissingProteinTableFields Then
-            strErrorMessage = strRequiredProteinFields & vbCrLf & "File: " & GelData(lngGelIndex).PathtoDatabase
-            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-                MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
-            End If
-            blnUserWarnedMissingProteinTableFields = True
+    blnSuccess = DetermineLegacyAMTDBFormat(dbAMT, eDBGeneration)
+    If Not blnSuccess Then
+        strErrorMessage = "Could not find the expected tables in the database. Connection with AMT database will be closed. " & _
+                          "Make sure the Access database contains a table named [" & TABLE_NAME_AMT & "] or the tables " & _
+                          "[" & TABLE_NAME_T_MASS_TAGS & "] and [" & TABLE_NAME_T_MASS_TAGS_NET & "]." & vbCrLf & "File: " & GelData(lngGelIndex).PathtoDatabase
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            AddToAnalysisHistory lngGelIndex, strErrorMessage
+        Else
+            MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
         End If
-        AMTProteinTablesExist = False
+        
+        Set dbAMT = Nothing
+        Exit Function
+    Else
+        
     End If
-End If
-
-
-' First loat the MT tags
-blnSuccess = LegacyDBLoadAMTData(frmCallingForm, GelData(lngGelIndex).PathtoDatabase, lngGelIndex, udtFieldPresent)
-
-If blnSuccess And blnLoadProteinInfo And AMTProteinTablesExist Then
-    ' Now load the proteins
-    blnSuccess = LegacyDBLoadProteinData(frmCallingForm, GelData(lngGelIndex).PathtoDatabase, lngGelIndex, blnIncludeProteinsForMassTagsNotImMemory)
-End If
-
-If blnSuccess Then
-    glbPreferencesExpanded.LegacyAMTDBPath = GelData(lngGelIndex).PathtoDatabase
-End If
-
-ConnectToLegacyAMTDB = blnSuccess
+    
+    If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+        ' Count the number of rows in tables TABLE_NAME_T_MASS_TAGS & TABLE_NAME_T_MASS_TAGS_NET
+        lngTableRowCount = GetTableRowCount(dbAMT, TABLE_NAME_T_MASS_TAGS, True, GetLegacyDBRequiredMTTableFields(eDBGeneration), lngGelIndex)
+        If lngTableRowCount <= 0 Then
+            Set dbAMT = Nothing
+            Exit Function
+        End If
+    
+        lngTableRowCount = GetTableRowCount(dbAMT, TABLE_NAME_T_MASS_TAGS_NET, True, GetLegacyDBRequiredMTTableFields(eDBGeneration), lngGelIndex)
+        If lngTableRowCount <= 0 Then
+            Set dbAMT = Nothing
+            Exit Function
+        End If
+    Else
+        ' Assume eDBGeneration is dbgGeneration1 through dbgGeneration1000
+        
+        ' Count the number of rows in TABLE_NAME_AMT
+        lngTableRowCount = GetTableRowCount(dbAMT, TABLE_NAME_AMT, True, GetLegacyDBRequiredMTTableFields(eDBGeneration), lngGelIndex)
+        If lngTableRowCount <= 0 Then
+            Set dbAMT = Nothing
+            Exit Function
+        End If
+    End If
+    
+    AMTProteinTablesExist = LegacyDBCheckForProteinTables(eDBGeneration, GelData(lngGelIndex).PathtoDatabase)
+    
+    ' Determine which fields are present
+    ' Note that eDBGeneration will get updated here if it is dbgGeneration1 through dbgGeneration1000
+    If Not EnumerateLegacyAMTFields(GelData(lngGelIndex).PathtoDatabase, lngGelIndex, udtFieldPresent, eDBGeneration) Then
+        strErrorMessage = GetLegacyDBRequiredMTTableFields(eDBGeneration) & vbCrLf & "File: " & GelData(lngGelIndex).PathtoDatabase
+        
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            AddToAnalysisHistory lngGelIndex, strErrorMessage
+        Else
+            MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
+        End If
+    
+        Set dbAMT = Nothing
+        Exit Function
+    End If
+    
+    If AMTProteinTablesExist Then
+        If Not EnumerateProteinTableFields(GelData(lngGelIndex).PathtoDatabase, lngGelIndex, eDBGeneration, udtFieldPresent) Then
+            If strLegacyDBNotifiedProteinTableFieldError <> GelData(lngGelIndex).PathtoDatabase Then
+                strErrorMessage = GetLegacyDBRequiredProteinTableFields(eDBGeneration) & vbCrLf & "File: " & GelData(lngGelIndex).PathtoDatabase
+                If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                    MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
+                End If
+            End If
+            AMTProteinTablesExist = False
+        End If
+    End If
+    
+    ' The data should be ready to load
+    ' First load the MT tags
+    blnSuccess = LegacyDBLoadAMTData(frmCallingForm, GelData(lngGelIndex).PathtoDatabase, lngGelIndex, udtFieldPresent, eDBGeneration)
+    
+    If blnSuccess And blnLoadProteinInfo And AMTProteinTablesExist Then
+        ' Now load the proteins
+        blnSuccess = LegacyDBLoadProteinData(frmCallingForm, GelData(lngGelIndex).PathtoDatabase, lngGelIndex, blnIncludeProteinsForMassTagsNotImMemory, eDBGeneration, udtFieldPresent)
+    End If
+    
+    If blnSuccess Then
+        glbPreferencesExpanded.LegacyAMTDBPath = GelData(lngGelIndex).PathtoDatabase
+    End If
+    
+    ConnectToLegacyAMTDB = blnSuccess
 
 Exit Function
 
 err_ConnectToLegacyAMTDB:
-If Err.Number = 3024 Then
-    strErrorMessage = "Error connecting to database; " & Err.Description
-Else
-    strErrorMessage = "Error connecting to database: " & GelData(lngGelIndex).PathtoDatabase & "; " & Err.Description & " (Error Number " & Trim(Err.Number) & ")"
-End If
-If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-    AddToAnalysisHistory lngGelIndex, strErrorMessage
-Else
-    MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
-End If
+    If Err.Number = 3024 Then
+        strErrorMessage = "Error connecting to database; " & Err.Description
+    Else
+        strErrorMessage = "Error connecting to database: " & GelData(lngGelIndex).PathtoDatabase & "; " & Err.Description & " (Error Number " & Trim(Err.Number) & ")"
+    End If
+    
+    If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        AddToAnalysisHistory lngGelIndex, strErrorMessage
+    Else
+        MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+    End If
 
 End Function
 
@@ -535,6 +587,41 @@ exit_ConstructInternalStdReference:
 
 End Function
 
+Private Function DetermineLegacyAMTDBFormat(ByRef dbAMT As Database, ByRef eDBGeneration As dbgDatabaseGenerationConstants) As Boolean
+    Dim objTableDef As TableDef
+    Dim blnMatchFound As Boolean
+    
+    ' First look for table TABLE_NAME_T_MASS_TAGS
+    blnMatchFound = False
+    For Each objTableDef In dbAMT.TableDefs
+        If UCase(objTableDef.Name) = UCase(TABLE_NAME_T_MASS_TAGS) Then
+            blnMatchFound = True
+            Exit For
+        End If
+    Next objTableDef
+    
+    If blnMatchFound Then
+        eDBGeneration = dbgMTSOffline
+    Else
+        For Each objTableDef In dbAMT.TableDefs
+            If UCase(objTableDef.Name) = UCase(TABLE_NAME_AMT) Then
+                blnMatchFound = True
+                Exit For
+            End If
+        Next objTableDef
+        
+        If blnMatchFound Then
+            ' We'll set eDBGeneration to dbgGeneration1000 for now
+            ' It could also be dbgGeneration1, dbgGeneration0800, or dbgGeneration0900
+            ' The correct format will be determined in EnumerateLegacyAMTFields
+            eDBGeneration = dbgGeneration1000
+        End If
+    End If
+    
+    DetermineLegacyAMTDBFormat = blnMatchFound
+    
+End Function
+
 Public Function FillMWSearchObject(ByRef objMWUtil As MWUtil) As Boolean
     Dim dblMW() As Double
     Dim lngIndex As Long
@@ -550,254 +637,289 @@ Public Function FillMWSearchObject(ByRef objMWUtil As MWUtil) As Boolean
     
 End Function
 
+Private Function GetTableRowCount(ByRef objThisDB As Database, ByVal strTableName As String, ByVal blnInformUserIfMissingOrNoData As Boolean, Optional ByVal strRequiredTableFields As String = "", Optional lngGelIndex As Long = 0) As Long
+    ' Determines the number of rows in table strTableName in database objThisDB
+    ' Returns 0 if the table is not found or no rows
+    
+    Dim strErrorMessage As String
+    Dim lngTableRowCount As Long
+    
+    On Error Resume Next
+    
+    strErrorMessage = ""
+    lngTableRowCount = objThisDB.TableDefs(strTableName).RecordCount
+    
+    If blnInformUserIfMissingOrNoData Then
+        If Err Then
+            strErrorMessage = "Error accessing the [" & strTableName & "] table. Make sure the Access database contains a table named [" & strTableName & "]."
+        ElseIf lngTableRowCount <= 0 Then
+            strErrorMessage = "No records found in the [" & strTableName & "] table."
+        End If
+        
+        If Len(strErrorMessage) > 0 Then
+            strErrorMessage = strErrorMessage & "  Connection with AMT database will be closed. " & strRequiredTableFields & vbCrLf & "File: " & GelData(lngGelIndex).PathtoDatabase
+            lngTableRowCount = 0
+            
+            If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                AddToAnalysisHistory lngGelIndex, strErrorMessage
+            Else
+                MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
+            End If
+        End If
+    End If
+    
+    If Err Then
+        Err.Clear
+    End If
+    
+    GetTableRowCount = lngTableRowCount
+    
+End Function
+
 ' Unused function (March 2006)
 ''Public Function GetAMTRecordByID(ByVal ID As String) As String
 '''retrieves record from AMT by it's ID (primary key)
 ''MsgBox "Not implemented at the moment.", vbOKOnly, glFGTU
 ''End Function
 
-Private Function LegacyDBLoadAMTData(ByRef frmCallingForm As VB.Form, ByVal strLegacyDBFilePath As String, ByVal lngGelIndex As Long, ByRef udtFieldPresent As udtAMTFieldPresentType) As Boolean
+Private Function LegacyDBCheckForProteinTables(ByVal eDBGeneration As dbgDatabaseGenerationConstants, ByVal strLegacyDBPath As String) As Boolean
+
+    Static strLegacyDBPathSaved As String
+    
+    Dim blnAMTProteinTablesExist As Boolean
+    
+    Dim strProteinTableName As String
+    Dim strMTtoProteinMapTableName As String
+    Dim strErrorMessage As String
+    
+    Dim lngTableRowCount As Long
+    
+    blnAMTProteinTablesExist = False
+    If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+        strProteinTableName = "[" & TABLE_NAME_T_PROTEINS & "]"
+        strMTtoProteinMapTableName = "[" & TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP & "]"
+    Else
+        ' Assume eDBGeneration is dbgGeneration1 through dbgGeneration1000
+        strProteinTableName = "[" & TABLE_NAME_AMT_PROTEINS & "]"
+        strMTtoProteinMapTableName = "[" & TABLE_NAME_AMT_TO_PROTEIN_MAP & "]"
+    End If
+
+    ' See if the Protein mapping tables exist
+    lngTableRowCount = GetTableRowCount(dbAMT, strProteinTableName, False)
+    If lngTableRowCount > 0 Then
+        lngTableRowCount = GetTableRowCount(dbAMT, strMTtoProteinMapTableName, False)
+        If lngTableRowCount > 0 Then
+            blnAMTProteinTablesExist = True
+        End If
+    End If
+
+    If Not blnAMTProteinTablesExist Then
+        If strLegacyDBPathSaved <> strLegacyDBPath Then
+            strLegacyDBPathSaved = strLegacyDBPath
+        
+            strErrorMessage = "Could not find the [" & strProteinTableName & "] and/or [" & strMTtoProteinMapTableName & "] tables in the Access database.  " & _
+                              "Analysis will continue but protein information will not be loaded.  To load protein information, make sure the database contains these tables.  " & _
+                              GetLegacyDBRequiredProteinTableFields(eDBGeneration) & vbCrLf & "File: " & strLegacyDBPath
+            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
+            End If
+        End If
+    End If
+    
+    LegacyDBCheckForProteinTables = blnAMTProteinTablesExist
+    
+End Function
+    
+Private Function LegacyDBLoadAMTData(ByRef frmCallingForm As VB.Form, ByVal strLegacyDBFilePath As String, ByVal lngGelIndex As Long, ByRef udtFieldPresent As udtAMTFieldPresentType, ByVal eDBGeneration As dbgDatabaseGenerationConstants) As Boolean
 '------------------------------------------------------------
 'loads data from AMT table in a Microsoft Access file into arrays
 'returns True on success
 'this function can be called at any time to refresh arrays
 '------------------------------------------------------------
-
-Const NET_VALUE_IF_NULL = -100000
-
-Dim rsAMTSQL As String
-Dim rsAMT As Recordset
-Dim IDFieldName As String
-Dim strTable As String
-Dim strErrorMessage As String
-Dim strCaptionSaved As String
-
-Dim i As Long
-Dim lngMassTagCountWithNullValues As Long
-
-' Save the form's caption
-strCaptionSaved = frmCallingForm.Caption
-
-strTable = "[" & TABLE_NAME_AMT & "]."
+    
+    Dim rsAMTSQL As String
+    Dim rsAMT As Recordset
+    Dim IDFieldName As String
+    Dim strMTTable As String
+    Dim strNETTable As String
+    Dim strErrorMessage As String
+    Dim strCaptionSaved As String
+    
+    Dim lngMassTagCountWithNullValues As Long
+    
+    ' Save the form's caption
+    strCaptionSaved = frmCallingForm.Caption
+    
 
 On Error GoTo err_LegacyDBLoadAMTData
-
-Select Case AMTGeneration
-Case glAMT_GENERATION1
-    IDFieldName = glAMT_FIELD_OLD_ID
-    rsAMTSQL = " SELECT " & strTable & glAMT_FIELD_OLD_ID & ", " & _
-                            strTable & glAMT_FIELD_MW & ", " & _
-                            strTable & glAMT_FIELD_NET & ", " & _
-                            strTable & glAMT_FIELD_Status & _
-               " FROM [" & TABLE_NAME_AMT & "]" & _
-               " ORDER BY " & strTable & glAMT_FIELD_MW & ";"
-           
-Case glAMT_GENERATION0800
-    IDFieldName = glAMT_FIELD_OLD_ID
-    rsAMTSQL = " SELECT " & strTable & glAMT_FIELD_OLD_ID & ", " & _
-                            strTable & glAMT_FIELD_MW & ", " & _
-                            strTable & glAMT_FIELD_NET & ", " & _
-                            strTable & glAMT_FIELD_Status & ", " & _
-                            strTable & glAMT_FIELD_RETENTION & _
-               " FROM [" & TABLE_NAME_AMT & "]" & _
-               " ORDER BY " & strTable & glAMT_FIELD_MW & ";"
-           
-Case glAMT_GENERATION0900
-    IDFieldName = glAMT_FIELD_OLD_ID
-    rsAMTSQL = " SELECT " & strTable & glAMT_FIELD_OLD_ID & ", " & _
-                            strTable & glAMT_FIELD_MW & ", " & _
-                            strTable & glAMT_FIELD_NET & ", " & _
-                            strTable & glAMT_FIELD_Status & ", " & _
-                            strTable & glAMT_FIELD_RETENTION & ", " & _
-                            strTable & glAMT_FIELD_NitrogenAtom & _
-               " FROM [" & TABLE_NAME_AMT & "]" & _
-               " ORDER BY " & strTable & glAMT_FIELD_MW & ";"
-           
-Case glAMT_GENERATION_NEW
-    IDFieldName = glAMT_FIELD_NEW_ID
-    rsAMTSQL = "SELECT " & strTable & glAMT_FIELD_NEW_ID & ", " & _
-                           strTable & glAMT_FIELD_MW & ", " & _
-                           strTable & glAMT_FIELD_NET
-
-    If udtFieldPresent.Status Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_Status
     
-    If udtFieldPresent.PNET Then
-        rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_PNET
-        
-        ' Do not read the Retention column if the PNET column is present
-        udtFieldPresent.RetentionTime = False
-    End If
-                      
-    If udtFieldPresent.RetentionTime Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_RETENTION
-    If udtFieldPresent.NitrogenAtom Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_NitrogenAtom
-    If udtFieldPresent.CysCount Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_CysCount
-    If udtFieldPresent.MSMSObsCount Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_MSMSObsCount
-    If udtFieldPresent.HighNormalizedScore Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_HighNormalizedScore
-    If udtFieldPresent.HighDiscriminantScore Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_HighDiscriminantScore
-    If udtFieldPresent.PeptideProphetProbability Then rsAMTSQL = rsAMTSQL & ", " & strTable & glAMT_FIELD_PeptideProphetProbability
-                      
-    rsAMTSQL = rsAMTSQL & " FROM [" & TABLE_NAME_AMT & "]" & _
-                          " ORDER BY " & strTable & glAMT_FIELD_MW & ";"
-
-Case Else
-    ' Unknown version
-    LegacyDBLoadAMTData = False
-End Select
-
-Set rsAMT = dbAMT.OpenRecordset(rsAMTSQL, dbOpenSnapshot)
-rsAMT.MoveLast
-AMTCnt = rsAMT.RecordCount
-If AMTCnt <= 0 Then GoTo exit_LegacyDBLoadAMTData
-
-ReDim AMTData(1 To AMTCnt)
-
-' Clear MTtoORFMapCount
-MTtoORFMapCount = 0
-
-''If AMTGeneration > glAMT_GENERATION1 Then ReDim AMTPNET(1 To AMTCnt)
-''If AMTGeneration > glAMT_GENERATION0800 Then ReDim AMTCNT_N(1 To AMTCnt)
-''If AMTGeneration > glAMT_GENERATION_NEW Then ReDim AMTCNT_Cys(1 To AMTCnt)
-
-i = 0
-With rsAMT
-    .MoveFirst
-    Do Until .EOF
-        i = i + 1
-        AMTData(i).ID = .Fields(IDFieldName).Value
-        AMTData(i).MW = CDbl(.Fields(glAMT_FIELD_MW).Value)
-        
-        If IsNull(.Fields(glAMT_FIELD_NET).Value) Then
-            AMTData(i).NET = NET_VALUE_IF_NULL
-        Else
-            AMTData(i).NET = CDbl(.Fields(glAMT_FIELD_NET).Value)
-        End If
-        
-       
-        ' Set the defaults for the remaining fields
-        ' We'll populate them with the real values if the field is present
-        AMTData(i).flag = 0
-        AMTData(i).PNET = NET_VALUE_IF_NULL
-        AMTData(i).NETStDev = 0
-        AMTData(i).CNT_N = -1
-        AMTData(i).CNT_Cys = -1
-        AMTData(i).MSMSObsCount = 1
-        AMTData(i).HighNormalizedScore = 0
-        AMTData(i).HighDiscriminantScore = 0
-        AMTData(i).PeptideProphetProbability = 0
-        
-        If udtFieldPresent.Status Then
-            AMTData(i).flag = CLng(.Fields(glAMT_FIELD_Status).Value)
-        End If
+    Select Case eDBGeneration
+    Case dbgGeneration1
+        strMTTable = "[" & TABLE_NAME_AMT & "]."
+        IDFieldName = DB_FIELD_AMT_OLD_ID
+        rsAMTSQL = " SELECT " & strMTTable & DB_FIELD_AMT_OLD_ID & ", " & _
+                                strMTTable & DB_FIELD_AMT_MW & ", " & _
+                                strMTTable & DB_FIELD_AMT_NET & ", " & _
+                                strMTTable & DB_FIELD_AMT_Status & _
+                   " FROM [" & TABLE_NAME_AMT & "]" & _
+                   " ORDER BY " & strMTTable & DB_FIELD_AMT_MW & ";"
+               
+    Case dbgGeneration0800
+        strMTTable = "[" & TABLE_NAME_AMT & "]."
+        IDFieldName = DB_FIELD_AMT_OLD_ID
+        rsAMTSQL = " SELECT " & strMTTable & DB_FIELD_AMT_OLD_ID & ", " & _
+                                strMTTable & DB_FIELD_AMT_MW & ", " & _
+                                strMTTable & DB_FIELD_AMT_NET & ", " & _
+                                strMTTable & DB_FIELD_AMT_Status & ", " & _
+                                strMTTable & DB_FIELD_AMT_RETENTION & _
+                   " FROM [" & TABLE_NAME_AMT & "]" & _
+                   " ORDER BY " & strMTTable & DB_FIELD_AMT_MW & ";"
+               
+    Case dbgGeneration0900
+        strMTTable = "[" & TABLE_NAME_AMT & "]."
+        IDFieldName = DB_FIELD_AMT_OLD_ID
+        rsAMTSQL = " SELECT " & strMTTable & DB_FIELD_AMT_OLD_ID & ", " & _
+                                strMTTable & DB_FIELD_AMT_MW & ", " & _
+                                strMTTable & DB_FIELD_AMT_NET & ", " & _
+                                strMTTable & DB_FIELD_AMT_Status & ", " & _
+                                strMTTable & DB_FIELD_AMT_RETENTION & ", " & _
+                                strMTTable & DB_FIELD_AMT_NitrogenAtom & _
+                   " FROM [" & TABLE_NAME_AMT & "]" & _
+                   " ORDER BY " & strMTTable & DB_FIELD_AMT_MW & ";"
+               
+    Case dbgGeneration1000
+        strMTTable = "[" & TABLE_NAME_AMT & "]."
+        IDFieldName = DB_FIELD_AMT_NEW_ID
+        rsAMTSQL = "SELECT " & strMTTable & DB_FIELD_AMT_NEW_ID & ", " & _
+                               strMTTable & DB_FIELD_AMT_MW & ", " & _
+                               strMTTable & DB_FIELD_AMT_NET
+    
+        If udtFieldPresent.Status Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_Status
         
         If udtFieldPresent.PNET Then
-            If Not IsNull(.Fields(glAMT_FIELD_PNET).Value) Then
-                AMTData(i).PNET = CDbl(.Fields(glAMT_FIELD_PNET).Value)
-            End If
+            rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_PNET
+            
+            ' Do not read the Retention column if the PNET column is present
+            udtFieldPresent.RetentionTime = False
         End If
+                          
+        If udtFieldPresent.RetentionTime Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_RETENTION
+        If udtFieldPresent.NitrogenAtom Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_NitrogenAtom
+        If udtFieldPresent.CysCount Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_CysCount
+        If udtFieldPresent.MSMSObsCount Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_MSMSObsCount
+        If udtFieldPresent.HighNormalizedScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_HighNormalizedScore
+        If udtFieldPresent.HighDiscriminantScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_HighDiscriminantScore
+        If udtFieldPresent.PeptideProphetProbability Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_PeptideProphetProbability
+                          
+        rsAMTSQL = rsAMTSQL & " FROM [" & TABLE_NAME_AMT & "]" & _
+                              " ORDER BY " & strMTTable & DB_FIELD_AMT_MW & ";"
+    Case dbgMTSOffline
         
-        If udtFieldPresent.RetentionTime Then
-            If Not IsNull(.Fields(glAMT_FIELD_RETENTION).Value) Then
-                AMTData(i).PNET = CDbl(.Fields(glAMT_FIELD_RETENTION).Value)
-            End If
-        End If
+        ' Query both T_Mass_Tags and T_Mass_Tags_NET in one query
+        ' We can use an Inner Join since EnumerateLegacyAMTFields has already validated that both tables exist
         
-        ' Correct for files that have RT defined but not NET, or vice versa
-        ' This program uses AMTData().NET by default; AMTData().PNET historically held the retention time, in seconds, but now holds Predicted NET
-        ' If one is missing from the Access DB file, then we'll copy the value from the other column to the missing column
+        strMTTable = "[" & TABLE_NAME_T_MASS_TAGS & "]."
+        strNETTable = "[" & TABLE_NAME_T_MASS_TAGS_NET & "]."
         
-        If AMTData(i).NET = NET_VALUE_IF_NULL And AMTData(i).PNET > NET_VALUE_IF_NULL Then
-             AMTData(i).NET = AMTData(i).PNET
-        ElseIf AMTData(i).NET > NET_VALUE_IF_NULL And AMTData(i).PNET = NET_VALUE_IF_NULL Then
-             AMTData(i).PNET = AMTData(i).NET
-        End If
-        
-        If AMTData(i).NET = NET_VALUE_IF_NULL Then
-            lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
-        End If
-
-        If udtFieldPresent.NitrogenAtom Then
-            If Not IsNull(.Fields(glAMT_FIELD_NitrogenAtom).Value) Then
-                AMTData(i).CNT_N = CLng(.Fields(glAMT_FIELD_NitrogenAtom).Value)
-            End If
-        End If
-        
-        If udtFieldPresent.CysCount Then
-           If Not IsNull(.Fields(glAMT_FIELD_CysCount).Value) Then
-              AMTData(i).CNT_Cys = CLng(.Fields(glAMT_FIELD_CysCount).Value)
-           End If
-        End If
-        
-        If udtFieldPresent.MSMSObsCount Then
-           If Not IsNull(.Fields(glAMT_FIELD_MSMSObsCount).Value) Then
-              AMTData(i).MSMSObsCount = CLng(.Fields(glAMT_FIELD_MSMSObsCount).Value)
-           End If
-        End If
-        
-        If udtFieldPresent.HighNormalizedScore Then
-           If Not IsNull(.Fields(glAMT_FIELD_HighNormalizedScore).Value) Then
-              AMTData(i).HighNormalizedScore = CSng(.Fields(glAMT_FIELD_HighNormalizedScore).Value)
-           End If
-        End If
-        
-        If udtFieldPresent.HighDiscriminantScore Then
-           If Not IsNull(.Fields(glAMT_FIELD_HighDiscriminantScore).Value) Then
-              AMTData(i).HighDiscriminantScore = CSng(.Fields(glAMT_FIELD_HighDiscriminantScore).Value)
-           End If
-        End If
-        
-        If udtFieldPresent.PeptideProphetProbability Then
-           If Not IsNull(.Fields(glAMT_FIELD_PeptideProphetProbability).Value) Then
-              AMTData(i).PeptideProphetProbability = CSng(.Fields(glAMT_FIELD_PeptideProphetProbability).Value)
-           End If
-        End If
-        
-        .MoveNext
+        rsAMTSQL = "SELECT " & strMTTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID & ", " & _
+                               strMTTable & DB_FIELD_TMASSTAGS_MW & ", " & _
+                               strNETTable & DB_FIELD_TMTNET_NET
     
-       If i Mod 100 = 0 Then frmCallingForm.Caption = "Loading MT Tags: " & LongToStringWithCommas(i)
+        If udtFieldPresent.PNET Then
+            rsAMTSQL = rsAMTSQL & ", " & strNETTable & DB_FIELD_TMTNET_PNET
+        End If
+        
+        If udtFieldPresent.NETStDev Then
+            rsAMTSQL = rsAMTSQL & ", " & strNETTable & DB_FIELD_TMTNET_STDEV
+        End If
+                          
+        If udtFieldPresent.MSMSObsCount Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_MSMSObsCount
+        If udtFieldPresent.HighNormalizedScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_HighNormalizedScore
+        If udtFieldPresent.HighDiscriminantScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_HighDiscriminantScore
+        If udtFieldPresent.PeptideProphetProbability Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_PeptideProphetProbability
+                          
+        rsAMTSQL = rsAMTSQL & " FROM [" & TABLE_NAME_T_MASS_TAGS & "] INNER JOIN" & _
+                                   " [" & TABLE_NAME_T_MASS_TAGS_NET & "] ON " & _
+                                   " " & strMTTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " = " & _
+                                   " " & strNETTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID & _
+                              " ORDER BY " & strMTTable & DB_FIELD_TMASSTAGS_MW & ";"
+
+    Case Else
+        ' Unknown version
+        Debug.Assert False
+        LegacyDBLoadAMTData = False
+    End Select
+    
+    Set rsAMT = dbAMT.OpenRecordset(rsAMTSQL, dbOpenForwardOnly)
+    
+    ' Initially reserve space for 1000 entries
+    AMTCnt = 0
+    ReDim AMTData(1 To 1000)
+    
+    ' Clear MTtoORFMapCount
+    MTtoORFMapCount = 0
+    
+    Do Until rsAMT.EOF
+        If AMTCnt >= UBound(AMTData) Then
+            If AMTCnt < 250000 Then
+                ReDim Preserve AMTData(1 To UBound(AMTData) * 2)
+            Else
+                ReDim Preserve AMTData(1 To UBound(AMTData) * 1.5)
+            End If
+        End If
+        
+        If LegacyDBLoadAMTDataWork(rsAMT, AMTCnt + 1, lngMassTagCountWithNullValues, udtFieldPresent, eDBGeneration) Then
+            AMTCnt = AMTCnt + 1
+        End If
+        
+        rsAMT.MoveNext
+    
+        If AMTCnt Mod 100 = 0 Then frmCallingForm.Caption = "Loading MT Tags: " & LongToStringWithCommas(AMTCnt)
     Loop
-End With
-rsAMT.Close
-
+    rsAMT.Close
+    
 exit_LegacyDBLoadAMTData:
-
-' Restore the caption on the calling form
-frmCallingForm.Caption = strCaptionSaved
-
-If (i = AMTCnt) And (AMTCnt > 0) Then
-    ' Update the AMT staleness stats
-    With glbPreferencesExpanded.MassTagStalenessOptions
-        .AMTLoadTime = Now()
-        .AMTCountInDB = AMTCnt
-        .AMTCountWithNulls = lngMassTagCountWithNullValues
+    
+    ' Restore the caption on the calling form
+    frmCallingForm.Caption = strCaptionSaved
+    
+    If (AMTCnt > 0) Then
+        ReDim Preserve AMTData(1 To AMTCnt)
+         
+         ' Update the AMT staleness stats
+        With glbPreferencesExpanded.MassTagStalenessOptions
+            .AMTLoadTime = Now()
+            .AMTCountInDB = AMTCnt
+            .AMTCountWithNulls = lngMassTagCountWithNullValues
+        End With
+        
+        LegacyDBLoadAMTData = True
+    Else
+        AMTCnt = 0
+        LegacyDBLoadAMTData = False
+    End If
+    
+    ' mark that currently loaded data is coming from legacy database
+    AMTGeneration = eDBGeneration
+    CurrMTDatabase = ""
+    CurrLegacyMTDatabase = strLegacyDBFilePath
+    CurrMTSchemaVersion = 0
+    With CurrMTFilteringOptions
+        .MTSubsetID = -1
+        .MTIncList = ""
     End With
     
-    LegacyDBLoadAMTData = True
-Else
-    AMTCnt = i
-    LegacyDBLoadAMTData = False
-End If
-
-'mark that currently loaded data is coming from legacy database
-CurrMTDatabase = ""
-CurrLegacyMTDatabase = strLegacyDBFilePath
-CurrMTSchemaVersion = 0
-With CurrMTFilteringOptions
-    .MTSubsetID = -1
-    .MTIncList = ""
-End With
-
-If GelAnalysis(lngGelIndex) Is Nothing Then
-    Set GelAnalysis(lngGelIndex) = New FTICRAnalysis
-
-    Dim udtEmptyAnalysisInfo As udtGelAnalysisInfoType
-    FillGelAnalysisObject GelAnalysis(lngGelIndex), udtEmptyAnalysisInfo
-End If
-
-Set rsAMT = Nothing
-Exit Function
+    If GelAnalysis(lngGelIndex) Is Nothing Then
+        Set GelAnalysis(lngGelIndex) = New FTICRAnalysis
+    
+        Dim udtEmptyAnalysisInfo As udtGelAnalysisInfoType
+        FillGelAnalysisObject GelAnalysis(lngGelIndex), udtEmptyAnalysisInfo
+    End If
+    
+    Set rsAMT = Nothing
+    Exit Function
 
 err_LegacyDBLoadAMTData:
-    strErrorMessage = "Error loading AMT data from table " & TABLE_NAME_AMT & " in file: " & strLegacyDBFilePath & "; " & Err.Description & " (Error Number " & Trim(Err.Number) & ")"
 
     strErrorMessage = "Error loading AMT data from file: " & strLegacyDBFilePath & "; " & Err.Description & " (Error Number " & Trim(Err.Number) & ")"
     If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
@@ -806,98 +928,360 @@ err_LegacyDBLoadAMTData:
         MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
     End If
 
-Resume exit_LegacyDBLoadAMTData
+    Resume exit_LegacyDBLoadAMTData
 
 End Function
 
-Private Function EnumerateAMTFields(ByVal strLegacyDBFilePath As String, ByVal lngGelIndex As Long, ByRef udtFieldPresent As udtAMTFieldPresentType) As Long
-'enumerates and returns AMT table fields and returns
-'its count; returns -1 on any error
-'also sets generation attribute to the current database
-Dim tdAMT As TableDef
-Dim fldAny As Field
-Dim i As Long
-Dim IsNewGeneration As Boolean
-Dim strErrorMessage As String
+Private Function LegacyDBLoadAMTDataWork(ByRef rsAMT As Recordset, ByVal lngIndex As Long, ByRef lngMassTagCountWithNullValues As Long, ByRef udtFieldPresent As udtAMTFieldPresentType, ByVal eDBGeneration As dbgDatabaseGenerationConstants) As Boolean
+    Const NET_VALUE_IF_NULL = -100000
 
-With udtFieldPresent
-    .Status = False
-    .RetentionTime = False
-    .PNET = False
-    .NitrogenAtom = False
-    .CysCount = False
-    .MSMSObsCount = False
-    .HighNormalizedScore = False
-    .HighDiscriminantScore = False
-    .PeptideProphetProbability = False
-End With
+    Dim blnSuccess As Boolean
+    
+On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
+    
+    ' Note: This function assumes (and requires) that udtFieldPresent.MTID, udtFieldPresent.MW,
+    '       and udtFieldPresent.NET are all True
+    
+    blnSuccess = False
+    With rsAMT
+        Select Case eDBGeneration
+        Case dbgMTSOffline
+            
+            AMTData(lngIndex).ID = .Fields(DB_FIELD_TMASSTAGS_MASS_TAG_ID).Value
+            AMTData(lngIndex).MW = CDbl(.Fields(DB_FIELD_TMASSTAGS_MW).Value)
+            
+            If IsNull(.Fields(DB_FIELD_TMTNET_NET).Value) Then
+                AMTData(lngIndex).NET = NET_VALUE_IF_NULL
+            Else
+                AMTData(lngIndex).NET = CDbl(.Fields(DB_FIELD_TMTNET_NET).Value)
+            End If
+            
+            
+            ' Set the defaults for the remaining fields
+            ' We'll populate them with the real values if the field is present
+            AMTData(lngIndex).flag = 0
+            AMTData(lngIndex).PNET = NET_VALUE_IF_NULL
+            AMTData(lngIndex).NETStDev = 0
+            AMTData(lngIndex).CNT_N = -1
+            AMTData(lngIndex).CNT_Cys = -1
+            AMTData(lngIndex).MSMSObsCount = 1
+            AMTData(lngIndex).HighNormalizedScore = 0
+            AMTData(lngIndex).HighDiscriminantScore = 0
+            AMTData(lngIndex).PeptideProphetProbability = 0
+            
+            If udtFieldPresent.PNET Then
+                If Not IsNull(.Fields(DB_FIELD_TMTNET_PNET).Value) Then
+                    AMTData(lngIndex).PNET = CDbl(.Fields(DB_FIELD_TMTNET_PNET).Value)
+                End If
+            End If
+            
+            If udtFieldPresent.NETStDev Then
+                If Not IsNull(.Fields(DB_FIELD_TMTNET_STDEV).Value) Then
+                    AMTData(lngIndex).NETStDev = CDbl(.Fields(DB_FIELD_TMTNET_STDEV).Value)
+                End If
+            End If
+            
+            ' Correct for files that have PNET defined but not NET, or vice versa
+            ' This program uses AMTData().NET by default; AMTData().PNET historically held the retention time, in seconds, but now holds Predicted NET
+            ' If one is missing from the Access DB file, then we'll copy the value from the other column to the missing column
+            
+            If AMTData(lngIndex).NET = NET_VALUE_IF_NULL And AMTData(lngIndex).PNET > NET_VALUE_IF_NULL Then
+                 AMTData(lngIndex).NET = AMTData(lngIndex).PNET
+            ElseIf AMTData(lngIndex).NET > NET_VALUE_IF_NULL And AMTData(lngIndex).PNET = NET_VALUE_IF_NULL Then
+                 AMTData(lngIndex).PNET = AMTData(lngIndex).NET
+            End If
+            
+            If AMTData(lngIndex).NET = NET_VALUE_IF_NULL Then
+                lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
+            End If
+            
+            If udtFieldPresent.MSMSObsCount Then
+               If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_MSMSObsCount).Value) Then
+                  AMTData(lngIndex).MSMSObsCount = CLng(.Fields(DB_FIELD_TMASSTAGS_MSMSObsCount).Value)
+               End If
+            End If
+            
+            If udtFieldPresent.HighNormalizedScore Then
+               If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_HighNormalizedScore).Value) Then
+                  AMTData(lngIndex).HighNormalizedScore = CSng(.Fields(DB_FIELD_TMASSTAGS_HighNormalizedScore).Value)
+               End If
+            End If
+            
+            If udtFieldPresent.HighDiscriminantScore Then
+               If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_HighDiscriminantScore).Value) Then
+                  AMTData(lngIndex).HighDiscriminantScore = CSng(.Fields(DB_FIELD_TMASSTAGS_HighDiscriminantScore).Value)
+               End If
+            End If
+            
+            If udtFieldPresent.PeptideProphetProbability Then
+               If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_PeptideProphetProbability).Value) Then
+                  AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_TMASSTAGS_PeptideProphetProbability).Value)
+               End If
+            End If
+            
+            blnSuccess = True
+        Case dbgGeneration1000, dbgGeneration1, dbgGeneration0800, dbgGeneration0900
+            If eDBGeneration < dbgGeneration1000 Then
+                AMTData(lngIndex).ID = .Fields(DB_FIELD_AMT_OLD_ID).Value
+            Else
+                AMTData(lngIndex).ID = .Fields(DB_FIELD_AMT_NEW_ID).Value
+            End If
+            
+            AMTData(lngIndex).MW = CDbl(.Fields(DB_FIELD_AMT_MW).Value)
+            
+            If IsNull(.Fields(DB_FIELD_AMT_NET).Value) Then
+                AMTData(lngIndex).NET = NET_VALUE_IF_NULL
+            Else
+                AMTData(lngIndex).NET = CDbl(.Fields(DB_FIELD_AMT_NET).Value)
+            End If
+            
+            
+            ' Set the defaults for the remaining fields
+            ' We'll populate them with the real values if the field is present
+            AMTData(lngIndex).flag = 0
+            AMTData(lngIndex).PNET = NET_VALUE_IF_NULL
+            AMTData(lngIndex).NETStDev = 0
+            AMTData(lngIndex).CNT_N = -1
+            AMTData(lngIndex).CNT_Cys = -1
+            AMTData(lngIndex).MSMSObsCount = 1
+            AMTData(lngIndex).HighNormalizedScore = 0
+            AMTData(lngIndex).HighDiscriminantScore = 0
+            AMTData(lngIndex).PeptideProphetProbability = 0
+            
+            If udtFieldPresent.Status Then
+                AMTData(lngIndex).flag = CLng(.Fields(DB_FIELD_AMT_Status).Value)
+            End If
+            
+            If udtFieldPresent.PNET Then
+                If Not IsNull(.Fields(DB_FIELD_AMT_PNET).Value) Then
+                    AMTData(lngIndex).PNET = CDbl(.Fields(DB_FIELD_AMT_PNET).Value)
+                End If
+            End If
+            
+            If udtFieldPresent.RetentionTime Then
+                If Not IsNull(.Fields(DB_FIELD_AMT_RETENTION).Value) Then
+                    AMTData(lngIndex).PNET = CDbl(.Fields(DB_FIELD_AMT_RETENTION).Value)
+                End If
+            End If
+            
+            ' Correct for files that have RT defined but not NET, or vice versa
+            ' This program uses AMTData().NET by default; AMTData().PNET historically held the retention time, in seconds, but now holds Predicted NET
+            ' If one is missing from the Access DB file, then we'll copy the value from the other column to the missing column
+            
+            If AMTData(lngIndex).NET = NET_VALUE_IF_NULL And AMTData(lngIndex).PNET > NET_VALUE_IF_NULL Then
+                 AMTData(lngIndex).NET = AMTData(lngIndex).PNET
+            ElseIf AMTData(lngIndex).NET > NET_VALUE_IF_NULL And AMTData(lngIndex).PNET = NET_VALUE_IF_NULL Then
+                 AMTData(lngIndex).PNET = AMTData(lngIndex).NET
+            End If
+            
+            If AMTData(lngIndex).NET = NET_VALUE_IF_NULL Then
+                lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
+            End If
+            
+            If udtFieldPresent.NitrogenAtom Then
+                If Not IsNull(.Fields(DB_FIELD_AMT_NitrogenAtom).Value) Then
+                    AMTData(lngIndex).CNT_N = CLng(.Fields(DB_FIELD_AMT_NitrogenAtom).Value)
+                End If
+            End If
+            
+            If udtFieldPresent.CysCount Then
+               If Not IsNull(.Fields(DB_FIELD_AMT_CysCount).Value) Then
+                  AMTData(lngIndex).CNT_Cys = CLng(.Fields(DB_FIELD_AMT_CysCount).Value)
+               End If
+            End If
+            
+            If udtFieldPresent.MSMSObsCount Then
+               If Not IsNull(.Fields(DB_FIELD_AMT_MSMSObsCount).Value) Then
+                  AMTData(lngIndex).MSMSObsCount = CLng(.Fields(DB_FIELD_AMT_MSMSObsCount).Value)
+               End If
+            End If
+            
+            If udtFieldPresent.HighNormalizedScore Then
+               If Not IsNull(.Fields(DB_FIELD_AMT_HighNormalizedScore).Value) Then
+                  AMTData(lngIndex).HighNormalizedScore = CSng(.Fields(DB_FIELD_AMT_HighNormalizedScore).Value)
+               End If
+            End If
+            
+            If udtFieldPresent.HighDiscriminantScore Then
+               If Not IsNull(.Fields(DB_FIELD_AMT_HighDiscriminantScore).Value) Then
+                  AMTData(lngIndex).HighDiscriminantScore = CSng(.Fields(DB_FIELD_AMT_HighDiscriminantScore).Value)
+               End If
+            End If
+            
+            If udtFieldPresent.PeptideProphetProbability Then
+               If Not IsNull(.Fields(DB_FIELD_AMT_PeptideProphetProbability).Value) Then
+                  AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_AMT_PeptideProphetProbability).Value)
+               End If
+            End If
+            
+            blnSuccess = True
+        Case Else
+            ' Unknown version
+            Debug.Assert False
+        End Select
 
-On Error GoTo err_EnumerateAMTFields:
+    End With
+    
+    LegacyDBLoadAMTDataWork = blnSuccess
+    Exit Function
 
-Set tdAMT = dbAMT.TableDefs(TABLE_NAME_AMT)
-AMTFldCnt = tdAMT.Fields.Count
-If AMTFldCnt > 0 Then
-    ReDim AMTFldNames(1 To AMTFldCnt)
-    i = 0
-    For Each fldAny In tdAMT.Fields
-        i = i + 1
-        AMTFldNames(i) = fldAny.Name
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_NEW_ID) Then
-            IsNewGeneration = True
-        End If
+LegacyDBLoadAMTDataWorkErrorHandler:
+    ' Data conversion error; skip this row
+    
+    Debug.Assert False
+    LegacyDBLoadAMTDataWork = False
+    
+End Function
+
+Private Function EnumerateLegacyAMTFields(ByVal strLegacyDBFilePath As String, ByVal lngGelIndex As Long, ByRef udtFieldPresent As udtAMTFieldPresentType, ByRef eDBGeneration As dbgDatabaseGenerationConstants) As Long
+    'enumerates and returns AMT table fields and returns
+    'its count; returns -1 on any error
+    'also sets generation attribute to the current database
+    Dim tdAMT As TableDef           ' Used with dbgGeneration1000
+    Dim tdAMTNET As TableDef        ' Used with dbgMTSOffline
+    
+    Dim strMTTableName As String
+    Dim strMTNETTableName As String
         
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_Status) Then
-            udtFieldPresent.Status = True
-        End If
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_RETENTION) Then
-            udtFieldPresent.RetentionTime = True
-        End If
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_PNET) Then
-            udtFieldPresent.PNET = True
-         End If
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_NitrogenAtom) Then
-            udtFieldPresent.NitrogenAtom = True
-        End If
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_CysCount) Then
-            udtFieldPresent.CysCount = True
-        End If
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_MSMSObsCount) Then
-            udtFieldPresent.MSMSObsCount = True
-        End If
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_HighNormalizedScore) Then
-            udtFieldPresent.HighNormalizedScore = True
-        End If
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_HighDiscriminantScore) Then
-            udtFieldPresent.HighDiscriminantScore = True
-        End If
-        If LCase(AMTFldNames(i)) = LCase(glAMT_FIELD_PeptideProphetProbability) Then
-            udtFieldPresent.PeptideProphetProbability = True
-        End If
-    Next fldAny
-End If
-
-'Mark type(generation) of database currentlly in use
-If IsNewGeneration Then
-    AMTGeneration = glAMT_GENERATION_NEW
-Else
-    If udtFieldPresent.RetentionTime Then
-        If udtFieldPresent.NitrogenAtom Then
-            AMTGeneration = glAMT_GENERATION0900
-        Else
-            AMTGeneration = glAMT_GENERATION0800
-        End If
+    Dim fldAny As Field
+    Dim blnIsNewGeneration As Boolean
+    Dim strErrorMessage As String
+    Dim AMTFldCnt As Long
+    
+    With udtFieldPresent
+        .MTID = False
+        .MW = False
+        .NET = False
+        .NETStDev = False
+        .Status = False
+        .RetentionTime = False
+        .PNET = False
+        .NitrogenAtom = False
+        .CysCount = False
+        .MSMSObsCount = False
+        .HighNormalizedScore = False
+        .HighDiscriminantScore = False
+        .PeptideProphetProbability = False
+        
+        With .ProteinInfo
+            .ID = False
+            .Name = False
+            .Description = False
+            .Sequence = False
+            .ResidueCount = False
+            .Mass = False
+        End With
+        
+        With .ProteinPeptideMap
+            .MTID = False
+            .MTName = False
+            .ProteinID = False
+        End With
+    End With
+    
+On Error GoTo err_EnumerateLegacyAMTFields:
+    
+    If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+        strMTTableName = TABLE_NAME_T_MASS_TAGS
+        strMTNETTableName = TABLE_NAME_T_MASS_TAGS_NET
     Else
-        AMTGeneration = glAMT_GENERATION1
+        ' Assume eDBGeneration is dbgGeneration1 through dbgGeneration1000
+        strMTTableName = TABLE_NAME_AMT
+        strMTNETTableName = ""
     End If
-End If
+    
+    Set tdAMT = dbAMT.TableDefs(strMTTableName)
+    AMTFldCnt = tdAMT.Fields.Count
+    If AMTFldCnt > 0 Then
+        For Each fldAny In tdAMT.Fields
+            If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+                Select Case LCase(fldAny.Name)
+                Case LCase(DB_FIELD_TMASSTAGS_MASS_TAG_ID):             udtFieldPresent.MTID = True
+                Case LCase(DB_FIELD_TMASSTAGS_MW):                      udtFieldPresent.MW = True
+                Case LCase(DB_FIELD_TMASSTAGS_MSMSObsCount):            udtFieldPresent.MSMSObsCount = True
+                Case LCase(DB_FIELD_TMASSTAGS_HighNormalizedScore):     udtFieldPresent.HighNormalizedScore = True
+                Case LCase(DB_FIELD_TMASSTAGS_HighDiscriminantScore):   udtFieldPresent.HighDiscriminantScore = True
+                Case LCase(DB_FIELD_TMASSTAGS_PeptideProphetProbability):     udtFieldPresent.PeptideProphetProbability = True
+                Case Else
+                    ' Unknown field; skip it
+                End Select
+            Else
+                ' Assume eDBGeneration is dbgGeneration1 through dbgGeneration1000
+                Select Case LCase(fldAny.Name)
+                Case LCase(DB_FIELD_AMT_OLD_ID)
+                    udtFieldPresent.MTID = True
+                    blnIsNewGeneration = False
+                Case LCase(DB_FIELD_AMT_NEW_ID)
+                    udtFieldPresent.MTID = True
+                    blnIsNewGeneration = True
+                Case LCase(DB_FIELD_AMT_MW):                udtFieldPresent.MW = True
+                Case LCase(DB_FIELD_AMT_NET):               udtFieldPresent.NET = True
+                Case LCase(DB_FIELD_AMT_Status):            udtFieldPresent.Status = True
+                Case LCase(DB_FIELD_AMT_RETENTION):         udtFieldPresent.RetentionTime = True
+                Case LCase(DB_FIELD_AMT_PNET):              udtFieldPresent.PNET = True
+                Case LCase(DB_FIELD_AMT_NitrogenAtom):              udtFieldPresent.NitrogenAtom = True
+                Case LCase(DB_FIELD_AMT_CysCount):                  udtFieldPresent.CysCount = True
+                Case LCase(DB_FIELD_AMT_MSMSObsCount):              udtFieldPresent.MSMSObsCount = True
+                Case LCase(DB_FIELD_AMT_HighNormalizedScore):       udtFieldPresent.HighNormalizedScore = True
+                Case LCase(DB_FIELD_AMT_HighDiscriminantScore):     udtFieldPresent.HighDiscriminantScore = True
+                Case LCase(DB_FIELD_AMT_PeptideProphetProbability):     udtFieldPresent.PeptideProphetProbability = True
+                Case Else
+                    ' Unknown field; skip it
+                End Select
+            End If
+        Next fldAny
+    End If
+    
+    If Len(strMTNETTableName) > 0 Then
+    
+        Set tdAMT = dbAMT.TableDefs(strMTNETTableName)
+        AMTFldCnt = tdAMT.Fields.Count
+        If AMTFldCnt > 0 Then
+            For Each fldAny In tdAMT.Fields
+                If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+                    Select Case LCase(fldAny.Name)
+                    Case LCase(DB_FIELD_TMTNET_NET):     udtFieldPresent.NET = True
+                    Case LCase(DB_FIELD_TMTNET_PNET):    udtFieldPresent.PNET = True
+                    Case LCase(DB_FIELD_TMTNET_STDEV):   udtFieldPresent.NETStDev = True
+                    Case Else
+                        ' Unknown field; skip it
+                    End Select
+                 Else
+                     ' Nothing to do
+                 End If
+           Next fldAny
+        End If
+    
+    End If
+    
+    ' Record type (generation) of database currently in use
+    If eDBGeneration <> dbgMTSOffline Then
+        If blnIsNewGeneration Then
+            eDBGeneration = dbgGeneration1000
+        Else
+            If udtFieldPresent.RetentionTime Then
+                If udtFieldPresent.NitrogenAtom Then
+                    eDBGeneration = dbgGeneration0900
+                Else
+                    eDBGeneration = dbgGeneration0800
+                End If
+            Else
+                eDBGeneration = dbgGeneration1
+            End If
+        End If
+    End If
+    
+exit_EnumerateLegacyAMTFields:
+    If udtFieldPresent.MTID And udtFieldPresent.MW And udtFieldPresent.NET Then
+        EnumerateLegacyAMTFields = True
+    Else
+        EnumerateLegacyAMTFields = False
+    End If
+    
+    Set tdAMT = Nothing
+    Exit Function
 
-
-exit_EnumerateAMTFields:
-EnumerateAMTFields = i
-Set tdAMT = Nothing
-Exit Function
-
-err_EnumerateAMTFields:
+err_EnumerateLegacyAMTFields:
 
     strErrorMessage = "Error enumerating AMT fields in table " & TABLE_NAME_AMT & " in file: " & strLegacyDBFilePath & "; " & Err.Description & " (Error Number " & Trim(Err.Number) & ")"
     If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
@@ -906,57 +1290,84 @@ err_EnumerateAMTFields:
         MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
     End If
 
-Resume exit_EnumerateAMTFields
+    Resume exit_EnumerateLegacyAMTFields
 End Function
 
-Private Function EnumerateProteinTableFields(ByVal strLegacyDBFilePath As String, ByVal lngGelIndex As Long)
+Private Function EnumerateProteinTableFields(ByVal strLegacyDBFilePath As String, ByVal lngGelIndex As Long, ByVal eDBGeneration As dbgDatabaseGenerationConstants, ByRef udtFieldPresent As udtAMTFieldPresentType)
     ' Makes sure the required protein fields are present in the protein tables
     ' Returns True if present, false if not
     Dim tdAMT As TableDef
     Dim fldAny As Field
+    
     Dim strErrorMessage As String
-    Dim intFieldMatchCount As Integer
+    Dim strProteinTableName As String
+    Dim strMTtoProteinMapTableName As String
+        
     Dim blnSuccess As Boolean
     
 On Error GoTo err_EnumerateProteinTableFields:
    
-    intFieldMatchCount = 0
+    blnSuccess = False
     
-    Set tdAMT = dbAMT.TableDefs(TABLE_NAME_AMT_PROTEINS)
+    If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+        strProteinTableName = "[" & TABLE_NAME_T_PROTEINS & "]"
+        strMTtoProteinMapTableName = "[" & TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP & "]"
+    Else
+        ' Assume eDBGeneration is dbgGeneration1 through dbgGeneration1000
+        strProteinTableName = "[" & TABLE_NAME_AMT_PROTEINS & "]"
+        strMTtoProteinMapTableName = "[" & TABLE_NAME_AMT_TO_PROTEIN_MAP & "]"
+    End If
+    
+    Set tdAMT = dbAMT.TableDefs(strProteinTableName)
     If tdAMT.Fields.Count > 0 Then
         For Each fldAny In tdAMT.Fields
-            Select Case LCase(fldAny.Name)
-            Case LCase(PROTEIN_FIELD_Protein_ID)
-                intFieldMatchCount = intFieldMatchCount + 1
-            Case LCase(PROTEIN_FIELD_Protein_Name)
-                intFieldMatchCount = intFieldMatchCount + 1
-            End Select
+            If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+                Select Case LCase(fldAny.Name)
+                Case LCase(DB_FIELD_TPROTEINS_Protein_ID): udtFieldPresent.ProteinInfo.ID = True
+                Case LCase(DB_FIELD_TPROTEINS_Protein_Name): udtFieldPresent.ProteinInfo.Name = True
+                Case LCase(DB_FIELD_TPROTEINS_Protein_Description): udtFieldPresent.ProteinInfo.Description = True
+                Case LCase(DB_FIELD_TPROTEINS_Protein_Sequence): udtFieldPresent.ProteinInfo.Sequence = True
+                Case LCase(DB_FIELD_TPROTEINS_Protein_ResidueCount): udtFieldPresent.ProteinInfo.ResidueCount = True
+                Case LCase(DB_FIELD_TPROTEINS_Protein_Mass): udtFieldPresent.ProteinInfo.Mass = True
+                Case Else
+                    ' Unknown field; skip it
+                End Select
+            Else
+                ' Assume eDBGeneration is dbgGeneration1 through dbgGeneration1000
+                Select Case LCase(fldAny.Name)
+                Case LCase(DB_FIELD_PROTEIN_Protein_ID): udtFieldPresent.ProteinInfo.ID = True
+                Case LCase(DB_FIELD_PROTEIN_Protein_Name): udtFieldPresent.ProteinInfo.Name = True
+                End Select
+            End If
         Next fldAny
     End If
     
-    If intFieldMatchCount = 2 Then
+    If udtFieldPresent.ProteinInfo.ID And udtFieldPresent.ProteinInfo.Name Then
         
-        intFieldMatchCount = 0
-        
-        Set tdAMT = dbAMT.TableDefs(TABLE_NAME_AMT_TO_PROTEIN_MAP)
+        Set tdAMT = dbAMT.TableDefs(strMTtoProteinMapTableName)
         If tdAMT.Fields.Count > 0 Then
             For Each fldAny In tdAMT.Fields
-                Select Case LCase(fldAny.Name)
-                Case LCase(PROTEIN_FIELD_AMT_ID)
-                    intFieldMatchCount = intFieldMatchCount + 1
-                Case LCase(PROTEIN_FIELD_Protein_ID)
-                    intFieldMatchCount = intFieldMatchCount + 1
-                End Select
+                If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+                    Select Case LCase(fldAny.Name)
+                    Case LCase(DB_FIELD_TMASSTAGS_MASS_TAG_ID): udtFieldPresent.ProteinPeptideMap.MTID = True
+                    Case LCase(DB_FIELD_TMASSTAGSPROTEINMAP_MASS_TAG_Name): udtFieldPresent.ProteinPeptideMap.MTName = True
+                    Case LCase(DB_FIELD_TPROTEINS_Protein_ID): udtFieldPresent.ProteinPeptideMap.ProteinID = True
+                    End Select
+                Else
+                    ' Assume eDBGeneration is dbgGeneration1 through dbgGeneration1000
+                    Select Case LCase(fldAny.Name)
+                    Case LCase(DB_FIELD_PROTEIN_AMT_ID): udtFieldPresent.ProteinPeptideMap.MTID = True
+                    Case LCase(DB_FIELD_PROTEIN_Protein_ID): udtFieldPresent.ProteinPeptideMap.ProteinID = True
+                    End Select
+                End If
             Next fldAny
         End If
         
-        If intFieldMatchCount = 2 Then
+        If udtFieldPresent.ProteinPeptideMap.MTID And udtFieldPresent.ProteinPeptideMap.ProteinID Then
             blnSuccess = True
         End If
     End If
     
-    EnumerateProteinTableFields = blnSuccess
-
 exit_EnumerateProteinTableFields:
     EnumerateProteinTableFields = blnSuccess
     Set tdAMT = Nothing
@@ -964,17 +1375,17 @@ exit_EnumerateProteinTableFields:
 
 err_EnumerateProteinTableFields:
 
-    strErrorMessage = "Error enumerating the fields in tables " & TABLE_NAME_AMT_PROTEINS & " and " & TABLE_NAME_AMT_TO_PROTEIN_MAP & " in file: " & strLegacyDBFilePath & "; " & Err.Description & " (Error Number " & Trim(Err.Number) & ")"
+    strErrorMessage = "Error enumerating the fields in tables " & strProteinTableName & " and " & strMTtoProteinMapTableName & " in file: " & strLegacyDBFilePath & "; " & Err.Description & " (Error Number " & Trim(Err.Number) & ")"
     If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         AddToAnalysisHistory lngGelIndex, strErrorMessage
     Else
         MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
     End If
 
-Resume exit_EnumerateProteinTableFields
+    Resume exit_EnumerateProteinTableFields
 End Function
 
-Private Function LegacyDBLoadProteinData(ByRef frmCallingForm As VB.Form, ByVal strLegacyDBFilePath As String, ByVal lngGelIndex As Long, ByVal blnIncludeORFsForMassTagsNotInMemory As Boolean) As Boolean
+Private Function LegacyDBLoadProteinData(ByRef frmCallingForm As VB.Form, ByVal strLegacyDBFilePath As String, ByVal lngGelIndex As Long, ByVal blnIncludeORFsForMassTagsNotInMemory As Boolean, ByVal eDBGeneration As dbgDatabaseGenerationConstants, ByRef udtFieldPresent As udtAMTFieldPresentType) As Boolean
     '---------------------------------------------------------------------------
     ' Obtains the mappings between MT tags and Protein IDs from the given legacy DB
     ' Also retrieves the Protein Names
@@ -985,12 +1396,14 @@ Private Function LegacyDBLoadProteinData(ByRef frmCallingForm As VB.Form, ByVal 
     
     Dim rsSQL As String
     Dim rsMT_ORF_Map As Recordset
-    Dim strProteinsTable As String
-    Dim strProteinToMTMapTable As String
+    Dim strProteinTableName As String
+    Dim strMTtoProteinMapTableName As String
     
     Dim lngMassTagIDToAdd As Long
     Dim blnProceed As Boolean
     Dim strCaptionSaved As String
+    
+    Dim strMTName As String
     
     Dim AMTIDsSorted() As Long          ' 1-based array to stay consistent with AMTData()
     Dim EmptyArray() As Long            ' Never allocate any memory for this; simply pass to objQSLong.QSAsc
@@ -1007,10 +1420,16 @@ Private Function LegacyDBLoadProteinData(ByRef frmCallingForm As VB.Form, ByVal 
     
     ' Save the form's caption
     strCaptionSaved = frmCallingForm.Caption
-    
-    strProteinsTable = "[" & TABLE_NAME_AMT_PROTEINS & "]"
-    strProteinToMTMapTable = "[" & TABLE_NAME_AMT_TO_PROTEIN_MAP & "]"
-    
+
+    If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+        strProteinTableName = "[" & TABLE_NAME_T_PROTEINS & "]"
+        strMTtoProteinMapTableName = "[" & TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP & "]"
+    Else
+        ' Assume eDBGeneration is dbgGeneration1 through dbgGeneration1000
+        strProteinTableName = "[" & TABLE_NAME_AMT_PROTEINS & "]"
+        strMTtoProteinMapTableName = "[" & TABLE_NAME_AMT_TO_PROTEIN_MAP & "]"
+    End If
+  
 On Error GoTo err_LegacyDBLoadProteinData
     
     If Not blnIncludeORFsForMassTagsNotInMemory Then
@@ -1033,9 +1452,20 @@ On Error GoTo err_LegacyDBLoadProteinData
     ' Clear MTtoORFMapCount
     MTtoORFMapCount = 0
     
-    rsSQL = " SELECT " & strProteinToMTMapTable & "." & PROTEIN_FIELD_AMT_ID & ", " & strProteinToMTMapTable & "." & PROTEIN_FIELD_Protein_ID & ", " & strProteinsTable & "." & PROTEIN_FIELD_Protein_Name & _
-            " FROM " & strProteinsTable & " INNER JOIN " & strProteinToMTMapTable & " ON " & strProteinsTable & "." & PROTEIN_FIELD_Protein_ID & " = " & strProteinToMTMapTable & "." & PROTEIN_FIELD_Protein_ID & _
-            " ORDER BY " & strProteinToMTMapTable & "." & PROTEIN_FIELD_AMT_ID & ", " & strProteinToMTMapTable & "." & PROTEIN_FIELD_Protein_ID & ";"
+    If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+        rsSQL = " SELECT " & strMTtoProteinMapTableName & "." & DB_FIELD_TMASSTAGS_MASS_TAG_ID & ", " & strMTtoProteinMapTableName & "." & DB_FIELD_TPROTEINS_Protein_ID & ", " & strProteinTableName & "." & DB_FIELD_TPROTEINS_Protein_Name
+        If udtFieldPresent.ProteinPeptideMap.MTName Then
+            rsSQL = rsSQL & ", " & strMTtoProteinMapTableName & "." & DB_FIELD_TMASSTAGSPROTEINMAP_MASS_TAG_Name
+        End If
+        
+        rsSQL = rsSQL & " FROM " & strProteinTableName & " INNER JOIN " & strMTtoProteinMapTableName & " ON " & strProteinTableName & "." & DB_FIELD_TPROTEINS_Protein_ID & " = " & strMTtoProteinMapTableName & "." & DB_FIELD_TPROTEINS_Protein_ID & _
+                         " ORDER BY " & strMTtoProteinMapTableName & "." & DB_FIELD_TMASSTAGS_MASS_TAG_ID & ", " & strMTtoProteinMapTableName & "." & DB_FIELD_TPROTEINS_Protein_ID & ";"
+    Else
+        ' Assume eDBGeneration is dbgGeneration1 through dbgGeneration1000
+        rsSQL = " SELECT " & strMTtoProteinMapTableName & "." & DB_FIELD_PROTEIN_AMT_ID & ", " & strMTtoProteinMapTableName & "." & DB_FIELD_PROTEIN_Protein_ID & ", " & strProteinTableName & "." & DB_FIELD_PROTEIN_Protein_Name & _
+                " FROM " & strProteinTableName & " INNER JOIN " & strMTtoProteinMapTableName & " ON " & strProteinTableName & "." & DB_FIELD_PROTEIN_Protein_ID & " = " & strMTtoProteinMapTableName & "." & DB_FIELD_PROTEIN_Protein_ID & _
+                " ORDER BY " & strMTtoProteinMapTableName & "." & DB_FIELD_PROTEIN_AMT_ID & ", " & strMTtoProteinMapTableName & "." & DB_FIELD_PROTEIN_Protein_ID & ";"
+    End If
 
 
     Set rsMT_ORF_Map = dbAMT.OpenRecordset(rsSQL, dbOpenSnapshot)
@@ -1060,7 +1490,7 @@ On Error GoTo err_LegacyDBLoadProteinData
             Else
                 If AMTCnt > 0 Then
                     If BinarySearchLng(AMTIDsSorted(), lngMassTagIDToAdd, 1, AMTCnt) >= 0 Then
-                    blnProceed = True
+                        blnProceed = True
                     Else
                         blnProceed = False
                     End If
@@ -1075,6 +1505,13 @@ On Error GoTo err_LegacyDBLoadProteinData
                 MTIDMap(MTtoORFMapCount) = lngMassTagIDToAdd
                 ORFIDMap(MTtoORFMapCount) = FixNullLng(.Fields(1).Value)
                 ORFRefNames(MTtoORFMapCount) = FixNull(.Fields(2).Value)
+
+                If udtFieldPresent.ProteinPeptideMap.MTName Then
+                    If Not IsNull(.Fields(DB_FIELD_TMASSTAGSPROTEINMAP_MASS_TAG_Name).Value) Then
+                        strMTName = .Fields(DB_FIELD_TMASSTAGSPROTEINMAP_MASS_TAG_Name).Value
+                    End If
+                End If
+            
             End If
            
             .MoveNext
@@ -1419,7 +1856,7 @@ On Error GoTo ComputeSLiCScoresErrorHandler
         ' If there is more than one match, then the highest scoreing match gets a DelSLiC value,
         '  computed by subtracting the next lower scoring value from the highest scoring value; all
         '  other matches get a DelSLiC score of 0
-        ' This allows one to quickly identify the UMCs with a single match (DelSLiC = 1) or with a match
+        ' This allows one to quickly identify the LC-MS Features with a single match (DelSLiC = 1) or with a match
         '  distinct from other matches (DelSLiC > threshold)
         
         If lngCurrIDCnt > 1 Then
@@ -2284,6 +2721,34 @@ Else
 End If
 End Sub
 
+Private Function GetLegacyDBRequiredMTTableFields(ByVal eDBGeneration As dbgDatabaseGenerationConstants) As String
+    Dim strMessage As String
+    
+    If eDBGeneration = dbgMTSOffline Then
+        strMessage = "The [" & TABLE_NAME_T_MASS_TAGS & "] table should contain the fields: " & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " and " & DB_FIELD_TMASSTAGS_MW & ".  " & _
+                     "It can optionally contain the fields: " & DB_FIELD_TMASSTAGS_MSMSObsCount & ", " & DB_FIELD_TMASSTAGS_HighNormalizedScore & ", " & DB_FIELD_TMASSTAGS_HighDiscriminantScore & ", and " & DB_FIELD_TMASSTAGS_PeptideProphetProbability & "." & _
+                     "In addition, the [" & TABLE_NAME_T_MASS_TAGS_NET & "] table should contain the fields: " & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " and " & DB_FIELD_TMTNET_NET & ", plus optionally " & DB_FIELD_TMTNET_PNET & " and " & DB_FIELD_TMTNET_STDEV & ".  "
+    Else
+        strMessage = "The [" & TABLE_NAME_AMT & "] table should contain the fields: " & DB_FIELD_AMT_NEW_ID & ", " & DB_FIELD_AMT_MW & ", " & DB_FIELD_AMT_NET & ", " & DB_FIELD_AMT_Status & ", and " & DB_FIELD_AMT_RETENTION & " or " & DB_FIELD_AMT_PNET & ".  " & _
+                     "It can optionally contain the fields: " & DB_FIELD_AMT_MSMSObsCount & ", " & DB_FIELD_AMT_HighNormalizedScore & ", " & DB_FIELD_AMT_HighDiscriminantScore & ", " & DB_FIELD_AMT_PeptideProphetProbability & ", " & DB_FIELD_AMT_NitrogenAtom & ", and " & DB_FIELD_AMT_CysCount & "."
+    End If
+    
+    GetLegacyDBRequiredMTTableFields = strMessage
+End Function
+
+Private Function GetLegacyDBRequiredProteinTableFields(ByVal eDBGeneration As dbgDatabaseGenerationConstants) As String
+    Dim strMessage As String
+    
+    If eDBGeneration = dbgMTSOffline Then
+        strMessage = "The [" & TABLE_NAME_T_PROTEINS & "] table should contain the fields " & DB_FIELD_TPROTEINS_Protein_ID & " and " & DB_FIELD_TPROTEINS_Protein_Name & ".  " & _
+                     "The [" & TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP & "] table should contain the fields " & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " and " & DB_FIELD_TPROTEINS_Protein_ID & "."
+    Else
+        strMessage = "The [" & TABLE_NAME_AMT_PROTEINS & "] table should contain the fields " & DB_FIELD_PROTEIN_Protein_ID & " and " & DB_FIELD_PROTEIN_Protein_Name & ".  " & _
+                     "The [" & TABLE_NAME_AMT_TO_PROTEIN_MAP & "] table should contain the fields " & DB_FIELD_PROTEIN_AMT_ID & " and " & DB_FIELD_PROTEIN_Protein_ID & "."
+    End If
+    
+    GetLegacyDBRequiredProteinTableFields = strMessage
+End Function
 
 Private Function IsGoodAMTFlag(ByVal AMTFlag As Integer) As Boolean
 'compares AMTFlag with SearchFlag and returnes True if AMTFlag

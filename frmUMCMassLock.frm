@@ -237,7 +237,7 @@ Dim ClsScore() As Double    'score for the class based on user selection
 Dim ClsAMT() As String      'AMT that best describes class
 Dim ClsHits() As Long       'class hits of best AMT
 
-'variable used to score UMCs
+'variable used to score LC-MS Features
 Dim ScoreOption As Integer      '0 - score on Intensity(average class Intensity
                                 '1 - score on Fit(average class Fit)
                                 '2 - score on class best AMT fit
@@ -425,12 +425,12 @@ Resp = MsgBox("Before using this function, gel needs to be broken to the Unique 
 If Resp <> vbYes Then Exit Sub
 If FillArrays() Then
    Me.MousePointer = vbHourglass
-   lblStatus.Caption = "Calculating UMC parameters..."
+   lblStatus.Caption = "Calculating LC-MS Feature parameters..."
    DoEvents
    ClsCnt = UMCStatistics1(CallerID, ClsStat())
    If GelUMC(CallerID).UMCCnt > 0 Then
      'pick best AMT choice, and score for each class
-     lblStatus.Caption = "Selecting MTs representing UMCs..."
+     lblStatus.Caption = "Selecting MTs representing LC-MS Features..."
      DoEvents
      ReDim ClsAMT(GelUMC(CallerID).UMCCnt - 1)
      ReDim ClsHits(GelUMC(CallerID).UMCCnt - 1)
@@ -442,7 +442,7 @@ If FillArrays() Then
        ClsScore(i) = UMCScore(i)
      Next i
      'pick the best class for each scan
-     lblStatus.Caption = "Selecting the best UMC for each scan..."
+     lblStatus.Caption = "Selecting the best LC-MS Feature for each scan..."
      DoEvents
      For i = MinFN To MaxFN
        BestScore = 0
@@ -490,7 +490,7 @@ If FillArrays() Then
      Selected = True
      Me.MousePointer = vbDefault
    Else
-     MsgBox "No UMC found; lock mass selection failed.", vbOKOnly, glFGTU
+     MsgBox "No LC-MS Feature found; lock mass selection failed.", vbOKOnly, glFGTU
    End If
 Else
    MsgBox "Error initializing data structures. Can not perform lock mass function.", vbOKOnly, glFGTU

@@ -1,7 +1,7 @@
 VERSION 5.00
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "Tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmSearchForNETAdjustmentUMC 
    Caption         =   "Search MT Tag Database For NET Adjustment"
    ClientHeight    =   8760
@@ -132,18 +132,18 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
       TabCaption(0)   =   "Robust NET Options"
       TabPicture(0)   =   "frmSearchForNETAdjustmentUMC.frx":0000
       Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "lblRobustNETPredictedIterationCount"
-      Tab(0).Control(1)=   "lblRobustNETCurrentSettings"
+      Tab(0).Control(0)=   "fraMassShiftPPMRange"
+      Tab(0).Control(1)=   "fraNETInterceptRange"
       Tab(0).Control(2)=   "fraNETSlopeRange"
-      Tab(0).Control(3)=   "fraNETInterceptRange"
-      Tab(0).Control(4)=   "fraMassShiftPPMRange"
+      Tab(0).Control(3)=   "lblRobustNETCurrentSettings"
+      Tab(0).Control(4)=   "lblRobustNETPredictedIterationCount"
       Tab(0).ControlCount=   5
       TabCaption(1)   =   "Addnl NET Options"
       TabPicture(1)   =   "frmSearchForNETAdjustmentUMC.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "fraOptionFrame(50)"
+      Tab(1).Control(0)=   "fraToleranceRefinementPeakCriteria"
       Tab(1).Control(1)=   "fraSlopeAndInterceptWarningTolerances"
-      Tab(1).Control(2)=   "fraToleranceRefinementPeakCriteria"
+      Tab(1).Control(2)=   "fraOptionFrame(50)"
       Tab(1).ControlCount=   3
       TabCaption(2)   =   "Misc. Adv. Options"
       TabPicture(2)   =   "frmSearchForNETAdjustmentUMC.frx":0038
@@ -808,7 +808,6 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          _ExtentX        =   9551
          _ExtentY        =   3889
          _Version        =   393217
-         Enabled         =   -1  'True
          ScrollBars      =   2
          TextRTF         =   $"frmSearchForNETAdjustmentUMC.frx":0054
       End
@@ -1441,19 +1440,19 @@ Private IDsAreInternalStandards As Boolean
 
 Private mIterationCount As Long  'iteration count
 
-Private UseUMC() As Boolean     'marks which UMCs should be used in this search
+Private UseUMC() As Boolean     'marks which LC-MS Features should be used in this search
 Private mUMCCntAddedSinceLowSegmentCount As Long
 Private mUMCSegmentCntWithLowUMCCnt As Long
 
-' The following holds the details of the UMCs being searched
-Private PeakCnt As Long             ' Number of UMC's searched
-Private PeakCntWithMatches As Long  ' Number of UMC's that matched an AMT
-Private PeakUMCInd() As Long        ' Index of the UMC
-Private PeakMW() As Double          ' Nominally the UMC's class mass, but will be adjusted if mMassShiftPPM is non-zero
-Private PeakScan() As Long          ' Scan of the UMC's class rep
-Private PeakIsoFit() As Single      ' Isotopic fit of the UMC's class rep
+' The following holds the details of the LC-MS Features being searched
+Private PeakCnt As Long             ' Number of LC-MS Features searched
+Private PeakCntWithMatches As Long  ' Number of LC-MS Features that matched an AMT
+Private PeakUMCInd() As Long        ' Index of the LC-MS Feature
+Private PeakMW() As Double          ' Nominally the LC-MS Features class mass, but will be adjusted if mMassShiftPPM is non-zero
+Private PeakScan() As Long          ' Scan of the LC-MS Features class rep
+Private PeakIsoFit() As Single      ' Isotopic fit of the LC-MS Features class rep
 
-Private UMCTotalPoints As Long      ' The total number of points in the UMCs being searched
+Private UMCTotalPoints As Long      ' The total number of points in the LC-MS Features being searched
 Private UMCTotalPointsMatching As Long
 
 'in this case CallerID is a public property
@@ -1773,7 +1772,7 @@ Private Sub CalculateIterationAutoIncrementTopAbuPct(intPlotUpdateInterval As In
                 SetNetAdjFailed
                 If IDCnt < .NETAdjustmentMinIDCount Then
                     ' Not enough ID's
-                    strNetAdjFailureReason = "Not enough UMC's matched MT tags in the database"
+                    strNetAdjFailureReason = "Not enough LC-MS Features matched MT tags in the database"
                 ElseIf AdjSlp <= 0 Then
                     ' Zero or Negative slope
                     strNetAdjFailureReason = "Negative slope was computed"
@@ -1801,7 +1800,7 @@ Private Sub CalculateIterationAutoIncrementTopAbuPct(intPlotUpdateInterval As In
                         txtUMCAbuTopPct = Trim(UMCNetAdjDef.TopAbuPct)
                         
                         If Not mRobustNETInProgress Then
-                            AddToAnalysisHistory CallerID, "NET Adjustment: " & strNetAdjFailureReason & "; incremented high abundance UMC's top percent and will repeat search; increment = " & Trim(.NETAdjustmentUMCTopAbuPctIncrement) & "%; new top abundance percent = " & Trim(UMCNetAdjDef.TopAbuPct) & "%"
+                            AddToAnalysisHistory CallerID, "NET Adjustment: " & strNetAdjFailureReason & "; incremented high abundance LC-MS Features top percent and will repeat search; increment = " & Trim(.NETAdjustmentUMCTopAbuPctIncrement) & "%; new top abundance percent = " & Trim(UMCNetAdjDef.TopAbuPct) & "%"
                         End If
                         
                         blnDone = False
@@ -1847,7 +1846,7 @@ Private Sub CalculateIterationAutoIncrementTopAbuPct(intPlotUpdateInterval As In
                         RestoreIterationStats udtPreviousIterationStats
                         
                         If Not mRobustNETInProgress Then
-                            strMessage = "Calculated NET adjustment using UMC's; Best score obtained using top " & Round(udtPreviousIterationStats.UMCTopAbuPct, 0) & "% of the UMCs"
+                            strMessage = "Calculated NET adjustment using LC-MS Features; Best score obtained using top " & Round(udtPreviousIterationStats.UMCTopAbuPct, 0) & "% of the LC-MS Features"
                             strMessage = strMessage & "; NET Formula = " & ConstructNETFormula(udtPreviousIterationStats.slope, udtPreviousIterationStats.intercept)
                             strMessage = strMessage & "; NET Match Score = " & Format(udtPreviousIterationStats.NETMatchScore, "0.00")
                         
@@ -1891,7 +1890,7 @@ Private Sub CalculateIterationOneStepOnly()
     
     mIterationCount = 1
     
-    UpdateStatus "Selecting UMCs to use ...."
+    UpdateStatus "Selecting LC-MS Features to use ...."
     If LinearNETAlignmentSelectUMCToUse(CallerID, UseUMC, mUMCCntAddedSinceLowSegmentCount, mUMCSegmentCntWithLowUMCCnt) > 0 Then
         UpdateStatus "Selecting peaks to use ..."
        If SelectPeaksToUse() > 0 Then
@@ -2039,7 +2038,7 @@ Do While Not bDone
    
    blnProceed = False
    If IterationStep = 1 Then
-      ' On the first iteration, determine which UMC's and which Peaks are to be used
+      ' On the first iteration, determine which LC-MS Features and which Peaks are to be used
       Call ResetProcedure
       If LinearNETAlignmentSelectUMCToUse(CallerID, UseUMC(), mUMCCntAddedSinceLowSegmentCount, mUMCSegmentCntWithLowUMCCnt) > 0 Then
          If SelectPeaksToUse() > 0 Then
@@ -2801,7 +2800,7 @@ End Sub
 ''                        If intMinimumTopAbuPct > 100 Then intMinimumTopAbuPct = 100
 ''                        UMCNetAdjDef.TopAbuPct = intMinimumTopAbuPct
 ''
-''                        strMessage = "NET Adjustment: " & strNetAdjFailureReason & "; incremented high abundance UMC's top percent and will repeat search; increment = " & Trim(.NETAdjustmentUMCTopAbuPctIncrement) & "%; new top abundance percent = " & Trim(UMCNetAdjDef.TopAbuPct) & "%"
+''                        strMessage = "NET Adjustment: " & strNetAdjFailureReason & "; incremented high abundance LC-MS Features top percent and will repeat search; increment = " & Trim(.NETAdjustmentUMCTopAbuPctIncrement) & "%; new top abundance percent = " & Trim(UMCNetAdjDef.TopAbuPct) & "%"
 ''                        AddToAnalysisHistory CallerID, strMessage
 ''                        AppendToIterationReport strMessage & vbCrLf & vbCrLf
 ''
@@ -2951,7 +2950,7 @@ End Sub
 ''            mMassShiftPPM = (.RobustNETMassShiftPPMEnd - .RobustNETMassShiftPPMStart) * Rnd + .RobustNETMassShiftPPMStart
 ''
 ''            ' Pick a new Top AbuPct value every 5 trials
-''            ' This is done to reduce the number of times we select the UMCs to use
+''            ' This is done to reduce the number of times we select the LC-MS Features to use
 ''            If (lngTrial - 1) Mod 5 = 0 Then
 ''                If intTopAbuPctMinimum = intTopAbuPctMax Then
 ''                    ' Cannot pick a new Top Abu Pct value
@@ -2990,7 +2989,7 @@ End Sub
 ''        UpdateInitialSlopeAndIntercept AdjSlp, AdjInt
 ''        ResetSlopeAndInterceptToDefault
 ''
-''        ' Match the UMCs to the MTs
+''        ' Match the LC-MS Features to the MTs
 ''        SearchForUMCsMatchingPMTs blnForceSelectUMCs
 ''        blnForceSelectUMCs = False
 ''
@@ -3956,7 +3955,7 @@ Dim dblMass As Double
 
 On Error GoTo err_GetUMCPeak_At
 
-' Use the class representative for the UMC's scan number
+' Use the class representative for the LC-MS Features scan number
 With GelUMC(CallerID).UMCs(UMCInd)
     If .ClassRepInd >= 0 Then
         PeakCnt = PeakCnt + 1
@@ -4588,12 +4587,12 @@ End Sub
 Private Sub PopulateComboBoxes()
     With cboPairsUMCsToUseForNETAdjustment
         .Clear
-        .AddItem "All UMC's, regardless of pair or light/heavy status", punaPairedAndUnpaired
-        .AddItem "Unpaired UMC's only", punaUnpairedOnly
-        .AddItem "Unpaired UMC's and light members of paired UMC's", punaUnpairedPlusPairedLight
-        .AddItem "Paired UMC's, both light and heavy members", punaPairedAll
-        .AddItem "Paired UMC's, light members only", punaPairedLight
-        .AddItem "Paired UMC's, heavy members only", punaPairedHeavy
+        .AddItem "All LC-MS Features, regardless of pair or light/heavy status", punaPairedAndUnpaired
+        .AddItem "Unpaired LC-MS Features only", punaUnpairedOnly
+        .AddItem "Unpaired LC-MS Features and light members of paired LC-MS Features", punaUnpairedPlusPairedLight
+        .AddItem "Paired LC-MS Features, both light and heavy members", punaPairedAll
+        .AddItem "Paired LC-MS Features, light members only", punaPairedLight
+        .AddItem "Paired LC-MS Features, heavy members only", punaPairedHeavy
         .ListIndex = punaPairsUMCNetAdjustmentConstants.punaUnpairedPlusPairedLight
     End With
 
@@ -4851,7 +4850,7 @@ Private Function ResetProcedure() As Boolean
     'resets all arguments and parameters so that we can restart calculation
     '----------------------------------------------------------------------
     Dim i As Long
-    ReDim UseUMC(GelUMC(CallerID).UMCCnt - 1)       'initially use all UMCs
+    ReDim UseUMC(GelUMC(CallerID).UMCCnt - 1)       'initially use all LC-MS Features
     For i = 0 To UBound(UseUMC)
         UseUMC(i) = True
     Next i
@@ -5027,7 +5026,7 @@ Private Function SearchForUMCsMatchingPMTs(blnForceSelectUMCs As Boolean) As Boo
     
     blnProceed = False
     If blnUpdateUMCs Then
-        ' Determine which UMC's and which Peaks are to be used
+        ' Determine which LC-MS Features and which Peaks are to be used
         Call ResetProcedure
         If LinearNETAlignmentSelectUMCToUse(CallerID, UseUMC(), mUMCCntAddedSinceLowSegmentCount, mUMCSegmentCntWithLowUMCCnt) > 0 Then
             If SelectPeaksToUse() > 0 Then
@@ -5483,7 +5482,7 @@ Private Function SelectPeaksToUse() As Long
 '------------------------------------------------------------------
 'selects peaks that will be used to correct NET based on specified
 'criteria; returns number of it; -1 on any error
-'NOTE: peaks are selected only from UMCs marked to be used
+'NOTE: peaks are selected only from LC-MS Features marked to be used
 'Furthermore, we're only selecting one point from each UMC, not every point in every UMC
 '------------------------------------------------------------------
 Dim i As Long
@@ -5622,15 +5621,15 @@ Private Sub UpdateAnalysisHistory(udtCurrentIterationStats As udtIterationStatsT
         If blnUseAbbreviatedFormat Then
             strDescription = "NET Adjustment iteration; " & UMC_NET_ADJ_ITERATION_COUNT & " = " & Trim(.IterationCount) & "; Mass tolerance = ±" & strMWTol & "; NET Tolerance = ±" & Format(.FinalNETTol, "0.000")
             If .UMCTopAbuPct >= 0 Then
-                strDescription = strDescription & "; Restrict to x% of UMC's = " & Trim(.UMCTopAbuPct) & "%"
+                strDescription = strDescription & "; Restrict to x% of LC-MS Features = " & Trim(.UMCTopAbuPct) & "%"
             End If
             
             strDescription = strDescription & "; " & UMC_NET_ADJ_UMCs_IN_TOLERANCE & " = " & Trim(.PointCountSearched) & "; " & UMC_NET_ADJ_UMCs_WITH_DB_HITS & " = " & Trim(.IDMatchCount) & "; NET Formula = " & ConstructNETFormula(.slope, .intercept)
             strDescription = strDescription & "; NET Match Score = " & Format(.NETMatchScore, "0.00")
         Else
-            strDescription = "Calculated NET adjustment using UMC's; " & UMC_NET_ADJ_ITERATION_COUNT & " = " & Trim(.IterationCount) & "; Mass tolerance = ±" & strMWTol & "; Final NET Tolerance = ±" & Format(.FinalNETTol, "0.000")
+            strDescription = "Calculated NET adjustment using LC-MS Features; " & UMC_NET_ADJ_ITERATION_COUNT & " = " & Trim(.IterationCount) & "; Mass tolerance = ±" & strMWTol & "; Final NET Tolerance = ±" & Format(.FinalNETTol, "0.000")
             If .UMCTopAbuPct >= 0 Then
-                strDescription = strDescription & "; Restrict to x% of UMC's (sorted by abundance) = " & Trim(.UMCTopAbuPct) & "%"
+                strDescription = strDescription & "; Restrict to x% of LC-MS Features (sorted by abundance) = " & Trim(.UMCTopAbuPct) & "%"
             End If
             
             strDescription = strDescription & "; " & UMC_NET_ADJ_UMCs_IN_TOLERANCE & " = " & Trim(.PointCountSearched) & "; " & UMC_NET_ADJ_UMCs_WITH_DB_HITS & " = " & Trim(.IDMatchCount) & "; NET Formula = " & ConstructNETFormula(.slope, .intercept) & "; Average Deviation = " & DoubleToStringScientific(.Deviation)
@@ -5644,7 +5643,7 @@ Private Sub UpdateAnalysisHistory(udtCurrentIterationStats As udtIterationStatsT
         AddToAnalysisHistory CallerID, strDescription
         
         If (.UMCSegmentCntWithLowUMCCnt > 0 Or .UMCCntAddedSinceLowSegmentCount > 0) And blnIncludeExtendedDetails Then
-            strDescription = "NET Adjustment UMC usage dispersion was low in 1 or more segments; Total segment count = " & Trim(glbPreferencesExpanded.NetAdjustmentUMCDistributionOptions.SegmentCount) & "; Segment count with low UMC counts = " & Trim(.UMCSegmentCntWithLowUMCCnt) & "; UMC's added (total) = " & Trim(.UMCCntAddedSinceLowSegmentCount)
+            strDescription = "NET Adjustment LC-MS Feature usage dispersion was low in 1 or more segments; Total segment count = " & Trim(glbPreferencesExpanded.NetAdjustmentUMCDistributionOptions.SegmentCount) & "; Segment count with low LC-MS Feature counts = " & Trim(.UMCSegmentCntWithLowUMCCnt) & "; LC-MS Features added (total) = " & Trim(.UMCCntAddedSinceLowSegmentCount)
             AddToAnalysisHistory CallerID, strDescription
         End If
     End With

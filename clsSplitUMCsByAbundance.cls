@@ -36,14 +36,14 @@ End Sub
 Public Sub ExamineUMCs(lngGelIndex As Long, frmCallingForm As VB.Form, Optional blnShowMessages As Boolean = True, Optional blnUseStatusFunctionOnCallingForm As Boolean = False)
     
     ' Examines the intensities of the ions in each UMC
-    ' Looks for UMC's that have two or more distinct peaks in a localized TIC plot (total ion chromatogram)
+    ' Looks for LC-MS Features that have two or more distinct peaks in a localized TIC plot (total ion chromatogram)
     ' If multiple members in a UMC are in the same scan, then can either combine their intensities, or use the intensity of the highest ion
     ' If a UMC is found to have two or more peaks, then splits the UMC into 2 (or more parts), proportioning
     '  the members along a scan-based division point
     ' Note: Be sure the UMC Statistics are up to date (by calling UpdateUMCStatArrays) before calling this function
     ' If blnUseStatusFunctionOnCallingForm = True, then calls frmCallingForm.Status for the status messages
     '
-    ' In addition, if .GapMaxSize is > 0, then will also split UMC's with gaps larger than .GapMaxSize, regardless of intensity or mass
+    ' In addition, if .GapMaxSize is > 0, then will also split LC-MS Features with gaps larger than .GapMaxSize, regardless of intensity or mass
     
     Dim lngUMCCountAtStart As Long
     Dim lngUMCIndex As Long
@@ -68,6 +68,7 @@ Public Sub ExamineUMCs(lngGelIndex As Long, frmCallingForm As VB.Form, Optional 
     Dim udtPeakLocs() As udtUMCPeakSplitType        ' 0-based array, parallel with lngPeakLocations()
     
     Dim lngPeakIndex As Long, lngSubIndex As Long
+    Dim lngLastValidPeakIndex As Long
     Dim lngSwapVal As Long
     
     Dim blnSuccess As Boolean
@@ -93,6 +94,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
         If .MaximumPeakCountToSplitUMC < 2 Then .MaximumPeakCountToSplitUMC = 2
     
         lngPeakHalfWidthPoints = CInt(.PeakWidthPointsMinimum / 2#)
+        If lngPeakHalfWidthPoints < 1 Then lngPeakHalfWidthPoints = 1
     End With
     
     ' Copy the settings to udtOptions (to make the code a bit cleaner)
@@ -106,7 +108,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
     lngUMCsSplit = 0
     
     strCaptionSaved = frmCallingForm.Caption
-    strMessage = "Finding UMC's needing to be split: 0 / " & Trim(lngUMCCountAtStart)
+    strMessage = "Splitting LC-MS Features with gaps that are too large: 0 / " & Trim(lngUMCCountAtStart)
     If blnUseStatusFunctionOnCallingForm Then
         frmCallingForm.Status strMessage
     Else
@@ -117,8 +119,8 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
     If GelSearchDef(lngGelIndex).UMCDef.GapMaxSize > 0 And _
        glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.ScanGapBehavior <> susgIgnoreScanGaps Then
        
-        ' First split any UMC's with gaps that are too large
-        ' This should only affect UMC's found using UMCIonNet, and not UMCListType2002 or UMC2003
+        ' First split any LC-MS Features with gaps that are too large
+        ' This should only affect LC-MS Features found using UMCIonNet, and not UMCListType2002 or UMC2003
         For lngUMCIndex = 0 To lngUMCCountAtStart - 1
             If GelUMC(lngGelIndex).UMCs(lngUMCIndex).ClassCount > GelSearchDef(lngGelIndex).UMCDef.GapMaxSize Then
                 SplitUMCsPopulateArrays lngGelIndex, lngUMCIndex, dblXData(), dblYData(), lngDataCount, lngMemberScanNumbersRelative(), lngClassMemberCount
@@ -169,7 +171,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
                         lngPeakLocations(lngPeakCount - 1) = (.PeakEndPoint + .PeakStartPoint) / 2
                     End With
                     
-                    ' I believe only UMC Ion Net will produce UMC's that need to be split using scan gaps
+                    ' I believe only UMC Ion Net will produce LC-MS Features that need to be split using scan gaps
                     ' Still, if .def.UMCType is not glUMC_TYPE_FROM_NET, then that is OK too
                     Debug.Assert GelUMC(lngGelIndex).def.UMCType = glUMC_TYPE_FROM_NET
                     
@@ -181,8 +183,10 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
                     If glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.ScanGapBehavior = susgSplitIfMassDifference Then
                         ' Combine the peaks that have similar masses
 
-                        ' Now compute the average mass of the points in each sub-peak
-                        SplitUMCsComputeMedianMass lngGelIndex, lngUMCIndex, udtPeakLocs(), lngPeakCount, lngPeakLocations(), udtOptions.MinimumDifferenceInAveragePpmMassToSplit
+                        ' Now compute the median mass of the points in each sub-peak
+                        ' Compare the median masses to see if they are > udtOptions.MinimumDifferenceInAveragePpmMassToSplit
+                        ' If they are, and if the difference is greater than the mass standard deviation (if enabled), then the peaks will be split
+                        SplitUMCsComputeMedianMass lngGelIndex, lngUMCIndex, udtPeakLocs(), lngPeakCount, lngPeakLocations(), udtOptions.MinimumDifferenceInAveragePpmMassToSplit, udtOptions.StdDevMultiplierForSplitting
                         If lngPeakCount > 0 Then
                             Debug.Assert udtPeakLocs(lngPeakCount - 1).MemberIndexEndPoint = lngClassMemberCount - 1
                         End If
@@ -197,7 +201,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
             End If
             
             If lngUMCIndex Mod 50 = 0 Then
-                strMessage = "Splitting UMC's with gaps that are too large: " & Trim(lngUMCIndex) & " / " & Trim(lngUMCCountAtStart)
+                strMessage = "Splitting LC-MS Features with gaps that are too large: " & Trim(lngUMCIndex) & " / " & Trim(lngUMCCountAtStart)
                 If blnUseStatusFunctionOnCallingForm Then
                     frmCallingForm.Status strMessage
                 Else
@@ -211,7 +215,16 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
     End If
     
     If Not mAbortRequested Then
-        ' Now see if any of the UMC's need to be split due to subregions with differing abundances and mass
+        lngUMCCountAtStart = GelUMC(lngGelIndex).UMCCnt
+    
+        strMessage = "Splitting LC-MS Features with multiple abundance profiles: 0 / " & Trim(lngUMCCountAtStart)
+        If blnUseStatusFunctionOnCallingForm Then
+            frmCallingForm.Status strMessage
+        Else
+            frmCallingForm.Caption = strMessage
+        End If
+    
+        ' Now see if any of the LC-MS Features need to be split due to subregions with differing abundances and mass
         For lngUMCIndex = 0 To lngUMCCountAtStart - 1
             If GelUMC(lngGelIndex).UMCs(lngUMCIndex).ClassCount >= lngMinimumClassCountToCheck Then
                 
@@ -229,13 +242,19 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
                 
                 If lngPeakCount > 1 And lngPeakCount <= udtOptions.MaximumPeakCountToSplitUMC Then
                 
-                    ' Possibly Split the UMC into multiple UMC's
+                    ' Possibly Split the UMC into multiple LC-MS Features
                     ' First, find the start and end of each peak
                     ' Next, find the average mass of the points in each peak
                     ' Then, find those peaks that have average masses significantly different than the adjacent peak
                     
                     ReDim udtPeakLocs(0 To lngPeakCount - 1)
                     
+''For lngPeakIndex = 0 To lngPeakCount - 1
+''    Debug.Print lngPeakLocations(lngPeakIndex)
+''Next lngPeakIndex
+
+                    ' Process all of the peaks except the first one, working right to left
+                    lngLastValidPeakIndex = -1
                     For lngPeakIndex = lngPeakCount - 1 To 1 Step -1
                         ' Make sure this peak and the previous peak are at least udtOptions.PeakWidthPointsMinimum scans apart
                         ' In addition, make sure this peak's apex still points to a valid index in the
@@ -277,6 +296,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
                     Next lngPeakIndex
                     
                     With udtPeakLocs(0)
+                        .Valid = True
                         .PeakStartPoint = 0
                         If .PeakEndPoint = 0 Then
                             .PeakEndPoint = lngPeakLocations(0) + lngPeakHalfWidthPoints
@@ -289,7 +309,6 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
                                 End If
                             Next lngSubIndex
                         End If
-                        .Valid = True
                     End With
                     
                     lngPeakIndex = 1
@@ -319,9 +338,12 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
                         SplitUMCsWidenAdjacentPeaks udtPeakLocs(), lngPeakCount, dblYData()
                         
                         SplitUMCsLookupMemberIndices udtPeakLocs(), lngPeakCount, dblXData(), lngMemberScanNumbersRelative(), lngClassMemberCount
-                                                
-                        ' Now compute the average mass of the points in each sub-peak
-                        SplitUMCsComputeMedianMass lngGelIndex, lngUMCIndex, udtPeakLocs(), lngPeakCount, lngPeakLocations(), udtOptions.MinimumDifferenceInAveragePpmMassToSplit
+                                               
+                        ' Now compute the median mass of the points in each sub-peak
+                        ' Compare the median masses to see if they are > udtOptions.MinimumDifferenceInAveragePpmMassToSplit
+                        ' If they are, and if the difference is greater than the mass standard deviation (if enabled), then the peaks will be split
+                        SplitUMCsComputeMedianMass lngGelIndex, lngUMCIndex, udtPeakLocs(), lngPeakCount, lngPeakLocations(), udtOptions.MinimumDifferenceInAveragePpmMassToSplit, udtOptions.StdDevMultiplierForSplitting
+                        
                         If lngPeakCount > 0 Then
                             Debug.Assert udtPeakLocs(lngPeakCount - 1).MemberIndexEndPoint = lngClassMemberCount - 1
                         End If
@@ -338,7 +360,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
             End If
             
             If lngUMCIndex Mod 50 = 0 Then
-                strMessage = "Splitting UMC's with multiple abundance profiles: " & Trim(lngUMCIndex) & " / " & Trim(lngUMCCountAtStart)
+                strMessage = "Splitting LC-MS Features with multiple abundance profiles: " & Trim(lngUMCIndex) & " / " & Trim(lngUMCCountAtStart)
                 If blnUseStatusFunctionOnCallingForm Then
                     frmCallingForm.Status strMessage
                 Else
@@ -358,19 +380,19 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
     
         frmCallingForm.Caption = strCaptionSaved
 
-        strMessage = "Split UMC's with separate regions; UMC Count before splitting = " & lngUMCCountAtStart & "; UMC's split = " & lngUMCsSplit & "; UMC's Added = " & lngUMCsAdded
+        strMessage = "Split LC-MS Features with separate regions; LC-MS Feature Count before splitting = " & lngUMCCountAtStart & "; LC-MS Features split = " & lngUMCsSplit & "; LC-MS Features Added = " & lngUMCsAdded
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled And blnShowMessages Then
             MsgBox strMessage, vbInformation + vbOKOnly, "Done"
         End If
         AddToAnalysisHistory lngGelIndex, strMessage
     
-        ' Possibly Auto-Refine the UMC's
+        ' Possibly Auto-Refine the LC-MS Features
         AutoRefineUMCs lngGelIndex, frmCallingForm
     
     Else
         frmCallingForm.Caption = strCaptionSaved
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled And blnShowMessages Then
-            MsgBox "No UMC's were found that needed splitting.", vbInformation + vbOKOnly, "Done"
+            MsgBox "No LC-MS Features were found that needed splitting.", vbInformation + vbOKOnly, "Done"
         End If
     End If
     
@@ -385,7 +407,7 @@ SplitUMCsByAbundanceErrorHandler:
 
 End Sub
 
-Private Sub SplitUMCsComputeMedianMass(lngGelIndex As Long, lngUMCIndex As Long, ByRef udtPeakLocs() As udtUMCPeakSplitType, ByRef lngPeakCount As Long, lngPeakLocations() As Long, dblMinimumDifferenceInMedianPpmMassToSplit As Double)
+Private Sub SplitUMCsComputeMedianMass(ByVal lngGelIndex As Long, ByVal lngUMCIndex As Long, ByRef udtPeakLocs() As udtUMCPeakSplitType, ByRef lngPeakCount As Long, ByRef lngPeakLocations() As Long, ByVal dblMinimumDifferenceInMedianPpmMassToSplit As Double, ByVal dblStdDevMultiplierForSplitting As Double)
 
     Dim lngPeakIndex As Long
     Dim lngSubIndex As Long

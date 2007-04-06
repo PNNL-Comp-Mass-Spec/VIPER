@@ -60,7 +60,7 @@ Public Const Net_CT_EQ = 3              'use only if difference equal
 
 'class representative has to be determined even if it does not directly
 'relates to how the class was created; therefore the quality of class
-'representative setting is not preserved for UMCs created from Nets; it
+'representative setting is not preserved for LC-MS Features created from Nets; it
 'is used just for practical purposes
 Public Const UMCFROMNet_REP_ABU = 0
 Public Const UMCFROMNet_REP_FIT = 1

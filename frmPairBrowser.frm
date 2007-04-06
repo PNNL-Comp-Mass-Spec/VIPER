@@ -3,7 +3,7 @@ Begin VB.Form frmPairBrowser
    Caption         =   "Pair Browser"
    ClientHeight    =   9285
    ClientLeft      =   165
-   ClientTop       =   840
+   ClientTop       =   855
    ClientWidth     =   7545
    LinkTopic       =   "Form1"
    ScaleHeight     =   9285
@@ -872,7 +872,7 @@ On Error GoTo GeneratePairDescriptionErrorHandler
             strDescriptionAddnl = ""
         Else
             strDescription = ""
-            strDescription = strDescription & "UMCs " & .P1 & " and " & .P2 & vbCrLf
+            strDescription = strDescription & "LC-MS Features " & .P1 & " and " & .P2 & vbCrLf
             strDescription = strDescription & "Abundances " & DoubleToStringScientific(udtUMCLight.ClassAbundance, 3)
             strDescription = strDescription & " and " & DoubleToStringScientific(udtUMCHeavy.ClassAbundance, 3) & vbCrLf
             
@@ -1934,7 +1934,7 @@ End Sub
 Private Sub mnuFileFindPairsDeltaUMC_Click()
     On Error Resume Next
     If IsLoaded("frmUMCDltPairs") Then
-        MsgBox "The Delta (UMC) Find Pairs window is already open.", vbInformation + vbOKOnly, "Cannot Open Window"
+        MsgBox "The LC-MS Feature Delta Pairing Analysis window is already open.", vbInformation + vbOKOnly, "Cannot Open Window"
     Else
         frmUMCDltPairs.Tag = CallerIDLoaded
         frmUMCDltPairs.FormMode = pfmDelta

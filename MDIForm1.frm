@@ -853,6 +853,7 @@ If Not MyAnalysisInit.NewAnalysis Is Nothing Then
            GelStatus(Ind).Dirty = True
            GelBody(Ind).Tag = Ind
            GelBody(Ind).Caption = "Untitled:" & Ind
+           GelStatus(Ind).GelFilePathFull = App.Path
            GelBody(Ind).Show
         Case 1      'auto analysis success
            ' Will already have been set to "Dirty" by the auto-analysis process and changed to not Dirty if successfully saved

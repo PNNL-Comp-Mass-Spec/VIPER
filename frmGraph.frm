@@ -194,9 +194,9 @@ Begin VB.Form frmGraph
    Begin VB.Menu mnuSteps 
       Caption         =   "&Steps"
       Begin VB.Menu mnuStepsFile 
-         Caption         =   "&1a. Load PEK File"
+         Caption         =   "&1a. Load peak list file"
          Begin VB.Menu mnuStepsFileNew 
-            Caption         =   "&New (Choose any PEK file)"
+            Caption         =   "&New (Choose any data file)"
          End
          Begin VB.Menu mnuStepsFileNewChooseFromDMS 
             Caption         =   "New Anal&ysis (Choose from DMS)"
@@ -208,11 +208,11 @@ Begin VB.Form frmGraph
       Begin VB.Menu mnuStepsUMCs 
          Caption         =   "&2. Find LC-MS Features (UMCs)"
          Begin VB.Menu mnuStepsUMCMode 
-            Caption         =   "UMC 2003 (fast but less accurate)"
+            Caption         =   "UMC Ion Networks (more accurate)"
             Index           =   0
          End
          Begin VB.Menu mnuStepsUMCMode 
-            Caption         =   "UMC Ion Networks (more accurate)"
+            Caption         =   "UMC 2003 (fast but less accurate)"
             Index           =   1
          End
       End
@@ -236,9 +236,9 @@ Begin VB.Form frmGraph
          End
       End
       Begin VB.Menu mnuStepsNETAdjustment 
-         Caption         =   "&5. NET Adjustment"
+         Caption         =   "&5. Align LC-MS Features to MT Tags"
          Begin VB.Menu mnuStepsNETAdjustmentMode 
-            Caption         =   "Align and Warp data Using MS Warp (preferred)"
+            Caption         =   "Align and Warp data Using LCMSWarp (preferred)"
             Index           =   0
          End
          Begin VB.Menu mnuStepsNETAdjustmentMode 
@@ -246,11 +246,8 @@ Begin VB.Form frmGraph
             Index           =   1
          End
       End
-      Begin VB.Menu mnuStepsDBSearch 
+      Begin VB.Menu mnuStepsDBSearchConglomerateMass 
          Caption         =   "&6. Database Search"
-         Begin VB.Menu mnuStepsDBSearchConglomerateMass 
-            Caption         =   "UMC Single Mass"
-         End
       End
       Begin VB.Menu mnuStepsToleranceRefinement 
          Caption         =   "&7. Mass Calibration and Tolerance Refinement"
@@ -510,7 +507,7 @@ Begin VB.Form frmGraph
          Caption         =   "-"
       End
       Begin VB.Menu mnuVUMC 
-         Caption         =   "Unique Mass Classes"
+         Caption         =   "LC-MS Features (UMCs)"
       End
       Begin VB.Menu mnuViewSepOverlay 
          Caption         =   "-"
@@ -642,7 +639,7 @@ Begin VB.Form frmGraph
          HelpContextID   =   108
       End
       Begin VB.Menu mnu2lsShowUMCOnly 
-         Caption         =   "Show &UMC Points"
+         Caption         =   "Show &UMC (LC-MS Feature) Points"
       End
       Begin VB.Menu mnu2lsInvertVisiblePoints 
          Caption         =   "Invert &Visible Points"
@@ -731,11 +728,11 @@ Begin VB.Form frmGraph
       Begin VB.Menu mnu2lsSep8 
          Caption         =   "-"
       End
-      Begin VB.Menu mnu2lsUMC2003 
-         Caption         =   "Unique Mass Classes 2003 (faster)"
-      End
       Begin VB.Menu mnu2lsUMCIonNet 
-         Caption         =   "Unique Mass Classes Ion Net (better)"
+         Caption         =   "Unique Mass Classes Ion Net (more accurate)"
+      End
+      Begin VB.Menu mnu2lsUMC2003 
+         Caption         =   "Unique Mass Classes 2003 (less accurate)"
       End
       Begin VB.Menu mnu2lsSep9 
          Caption         =   "-"
@@ -893,22 +890,22 @@ Begin VB.Form frmGraph
          Caption         =   "-"
       End
       Begin VB.Menu mnuSplitUMCs 
-         Caption         =   "Split UMC's by Examining Abundances"
+         Caption         =   "Split LC-MS Features by Examining Abundances"
       End
       Begin VB.Menu mnuShowSplitUMCs 
-         Caption         =   "Show Split UMC's"
+         Caption         =   "Show Split LC-MS Features"
       End
       Begin VB.Menu mnuSSepShow 
          Caption         =   "-"
       End
       Begin VB.Menu mnuShowNETAdjUMCs 
-         Caption         =   "Show UMC's Used for NET Adjustment"
+         Caption         =   "Show LC-MS Features Used for NET Adjustment"
       End
       Begin VB.Menu mnuShowLowSegmentCountUMCs 
-         Caption         =   "Show Low Segment Count UMC's Added"
+         Caption         =   "Show Low Segment Count LC-MS Features Added"
       End
       Begin VB.Menu mnuShowNETAdjUMCsWithDBHit 
-         Caption         =   "Show NET Adjustment UMC's with a DB Hit"
+         Caption         =   "Show NET Adjustment LC-MS Features with a DB Hit"
       End
    End
    Begin VB.Menu mnuWindow 
@@ -1204,7 +1201,7 @@ Private Sub PointVisibilityShowUMCPoints()
        Call fUMCSpotsOnly(nMyIndex)
        picGraph.Refresh
     Else
-       MsgBox "UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
+       MsgBox "LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
     End If
 End Sub
 
@@ -1307,7 +1304,7 @@ Private Sub ShowErrorDistribution2DForm()
     On Error Resume Next
     
     If GelUMC(nMyIndex).UMCCnt <= 0 Then
-        MsgBox "You must cluster the data into Unique Mass Classes before running Mass Calibration and Tolerance Refinement.  Please use menu item 'Steps->2. Find UMCs' to accomplish this.", vbInformation + vbOKOnly, "No UMCs"
+        MsgBox "You must cluster the data into Unique Mass Classes before running Mass Calibration and Tolerance Refinement.  Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to accomplish this.", vbInformation + vbOKOnly, "No LC-MS Features"
     Else
         frmErrorDistribution2DLoadedData.CallerID = nMyIndex
         frmErrorDistribution2DLoadedData.Show vbModal
@@ -1824,7 +1821,7 @@ Private Sub ShowSearchMTDBUMCPairsN14N15()
        UMCPairsSearch.Show vbModal
        Set UMCPairsSearch = Nothing
     Else
-       MsgBox "Paired UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes then use menu item 'Steps->4. Find Pairs' to find paired UMCs.", vbOKOnly, glFGTU
+       MsgBox "Paired LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes then use menu item 'Steps->4. Find Pairs' to find paired LC-MS Features.", vbOKOnly, glFGTU
     End If
 End Sub
 
@@ -1839,7 +1836,7 @@ Private Sub ShowSearchMTDBUMCPairsPEON14N15()
        UMCPairsSearch.Show vbModal
        Set UMCPairsSearch = Nothing
     Else
-       MsgBox "Paired UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes then use menu item 'Steps->4. Find Pairs' to find paired UMCs.", vbOKOnly, glFGTU
+       MsgBox "Paired LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes then use menu item 'Steps->4. Find Pairs' to find paired LC-MS Features.", vbOKOnly, glFGTU
     End If
 End Sub
 
@@ -1854,13 +1851,13 @@ Private Sub ShowSearchMTDBUMCPairsICAT()
        UMCPairsSearch.Show vbModal
        Set UMCPairsSearch = Nothing
     Else
-       MsgBox "Paired UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes then use menu item 'Steps->4. Find Pairs' to find paired UMCs.", vbOKOnly, glFGTU
+       MsgBox "Paired LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes then use menu item 'Steps->4. Find Pairs' to find paired LC-MS Features.", vbOKOnly, glFGTU
     End If
 End Sub
 
 Private Sub ShowSearchMTDBUMCSingleMassForm()
     '---------------------------------------------------
-    'displays search of MT tag database form for UMCs
+    'displays search of MT tag database form for LC-MS Features
     '---------------------------------------------------
     Dim UMC_IDSearch As New frmSearchMT_ConglomerateUMC
     On Error Resume Next
@@ -1869,7 +1866,7 @@ Private Sub ShowSearchMTDBUMCSingleMassForm()
        UMC_IDSearch.Show vbModal
        Set UMC_IDSearch = Nothing
     Else
-       MsgBox "You must cluster the data into Unique Mass Classes before searching for matching MT tags.  Please use menu item 'Steps->2. Find UMCs' to accomplish this.", vbOKOnly, glFGTU
+       MsgBox "You must cluster the data into Unique Mass Classes before searching for matching MT tags.  Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to accomplish this.", vbOKOnly, glFGTU
     End If
 End Sub
 
@@ -1903,7 +1900,7 @@ Private Sub ShowUMCNetAdjustmentForm()
        NETAdj.Show vbModal
        Set NETAdj = Nothing
     Else
-       MsgBox "You must cluster the data into Unique Mass Classes before NET Adjustment.  Please use menu item 'Steps->2. Find UMCs' to accomplish this.", vbOKOnly, glFGTU
+       MsgBox "You must cluster the data into Unique Mass Classes before NET Adjustment.  Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to accomplish this.", vbOKOnly, glFGTU
     End If
 End Sub
 
@@ -2273,7 +2270,7 @@ If GelUMC(nMyIndex).UMCCnt > 0 Then
    ShowNetAdjUMCPoints nMyIndex, UMC_INDICATOR_BIT_LOWSEGMENTCOUNT_ADDITION
    picGraph.Refresh
 Else
-   MsgBox "UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
+   MsgBox "LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -2283,7 +2280,7 @@ If GelUMC(nMyIndex).UMCCnt > 0 Then
    ShowNetAdjUMCPoints nMyIndex, UMC_INDICATOR_BIT_USED_FOR_NET_ADJ
    picGraph.Refresh
 Else
-   MsgBox "UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
+   MsgBox "LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -2293,7 +2290,7 @@ If GelUMC(nMyIndex).UMCCnt > 0 Then
    ShowNetAdjUMCPoints nMyIndex, UMC_INDICATOR_BIT_NET_ADJ_DB_HIT
    picGraph.Refresh
 Else
-   MsgBox "UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
+   MsgBox "LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
 End If
 
 End Sub
@@ -2304,7 +2301,7 @@ If GelUMC(nMyIndex).UMCCnt > 0 Then
    ShowSplitUMCPoints nMyIndex
    picGraph.Refresh
 Else
-   MsgBox "UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
+   MsgBox "LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -2391,7 +2388,7 @@ Private Sub mnuStepsToleranceRefinement_Click()
 End Sub
 
 Private Sub mnuStepsUMCMode_Click(Index As Integer)
-    If Index = 0 Then
+    If Index = 1 Then
         ShowUMC2003Form
     Else
         ShowUMCIonNetworksForm
@@ -2588,7 +2585,7 @@ If GelUMC(nMyIndex).UMCCnt > 0 Then
    MyUMCSearch.Show vbModal
    Set MyUMCSearch = Nothing
 Else
-   MsgBox "UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
+   MsgBox "LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -2770,14 +2767,14 @@ Private Sub mnuEditAvgUMC_Click()
 Dim Resp As Long
 On Error Resume Next
 If GelUMC(nMyIndex).UMCCnt > 0 Then
-   Resp = MsgBox("Application of this function will change masses from original file. Continue with averaging masses of UMCs?", vbYesNo, glFGTU)
+   Resp = MsgBox("Application of this function will change masses from original file. Continue with averaging masses of LC-MS Features?", vbYesNo, glFGTU)
    If Resp <> vbYes Then Exit Sub
    Me.MousePointer = vbHourglass
    If UMCAverageMass(nMyIndex) Then
       GelStatus(nMyIndex).Dirty = True
       ResetGraph True, True, fgDisplay
    Else
-      MsgBox "Error calculating average UMC masses.", vbOKOnly, glFGTU
+      MsgBox "Error calculating average LC-MS Feature masses.", vbOKOnly, glFGTU
    End If
    Me.MousePointer = vbDefault
 Else
@@ -2912,7 +2909,7 @@ If GelUMC(nMyIndex).UMCCnt > 0 Then
    frmVisUMC.Show vbModal
     UpdateTICPlotAndFeatureBrowsersIfNeeded True
 Else
-   MsgBox "UMCs not found. Please use menu item 'Steps->2. Find UMCs' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
+   MsgBox "LC-MS Features not found. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' to cluster the data into unique mass classes.", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -3377,9 +3374,9 @@ End Sub
 
 Private Sub mnuVMTDisplay_Click()
 If AMTCnt > 0 Then
-   Call Display0        'always recreate database display
+   Call Display0        'always re-create database display
 Else
-   MsgBox "No MT tags(database peptides) found.", vbOKOnly, glFGTU
+   MsgBox "No MT tags (database peptides) in memory.  Choose Steps->6. Database Search to load the MT tags then re-select his menu item.", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -4042,21 +4039,21 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     If lngAllUMCCount > 0 Then
         If blnPromptForFileToExportTo Then
             ' Save to a file
-            strFilePath = SelectFile(Me.hwnd, "Enter file name to copy UMC's to", "", True, "UMCsInView.txt", , 2)
+            strFilePath = SelectFile(Me.hwnd, "Enter file name to copy LC-MS Featurse to", "", True, "LCMSFeaturesInView.txt", , 2)
             If Len(strFilePath) = 0 Then Exit Sub
         ElseIf Len(strFilePathForce) > 0 Then
             strFilePath = strFilePathForce
         End If
     Else
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "No UMC's are present in memory", vbInformation + vbOKOnly, glFGTU
+            MsgBox "No LC-MS Features are present in memory", vbInformation + vbOKOnly, glFGTU
         End If
         Exit Sub
     End If
     
     lngProgessStepCount = 0
     frmProgress.InitializeForm "Preparing data", 0, EXPORT_STEP_COUNT, False, True, False
-    frmProgress.InitializeSubtask "Generating UMC statistics", 0, 1
+    frmProgress.InitializeSubtask "Generating LC-MS Feature statistics", 0, 1
     
     lngAllUMCCount = UMCStatistics1(nMyIndex, ClsStat())
     Debug.Assert lngAllUMCCount = GelUMC(nMyIndex).UMCCnt
@@ -4098,7 +4095,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             End If
             
             If blnMatchFound Then
-                eResponse = MsgBox("One or more UMC's contains database matches.  However, the appropriate ORF (protein) information is not currently loaded.  Load it now (if No, then re-enable this option using Edit->Copy UMC's in View->Include DB Search Matches)?", vbQuestion + vbYesNoCancel + vbDefaultButton1, "Load MT tags")
+                eResponse = MsgBox("One or more LC-MS Features contains database matches.  However, the appropriate Protein (ORF) information is not currently loaded.  Load it now (if No, then re-enable this option using Edit->Copy LC-MS Features in View->Include DB Search Matches)?", vbQuestion + vbYesNoCancel + vbDefaultButton1, "Load MT tags")
                 If eResponse = vbYes Then
                     ConfirmMassTagsAndInternalStdsLoaded Me, nMyIndex, True
                 Else
@@ -4135,9 +4132,9 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     
     lngProgessStepCount = lngProgessStepCount + 1
     frmProgress.UpdateProgressBar lngProgessStepCount
-    frmProgress.InitializeSubtask "Finding UMC's in view", 0, lngAllUMCCount
+    frmProgress.InitializeSubtask "Finding LC-MS Features in view", 0, lngAllUMCCount
     
-    ' Step 2: Set blnUMCPresent() to True for the UMC's that the ions currently "In Scope" belong to
+    ' Step 2: Set blnUMCPresent() to True for the LC-MS Features that the ions currently "In Scope" belong to
     lngUMCInViewCountDimmed = 0
     For lngIonIndex = 1 To lngCSCount
         With GelDataLookupArrays(nMyIndex).CSUMCs(lngCSPointerArray(lngIonIndex))
@@ -4185,9 +4182,9 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     If lngUMCsInViewCount = 0 Then
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             If blnPromptForFileToExportTo Then
-                MsgBox "No UMC's found in the current view; nothing was saved to disk.", vbInformation + vbOKOnly, glFGTU
+                MsgBox "No LC-MS Features found in the current view; nothing was saved to disk.", vbInformation + vbOKOnly, glFGTU
             Else
-                MsgBox "No UMC's found in the current view", vbInformation + vbOKOnly, glFGTU
+                MsgBox "No LC-MS Features found in the current view", vbInformation + vbOKOnly, glFGTU
             End If
         End If
         frmProgress.HideForm
@@ -4196,7 +4193,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     
     lngProgessStepCount = lngProgessStepCount + 1
     frmProgress.UpdateProgressBar lngProgessStepCount
-    frmProgress.InitializeSubtask "Preparing UMC Match stats", 0, lngUMCsInViewCount
+    frmProgress.InitializeSubtask "Preparing LC-MS Feature Match stats", 0, lngUMCsInViewCount
     
     lngExportCount = 0
     lngExportCountDimmed = lngCSCount + lngIsoCount
@@ -4218,7 +4215,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     
     lngExportCount = 1
     
-    ' Step 4: Output the UMC's; exit the For loop if lngExportCount becomes greater than lngMaxPointsCountToCopy
+    ' Step 4: Output the LC-MS Features; exit the For loop if lngExportCount becomes greater than lngMaxPointsCountToCopy
     For lngUMCIndex = 0 To lngUMCsInViewCount - 1
     
         lngUMCIndexOriginal = udtUMCsInView(lngUMCIndex).UMCIndex
@@ -4491,7 +4488,7 @@ Private Function SaveFileAsWrapper(strSuggestedSaveFilePath As String, blnPrompt
         
           ' No longer supported (March 2006)
 ''        If GelORFData(nMyIndex).ORFCount > 0 Then
-''            eResponse = MsgBox("Include ORF (protein) Data and ORF MT tags when saving?", vbQuestion + vbYesNoCancel + intDefaultButtonIndex, "Include ORF Data")
+''            eResponse = MsgBox("Include Protein (ORF) Data and ORF MT tags when saving?", vbQuestion + vbYesNoCancel + intDefaultButtonIndex, "Include Protein Data")
 ''            If eResponse = vbCancel Then
 ''                SaveFileAsWrapper = False
 ''                Exit Function
@@ -4503,7 +4500,7 @@ Private Function SaveFileAsWrapper(strSuggestedSaveFilePath As String, blnPrompt
 ''        End If
         
         If GelUMC(nMyIndex).UMCCnt > 0 Then
-            eResponse = MsgBox("Include UMC data when saving?", vbQuestion + vbYesNoCancel + intDefaultButtonIndex, "Include UMC Data")
+            eResponse = MsgBox("Include LC-MS Feature (UMC) data when saving?", vbQuestion + vbYesNoCancel + intDefaultButtonIndex, "Include LC-MS Feature Data")
             If eResponse = vbCancel Then
                 SaveFileAsWrapper = False
                 Exit Function

@@ -142,7 +142,7 @@ Public Function AddDisplayToOverlay(ByVal Ind As Long) As Boolean
 'creates overlay based on display Ind; returns True if succesful
 '----------------------------------------------------------------
 On Error GoTo exit_AddDisplayToOverlay
-'check if UMC should be overlaid that UMCs exist for specified display
+'check if UMC should be overlaid that LC-MS Features exist for specified display
 If OlyOptions.DefType = OlyUMC Then
    If GelUMC(Ind).UMCCnt <= 0 Then
       MsgBox "No unique mass classes found for selected display.", vbOKOnly, glFGTU

@@ -914,7 +914,7 @@ Dim lngMatchCount As Long
 Dim lngMatchingIndices() As Long
 
 On Error Resume Next
-If AMTGeneration < glAMT_GENERATION_NEW Then
+If AMTGeneration < dbgGeneration1000 Then
    MsgBox "MT tag database does not support this feature.", vbOKOnly, glFGTU
    Exit Sub
 End If

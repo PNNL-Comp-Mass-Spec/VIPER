@@ -4,7 +4,7 @@ Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Object = "{C02A7541-5364-11D2-9373-00A02411EBE6}#1.6#0"; "cw3dgrph.ocx"
 Begin VB.Form frmMSAlign 
    BackColor       =   &H00FFFFFF&
-   Caption         =   "LCMSWARP"
+   Caption         =   "LCMSWarp"
    ClientHeight    =   10410
    ClientLeft      =   165
    ClientTop       =   855
@@ -97,13 +97,12 @@ Begin VB.Form frmMSAlign
       _Version        =   393216
       Style           =   1
       Tabs            =   6
-      Tab             =   4
       TabsPerRow      =   6
       TabHeight       =   520
       BackColor       =   -2147483643
       TabCaption(0)   =   "NET Options"
       TabPicture(0)   =   "frmMSAlign.frx":0000
-      Tab(0).ControlEnabled=   0   'False
+      Tab(0).ControlEnabled=   -1  'True
       Tab(0).Control(0)=   "fraNETWarpOptions"
       Tab(0).Control(0).Enabled=   0   'False
       Tab(0).ControlCount=   1
@@ -111,39 +110,30 @@ Begin VB.Form frmMSAlign
       TabPicture(1)   =   "frmMSAlign.frx":001C
       Tab(1).ControlEnabled=   0   'False
       Tab(1).Control(0)=   "fraMassWarpOptions"
-      Tab(1).Control(0).Enabled=   0   'False
       Tab(1).ControlCount=   1
       TabCaption(2)   =   "Tolerances"
       TabPicture(2)   =   "frmMSAlign.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraNETTolerances"
-      Tab(2).Control(0).Enabled=   0   'False
-      Tab(2).Control(1)=   "fraBinningOptions"
-      Tab(2).Control(1).Enabled=   0   'False
+      Tab(2).Control(0)=   "fraBinningOptions"
+      Tab(2).Control(1)=   "fraNETTolerances"
       Tab(2).ControlCount=   2
       TabCaption(3)   =   "Calibration Type"
       TabPicture(3)   =   "frmMSAlign.frx":0054
       Tab(3).ControlEnabled=   0   'False
       Tab(3).Control(0)=   "fraMassCalibType"
-      Tab(3).Control(0).Enabled=   0   'False
       Tab(3).ControlCount=   1
       TabCaption(4)   =   "Advanced"
       TabPicture(4)   =   "frmMSAlign.frx":0070
-      Tab(4).ControlEnabled=   -1  'True
-      Tab(4).Control(0)=   "Label21"
-      Tab(4).Control(0).Enabled=   0   'False
-      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
-      Tab(4).Control(1).Enabled=   0   'False
-      Tab(4).Control(2)=   "Frame1"
-      Tab(4).Control(2).Enabled=   0   'False
-      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
-      Tab(4).Control(3).Enabled=   0   'False
+      Tab(4).ControlEnabled=   0   'False
+      Tab(4).Control(0)=   "txtWarpMassZScoreTolerance"
+      Tab(4).Control(1)=   "Frame1"
+      Tab(4).Control(2)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(3)=   "Label21"
       Tab(4).ControlCount=   4
       TabCaption(5)   =   "Plots"
       TabPicture(5)   =   "frmMSAlign.frx":008C
       Tab(5).ControlEnabled=   0   'False
       Tab(5).Control(0)=   "fraResidualPlotOptions"
-      Tab(5).Control(0).Enabled=   0   'False
       Tab(5).ControlCount=   1
       Begin VB.Frame fraResidualPlotOptions 
          Caption         =   "Residual Plot Options"
@@ -285,7 +275,7 @@ Begin VB.Form frmMSAlign
       End
       Begin VB.TextBox txtWarpMassZScoreTolerance 
          Height          =   285
-         Left            =   5160
+         Left            =   -69840
          TabIndex        =   48
          Text            =   "3"
          Top             =   420
@@ -294,7 +284,7 @@ Begin VB.Form frmMSAlign
       Begin VB.Frame Frame1 
          Caption         =   "LSQ Options"
          Height          =   855
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   49
          Top             =   720
          Width           =   6015
@@ -334,7 +324,7 @@ Begin VB.Form frmMSAlign
       Begin VB.CheckBox chkWarpMassUseLSQ 
          Caption         =   "Use LSQ (least squares fit)"
          Height          =   255
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   46
          Top             =   420
          Value           =   1  'Checked
@@ -416,7 +406,7 @@ Begin VB.Form frmMSAlign
          End
          Begin VB.Label lblGANETBinSize 
             BackStyle       =   0  'Transparent
-            Caption         =   "GANET Bin Size"
+            Caption         =   "NET Bin Size"
             Height          =   255
             Left            =   120
             TabIndex        =   40
@@ -585,7 +575,7 @@ Begin VB.Form frmMSAlign
       Begin VB.Frame fraNETWarpOptions 
          Caption         =   "NET Warp Options"
          Height          =   1335
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   8
          Top             =   360
          Width           =   6135
@@ -693,7 +683,7 @@ Begin VB.Form frmMSAlign
       Begin VB.Label Label21 
          Caption         =   "z-score tolerance:"
          Height          =   210
-         Left            =   3480
+         Left            =   -71520
          TabIndex        =   47
          Top             =   450
          Width           =   1695
@@ -708,7 +698,7 @@ Begin VB.Form frmMSAlign
       Width           =   11055
       Begin VB.Label lblUMCMassMode 
          BackColor       =   &H00FFFFFF&
-         Caption         =   "UMC Mass Mode"
+         Caption         =   "LC-MS Feature Mass Mode"
          Height          =   255
          Left            =   120
          TabIndex        =   98
@@ -875,7 +865,7 @@ Begin VB.Form frmMSAlign
       End
       Begin VB.Label Label8 
          BackColor       =   &H00FFFFFF&
-         Caption         =   "Feature Count:"
+         Caption         =   "LC-MS Features:"
          Height          =   255
          Left            =   120
          TabIndex        =   88
@@ -2210,8 +2200,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   3.98406509787428E-295
-         DataMax_5       =   3.98406509787428E-295
+         DataMin_5       =   5.47080630525871E-295
+         DataMax_5       =   5.47080630525871E-295
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2277,8 +2267,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   4.04245006986144E-295
-         DataMax_14      =   4.04245006986144E-295
+         DataMin_14      =   5.4868435072828E-295
+         DataMax_14      =   5.4868435072828E-295
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2346,8 +2336,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   4.06299680169119E-295
-         DataMax_23      =   4.06299680169119E-295
+         DataMin_23      =   5.50828617218652E-295
+         DataMax_23      =   5.50828617218652E-295
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -3301,9 +3291,9 @@ Private Function ConstructHistoryTextForNETAlignment(ByVal strSecondsElapsed As 
                  "; Mass tolerance = ±" & Trim(Round(UMCNetAdjDef.MWTol, 3)) & " ppm" & _
                  "; NET Tolerance = ±" & Format(UMCNetAdjDef.MSWarpOptions.NETTol, "0.000")
                     
-    '' If, in the future, we restrict the alignment to the top x% of UMCs, then use this text to record that
+    '' If, in the future, we restrict the alignment to the top x% of LC-MS Features, then use this text to record that
     ' If .UMCTopAbuPct >= 0 Then
-    '     strMessage = strMessage & "; Restrict to x% of UMC's = " & Trim(.UMCTopAbuPct) & "%"
+    '     strMessage = strMessage & "; Restrict to x% of LC-MS Features = " & Trim(.UMCTopAbuPct) & "%"
     ' End If
     
     If MatchesAreValid Then
@@ -3463,7 +3453,7 @@ On Error GoTo CopyLocalDataToGelErrorHandler
             
             '--------------------------------------------------
             ' Estimate the Linear NET slope and intercept
-            ' Always start with 20% of the UMCs, then step up in increments of 20%
+            ' Always start with 20% of the LC-MS Features, then step up in increments of 20%
             '--------------------------------------------------
             intTopAbuPct = 20
             strLastGoodPosition = "Estimate the Linear NET"
@@ -3477,12 +3467,12 @@ On Error GoTo CopyLocalDataToGelErrorHandler
             With GelUMC(CallerID)
                 strLastGoodPosition = "Update the status bit for UMC_INDICATOR_BIT_USED_FOR_NET_ADJ"
                 
-                ' First claer the UMC_INDICATOR_BIT_USED_FOR_NET_ADJ status bit
+                ' First clear the UMC_INDICATOR_BIT_USED_FOR_NET_ADJ status bit
                 For lngIndex = 0 To .UMCCnt - 1
                     .UMCs(lngIndex).ClassStatusBits = .UMCs(lngIndex).ClassStatusBits And Not UMC_INDICATOR_BIT_USED_FOR_NET_ADJ
                 Next lngIndex
 
-                ' Now update the status bit for the UMCs in mPepTransformRT()
+                ' Now update the status bit for the LC-MS Features in mPepTransformRT()
                 For lngIndex = 0 To UBound(mPepTransformRT, 1)
                     With .UMCs(mPepTransformRT(lngIndex, ptcPepTransformRTColumns.ptcUMCIndex))
                         .ClassStatusBits = .ClassStatusBits Or UMC_INDICATOR_BIT_USED_FOR_NET_ADJ
@@ -4090,10 +4080,10 @@ On Error GoTo EstimateLinearNETErrorHandler
            
 
     '--------------------------------------------------
-    ' Select the most abundant UMCs that pass the UMC selection criteria defined in UMCNetAdjDef
+    ' Select the most abundant LC-MS Features that pass the UMC selection criteria defined in UMCNetAdjDef
     '--------------------------------------------------
     
-    ' Initially set all UMCs for use
+    ' Initially set all LC-MS Features for use
     ReDim UseUMC(GelUMC(CallerID).UMCCnt - 1)
     For lngIndex = 0 To UBound(UseUMC)
         UseUMC(lngIndex) = True
@@ -4104,7 +4094,7 @@ On Error GoTo EstimateLinearNETErrorHandler
     
     '--------------------------------------------------
     ' Step through the features that have valid matches
-    ' Only use those UMCs with UseUMC() = True
+    ' Only use those LC-MS Features with UseUMC() = True
     ' Use the scan and CustomNET for each feature to compute
     ' a least squares line of scan vs. CustomNET, along with
     ' the R-Squared value
@@ -4491,20 +4481,20 @@ On Error GoTo InitializeSearchErrorHandler
     Me.MousePointer = vbHourglass
 
     If CallerID >= 1 And CallerID <= UBound(GelUMC) Then
-        ' Update lblUMCMassMode to reflect the mass mode used to identify the UMC's
+        ' Update lblUMCMassMode to reflect the mass mode used to identify the LC-MS Features
         Select Case GelUMC(CallerID).def.ClassMW
         Case UMCClassMassConstants.UMCMassAvg
-            lblUMCMassMode = "UMC Mass = Average of the masses of the UMC members"
+            lblUMCMassMode = "LC-MS Feature Mass = Average of the masses of the LC-MS Feature members"
         Case UMCClassMassConstants.UMCMassRep
-            lblUMCMassMode = "UMC Mass = Mass of the UMC Class Representative"
+            lblUMCMassMode = "LC-MS Feature Mass = Mass of the LC-MS Feature Class Representative"
         Case UMCClassMassConstants.UMCMassMed
-            lblUMCMassMode = "UMC Mass = Median of the masses of the UMC members"
+            lblUMCMassMode = "LC-MS Feature Mass = Median of the masses of the LC-MS Feature members"
         Case UMCMassAvgTopX
-            lblUMCMassMode = "UMC Mass = Average of top X members of the UMC"
+            lblUMCMassMode = "LC-MS Feature Mass = Average of top X members of the LC-MS Feature"
         Case UMCMassMedTopX
-            lblUMCMassMode = "UMC Mass = Median of top X members of the UMC"
+            lblUMCMassMode = "LC-MS Feature Mass = Median of top X members of the LC-MS Feature"
         Case Else
-            lblUMCMassMode = "UMC Mass = ?? Unable to determine; is it a new mass mode?"
+            lblUMCMassMode = "LC-MS Feature Mass = ?? Unable to determine; is it a new mass mode?"
         End Select
         
         PopulateLocalFeaturesArray
@@ -4512,7 +4502,7 @@ On Error GoTo InitializeSearchErrorHandler
         UMCNetAdjDef = GelUMCNETAdjDef(CallerID)
     
     Else
-        lblUMCMassMode = "CallerID is not defined; UMC Mass mode is unknown"
+        lblUMCMassMode = "CallerID is not defined; LC-MS Feature Mass mode is unknown"
         ClearLocalFeaturesArray
     End If
     
@@ -4738,7 +4728,7 @@ LoadPMTsFromLegacyDBErrorHandler:
     
 End Sub
 
-Private Sub LoadUMCsFromFile()
+Private Sub LoadLCMSFeaturesFromFile()
     Dim OldPath As String
     Dim i As Long
     Dim j As Integer
@@ -4756,11 +4746,11 @@ Private Sub LoadUMCsFromFile()
     Dim dblTempUMCs() As Double
     Dim Index As Long
     
-On Error GoTo LoadUMCsFromFileErrorHandler
+On Error GoTo LoadLCMSFeaturesFromFileErrorHandler
 
     If mLoading Then Exit Sub
     
-    FileName = SelectFile(Me.hwnd, "Load UMC File ...", , False, "*.txt", "UMC Files (*umcs.txt)|*umcs.txt|All Files (*.*)|*.*", 1)
+    FileName = SelectFile(Me.hwnd, "Load LC-MS Features File ...", , False, "*.txt", "UMC Files (*umcs.txt)|*umcs.txt|All Files (*.*)|*.*", 1)
     If Len(FileName) = 0 Then
         Exit Sub
     End If
@@ -4779,7 +4769,7 @@ On Error GoTo LoadUMCsFromFileErrorHandler
     End If
     
     EnableDisableControls False
-    UpdateStatus "Loading UMCs"
+    UpdateStatus "Loading LC-MS Features"
     
     Line Input #FileNum, strLineIn
     mLocalFeatureCount = 0
@@ -4818,7 +4808,7 @@ On Error GoTo LoadUMCsFromFileErrorHandler
        
         If mLocalFeatureCount Mod 100 = 0 Then
             If mAbortRequested Then Exit Do
-            UpdateStatus "Loading UMCs: " & mLocalFeatureCount
+            UpdateStatus "Loading LC-MS Features: " & mLocalFeatureCount
             DoEvents
         End If
     Loop
@@ -4842,9 +4832,9 @@ ExitSub:
    EnableDisableControls True
     Exit Sub
     
-LoadUMCsFromFileErrorHandler:
-    MsgBox "Error in LoadUMCsFromFile: " & Err.Description
-    UpdateStatus "Aborted loading UMCs"
+LoadLCMSFeaturesFromFileErrorHandler:
+    MsgBox "Error in LoadLCMSFeaturesFromFile: " & Err.Description
+    UpdateStatus "Aborted loading LC-MS Features"
     Resume ExitSub
     
 End Sub
@@ -5517,7 +5507,7 @@ On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
         blnSuccess = MassCalibrationUpdateHistory(CallerID, dblMassShiftPPMAvg, eMassType, True, True, glbPreferencesExpanded.ErrorPlottingOptions.MassBinSizePPM, True)
 
         ' Recompute the UMC class mass stats
-        UpdateStatus "Updating mass calibration: 100% done; now recomputing UMC stats"
+        UpdateStatus "Updating mass calibration: 100% done; now recomputing LC-MS Feature stats"
         blnSuccess = CalculateClasses(CallerID, False, Me)
 
         ' Update mLocalFeatures
@@ -6300,7 +6290,7 @@ On Error GoTo StartAlignmentErrorHandler
             If mLocalPMTCount = 0 Then
                 MsgBox "MT tags are not present in memory.  Please close this dialog and use menu option 'Steps->3. Select MT tags' in the main window to connect to a database or define a legacy database (Access DB file).", vbExclamation + vbOKOnly, "Error"
             Else
-                MsgBox "UMCs (aka features) are not present in memory.  Please close this dialog and use menu item 'Steps->2. Find UMCs' in the main window to cluster the data into unique mass classes.", vbExclamation + vbOKOnly, "Error"
+                MsgBox "LC-MS Features are not present in memory.  Please close this dialog and use menu item 'Steps->2. Find LC-MS Features (UMCs)' in the main window to cluster the data into unique mass classes.", vbExclamation + vbOKOnly, "Error"
             End If
         End If
         Exit Sub
@@ -7128,8 +7118,8 @@ Private Sub mnuEditLoadPMTsFromFile_Click()
     LoadPMTsFromFile
 End Sub
 
-Private Sub mnuEditLoadUMCsFromFile_Click()
-    LoadUMCsFromFile
+Private Sub mnuEditLoadLCMSFeaturesFromFile_Click()
+    LoadLCMSFeaturesFromFile
 End Sub
 
 Private Sub mnuFileExit_Click()

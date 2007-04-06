@@ -1416,6 +1416,23 @@ TryAgain:
 
 End Function
 
+Public Function GetFilePathFull(ByVal strFilePath As String) As String
+
+    Dim fso As New FileSystemObject
+    
+On Error GoTo GetFilePathFullErrorHandler
+
+    GetFilePathFull = fso.GetAbsolutePathName(strFilePath)
+    Exit Function
+
+GetFilePathFullErrorHandler:
+    Debug.Assert False
+    
+    ' Error; return the application path
+    GetFilePathFull = App.Path
+
+End Function
+
 ''Public Function GetUrlSource(sURL As String, Optional boolUpdateProgressForm As Boolean = False) As String
 ''    ' Function from http://www.planet-source-code.com/vb/scripts/ShowCode.asp?lngWId=1&txtCodeId=24465
 ''

@@ -1562,7 +1562,7 @@ Public Function GeneratePEKFileUsingDataPoints(ByVal lngGelIndex As Long, ByVal 
     Dim blnResponse As Boolean
 
     Dim lngCurrentScan As Long
-    Dim lngDataPointCountInScan As Long               ' Counts the number of CS-based UMCs or the number of Isotopic-based UMCs in a given scan -- not both
+    Dim lngDataPointCountInScan As Long               ' Counts the number of CS-based LC-MS Features or the number of Isotopic-based LC-MS Features in a given scan -- not both
     Dim lngScanIndex As Long
 
     Dim lngCSPointerArray() As Long             ' 1-based array (dictated by GetCSScope)
@@ -1845,7 +1845,7 @@ GeneratePEKFileUsingDataPointsErrorHandler:
 End Function
 
 Public Function GeneratePEKFileUsingUMCs(ByVal lngGelIndex As Long, ByVal blnLimitToUMCsInView As Boolean, ByVal strFilePathForce As String, ByVal hwndOwner As Long) As Boolean
-    ' Creates new barebones PEK file using the UMCs in memory
+    ' Creates new barebones PEK file using the LC-MS Features in memory
     ' Only outputs one entry for each UMC (class mass and class rep)
     
     ' If strFilePathForce contains text then that file path will be used (and the user will not be prompted)
@@ -1870,7 +1870,7 @@ Public Function GeneratePEKFileUsingUMCs(ByVal lngGelIndex As Long, ByVal blnLim
     Dim lngUMCsInViewCount As Long
     
     Dim lngCurrentScan As Long
-    Dim lngUMCCountInScan As Long               ' Counts the number of CS-based UMCs or the number of Isotopic-based UMCs in a given scan -- not both
+    Dim lngUMCCountInScan As Long               ' Counts the number of CS-based LC-MS Features or the number of Isotopic-based LC-MS Features in a given scan -- not both
     Dim lngScanIndex As Long
     
     Dim lngCSPointerArray() As Long
@@ -1884,8 +1884,8 @@ Public Function GeneratePEKFileUsingUMCs(ByVal lngGelIndex As Long, ByVal blnLim
     Dim sngScanClassRep As Single
 
     Dim blnUMCPresent() As Boolean          ' Records whether or not each UMC is present
-    Dim lngUMCsInView() As Long             ' 0-based array; holds the indices of the UMCs in view
-    Dim sngUMCsClassRepScan() As Single     ' 0-based array; holds the scan numbers of the class rep for the UMCs in view; parallel to lngUMCsInView; each scan number is appened with CHARGE_STATE_DATA_DECIMAL or ISOTOPIC_DATA_DECIMAL -- .1 is used for UMCs from ChargeState data and .2 is used for UMCs from Isotopic data
+    Dim lngUMCsInView() As Long             ' 0-based array; holds the indices of the LC-MS Features in view
+    Dim sngUMCsClassRepScan() As Single     ' 0-based array; holds the scan numbers of the class rep for the LC-MS Features in view; parallel to lngUMCsInView; each scan number is appened with CHARGE_STATE_DATA_DECIMAL or ISOTOPIC_DATA_DECIMAL -- .1 is used for LC-MS Features from ChargeState data and .2 is used for LC-MS Features from Isotopic data
     
     Dim lngScanInfoMaxIndex As Long
     
@@ -1896,13 +1896,13 @@ Public Function GeneratePEKFileUsingUMCs(ByVal lngGelIndex As Long, ByVal blnLim
     
     Dim blnIsoHeaderWritten As Boolean
     Dim blnValidUMC As Boolean
-    Dim blnIsotopicUMCsPresent As Boolean           ' This is set to True if any of the UMCs have .ClassRepType = gldtIS
+    Dim blnIsotopicUMCsPresent As Boolean           ' This is set to True if any of the LC-MS Features have .ClassRepType = gldtIS
     Dim blnAborted As Boolean
     
 On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
 
         
-    ' Need to generate list of UMCs that will be exported and sort them on ascending scan number of the class rep
+    ' Need to generate list of LC-MS Features that will be exported and sort them on ascending scan number of the class rep
     ' Then, step through the list and write an entry for each UMC
 
     lngAllUMCCount = GelUMC(lngGelIndex).UMCCnt
@@ -1919,14 +1919,14 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
                 strSuggestedName = "UMCsInView.pek"
             End If
             
-            strFilePath = SelectFile(hwndOwner, "Enter file name to create using UMCs in view", "", True, strSuggestedName, "All Files (*.*)|*.*|PEK Files (*.pek)|*.pek", 2)
+            strFilePath = SelectFile(hwndOwner, "Enter file name to create using LC-MS Features in view", "", True, strSuggestedName, "All Files (*.*)|*.*|PEK Files (*.pek)|*.pek", 2)
             If Len(strFilePath) = 0 Then Exit Function
         Else
             strFilePath = strFilePathForce
         End If
     Else
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "No UMC's are present in memory", vbInformation + vbOKOnly, glFGTU
+            MsgBox "No LC-MS Features are present in memory", vbInformation + vbOKOnly, glFGTU
         End If
         Exit Function
     End If
@@ -1934,7 +1934,7 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
     
     lngProgessStepCount = 0
     frmProgress.InitializeForm "Preparing data", 0, EXPORT_STEP_COUNT, False, True, False
-    frmProgress.InitializeSubtask "Finding UMCs in View", 0, lngAllUMCCount
+    frmProgress.InitializeSubtask "Finding LC-MS Features in View", 0, lngAllUMCCount
     blnAborted = False
     
     ' Reserve space for the UMC Presence array
@@ -1945,7 +1945,7 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
     lngCSCount = GetCSScope(lngGelIndex, lngCSPointerArray(), glSc_Current)
     lngIsoCount = GetISScope(lngGelIndex, lngIsoPointerArray(), glScope.glSc_Current)
     
-    ' Step 2: Set blnUMCPresent() to True for the UMC's that the ions currently "In Scope" belong to
+    ' Step 2: Set blnUMCPresent() to True for the LC-MS Features that the ions currently "In Scope" belong to
     lngUMCsInViewCount = 0
     For lngIonIndex = 1 To lngCSCount
         With GelDataLookupArrays(lngGelIndex).CSUMCs(lngCSPointerArray(lngIonIndex))
@@ -1971,7 +1971,7 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
 
     If lngUMCsInViewCount = 0 Then
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "No UMC's found in the current view; nothing was saved to disk.", vbInformation + vbOKOnly, glFGTU
+            MsgBox "No LC-MS Features found in the current view; nothing was saved to disk.", vbInformation + vbOKOnly, glFGTU
         End If
         frmProgress.HideForm
         Exit Function
@@ -2020,7 +2020,7 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
     If blnSuccess = False Then
         frmProgress.HideForm
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "Error sorting the UMCs Class Rep scan array", vbInformation + vbOKOnly, glFGTU
+            MsgBox "Error sorting the LC-MS Features Class Rep scan array", vbInformation + vbOKOnly, glFGTU
         End If
         Exit Function
     End If
@@ -2065,7 +2065,7 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
     
     ' Write the file header
     tsOutfile.WriteLine App.Title & " - Version " & GetProgramVersion() & ", " & APP_BUILD_DATE
-    tsOutfile.WriteLine "PEK file generated from UMC data"
+    tsOutfile.WriteLine "PEK file generated from LC-MS Feature data"
     tsOutfile.WriteLine "Original PEK file: " & GelData(lngGelIndex).FileName
     tsOutfile.WriteLine
 
@@ -2082,7 +2082,7 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
             If Not blnIsoHeaderWritten Then
                 ' Scan only contained CS Data
                 If blnIsotopicUMCsPresent Then
-                    ' However, there are Isotopic UMCs in the data file, so write the Isotopic Header anyway
+                    ' However, there are Isotopic LC-MS Features in the data file, so write the Isotopic Header anyway
                     GeneratePEKFileWriteIsoHeader tsOutfile
                     tsOutfile.WriteLine "Number of peaks in spectrum = " & Trim(lngUMCCountInScan)
                     tsOutfile.WriteLine "Number of isotopic distributions detected = " & Trim(0)
@@ -2104,9 +2104,9 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
                 lngCurrentScan = GelData(lngGelIndex).ScanInfo(lngScanIndex + 1).ScanNumber
                 lngScanIndex = lngScanIndex + 1
             Else
-                ' We've passed the last scan in .ScanInfo; exit the for loop (and thus do not write out any more UMCs)
+                ' We've passed the last scan in .ScanInfo; exit the for loop (and thus do not write out any more LC-MS Features)
                 If lngIndex < lngUMCsInViewCount - 1 Then
-                    ' One or more UMCs has scan numbers greater than lngCurrentScan
+                    ' One or more LC-MS Features has scan numbers greater than lngCurrentScan
                     Debug.Assert False
                 End If
                 Exit For
@@ -2210,11 +2210,11 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
     
     If blnAborted Then
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "Process aborted; saved the first " & Trim(lngUMCsInViewCount) & " UMCs to file:" & vbCrLf & strFilePath, vbExclamation + vbOKOnly, "Aborted"
+            MsgBox "Process aborted; saved the first " & Trim(lngUMCsInViewCount) & " LC-MS Features to file:" & vbCrLf & strFilePath, vbExclamation + vbOKOnly, "Aborted"
         End If
     Else
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "Save complete; saved " & Trim(lngUMCsInViewCount) & " UMCs to file:" & vbCrLf & strFilePath, vbInformation + vbOKOnly, "Done"
+            MsgBox "Save complete; saved " & Trim(lngUMCsInViewCount) & " LC-MS Features to file:" & vbCrLf & strFilePath, vbInformation + vbOKOnly, "Done"
         End If
     End If
     

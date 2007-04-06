@@ -249,17 +249,17 @@ Begin VB.Form frmUMCBrowser
    End
    Begin VB.Menu mnuFile 
       Caption         =   "&File"
-      Begin VB.Menu mnuFileFindUMCs2003 
-         Caption         =   "Open Find UMC 2003 Window (faster)"
-      End
       Begin VB.Menu mnuFileFindUMCsIonNetworks 
          Caption         =   "&Open Find UMC Ion Networks Window (better)"
+      End
+      Begin VB.Menu mnuFileFindUMCs2003 
+         Caption         =   "Open Find UMC 2003 Window (faster, but less accurate)"
       End
       Begin VB.Menu mnuFileSep1 
          Caption         =   "-"
       End
       Begin VB.Menu mnuFileSaveChanges 
-         Caption         =   "&Save Changes (Delete UMCs)"
+         Caption         =   "&Save Changes (Delete LC-MS Features)"
          Shortcut        =   ^S
       End
       Begin VB.Menu mnuFileSep2 
@@ -272,17 +272,17 @@ Begin VB.Form frmUMCBrowser
    Begin VB.Menu mnuEdit 
       Caption         =   "&Edit"
       Begin VB.Menu mnuEditUndoDelete 
-         Caption         =   "&Undo last UMC deletion"
+         Caption         =   "&Undo last LC-MS Feature deletion"
          Shortcut        =   ^Z
       End
       Begin VB.Menu mnuEditSep1 
          Caption         =   "-"
       End
       Begin VB.Menu mnuEditDeleteSelectedUMC 
-         Caption         =   "&Delete Selected UMC"
+         Caption         =   "&Delete Selected LC-MS Feature"
       End
       Begin VB.Menu mnuEditUndeletedSelectedUMC 
-         Caption         =   "&Include Selected UMC"
+         Caption         =   "&Include Selected LC-MS Feature"
       End
       Begin VB.Menu mnuEditSep2 
          Caption         =   "-"
@@ -325,7 +325,7 @@ Begin VB.Form frmUMCBrowser
          Checked         =   -1  'True
       End
       Begin VB.Menu mnuOptionsHighlightUMCMembers 
-         Caption         =   "&Highlight UMC members"
+         Caption         =   "&Highlight LC-MS Feature members"
          Checked         =   -1  'True
          Shortcut        =   ^H
       End
@@ -379,10 +379,10 @@ End Enum
 Private mUMCsCount As Long
 Private mUMCValid() As Boolean                 ' 0-based array; Dereference into GelUMC() using mUMCInfoOriginalIndex()
 Private mUMCInfoSortedPointerArray() As Long   ' 0-based array; pointer into mUMCValid
-Private mUMCInfoOriginalIndex() As Long        ' 0-based array; Original index of UMC in GelUMC(); needed for option to filter to only include UMCs with hits
+Private mUMCInfoOriginalIndex() As Long        ' 0-based array; Original index of UMC in GelUMC(); needed for option to filter to only include LC-MS Features with hits
 
 Private mDeletedUMCsStackCount As Long
-Private mDeletedUMCsStack() As Long            ' 0-based array; Indices of deleted UMCs; pointers into mUMCValid(); used with the undo command
+Private mDeletedUMCsStack() As Long            ' 0-based array; Indices of deleted LC-MS Features; pointers into mUMCValid(); used with the undo command
 
 ' The following are 1-based arrays, for compatibility with the plot control
 Private mDataPointCount As Long
@@ -424,7 +424,7 @@ Private Sub CustomizeMenus()
 End Sub
 
 Private Function DeleteMarkedUMCs(Optional blnInformIfNoneToDelete As Boolean = True) As Boolean
-    ' Returns true if the UMCs were deleted (or no deleted UMCs exist)
+    ' Returns true if the LC-MS Features were deleted (or no deleted LC-MS Features exist)
     
     Dim eResponse As VbMsgBoxResult
     Dim lngUMCCountToDelete As Long
@@ -443,10 +443,10 @@ Private Function DeleteMarkedUMCs(Optional blnInformIfNoneToDelete As Boolean = 
     
     blnSuccess = True
     If lngUMCCountToDelete > 0 And CallerIDLoaded > 0 Then
-        eResponse = MsgBox("You have marked " & Trim(mDeletedUMCsStackCount) & " UMCs for deletion (" & Trim(mUMCsCount - lngUMCCountToDelete) & " will remain).  Choose Yes to proceed with deletion.", vbQuestion + vbYesNoCancel, "Delete UMCs")
+        eResponse = MsgBox("You have marked " & Trim(mDeletedUMCsStackCount) & " LC-MS Features for deletion (" & Trim(mUMCsCount - lngUMCCountToDelete) & " will remain).  Choose Yes to proceed with deletion.", vbQuestion + vbYesNoCancel, "Delete LC-MS Features")
         
         If eResponse = vbYes Then
-            ' Delete marked UMCs
+            ' Delete marked LC-MS Features
             ' Cannot copy in place since must use mUMCInfoOriginalIndex() pointer array
             With GelUMC(CallerIDLoaded)
             
@@ -474,7 +474,7 @@ Private Function DeleteMarkedUMCs(Optional blnInformIfNoneToDelete As Boolean = 
         End If
     Else
         If blnInformIfNoneToDelete And CallerIDLoaded > 0 Then
-            MsgBox "No UMCs have been marked for deletion.", vbInformation + vbOKOnly, "Nothing to do"
+            MsgBox "No LC-MS Features have been marked for deletion.", vbInformation + vbOKOnly, "Nothing to do"
         End If
     End If
     
@@ -506,7 +506,7 @@ Private Sub DisplayUMCInfoSelectedItem(Optional blnSkipAutoZoom As Boolean = Fal
     If mUpdatingControls Then Exit Sub
     
     If lstUMCs.ListIndex < 0 Or CallerIDLoaded <= 0 Then
-        strDescription = "UMC not selected"
+        strDescription = "LC-MS Feature not selected"
         strDescriptionAddnl = ""
     Else
         lngUMCIndexDereferenced = mUMCInfoSortedPointerArray(lstUMCs.ListIndex)
@@ -860,7 +860,7 @@ Private Sub PopulateComboBoxes()
     
     With cboUMCSortOrder
         .Clear
-        .AddItem "Sort by UMC Index", eusUMCSortOrderConstants.eusUMCIndex
+        .AddItem "Sort by LC-MS Feature Index", eusUMCSortOrderConstants.eusUMCIndex
         .AddItem "Sort by Mass", eusUMCSortOrderConstants.eusMass
         .AddItem "Sort by Time", eusUMCSortOrderConstants.eusTime
         .AddItem "Sort by Abundance", eusUMCSortOrderConstants.eusAbundance
@@ -886,7 +886,7 @@ On Error GoTo PopulateControlsErrorHandler
         
         CallerIDLoaded = CallerIDNew
         
-        Me.Caption = "UMC Browser: " & GelBody(CallerIDLoaded).Caption
+        Me.Caption = "LC-MS Feature Browser: " & GelBody(CallerIDLoaded).Caption
         
         If CallerIDLoaded > UBound(GelUMC) Then
             CallerIDLoaded = UBound(GelUMC)
@@ -1117,7 +1117,7 @@ On Error GoTo SortAndDisplayUMCsErrorHandler
             If Not blnSuccess Then
                 ' Error performing sort
                 Debug.Assert False
-                MsgBox "Error sorting UMCs: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+                MsgBox "Error sorting LC-MS Features: " & Err.Description, vbExclamation + vbOKOnly, "Error"
                 LogErrors Err.Number, "frmUMCBrowser->SortAndDisplayUMCs", Err.Description, CallerIDLoaded
             End If
         End If
@@ -1133,7 +1133,7 @@ On Error GoTo SortAndDisplayUMCsErrorHandler
 
 SortAndDisplayUMCsErrorHandler:
     Me.MousePointer = vbDefault
-    MsgBox "Error sorting UMCs and populating list: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    MsgBox "Error sorting LC-MS Features and populating list: " & Err.Description, vbExclamation + vbOKOnly, "Error"
     LogErrors Err.Number, "SortAndDisplayUMCs", Err.Description, CallerIDLoaded
 
 End Sub
@@ -1266,10 +1266,10 @@ Private Sub UpdatePlotForUMC(lngUMCIndexOriginal As Long)
     
 On Error GoTo UpdatePlotForUMCErrorHandler
 
-    ' This is False for UMCs
+    ' This is False for LC-MS Features
     blnUseMaxValueEachScan = False
     
-    ' Look up the charges used to compute this UMC's abundance
+    ' Look up the charges used to compute this LC-MS Feature's abundance
     With GelUMC(CallerIDLoaded)
         With .UMCs(lngUMCIndexOriginal)
             If .ChargeStateCount > 0 Then
@@ -1295,7 +1295,7 @@ On Error GoTo UpdatePlotForUMCErrorHandler
     With ctlAbundancePlot
         .EnableDisableDelayUpdating True
         
-        strTitle = "UMC #" & Trim(lngUMCIndexOriginal)
+        strTitle = "LC-MS Feature #" & Trim(lngUMCIndexOriginal)
         
         intChargesUsedCount = UBound(intChargesUsed()) + 1
         If intChargesUsed(0) = 0 Then
@@ -1597,7 +1597,7 @@ End Sub
 Private Sub mnuFileFindUMCs2003_Click()
     On Error Resume Next
     If IsLoaded("frmUMCSimple") Then
-        MsgBox "The Find UMC 2003 window is already open.", vbInformation + vbOKOnly, "Cannot Open Window"
+        MsgBox "The LC-MS Feature (UMC) Definition window is already open.", vbInformation + vbOKOnly, "Cannot Open Window"
     Else
         frmUMCSimple.Tag = CallerIDLoaded
         frmUMCSimple.Show vbModal
@@ -1616,7 +1616,7 @@ End Sub
 Private Sub mnuFileFindUMCsIonNetworks_Click()
     On Error Resume Next
     If IsLoaded("frmUMCIonNet") Then
-        MsgBox "The Find UMC Ion Networks window is already open.", vbInformation + vbOKOnly, "Cannot Open Window"
+        MsgBox "The LC-MS Feature (UMC) Ion Networks window is already open.", vbInformation + vbOKOnly, "Cannot Open Window"
     Else
         frmUMCIonNet.Tag = CallerIDLoaded
         frmUMCIonNet.Show vbModal
@@ -1661,7 +1661,7 @@ Private Sub mnuOptionsHighlightUMCMembers_Click()
         .HighlightMembers = Not .HighlightMembers
         mnuOptionsHighlightUMCMembers.Checked = .HighlightMembers
     
-        UpdateStatus "Highlight UMC members now ", True, .HighlightMembers
+        UpdateStatus "Highlight LC-MS Feature members now ", True, .HighlightMembers
     End With
 End Sub
 

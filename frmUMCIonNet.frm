@@ -1,16 +1,16 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
 Begin VB.Form frmUMCIonNet 
    BorderStyle     =   3  'Fixed Dialog
-   Caption         =   "UMC Ion Networks"
-   ClientHeight    =   5400
+   Caption         =   "LC-MS Feature (UMC) Ion Networks"
+   ClientHeight    =   5850
    ClientLeft      =   2760
    ClientTop       =   3750
    ClientWidth     =   11355
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   5400
+   ScaleHeight     =   5850
    ScaleWidth      =   11355
    ShowInTaskbar   =   0   'False
    Begin VB.CommandButton cmdClose 
@@ -18,71 +18,65 @@ Begin VB.Form frmUMCIonNet
       Default         =   -1  'True
       Height          =   375
       Left            =   120
-      TabIndex        =   135
-      Top             =   4920
+      TabIndex        =   137
+      Top             =   5280
       Width           =   975
    End
    Begin TabDlg.SSTab tbsTabStrip 
-      Height          =   4695
+      Height          =   5055
       Left            =   180
       TabIndex        =   0
       Top             =   120
       Width           =   10995
       _ExtentX        =   19394
-      _ExtentY        =   8281
+      _ExtentY        =   8916
       _Version        =   393216
       Style           =   1
+      Tab             =   2
       TabHeight       =   520
       TabCaption(0)   =   "1. Find Connections"
       TabPicture(0)   =   "frmUMCIonNet.frx":0000
-      Tab(0).ControlEnabled=   -1  'True
+      Tab(0).ControlEnabled=   0   'False
       Tab(0).Control(0)=   "lblLCMSFeatureFinderInfo"
-      Tab(0).Control(0).Enabled=   0   'False
       Tab(0).Control(1)=   "fraNet(0)"
-      Tab(0).Control(1).Enabled=   0   'False
       Tab(0).Control(2)=   "fraUMCScope"
-      Tab(0).Control(2).Enabled=   0   'False
       Tab(0).Control(3)=   "cmdFindConnectionsThenUMCs"
-      Tab(0).Control(3).Enabled=   0   'False
       Tab(0).Control(4)=   "chkUseLCMSFeatureFinder"
-      Tab(0).Control(4).Enabled=   0   'False
       Tab(0).ControlCount=   5
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "lblFilterConnections"
-      Tab(1).Control(0).Enabled=   0   'False
-      Tab(1).Control(1)=   "Frame1"
-      Tab(1).Control(1).Enabled=   0   'False
+      Tab(1).Control(0)=   "Frame1"
+      Tab(1).Control(1)=   "lblFilterConnections"
       Tab(1).ControlCount=   2
-      TabCaption(2)   =   "3. Define UMC's using Connections"
+      TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
-      Tab(2).ControlEnabled=   0   'False
+      Tab(2).ControlEnabled=   -1  'True
       Tab(2).Control(0)=   "fraNet(1)"
       Tab(2).Control(0).Enabled=   0   'False
       Tab(2).ControlCount=   1
       Begin VB.CheckBox chkUseLCMSFeatureFinder 
          Caption         =   "Use LCMSFeatureFinder external app"
          Height          =   255
-         Left            =   240
-         TabIndex        =   141
+         Left            =   -74760
+         TabIndex        =   143
          Top             =   3840
          Value           =   1  'Checked
          Width           =   2985
       End
       Begin VB.CommandButton cmdFindConnectionsThenUMCs 
-         Caption         =   "&Find Connections then UMC's"
-         Height          =   375
-         Left            =   8040
+         Caption         =   "&Find Connections then LC-MS Features"
+         Height          =   615
+         Left            =   -66720
          TabIndex        =   54
-         ToolTipText     =   "Create Net based on current settings, then Find UMC's"
+         ToolTipText     =   "Create Net based on current settings, then Find LC-MS Features"
          Top             =   3840
-         Width           =   2415
+         Width           =   2175
       End
       Begin VB.Frame fraUMCScope 
          Caption         =   "Definition Scope"
          Height          =   975
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   1
          Top             =   420
          Width           =   1815
@@ -154,17 +148,17 @@ Begin VB.Form frmUMCIonNet
          End
       End
       Begin VB.Frame fraNet 
-         Height          =   4095
+         Height          =   4455
          Index           =   1
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   61
          Top             =   360
          Width           =   10695
          Begin VB.CommandButton cmdFindUMCsUsingNETConnections 
-            Caption         =   "Find &UMC's"
-            Height          =   375
+            Caption         =   "Find &LC-MS Features"
+            Height          =   495
             Left            =   9240
-            TabIndex        =   133
+            TabIndex        =   135
             Top             =   2760
             Width           =   1095
          End
@@ -172,7 +166,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Abort!"
             Height          =   375
             Left            =   9240
-            TabIndex        =   134
+            TabIndex        =   136
             Top             =   2760
             Width           =   1095
          End
@@ -180,7 +174,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "&Report"
             Height          =   375
             Left            =   9360
-            TabIndex        =   132
+            TabIndex        =   134
             Top             =   2160
             Width           =   855
          End
@@ -189,7 +183,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   375
             Index           =   1
             Left            =   9120
-            TabIndex        =   131
+            TabIndex        =   133
             Top             =   240
             Width           =   1455
          End
@@ -199,7 +193,7 @@ Begin VB.Form frmUMCIonNet
             Left            =   1680
             List            =   "frmUMCIonNet.frx":0056
             Style           =   2  'Dropdown List
-            TabIndex        =   130
+            TabIndex        =   132
             Top             =   3675
             Width           =   2175
          End
@@ -207,21 +201,21 @@ Begin VB.Form frmUMCIonNet
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   7200
-            TabIndex        =   128
+            TabIndex        =   130
             Text            =   "0"
-            Top             =   3675
+            Top             =   4035
             Width           =   495
          End
          Begin VB.CheckBox chkInterpolateMissingIons 
             Caption         =   "Interpolate abundances across gaps"
             Height          =   255
             Left            =   4080
-            TabIndex        =   126
-            Top             =   3405
+            TabIndex        =   128
+            Top             =   3765
             Width           =   3015
          End
          Begin VB.Frame Frame2 
-            Caption         =   "UMC From Net"
+            Caption         =   "LC-MS Feature Stats"
             Height          =   3375
             Left            =   120
             TabIndex        =   62
@@ -231,7 +225,7 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Use most abundant charge state group stats for class stats"
                Height          =   530
                Left            =   240
-               TabIndex        =   139
+               TabIndex        =   141
                ToolTipText     =   "Make single-member classes from unconnected nodes"
                Top             =   2760
                Width           =   2055
@@ -240,7 +234,7 @@ Begin VB.Form frmUMCIonNet
                Height          =   315
                Left            =   240
                Style           =   2  'Dropdown List
-               TabIndex        =   137
+               TabIndex        =   139
                Top             =   2360
                Width           =   3255
             End
@@ -282,7 +276,7 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Most Abu Charge State Group Type"
                Height          =   255
                Left            =   240
-               TabIndex        =   138
+               TabIndex        =   140
                Top             =   2120
                Width           =   3135
             End
@@ -315,26 +309,27 @@ Begin VB.Form frmUMCIonNet
             End
          End
          Begin TabDlg.SSTab tbsUMCRefinementOptions 
-            Height          =   3135
+            Height          =   3375
             Left            =   3960
             TabIndex        =   70
             Top             =   180
             Width           =   4815
             _ExtentX        =   8493
-            _ExtentY        =   5530
+            _ExtentY        =   5953
             _Version        =   393216
             Style           =   1
+            Tab             =   1
             TabHeight       =   520
             TabCaption(0)   =   "Auto-Refine Options"
             TabPicture(0)   =   "frmUMCIonNet.frx":0058
-            Tab(0).ControlEnabled=   -1  'True
+            Tab(0).ControlEnabled=   0   'False
             Tab(0).Control(0)=   "fraOptionFrame(10)"
-            Tab(0).Control(0).Enabled=   0   'False
             Tab(0).ControlCount=   1
-            TabCaption(1)   =   "Split UMC's Options"
+            TabCaption(1)   =   "Split Features Options"
             TabPicture(1)   =   "frmUMCIonNet.frx":0074
-            Tab(1).ControlEnabled=   0   'False
+            Tab(1).ControlEnabled=   -1  'True
             Tab(1).Control(0)=   "fraOptionFrame(15)"
+            Tab(1).Control(0).Enabled=   0   'False
             Tab(1).ControlCount=   1
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
@@ -346,14 +341,14 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Class Mass Top X"
                Height          =   1215
                Left            =   -74880
-               TabIndex        =   119
+               TabIndex        =   121
                Top             =   1800
                Width           =   4095
                Begin VB.TextBox txtClassMassTopXMinAbu 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   121
+                  TabIndex        =   123
                   Text            =   "0"
                   Top             =   240
                   Width           =   900
@@ -362,7 +357,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   123
+                  TabIndex        =   125
                   Text            =   "0"
                   ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
                   Top             =   540
@@ -372,7 +367,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   125
+                  TabIndex        =   127
                   Text            =   "3"
                   Top             =   840
                   Width           =   900
@@ -382,7 +377,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   120
+                  TabIndex        =   122
                   Top             =   270
                   Width           =   2535
                End
@@ -391,7 +386,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Maximum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   122
+                  TabIndex        =   124
                   Top             =   560
                   Width           =   2535
                End
@@ -400,7 +395,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum members to include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   124
+                  TabIndex        =   126
                   Top             =   870
                   Width           =   2535
                End
@@ -409,14 +404,14 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Class Abundance Top X"
                Height          =   1215
                Left            =   -74880
-               TabIndex        =   112
+               TabIndex        =   114
                Top             =   480
                Width           =   4095
                Begin VB.TextBox txtClassAbuTopXMinMembers 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   118
+                  TabIndex        =   120
                   Text            =   "3"
                   Top             =   840
                   Width           =   900
@@ -425,7 +420,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   116
+                  TabIndex        =   118
                   Text            =   "0"
                   ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
                   Top             =   540
@@ -435,7 +430,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   114
+                  TabIndex        =   116
                   Text            =   "0"
                   Top             =   240
                   Width           =   900
@@ -445,7 +440,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum members to include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   117
+                  TabIndex        =   119
                   Top             =   870
                   Width           =   2535
                End
@@ -454,7 +449,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Maximum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   115
+                  TabIndex        =   117
                   Top             =   560
                   Width           =   2535
                End
@@ -463,60 +458,69 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   113
+                  TabIndex        =   115
                   Top             =   270
                   Width           =   2535
                End
             End
             Begin VB.Frame fraOptionFrame 
-               Height          =   2640
+               Height          =   2920
                Index           =   15
-               Left            =   -74880
+               Left            =   120
                TabIndex        =   93
                Top             =   330
                Width           =   4300
+               Begin VB.TextBox txtSplitUMCsStdDevMultiplierForSplitting 
+                  Alignment       =   1  'Right Justify
+                  Height          =   285
+                  Left            =   2880
+                  TabIndex        =   99
+                  Text            =   "1"
+                  Top             =   900
+                  Width           =   495
+               End
                Begin VB.ComboBox cboSplitUMCsScanGapBehavior 
                   Height          =   315
                   Left            =   1800
                   Style           =   2  'Dropdown List
-                  TabIndex        =   111
-                  Top             =   2220
+                  TabIndex        =   113
+                  Top             =   2580
                   Width           =   2295
                End
                Begin VB.TextBox txtHoleSize 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   108
+                  TabIndex        =   110
                   Text            =   "3"
-                  Top             =   1890
+                  Top             =   2220
                   Width           =   495
                End
                Begin VB.TextBox txtSplitUMCsPeakPickingMinimumWidth 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   105
+                  TabIndex        =   107
                   Text            =   "4"
-                  Top             =   1560
+                  Top             =   1890
                   Width           =   495
                End
                Begin VB.TextBox txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   102
+                  TabIndex        =   104
                   Text            =   "15"
-                  Top             =   1230
+                  Top             =   1560
                   Width           =   495
                End
                Begin VB.TextBox txtSplitUMCsMaximumPeakCount 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   99
+                  TabIndex        =   101
                   Text            =   "6"
-                  Top             =   900
+                  Top             =   1230
                   Width           =   495
                End
                Begin VB.TextBox txtSplitUMCsMinimumDifferenceInAvgPpmMass 
@@ -529,19 +533,27 @@ Begin VB.Form frmUMCIonNet
                   Width           =   495
                End
                Begin VB.CheckBox chkSplitUMCsByExaminingAbundance 
-                  Caption         =   "Split UMC's by examining abundance"
+                  Caption         =   "Split LC-MS Features by examining abundance"
                   Height          =   255
                   Left            =   120
                   TabIndex        =   94
                   Top             =   240
-                  Width           =   3015
+                  Width           =   3975
+               End
+               Begin VB.Label lblSplitUMCsStdDevMultiplierForSplitting 
+                  Caption         =   "Mass Std Dev threshold multiplier"
+                  Height          =   255
+                  Left            =   120
+                  TabIndex        =   98
+                  Top             =   930
+                  Width           =   2700
                End
                Begin VB.Label lblSplitUMCsScanGapBehavior 
                   Caption         =   "Scan gap behavior:"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   110
-                  Top             =   2250
+                  TabIndex        =   112
+                  Top             =   2610
                   Width           =   1620
                End
                Begin VB.Label lblUnits 
@@ -549,26 +561,26 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   3
                   Left            =   3480
-                  TabIndex        =   109
-                  Top             =   1920
+                  TabIndex        =   111
+                  Top             =   2250
                   Width           =   600
                End
                Begin VB.Label Label3 
                   BackStyle       =   0  'Transparent
-                  Caption         =   "Max size of scan gap in the UMC:"
+                  Caption         =   "Max size of scan gap in the feature:"
                   Height          =   255
                   Index           =   1
                   Left            =   120
-                  TabIndex        =   107
-                  Top             =   1920
+                  TabIndex        =   109
+                  Top             =   2250
                   Width           =   2655
                End
                Begin VB.Label lblSplitUMCsPeakPickingMinimumWidth 
                   Caption         =   "Peak picking minimum width"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   104
-                  Top             =   1590
+                  TabIndex        =   106
+                  Top             =   1920
                   Width           =   2700
                End
                Begin VB.Label lblUnits 
@@ -576,16 +588,16 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   5
                   Left            =   3480
-                  TabIndex        =   106
-                  Top             =   1590
+                  TabIndex        =   108
+                  Top             =   1920
                   Width           =   600
                End
                Begin VB.Label lblSplitUMCsPeakDetectIntensityThresholdPercentageOfMax 
                   Caption         =   "Peak picking intensity threshold"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   101
-                  Top             =   1260
+                  TabIndex        =   103
+                  Top             =   1590
                   Width           =   2700
                End
                Begin VB.Label lblUnits 
@@ -593,16 +605,16 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   0
                   Left            =   3480
-                  TabIndex        =   103
-                  Top             =   1260
-                  Width           =   700
+                  TabIndex        =   105
+                  Top             =   1590
+                  Width           =   705
                End
                Begin VB.Label lblSplitUMCsMaximumPeakCount 
-                  Caption         =   "Maximum peak count to split UMC"
+                  Caption         =   "Maximum peak count to split feature"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   98
-                  Top             =   930
+                  TabIndex        =   100
+                  Top             =   1260
                   Width           =   2700
                End
                Begin VB.Label lblUnits 
@@ -610,8 +622,8 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   1
                   Left            =   3480
-                  TabIndex        =   100
-                  Top             =   930
+                  TabIndex        =   102
+                  Top             =   1260
                   Width           =   600
                End
                Begin VB.Label lblSplitUMCsMinimumDifferenceInAvgPpmMass 
@@ -635,7 +647,7 @@ Begin VB.Form frmUMCIonNet
             Begin VB.Frame fraOptionFrame 
                Height          =   2700
                Index           =   10
-               Left            =   120
+               Left            =   -74880
                TabIndex        =   71
                Top             =   300
                Width           =   4545
@@ -675,7 +687,7 @@ Begin VB.Form frmUMCIonNet
                   Width           =   495
                End
                Begin VB.CheckBox chkRefineUMCLengthByScanRange 
-                  Caption         =   "Test UMC length using scan range"
+                  Caption         =   "Test feature length using scan range"
                   Height          =   375
                   Left            =   240
                   TabIndex        =   90
@@ -826,10 +838,10 @@ Begin VB.Form frmUMCIonNet
          End
          Begin VB.Label lblUMCDrawType 
             BackStyle       =   0  'Transparent
-            Caption         =   "UMC Draw Type"
+            Caption         =   "FeatureDraw Type"
             Height          =   255
             Left            =   240
-            TabIndex        =   129
+            TabIndex        =   131
             Top             =   3705
             Width           =   1455
          End
@@ -838,15 +850,15 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Maximum size of gap to interpolate:"
             Height          =   255
             Left            =   4080
-            TabIndex        =   127
-            Top             =   3705
+            TabIndex        =   129
+            Top             =   4065
             Width           =   2535
          End
       End
       Begin VB.Frame fraNet 
          Height          =   3255
          Index           =   0
-         Left            =   2040
+         Left            =   -72960
          TabIndex        =   4
          Top             =   420
          Width           =   8535
@@ -855,7 +867,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   250
             Index           =   2
             Left            =   5280
-            TabIndex        =   140
+            TabIndex        =   142
             Top             =   240
             Width           =   1575
          End
@@ -1313,13 +1325,13 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Label lblLCMSFeatureFinderInfo 
          Caption         =   $"frmUMCIonNet.frx":00AC
          Height          =   400
-         Left            =   240
-         TabIndex        =   142
+         Left            =   -74760
+         TabIndex        =   144
          Top             =   4080
          Width           =   5415
       End
       Begin VB.Label lblFilterConnections 
-         Caption         =   $"frmUMCIonNet.frx":013D
+         Caption         =   $"frmUMCIonNet.frx":0147
          Height          =   615
          Left            =   -74640
          TabIndex        =   55
@@ -1334,8 +1346,8 @@ Begin VB.Form frmUMCIonNet
       ForeColor       =   &H80000008&
       Height          =   255
       Left            =   1200
-      TabIndex        =   136
-      Top             =   4980
+      TabIndex        =   138
+      Top             =   5340
       Width           =   9855
    End
 End
@@ -1377,7 +1389,7 @@ Private CallerID As Long
 Private bLoading As Boolean
 
 Private DataCnt As Long     'count of isotopic data
-                            ' If only finding UMC's on data "in current view", then this value may be
+                            ' If only finding LC-MS Features on data "in current view", then this value may be
                             ' less than the actual data count in the file
 
 ' Unused variable
@@ -1487,7 +1499,7 @@ With GelUMC(CallerID)
 End With
 
 err_BuildCurrentClass:
-ChangeStatus " Error building UMC."
+ChangeStatus " Error building LC-MS Feature."
 End Function
 
 Private Function BuildUMCsUsingmLCMSResultsMapping(ByVal blnShowMessages As Boolean) As Boolean
@@ -1531,10 +1543,10 @@ On Error GoTo BuildUMCsUsingmLCMSResultsMappingErrorHandler
             .def.DefScope = intScopeUsedForConnections
         End With
             
-        ChangeStatus " Initializing UMC structures..."
+        ChangeStatus " Initializing LC-MS Feature structures..."
         
         If Not ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
-            strMessage = "Error initializing UMC structures, unable to continue"
+            strMessage = "Error initializing LC-MS Feature structures, unable to continue"
             If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                 AddToAnalysisHistory CallerID, strMessage
             ElseIf blnShowMessages Then
@@ -1577,17 +1589,17 @@ On Error GoTo BuildUMCsUsingmLCMSResultsMappingErrorHandler
                 blnSuccess = False
             Else
                 If HUMCEquClsCnt > 0 Then
-                    ' Store the data for the final UMC
+                    ' Store the data for the final LC-MS Feature
                     BuildCurrentClass
                 End If
             
-                ' Refine the UMCs and compute class stats
+                ' Refine the LC-MS Features and compute class stats
                 blnSuccess = FinalizeNewUMCs()
                 
                 If blnSuccess Then
-                    ChangeStatus "Number of UMCs: " & GelUMC(CallerID).UMCCnt
+                    ChangeStatus "Number of LC-MS Features: " & GelUMC(CallerID).UMCCnt
                 Else
-                    ChangeStatus "Error creating UMCs."
+                    ChangeStatus "Error creating LC-MS Features."
                 End If
             End If
             
@@ -1704,6 +1716,7 @@ Private Sub DisplayCurrentOptions()
         With .SplitUMCOptions
             txtSplitUMCsMaximumPeakCount = Trim(.MaximumPeakCountToSplitUMC)
             txtSplitUMCsMinimumDifferenceInAvgPpmMass = Trim(.MinimumDifferenceInAveragePpmMassToSplit)
+            txtSplitUMCsStdDevMultiplierForSplitting = Trim(.StdDevMultiplierForSplitting)
             txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax = Trim(.PeakDetectIntensityThresholdPercentageOfMaximum)
             txtSplitUMCsPeakPickingMinimumWidth = Trim(.PeakWidthPointsMinimum)
             cboSplitUMCsScanGapBehavior.ListIndex = .ScanGapBehavior
@@ -1978,7 +1991,7 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     
     ChangeStatus "Exporting parameters for finding LC-MS features with external application"
     
-     ' Write out the parameters to use to find the UMCs
+     ' Write out the parameters to use to find the LC-MS Features
     strIniFilePath = fso.BuildPath(strOutputFolder, LCMS_FEATURE_FINDER_INI_FILE)
     Set tsOutfile = fso.CreateTextFile(strIniFilePath, True)
     
@@ -2124,7 +2137,7 @@ Private Function FinalizeNewUMCs() As Boolean
 On Error GoTo FinalizeNewUMCsErrorHandler
     blnSuccess = False
     
-    ChangeStatus " Managing UMC structures..."
+    ChangeStatus " Managing LC-MS Feature structures..."
     If ManageClasses(CallerID, UMCManageConstants.UMCMngTrim) Then
         
         ' Examine GelUMCIon(CallerID).ThisNetDef to determine the appropriate .Tol and .TolType
@@ -2152,9 +2165,9 @@ On Error GoTo FinalizeNewUMCsErrorHandler
         
         AddToAnalysisHistory CallerID, ConstructUMCDefDescription(CallerID, AUTO_ANALYSIS_UMCIonNet, UMCDef, glbPreferencesExpanded.UMCAdvancedStatsOptions, False, True)
         
-        ChangeStatus "Calculating UMC parameters..."
+        ChangeStatus "Calculating LC-MS Feature parameters..."
         
-        ' Possibly Auto-Refine the UMC's
+        ' Possibly Auto-Refine the LC-MS Features
         blnUMCIndicesUpdated = AutoRefineUMCs(CallerID, Me)
         
         If Not blnUMCIndicesUpdated Then
@@ -2165,6 +2178,8 @@ On Error GoTo FinalizeNewUMCsErrorHandler
         End If
       
         If glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance Then
+            ' Be sure to call UpdateUMCStatArrays before using clsSplitUMCsByAbundance
+            
             Set mSplitUMCs = New clsSplitUMCsByAbundance
             mSplitUMCs.ExamineUMCs CallerID, Me, False, True
             
@@ -2172,7 +2187,7 @@ On Error GoTo FinalizeNewUMCsErrorHandler
         End If
         
     Else
-       ChangeStatus " Error managing UMC structures."
+       ChangeStatus " Error managing LC-MS Feature structures."
     End If
     
     FinalizeNewUMCs = blnSuccess
@@ -2463,8 +2478,8 @@ End Sub
 
 
 Private Function FindUMCsUsingLCMSFeatureFinder(ByVal blnShowMessages As Boolean) As Boolean
-    ' Find UMCs using LCMSFeatureFinder.exe
-    ' If the .Exe isn't found or if a problem occurs while finding UMCs, then this function will return False
+    ' Find LC-MS Features using LCMSFeatureFinder.exe
+    ' If the .Exe isn't found or if a problem occurs while finding LC-MS Features, then this function will return False
     
     Const DEFAULT_MAXIMUM_PROCESSING_TIME_MINUTES As Single = 60
     
@@ -2549,10 +2564,10 @@ On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
                 sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
                 If sngProcessingTimeSeconds / 60# >= sngMaxProcessingTimeMinutes Then
                     blnAbortProcessing = True
-                    strMessage = "UMC Finding using the LCMS Feature Finder was aborted because over " & Trim(sngMaxProcessingTimeMinutes) & " minutes has elapsed."
+                    strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was aborted because over " & Trim(sngMaxProcessingTimeMinutes) & " minutes has elapsed."
                 ElseIf mAbortProcess Then
                     blnAbortProcessing = True
-                    strMessage = "UMC Finding using the LCMS Feature Finder was manually aborted by the user after " & Trim(sngProcessingTimeSeconds) & " seconds of processing."
+                    strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was manually aborted by the user after " & Trim(sngProcessingTimeSeconds) & " seconds of processing."
                 End If
                 
                 If blnAbortProcessing Then
@@ -2710,12 +2725,12 @@ Private Function FormClassesFromNETsWrapper(Optional ByVal blnShowMessages As Bo
         blnSuccess = FormClassesFromNets()
         
         If blnSuccess Then
-           ChangeStatus "Number of UMCs: " & GelUMC(CallerID).UMCCnt
+           ChangeStatus "Number of LC-MS Features: " & GelUMC(CallerID).UMCCnt
         Else
-           ChangeStatus "Error creating UMCs from Nets."
+           ChangeStatus "Error creating LC-MS Features from Nets."
         End If
     Else
-        strMessage = "Net elements not found.  Unable to find UMC's."
+        strMessage = "Net elements not found.  Unable to find LC-MS Features."
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
            MsgBox strMessage, vbOKOnly, glFGTU
         Else
@@ -2778,7 +2793,7 @@ With GelUMC(CallerID)
     .def.DefScope = intScopeUsedForConnections
 End With
 
-ChangeStatus " Initializing UMC structures..."
+ChangeStatus " Initializing LC-MS Feature structures..."
 If ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
    ChangeStatus " Preparing classification..."
    If PrepareHUMCArrays() Then
@@ -2854,7 +2869,7 @@ If ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
                lngNewTickCount = GetTickCount()     ' Note that GetTickCount returns a negative number after 24 days of computer Uptime and resets to 0 after 48 days
                If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
                    ' Only update 4 times per second
-                   ChangeStatus "Building Class: " & GelUMC(CallerID).UMCCnt & " (" & Format(CurrConnInd / HUMCNetCnt * 100, "0.00") & "% completed)"
+                   ChangeStatus "Building LC-MS Feature: " & GelUMC(CallerID).UMCCnt & " (" & Format(CurrConnInd / HUMCNetCnt * 100, "0.00") & "% completed)"
                    lngTickCountLastUpdate = lngNewTickCount
                    dtLastUpdateTime = Now()
                    If mAbortProcess Then bDone = True
@@ -2868,7 +2883,7 @@ If ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
       ' Add single member classes if requested
       If UMCMakeSingleMemberClasses Then Call HUMCAddingSingleMemberUMCs
       
-      ' Refine the UMCs and compute class stats
+      ' Refine the LC-MS Features and compute class stats
       blnSuccess = FinalizeNewUMCs()
       
    End If
@@ -3037,7 +3052,7 @@ On Error GoTo err_HUMCAddingSingleMemberUMCs
 ' Get a list of the data "in-scope"
 lngDataInScope = GetISScope(CallerID, ISInd(), GelUMC(CallerID).def.DefScope)
 
-ChangeStatus " Adding single-member UMCs..."
+ChangeStatus " Adding single-member LC-MS Features..."
 With GelUMC(CallerID)
     For i = 1 To lngDataInScope
         lngOriginalIndex = ISInd(i)
@@ -3505,9 +3520,9 @@ Private Sub PopulateComboBoxes()
     
     With cmbUMCDrawType
         .Clear
-        .AddItem "Actual UMC"
-        .AddItem "UMC Full Region"
-        .AddItem "UMC Intensity"
+        .AddItem "Actual LC-MS Feature"
+        .AddItem "LC-MS Feature Full Region"
+        .AddItem "LC-MS Feature Intensity"
     End With
     
     With cboChargeStateAbuType
@@ -3911,8 +3926,8 @@ On Error GoTo StartUMCSearchErrorHandler
         blnSuccess = FindUMCsUsingLCMSFeatureFinder(False)
         
         If Not blnSuccess And Not mAbortProcess Then
-            ' Search failed; try to find UMCs using the built-in UMC finding code
-            AddToAnalysisHistory CallerID, "Warning: Unable to find UMCs using the LCMS Feature Finder; will instead use the built-in finder"
+            ' Search failed; try to find LC-MS Features using the built-in UMC finding code
+            AddToAnalysisHistory CallerID, "Warning: Unable to find LC-MS Features using the LCMS Feature Finder; will instead use the built-in finder"
         End If
     Else
         blnSuccess = False
@@ -3930,7 +3945,7 @@ On Error GoTo StartUMCSearchErrorHandler
         End If
         
         If Not mAbortProcess Then
-            ' 2. Find the UMC's
+            ' 2. Find the LC-MS Features
             tbsTabStrip.Tab = 2
             blnSuccess = FormClassesFromNETsWrapper(False)
         End If
@@ -4329,7 +4344,7 @@ End If
 End Sub
     
 Private Sub txtSplitUMCsMaximumPeakCount_LostFocus()
-    ValidateTextboxValueLng txtSplitUMCsMaximumPeakCount, 2, 100, 6
+    ValidateTextboxValueLng txtSplitUMCsMaximumPeakCount, 2, 100000, 6
     glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.MaximumPeakCountToSplitUMC = CLngSafe(txtSplitUMCsMaximumPeakCount)
 End Sub
 
@@ -4348,12 +4363,17 @@ Private Sub txtSplitUMCsPeakPickingMinimumWidth_LostFocus()
     glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.PeakWidthPointsMinimum = CLngSafe(txtSplitUMCsPeakPickingMinimumWidth)
 End Sub
 
+Private Sub txtSplitUMCsStdDevMultiplierForSplitting_LostFocus()
+    ValidateTextboxValueDbl txtSplitUMCsStdDevMultiplierForSplitting, 0, 1000, 1
+    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCOptions.StdDevMultiplierForSplitting = CSngSafe(txtSplitUMCsStdDevMultiplierForSplitting)
+End Sub
+
 Private Sub txtWeightingFactor_KeyDown(Index As Integer, KeyCode As Integer, Shift As Integer)
-If mCalculating Then KeyCode = 0
+    If mCalculating Then KeyCode = 0
 End Sub
 
 Private Sub txtWeightingFactor_KeyPress(Index As Integer, KeyAscii As Integer)
-If mCalculating Then KeyAscii = 0
+    If mCalculating Then KeyAscii = 0
 End Sub
 
 Private Sub txtWeightingFactor_LostFocus(Index As Integer)
@@ -4433,7 +4453,7 @@ End Sub
 Private Sub cmdReportUMC_Click()
 If mCalculating Then Exit Sub
 Me.MousePointer = vbHourglass
-ChangeStatus "Generating UMC report..."
+ChangeStatus "Generating LC-MS Feature report..."
 Call ReportUMC(CallerID, "UMCIonNet" & vbCrLf & GetUMCIsoDefinitionText(CallerID))
 ChangeStatus ""
 Me.MousePointer = vbDefault

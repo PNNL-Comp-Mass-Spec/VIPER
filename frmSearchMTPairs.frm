@@ -492,7 +492,7 @@ Begin VB.Form frmSearchMTPairs
          Caption         =   "Export Results To &MT Tag DB"
       End
       Begin VB.Menu mnuPExportDetailedMemberInformation 
-         Caption         =   "Export detailed member information for each UMC"
+         Caption         =   "Export detailed member information for each LC-MS Feature"
       End
       Begin VB.Menu mnuPSep4 
          Caption         =   "-"
@@ -525,7 +525,7 @@ Begin VB.Form frmSearchMTPairs
          Caption         =   "-"
       End
       Begin VB.Menu mnuReportIncludeORFName 
-         Caption         =   "Include ORFs in Report"
+         Caption         =   "Include Proteins (ORFs) in Report"
          Checked         =   -1  'True
       End
    End
@@ -951,7 +951,10 @@ Private Sub mnuPCalculateER_Click()
 'recalculate ER numbers for all pairs
 '------------------------------------
 Dim strMessage As String
-CalcDltLblPairsER_UMC CallerID, strMessage
+
+Dim objDltLblPairsUMC As New clsDltLblPairsUMC
+objDltLblPairsUMC.CalcDltLblPairsER_UMC CallerID, strMessage
+
 UpdateStatus strMessage
 End Sub
 
@@ -1509,7 +1512,7 @@ If PCount <= 0 And Len(strOutputFilePath) = 0 Then
 End If
 
 If blnIncludeORFInfo Then
-    UpdateStatus "Sorting ORF lookup arrays"
+    UpdateStatus "Sorting Protein lookup arrays"
     If MTtoORFMapCount = 0 Then
         blnIncludeORFInfo = InitializeORFInfo(False)
     Else
@@ -1703,7 +1706,7 @@ Public Function StartSearchPaired(Optional blnShowMessages As Boolean = True, Op
 '  -2 = Error in NET calculation formula
 '  -3 = No pairs found
 '  -4 = Incorrect pairs type (must have .DltLblType = ptUMCDlt for this function)
-'  -5 = Pairs are not synchronized with the UMC's (.SyncWithUMC = False)
+'  -5 = Pairs are not synchronized with the LC-MS Features (.SyncWithUMC = False)
 '  -6 = Error preparing MT tag search arrays
 ' Additionally, returns a status message in strStatusMessage
 '--------------------------------------------------------
@@ -1801,7 +1804,7 @@ If PCount > 0 Then
                 ' Store the search results in the gel data
                 If mMatchStatsCount > 0 Then RecordSearchResultsInData
             End If
-            UpdateStatus "Paired UMC's - MT tag ID Cnt: " & mMatchStatsCount
+            UpdateStatus "Paired LC-MS Features - MT tag ID Cnt: " & mMatchStatsCount
          End If
          GelStatus(CallerID).Dirty = True
       Else
@@ -1825,10 +1828,10 @@ Case -2
     If blnShowMessages Then MsgBox strStatusMessage, vbOKOnly, glFGTU
     txtNETFormula.SetFocus
 Case -3
-    strStatusMessage = "No pairs found. Make sure that some of UMC pairing functions was applied first."
+    strStatusMessage = "No pairs found. Make sure that one of the LC-MS Feature pairing functions is applied first."
     If blnShowMessages Then MsgBox strStatusMessage, vbOKOnly, glFGTU
 Case -4
-    strStatusMessage = "Incorrect pairs type.  Should be UMC Delta Pairs (e.g. N14/N15 pairs)"
+    strStatusMessage = "Incorrect pairs type.  Should be LC-MS Feature Delta Pairs (e.g. N14/N15 pairs)"
     If blnShowMessages Then MsgBox strStatusMessage, vbOKOnly, glFGTU
 Case -5
     strStatusMessage = "Pairs need to be recalculated. Close dialog and recalculate pairs, then return to this dialog."
@@ -1850,7 +1853,7 @@ Case Else
 
     'MonroeMod
     GelSearchDef(CallerID).AMTSearchOnPairs = samtDef
-    strSearchDescription = "Searched N14/N15 pairs for MT tags (Conglomerate UMC Mass)"
+    strSearchDescription = "Searched N14/N15 pairs for MT tags (Conglomerate LC-MS Feature Mass)"
     
     AddToAnalysisHistory CallerID, GetMassTagSearchSummaryText(strSearchDescription, HitsCnt, mMTMinimumHighNormalizedScore, mMTMinimumHighDiscriminantScore, mMTMinimumPeptideProphetProbability, samtDef, True, GelData(CallerID).CustomNETsDefined)
 End Select
@@ -2134,12 +2137,12 @@ Private Sub SearchPairConglomerateMassAMT(ByRef udtTestUMC As udtUMCType, ByVal 
                     blnFirstMatchFound = False
                     If glbPreferencesExpanded.UseUMCConglomerateNET Then
                         If SearchUMCTestNET(.ClassRepType, .ClassRepInd, dblMassTagNET, dblNETTol, dblNETDifference) Then
-                            ' AMT Matches this UMC's median mass and Class Rep NET
+                            ' AMT Matches this LC-MS Feature's median mass and Class Rep NET
                             
                             ' See if match has correct number of N atoms
                             If CheckNAtomsVsDeltaCount(.ClassMW, DltCnt, mMTOrInd(mMTInd(FastSearchMatchInd))) Then
                                                 
-                                ' AMT Matches this UMC's median mass, Class Rep NET, and has correct
+                                ' AMT Matches this LC-MS Feature's median mass, Class Rep NET, and has correct
                                 '  number of N atoms; increment mCurrIDCnt
                                 
                                 If mCurrIDCnt > UBound(mCurrIDMatches) Then ManageCurrID (MNG_ADD_START_SIZE)
@@ -2348,7 +2351,7 @@ Private Function InitializeORFInfo(blnForceDataReload As Boolean) As Boolean
     
     With objMTDBNameLookupClass
         'loading MT tag names
-        UpdateStatus "Loading ORF info"
+        UpdateStatus "Loading Protein info"
         
         Me.MousePointer = vbHourglass
         
@@ -2395,7 +2398,7 @@ If bLoading Then
     Else         'have to have MT tag database loaded
         Call LoadMTDB
     End If
-    UpdateStatus "Generating UMC statistic ..."
+    UpdateStatus "Generating LC-MS Feature statistic ..."
     ClsCnt = UMCStatistics1(CallerID, ClsStat())
     PCount = GelP_D_L(CallerID).PCnt
     UpdateStatus "Potential Pairs: " & PCount
@@ -2515,7 +2518,7 @@ End Function
 ''
 ''On Error GoTo err_ExportMTDB
 ''
-''UpdateStatus "Calculating statistics for UMC ..."
+''UpdateStatus "Calculating statistics for LC-MS Feature ..."
 ''UMCCnt2 = UMCStatistics2(CallerID, UMCStat2)
 ''If UMCCnt2 <= 0 Then
 ''   ExportIDPairsToPeakResultsTable = "Error calculating statistics for UMC. Export aborted."
@@ -2538,7 +2541,7 @@ End Function
 '''first write new analysis in T_Match_Making_Description table
 ''AddEntryToMatchMakingDescriptionTable cnNew, lngMDID, ExpAnalysisSPName, CallerID, mMatchStatsCount, GelData(CallerID).CustomNETsDefined, True, strIniFileName
 ''
-''strSearchDescription = "N14/N15 Identification Pairs results (Conglomerate UMC Mass)"
+''strSearchDescription = "N14/N15 Identification Pairs results (Conglomerate LC-MS Feature Mass)"
 ''
 ''AddToAnalysisHistory CallerID, "Exported " & strSearchDescription & " results to database (" & ExtractDBNameFromConnectionString(GelAnalysis(CallerID).MTDB.cn.ConnectionString) & "); MMD_ID = " & lngMDID
 ''AddToAnalysisHistory CallerID, "Export to MMD table details: Reference Job = " & GelAnalysis(CallerID).MD_Reference_Job & "; MD_File = " & GelAnalysis(CallerID).MD_file
@@ -2871,9 +2874,9 @@ End If
 
 If blnCreateNewEntryInMMDTable Or mMatchStatsCount > 0 Then
     ' MonroeMod
-    strSearchDescription = "N14/N15 Identification Pairs results (Conglomerate UMC Mass)"
+    strSearchDescription = "N14/N15 Identification Pairs results (Conglomerate LC-MS Feature Mass)"
     
-    AddToAnalysisHistory CallerID, "Exported " & strSearchDescription & " to UMC Results table in database (" & ExtractDBNameFromConnectionString(GelAnalysis(CallerID).MTDB.cn.ConnectionString) & "); MMD_ID = " & lngMDID
+    AddToAnalysisHistory CallerID, "Exported " & strSearchDescription & " to LC-MS Feature Results table in database (" & ExtractDBNameFromConnectionString(GelAnalysis(CallerID).MTDB.cn.ConnectionString) & "); MMD_ID = " & lngMDID
     If blnCreateNewEntryInMMDTable Then
         AddToAnalysisHistory CallerID, "Export to MMD table details: Reference Job = " & GelAnalysis(CallerID).MD_Reference_Job & "; MD_File = " & GelAnalysis(CallerID).MD_file
     End If
@@ -2898,7 +2901,7 @@ ExportMTDBInitializePutNewUMCMemberParams cnNew, cmdPutNewUMCMember, udtPutUMCMe
 TraceLog 3, "frmSearchMTPairs->ExportIDPairsToUMCResultsTable", "Call ExportMTDBInitializePutUMCMatchParams"
 ExportMTDBInitializePutUMCMatchParams cnNew, cmdPutNewUMCMatch, udtPutUMCMatchParams, ExpUmcMatchSPName
 
-Me.Caption = "Exporting UMC's to DB: 0 / " & Trim(PCount)
+Me.Caption = "Exporting LC-MS Features to DB: 0 / " & Trim(PCount)
 
 'now export data
 MassTagExpCnt = 0
@@ -2960,11 +2963,11 @@ For lngPairInd = 0 To PCount - 1
 Next lngPairInd
 
 ' MonroeMod
-AddToAnalysisHistory CallerID, "Export to UMC Results table details: MT tags Match Count = " & MassTagExpCnt
+AddToAnalysisHistory CallerID, "Export to LC-MS Feature Results table details: MT tags Match Count = " & MassTagExpCnt
 
 Me.Caption = strCaptionSaved
 
-strExportStatus = MassTagExpCnt & " associations between MT tags and UMC's exported."
+strExportStatus = MassTagExpCnt & " associations between MT tags and LC-MS Features exported."
 Set cmdPutNewUMC.ActiveConnection = Nothing
 Set cmdPutNewUMCMatch.ActiveConnection = Nothing
 cnNew.Close
@@ -3130,7 +3133,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
     End With
     
     If KeyPressAbortProcess <= 1 Then
-        AddToAnalysisHistory CallerID, "Stored search results in ions; recorded all MT tag hits for each UMC in all members of the UMC; total ions updated = " & Trim(lngIonCountUpdated)
+        AddToAnalysisHistory CallerID, "Stored search results in ions; recorded all MT tag hits for each LC-MS Feature in all members of the UMC; total ions updated = " & Trim(lngIonCountUpdated)
     End If
     
     Exit Sub

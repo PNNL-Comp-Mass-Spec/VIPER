@@ -195,7 +195,7 @@ On Error GoTo BinaryLoadDataErrorHandler
                 Get #InFileNum, , GelUMC2002
                 blnUMCDataLoaded = True
                 
-                frmProgress.UpdateCurrentSubTask "Updating UMC data format to current version"
+                frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
                 CopyGelUMC2002ToCurrent GelUMC2002, GelUMC(lngGelIndex)
             ElseIf sngVersionsInFile(fioGelUMC) = 2# Then
                 ' Update from version 2 to current version
@@ -203,7 +203,7 @@ On Error GoTo BinaryLoadDataErrorHandler
                 Get #InFileNum, , GelUMC2003a
                 blnUMCDataLoaded = True
                 
-                frmProgress.UpdateCurrentSubTask "Updating UMC data format to current version"
+                frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
                 CopyGelUMC2003aToCurrent GelUMC2003a, GelUMC(lngGelIndex)
             
             ElseIf sngVersionsInFile(fioGelUMC) = 3# Then
@@ -212,11 +212,11 @@ On Error GoTo BinaryLoadDataErrorHandler
                 Get #InFileNum, , GelUMC2004
                 blnUMCDataLoaded = True
                 
-                frmProgress.UpdateCurrentSubTask "Updating UMC data format to current version"
+                frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
                 CopyGelUMC2004ToCurrent GelUMC2004, GelUMC(lngGelIndex)
             
             Else
-                MsgBox "The UMC data " & FILE_FORMAT_ERROR_MESSAGE
+                MsgBox "The LC-MS Feature data " & FILE_FORMAT_ERROR_MESSAGE
             End If
         Else
             Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
@@ -359,10 +359,10 @@ On Error GoTo BinaryLoadDataErrorHandler
     If eFileSaveMode <> fsNoExtended Then
     ' 7. Read the ORF Data
         frmProgress.UpdateProgressBar Loc(InFileNum)
-        frmProgress.InitializeSubtask "Reading ORF information", 0, 1
+        frmProgress.InitializeSubtask "Reading Protein information", 0, 1
       
 ''        If sngVersionsInFile(fioORFData) <> FileInfoVersions(fioORFData) Then
-''            MsgBox "The ORF information " & FILE_FORMAT_ERROR_MESSAGE
+''            MsgBox "The Protein information " & FILE_FORMAT_ERROR_MESSAGE
 ''        Else
 ''            Seek #InFileNum, lngOffsetsInFile(fioORFData)
 ''            ' Unused variable (March 2006)
@@ -371,11 +371,11 @@ On Error GoTo BinaryLoadDataErrorHandler
 ''
     ' 8. Read the ORF MT tags
         frmProgress.UpdateProgressBar Loc(InFileNum)
-        frmProgress.InitializeSubtask "Reading the MT tags for the ORFs", 0, 1
+        frmProgress.InitializeSubtask "Reading the MT tags for the Proteins", 0, 1
       
       ' No longer supported (March 2006)
 ''        If sngVersionsInFile(fioORFMassTags) <> FileInfoVersions(fioORFMassTags) Then
-''            MsgBox "The ORF MT tags information " & FILE_FORMAT_ERROR_MESSAGE
+''            MsgBox "The Protein MT tags information " & FILE_FORMAT_ERROR_MESSAGE
 ''        Else
 ''            Seek #InFileNum, lngOffsetsInFile(fioORFMassTags)
 ''            ' Unused variable (March 2006)
@@ -605,12 +605,14 @@ Public Function BinarySaveLegacy(strFilePath As String, lngGelIndex As Long) As 
     Put #OutFileNum, , LegacyData
     
     If Err Then
-       MsgBox "Unexpected error." & sErrLogReference, vbOKOnly
-       LogErrors Err.Number, "BinarySaveLegacy"
+        MsgBox "Unexpected error." & sErrLogReference, vbOKOnly
+        LogErrors Err.Number, "BinarySaveLegacy"
     Else
-       GelBody(lngGelIndex).Caption = strFilePath
-       GelStatus(lngGelIndex).Dirty = False
-       UpdateFileMenu strFilePath
+        GelBody(lngGelIndex).Caption = strFilePath
+        GelStatus(lngGelIndex).GelFilePathFull = GetFilePathFull(strFilePath)
+       
+        GelStatus(lngGelIndex).Dirty = False
+        UpdateFileMenu strFilePath
     End If
     Close OutFileNum
     
@@ -651,7 +653,7 @@ Public Function BinarySaveData(strFilePath As String, ByVal blnRemoveUMCData As 
     Dim blnSuccess As Boolean
     
     Dim fso As New FileSystemObject
-    
+
 On Error GoTo BinarySaveDataErrorHandler
     
     ' Initialize the File IO Offset Arrays
@@ -826,7 +828,7 @@ On Error GoTo BinarySaveDataErrorHandler
     End If
     
 ' 3. Write the UMC Data
-    BinarySaveDataInitSection lngProgressStepCount, "Writing UMC info", 1, lngOffsetsInFile(fioGelUMC), OutFileNum
+    BinarySaveDataInitSection lngProgressStepCount, "Writing LC-MS Feature info", 1, lngOffsetsInFile(fioGelUMC), OutFileNum
     If blnDataChanged(fioGelUMC) And Not blnRemoveUMCData Then
         Put #OutFileNum, , GelUMC(lngGelIndex)
         
@@ -892,7 +894,7 @@ On Error GoTo BinarySaveDataErrorHandler
     blnDataChanged(fioUMCNetAdjDef) = False
 
 ' 7. Write ORF information (GelORFData is unused, so simply writing an Int32 zero, March 2006)
-    BinarySaveDataInitSection lngProgressStepCount, "Writing ORF information", 1, lngOffsetsInFile(fioORFData), OutFileNum
+    BinarySaveDataInitSection lngProgressStepCount, "Writing Protein information", 1, lngOffsetsInFile(fioORFData), OutFileNum
     Put #OutFileNum, , CLng(0)
     lngProgressStepCount = lngProgressStepCount + 1
     frmProgress.UpdateProgressBar lngProgressStepCount
@@ -916,7 +918,7 @@ On Error GoTo BinarySaveDataErrorHandler
 ''    End If
 
 ' 8. Write ORF MT tag information (GelORFMassTags is unused, so simply writing an Int32 zero, March 2006)
-    BinarySaveDataInitSection lngProgressStepCount, "Writing the MT tags for the ORFs", 1, lngOffsetsInFile(fioORFMassTags), OutFileNum
+    BinarySaveDataInitSection lngProgressStepCount, "Writing the MT tags for the Proteins", 1, lngOffsetsInFile(fioORFMassTags), OutFileNum
     Put #OutFileNum, , CLng(0)
     lngProgressStepCount = lngProgressStepCount + 1
     frmProgress.UpdateProgressBar lngProgressStepCount
@@ -1035,6 +1037,8 @@ On Error GoTo BinarySaveDataErrorHandler
     blnSuccess = objRemoteSaveFileHandler.MoveTempFileToFinalDestination()
     
     GelBody(lngGelIndex).Caption = strFilePath
+    GelStatus(lngGelIndex).GelFilePathFull = GetFilePathFull(strFilePath)
+    
     UpdateFileMenu strFilePath
     
     BinarySaveData = blnSuccess

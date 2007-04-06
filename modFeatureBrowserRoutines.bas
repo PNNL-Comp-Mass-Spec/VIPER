@@ -389,7 +389,7 @@ On Error GoTo BrowseFeaturesZoom2DPlotErrorHandler
         
         GelBody(lngGelIndex).GelSel.Clear
         
-        ' Retrieve an array of the ion indices of the ions currently "In Scope" and part of the light UMC
+        ' Retrieve an array of the ion indices of the ions currently "In Scope" and part of the light LC-MS Feature
         ' Note that GetISScope will ReDim lngIonPointerArray() automatically
         lngIonCount = GetISScopeFilterByUMC(lngGelIndex, lngIonPointerArray(), glScope.glSc_Current, lngUMCIndex)
         For lngIndex = 1 To lngIonCount

@@ -1,5 +1,25 @@
 VIPER Change Log
 
+Version 3.42 - Build 367; April 6, 2007
+	- Added option of reporting Scan-by-Scan Pair Details on the "LC-MS Feature Delta Pairing Analysis" form
+
+Version 3.42 - Build 366; March 2, 2007
+	- Finalized updates to handle Microsoft Access files with T_Mass_Tags and T_Mass_Tags_NET tables
+		- Legacy Access DBs can now be of two distinct formats:
+			a) with table AMT, plus optionally tables AMT_Proteins and AMT_to_Protein_Map
+			b) with tables T_Mass_Tags and T_Mass_Tags_NET, plus optionall tables T_Proteins and T_Mass_Tags_to_Protein_Map
+		- See the Readme.txt file for more information
+
+Version 3.42 - Build 365; February 28, 2007
+	- Renamed most instances of UMC with LC-MS Feature
+	- Renamed most instances of ORF with Protein
+	- Fixed bug that reported overly large StDev value reported for Paired UMCs that had normal Light/Heavy expression ratio values between 0 and 1
+
+Version 3.42 - Build 364; February 22, 2007
+	- Now setting the log type to "ErrorIgnore" when error "Failed to load control 'ctl2DHeatMap'" occurs
+		- Was previously using log type "Error"
+	- Started redesigning the code that imports data from standalone Microsoft Access databases
+
 Version 3.42 - Build 363; February 12, 2007
 	- Now including LCMSWarp (aka MassMatchCOM.dll) in the public distribution version of Viper
 		- The public distribution version disables MTS access and hides obsolete menus
@@ -9,7 +29,7 @@ Version 3.42 - Build 363; February 12, 2007
 Version 3.42 - Build 362; February 7, 2007
 	- Renamed column num_isotopic_signatures to num_deisotoped when reading Decon2LS _scans.csv files
 
-Version 3.42 - Build 361; February 5, 2007viper_mts
+Version 3.42 - Build 361; February 5, 2007
 	- Now using the LCMSFeatureFinder external application to find UMCs
 		- The algorithm in LCMSFeatureFinder.exe is identical to the interal algorithm in Viper, but runs ~25 times faster (including the time to save out the data to disk and load the results into memory)
 		- Example stats:

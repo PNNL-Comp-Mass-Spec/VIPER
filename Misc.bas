@@ -272,7 +272,7 @@ End Type
 Private Type udtSegmentStatsType
     UMCHitCountUsed As Long
     ArrayCountUnused As Long
-    UnusedUMCIndices() As Long          ' 0-based array; holds the indices of the Unused UMC's in this segment
+    UnusedUMCIndices() As Long          ' 0-based array; holds the indices of the Unused LC-MS Features in this segment
 End Type
 
 Public Function GetFileNameOnly(ByVal SP As String) As String
@@ -504,37 +504,37 @@ If ePairedSearchUMCSelection <> punaPairedAndUnpaired Then
     Select Case ePairedSearchUMCSelection
     Case punaPairedAll, punaPairedLight, punaPairedHeavy
         ' First exclude everything
-        ' Then, include UMC's that are paired, depending upon ePairedSearchUMCSelection
+        ' Then, include LC-MS Features that are paired, depending upon ePairedSearchUMCSelection
         For i = 0 To GelUMC(lngGelIndex).UMCCnt - 1
             UseUMC(i) = False
         Next i
         
         If ePairedSearchUMCSelection = punaPairedAll Then
-            ' Add back all UMC's belonging to pairs
+            ' Add back all LC-MS Features belonging to pairs
             For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
                 UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P1) = True
                 UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P2) = True
             Next i
         ElseIf ePairedSearchUMCSelection = punaPairedHeavy Then
-            ' Add back UMC's belonging to the heavy member of pairs
+            ' Add back LC-MS Features belonging to the heavy member of pairs
             For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
                 UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P2) = True
             Next i
         Else
             ' punaPairedLight
-            ' Add back UMC's belonging to the light member of pairs
+            ' Add back LC-MS Features belonging to the light member of pairs
             For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
                 UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P1) = True
             Next i
         End If
     Case punaUnpairedOnly
-        ' Exclude UMC's that are paired
+        ' Exclude LC-MS Features that are paired
         For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
             UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P1) = False
             UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P2) = False
         Next i
     Case punaUnpairedPlusPairedLight
-        ' Exclude UMC's that belong to heavy members of pairs
+        ' Exclude LC-MS Features that belong to heavy members of pairs
         For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
             UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P2) = False
         Next i
@@ -555,7 +555,7 @@ End If
 
 If UMCNetAdjDef.TopAbuPct >= 0 And UMCNetAdjDef.TopAbuPct < 100 Then
     ' Filter-out low abundant classes
-    ' However, if .RequireDispersedUMCSelection = True, then make sure we have some UMC's from all portions of the data
+    ' However, if .RequireDispersedUMCSelection = True, then make sure we have some LC-MS Features from all portions of the data
     LinearNETAlignmentSelectUMCsToUseWork lngGelIndex, _
                                           glbPreferencesExpanded.NetAdjustmentUMCDistributionOptions.RequireDispersedUMCSelection, _
                                           UseUMC(), _
@@ -588,7 +588,7 @@ Private Sub LinearNETAlignmentSelectUMCsToUseWork(ByVal lngGelIndex As Long, _
                                                  ByRef lngUMCCntAddedSinceLowSegmentCount As Long, _
                                                  ByRef lngUMCSegmentCntWithLowUMCCnt As Long)
                                                  
-    ' If blnRequireDispersed = True, then assures that the selected UMC's are representative of all parts of the data
+    ' If blnRequireDispersed = True, then assures that the selected LC-MS Features are representative of all parts of the data
     
     Dim Abu() As Double         ' 0-based array; abundances to sort
     Dim TmpInd() As Long        ' 0-based array; original indices in GelUMC()
@@ -630,8 +630,8 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
 
     UMCTopAbuPctCnt = CLng((UMCNetAdjDef.TopAbuPct / 100) * GelUMC(lngGelIndex).UMCCnt)
     
-    ' First select the UMC's to use
-    ' What we do here is set the UseUMC() flag for the low abundance UMC's to false
+    ' First select the LC-MS Features to use
+    ' What we do here is set the UseUMC() flag for the low abundance LC-MS Features to false
     ' We do not take the pairing preferences into account when we do this; we will
     '  consider that below if blnRequireDispersed = True
     ReDim Abu(GelUMC(lngGelIndex).UMCCnt - 1)
@@ -655,7 +655,7 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
     lngUMCSegmentCntWithLowUMCCnt = 0
 
     If blnRequireDispersed Then
-        ' Collect stats on the number of UMC's used per segment
+        ' Collect stats on the number of LC-MS Features used per segment
         
         With glbPreferencesExpanded.NetAdjustmentUMCDistributionOptions
             lngSegmentCount = .SegmentCount
@@ -671,7 +671,7 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
         
         ReDim udtSegmentStats(0 To lngSegmentCount - 1)
         
-        ' Determine the total number of unused UMC's
+        ' Determine the total number of unused LC-MS Features
         lngMaxUnusedUMCs = 0
         For lngUMCIndex = 0 To GelUMC(lngGelIndex).UMCCnt - 1
             If Not UseUMC(lngUMCIndex) Then lngMaxUnusedUMCs = lngMaxUnusedUMCs + 1
@@ -711,7 +711,7 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
                 If UseUMC(lngIndex) Then
                     udtSegmentStats(lngSegmentBin).UMCHitCountUsed = udtSegmentStats(lngSegmentBin).UMCHitCountUsed + 1
                 Else
-                    ' Add to the array of potential UMC's that could be added if needed
+                    ' Add to the array of potential LC-MS Features that could be added if needed
                     With udtSegmentStats(lngSegmentBin)
                         .UnusedUMCIndices(.ArrayCountUnused) = lngIndex
                         .ArrayCountUnused = .ArrayCountUnused + 1
@@ -743,7 +743,7 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
                         Next lngIndex
                         
                         If qsd.QSAsc(Abu(), TmpInd()) Then
-                            ' Add back in the necessary number of UMC's, taking into
+                            ' Add back in the necessary number of LC-MS Features, taking into
                             '   account the value of ePairedSearchUMCSelection and
 
                             ePairedSearchUMCSelection = glbPreferencesExpanded.PairSearchOptions.NETAdjustmentPairedSearchUMCSelection
@@ -751,7 +751,7 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
                             If ePairedSearchUMCSelection <> punaPairedAndUnpaired Then
                                 ' Initialize the PairIndex lookup objects
                                 If Not PairIndexLookupInitialize(lngGelIndex, objP1IndFastSearch, objP2IndFastSearch) Then
-                                    ' No pairs found; pretend we're including all UMC's
+                                    ' No pairs found; pretend we're including all LC-MS Features
                                     ePairedSearchUMCSelection = punaPairedAndUnpaired
                                 End If
                             End If
@@ -849,7 +849,7 @@ Private Function LinearNETAlignmentUMCSelectionFilterCheck(ByVal lngGelIndex As 
             End If
         End If
         
-        ' Filter out UMCs that are not of the correct charge state
+        ' Filter out LC-MS Features that are not of the correct charge state
         If Not LinearNETAlignmentIsOKChargeState(.ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge) Then
             blnValidUMC = False
         End If

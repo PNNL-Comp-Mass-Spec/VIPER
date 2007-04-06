@@ -844,7 +844,7 @@ Dim bLoading As Long
 Dim CallerID As Long
 
 Dim tmp As UMCListType              'all work on this form is done with temporary UMC
-Dim TmpInc() As Long        'array parallel with UMCs in Tmp used to determine
+Dim TmpInc() As Long        'array parallel with LC-MS Features in Tmp used to determine
                             'what will be included in newly defined UMC
                         
 Dim UMCStat() As Double     'precalculated classes statistics used to easily
@@ -970,7 +970,7 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
                   TmpInc(arrInd(i)) = REMOVE_UMC_MARK
               Next i
            End If
-           strProcessSummary = "Removed high abundance classes (" & Trim(udtAutoRefine.UMCAutoRefinePctHighAbundance) & "% removed)"
+           strProcessSummary = "Removed high abundance features (" & Trim(udtAutoRefine.UMCAutoRefinePctHighAbundance) & "% removed)"
         End If
         If udtAutoRefine.UMCAutoRefineRemoveAbundanceLow Then
            UpdateStatus "Eliminating low abundance classes ..."
@@ -988,7 +988,7 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
               Next i
            End If
            If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
-           strProcessSummary = strProcessSummary & "Removed low abundance classes (" & Trim(udtAutoRefine.UMCAutoRefinePctLowAbundance) & "% removed)"
+           strProcessSummary = strProcessSummary & "Removed low abundance features (" & Trim(udtAutoRefine.UMCAutoRefinePctLowAbundance) & "% removed)"
         End If
         If udtAutoRefine.UMCAutoRefineRemoveCountLow Then
            If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
@@ -997,7 +997,7 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
                 For i = 0 To .UMCCnt - 1
                     If .UMCs(i).ClassCount < udtAutoRefine.UMCAutoRefineMinLength Then TmpInc(i) = REMOVE_UMC_MARK
                 Next i
-                strProcessSummary = strProcessSummary & "Removed classes with low member count (count < " & Trim(udtAutoRefine.UMCAutoRefineMinLength) & ")"
+                strProcessSummary = strProcessSummary & "Removed features with low member count (count < " & Trim(udtAutoRefine.UMCAutoRefineMinLength) & ")"
            Else
                 UpdateStatus "Removing classes with too short of a scan range ..."
                 For i = 0 To .UMCCnt - 1
@@ -1006,7 +1006,7 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
                         TmpInc(i) = REMOVE_UMC_MARK
                     End If
                 Next i
-                strProcessSummary = strProcessSummary & "Removed classes with too short of a scan range (range < " & Trim(udtAutoRefine.UMCAutoRefineMinLength) & " scans) or too few members (count < " & Trim(udtAutoRefine.MinMemberCountWhenUsingScanRange) & ")"
+                strProcessSummary = strProcessSummary & "Removed features with too short of a scan range (range < " & Trim(udtAutoRefine.UMCAutoRefineMinLength) & " scans) or too few members (count < " & Trim(udtAutoRefine.MinMemberCountWhenUsingScanRange) & ")"
            End If
         End If
     End With
@@ -1020,15 +1020,15 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
                     If .UMCs(i).ClassCount > udtAutoRefine.UMCAutoRefineMaxLength Then TmpInc(i) = REMOVE_UMC_MARK
                 Next i
             End With
-            strProcessSummary = strProcessSummary & "Removed classes with high member count (count > " & Trim(udtAutoRefine.UMCAutoRefineMaxLength) & ")"
+            strProcessSummary = strProcessSummary & "Removed features with high member count (count > " & Trim(udtAutoRefine.UMCAutoRefineMaxLength) & ")"
         Else
             UpdateStatus "Removing classes with too long of a scan range ..."
             AutoRemoveUMCsCheckLongScanLength tmp, udtAutoRefine, udtAutoRefine.UMCAutoRefineMaxLength
             
-            strProcessSummary = strProcessSummary & "Removed classes with too long of a scan range (range > " & Trim(udtAutoRefine.UMCAutoRefineMaxLength) & " scans); "
+            strProcessSummary = strProcessSummary & "Removed features with too long of a scan range (range > " & Trim(udtAutoRefine.UMCAutoRefineMaxLength) & " scans); "
             strProcessSummary = strProcessSummary & "Max abundance to use to gauge width = " & Trim(udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength) & "%"
             If udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength = 0 Then
-                strProcessSummary = strProcessSummary & " (used full width of the UMC to gauge width)"
+                strProcessSummary = strProcessSummary & " (used full width of the LC-MS Feature to gauge width)"
             End If
         End If
     End If
@@ -1050,10 +1050,10 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
         Else
             AutoRemoveUMCsCheckLongScanLength tmp, udtAutoRefine, lngMaxLengthScans
             
-            strProcessSummary = strProcessSummary & "Removed classes with too long of a scan range (range > " & Trim(lngMaxLengthScans) & " scans, which is " & Trim(udtAutoRefine.UMCAutoRefineMaxLengthPctAllScans) & "% of the total number of scans in this dataset); "
+            strProcessSummary = strProcessSummary & "Removed features with too long of a scan range (range > " & Trim(lngMaxLengthScans) & " scans, which is " & Trim(udtAutoRefine.UMCAutoRefineMaxLengthPctAllScans) & "% of the total number of scans in this dataset); "
             strProcessSummary = strProcessSummary & "Max abundance to use to gauge width = " & Trim(udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength) & "%"
             If udtAutoRefine.UMCAutoRefinePercentMaxAbuToUseForLength = 0 Then
-                strProcessSummary = strProcessSummary & " (used full width of the UMC to gauge width)"
+                strProcessSummary = strProcessSummary & " (used full width of the LC-MS Feature to gauge width)"
             End If
         End If
     End If
@@ -1083,7 +1083,7 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
     Call ClearGroupsAndLists
     Call RemoveClasses
     Call ResetUMC
-    AddToTentativeChangeList "Auto-removed UMC's; Original UMC Count = " & Trim(lngOriginalUMCCount) & "; Count after removal = " & Trim(tmp.UMCCnt) & "; " & strProcessSummary
+    AddToTentativeChangeList "Auto-removed LC-MS Features; Original UMC Count = " & Trim(lngOriginalUMCCount) & "; Count after removal = " & Trim(tmp.UMCCnt) & "; " & strProcessSummary
     NeedToSave = True
     UpdateStatus ""
     Me.MousePointer = vbDefault
@@ -1214,10 +1214,10 @@ End Sub
 Private Sub FillComboBoxes()
     With cmbAutoMerge
         .Clear
-        .AddItem "Prefer higher UMC abundance"
-        .AddItem "Prefer lower UMC abundance"
-        .AddItem "Prefer higher UMC count"
-        .AddItem "Prefer lower UMC count"
+        .AddItem "Prefer higher LC-MS Feature abundance"
+        .AddItem "Prefer lower LC-MS Feature abundance"
+        .AddItem "Prefer higher LC-MS Feature count"
+        .AddItem "Prefer lower LC-MS Feature count"
         .AddItem "Prefer higher MW"
         .AddItem "Prefer lower MW"
     End With
@@ -1418,7 +1418,7 @@ If NeedToSave Then
    If glbPreferencesExpanded.AutoAnalysisStatus.AutoRefiningUMCs Then
       Res = vbYes
    Else
-      Res = MsgBox("Do you want to save the UMC changes?", vbYesNoCancel, glFGTU)
+      Res = MsgBox("Do you want to save the LC-MS Feature changes?", vbYesNoCancel, glFGTU)
    End If
    Select Case Res
    Case vbYes                               'if Yes save and unload
@@ -1630,7 +1630,7 @@ UpdateStatus "Recalculating class structure..."
 Call ClearGroupsAndLists
 Call RemoveClasses
 Call ResetUMC
-If lngOriginalUMCCount > 0 Then AddToTentativeChangeList "Auto-merged UMC's: Original UMC Group Count = " & Trim(lngOriginalUMCCount) & "; Count after merge = " & Trim(GrRes.Count) & "; Auto-merge mode = " & cmbAutoMerge.List(cmbAutoMerge.ListIndex) & "; MinMW = " & txtAutoMergeMinMW & "; MaxMW = " & txtAutoMergeMaxMW
+If lngOriginalUMCCount > 0 Then AddToTentativeChangeList "Auto-merged LC-MS Features: Original LC-MS Feature Group Count = " & Trim(lngOriginalUMCCount) & "; Count after merge = " & Trim(GrRes.Count) & "; Auto-merge mode = " & cmbAutoMerge.List(cmbAutoMerge.ListIndex) & "; MinMW = " & txtAutoMergeMinMW & "; MaxMW = " & txtAutoMergeMaxMW
 NeedToSave = True
 UpdateStatus ""
 err_mnuTAutoMerge:
@@ -1769,7 +1769,7 @@ If CurrClassInd >= 0 Then
     Res = Format$(AbuSum / tmp.UMCs(CurrClassInd).ClassCount, "Scientific")
   End With
 End If
-lblUMCCalculator.Caption = "UMC: " & CurrClassInd & vbCrLf & "Avg.Abu.= " & Res
+lblUMCCalculator.Caption = "LC-MS Feature: " & CurrClassInd & vbCrLf & "Avg.Abu.= " & Res
 End Sub
 
 Private Sub mnuTUMCAvgMW_Click()
@@ -1796,7 +1796,7 @@ If CurrClassInd >= 0 Then
     Next i
   End With
 End If
-lblUMCCalculator.Caption = "UMC: " & CurrClassInd & vbCrLf & "Avg.MW= " & Res
+lblUMCCalculator.Caption = "LC-MS Feature: " & CurrClassInd & vbCrLf & "Avg.MW= " & Res
 End Sub
 
 Private Sub mnuTUMCSumAbu_Click()
@@ -1823,7 +1823,7 @@ If CurrClassInd >= 0 Then
     Res = Format$(AbuSum, "Scientific")
   End With
 End If
-lblUMCCalculator.Caption = "UMC: " & CurrClassInd & vbCrLf & "Sum.Abu.= " & Res
+lblUMCCalculator.Caption = "LC-MS Feature: " & CurrClassInd & vbCrLf & "Sum.Abu.= " & Res
 End Sub
 
 
@@ -2208,7 +2208,7 @@ With tmp
                  UMCStat(i, j) = -1
              Next j
           End If
-          UMCDisplay(i) = "UMC " & i & "; Scans [" & UMCStat(i, 1) & "," & UMCStat(i, 2) _
+          UMCDisplay(i) = "LC-MS Feature " & i & "; Scans [" & UMCStat(i, 1) & "," & UMCStat(i, 2) _
                         & "]; MW~" & Format$(.ClassMW, "0.00") & "Da; Count " & .ClassCount
       End With
    Next i

@@ -250,7 +250,7 @@ Dim ScanRange As Long
 Private Sub cmbDisplays_Click()
 DisplayInd = cmbDisplays.ItemData(cmbDisplays.ListIndex)
 'set NET calculation formula on Generic
-optNETCalculation(etGenericNET).value = True
+optNETCalculation(etGenericNET).Value = True
 
 EnableDisableControls
 End Sub
@@ -268,7 +268,7 @@ End Sub
 Private Sub cmdExport_Click()
 
 If ExpType = EXP_UMC Then
-    MsgBox "This window cannot be used to export UMCs to a file.  Please use Edit->Copy UMCs in View->Copy to File.  Be sure the view is completely zoomed out and that all of the UMCs are shown (using Tools->Show UMC Points).", vbOKOnly, glFGTU
+    MsgBox "This window cannot be used to export LC-MS Features to a file.  Please use Edit->Copy LC-MS Features in View->Copy to File.  Be sure the view is completely zoomed out and that all of the LC-MS Features are shown (using Tools->Show LC-MS Feature Points).", vbOKOnly, glFGTU
     Exit Sub
 End If
 

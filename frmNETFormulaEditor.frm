@@ -193,7 +193,7 @@ Private Sub ApplyChanges(blnCloseForm As Boolean)
                 End If
                 
                 If blnUpdated Then
-                    AddToAnalysisHistory CallerID, "NET parameters updated; NET Slope = " & Trim(.NET_Slope) & "; NET Intercept = " & Trim(.NET_Intercept) & "; GANET Slope = " & Trim(.GANET_Slope) & "; GANET Intercept = " & Trim(.GANET_Intercept)
+                    AddToAnalysisHistory CallerID, "NET parameters updated; NET Slope = " & Trim(.NET_Slope) & "; NET Intercept = " & Trim(.NET_Intercept) & "; NET Slope = " & Trim(.GANET_Slope) & "; NET Intercept = " & Trim(.GANET_Intercept)
                 End If
             End With
         Else

@@ -92,8 +92,8 @@ Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Conne
     Dim prmToolVersion As New ADODB.Parameter   'Viper version string
     
     Dim prmComparisonMassTagCount As New ADODB.Parameter        ' Number of MT tags loaded from database
-    Dim prmUMCTolerancePPM As New ADODB.Parameter               ' Tolerance for finding UMC's
-    Dim prmUMCCount As New ADODB.Parameter                      ' Number of UMC's (after filtering and refinement, if applicable)
+    Dim prmUMCTolerancePPM As New ADODB.Parameter               ' Tolerance for finding LC-MS Features
+    Dim prmUMCCount As New ADODB.Parameter                      ' Number of LC-MS Features (after filtering and refinement, if applicable)
     Dim prmNetAdjTolerancePPM As New ADODB.Parameter            ' NET Adjustment mass tolerance
     Dim prmNetAdjNETMin As New ADODB.Parameter                  ' NET Adjustment result: NET value of first scan
     Dim prmNetAdjNETMax As New ADODB.Parameter                  ' NET Adjustment result: NET value of last scan
@@ -1089,7 +1089,7 @@ Public Function ExportMTDBAddQuantitationDescriptionEntry(ByRef frmCallingForm A
             ' Append a . to the caption every second
             strCaptionAddOn = strCaptionAddOn & "."
             If Len(strCaptionAddOn) > 10 Then strCaptionAddOn = ""
-            frmCallingForm.Caption = "Summarizing ORF Abundances " & strCaptionAddOn
+            frmCallingForm.Caption = "Summarizing Protein Abundances " & strCaptionAddOn
             DoEvents
         End If
     Loop While cmdPutQuantitationDesc.STATE = adStateExecuting

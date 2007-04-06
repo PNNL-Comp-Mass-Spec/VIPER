@@ -146,7 +146,6 @@ Begin VB.Form frmProtoViewPRISM
       _ExtentX        =   9975
       _ExtentY        =   6588
       _Version        =   393217
-      Enabled         =   -1  'True
       TextRTF         =   $"frmProtoViewPRISM.frx":030A
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "Courier New"
@@ -271,7 +270,7 @@ Attribute VB_Exposed = False
 'simple to extend this functionality to FASTA file  but hey ....
 'NOTE: Peptide Significance(PS) is defined as product of number
 '      of peptides pointing to ORF with number of peptides pointing
-'      to different ORFs within defined mass/time range
+'      to different Proteins within defined mass/time range
 '      In this instance peptide significance is defined on a set of
 '      loaded MT tags
 'created: 08/01/2002 nt
@@ -389,10 +388,10 @@ If bLoading Then
    UpdateStatus "Loading ORF list ..."
    SetNETSlopeIntercept
    LoadORFs CallerID
-   UpdateStatus "Number of loaded ORFs: " & ORFCnt
-   UpdateStatus "Loading MT tag - ORF mappings ..."
+   UpdateStatus "Number of loaded Proteins: " & ORFCnt
+   UpdateStatus "Loading MT tag - Protein mappings ..."
    LoadMassTagToProteinMapping Me, CallerID, True
-   UpdateStatus "ORFs: " & ORFCnt & " MT tags: " & AMTCnt & " Mappings: " & MTtoORFMapCount
+   UpdateStatus "Proteins: " & ORFCnt & " MT tags: " & AMTCnt & " Mappings: " & MTtoORFMapCount
    bLoading = False
    Call cmdORFNavigate_Click(0)
 End If

@@ -189,6 +189,7 @@ Begin VB.Form frmPRISMAutomation
       _ExtentX        =   11456
       _ExtentY        =   4471
       _Version        =   393217
+      Enabled         =   -1  'True
       ReadOnly        =   -1  'True
       ScrollBars      =   3
       TextRTF         =   $"frmPRISMAutomation.frx":0000
@@ -693,6 +694,7 @@ Private Sub QueryPRISM()
     
     Dim strRequestTaskSPName As String
     Dim strSetTaskCompleteSPName As String
+    Dim strLogEntryType As String
     
     Dim cmdGetPMTask As New ADODB.Command
     Dim prmProcessorName As New ADODB.Parameter
@@ -1125,7 +1127,14 @@ QueryPRISMCleanup:
     If udtAutoParams.ExitViperASAP Then
         ' A fatal error has occurred; exit Viper
         AddToPrismAutoAnalysisLog GetCurrentTimeStamp() & " > Fatal error (" & udtAutoParams.ExitViperReason & "); shutting down VIPER"
-        PostLogEntryToDB "Error", "Fatal error (" & udtAutoParams.ExitViperReason & "); shutting down VIPER"
+        
+        If InStr(udtAutoParams.ExitViperReason, "Failed to load control 'ctl2DHeatMap'") > 0 Then
+            strLogEntryType = "ErrorIgnore"
+        Else
+            strLogEntryType = "Error"
+        End If
+        PostLogEntryToDB strLogEntryType, "Fatal error (" & udtAutoParams.ExitViperReason & "); shutting down VIPER"
+        
         ExitProgramQueryUser False, udtAutoParams.RestartAfterExit, udtAutoParams.ExitViperReason
     Else
         If Not mPaused Then tmrPRISMQueryDelay.Enabled = True
