@@ -35,7 +35,7 @@ for instructions on how to validate that the Framework is installed.  Follow
 this link to install it: http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=262D25E3-F589-4842-8157-034D1E7CF3A3
 
 If, after installing VIPER, the LCMSFeatureFinder does not run properly, then 
-install it separately using the LCMSFeatureFinder.msi file
+install it separately using the LCMSFeatureFinder.msi file (aka "LCMSFeatureFinder (Install this after installing Viper).msi")
 
 The shortcut for starting VIPER can be found at Start Menu -> Programs -> PAST Toolkit -> VIPER
 
@@ -163,7 +163,7 @@ Input file format notes:
 	  Decon2LS saves its results in a pair of CSV (comma-separated value) files
 	- The _scans.csv file contains information about each mass spectrum (aka scan); columns are:
 		scan_num
-		time
+		scan_time
 		type
 		bpi
 		bpi_mz

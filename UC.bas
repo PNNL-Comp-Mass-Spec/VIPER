@@ -2643,36 +2643,71 @@ exit_fUMCCharacteristicPoints:
 End Function
 
 
-Private Function UMCInterpolateGapsAbundance_Lin(Scans() As Long, _
-                        Abundances() As Double, MaxGapToInterpolate As Long) As Double
+Private Function UMCInterpolateGapsAbundance_Lin( _
+                        ByVal lngGelIndex As Long, _
+                        ByRef Scans() As Long, _
+                        ByRef Abundances() As Double, _
+                        ByVal MaxGapToInterpolate As Long) As Double
 '-------------------------------------------------------------------------------------
-'corrects class abundance by interpolating missing ions in the class; if gap is larger
-'than the MaxGapToInterpolate then don't interpolate; return sum of all abundances
+'corrects class abundance by interpolating missing ions in the class; if lngScanGap is larger
+'than the MaxGapToInterpolate then don't interpolate; return dblAbundanceSum of all abundances
 'NOTE: function assumes that scans are coming in ascending order
 '-------------------------------------------------------------------------------------
-Dim i As Long
-Dim Cnt As Long
-Dim Sum As Double
-Dim Gap As Long
+
+Const INTERPOLATE_USING_RELATIVE_SCAN_NUMBERS As Boolean = True
+
+Dim lngIndex As Long
+Dim lngScanCount As Long
+Dim dblAbundanceSum As Double
+Dim lngScanGap As Long
+Dim lngScanNumber1 As Long, lngScanNumber2 As Long
+Dim lngScanIndex1 As Long, lngScanIndex2 As Long
+
 On Error Resume Next
-Cnt = UBound(Scans) + 1
-If Cnt > 0 Then
-   Sum = Abundances(0)
-   If Cnt > 1 Then
-      For i = 1 To Cnt - 1
-          Sum = Sum + Abundances(i)         'add regular abundance
-          Gap = Scans(i) - Scans(i - 1)
-          If Gap > 1 Then                   'have to insert (Gap-1) ions (for each missing scan)
-             ' MonroeMod: Changed from 'Gap <=' to 'Gap - 1 <='
-             If Gap - 1 <= MaxGapToInterpolate Then
-                Sum = Sum + (Gap - 1) * (Abundances(i - 1) + Abundances(i)) / 2
-             End If
-          End If
-      Next i
-   End If
-   UMCInterpolateGapsAbundance_Lin = Sum
+lngScanCount = UBound(Scans) + 1
+If lngScanCount > 0 Then
+    dblAbundanceSum = Abundances(0)
+    If lngScanCount > 1 Then
+        For lngIndex = 1 To lngScanCount - 1
+            dblAbundanceSum = dblAbundanceSum + Abundances(lngIndex)         'add regular abundance
+            
+            If INTERPOLATE_USING_RELATIVE_SCAN_NUMBERS Then
+                
+                ' Since LTQ-FT and LTQ-Orbitrap data can have gaps between scans, need to use
+                ' LookupScanNumberRelativeIndex to determine the relative index for each scan number
+    
+                lngScanNumber1 = Scans(lngIndex - 1)
+                lngScanIndex1 = LookupScanNumberRelativeIndex(lngGelIndex, lngScanNumber1)
+                If lngScanIndex1 = 0 Then
+                    lngScanNumber1 = LookupScanNumberClosest(lngGelIndex, lngScanNumber1)
+                    lngScanIndex1 = LookupScanNumberRelativeIndex(lngGelIndex, lngScanNumber1)
+                End If
+            
+                lngScanNumber2 = Scans(lngIndex)
+                lngScanIndex2 = LookupScanNumberRelativeIndex(lngGelIndex, lngScanNumber2)
+                If lngScanIndex2 = 0 Then
+                    lngScanNumber2 = LookupScanNumberClosest(lngGelIndex, lngScanNumber2)
+                    lngScanIndex2 = LookupScanNumberRelativeIndex(lngGelIndex, lngScanNumber2)
+                End If
+                
+                lngScanGap = lngScanIndex2 - lngScanIndex1
+            Else
+                lngScanGap = Scans(lngIndex) - Scans(lngIndex - 1)
+            End If
+                
+            If lngScanGap > 1 Then
+                ' Have to insert (lngScanGap-1) ions (for each missing scan)
+                
+                If lngScanGap - 1 <= MaxGapToInterpolate Then
+                    dblAbundanceSum = dblAbundanceSum + (lngScanGap - 1) * (Abundances(lngIndex - 1) + Abundances(lngIndex)) / 2
+                End If
+            End If
+            
+        Next lngIndex
+    End If
+    UMCInterpolateGapsAbundance_Lin = dblAbundanceSum
 Else
-   UMCInterpolateGapsAbundance_Lin = -1
+    UMCInterpolateGapsAbundance_Lin = -1
 End If
 End Function
 
@@ -2718,7 +2753,7 @@ ManageClasses = True
 exit_ManageClasses:
 End Function
 
-Public Function CalculateClasses(ByVal Ind As Long, Optional blnUseProgressForm As Boolean = False, Optional frmCallingForm As VB.Form) As Boolean
+Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgressForm As Boolean = False, Optional frmCallingForm As VB.Form) As Boolean
 '--------------------------------------------------------------------------------
 'Recalculates parameters of the unique mass classes; returns True on success
 '
@@ -2777,7 +2812,7 @@ Dim blnShowProgressUsingFormCaption As Boolean
 On Error GoTo err_CalculateClasses
 
 If blnUseProgressForm Then
-    frmProgress.InitializeSubtask "Updating LC-MS Feature Stats", 0, GelUMC(Ind).UMCCnt
+    frmProgress.InitializeSubtask "Updating LC-MS Feature Stats", 0, GelUMC(lngGelIndex).UMCCnt
 Else
     If Not frmCallingForm Is Nothing Then
         blnShowProgressUsingFormCaption = True
@@ -2805,7 +2840,7 @@ ReDim ChargeStateBasedScan(INITIAL_RESERVE_COUNT)
 ReDim ChargeStateBasedFit(INITIAL_RESERVE_COUNT)
 ReDim ChargeStateBasedOrgIndex(INITIAL_RESERVE_COUNT)
 
-With GelUMC(Ind)
+With GelUMC(lngGelIndex)
     ISMWField = .def.MWField
     If .UMCCnt > 0 Then
        For i = 0 To .UMCCnt - 1
@@ -2832,17 +2867,17 @@ With GelUMC(Ind)
                   For j = 0 To lngMaxMemberIndex
                       Select Case .ClassMType(j)
                       Case glCSType
-                           UMCMembersMW(j) = GelData(Ind).CSData(.ClassMInd(j)).AverageMW
-                           UMCMembersAbu(j) = GelData(Ind).CSData(.ClassMInd(j)).Abundance
-                           UMCMembersScan(j) = GelData(Ind).CSData(.ClassMInd(j)).ScanNumber
-                           UMCMembersFit(j) = GelData(Ind).CSData(.ClassMInd(j)).MassStDev        ' Isotopic fit is not defined for charge state data; use standard deviation instead
-                           UMCMembersCharge(j) = GelData(Ind).CSData(.ClassMInd(j)).Charge
+                           UMCMembersMW(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).AverageMW
+                           UMCMembersAbu(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).Abundance
+                           UMCMembersScan(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).ScanNumber
+                           UMCMembersFit(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).MassStDev        ' Isotopic fit is not defined for charge state data; use standard deviation instead
+                           UMCMembersCharge(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).Charge
                       Case glIsoType
-                           UMCMembersMW(j) = GetIsoMass(GelData(Ind).IsoData(.ClassMInd(j)), ISMWField)
-                           UMCMembersAbu(j) = GelData(Ind).IsoData(.ClassMInd(j)).Abundance
-                           UMCMembersScan(j) = GelData(Ind).IsoData(.ClassMInd(j)).ScanNumber
-                           UMCMembersFit(j) = GelData(Ind).IsoData(.ClassMInd(j)).Fit
-                           UMCMembersCharge(j) = GelData(Ind).IsoData(.ClassMInd(j)).Charge
+                           UMCMembersMW(j) = GetIsoMass(GelData(lngGelIndex).IsoData(.ClassMInd(j)), ISMWField)
+                           UMCMembersAbu(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Abundance
+                           UMCMembersScan(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).ScanNumber
+                           UMCMembersFit(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Fit
+                           UMCMembersCharge(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Charge
                       End Select
                       If UMCMembersMW(j) < .MinMW Then .MinMW = UMCMembersMW(j)
                       If UMCMembersMW(j) > .MaxMW Then .MaxMW = UMCMembersMW(j)
@@ -2934,7 +2969,7 @@ With GelUMC(Ind)
                             RepAbu = ChargeStateBasedAbu(lngChargeStateGroupRepIndex)
 
                             ' Compute the stats for this charge state group
-                            CalculateClassesComputeStats .def, ChargeStateMaxIndex, ChargeStateBasedMW(), ChargeStateBasedAbu(), ChargeStateBasedScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
+                            CalculateClassesComputeStats lngGelIndex, .def, ChargeStateMaxIndex, ChargeStateBasedMW(), ChargeStateBasedAbu(), ChargeStateBasedScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
 
                             With .UMCs(i)
                                 With .ChargeStateBasedStats(.ChargeStateCount)
@@ -2983,9 +3018,9 @@ With GelUMC(Ind)
                                 lngClassMIndexPointer = .ChargeStateBasedStats(intChargeState).GroupRepIndex
                                 Select Case .ClassMType(lngClassMIndexPointer)
                                 Case glCSType
-                                     dblCompareValue = GelData(Ind).CSData(lngClassMIndexPointer).Abundance
+                                     dblCompareValue = GelData(lngGelIndex).CSData(lngClassMIndexPointer).Abundance
                                 Case glIsoType
-                                     dblCompareValue = GelData(Ind).IsoData(lngClassMIndexPointer).Abundance
+                                     dblCompareValue = GelData(lngGelIndex).IsoData(lngClassMIndexPointer).Abundance
                                 End Select
                                 
                                 If dblCompareValue > dblBestValue Then
@@ -3032,16 +3067,16 @@ With GelUMC(Ind)
                     With .UMCs(i)
                         Select Case .ClassRepType
                         Case glCSType
-                             RepMW = GelData(Ind).CSData(.ClassRepInd).AverageMW
-                             RepAbu = GelData(Ind).CSData(.ClassRepInd).Abundance
+                             RepMW = GelData(lngGelIndex).CSData(.ClassRepInd).AverageMW
+                             RepAbu = GelData(lngGelIndex).CSData(.ClassRepInd).Abundance
                         Case glIsoType
-                             RepMW = GetIsoMass(GelData(Ind).IsoData(.ClassRepInd), ISMWField)
-                             RepAbu = GelData(Ind).IsoData(.ClassRepInd).Abundance
+                             RepMW = GetIsoMass(GelData(lngGelIndex).IsoData(.ClassRepInd), ISMWField)
+                             RepAbu = GelData(lngGelIndex).IsoData(.ClassRepInd).Abundance
                         End Select
                     End With
                     
                     ' Compute the class stats
-                    CalculateClassesComputeStats .def, UMCMembersMaxIndex, UMCMembersMW(), UMCMembersAbu(), UMCMembersScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
+                    CalculateClassesComputeStats lngGelIndex, .def, UMCMembersMaxIndex, UMCMembersMW(), UMCMembersAbu(), UMCMembersScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
                     
                     With .UMCs(i)
                         .ClassMW = dblConglomerateMW
@@ -3084,7 +3119,7 @@ On Error Resume Next
 If blnShowProgressUsingFormCaption Then frmCallingForm.Caption = strCaptionSaved
 End Function
 
-Private Sub CalculateClassesComputeStats(ByRef udtUMCDef As UMCDefinition, ByVal SrcMaxIndex As Long, ByRef MWArray() As Double, ByRef AbuArray() As Double, ByRef ScanArray() As Long, ByVal dblRepMW As Double, ByVal dblRepAbu As Double, ByRef dblConglomerateMW As Double, ByRef dblConglomerateMWStD As Double, ByRef dblConglomerateAbu As Double)
+Private Sub CalculateClassesComputeStats(ByVal lngGelIndex As Long, ByRef udtUMCDef As UMCDefinition, ByVal SrcMaxIndex As Long, ByRef MWArray() As Double, ByRef AbuArray() As Double, ByRef ScanArray() As Long, ByVal dblRepMW As Double, ByVal dblRepAbu As Double, ByRef dblConglomerateMW As Double, ByRef dblConglomerateMWStD As Double, ByRef dblConglomerateAbu As Double)
     
     ' Note: This function previously used the StatDoubles class
     ' However, this can lead to poor performance in the compiled version of the program, so we've now switched to computing the stats locally
@@ -3223,7 +3258,7 @@ On Error GoTo CalculateClassesComputeStatsErrorHandler
         Case UMCClassAbundanceConstants.UMCAbuSum, UMCClassAbundanceConstants.UMCAbuSumTopX
             If udtUMCDef.InterpolateGaps Then
                 ' interpolate gaps (ghost ions)
-                dblConglomerateAbu = UMCInterpolateGapsAbundance_Lin(lngScanWork(), dblAbuWork(), udtUMCDef.InterpolateMaxGapSize)
+                dblConglomerateAbu = UMCInterpolateGapsAbundance_Lin(lngGelIndex, lngScanWork(), dblAbuWork(), udtUMCDef.InterpolateMaxGapSize)
             Else
                 ' normal sum
                 dblConglomerateAbu = dblStatSum

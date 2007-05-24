@@ -771,7 +771,7 @@ On Error GoTo AddUMCErrorHandler
                 If udtPutUMCParams.AbundanceMax.Value > ClsStat(lngUMCIndexOriginal, ustAbundanceMax) Then
                     Debug.Assert udtPutUMCParams.AbundanceMax.Value / ClsStat(lngUMCIndexOriginal, ustAbundanceMax) < 2
                 Else
-                    Debug.Assert ClsStat(lngUMCIndexOriginal, ustAbundanceMax) / udtPutUMCParams.AbundanceMax.Value < 2
+                    'Debug.Assert ClsStat(lngUMCIndexOriginal, ustAbundanceMax) / udtPutUMCParams.AbundanceMax.Value < 2
                 End If
             Else
                 Debug.Assert False

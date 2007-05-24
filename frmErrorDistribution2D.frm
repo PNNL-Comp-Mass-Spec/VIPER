@@ -579,14 +579,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabCaption(1)   =   "Tolerance Refinement"
          TabPicture(1)   =   "frmErrorDistribution2D.frx":0196
          Tab(1).ControlEnabled=   0   'False
-         Tab(1).Control(0)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
-         Tab(1).Control(1)=   "fraExpecationMaximizationOptions"
-         Tab(1).Control(2)=   "cboToleranceRefinementMethod"
-         Tab(1).Control(3)=   "cmdAbortProcessing(1)"
-         Tab(1).Control(4)=   "cmdNETToleranceRefinementStart"
-         Tab(1).Control(5)=   "fraToleranceRefinementGANET"
-         Tab(1).Control(6)=   "fraToleranceRefinementMass"
-         Tab(1).Control(7)=   "cmdMassToleranceRefinementStart"
+         Tab(1).Control(0)=   "cmdMassToleranceRefinementStart"
+         Tab(1).Control(1)=   "fraToleranceRefinementMass"
+         Tab(1).Control(2)=   "fraToleranceRefinementGANET"
+         Tab(1).Control(3)=   "cmdNETToleranceRefinementStart"
+         Tab(1).Control(4)=   "cmdAbortProcessing(1)"
+         Tab(1).Control(5)=   "cboToleranceRefinementMethod"
+         Tab(1).Control(6)=   "fraExpecationMaximizationOptions"
+         Tab(1).Control(7)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
          Tab(1).ControlCount=   8
          Begin VB.CommandButton cmdResetToDefaults 
             Caption         =   "Set to Defaults"
@@ -2854,6 +2854,7 @@ End Function
 Private Function VarianceToPeakWidth(dblVariance As Double, sngSigma As Single) As Double
     ' Converts from variance to peak width at the given sigma value
     ' Note: Variance = StDev^2
+    '  i.e. StDev = Sqrt(Variance)
     
     VarianceToPeakWidth = sngSigma * Sqr(dblVariance)
 End Function

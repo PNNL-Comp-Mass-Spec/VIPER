@@ -23,7 +23,8 @@ Private Const ISOS_COLUMN_MONO_PLUS2_ABUNDANCE As String = "mono_plus2_abundance
 
 ' Note: These should all be lowercase string values
 Private Const SCANS_COLUMN_SCAN_NUM As String = "scan_num"
-Private Const SCANS_COLUMN_TIME As String = "time"
+Private Const SCANS_COLUMN_TIME_A As String = "time"
+Private Const SCANS_COLUMN_TIME_B As String = "scan_time"
 Private Const SCANS_COLUMN_TYPE As String = "type"
 Private Const SCANS_COLUMN_NUM_DEISOTOPED As String = "num_deisotoped"
 Private Const SCANS_COLUMN_NUM_PEAKS As String = "num_peaks"
@@ -180,7 +181,7 @@ Private Function GetDefaultScansColumnHeaders(blnRequiredColumnsOnly As Boolean)
     Dim strHeaders As String
 
     strHeaders = SCANS_COLUMN_SCAN_NUM
-    strHeaders = strHeaders & ", " & SCANS_COLUMN_TIME
+    strHeaders = strHeaders & ", " & SCANS_COLUMN_TIME_B
     strHeaders = strHeaders & ", " & SCANS_COLUMN_TYPE
     
     If Not blnRequiredColumnsOnly Then
@@ -910,7 +911,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
 
                             Select Case LCase(Trim(strData(lngIndex)))
                             Case SCANS_COLUMN_SCAN_NUM: intColumnMapping(ScanFileColumnConstants.ScanNumber) = lngIndex
-                            Case SCANS_COLUMN_TIME: intColumnMapping(ScanFileColumnConstants.ScanTime) = lngIndex
+                            Case SCANS_COLUMN_TIME_A, SCANS_COLUMN_TIME_B: intColumnMapping(ScanFileColumnConstants.ScanTime) = lngIndex
                             Case SCANS_COLUMN_TYPE: intColumnMapping(ScanFileColumnConstants.ScanType) = lngIndex
                             Case SCANS_COLUMN_NUM_DEISOTOPED: intColumnMapping(ScanFileColumnConstants.NumDeisotoped) = lngIndex
                             Case SCANS_COLUMN_NUM_PEAKS: intColumnMapping(ScanFileColumnConstants.NumPeaks) = lngIndex

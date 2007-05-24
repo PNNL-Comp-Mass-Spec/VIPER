@@ -1,5 +1,15 @@
 VIPER Change Log
 
+Version 3.42 - Build 369; May 22, 2007
+	- Updated the scan gap interpolation method used when computing the abundance values for LC-MS features (aka UMCs)
+		- Previously would interpolate by absolute scan number without respect to whether or not the intervening spectra were MS/MS (as acquired with an LTQ-FT or LTQ-Orbitrap)
+		- Now interpolating by relative scan number, where each successive MS1 spectrum is assigned a sequential number
+			- For example, given three MS1 spectra in scans 2000, 2003, and 2006, if we see a data point in scans 2000 and 2006 but not 2003, then the interpolation is now based on just one additional spectrum (scan 2003) instead of on five additional spectra (scans 2001-2005)
+		- The result of this change is that LC-MS Feature abundance values will now be ~33% smaller for LTQ-FT or LTQ-Orbitrap data (when acquired with interleaved MS/MS spectra)
+
+Version 3.42 - Build 368; April 27, 2007
+	- Updated to support column "scan_time" in addition to "time" in Decon2LS _scans.csv files
+
 Version 3.42 - Build 367; April 6, 2007
 	- Added option of reporting Scan-by-Scan Pair Details on the "LC-MS Feature Delta Pairing Analysis" form
 
