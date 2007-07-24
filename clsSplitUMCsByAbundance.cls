@@ -33,7 +33,7 @@ Public Sub AbortProcessingNow()
     mAbortRequested = True
 End Sub
 
-Public Sub ExamineUMCs(lngGelIndex As Long, frmCallingForm As VB.Form, Optional blnShowMessages As Boolean = True, Optional blnUseStatusFunctionOnCallingForm As Boolean = False)
+Public Sub ExamineUMCs(ByVal lngGelIndex As Long, ByRef frmCallingForm As VB.Form, Optional ByVal blnShowMessages As Boolean = True, Optional ByVal blnUseStatusFunctionOnCallingForm As Boolean = False)
     
     ' Examines the intensities of the ions in each UMC
     ' Looks for LC-MS Features that have two or more distinct peaks in a localized TIC plot (total ion chromatogram)

@@ -599,7 +599,7 @@ Private Sub LinearNETAlignmentSelectUMCsToUseWork(ByVal lngGelIndex As Long, _
     Dim UMCTopAbuPctCnt As Long
     Dim UMCMinimumCntPerSegment As Long
     
-    Dim lngIndex As Long, lngSegmentIndex As Long
+    Dim lngindex As Long, lngSegmentIndex As Long
     Dim lngMaxUnusedUMCs As Long
     Dim lngUMCIndex As Long
     Dim lngMatchingIndices() As Long
@@ -636,19 +636,19 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
     '  consider that below if blnRequireDispersed = True
     ReDim Abu(GelUMC(lngGelIndex).UMCCnt - 1)
     ReDim TmpInd(GelUMC(lngGelIndex).UMCCnt - 1)
-    For lngIndex = 0 To GelUMC(lngGelIndex).UMCCnt - 1
-        With GelUMC(lngGelIndex).UMCs(lngIndex)
-            Abu(lngIndex) = .ClassAbundance
-            TmpInd(lngIndex) = lngIndex
+    For lngindex = 0 To GelUMC(lngGelIndex).UMCCnt - 1
+        With GelUMC(lngGelIndex).UMCs(lngindex)
+            Abu(lngindex) = .ClassAbundance
+            TmpInd(lngindex) = lngindex
         End With
-    Next lngIndex
+    Next lngindex
     
     If qsd.QSDesc(Abu(), TmpInd()) Then
        If UMCTopAbuPctCnt > GelUMC(lngGelIndex).UMCCnt Then UMCTopAbuPctCnt = GelUMC(lngGelIndex).UMCCnt
        If UMCTopAbuPctCnt < 0 Then UMCTopAbuPctCnt = 0
-       For lngIndex = UMCTopAbuPctCnt To GelUMC(lngGelIndex).UMCCnt - 1
-           UseUMC(TmpInd(lngIndex)) = False
-       Next lngIndex
+       For lngindex = UMCTopAbuPctCnt To GelUMC(lngGelIndex).UMCCnt - 1
+           UseUMC(TmpInd(lngindex)) = False
+       Next lngindex
     End If
 
     lngUMCCntAddedSinceLowSegmentCount = 0
@@ -687,8 +687,8 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
         
         lngScansPerSegment = (lngScanMaxAdjusted - lngScanMinAdjusted) / lngSegmentCount
         
-        For lngIndex = 0 To GelUMC(lngGelIndex).UMCCnt - 1
-            With GelUMC(lngGelIndex).UMCs(lngIndex)
+        For lngindex = 0 To GelUMC(lngGelIndex).UMCCnt - 1
+            With GelUMC(lngGelIndex).UMCs(lngindex)
                 ' Compute the center scan of this UMC
                 lngScanCenter = (.MaxScan + .MinScan) / 2
             End With
@@ -708,19 +708,19 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
                 If lngSegmentBin < 0 Then lngSegmentBin = 0
                 If lngSegmentBin >= lngSegmentCount Then lngSegmentBin = lngSegmentCount - 1
                 
-                If UseUMC(lngIndex) Then
+                If UseUMC(lngindex) Then
                     udtSegmentStats(lngSegmentBin).UMCHitCountUsed = udtSegmentStats(lngSegmentBin).UMCHitCountUsed + 1
                 Else
                     ' Add to the array of potential LC-MS Features that could be added if needed
                     With udtSegmentStats(lngSegmentBin)
-                        .UnusedUMCIndices(.ArrayCountUnused) = lngIndex
+                        .UnusedUMCIndices(.ArrayCountUnused) = lngindex
                         .ArrayCountUnused = .ArrayCountUnused + 1
                     End With
                 End If
             Else
                 ' UMC is outside the desired scan range; ignore it
             End If
-        Next lngIndex
+        Next lngindex
         
         For lngSegmentIndex = 0 To lngSegmentCount - 1
             With udtSegmentStats(lngSegmentIndex)
@@ -737,10 +737,10 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
                         ReDim Abu(.ArrayCountUnused - 1)
                         ReDim TmpInd(.ArrayCountUnused - 1)
                         
-                        For lngIndex = 0 To .ArrayCountUnused - 1
-                            Abu(lngIndex) = GelUMC(lngGelIndex).UMCs(.UnusedUMCIndices(lngIndex)).ClassAbundance
-                            TmpInd(lngIndex) = .UnusedUMCIndices(lngIndex)
-                        Next lngIndex
+                        For lngindex = 0 To .ArrayCountUnused - 1
+                            Abu(lngindex) = GelUMC(lngGelIndex).UMCs(.UnusedUMCIndices(lngindex)).ClassAbundance
+                            TmpInd(lngindex) = .UnusedUMCIndices(lngindex)
+                        Next lngindex
                         
                         If qsd.QSAsc(Abu(), TmpInd()) Then
                             ' Add back in the necessary number of LC-MS Features, taking into
@@ -756,10 +756,10 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
                                 End If
                             End If
                             
-                            lngIndex = 0
-                            Do While .UMCHitCountUsed < UMCMinimumCntPerSegment And lngIndex < .ArrayCountUnused
+                            lngindex = 0
+                            Do While .UMCHitCountUsed < UMCMinimumCntPerSegment And lngindex < .ArrayCountUnused
                                 
-                                lngUMCIndex = TmpInd(lngIndex)
+                                lngUMCIndex = TmpInd(lngindex)
                                 blnAddThisUMC = False
                                 
                                 Select Case ePairedSearchUMCSelection
@@ -809,7 +809,7 @@ On Error GoTo SelectUMCsToUseWorkErrorHandler
                                     End If
                                 End If
                                 
-                                lngIndex = lngIndex + 1
+                                lngindex = lngindex + 1
                             Loop
                             
                         End If

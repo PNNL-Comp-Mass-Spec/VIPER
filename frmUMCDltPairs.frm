@@ -1,19 +1,15 @@
 VERSION 5.00
 Begin VB.Form frmUMCDltPairs 
    BackColor       =   &H00C0FFC0&
-   BorderStyle     =   3  'Fixed Dialog
    Caption         =   "LC-MS Feature Delta Pairing Analysis"
-   ClientHeight    =   9210
-   ClientLeft      =   45
-   ClientTop       =   615
-   ClientWidth     =   5445
+   ClientHeight    =   7320
+   ClientLeft      =   60
+   ClientTop       =   630
+   ClientWidth     =   10725
    Icon            =   "frmUMCDltPairs.frx":0000
    LinkTopic       =   "Form1"
-   MaxButton       =   0   'False
-   MinButton       =   0   'False
-   ScaleHeight     =   9210
-   ScaleWidth      =   5445
-   ShowInTaskbar   =   0   'False
+   ScaleHeight     =   7320
+   ScaleWidth      =   10725
    StartUpPosition =   1  'CenterOwner
    Begin VB.CommandButton cmdResetToDefaults 
       Caption         =   "Set to Defaults"
@@ -35,16 +31,17 @@ Begin VB.Form frmUMCDltPairs
    Begin VB.Frame fraLabelOptions 
       BackColor       =   &H00C0FFC0&
       Caption         =   "Label Mass Options"
-      Height          =   2150
+      Height          =   1875
       Left            =   5400
-      TabIndex        =   17
-      Top             =   480
+      TabIndex        =   26
+      Top             =   3960
+      Visible         =   0   'False
       Width           =   5175
       Begin VB.CommandButton cmdSetToICAT 
          Caption         =   "Set to ICAT"
          Height          =   300
          Left            =   240
-         TabIndex        =   28
+         TabIndex        =   37
          Top             =   1320
          Width           =   1455
       End
@@ -52,7 +49,7 @@ Begin VB.Form frmUMCDltPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   3840
-         TabIndex        =   27
+         TabIndex        =   36
          Text            =   "1"
          Top             =   960
          Width           =   855
@@ -61,7 +58,7 @@ Begin VB.Form frmUMCDltPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   3840
-         TabIndex        =   21
+         TabIndex        =   30
          Text            =   "8.05"
          Top             =   240
          Width           =   855
@@ -70,7 +67,7 @@ Begin VB.Form frmUMCDltPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   1080
-         TabIndex        =   23
+         TabIndex        =   32
          Text            =   "1"
          Top             =   600
          Width           =   855
@@ -79,7 +76,7 @@ Begin VB.Form frmUMCDltPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   3840
-         TabIndex        =   25
+         TabIndex        =   34
          Text            =   "5"
          Top             =   600
          Width           =   855
@@ -88,7 +85,7 @@ Begin VB.Form frmUMCDltPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   1080
-         TabIndex        =   19
+         TabIndex        =   28
          Text            =   "442.2249697"
          Top             =   240
          Width           =   1215
@@ -100,7 +97,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   255
          Index           =   9
          Left            =   120
-         TabIndex        =   26
+         TabIndex        =   35
          Top             =   960
          Width           =   3375
       End
@@ -111,7 +108,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   255
          Index           =   8
          Left            =   2400
-         TabIndex        =   20
+         TabIndex        =   29
          Top             =   300
          Width           =   1455
       End
@@ -122,7 +119,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   255
          Index           =   7
          Left            =   120
-         TabIndex        =   22
+         TabIndex        =   31
          Top             =   600
          Width           =   975
       End
@@ -133,7 +130,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   255
          Index           =   1
          Left            =   2400
-         TabIndex        =   24
+         TabIndex        =   33
          Top             =   600
          Width           =   975
       End
@@ -144,7 +141,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   255
          Index           =   0
          Left            =   120
-         TabIndex        =   18
+         TabIndex        =   27
          Top             =   300
          Width           =   855
       End
@@ -153,15 +150,15 @@ Begin VB.Form frmUMCDltPairs
       BackColor       =   &H00C0FFC0&
       Caption         =   "Inclusion/Exclusion Options"
       Height          =   975
-      Left            =   120
-      TabIndex        =   37
-      Top             =   4680
+      Left            =   5400
+      TabIndex        =   49
+      Top             =   2760
       Width           =   5175
       Begin VB.TextBox txtERMin 
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   2400
-         TabIndex        =   39
+         TabIndex        =   51
          Text            =   "-5"
          Top             =   240
          Width           =   855
@@ -170,7 +167,7 @@ Begin VB.Form frmUMCDltPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   3720
-         TabIndex        =   41
+         TabIndex        =   53
          Text            =   "5"
          Top             =   240
          Width           =   855
@@ -180,7 +177,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Ambiguous pairs exclusion keeps most confident pair"
          Height          =   255
          Left            =   120
-         TabIndex        =   42
+         TabIndex        =   54
          Top             =   615
          Value           =   1  'Checked
          Width           =   4485
@@ -191,7 +188,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   255
          Index           =   2
          Left            =   3360
-         TabIndex        =   40
+         TabIndex        =   52
          Top             =   255
          Width           =   255
       End
@@ -200,7 +197,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "ER Inclusion Range:"
          Height          =   255
          Left            =   120
-         TabIndex        =   38
+         TabIndex        =   50
          Top             =   255
          Width           =   2175
       End
@@ -210,15 +207,15 @@ Begin VB.Form frmUMCDltPairs
       Caption         =   "Pair Search and ER Calculation Options"
       Height          =   2535
       Left            =   120
-      TabIndex        =   43
-      Top             =   5760
+      TabIndex        =   55
+      Top             =   3960
       Width           =   5175
       Begin VB.CheckBox chkOutlierRemovalUsesSymmetricERs 
          BackColor       =   &H00C0FFC0&
          Caption         =   "Use symmetric ERs"
          Height          =   300
          Left            =   360
-         TabIndex        =   52
+         TabIndex        =   64
          Top             =   2160
          Value           =   1  'Checked
          Width           =   2175
@@ -227,7 +224,7 @@ Begin VB.Form frmUMCDltPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   4320
-         TabIndex        =   53
+         TabIndex        =   66
          Text            =   "3"
          Top             =   2000
          Width           =   615
@@ -237,7 +234,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Repeatedly remove outliers"
          Height          =   300
          Left            =   360
-         TabIndex        =   51
+         TabIndex        =   63
          Top             =   1920
          Value           =   1  'Checked
          Width           =   2415
@@ -247,7 +244,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Remove outlier ER values using Grubb's test (95% conf.)"
          Height          =   255
          Left            =   120
-         TabIndex        =   50
+         TabIndex        =   62
          Top             =   1680
          Value           =   1  'Checked
          Width           =   4695
@@ -257,7 +254,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Enable I-Report ER computation"
          Height          =   255
          Left            =   120
-         TabIndex        =   49
+         TabIndex        =   61
          Top             =   1360
          Value           =   1  'Checked
          Width           =   3375
@@ -266,7 +263,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   315
          Left            =   3000
          Style           =   2  'Dropdown List
-         TabIndex        =   47
+         TabIndex        =   59
          Top             =   720
          Width           =   2055
       End
@@ -275,7 +272,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Average ER's for all charge states"
          Height          =   255
          Left            =   120
-         TabIndex        =   46
+         TabIndex        =   58
          Top             =   765
          Value           =   1  'Checked
          Width           =   2895
@@ -285,7 +282,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Compute ER Scan by Scan"
          Height          =   255
          Left            =   120
-         TabIndex        =   48
+         TabIndex        =   60
          Top             =   1080
          Value           =   1  'Checked
          Width           =   2655
@@ -295,7 +292,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Require matching charge states for pair"
          Height          =   255
          Left            =   120
-         TabIndex        =   44
+         TabIndex        =   56
          Top             =   240
          Value           =   1  'Checked
          Width           =   3255
@@ -305,7 +302,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Use identical charge states for expression ratio"
          Height          =   255
          Left            =   120
-         TabIndex        =   45
+         TabIndex        =   57
          Top             =   495
          Value           =   1  'Checked
          Width           =   4095
@@ -315,7 +312,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Minimum final data point count"
          Height          =   400
          Left            =   2880
-         TabIndex        =   55
+         TabIndex        =   65
          Top             =   1940
          Width           =   1455
       End
@@ -323,36 +320,57 @@ Begin VB.Form frmUMCDltPairs
    Begin VB.Frame fraToleranceOptions 
       BackColor       =   &H00C0FFC0&
       Caption         =   "Tolerance Options"
-      Height          =   1935
-      Left            =   120
-      TabIndex        =   29
-      Top             =   2640
+      Height          =   2175
+      Left            =   5400
+      TabIndex        =   38
+      Top             =   480
       Width           =   5175
+      Begin VB.OptionButton optPairTolType 
+         BackColor       =   &H00C0FFC0&
+         Caption         =   "&ppm"
+         Height          =   255
+         Index           =   0
+         Left            =   2760
+         TabIndex        =   41
+         Top             =   240
+         Width           =   855
+      End
+      Begin VB.OptionButton optPairTolType 
+         BackColor       =   &H00C0FFC0&
+         Caption         =   "&Dalton"
+         Height          =   255
+         Index           =   1
+         Left            =   2760
+         TabIndex        =   42
+         Top             =   480
+         Value           =   -1  'True
+         Width           =   855
+      End
       Begin VB.TextBox txtPairTol 
          Alignment       =   1  'Right Justify
          Height          =   285
-         Left            =   1440
-         TabIndex        =   31
+         Left            =   1800
+         TabIndex        =   40
          Text            =   "0.02"
-         Top             =   240
+         Top             =   360
          Width           =   855
       End
       Begin VB.TextBox txtPairsScanTolApex 
          Alignment       =   1  'Right Justify
          Height          =   285
-         Left            =   3840
-         TabIndex        =   36
+         Left            =   3960
+         TabIndex        =   48
          Text            =   "15"
-         Top             =   1560
+         Top             =   1800
          Width           =   495
       End
       Begin VB.TextBox txtPairsScanTolEdge 
          Alignment       =   1  'Right Justify
          Height          =   285
-         Left            =   3840
-         TabIndex        =   34
+         Left            =   3960
+         TabIndex        =   45
          Text            =   "15"
-         Top             =   600
+         Top             =   840
          Width           =   495
       End
       Begin VB.CheckBox chkPairsRequireOverlapAtApex 
@@ -360,9 +378,9 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Require pair-classes &overlap at feature apexes"
          Height          =   255
          Left            =   120
-         TabIndex        =   35
+         TabIndex        =   47
          ToolTipText     =   "If checked pair classes have to show at least once in the same scan"
-         Top             =   1560
+         Top             =   1800
          Value           =   1  'Checked
          Width           =   3840
       End
@@ -371,9 +389,9 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Require pair-classes &overlap at feature edges"
          Height          =   255
          Left            =   120
-         TabIndex        =   32
+         TabIndex        =   43
          ToolTipText     =   "If checked pair classes have to show at least once in the same scan"
-         Top             =   615
+         Top             =   855
          Value           =   1  'Checked
          Width           =   3600
       End
@@ -382,48 +400,76 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   $"frmUMCDltPairs.frx":030A
          Height          =   615
          Left            =   240
-         TabIndex        =   58
-         Top             =   920
+         TabIndex        =   46
+         Top             =   1155
          Width           =   4815
-      End
-      Begin VB.Label lblUnits 
-         BackStyle       =   0  'Transparent
-         Caption         =   "Da"
-         Height          =   255
-         Left            =   2400
-         TabIndex        =   57
-         Top             =   250
-         Width           =   615
       End
       Begin VB.Label Label1 
          BackStyle       =   0  'Transparent
          Caption         =   "Scan Tolerance:"
          Height          =   255
          Index           =   5
-         Left            =   3600
-         TabIndex        =   33
-         Top             =   315
+         Left            =   3720
+         TabIndex        =   44
+         Top             =   600
          Width           =   1335
       End
       Begin VB.Label Label1 
          BackStyle       =   0  'Transparent
-         Caption         =   "Pair Tolerance:"
+         Caption         =   "Pair Mass Tolerance:"
          Height          =   255
          Index           =   3
          Left            =   120
-         TabIndex        =   30
-         Top             =   250
-         Width           =   1335
+         TabIndex        =   39
+         Top             =   360
+         Width           =   1575
       End
    End
    Begin VB.Frame fraDeltaOptions 
       BackColor       =   &H00C0FFC0&
       Caption         =   "Delta Mass Options"
-      Height          =   2145
+      Height          =   3465
       Left            =   120
       TabIndex        =   3
       Top             =   480
       Width           =   5175
+      Begin VB.TextBox txtN15PercentIncorporationStep 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   3120
+         TabIndex        =   25
+         Text            =   "1"
+         Top             =   3000
+         Width           =   855
+      End
+      Begin VB.TextBox txtN15PercentIncorporationMaximum 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   3120
+         TabIndex        =   23
+         Text            =   "95"
+         Top             =   2700
+         Width           =   855
+      End
+      Begin VB.TextBox txtN15PercentIncorporationMinimum 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   3120
+         TabIndex        =   21
+         Text            =   "95"
+         Top             =   2400
+         Width           =   855
+      End
+      Begin VB.CheckBox chkN14N15IncompleteIncorporationMode 
+         BackColor       =   &H00C0FFC0&
+         Caption         =   "Enable N14/N15 Incomplete Incorporation Mode"
+         Height          =   615
+         Left            =   120
+         TabIndex        =   18
+         Top             =   2400
+         Value           =   1  'Checked
+         Width           =   1845
+      End
       Begin VB.TextBox txtDeltaStepSize 
          Alignment       =   1  'Right Justify
          Height          =   285
@@ -481,7 +527,7 @@ Begin VB.Form frmUMCDltPairs
             Caption         =   "Set to Deuterium"
             Height          =   300
             Left            =   1680
-            TabIndex        =   56
+            TabIndex        =   17
             Top             =   320
             Width           =   1455
          End
@@ -509,6 +555,46 @@ Begin VB.Form frmUMCDltPairs
             Top             =   0
             Width           =   1455
          End
+      End
+      Begin VB.Label Label4 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Percent Incorporation Range"
+         Height          =   255
+         Index           =   4
+         Left            =   2280
+         TabIndex        =   19
+         Top             =   2160
+         Width           =   2415
+      End
+      Begin VB.Label Label4 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Step"
+         Height          =   255
+         Index           =   3
+         Left            =   2280
+         TabIndex        =   24
+         Top             =   3020
+         Width           =   735
+      End
+      Begin VB.Label Label4 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Maximum"
+         Height          =   255
+         Index           =   2
+         Left            =   2280
+         TabIndex        =   22
+         Top             =   2720
+         Width           =   735
+      End
+      Begin VB.Label Label4 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Minimum"
+         Height          =   255
+         Index           =   1
+         Left            =   2280
+         TabIndex        =   20
+         Top             =   2420
+         Width           =   735
       End
       Begin VB.Label Label1 
          BackStyle       =   0  'Transparent
@@ -561,11 +647,11 @@ Begin VB.Form frmUMCDltPairs
    End
    Begin VB.Label lblStatus 
       BackStyle       =   0  'Transparent
-      Height          =   840
+      Height          =   600
       Left            =   120
-      TabIndex        =   54
-      Top             =   8280
-      Width           =   5295
+      TabIndex        =   67
+      Top             =   6600
+      Width           =   10455
    End
    Begin VB.Menu mnuFunction 
       Caption         =   "&Function"
@@ -719,6 +805,28 @@ Private Sub ClearAllPairs()
     DestroyDltLblPairs CallerID
 End Sub
 
+Private Sub EnableDisableN14N15IncompleteIncorporationMode()
+    Dim blnIncompleteModeEnabled As Boolean
+    
+    blnIncompleteModeEnabled = cChkBox(chkN14N15IncompleteIncorporationMode)
+    
+    If blnIncompleteModeEnabled Then
+        SetPairSearchDeltas glN14N15_DELTA, 1, 100
+        EnableDisableScanByScanAndIReport False
+    End If
+    
+    txtDelta.Enabled = Not blnIncompleteModeEnabled
+    txtN15PercentIncorporationMinimum.Enabled = blnIncompleteModeEnabled
+    txtN15PercentIncorporationMaximum.Enabled = blnIncompleteModeEnabled
+    txtN15PercentIncorporationStep.Enabled = blnIncompleteModeEnabled
+    
+    cmdSetToN15.Enabled = Not blnIncompleteModeEnabled
+    cmdSetToC13.Enabled = Not blnIncompleteModeEnabled
+    cmdSetToO18.Enabled = Not blnIncompleteModeEnabled
+    cmdSetDeuterium.Enabled = Not blnIncompleteModeEnabled
+    
+End Sub
+
 Private Sub EnableDisableScanByScanAndIReport(blnEnable As Boolean)
     If cChkBox(chkComputeERScanByScan) <> blnEnable Then
         SetCheckBox chkComputeERScanByScan, blnEnable
@@ -764,7 +872,7 @@ End Sub
 Public Function FindPairsWrapper(Optional blnShowMessages As Boolean = True) As Boolean
     ' Returns True if success, False if error or searching was cancelled prematurely
 
-Dim eResponse As VbMsgBoxResult
+Dim eResponse As vbMsgBoxResult
 Dim blnSuccess As Boolean
 
 On Error GoTo exit_cmdFindPairs
@@ -804,11 +912,15 @@ FindPairsWrapper = blnSuccess
 End Function
 
 Private Function FindPairs(ePairFormMode As pfmPairFormMode, Optional blnShowMessages As Boolean = True) As Boolean
+    
 '-----------------------------------------------------
 'Delta pairing function; finds and put into structure all potential pairs
 ' pairs based on numerical criteria
 'Returns True if success, False if error or searching was cancelled prematurely
 '-----------------------------------------------------
+
+Static WarnedUserInapproporiateMassModeForN14N15 As Boolean
+
 Dim lngIndexLight As Long, lngIndexHeavy As Long
 Dim ClsMinDelta As Long
 Dim ClsMaxDelta As Long
@@ -818,7 +930,9 @@ Dim LClsMW As Double            ' Light member MW
 Dim HClsMW As Double            ' Heavy member mw
 Dim OverlapOK As Boolean
 
+Dim strStatus As String
 Dim strSearchMode As String, strMessage As String
+Dim eResponse As vbMsgBoxResult
 Dim blnDeltaInfo As Boolean, blnLabelInfo As Boolean
 
 Dim blnSuccess As Boolean
@@ -837,6 +951,37 @@ Case Else
     FindPairs = False
     Exit Function
 End Select
+
+' Validate the N15 incorporation settings
+If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+    ValidateN15IncorporationSettings
+    
+    ' See if the UMC mass values are based on average masses; warn the user if they're not
+    If GelUMC(CallerID).def.MWField <> isfMWAvg Then
+        strMessage = "Warning: The N14/N15 incomplete incorporation mode is designed to be used with LC-MS Features that have class masses based on the average masses of the members of the LC-MS feature.  The features in memory have mass values based on the "
+        If GelUMC(CallerID).def.MWField = isfMWTMA Then
+            strMessage = strMessage & "most abundant molecular"
+        Else
+            strMessage = strMessage & "monoisotopic"
+        End If
+        strMessage = strMessage & " masses of the members of the LC-MS Feature.  The pair spacing values computed may not be appropriate for this mass type."
+        
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            AddToAnalysisHistory CallerID, strMessage
+        Else
+            If blnShowMessages Then
+                If Not WarnedUserInapproporiateMassModeForN14N15 Then
+                    strMessage = strMessage & " Continue finding pairs?"
+                    eResponse = MsgBox(strMessage, vbYesNoCancel + vbDefaultButton3, "Invalid Mass Mode")
+                    If eResponse <> vbYes Then Exit Function
+                    
+                    WarnedUserInapproporiateMassModeForN14N15 = True
+                End If
+            End If
+        End If
+    End If
+End If
+
 
 mPairInfoChanged = True
 
@@ -877,6 +1022,15 @@ If blnSuccess Then
         ClsStepDelta = GelP_D_L(CallerID).SearchDef.DeltaStepSize
     End With
    
+    With glbPreferencesExpanded.PairSearchOptions.SearchDef
+        If .N15IncompleteIncorporationMode Then
+            ' Check that the values are <= 100 to avoid overflow errors
+            If .N15PercentIncorporationMinimum > 100 Then .N15PercentIncorporationMinimum = 100
+            If .N15PercentIncorporationMaximum > 100 Then .N15PercentIncorporationMaximum = 100
+            If .N15PercentIncorporationStep > 100 Then .N15PercentIncorporationStep = 100
+        End If
+    End With
+    
     ' Step through the LC-MS Features, treating each lngIndexHeavy'th UMC as the heavy member of the pair
     For lngIndexHeavy = 0 To GelUMC(CallerID).UMCCnt - 1
         HClsMW = GelUMC(CallerID).UMCs(lngIndexHeavy).ClassMW
@@ -887,7 +1041,9 @@ If blnSuccess Then
            ClsMinDelta = CLng(0.5 * ClsMidDelta)
            ClsMaxDelta = CLng(1.5 * ClsMidDelta)
         End If
-        UpdateStatus "Examining LC-MS Features: " & Trim(lngIndexHeavy + 1) & " / " & Trim(GelUMC(CallerID).UMCCnt) & "; Pairs found: " & Trim(GelP_D_L(CallerID).PCnt)
+        
+        strStatus = "Examining LC-MS Features: " & Trim(lngIndexHeavy + 1) & " / " & Trim(GelUMC(CallerID).UMCCnt) & "; Pairs found: " & Trim(GelP_D_L(CallerID).PCnt)
+        UpdateStatus strStatus
         If mAbortProcess Then Exit For
        
         ' Step through the LC-MS Features, treating each lngIndexLight'th UMC as the light member of the pair
@@ -997,7 +1153,7 @@ If blnSuccess Then
                 strMessage = strMessage & "; Max difference in number of labels = " & Trim(.MaxDifferenceInNumberOfLightHeavyLabels)
             End If
             
-            strMessage = strMessage & "; Pair Tolerance = " & Trim(.DeltaMassTolerance) & " Da"
+            strMessage = strMessage & "; Pair Tolerance = " & Trim(.DeltaMassTolerance) & " " & GetSearchToleranceUnitText(CInt(.DeltaMassTolType))
         
             strMessage = strMessage & "; Scan Tolerance at Edges = " & Trim(.ScanTolerance) & "; Require Overlap at Edges = " & CStr(.RequireUMCOverlap)
             strMessage = strMessage & "; Scan Tolerance at Apex = " & Trim(.ScanToleranceAtApex) & "; Require Overlap at Apex = " & CStr(.RequireUMCOverlapAtApex)
@@ -1007,7 +1163,15 @@ If blnSuccess Then
             strMessage = strMessage & "; Compute ER Scan by Scan = " & CStr(.ComputeERScanByScan)
             strMessage = strMessage & "; Avg ER All Charge States = " & CStr(.AverageERsAllChargeStates)
             strMessage = strMessage & "; Avg ERs Weighting Mode = " & CStr(.AverageERsWeightingMode)
+        End With
         
+        With glbPreferencesExpanded.PairSearchOptions.SearchDef
+            If .N15IncompleteIncorporationMode Then
+                strMessage = strMessage & "; N15 Incomplete Incorporation Search Enabled"
+                strMessage = strMessage & "; Minimum Incorporation = " & Round(.N15PercentIncorporationMinimum, 1) & "%"
+                strMessage = strMessage & "; Maximum Incorporation = " & Round(.N15PercentIncorporationMaximum, 1) & "%"
+                strMessage = strMessage & "; Step size = " & Round(.N15PercentIncorporationStep, 1) & "%"
+            End If
         End With
         
         AddToAnalysisHistory CallerID, strMessage
@@ -1056,7 +1220,9 @@ Resume exit_Cleanup
 
 End Function
 
-Private Sub FindPairsWorkDelta(blnShowMessages As Boolean, LClsMW As Double, HClsMW As Double, lngIndexLight As Long, lngIndexHeavy As Long, ClsMinDelta As Long, ClsMaxDelta As Long, ClsStepDelta As Long)
+Private Sub FindPairsWorkDelta(ByVal blnShowMessages As Boolean, ByVal LClsMW As Double, ByVal HClsMW As Double, ByVal lngIndexLight As Long, ByVal lngIndexHeavy As Long, ByVal ClsMinDelta As Long, ByVal ClsMaxDelta As Long, ByVal ClsStepDelta As Long)
+    Const N15_NATURAL_ABUNDANCE As Single = 0.00368
+    
     '--------------------------------------------------------------
     'create all pairs in which class i is the heavy member
     'since this is Delta calculation light member has to be
@@ -1064,27 +1230,141 @@ Private Sub FindPairsWorkDelta(blnShowMessages As Boolean, LClsMW As Double, HCl
     '--------------------------------------------------------------
 
     Dim lngDeltaCnt As Long
+    Dim dblDeltaMassToCheck As Double
+    Dim dblMassTolerance As Double
     Dim MWDiff As Double
     Dim lngStepSize As Long
     
+    Dim blnPairFound As Boolean
+    
+    Dim intN15Incorporation10x As Integer
+    Dim intN15IncorporationStart10x As Integer
+    Dim intN15IncorporationEnd10x As Integer
+    Dim intN15IncorporationStep10x As Integer
+    Dim sngN15IncorporationFraction As Single
+    
+    Dim intArrayIndexMax As Integer
+    Dim intCandidateCount As Integer
+    Static lngCandidateDeltaCounts() As Long
+    Static sngCandidateIncorporationVals() As Single
+    Static sngCandidateMassDiff() As Single
+    
+    Dim intIndex As Integer
+    Dim intCandidateIndexBest As Integer
+
     If ClsStepDelta > 0 Then
         lngStepSize = ClsStepDelta
     Else
         lngStepSize = 1
     End If
-    
+
     If LClsMW < HClsMW Then
-        With GelP_D_L(CallerID)
-            For lngDeltaCnt = ClsMinDelta To ClsMaxDelta Step lngStepSize
-                MWDiff = HClsMW - (LClsMW + lngDeltaCnt * .SearchDef.DeltaMass)
-                If Abs(MWDiff) <= .SearchDef.DeltaMassTolerance Then
-                    FindPairsWorkValidatePair blnShowMessages, lngIndexLight, lngIndexHeavy, lngDeltaCnt, 0, 0
+        
+        With glbPreferencesExpanded.PairSearchOptions.SearchDef
+            If .N15IncompleteIncorporationMode Then
+                ' Multiplying the values by 10 and then using Int() to round to one decimal place and allow for integer values in the For Loop
+                intN15IncorporationStart10x = Int(.N15PercentIncorporationMinimum * 10)
+                intN15IncorporationEnd10x = Int(.N15PercentIncorporationMaximum * 10)
+                intN15IncorporationStep10x = Int(.N15PercentIncorporationStep * 10)
+                
+                ' Reserve space for 10 candidates
+                intCandidateCount = 0
+                
+                ' The following code is used to determine whether or not lngCandidateDeltaCounts has yet been initialized
+                On Error Resume Next
+                intArrayIndexMax = 0
+                intArrayIndexMax = UBound(lngCandidateDeltaCounts)
+                On Error GoTo 0
+                
+                If intArrayIndexMax < 9 Then
+                    intArrayIndexMax = 9
+                    ReDim lngCandidateDeltaCounts(intArrayIndexMax)
+                    ReDim sngCandidateIncorporationVals(intArrayIndexMax)
+                    ReDim sngCandidateMassDiff(intArrayIndexMax)
                 End If
-                If MWDiff < -.SearchDef.DeltaMassTolerance Or mAbortProcess Then
-                    Exit For
-                End If
-            Next lngDeltaCnt
+            Else
+                intN15IncorporationStart10x = 1000
+                intN15IncorporationEnd10x = 1000
+                intN15IncorporationStep10x = 10
+            End If
         End With
+
+        If GelP_D_L(CallerID).SearchDef.DeltaMassTolType = gltPPM Then
+            dblMassTolerance = PPMToMass(GelP_D_L(CallerID).SearchDef.DeltaMassTolerance, LClsMW)
+        Else
+            dblMassTolerance = GelP_D_L(CallerID).SearchDef.DeltaMassTolerance
+        End If
+
+        blnPairFound = False
+        For intN15Incorporation10x = intN15IncorporationStart10x To intN15IncorporationEnd10x Step intN15IncorporationStep10x
+            sngN15IncorporationFraction = intN15Incorporation10x / 1000#
+            
+            With GelP_D_L(CallerID)
+                For lngDeltaCnt = ClsMinDelta To ClsMaxDelta Step lngStepSize
+                    If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+                        dblDeltaMassToCheck = (sngN15IncorporationFraction - N15_NATURAL_ABUNDANCE) * lngDeltaCnt * glN14N15_DELTA
+                    Else
+                        dblDeltaMassToCheck = lngDeltaCnt * .SearchDef.DeltaMass
+                    End If
+                    
+                    MWDiff = HClsMW - (LClsMW + dblDeltaMassToCheck)
+                    
+                    If Abs(MWDiff) <= dblMassTolerance Then
+                        blnPairFound = FindPairsWorkValidatePair(lngIndexLight, lngIndexHeavy, lngDeltaCnt, 0, 0)
+                        If blnPairFound Then
+                            If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+                                ' Cache this found pair
+                                If intCandidateCount > UBound(lngCandidateDeltaCounts) Then
+                                    intArrayIndexMax = (UBound(lngCandidateDeltaCounts) + 1) * 2 - 1
+                                    ReDim Preserve lngCandidateDeltaCounts(intArrayIndexMax)
+                                    ReDim Preserve sngCandidateIncorporationVals(intArrayIndexMax)
+                                    ReDim Preserve sngCandidateMassDiff(intArrayIndexMax)
+                                End If
+                                
+                                lngCandidateDeltaCounts(intCandidateCount) = lngDeltaCnt
+                                sngCandidateIncorporationVals(intCandidateCount) = sngN15IncorporationFraction
+                                sngCandidateMassDiff(intCandidateCount) = Abs(MWDiff)
+                                intCandidateCount = intCandidateCount + 1
+                            Else
+                                ' Store the found pair
+                                FindPairsWorkAddPair blnShowMessages, lngIndexLight, lngIndexHeavy, lngDeltaCnt, 0, 0, sngN15IncorporationFraction
+                            End If
+                        End If
+                        
+                        ' Since the mass was in tolerance, we can exit this For loop
+                        Exit For
+                    End If
+                    
+                    If MWDiff < -dblMassTolerance Or mAbortProcess Then
+                        Exit For
+                    End If
+                Next lngDeltaCnt
+            End With
+            
+            If mAbortProcess Then Exit For
+            If Not glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+                If blnPairFound Then Exit For
+            End If
+        Next intN15Incorporation10x
+        
+        If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+            If intCandidateCount > 0 Then
+                ' Need to find the best candidate (the one with the smallest value in sngCandidateMassDiff)
+                intCandidateIndexBest = 0
+                If intCandidateCount > 1 Then
+                    For intIndex = 1 To intCandidateCount - 1
+                        If sngCandidateMassDiff(intIndex) < sngCandidateMassDiff(intCandidateIndexBest) Then
+                            intCandidateIndexBest = intIndex
+                        End If
+                    Next intIndex
+                End If
+                
+                ' Store the found pair
+                lngDeltaCnt = lngCandidateDeltaCounts(intCandidateIndexBest)
+                sngN15IncorporationFraction = sngCandidateIncorporationVals(intCandidateIndexBest)
+                FindPairsWorkAddPair blnShowMessages, lngIndexLight, lngIndexHeavy, lngDeltaCnt, 0, 0, sngN15IncorporationFraction
+            End If
+        End If
     End If
 
 End Sub
@@ -1099,6 +1379,13 @@ Private Sub FindPairsWorkLabeled(blnShowMessages As Boolean, LClsMW As Double, H
     Dim LblCntHvy As Long
     Dim LblCntLgt As Long
     Dim MWDiff As Double
+    Dim dblMassTolerance As Double
+    
+    If GelP_D_L(CallerID).SearchDef.DeltaMassTolType = gltPPM Then
+        dblMassTolerance = PPMToMass(GelP_D_L(CallerID).SearchDef.DeltaMassTolerance, LClsMW)
+    Else
+        dblMassTolerance = GelP_D_L(CallerID).SearchDef.DeltaMassTolerance
+    End If
     
     MWDiff = HClsMW - LClsMW
     With GelP_D_L(CallerID)
@@ -1109,8 +1396,11 @@ Private Sub FindPairsWorkLabeled(blnShowMessages As Boolean, LClsMW As Double, H
                     For LblCntLgt = .SearchDef.LabelCountMin To .SearchDef.LabelCountMax
                         If (LClsMW - LblCntLgt * .SearchDef.LightLabelMass > 0) Then         'don't consider impossible pairs
                             If Abs(LblCntHvy - LblCntLgt) <= .SearchDef.MaxDifferenceInNumberOfLightHeavyLabels And (LblCntHvy + LblCntLgt) > 0 Then
-                                If Abs(MWDiff - ((LblCntHvy - LblCntLgt) * .SearchDef.LightLabelMass + LblCntHvy * .SearchDef.HeavyLightMassDifference)) <= .SearchDef.DeltaMassTolerance Then
-                                    FindPairsWorkValidatePair blnShowMessages, lngIndexLight, lngIndexHeavy, 0, LblCntLgt, LblCntHvy
+                                If Abs(MWDiff - ((LblCntHvy - LblCntLgt) * .SearchDef.LightLabelMass + LblCntHvy * .SearchDef.HeavyLightMassDifference)) <= dblMassTolerance Then
+                                    If FindPairsWorkValidatePair(lngIndexLight, lngIndexHeavy, 0, LblCntLgt, LblCntHvy) Then
+                                        FindPairsWorkAddPair blnShowMessages, lngIndexLight, lngIndexHeavy, 0, LblCntLgt, LblCntHvy, 0
+                                    End If
+                                    Exit For
                                 End If
                             End If
                         End If
@@ -1123,8 +1413,11 @@ Private Sub FindPairsWorkLabeled(blnShowMessages As Boolean, LClsMW As Double, H
             For LblCntHvy = .SearchDef.LabelCountMin To .SearchDef.LabelCountMax
                 If (LClsMW - LblCntHvy * .SearchDef.LightLabelMass > 0) Then       'don't consider impossible pairs
                     If (HClsMW - LblCntHvy * (.SearchDef.LightLabelMass + .SearchDef.HeavyLightMassDifference) > 0) Then
-                        If Abs(MWDiff - LblCntHvy * .SearchDef.HeavyLightMassDifference) <= .SearchDef.DeltaMassTolerance Then
-                            FindPairsWorkValidatePair blnShowMessages, lngIndexLight, lngIndexHeavy, 0, LblCntHvy, LblCntHvy
+                        If Abs(MWDiff - LblCntHvy * .SearchDef.HeavyLightMassDifference) <= dblMassTolerance Then
+                            If FindPairsWorkValidatePair(lngIndexLight, lngIndexHeavy, 0, LblCntHvy, LblCntHvy) Then
+                                FindPairsWorkAddPair blnShowMessages, lngIndexLight, lngIndexHeavy, 0, LblCntHvy, LblCntHvy, 0
+                            End If
+                            Exit For
                         End If
                     End If
                 End If
@@ -1149,6 +1442,7 @@ Private Sub FindPairsWorkDeltaLabeled(blnShowMessages As Boolean, LClsMW As Doub
 
     Dim lngDeltaCnt As Long
     Dim MWDiff As Double
+    Dim dblMassTolerance As Double
     Dim lngStepSize As Long
     
     If ClsStepDelta > 0 Then
@@ -1157,14 +1451,23 @@ Private Sub FindPairsWorkDeltaLabeled(blnShowMessages As Boolean, LClsMW As Doub
         lngStepSize = 1
     End If
     
+    If GelP_D_L(CallerID).SearchDef.DeltaMassTolType = gltPPM Then
+        dblMassTolerance = PPMToMass(GelP_D_L(CallerID).SearchDef.DeltaMassTolerance, LClsMW)
+    Else
+        dblMassTolerance = GelP_D_L(CallerID).SearchDef.DeltaMassTolerance
+    End If
+    
     If LClsMW < HClsMW Then
         With GelP_D_L(CallerID)
             For lngDeltaCnt = ClsMinDelta To ClsMaxDelta Step lngStepSize
                 MWDiff = HClsMW - (LClsMW + lngDeltaCnt * .SearchDef.DeltaMass)
-                If Abs(MWDiff) <= .SearchDef.DeltaMassTolerance Then
-                    FindPairsWorkValidatePair blnShowMessages, lngIndexLight, lngIndexHeavy, lngDeltaCnt, 0, 0
+                If Abs(MWDiff) <= dblMassTolerance Then
+                    If FindPairsWorkValidatePair(lngIndexLight, lngIndexHeavy, lngDeltaCnt, 0, 0) Then
+                        FindPairsWorkAddPair blnShowMessages, lngIndexLight, lngIndexHeavy, lngDeltaCnt, 0, 0, 0
+                    End If
+                    Exit For
                 End If
-                If MWDiff < -.SearchDef.DeltaMassTolerance Or mAbortProcess Then
+                If MWDiff < -dblMassTolerance Or mAbortProcess Then
                     Exit For
                 End If
             Next lngDeltaCnt
@@ -1172,43 +1475,54 @@ Private Sub FindPairsWorkDeltaLabeled(blnShowMessages As Boolean, LClsMW As Doub
     End If
 End Sub
 
-Private Sub FindPairsWorkValidatePair(blnShowMessages As Boolean, lngIndexLight As Long, lngIndexHeavy As Long, DeltaCnt As Long, LblCntLgt As Long, LblCntHvy As Long)
+Private Function FindPairsWorkValidatePair(ByVal lngIndexLight As Long, ByVal lngIndexHeavy As Long, ByVal DeltaCnt As Long, ByVal LblCntLgt As Long, ByVal LblCntHvy As Long) As Boolean
+    ' Checks whether or not the UMCs overlap properly (if required) and have matching charge states (if required)
+    ' Returns True if the UMCs make a valid pair
+    
     Dim blnPairOK As Boolean
     
-    With GelP_D_L(CallerID)
-        If .SearchDef.RequireUMCOverlap Then
-            ' See if pairs overlap at the edges within Scan Tolerance
-            blnPairOK = PairsOverlapAtEdgesWithinTol(CallerID, lngIndexLight, lngIndexHeavy, .SearchDef.ScanTolerance)
-        Else
-            blnPairOK = True
+    blnPairOK = False
+   
+    If GelP_D_L(CallerID).SearchDef.RequireUMCOverlap Then
+        ' See if pairs overlap at the edges within Scan Tolerance
+        blnPairOK = PairsOverlapAtEdgesWithinTol(CallerID, lngIndexLight, lngIndexHeavy, GelP_D_L(CallerID).SearchDef.ScanTolerance)
+    Else
+        blnPairOK = True
+    End If
+    
+    If blnPairOK Then
+        If GelP_D_L(CallerID).SearchDef.RequireMatchingChargeStatesForPairMembers Then
+            ' See if pairs contain matching charge states
+            blnPairOK = ChargeStatesMatch(CallerID, lngIndexLight, lngIndexHeavy)
         End If
-        
-        If blnPairOK Then
-            If .SearchDef.RequireMatchingChargeStatesForPairMembers Then
-                ' See if pairs contain matching charge states
-                blnPairOK = ChargeStatesMatch(CallerID, lngIndexLight, lngIndexHeavy)
-            End If
-            
-            If blnPairOK Then
-                If ValidatePairArraySpace(blnShowMessages) Then
-                    .PCnt = .PCnt + 1
-                    With .Pairs(.PCnt - 1)
-                        .P1 = lngIndexLight
-                        .P2 = lngIndexHeavy
-                        .P2DltCnt = DeltaCnt
-                        .P1LblCnt = LblCntLgt
-                        .P2LblCnt = LblCntHvy
-                    End With
-                Else
-                    ' Memory management error
-                    Debug.Assert False
-                    mAbortProcess = True
-                End If
-            End If
-        End If
-    End With
+    End If
+    
+    FindPairsWorkValidatePair = blnPairOK
+    
+End Function
+
+Private Sub FindPairsWorkAddPair(ByVal blnShowMessages As Boolean, ByVal lngIndexLight As Long, ByVal lngIndexHeavy As Long, ByVal DeltaCnt As Long, ByVal LblCntLgt As Long, ByVal LblCntHvy As Long, ByVal sngDeltaMassFractionIncorporation As Single)
+    
+    If ValidatePairArraySpace(blnShowMessages) Then
+        With GelP_D_L(CallerID)
+            .PCnt = .PCnt + 1
+            With .Pairs(.PCnt - 1)
+                .P1 = lngIndexLight
+                .P2 = lngIndexHeavy
+                .P2DltCnt = DeltaCnt
+                .P1LblCnt = LblCntLgt
+                .P2LblCnt = LblCntHvy
+                .DeltaAtomPercentIncorporation = sngDeltaMassFractionIncorporation * 100    ' Convert to value between 0 and 100
+            End With
+        End With
+    Else
+        ' Memory management error
+        Debug.Assert False
+        mAbortProcess = True
+    End If
     
 End Sub
+
 
 Private Function GenerateERStat() As Boolean
 '-----------------------------------------------------
@@ -1273,31 +1587,31 @@ With GelP_D_L(CallerID)
            Loop
            'add counts
            ERAllS.ERCnt = ERAllS.ERCnt + 1
-           If .Pairs(i).STATE = glPAIR_Inc Then
+           If .Pairs(i).State = glPAIR_Inc Then
               ERIncS.ERCnt = ERIncS.ERCnt + 1
-           ElseIf .Pairs(i).STATE = glPAIR_Exc Then
+           ElseIf .Pairs(i).State = glPAIR_Exc Then
               ERExcS.ERCnt = ERExcS.ERCnt + 1
            End If
            Select Case BinInd
            Case Is < 0
                 ERAllS.ERBadL = ERAllS.ERBadL + 1
-                If .Pairs(i).STATE = glPAIR_Inc Then
+                If .Pairs(i).State = glPAIR_Inc Then
                     ERIncS.ERBadL = ERIncS.ERBadL + 1
-                ElseIf .Pairs(i).STATE = glPAIR_Exc Then
+                ElseIf .Pairs(i).State = glPAIR_Exc Then
                     ERExcS.ERBadL = ERExcS.ERBadL + 1
                 End If
            Case Is > 1000
                 ERAllS.ERBadR = ERAllS.ERBadR + 1
-                If .Pairs(i).STATE = glPAIR_Inc Then
+                If .Pairs(i).State = glPAIR_Inc Then
                     ERIncS.ERBadR = ERIncS.ERBadR + 1
-                ElseIf .Pairs(i).STATE = glPAIR_Exc Then
+                ElseIf .Pairs(i).State = glPAIR_Exc Then
                     ERExcS.ERBadR = ERExcS.ERBadR + 1
                 End If
            Case Else            'some of our cases
                 ERBinAll(BinInd) = ERBinAll(BinInd) + 1
-                If .Pairs(i).STATE = glPAIR_Inc Then
+                If .Pairs(i).State = glPAIR_Inc Then
                    ERBinInc(BinInd) = ERBinInc(BinInd) + 1
-                ElseIf .Pairs(i).STATE = glPAIR_Exc Then
+                ElseIf .Pairs(i).State = glPAIR_Exc Then
                    ERBinExc(BinInd) = ERBinExc(BinInd) + 1
                 End If
            End Select
@@ -1324,13 +1638,16 @@ Public Sub InitializeForm()
             glbPreferencesExpanded.PairSearchOptions.SearchDef = GelP_D_L(CallerID).SearchDef
         End If
        
+        ' Validate the N15 incorporation settings
+        ValidateN15IncorporationSettings
+       
         With glbPreferencesExpanded.PairSearchOptions
             SetCheckBox chkOutlierRemovalUsesSymmetricERs, .OutlierRemovalUsesSymmetricERs
         End With
         
         With glbPreferencesExpanded.PairSearchOptions.SearchDef
             txtDelta.Text = .DeltaMass
-            
+                        
             SetCheckBox chkAutoMinMaxDelta, .AutoCalculateDeltaMinMaxCount
             txtMinDelta.Text = .DeltaCountMin
             txtMaxDelta.Text = .DeltaCountMax
@@ -1344,8 +1661,19 @@ Public Sub InitializeForm()
             txtMaxLblDiff = .MaxDifferenceInNumberOfLightHeavyLabels
             
             txtPairTol.Text = .DeltaMassTolerance
+            If .DeltaMassTolType = gltPPM Then
+                optPairTolType(0).Value = True
+            Else
+                optPairTolType(1).Value = True
+            End If
+            
             txtPairsScanTolEdge.Text = .ScanTolerance
             txtPairsScanTolApex.Text = .ScanToleranceAtApex
+            
+            SetCheckBox chkN14N15IncompleteIncorporationMode, .N15IncompleteIncorporationMode
+            txtN15PercentIncorporationMinimum.Text = Round(.N15PercentIncorporationMinimum, 1)
+            txtN15PercentIncorporationMaximum.Text = Round(.N15PercentIncorporationMaximum, 1)
+            txtN15PercentIncorporationStep.Text = Round(.N15PercentIncorporationStep, 1)
             
             SetCheckBox chkPairsRequireOverlapAtEdge, .RequireUMCOverlap
             SetCheckBox chkPairsRequireOverlapAtApex, .RequireUMCOverlapAtApex
@@ -1402,6 +1730,9 @@ If mFormMode <> pfmLabel Then
     Call txtMinDelta_LostFocus
     Call txtMaxDelta_LostFocus
     Call txtDeltaStepSize_LostFocus
+    Call txtN15PercentIncorporationMinimum_LostFocus
+    Call txtN15PercentIncorporationMaximum_LostFocus
+    Call txtN15PercentIncorporationStep_LostFocus
 End If
 
 If mFormMode <> pfmDelta Then
@@ -1475,6 +1806,7 @@ Private Sub ReportScanByScanDetails(Optional strFilePath As String = "")
 
     Dim lngAlignedScanCount As Long
     Dim lngScanNumbers() As Long
+    Dim intCharges() As Integer
     Dim dblER() As Double
     Dim dblLtAbundance() As Double
     Dim dblHvAbundance() As Double
@@ -1487,6 +1819,7 @@ On Error GoTo ReportScanByScanDetailsErrorHandler
     Me.MousePointer = vbHourglass
 
     ReDim lngScanNumbers(INITIAL_DIM_COUNT - 1)
+    ReDim intCharges(INITIAL_DIM_COUNT - 1)
     ReDim dblER(INITIAL_DIM_COUNT - 1)
     ReDim dblLtAbundance(INITIAL_DIM_COUNT - 1)
     ReDim dblHvAbundance(INITIAL_DIM_COUNT - 1)
@@ -1535,7 +1868,7 @@ On Error GoTo ReportScanByScanDetailsErrorHandler
             strLineOut = strLineOut & "UMC Heavy Index" & strSepChar & "Heavy MW" & strSepChar & "Heavy Abu" & strSepChar
             strLineOut = strLineOut & "Delta Count" & strSepChar
             strLineOut = strLineOut & "ER" & strSepChar & "ER StDev" & strSepChar & "ER Charge State Basis Count" & strSepChar & "ER Member Basis Count" & strSepChar
-            strLineOut = strLineOut & "Scan_Number" & strSepChar & "Scan_Light_Abundance" & strSepChar & "Scan_Heavy_Abundance" & strSepChar
+            strLineOut = strLineOut & "Scan_Number" & strSepChar & "Charge_State" & strSepChar & "Scan_Light_Abundance" & strSepChar & "Scan_Heavy_Abundance" & strSepChar
             strLineOut = strLineOut & "Scan_Abu2DaCorrected" & strSepChar & "Scan_Abu4DaCorrected" & strSepChar & "Scan_ER"
             ts.WriteLine strLineOut
             
@@ -1558,13 +1891,14 @@ On Error GoTo ReportScanByScanDetailsErrorHandler
                         ts.WriteLine strLineOut
                     Else
                     
-                        mDltLblPairsUMC.GetScanByScanStatsForPair lngPairIndex, lngAlignedScanCount, lngScanNumbers(), dblLtAbundance(), dblHvAbundance(), dblER(), sngAbu2DaCorrected(), sngAbu4DaCorected()
+                        mDltLblPairsUMC.GetScanByScanStatsForPair lngPairIndex, lngAlignedScanCount, lngScanNumbers(), intCharges(), dblLtAbundance(), dblHvAbundance(), dblER(), sngAbu2DaCorrected(), sngAbu4DaCorected()
                         
                         If lngAlignedScanCount = 0 Then
                             ts.WriteLine strLineOut
                         Else
                             For lngAlignedScanIndex = 0 To lngAlignedScanCount - 1
                                 strAdditional = lngScanNumbers(lngAlignedScanIndex) & strSepChar & _
+                                                intCharges(lngAlignedScanIndex) & strSepChar & _
                                                 Round(dblLtAbundance(lngAlignedScanIndex), 6) & strSepChar & _
                                                 Round(dblHvAbundance(lngAlignedScanIndex), 6) & strSepChar & _
                                                 sngAbu2DaCorrected(lngAlignedScanIndex) & strSepChar & _
@@ -1634,7 +1968,7 @@ Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
     
     Const CONTROL_SPACING = 100
     
-    Dim lngToleranceFormTop As Long
+    Dim lngGeneralOptionsFrameTop As Long
     
     mFormMode = eNewFormMode
     
@@ -1649,7 +1983,7 @@ Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
             ' Delta pairs
             fraDeltaOptions.Visible = True
             fraLabelOptions.Visible = False
-            lngToleranceFormTop = fraDeltaOptions.Top + fraDeltaOptions.Height + CONTROL_SPACING
+            lngGeneralOptionsFrameTop = fraDeltaOptions.Top + fraDeltaOptions.Height + CONTROL_SPACING
             Me.Caption = "LC-MS Feature Delta Pairing Analysis"
             
             If txtDelta = "0" Then cmdSetToO18_Click
@@ -1657,7 +1991,7 @@ Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
             ' Label pairs
             fraDeltaOptions.Visible = False
             fraLabelOptions.Visible = True
-            lngToleranceFormTop = fraLabelOptions.Top + fraLabelOptions.Height + CONTROL_SPACING
+            lngGeneralOptionsFrameTop = fraLabelOptions.Top + fraLabelOptions.Height + CONTROL_SPACING
             Me.Caption = "LC-MS Feature Labeled Pairing Analysis"
             
             If txtLabel = "0" Then cmdSetToICAT_Click
@@ -1671,7 +2005,7 @@ Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
         
         fraDeltaOptions.Visible = True
         fraLabelOptions.Visible = True
-        lngToleranceFormTop = fraLabelOptions.Top + fraLabelOptions.Height + CONTROL_SPACING
+        lngGeneralOptionsFrameTop = fraLabelOptions.Top + fraLabelOptions.Height + CONTROL_SPACING
         Me.Caption = "LC-MS Feature N14/N15 Cys-based Labeled Pairing"
         
         MsgBox "Warning, the Delta/Label Pairs search algorithm is under development and has not been fully implemented.  In particular, the settings for Label mass and Heavy/Light Delta mass are not utilized in the search (MEM - July 2004).", vbInformation + vbOKOnly, "Warning"
@@ -1681,20 +2015,10 @@ Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
         Debug.Assert False
         SetFormMode pfmDelta
     End Select
-    
-    With fraToleranceOptions
-        .Left = fraDeltaOptions.Left
-        .Top = lngToleranceFormTop
-    End With
-    
-    With fraInclusionOptions
-        .Left = fraDeltaOptions.Left
-        .Top = fraToleranceOptions.Top + fraToleranceOptions.Height + CONTROL_SPACING
-    End With
-    
+   
     With fraGeneralOptions
         .Left = fraDeltaOptions.Left
-        .Top = fraInclusionOptions.Top + fraInclusionOptions.Height + CONTROL_SPACING
+        .Top = lngGeneralOptionsFrameTop
     End With
     
     With lblStatus
@@ -1703,7 +2027,7 @@ Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
     End With
     
     Me.Height = lblStatus.Top + lblStatus.Height + 740
-    Me.width = 5650
+    Me.width = 10850
 End Sub
 
 Private Sub SetPairSearchDeltas(dblDeltaMass As Double, DeltaCountMin As Long, DeltaCountMax As Long, Optional DeltaStepSize As Long = 1)
@@ -1796,7 +2120,35 @@ lblStatus.Caption = Status
 DoEvents
 End Sub
 
-Private Function ValidatePairArraySpace(blnShowMessages As Boolean) As Boolean
+Private Sub ValidateN15IncorporationSettings()
+    
+    With glbPreferencesExpanded.PairSearchOptions.SearchDef
+        If .N15PercentIncorporationMinimum < 0 Then
+            .N15PercentIncorporationMinimum = 0
+        End If
+        
+        If .N15PercentIncorporationMinimum > 100 Then
+            .N15PercentIncorporationMinimum = 100
+        End If
+        
+        If .N15PercentIncorporationMaximum < .N15PercentIncorporationMinimum Then
+            .N15PercentIncorporationMaximum = .N15PercentIncorporationMinimum
+        ElseIf .N15PercentIncorporationMaximum > 100 Then
+            .N15PercentIncorporationMaximum = .N15PercentIncorporationMinimum
+        End If
+                
+        If .N15PercentIncorporationStep < 0.1 Or .N15PercentIncorporationStep > 100 Then
+            .N15PercentIncorporationStep = 1
+        End If
+    
+        txtN15PercentIncorporationMinimum = Round(.N15PercentIncorporationMinimum, 1)
+        txtN15PercentIncorporationMaximum = Round(.N15PercentIncorporationMaximum, 1)
+        txtN15PercentIncorporationStep = Round(.N15PercentIncorporationStep, 1)
+    End With
+    
+End Sub
+
+Private Function ValidatePairArraySpace(ByVal blnShowMessages As Boolean) As Boolean
     Dim blnContinue As Boolean
     Dim strMessage As String
     
@@ -1848,6 +2200,12 @@ End Sub
 
 Private Sub chkIReportEREnabled_Click()
     glbPreferencesExpanded.PairSearchOptions.SearchDef.IReportEROptions.Enabled = cChkBox(chkIReportEREnabled)
+End Sub
+
+Private Sub chkN14N15IncompleteIncorporationMode_Click()
+    EnableDisableN14N15IncompleteIncorporationMode
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode = cChkBox(chkN14N15IncompleteIncorporationMode)
+    ValidateN15IncorporationSettings
 End Sub
 
 Private Sub chkOutlierRemovalUsesSymmetricERs_Click()
@@ -2064,6 +2422,14 @@ Private Sub mnuRScanByScanDetails_Click()
     ReportScanByScanDetails
 End Sub
 
+Private Sub optPairTolType_Click(Index As Integer)
+    If Index = 0 Then
+       glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMassTolType = gltPPM
+    Else
+       glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMassTolType = gltABS
+    End If
+End Sub
+
 Private Sub txtDelta_LostFocus()
 On Error GoTo err_Delta
 glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMass = CDbl(txtDelta.Text)
@@ -2073,11 +2439,14 @@ MsgBox "Delta should be positive number.", vbOKOnly, glFGTU
 txtDelta.SetFocus
 End Sub
 
+Private Sub txtDeltaStepSize_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtDeltaStepSize, KeyAscii, True, False
+End Sub
+
 Private Sub txtDeltaStepSize_LostFocus()
 On Error GoTo err_DeltaStep
 glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaStepSize = CLng(txtDeltaStepSize.Text)
 If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaStepSize >= 0 Then Exit Sub
-Exit Sub
 err_DeltaStep:
 MsgBox "Delta step size should be 0 or greater.", vbOKOnly, glFGTU
 txtDeltaStepSize.SetFocus
@@ -2101,6 +2470,14 @@ MsgBox "Label mass should be non-negative number.", vbOKOnly, glFGTU
 txtLabel.SetFocus
 End Sub
 
+Private Sub txtMaxDelta_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtMaxDelta, KeyAscii, True, False
+End Sub
+
+Private Sub txtMaxLbl_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtMaxLbl, KeyAscii, True, False
+End Sub
+
 Private Sub txtMaxLbl_LostFocus()
 On Error GoTo err_MaxLbl
 glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMax = CLng(txtMaxLbl.Text)
@@ -2108,6 +2485,10 @@ If glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMax > 0 Then Exi
 err_MaxLbl:
 MsgBox "Maximum number of labels should be non-negative integer.", vbOKOnly, glFGTU
 txtMaxLbl.SetFocus
+End Sub
+
+Private Sub txtMaxLblDiff_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtMaxLblDiff, KeyAscii, True, False
 End Sub
 
 Private Sub txtMaxLblDiff_LostFocus()
@@ -2119,6 +2500,14 @@ MsgBox "Maximum difference between number of light and heavy labels should be no
 txtMaxLblDiff.SetFocus
 End Sub
 
+Private Sub txtMinDelta_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtMinDelta, KeyAscii, True, False
+End Sub
+
+Private Sub txtMinLbl_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtMinLbl, KeyAscii, True, False
+End Sub
+
 Private Sub txtMinLbl_LostFocus()
 On Error GoTo err_MinLbl
 glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMin = CLng(txtMinLbl.Text)
@@ -2126,6 +2515,53 @@ If glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMin >= 0 Then Ex
 err_MinLbl:
 MsgBox "Minimum number of labels should be non-negative integer.", vbOKOnly, glFGTU
 txtMinLbl.SetFocus
+End Sub
+
+Private Sub txtN15PercentIncorporationMaximum_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtN15PercentIncorporationMaximum, KeyAscii, True, True
+End Sub
+
+Private Sub txtN15PercentIncorporationMaximum_LostFocus()
+    On Error GoTo err_IncorporationMaximum
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.N15PercentIncorporationMaximum = CSng(txtN15PercentIncorporationMaximum.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15PercentIncorporationMaximum >= 0 Then Exit Sub
+err_IncorporationMaximum:
+    MsgBox "N15 Percent Incorporation maximum should be 0 or greater.", vbOKOnly, glFGTU
+    txtN15PercentIncorporationMaximum.SetFocus
+End Sub
+
+Private Sub txtN15PercentIncorporationMinimum_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtN15PercentIncorporationMinimum, KeyAscii, True, True
+End Sub
+
+Private Sub txtN15PercentIncorporationMinimum_LostFocus()
+    On Error GoTo err_IncorporationMinimum
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.N15PercentIncorporationMinimum = CSng(txtN15PercentIncorporationMinimum.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15PercentIncorporationMinimum >= 0 Then Exit Sub
+err_IncorporationMinimum:
+    MsgBox "N15 Percent Incorporation minimum should be 0 or greater.", vbOKOnly, glFGTU
+    txtN15PercentIncorporationMinimum.SetFocus
+End Sub
+
+Private Sub txtN15PercentIncorporationStep_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtN15PercentIncorporationStep, KeyAscii, True, True
+End Sub
+
+Private Sub txtN15PercentIncorporationStep_LostFocus()
+    On Error GoTo err_IncorporationStep
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.N15PercentIncorporationStep = CSng(txtN15PercentIncorporationStep.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15PercentIncorporationStep >= 0.1 Then Exit Sub
+err_IncorporationStep:
+    MsgBox "N15 Percent Incorporation step size should 0.1 or greater.", vbOKOnly, glFGTU
+    txtN15PercentIncorporationStep.SetFocus
+End Sub
+
+Private Sub txtPairsScanTolApex_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtPairsScanTolApex, KeyAscii, True, False
+End Sub
+
+Private Sub txtPairsScanTolEdge_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtPairsScanTolEdge, KeyAscii, True, False
 End Sub
 
 Private Sub txtPairTol_LostFocus()
@@ -2189,6 +2625,10 @@ Private Sub txtPairsScanTolEdge_LostFocus()
 err_ScanTol:
     MsgBox "Scan tolerance should be non-negative integer.", vbOKOnly, glFGTU
     txtPairsScanTolEdge.SetFocus
+End Sub
+
+Private Sub txtRemoveOutlierERsMinimumDataPointCount_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtRemoveOutlierERsMinimumDataPointCount, KeyAscii, True, False
 End Sub
 
 Private Sub txtRemoveOutlierERsMinimumDataPointCount_LostFocus()

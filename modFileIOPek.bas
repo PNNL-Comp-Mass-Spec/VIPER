@@ -650,7 +650,13 @@ On Error GoTo LoadNewPEKErrorHandler
         frmProgress.InitializeSubtask "Sorting isotopic data", 0, GelData(mGelIndex).IsoLines
     End If
     
+    ' Sort the data
     SortIsotopicData mGelIndex
+    
+    If (GelData(mGelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IREPORT) = GEL_DATA_STATUS_BIT_IREPORT Then
+        ' Fix the mono plus 2 abundance values
+        FixIsosMonoPlus2Abu mGelIndex
+    End If
     
     If Not blnSkipTimeDomainLoad Then
         ' Extract the time domain signals from the .PEK file

@@ -41,9 +41,9 @@ Public Enum glDocDataISFields
     isfAbu = 3              'intensity(abundance)
     isfMOverZ = 4           'm/z
     isfFit = 5              'calculated fit
-    isfMWavg = 6            'average molecular mass
+    isfMWAvg = 6            'average molecular mass
     isfMWMono = 7           'monoisotopic molecular mass
-    isfMWTMA = 8            'the most abundant mol.mass
+    isfMWTMA = 8            'the most abundant molecular mass
     isfIsotopicFitRatio = 9         ' Fit from ICR-2LS based pairs finding; Legacy: matching DB mass(obsolete)
     isfIsotopicAtomCount = 10       ' Atom count from ICR-2LS based pairs finding; Legacy: error of matching DB mass
     isfIReportMWMonoAbu = 11

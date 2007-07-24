@@ -515,7 +515,8 @@ Dim prmMinimumHighNormalizedScore As ADODB.Parameter
 Dim prmMinimumHighDiscriminantScore As ADODB.Parameter
 Dim prmMinimumPeptideProphetProbability As ADODB.Parameter
 
-Dim intMTIDField As Integer, intORFIDField As Integer, intReferenceField As Integer
+Dim intMTIDField As Integer, intProteinIDField As Integer
+Dim intReferenceField As Integer, intInternalRefID As Integer
 Dim intFieldIndex As Integer
 Dim lngMassTagIDToAdd As Long
 Dim blnProceed As Boolean
@@ -610,13 +611,15 @@ Set rsMT_ORF_Map = cmdGetMap.Execute
 With rsMT_ORF_Map
     ' Determine the field indices
     intMTIDField = 0
-    intORFIDField = 1
+    intProteinIDField = 1
     intReferenceField = -1
+    intInternalRefID = -1
     For intFieldIndex = 0 To .Fields.Count - 1
         Select Case .Fields(intFieldIndex).Name
         Case "Mass_Tag_ID", "MT_ID": intMTIDField = intFieldIndex
-        Case "Protein_ID", "ORF_ID": intORFIDField = intFieldIndex
+        Case "Protein_ID", "ORF_ID": intProteinIDField = intFieldIndex      ' Protein_ID, globally unique across DBs
         Case "Reference": intReferenceField = intFieldIndex
+        Case "Ref_ID": intInternalRefID = intFieldIndex                 ' Ref_ID for this protein in this AMT database
         Case Else
             Debug.Assert False
         End Select
@@ -624,7 +627,7 @@ With rsMT_ORF_Map
     
     lngORFMapItemsExamined = 0
     Do Until .EOF
-       lngMassTagIDToAdd = FixNullLng(.Fields(0).Value)
+       lngMassTagIDToAdd = FixNullLng(.Fields(intMTIDField).Value)
        If blnIncludeORFsForMassTagsNotInMemory Then
           blnProceed = True
        Else
@@ -642,7 +645,7 @@ With rsMT_ORF_Map
        If blnProceed Then
           MTtoORFMapCount = MTtoORFMapCount + 1
           MTIDMap(MTtoORFMapCount) = lngMassTagIDToAdd
-          ORFIDMap(MTtoORFMapCount) = FixNullLng(.Fields(1).Value)      ' This will be Null if the ORF_ID column in T_ORF_Reference is null
+          ORFIDMap(MTtoORFMapCount) = FixNullLng(.Fields(intProteinIDField).Value)      ' This will be Null if the ORF_ID column in T_ORF_Reference is null
           If intReferenceField >= 0 Then ORFRefNames(MTtoORFMapCount) = FixNull(.Fields(intReferenceField).Value)
        End If
        .MoveNext

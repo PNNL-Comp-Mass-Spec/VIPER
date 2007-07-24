@@ -222,10 +222,11 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 All publications that result from the use of this software should include 
 the following acknowledgment statement:
- Portions of this research were supported by the W.R. Wiley Environmental 
- Molecular Science Laboratory, a national scientific user facility sponsored 
- by the U.S. Department of Energy's Office of Biological and Environmental 
- Research and located at PNNL.  PNNL is operated by Battelle Memorial Institute 
+ Portions of this research were supported by the U.S. Department of Energy 
+ Office of Biological and Environmental Research Genomes:GtL Program, the NIH 
+ National Center for Research Resources (Grant RR018522), and the National 
+ Institute of Allergy and Infectious Diseases (NIH/DHHS through interagency 
+ agreement Y1-AI-4894-01).  PNNL is operated by Battelle Memorial Institute 
  for the U.S. Department of Energy under contract DE-AC05-76RL0 1830.
 
 Notice: This computer software was prepared by Battelle Memorial Institute, 

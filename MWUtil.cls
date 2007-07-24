@@ -135,3 +135,4 @@ Public Function GetMWByIndex(lngIndex As Long) As Double
         GetMWByIndex = 0
     End If
 End Function
+

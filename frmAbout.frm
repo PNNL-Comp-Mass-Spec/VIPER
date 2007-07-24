@@ -252,10 +252,11 @@ Private Sub UpdateMessages()
     
     strMessage = strMessage & "All publications that result from the use of this software should include "
     strMessage = strMessage & "the following acknowledgment statement: " & vbCrLf
-    strMessage = strMessage & "Portions of this research were supported by the W.R. Wiley Environmental "
-    strMessage = strMessage & "Molecular Science Laboratory, a national scientific user facility sponsored "
-    strMessage = strMessage & "by the U.S. Department of Energy's Office of Biological and Environmental "
-    strMessage = strMessage & "Research and located at PNNL.  PNNL is operated by Battelle Memorial Institute "
+    strMessage = strMessage & "Portions of this research were supported by the U.S. Department of Energy "
+    strMessage = strMessage & "Office of Biological and Environmental Research Genomes:GtL Program, the NIH "
+    strMessage = strMessage & "National Center for Research Resources (Grant RR018522), and the National "
+    strMessage = strMessage & "Institute of Allergy and Infectious Diseases (NIH/DHHS through interagency "
+    strMessage = strMessage & "agreement Y1-AI-4894-01).  PNNL is operated by Battelle Memorial Institute "
     strMessage = strMessage & "for the U.S. Department of Energy under contract DE-AC05-76RL0 1830." & vbCrLf & vbCrLf
     
     strMessage = strMessage & "Notice: This computer software was prepared by Battelle Memorial Institute, "
@@ -369,3 +370,6 @@ End Sub
 '''    GetKeyValue = False                                     ' Return Failure
 '''    rc = RegCloseKey(hKey)                                  ' Close Registry Key
 '''End Function
+Private Sub txtLicenseInfo_Change()
+
+End Sub

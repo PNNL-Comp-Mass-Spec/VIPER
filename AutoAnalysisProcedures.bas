@@ -3141,7 +3141,7 @@ AutoAnalysisSaveNETSurfaceAndResidualPlotsErrorhandler:
 
 End Sub
 
-''Public Sub TestAutoNETWarp(lngGelIndex As Long, Optional strResultsFileNameBase As String = "MyTestFile")
+''Public Sub TestAutoNETWarp(byval lngGelIndex As Long, Optional byval strResultsFileNameBase As String = "MyTestFile")
 ''
 ''    Dim dblGANETSlope As Double, dblGANETIntercept As Double
 ''

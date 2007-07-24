@@ -52,6 +52,7 @@ End Type
 
 Private Type udtCorrectedAbundanceStatsByScanType
     ScanNumber As Long
+    ChargeState As Integer
     LightAbundance As Double
     HeavyAbundance As Double
     ER As Double
@@ -65,7 +66,7 @@ Private Type udtCorrectedAbundanceStatsType
 End Type
 
 ' mCorrectedAbundanceStats should be parallel to GelP_D_L(mGelIndex).Pairs
-Private mCorrectedAbundanceStatsCount As Long
+Private mCorrectedAbundanceStatsMaxIndex As Long
 Private mCorrectedAbundanceStats() As udtCorrectedAbundanceStatsType
 
 Private mGelIndex As Long
@@ -343,6 +344,8 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
     Dim dblChargeIndexIntensities() As Double       ' 0-based array of the intensities for the charge indices in the light UMC
     Dim intChargeToFind As Integer
     
+    Dim lngAlignedScanCountNew As Long
+    
     ' This udt is used when computing stats scan-by-scan
     Dim udtScanByScanStats As udtScanByScanStatsType
     Dim intTargetChargeLt As Integer, intTargetChargeHv As Integer
@@ -602,36 +605,40 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
         End If
     End If
 
-    If mCorrectedAbundanceStatsCount > UBound(mCorrectedAbundanceStats) Then
-        ' This code shouldn't normally be reached
+    If lngPairIndex > UBound(mCorrectedAbundanceStats) Then
+        ' Need to reserve more space in mCorrectedAbundanceStats
+        ' This is unexpected
         Debug.Assert False
         ReDim Preserve mCorrectedAbundanceStats((UBound(mCorrectedAbundanceStats) + 1) * 2 - 1)
     End If
+    
+    ' ToDo: Fix the bug that is occurring when multiple charge states are being processed for a given pair
+    '       The result is that data is being overwrrite in mCorrectedAbundanceStats() for the same lngPairIndex value, effectively only keeping the highest charge state value
     
     With mCorrectedAbundanceStats(lngPairIndex)
         If blnComputedERScanByScan Then
             ' Store the ScanAbu2PlusCorrected and ScanAbu4PlusCorrected values so they can be accessed later
             
             ' First step through udtScanByScanStats and count the number of scans with a light or heavy abundance value
-            .AlignedScanCount = 0
+            lngAlignedScanCountNew = 0
             For lngScanIndex = 0 To udtScanByScanStats.ScanNumCount - 1
                 If udtScanByScanStats.ScanDetailsLt(lngScanIndex).Abundance <> 0 Or _
                    udtScanByScanStats.ScanDetailsHv(lngScanIndex).Abundance <> 0 Then
-                   .AlignedScanCount = .AlignedScanCount + 1
+                  lngAlignedScanCountNew = lngAlignedScanCountNew + 1
                 End If
             Next lngScanIndex
             
-            If .AlignedScanCount = 0 Then
-                ReDim .AlignedScanStats(0)
-            Else
-                ReDim .AlignedScanStats(.AlignedScanCount - 1)
+            If lngAlignedScanCountNew > 0 Then
+                If .AlignedScanCount + lngAlignedScanCountNew - 1 > UBound(.AlignedScanStats) Then
+                    ReDim Preserve .AlignedScanStats(.AlignedScanCount + lngAlignedScanCountNew - 1)
+                End If
                 
-                .AlignedScanCount = 0
                 For lngScanIndex = 0 To udtScanByScanStats.ScanNumCount - 1
                     If udtScanByScanStats.ScanDetailsLt(lngScanIndex).Abundance <> 0 Or _
                        udtScanByScanStats.ScanDetailsHv(lngScanIndex).Abundance <> 0 Then
                        With .AlignedScanStats(.AlignedScanCount)
                             .ScanNumber = udtScanByScanStats.ScanNumStart + lngScanIndex
+                            .ChargeState = intChargeStateToMatch
                             .LightAbundance = udtScanByScanStats.ScanDetailsLt(lngScanIndex).Abundance
                             .HeavyAbundance = udtScanByScanStats.ScanDetailsHv(lngScanIndex).Abundance
                             .ER = udtScanByScanStats.ScanER(lngScanIndex)
@@ -646,7 +653,10 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
             .AlignedScanCount = 0
         End If
     End With
-    mCorrectedAbundanceStatsCount = mCorrectedAbundanceStatsCount + 1
+    
+    If lngPairIndex > mCorrectedAbundanceStatsMaxIndex Then
+        mCorrectedAbundanceStatsMaxIndex = lngPairIndex
+    End If
     
     If Not blnValidER Then
         With udtERStats
@@ -681,7 +691,7 @@ Private Function CalcDltLblPairsERScanByScan(ByRef udtScanByScanStats As udtScan
     
     
     Dim lngScanIndex As Long
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
     Dim blnUseMaxValueEachScan As Boolean
     Dim blnSuccess As Boolean
@@ -831,17 +841,17 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
             
             If glbPreferencesExpanded.PairSearchOptions.OutlierRemovalUsesSymmetricERs Then
                 ' Convert the ER values to symmetric ER values (0 means unchanged)
-                If lngERListCount = 1 And dblERList(lngIndex) = ER_CALC_ERR Then
+                If lngERListCount = 1 And dblERList(lngindex) = ER_CALC_ERR Then
                     ' Do not convert to symmetric ER
                 Else
-                    For lngIndex = 0 To lngERListCount - 1
-                        If dblERList(lngIndex) > 0 Then
-                            dblERList(lngIndex) = AltERViaRatER(dblERList(lngIndex))
+                    For lngindex = 0 To lngERListCount - 1
+                        If dblERList(lngindex) > 0 Then
+                            dblERList(lngindex) = AltERViaRatER(dblERList(lngindex))
                         Else
                             Debug.Assert False
-                            dblERList(lngIndex) = 0
+                            dblERList(lngindex) = 0
                         End If
-                    Next lngIndex
+                    Next lngindex
                     blnConvertedToSymmetricER = True
                 End If
             End If
@@ -899,19 +909,19 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
                     dblERProductSum = 0
                     dblWeightingSum = 0
                     
-                    For lngIndex = 0 To lngERListCount - 1
+                    For lngindex = 0 To lngERListCount - 1
                     
-                        Debug.Assert dblERList(lngIndex) <> ER_CALC_ERR
+                        Debug.Assert dblERList(lngindex) <> ER_CALC_ERR
                     
-                        dblLightHeavyAbuSum = .ScanDetailsLt(lngERListIndexPointers(lngIndex)).Abundance + .ScanDetailsHv(lngERListIndexPointers(lngIndex)).Abundance
-                        dblERProductSum = dblERProductSum + dblERList(lngIndex) * dblLightHeavyAbuSum
+                        dblLightHeavyAbuSum = .ScanDetailsLt(lngERListIndexPointers(lngindex)).Abundance + .ScanDetailsHv(lngERListIndexPointers(lngindex)).Abundance
+                        dblERProductSum = dblERProductSum + dblERList(lngindex) * dblLightHeavyAbuSum
                       
                         dblWeightingSum = dblWeightingSum + dblLightHeavyAbuSum
                         
                         .ERStats.TotalAbundance = .ERStats.TotalAbundance + dblLightHeavyAbuSum
-                        .ERStats.TotalMemberCount = .ERStats.TotalMemberCount + .ScanDetailsLt(lngERListIndexPointers(lngIndex)).MemberCount + .ScanDetailsHv(lngERListIndexPointers(lngIndex)).MemberCount
+                        .ERStats.TotalMemberCount = .ERStats.TotalMemberCount + .ScanDetailsLt(lngERListIndexPointers(lngindex)).MemberCount + .ScanDetailsHv(lngERListIndexPointers(lngindex)).MemberCount
                 
-                    Next lngIndex
+                    Next lngindex
                 End With
             Else
                 If dblERList(0) <> ER_CALC_ERR Then
@@ -955,9 +965,9 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
                         ' Otherwise, need to recompute the StDev using the regular light/heavy values
                         If .ERAvg < 0 Then
                             ReDim dblERListLtOverHv(lngERListCount - 1)
-                            For lngIndex = 0 To lngERListCount - 1
-                                dblERListLtOverHv(lngIndex) = RatERViaAltER(dblERList(lngIndex))
-                            Next lngIndex
+                            For lngindex = 0 To lngERListCount - 1
+                                dblERListLtOverHv(lngindex) = RatERViaAltER(dblERList(lngindex))
+                            Next lngindex
                             
                             If objStatDoubles.Fill(dblERListLtOverHv) Then
                                 .ERStDev = objStatDoubles.StDev
@@ -1183,10 +1193,10 @@ CalcDltLblPairsScanByScanPopulateErrorHandler:
 
 End Sub
 
-Public Sub GetScanByScanStatsForPair(ByVal lngPairIndex As Long, ByRef lngAlignedScanCount As Long, ByRef lngScanNumbers() As Long, ByRef dblLtAbundance() As Double, ByRef dblHvAbundance() As Double, ByRef dblER() As Double, ByRef sngAbu2DaCorrected() As Single, ByRef sngAbu4DaCorrected() As Single)
+Public Sub GetScanByScanStatsForPair(ByVal lngPairIndex As Long, ByRef lngAlignedScanCount As Long, ByRef lngScanNumbers() As Long, ByRef intCharges() As Integer, ByRef dblLtAbundance() As Double, ByRef dblHvAbundance() As Double, ByRef dblER() As Double, ByRef sngAbu2DaCorrected() As Single, ByRef sngAbu4DaCorrected() As Single)
     Dim lngScanIndex As Long
     
-    If lngPairIndex < mCorrectedAbundanceStatsCount Then
+    If lngPairIndex <= mCorrectedAbundanceStatsMaxIndex Then
         With mCorrectedAbundanceStats(lngPairIndex)
             lngAlignedScanCount = .AlignedScanCount
             
@@ -1202,6 +1212,7 @@ Public Sub GetScanByScanStatsForPair(ByVal lngPairIndex As Long, ByRef lngAligne
             For lngScanIndex = 0 To .AlignedScanCount - 1
                 With .AlignedScanStats(lngScanIndex)
                     lngScanNumbers(lngScanIndex) = .ScanNumber
+                    intCharges(lngScanIndex) = .ChargeState
                     dblLtAbundance(lngScanIndex) = .LightAbundance
                     dblHvAbundance(lngScanIndex) = .HeavyAbundance
                     dblER(lngScanIndex) = .ER
@@ -1216,13 +1227,25 @@ Public Sub GetScanByScanStatsForPair(ByVal lngPairIndex As Long, ByRef lngAligne
 End Sub
 
 Private Sub InitializeLocalVariables(ByVal lngPairCount As Long)
-    mCorrectedAbundanceStatsCount = 0
+    Dim lngindex As Long
+
+    mCorrectedAbundanceStatsMaxIndex = 0
     
     If lngPairCount < 1 Then
         ReDim mCorrectedAbundanceStats(9)
     Else
         ReDim mCorrectedAbundanceStats(lngPairCount - 1)
     End If
+    
+    For lngindex = 0 To UBound(mCorrectedAbundanceStats)
+        With mCorrectedAbundanceStats(lngindex)
+            .AlignedScanCount = 0
+            
+            ' Initially reserve space for 10 entries
+            ReDim .AlignedScanStats(9)
+        End With
+    Next lngindex
+
 End Sub
 
 Private Function AltERViaRatER(ByVal dblRatER As Double) As Double

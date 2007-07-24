@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmUMCIonNet 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "LC-MS Feature (UMC) Ion Networks"
@@ -46,8 +46,8 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "Frame1"
-      Tab(1).Control(1)=   "lblFilterConnections"
+      Tab(1).Control(0)=   "lblFilterConnections"
+      Tab(1).Control(1)=   "Frame1"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
@@ -194,7 +194,7 @@ Begin VB.Form frmUMCIonNet
             List            =   "frmUMCIonNet.frx":0056
             Style           =   2  'Dropdown List
             TabIndex        =   132
-            Top             =   3675
+            Top             =   4035
             Width           =   2175
          End
          Begin VB.TextBox txtInterpolateMaxGapSize 
@@ -216,18 +216,26 @@ Begin VB.Form frmUMCIonNet
          End
          Begin VB.Frame Frame2 
             Caption         =   "LC-MS Feature Stats"
-            Height          =   3375
+            Height          =   3735
             Left            =   120
             TabIndex        =   62
             Top             =   180
             Width           =   3735
+            Begin VB.ComboBox cboMolecularMassField 
+               Height          =   315
+               Left            =   1560
+               Style           =   2  'Dropdown List
+               TabIndex        =   145
+               Top             =   2760
+               Width           =   1935
+            End
             Begin VB.CheckBox chkUseMostAbuChargeStateStatsForClassStats 
                Caption         =   "Use most abundant charge state group stats for class stats"
                Height          =   530
                Left            =   240
                TabIndex        =   141
                ToolTipText     =   "Make single-member classes from unconnected nodes"
-               Top             =   2760
+               Top             =   3120
                Width           =   2055
             End
             Begin VB.ComboBox cboChargeStateAbuType 
@@ -268,8 +276,17 @@ Begin VB.Form frmUMCIonNet
                Left            =   2400
                TabIndex        =   69
                ToolTipText     =   "Make single-member classes from unconnected nodes"
-               Top             =   2760
+               Top             =   3120
                Width           =   1215
+            End
+            Begin VB.Label lblMolecularMassField 
+               BackStyle       =   0  'Transparent
+               Caption         =   "Mass field to use"
+               Height          =   255
+               Left            =   240
+               TabIndex        =   146
+               Top             =   2760
+               Width           =   1335
             End
             Begin VB.Label lblChargeStateAbuType 
                BackStyle       =   0  'Transparent
@@ -334,8 +351,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassAbundanceTopX"
-            Tab(2).Control(1)=   "fraClassMassTopX"
+            Tab(2).Control(0)=   "fraClassMassTopX"
+            Tab(2).Control(1)=   "fraClassAbundanceTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -842,7 +859,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Left            =   240
             TabIndex        =   131
-            Top             =   3705
+            Top             =   4065
             Width           =   1455
          End
          Begin VB.Label lblMaxGapSize 
@@ -1503,7 +1520,7 @@ ChangeStatus " Error building LC-MS Feature."
 End Function
 
 Private Function BuildUMCsUsingmLCMSResultsMapping(ByVal blnShowMessages As Boolean) As Boolean
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim lngCurrentUMC As Long
     Dim intScopeUsedForConnections As Integer
     
@@ -1561,12 +1578,12 @@ On Error GoTo BuildUMCsUsingmLCMSResultsMappingErrorHandler
             ReDim HUMCEquCls(999)
             
             lngCurrentUMC = mLCMSResultsMappingUMCs(0)
-            For lngIndex = 0 To mLCMSResultsMappingCount - 1
+            For lngindex = 0 To mLCMSResultsMappingCount - 1
                   
-                If mLCMSResultsMappingUMCs(lngIndex) <> lngCurrentUMC Then
+                If mLCMSResultsMappingUMCs(lngindex) <> lngCurrentUMC Then
                     BuildCurrentClass
                     
-                    lngCurrentUMC = mLCMSResultsMappingUMCs(lngIndex)
+                    lngCurrentUMC = mLCMSResultsMappingUMCs(lngindex)
                     HUMCEquClsCnt = 0
                 End If
                 
@@ -1574,15 +1591,15 @@ On Error GoTo BuildUMCsUsingmLCMSResultsMappingErrorHandler
                     ReDim Preserve HUMCEquCls((UBound(HUMCEquCls) + 1) * 2 - 1)
                 End If
                 
-                HUMCEquCls(HUMCEquClsCnt) = mLCMSResultsMappingDataIndices(lngIndex)
+                HUMCEquCls(HUMCEquClsCnt) = mLCMSResultsMappingDataIndices(lngindex)
                 HUMCEquClsCnt = HUMCEquClsCnt + 1
                 
-                If lngIndex Mod 1000 = 999 Then
-                    ChangeStatus strBaseStatus & ": " & (lngIndex + 1) & " / " & mLCMSResultsMappingCount
+                If lngindex Mod 1000 = 999 Then
+                    ChangeStatus strBaseStatus & ": " & (lngindex + 1) & " / " & mLCMSResultsMappingCount
                 End If
                 
                 If mAbortProcess Then Exit For
-            Next lngIndex
+            Next lngindex
                 
             If mAbortProcess Then
                 ChangeStatus "Processing aborted."
@@ -1887,7 +1904,7 @@ End Function
 Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef strLCMSFeaturesFilePath As String, ByRef strIniFilePath As String) As Boolean
     Const COL_DELIMITER As String = vbTab
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim ISInd() As Long         ' In-scope index
     
     Dim tsOutfile As TextStream
@@ -1954,8 +1971,8 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     tsOutfile.WriteLine strLineOut
     
     With GelData(CallerID)
-        For lngIndex = 1 To DataCnt
-            With .IsoData(ISInd(lngIndex))
+        For lngindex = 1 To DataCnt
+            With .IsoData(ISInd(lngindex))
                 strLineOut = Trim(.ScanNumber) & COL_DELIMITER & _
                              Trim(.Charge) & COL_DELIMITER & _
                              Trim(.Abundance) & COL_DELIMITER & _
@@ -1968,17 +1985,17 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                              Trim(.SignalToNoise) & COL_DELIMITER & _
                              Trim(.IntensityMono) & COL_DELIMITER & _
                              Trim(.IntensityMonoPlus2) & COL_DELIMITER & _
-                             Trim(ISInd(lngIndex))
+                             Trim(ISInd(lngindex))
 
                 tsOutfile.WriteLine strLineOut
             End With
             
-            If lngIndex Mod 5000 = 0 Then
-                ChangeStatus strBaseStatus & ": " & Trim(lngIndex) & " / " & Trim(DataCnt)
+            If lngindex Mod 5000 = 0 Then
+                ChangeStatus strBaseStatus & ": " & Trim(lngindex) & " / " & Trim(DataCnt)
             End If
             
             If mAbortProcess Then Exit For
-        Next lngIndex
+        Next lngindex
     End With
    
     tsOutfile.Close
@@ -2006,11 +2023,11 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     
     blnUseGenericNET = False
     
-    For lngIndex = 0 To MyDef.NetDim - 1
+    For lngindex = 0 To MyDef.NetDim - 1
         strDimensionName = ""
         strConstraint = ""
         
-        With MyDef.MetricData(lngIndex)
+        With MyDef.MetricData(lngindex)
             Select Case .DataType
                Case uindUMCIonNetDimConstants.uindMonoMW
                     strDimensionName = "MonoMass"
@@ -2079,7 +2096,7 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                 Debug.Assert False
             End If
         End With
-    Next lngIndex
+    Next lngindex
 
     If Not blnMonoMassDefined Then tsOutfile.WriteLine "MonoMassWeight=0"
     If Not blnAvgMassDefined Then tsOutfile.WriteLine "AvgMassWeight=0"
@@ -2126,6 +2143,39 @@ ExportPeaksForUMCFinding = False
 
 End Function
 
+Private Sub SetMolecularMassFieldDropdown(eMWField As glDocDataISFields)
+    If eMWField <> isfMWAvg And eMWField <> isfMWMono And eMWField <> isfMWTMA Then
+        eMWField = GelData(CallerID).Preferences.IsoDataField
+    End If
+    
+    Select Case eMWField
+    Case isfMWAvg
+        cboMolecularMassField.ListIndex = 0
+    Case isfMWMono
+        cboMolecularMassField.ListIndex = 1
+    Case isfMWTMA
+        cboMolecularMassField.ListIndex = 2
+    Case Else
+        cboMolecularMassField.ListIndex = 1
+    End Select
+End Sub
+
+Private Function GetMolecularMassFieldFromDropdown() As Integer
+    Dim eMWField As glDocDataISFields
+    
+    Select Case cboMolecularMassField.ListIndex
+    Case 0
+        eMWField = isfMWAvg
+    Case 2
+        eMWField = isfMWTMA
+    Case Else
+        ' Includes case 1
+        eMWField = isfMWMono
+    End Select
+
+    GetMolecularMassFieldFromDropdown = eMWField
+End Function
+
 Private Function FinalizeNewUMCs() As Boolean
     
     Dim dblTolPPM As Double
@@ -2147,7 +2197,7 @@ On Error GoTo FinalizeNewUMCsErrorHandler
         'set various Unique Mass Classes parameters
         With GelUMC(CallerID).def
             .UMCType = glUMC_TYPE_FROM_NET
-            .MWField = GelData(CallerID).Preferences.IsoDataField
+            .MWField = GetMolecularMassFieldFromDropdown
             .UMCSharing = False
             .Tol = dblTolPPM            ' IonNet searching doesn't really use ppm, but we'll store ppm here anyway so that it gets exported to the database
             .TolType = eTolType
@@ -3532,6 +3582,13 @@ Private Sub PopulateComboBoxes()
         .AddItem "Most Members"
     End With
     
+    With cboMolecularMassField
+        .Clear
+        .AddItem "Average"
+        .AddItem "Monoisotopic"
+        .AddItem "Most abundant"
+    End With
+    
     With cboSplitUMCsScanGapBehavior
         .Clear
         .AddItem "Ignore scan gaps"
@@ -3863,6 +3920,8 @@ With UMCDef
     cmbUMCMW.ListIndex = .ClassMW
     cmbUMCAbu.ListIndex = .ClassAbu
     cboChargeStateAbuType.ListIndex = .ChargeStateStatsRepType
+    
+    SetMolecularMassFieldDropdown CInt(.MWField)
     SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
     
     optDefScope(.DefScope).Value = True
@@ -4148,6 +4207,14 @@ Private Function ValidateClassStatOptions() As Boolean
     
     ValidateClassStatOptions = True
 End Function
+
+Private Sub cboMolecularMassField_Click()
+If mCalculating Then
+    SetMolecularMassFieldDropdown CInt(UMCDef.MWField)
+Else
+    UMCDef.MWField = GetMolecularMassFieldFromDropdown
+End If
+End Sub
 
 Private Sub Form_Activate()
     InitializeUMCSearch

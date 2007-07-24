@@ -624,13 +624,13 @@ End Function
 
 Public Function FillMWSearchObject(ByRef objMWUtil As MWUtil) As Boolean
     Dim dblMW() As Double
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim blnSuccess As Boolean
     
     ReDim dblMW(LBound(AMTData) To UBound(AMTData))
-    For lngIndex = LBound(AMTData) To UBound(AMTData)
-        dblMW(lngIndex) = AMTData(lngIndex).MW
-    Next lngIndex
+    For lngindex = LBound(AMTData) To UBound(AMTData)
+        dblMW(lngindex) = AMTData(lngindex).MW
+    Next lngindex
     
     blnSuccess = mwutSearch.Fill(dblMW())
     FillMWSearchObject = blnSuccess
@@ -932,7 +932,7 @@ err_LegacyDBLoadAMTData:
 
 End Function
 
-Private Function LegacyDBLoadAMTDataWork(ByRef rsAMT As Recordset, ByVal lngIndex As Long, ByRef lngMassTagCountWithNullValues As Long, ByRef udtFieldPresent As udtAMTFieldPresentType, ByVal eDBGeneration As dbgDatabaseGenerationConstants) As Boolean
+Private Function LegacyDBLoadAMTDataWork(ByRef rsAMT As Recordset, ByVal lngindex As Long, ByRef lngMassTagCountWithNullValues As Long, ByRef udtFieldPresent As udtAMTFieldPresentType, ByVal eDBGeneration As dbgDatabaseGenerationConstants) As Boolean
     Const NET_VALUE_IF_NULL = -100000
 
     Dim blnSuccess As Boolean
@@ -947,37 +947,37 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
         Select Case eDBGeneration
         Case dbgMTSOffline
             
-            AMTData(lngIndex).ID = .Fields(DB_FIELD_TMASSTAGS_MASS_TAG_ID).Value
-            AMTData(lngIndex).MW = CDbl(.Fields(DB_FIELD_TMASSTAGS_MW).Value)
+            AMTData(lngindex).ID = .Fields(DB_FIELD_TMASSTAGS_MASS_TAG_ID).Value
+            AMTData(lngindex).MW = CDbl(.Fields(DB_FIELD_TMASSTAGS_MW).Value)
             
             If IsNull(.Fields(DB_FIELD_TMTNET_NET).Value) Then
-                AMTData(lngIndex).NET = NET_VALUE_IF_NULL
+                AMTData(lngindex).NET = NET_VALUE_IF_NULL
             Else
-                AMTData(lngIndex).NET = CDbl(.Fields(DB_FIELD_TMTNET_NET).Value)
+                AMTData(lngindex).NET = CDbl(.Fields(DB_FIELD_TMTNET_NET).Value)
             End If
             
             
             ' Set the defaults for the remaining fields
             ' We'll populate them with the real values if the field is present
-            AMTData(lngIndex).flag = 0
-            AMTData(lngIndex).PNET = NET_VALUE_IF_NULL
-            AMTData(lngIndex).NETStDev = 0
-            AMTData(lngIndex).CNT_N = -1
-            AMTData(lngIndex).CNT_Cys = -1
-            AMTData(lngIndex).MSMSObsCount = 1
-            AMTData(lngIndex).HighNormalizedScore = 0
-            AMTData(lngIndex).HighDiscriminantScore = 0
-            AMTData(lngIndex).PeptideProphetProbability = 0
+            AMTData(lngindex).flag = 0
+            AMTData(lngindex).PNET = NET_VALUE_IF_NULL
+            AMTData(lngindex).NETStDev = 0
+            AMTData(lngindex).CNT_N = -1
+            AMTData(lngindex).CNT_Cys = -1
+            AMTData(lngindex).MSMSObsCount = 1
+            AMTData(lngindex).HighNormalizedScore = 0
+            AMTData(lngindex).HighDiscriminantScore = 0
+            AMTData(lngindex).PeptideProphetProbability = 0
             
             If udtFieldPresent.PNET Then
                 If Not IsNull(.Fields(DB_FIELD_TMTNET_PNET).Value) Then
-                    AMTData(lngIndex).PNET = CDbl(.Fields(DB_FIELD_TMTNET_PNET).Value)
+                    AMTData(lngindex).PNET = CDbl(.Fields(DB_FIELD_TMTNET_PNET).Value)
                 End If
             End If
             
             If udtFieldPresent.NETStDev Then
                 If Not IsNull(.Fields(DB_FIELD_TMTNET_STDEV).Value) Then
-                    AMTData(lngIndex).NETStDev = CDbl(.Fields(DB_FIELD_TMTNET_STDEV).Value)
+                    AMTData(lngindex).NETStDev = CDbl(.Fields(DB_FIELD_TMTNET_STDEV).Value)
                 End If
             End If
             
@@ -985,82 +985,82 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             ' This program uses AMTData().NET by default; AMTData().PNET historically held the retention time, in seconds, but now holds Predicted NET
             ' If one is missing from the Access DB file, then we'll copy the value from the other column to the missing column
             
-            If AMTData(lngIndex).NET = NET_VALUE_IF_NULL And AMTData(lngIndex).PNET > NET_VALUE_IF_NULL Then
-                 AMTData(lngIndex).NET = AMTData(lngIndex).PNET
-            ElseIf AMTData(lngIndex).NET > NET_VALUE_IF_NULL And AMTData(lngIndex).PNET = NET_VALUE_IF_NULL Then
-                 AMTData(lngIndex).PNET = AMTData(lngIndex).NET
+            If AMTData(lngindex).NET = NET_VALUE_IF_NULL And AMTData(lngindex).PNET > NET_VALUE_IF_NULL Then
+                 AMTData(lngindex).NET = AMTData(lngindex).PNET
+            ElseIf AMTData(lngindex).NET > NET_VALUE_IF_NULL And AMTData(lngindex).PNET = NET_VALUE_IF_NULL Then
+                 AMTData(lngindex).PNET = AMTData(lngindex).NET
             End If
             
-            If AMTData(lngIndex).NET = NET_VALUE_IF_NULL Then
+            If AMTData(lngindex).NET = NET_VALUE_IF_NULL Then
                 lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
             End If
             
             If udtFieldPresent.MSMSObsCount Then
                If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_MSMSObsCount).Value) Then
-                  AMTData(lngIndex).MSMSObsCount = CLng(.Fields(DB_FIELD_TMASSTAGS_MSMSObsCount).Value)
+                  AMTData(lngindex).MSMSObsCount = CLng(.Fields(DB_FIELD_TMASSTAGS_MSMSObsCount).Value)
                End If
             End If
             
             If udtFieldPresent.HighNormalizedScore Then
                If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_HighNormalizedScore).Value) Then
-                  AMTData(lngIndex).HighNormalizedScore = CSng(.Fields(DB_FIELD_TMASSTAGS_HighNormalizedScore).Value)
+                  AMTData(lngindex).HighNormalizedScore = CSng(.Fields(DB_FIELD_TMASSTAGS_HighNormalizedScore).Value)
                End If
             End If
             
             If udtFieldPresent.HighDiscriminantScore Then
                If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_HighDiscriminantScore).Value) Then
-                  AMTData(lngIndex).HighDiscriminantScore = CSng(.Fields(DB_FIELD_TMASSTAGS_HighDiscriminantScore).Value)
+                  AMTData(lngindex).HighDiscriminantScore = CSng(.Fields(DB_FIELD_TMASSTAGS_HighDiscriminantScore).Value)
                End If
             End If
             
             If udtFieldPresent.PeptideProphetProbability Then
                If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_PeptideProphetProbability).Value) Then
-                  AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_TMASSTAGS_PeptideProphetProbability).Value)
+                  AMTData(lngindex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_TMASSTAGS_PeptideProphetProbability).Value)
                End If
             End If
             
             blnSuccess = True
         Case dbgGeneration1000, dbgGeneration1, dbgGeneration0800, dbgGeneration0900
             If eDBGeneration < dbgGeneration1000 Then
-                AMTData(lngIndex).ID = .Fields(DB_FIELD_AMT_OLD_ID).Value
+                AMTData(lngindex).ID = .Fields(DB_FIELD_AMT_OLD_ID).Value
             Else
-                AMTData(lngIndex).ID = .Fields(DB_FIELD_AMT_NEW_ID).Value
+                AMTData(lngindex).ID = .Fields(DB_FIELD_AMT_NEW_ID).Value
             End If
             
-            AMTData(lngIndex).MW = CDbl(.Fields(DB_FIELD_AMT_MW).Value)
+            AMTData(lngindex).MW = CDbl(.Fields(DB_FIELD_AMT_MW).Value)
             
             If IsNull(.Fields(DB_FIELD_AMT_NET).Value) Then
-                AMTData(lngIndex).NET = NET_VALUE_IF_NULL
+                AMTData(lngindex).NET = NET_VALUE_IF_NULL
             Else
-                AMTData(lngIndex).NET = CDbl(.Fields(DB_FIELD_AMT_NET).Value)
+                AMTData(lngindex).NET = CDbl(.Fields(DB_FIELD_AMT_NET).Value)
             End If
             
             
             ' Set the defaults for the remaining fields
             ' We'll populate them with the real values if the field is present
-            AMTData(lngIndex).flag = 0
-            AMTData(lngIndex).PNET = NET_VALUE_IF_NULL
-            AMTData(lngIndex).NETStDev = 0
-            AMTData(lngIndex).CNT_N = -1
-            AMTData(lngIndex).CNT_Cys = -1
-            AMTData(lngIndex).MSMSObsCount = 1
-            AMTData(lngIndex).HighNormalizedScore = 0
-            AMTData(lngIndex).HighDiscriminantScore = 0
-            AMTData(lngIndex).PeptideProphetProbability = 0
+            AMTData(lngindex).flag = 0
+            AMTData(lngindex).PNET = NET_VALUE_IF_NULL
+            AMTData(lngindex).NETStDev = 0
+            AMTData(lngindex).CNT_N = -1
+            AMTData(lngindex).CNT_Cys = -1
+            AMTData(lngindex).MSMSObsCount = 1
+            AMTData(lngindex).HighNormalizedScore = 0
+            AMTData(lngindex).HighDiscriminantScore = 0
+            AMTData(lngindex).PeptideProphetProbability = 0
             
             If udtFieldPresent.Status Then
-                AMTData(lngIndex).flag = CLng(.Fields(DB_FIELD_AMT_Status).Value)
+                AMTData(lngindex).flag = CLng(.Fields(DB_FIELD_AMT_Status).Value)
             End If
             
             If udtFieldPresent.PNET Then
                 If Not IsNull(.Fields(DB_FIELD_AMT_PNET).Value) Then
-                    AMTData(lngIndex).PNET = CDbl(.Fields(DB_FIELD_AMT_PNET).Value)
+                    AMTData(lngindex).PNET = CDbl(.Fields(DB_FIELD_AMT_PNET).Value)
                 End If
             End If
             
             If udtFieldPresent.RetentionTime Then
                 If Not IsNull(.Fields(DB_FIELD_AMT_RETENTION).Value) Then
-                    AMTData(lngIndex).PNET = CDbl(.Fields(DB_FIELD_AMT_RETENTION).Value)
+                    AMTData(lngindex).PNET = CDbl(.Fields(DB_FIELD_AMT_RETENTION).Value)
                 End If
             End If
             
@@ -1068,49 +1068,49 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             ' This program uses AMTData().NET by default; AMTData().PNET historically held the retention time, in seconds, but now holds Predicted NET
             ' If one is missing from the Access DB file, then we'll copy the value from the other column to the missing column
             
-            If AMTData(lngIndex).NET = NET_VALUE_IF_NULL And AMTData(lngIndex).PNET > NET_VALUE_IF_NULL Then
-                 AMTData(lngIndex).NET = AMTData(lngIndex).PNET
-            ElseIf AMTData(lngIndex).NET > NET_VALUE_IF_NULL And AMTData(lngIndex).PNET = NET_VALUE_IF_NULL Then
-                 AMTData(lngIndex).PNET = AMTData(lngIndex).NET
+            If AMTData(lngindex).NET = NET_VALUE_IF_NULL And AMTData(lngindex).PNET > NET_VALUE_IF_NULL Then
+                 AMTData(lngindex).NET = AMTData(lngindex).PNET
+            ElseIf AMTData(lngindex).NET > NET_VALUE_IF_NULL And AMTData(lngindex).PNET = NET_VALUE_IF_NULL Then
+                 AMTData(lngindex).PNET = AMTData(lngindex).NET
             End If
             
-            If AMTData(lngIndex).NET = NET_VALUE_IF_NULL Then
+            If AMTData(lngindex).NET = NET_VALUE_IF_NULL Then
                 lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
             End If
             
             If udtFieldPresent.NitrogenAtom Then
                 If Not IsNull(.Fields(DB_FIELD_AMT_NitrogenAtom).Value) Then
-                    AMTData(lngIndex).CNT_N = CLng(.Fields(DB_FIELD_AMT_NitrogenAtom).Value)
+                    AMTData(lngindex).CNT_N = CLng(.Fields(DB_FIELD_AMT_NitrogenAtom).Value)
                 End If
             End If
             
             If udtFieldPresent.CysCount Then
                If Not IsNull(.Fields(DB_FIELD_AMT_CysCount).Value) Then
-                  AMTData(lngIndex).CNT_Cys = CLng(.Fields(DB_FIELD_AMT_CysCount).Value)
+                  AMTData(lngindex).CNT_Cys = CLng(.Fields(DB_FIELD_AMT_CysCount).Value)
                End If
             End If
             
             If udtFieldPresent.MSMSObsCount Then
                If Not IsNull(.Fields(DB_FIELD_AMT_MSMSObsCount).Value) Then
-                  AMTData(lngIndex).MSMSObsCount = CLng(.Fields(DB_FIELD_AMT_MSMSObsCount).Value)
+                  AMTData(lngindex).MSMSObsCount = CLng(.Fields(DB_FIELD_AMT_MSMSObsCount).Value)
                End If
             End If
             
             If udtFieldPresent.HighNormalizedScore Then
                If Not IsNull(.Fields(DB_FIELD_AMT_HighNormalizedScore).Value) Then
-                  AMTData(lngIndex).HighNormalizedScore = CSng(.Fields(DB_FIELD_AMT_HighNormalizedScore).Value)
+                  AMTData(lngindex).HighNormalizedScore = CSng(.Fields(DB_FIELD_AMT_HighNormalizedScore).Value)
                End If
             End If
             
             If udtFieldPresent.HighDiscriminantScore Then
                If Not IsNull(.Fields(DB_FIELD_AMT_HighDiscriminantScore).Value) Then
-                  AMTData(lngIndex).HighDiscriminantScore = CSng(.Fields(DB_FIELD_AMT_HighDiscriminantScore).Value)
+                  AMTData(lngindex).HighDiscriminantScore = CSng(.Fields(DB_FIELD_AMT_HighDiscriminantScore).Value)
                End If
             End If
             
             If udtFieldPresent.PeptideProphetProbability Then
                If Not IsNull(.Fields(DB_FIELD_AMT_PeptideProphetProbability).Value) Then
-                  AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_AMT_PeptideProphetProbability).Value)
+                  AMTData(lngindex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_AMT_PeptideProphetProbability).Value)
                End If
             End If
             
@@ -1767,7 +1767,7 @@ GoTo exit_SearchAMT
 End Function
 
 Public Sub SearchAMTComputeSLiCScores(ByRef lngCurrIDCnt As Long, ByRef udtCurrIDMatches() As udtUMCMassTagRawMatches, ByVal dblClassMass As Double, ByVal dblMWTolFinal As Double, ByVal dblNETTolFinal As Double, ByVal eSearchRegionShape As srsSearchRegionShapeConstants)
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
     Dim dblMassStDevPPM As Double
     Dim dblMassStDevAbs As Double
@@ -1797,7 +1797,7 @@ On Error GoTo ComputeSLiCScoresErrorHandler
     
     ' Compute the standarized squared distance and the numerator sum
     dblNumeratorSum = 0
-    For lngIndex = 0 To lngCurrIDCnt - 1
+    For lngindex = 0 To lngCurrIDCnt - 1
         
         ' December 2005: .UseAMTNETStDev is now always forced to be false
 ''        If glbPreferencesExpanded.SLiCScoreOptions.UseAMTNETStDev Then
@@ -1824,25 +1824,25 @@ On Error GoTo ComputeSLiCScoresErrorHandler
             dblNETStDevCombined = 0.025
         End If
         
-        With udtCurrIDMatches(lngIndex)
+        With udtCurrIDMatches(lngindex)
             .StandardizedSquaredDistance = .MassErr ^ 2 / dblMassStDevAbs ^ 2 + .NETErr ^ 2 / dblNETStDevCombined ^ 2
             
             .SLiCScoreNumerator = (1 / (dblMassStDevAbs * dblNETStDevCombined)) * Exp(-.StandardizedSquaredDistance / 2)
             
             dblNumeratorSum = dblNumeratorSum + .SLiCScoreNumerator
         End With
-    Next lngIndex
+    Next lngindex
     
     ' Compute the match score for each match
-    For lngIndex = 0 To lngCurrIDCnt - 1
-        With udtCurrIDMatches(lngIndex)
+    For lngindex = 0 To lngCurrIDCnt - 1
+        With udtCurrIDMatches(lngindex)
             If dblNumeratorSum > 0 Then
                 .SLiCScore = Round(.SLiCScoreNumerator / dblNumeratorSum, 5)
             Else
                 .SLiCScore = 0
             End If
         End With
-    Next lngIndex
+    Next lngindex
     
     
     If lngCurrIDCnt > 1 Then
@@ -1853,18 +1853,18 @@ On Error GoTo ComputeSLiCScoresErrorHandler
     If lngCurrIDCnt > 0 Then
         ' Compute the DelSLiC value
         ' If there is only one match, then the DelSLiC value is 1
-        ' If there is more than one match, then the highest scoreing match gets a DelSLiC value,
-        '  computed by subtracting the next lower scoring value from the highest scoring value; all
-        '  other matches get a DelSLiC score of 0
+        ' If there is more than one match, then the highest scoring match gets a DelSLiC value,
+        '  computed by subtracting the next lower scoring value from the highest scoring value;
+        '  all other matches get a DelSLiC score of 0
         ' This allows one to quickly identify the LC-MS Features with a single match (DelSLiC = 1) or with a match
         '  distinct from other matches (DelSLiC > threshold)
         
         If lngCurrIDCnt > 1 Then
             udtCurrIDMatches(0).DelSLiC = (udtCurrIDMatches(0).SLiCScore - udtCurrIDMatches(1).SLiCScore)
             
-            For lngIndex = 1 To lngCurrIDCnt - 1
-                udtCurrIDMatches(lngIndex).DelSLiC = 0
-            Next lngIndex
+            For lngindex = 1 To lngCurrIDCnt - 1
+                udtCurrIDMatches(lngindex).DelSLiC = 0
+            Next lngindex
         Else
             udtCurrIDMatches(0).DelSLiC = 1
         End If
@@ -1877,12 +1877,12 @@ On Error GoTo ComputeSLiCScoresErrorHandler
         '  in the ellipse or in the rectangle bounded by dblMWTolFinal and dblNETTolFinal
         ' Note that these are half-widths of the ellipse or rectangle
         lngNewIDCount = 0
-        For lngIndex = 0 To lngCurrIDCnt - 1
-            If TestPointInRegion(udtCurrIDMatches(lngIndex).NETErr, udtCurrIDMatches(lngIndex).MassErr, dblNETTolFinal, dblMWTolFinal, eSearchRegionShape) Then
-                udtCurrIDMatches(lngNewIDCount) = udtCurrIDMatches(lngIndex)
+        For lngindex = 0 To lngCurrIDCnt - 1
+            If TestPointInRegion(udtCurrIDMatches(lngindex).NETErr, udtCurrIDMatches(lngindex).MassErr, dblNETTolFinal, dblMWTolFinal, eSearchRegionShape) Then
+                udtCurrIDMatches(lngNewIDCount) = udtCurrIDMatches(lngindex)
                 lngNewIDCount = lngNewIDCount + 1
             End If
-        Next lngIndex
+        Next lngindex
            
     End If
  
@@ -1967,7 +1967,7 @@ End Sub
     Dim lngHighIndex As Long
     Dim lngCount As Long
     Dim lngIncrement As Long
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim lngIndexCompare As Long
     Dim udtCompareVal As udtUMCMassTagRawMatches
 
@@ -1993,15 +1993,15 @@ On Error GoTo ShellSortCurrIDMatchesErrorHandler
 
     Do While lngIncrement > 0
         ' sort by insertion in increments of lngIncrement
-        For lngIndex = lngLowIndex + lngIncrement To lngHighIndex
-            udtCompareVal = udtCurrIDMatches(lngIndex)
-            For lngIndexCompare = lngIndex - lngIncrement To lngLowIndex Step -lngIncrement
+        For lngindex = lngLowIndex + lngIncrement To lngHighIndex
+            udtCompareVal = udtCurrIDMatches(lngindex)
+            For lngIndexCompare = lngindex - lngIncrement To lngLowIndex Step -lngIncrement
                 ' Use <= to sort ascending; Use > to sort descending
                 If udtCurrIDMatches(lngIndexCompare).SLiCScore > udtCompareVal.SLiCScore Then Exit For
                 udtCurrIDMatches(lngIndexCompare + lngIncrement) = udtCurrIDMatches(lngIndexCompare)
             Next lngIndexCompare
             udtCurrIDMatches(lngIndexCompare + lngIncrement) = udtCompareVal
-        Next lngIndex
+        Next lngindex
         lngIncrement = lngIncrement \ 3
     Loop
 
@@ -2554,7 +2554,7 @@ LookupResidueOccurrenceErrorHandler:
     
 End Function
 
-Private Function NET_RT(lngGelIndex As Long, FN As Long, MinFN As Long, MaxFN As Long) As Double
+Private Function NET_RT(ByVal lngGelIndex As Long, ByVal FN As Long, ByVal MinFN As Long, ByVal MaxFN As Long) As Double
     If GelData(lngGelIndex).CustomNETsDefined Then
         NET_RT = ScanToGANET(lngGelIndex, FN)
     Else
@@ -3433,7 +3433,7 @@ Public Function CreateNewMTSearchObject(Optional ByVal blnUseN15AMTMasses As Boo
 '-------------------------------------------------
 
 Dim dblN15AMTMasses() As Double
-Dim lngIndex As Long
+Dim lngindex As Long
 
 On Error GoTo err_CreateNewMTSearchObject
 Set mwutSearch = New MWUtil
@@ -3441,9 +3441,9 @@ Set mwutSearch = New MWUtil
 If blnUseN15AMTMasses Then
     If AMTCnt > 0 Then
         ReDim dblN15AMTMasses(1 To AMTCnt)
-        For lngIndex = 1 To AMTCnt
-            dblN15AMTMasses(lngIndex) = AMTData(lngIndex).MW + glN14N15_DELTA * AMTData(lngIndex).CNT_N
-        Next lngIndex
+        For lngindex = 1 To AMTCnt
+            dblN15AMTMasses(lngindex) = AMTData(lngindex).MW + glN14N15_DELTA * AMTData(lngindex).CNT_N
+        Next lngindex
     Else
         ReDim dblN15AMTMasses(1)
     End If

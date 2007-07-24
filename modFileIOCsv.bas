@@ -233,6 +233,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     
     Dim lngReturnValue As Long
     
+    Dim lngScansFileByteCount As Long
     Dim lngByteCountTotal As Long
     Dim lngTotalBytesRead As Long
     
@@ -305,12 +306,13 @@ On Error GoTo LoadNewCSVErrorHandler
     ' Initialize the progress bar
     lngTotalBytesRead = 0
     lngByteCountTotal = FileLen(strIsosFilePath)
-    If mMaximumDataCountEnabled Then
-        lngByteCountTotal = lngByteCountTotal * 2
-    End If
+''    If mMaximumDataCountEnabled Then
+''        lngByteCountTotal = lngByteCountTotal * 2
+''    End If
     
     If blnValidScanFile Then
-        lngByteCountTotal = lngByteCountTotal + FileLen(strScansFilePath)
+        lngScansFileByteCount = FileLen(strScansFilePath)
+        lngByteCountTotal = lngByteCountTotal + lngScansFileByteCount
     End If
     
     frmProgress.InitializeSubtask "Reading data", 0, lngByteCountTotal
@@ -327,7 +329,7 @@ On Error GoTo LoadNewCSVErrorHandler
     If lngReturnValue = 0 Then
         ' Read the Isos file
         ' Note that the CSV Isos file only contains isotopic data, not charge state data
-        lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseName, lngTotalBytesRead, blnValidScanFile)
+        lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseName, lngScansFileByteCount, lngByteCountTotal, lngTotalBytesRead, blnValidScanFile)
     End If
         
     LoadNewCSV = lngReturnValue
@@ -344,6 +346,7 @@ LoadNewCSVErrorHandler:
 End Function
 
 Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFilePath As String, ByVal strBaseName As String, _
+                                 ByVal lngScansFileByteCount As Long, ByVal lngByteCountTotal As Long, _
                                  ByRef lngTotalBytesRead As Long, ByVal blnValidScanFile As Boolean) As Long
 
     ' Returns 0 if no error, the error number if an error
@@ -354,6 +357,7 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
     Dim objFile As File
     Dim objFolder As Folder
     
+    Dim blnMonoPlus2DataPresent As Boolean
     Dim MaxMZ As Double
     Dim intColumnMapping() As Integer
     
@@ -412,10 +416,12 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         Else
             mSubtaskMessage = "Reading Isotopic CSV file"
         End If
-        frmProgress.InitializeSubtask mSubtaskMessage, 0, 100
-    
-        ' Reset the tracking variables
+        frmProgress.InitializeSubtask mSubtaskMessage, 0, lngByteCountTotal
+        frmProgress.UpdateSubtaskProgressBar lngScansFileByteCount
+        
+            ' Reset the tracking variables
         mValidDataPointCount = 0
+        lngTotalBytesRead = 0
     
         lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, lngTotalBytesRead, intColumnMapping, blnValidScanFile)
         If lngReturnValue <> 0 Then
@@ -470,6 +476,7 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         
         ' Find the minimum and maximum MW, Abundance, and MZ values, and set the filters
         MaxMZ = 0
+        blnMonoPlus2DataPresent = False
         If .IsoLines > 0 Then
             ReDim Preserve .IsoData(.IsoLines)
             
@@ -482,6 +489,10 @@ On Error GoTo ReadCSVIsosFileErrorHandler
             If .IsoData(lngIndex).Abundance < .MinAbu Then .MinAbu = .IsoData(lngIndex).Abundance
                 If .IsoData(lngIndex).Abundance > .MaxAbu Then .MaxAbu = .IsoData(lngIndex).Abundance
                 
+                If intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) >= 0 And Not blnMonoPlus2DataPresent Then
+                    If .IsoData(lngIndex).IntensityMonoPlus2 > 0 Then blnMonoPlus2DataPresent = True
+                End If
+                
                 FindMWExtremes .IsoData(lngIndex), .MinMW, .MaxMW, MaxMZ
             Next lngIndex
         
@@ -493,8 +504,9 @@ On Error GoTo ReadCSVIsosFileErrorHandler
             .MaxMW = 0
         End If
         
-        If intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) >= 0 Then
-            ' IReport column was present
+        ' If the IReport column was present and at least one entry had a non-zero MonoPlus2Abundance value,
+        '  then set the GEL_DATA_STATUS_BIT_IREPORT data status bit
+        If blnMonoPlus2DataPresent Then
             .DataStatusBits = .DataStatusBits Or GEL_DATA_STATUS_BIT_IREPORT
         Else
             .DataStatusBits = .DataStatusBits And Not GEL_DATA_STATUS_BIT_IREPORT
@@ -541,7 +553,14 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         frmProgress.InitializeSubtask "Sorting isotopic data", 0, GelData(mGelIndex).IsoLines
     End If
     
+    ' Sort the data
     SortIsotopicData mGelIndex
+    
+    If (GelData(mGelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IREPORT) = GEL_DATA_STATUS_BIT_IREPORT Then
+        ' Fix the mono plus 2 abundance values
+        FixIsosMonoPlus2Abu mGelIndex
+    End If
+    
     
     If KeyPressAbortProcess > 1 Then
         ' User Cancelled Load
@@ -597,7 +616,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
         lngTotalBytesRead = lngTotalBytesRead + Len(strLineIn) + 2          ' Add 2 bytes to account for CrLf at end of line
         
         If lngLinesRead Mod 100 = 0 Then
-            frmProgress.UpdateSubtaskProgressBar lngTotalBytesRead
+            frmProgress.UpdateSubtaskProgressBar lngTotalBytesRead, True
             If KeyPressAbortProcess > 1 Then Exit Do
         End If
         

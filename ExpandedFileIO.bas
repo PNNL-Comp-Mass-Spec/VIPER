@@ -85,6 +85,7 @@ Public Function BinaryLoadData(ByVal strFilePath As String, ByVal lngGelIndex As
     Dim GelP_D_L2004b As IsoPairsDltLbl2004bType
     Dim GelP_D_L2004c As IsoPairsDltLbl2004cType
     Dim GelP_D_L2004d As IsoPairsDltLbl2004dType
+    Dim GelP_D_L2004e As IsoPairsDltLbl2004eType
         
     Dim GelSearchDef2002 As udtSearchDefinition2002GroupType
     Dim GelSearchDef2003 As udtSearchDefinition2003GroupType
@@ -435,7 +436,12 @@ On Error GoTo BinaryLoadDataErrorHandler
                 
                 CopyDeltaLabelPairs2004dToCurrent GelP_D_L2004d, GelP_D_L(lngGelIndex)
                 blnPairsDataLoaded = True
-            
+            ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 7# Then
+                Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
+                Get #InFileNum, , GelP_D_L2004e
+                
+                CopyDeltaLabelPairs2004eToCurrent GelP_D_L2004e, GelP_D_L(lngGelIndex)
+                blnPairsDataLoaded = True
             Else
                 MsgBox "The pairs data " & FILE_FORMAT_ERROR_MESSAGE
             End If
@@ -1105,6 +1111,52 @@ Private Sub BinarySaveDataInitSection(lngOverallProgressValue As Long, strProgre
     
 End Sub
 
+Private Sub CopyDeltaLabelPairDetails2004bToCurrent(ByVal OldPairDetailsCount As Long, ByRef OldDeltaLabelPairDetails() As udtIsoPairsDetails2004bType, ByRef CurrentDeltaLabelPairs As IsoPairsDltLblType)
+    Dim i As Long
+    Dim j As Integer
+    Dim MaxInd As Long
+    
+    With CurrentDeltaLabelPairs
+        .PCnt = OldPairDetailsCount
+        
+        If OldPairDetailsCount > 0 Then
+            MaxInd = UBound(OldDeltaLabelPairDetails)
+            If MaxInd > 0 Then
+                ReDim .Pairs(MaxInd)
+                For i = 0 To MaxInd
+                    With .Pairs(i)
+                        .P1 = OldDeltaLabelPairDetails(i).P1
+                        .P1LblCnt = OldDeltaLabelPairDetails(i).P1LblCnt
+                        .P2 = OldDeltaLabelPairDetails(i).P2
+                        .P2DltCnt = OldDeltaLabelPairDetails(i).P2DltCnt
+                        .P2LblCnt = OldDeltaLabelPairDetails(i).P2LblCnt
+                        .ER = OldDeltaLabelPairDetails(i).ER
+                        .ERStDev = OldDeltaLabelPairDetails(i).ERStDev
+                        .ERChargeStateBasisCount = OldDeltaLabelPairDetails(i).ERChargeStateBasisCount
+                        
+                        If .ERChargeStateBasisCount = 0 Then
+                            ReDim .ERChargesUsed(0)
+                        Else
+                            ReDim .ERChargesUsed(UBound(OldDeltaLabelPairDetails(i).ERChargesUsed))
+                            For j = 0 To UBound(OldDeltaLabelPairDetails(i).ERChargesUsed)
+                                .ERChargesUsed(j) = OldDeltaLabelPairDetails(i).ERChargesUsed(j)
+                            Next j
+                        End If
+                        
+                        .ERMemberBasisCount = OldDeltaLabelPairDetails(i).ERMemberBasisCount
+                        .State = OldDeltaLabelPairDetails(i).State
+                    End With
+                Next i
+            Else
+                ReDim .Pairs(0)
+            End If
+        Else
+            ReDim .Pairs(0)
+        End If
+    End With
+
+End Sub
+
 Private Sub CopyDeltaLabelPairs2003ToCurrent(OldDeltaLabelPairs As IsoPairsDltLbl2003Type, ByRef CurrentDeltaLabelPairs As IsoPairsDltLblType)
     Dim MaxInd As Long
     Dim i As Long
@@ -1158,7 +1210,7 @@ Private Sub CopyDeltaLabelPairs2003ToCurrent(OldDeltaLabelPairs As IsoPairsDltLb
                         .ERChargeStateBasisCount = 0
                         ReDim .ERChargesUsed(0)
                         .ERMemberBasisCount = 1
-                        .STATE = OldDeltaLabelPairs.PState(i)
+                        .State = OldDeltaLabelPairs.PState(i)
                     End With
                 Next i
             Else
@@ -1231,7 +1283,7 @@ Private Sub CopyDeltaLabelPairs2004aToCurrent(OldDeltaLabelPairs As IsoPairsDltL
                         .ERChargeStateBasisCount = OldDeltaLabelPairs.Pairs(i).ERChargeStateBasisCount
                         ReDim .ERChargesUsed(0)
                         .ERMemberBasisCount = OldDeltaLabelPairs.Pairs(i).ERMemberBasisCount
-                        .STATE = OldDeltaLabelPairs.Pairs(i).STATE
+                        .State = OldDeltaLabelPairs.Pairs(i).State
                     End With
                 Next i
             Else
@@ -1253,7 +1305,6 @@ CopyDeltaLabelPairsErrorHandler:
 End Sub
 
 Private Sub CopyDeltaLabelPairs2004bToCurrent(OldDeltaLabelPairs As IsoPairsDltLbl2004bType, ByRef CurrentDeltaLabelPairs As IsoPairsDltLblType)
-    Dim MaxInd As Long
     
     On Error GoTo CopyDeltaLabelPairsErrorHandler
     
@@ -1286,22 +1337,11 @@ Private Sub CopyDeltaLabelPairs2004bToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .AverageERsWeightingMode = OldDeltaLabelPairs.AverageERsWeightingMode
         End With
         
-        .PCnt = OldDeltaLabelPairs.PCnt
-        
-        If OldDeltaLabelPairs.PCnt > 0 Then
-            MaxInd = UBound(OldDeltaLabelPairs.Pairs)
-            If MaxInd > 0 Then
-                ReDim .Pairs(MaxInd)
-                .Pairs = OldDeltaLabelPairs.Pairs
-            Else
-                ReDim .Pairs(0)
-            End If
-        Else
-            ReDim .Pairs(0)
-        End If
-        
+        ' Note: .PCnt and .Pairs are copied by CopyDeltaLabelPairDetails2004bToCurrent
         .OtherInfo = ""
     End With
+    
+    CopyDeltaLabelPairDetails2004bToCurrent OldDeltaLabelPairs.PCnt, OldDeltaLabelPairs.Pairs, CurrentDeltaLabelPairs
     
     Exit Sub
     
@@ -1312,7 +1352,6 @@ CopyDeltaLabelPairsErrorHandler:
 End Sub
 
 Private Sub CopyDeltaLabelPairs2004cToCurrent(OldDeltaLabelPairs As IsoPairsDltLbl2004cType, ByRef CurrentDeltaLabelPairs As IsoPairsDltLblType)
-    Dim MaxInd As Long
     
     On Error GoTo CopyDeltaLabelPairsErrorHandler
     
@@ -1358,22 +1397,11 @@ Private Sub CopyDeltaLabelPairs2004cToCurrent(OldDeltaLabelPairs As IsoPairsDltL
              .OtherInfo = ""
         End With
         
-        .PCnt = OldDeltaLabelPairs.PCnt
-        
-        If OldDeltaLabelPairs.PCnt > 0 Then
-            MaxInd = UBound(OldDeltaLabelPairs.Pairs)
-            If MaxInd > 0 Then
-                ReDim .Pairs(MaxInd)
-                .Pairs = OldDeltaLabelPairs.Pairs
-            Else
-                ReDim .Pairs(0)
-            End If
-        Else
-            ReDim .Pairs(0)
-        End If
-        
+        ' Note: .PCnt and .Pairs are copied by CopyDeltaLabelPairDetails2004bToCurrent
         .OtherInfo = ""
     End With
+    
+    CopyDeltaLabelPairDetails2004bToCurrent OldDeltaLabelPairs.PCnt, OldDeltaLabelPairs.Pairs, CurrentDeltaLabelPairs
     
     Exit Sub
     
@@ -1384,7 +1412,6 @@ CopyDeltaLabelPairsErrorHandler:
 End Sub
 
 Private Sub CopyDeltaLabelPairs2004dToCurrent(OldDeltaLabelPairs As IsoPairsDltLbl2004dType, ByRef CurrentDeltaLabelPairs As IsoPairsDltLblType)
-    Dim MaxInd As Long
     
     On Error GoTo CopyDeltaLabelPairsErrorHandler
     
@@ -1432,26 +1459,85 @@ Private Sub CopyDeltaLabelPairs2004dToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .RemoveOutlierERsMinimumDataPointCount = OldDeltaLabelPairs.SearchDef.RemoveOutlierERsMinimumDataPointCount
             .RemoveOutlierERsConfidenceLevel = OldDeltaLabelPairs.SearchDef.RemoveOutlierERsConfidenceLevel
     
-             .OtherInfo = OldDeltaLabelPairs.OtherInfo
+            .OtherInfo = OldDeltaLabelPairs.OtherInfo
         End With
         
-        .PCnt = OldDeltaLabelPairs.PCnt
-        
-        If OldDeltaLabelPairs.PCnt > 0 Then
-            MaxInd = UBound(OldDeltaLabelPairs.Pairs)
-            If MaxInd > 0 Then
-                ReDim .Pairs(MaxInd)
-                .Pairs = OldDeltaLabelPairs.Pairs
-            Else
-                ReDim .Pairs(0)
-            End If
-        Else
-            ReDim .Pairs(0)
-        End If
-        
-        .OtherInfo = OldDeltaLabelPairs.OtherInfo
+        ' Note: .PCnt and .Pairs are copied by CopyDeltaLabelPairDetails2004bToCurrent
+        .OtherInfo = ""
     End With
     
+    CopyDeltaLabelPairDetails2004bToCurrent OldDeltaLabelPairs.PCnt, OldDeltaLabelPairs.Pairs, CurrentDeltaLabelPairs
+        
+    Exit Sub
+    
+CopyDeltaLabelPairsErrorHandler:
+    Debug.Assert False
+    Resume Next
+
+End Sub
+
+Private Sub CopyDeltaLabelPairs2004eToCurrent(OldDeltaLabelPairs As IsoPairsDltLbl2004eType, ByRef CurrentDeltaLabelPairs As IsoPairsDltLblType)
+    
+    On Error GoTo CopyDeltaLabelPairsErrorHandler
+    
+    With CurrentDeltaLabelPairs
+        .SyncWithUMC = OldDeltaLabelPairs.SyncWithUMC
+        .DltLblType = OldDeltaLabelPairs.DltLblType
+        
+        .SearchDef = glbPreferencesExpanded.PairSearchOptions.SearchDef
+        
+        With .SearchDef
+            .DeltaMass = OldDeltaLabelPairs.SearchDef.DeltaMass
+            .DeltaMassTolerance = OldDeltaLabelPairs.SearchDef.DeltaMassTolerance
+            .DeltaMassTolType = gltABS
+            
+            .AutoCalculateDeltaMinMaxCount = OldDeltaLabelPairs.SearchDef.AutoCalculateDeltaMinMaxCount
+            .DeltaCountMin = OldDeltaLabelPairs.SearchDef.DeltaCountMin
+            .DeltaCountMax = OldDeltaLabelPairs.SearchDef.DeltaCountMax
+            .DeltaStepSize = OldDeltaLabelPairs.SearchDef.DeltaStepSize
+            
+            .LightLabelMass = OldDeltaLabelPairs.SearchDef.LightLabelMass
+            .HeavyLightMassDifference = OldDeltaLabelPairs.SearchDef.HeavyLightMassDifference
+            .LabelCountMin = OldDeltaLabelPairs.SearchDef.LabelCountMin
+            .LabelCountMax = OldDeltaLabelPairs.SearchDef.LabelCountMax
+            .MaxDifferenceInNumberOfLightHeavyLabels = OldDeltaLabelPairs.SearchDef.MaxDifferenceInNumberOfLightHeavyLabels
+            
+            .RequireUMCOverlap = OldDeltaLabelPairs.SearchDef.RequireUMCOverlap
+            .RequireUMCOverlapAtApex = OldDeltaLabelPairs.SearchDef.RequireUMCOverlapAtApex
+            
+            .ScanTolerance = OldDeltaLabelPairs.SearchDef.ScanTolerance
+            .ScanToleranceAtApex = OldDeltaLabelPairs.SearchDef.ScanToleranceAtApex
+            
+            .ERInclusionMin = OldDeltaLabelPairs.SearchDef.ERInclusionMin
+            .ERInclusionMax = OldDeltaLabelPairs.SearchDef.ERInclusionMax
+            
+            .RequireMatchingChargeStatesForPairMembers = OldDeltaLabelPairs.SearchDef.RequireMatchingChargeStatesForPairMembers
+            .UseIdenticalChargesForER = OldDeltaLabelPairs.SearchDef.UseIdenticalChargesForER
+            .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
+            .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
+            .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode
+            
+            .ERCalcType = OldDeltaLabelPairs.SearchDef.ERCalcType
+             
+            .IReportEROptions = OldDeltaLabelPairs.SearchDef.IReportEROptions
+            
+            .RemoveOutlierERs = OldDeltaLabelPairs.SearchDef.RemoveOutlierERs
+            .RemoveOutlierERsIterate = OldDeltaLabelPairs.SearchDef.RemoveOutlierERsIterate
+            .RemoveOutlierERsMinimumDataPointCount = OldDeltaLabelPairs.SearchDef.RemoveOutlierERsMinimumDataPointCount
+            .RemoveOutlierERsConfidenceLevel = OldDeltaLabelPairs.SearchDef.RemoveOutlierERsConfidenceLevel
+    
+            ' The N15 Incorporation options were initialized when we copied the .SearchDef from glbPreferencesExpanded
+
+            .OtherInfo = OldDeltaLabelPairs.SearchDef.OtherInfo
+        End With
+        
+
+        ' Note: .PCnt and .Pairs are copied by CopyDeltaLabelPairDetails2004bToCurrent
+        .OtherInfo = ""
+    End With
+    
+    CopyDeltaLabelPairDetails2004bToCurrent OldDeltaLabelPairs.PCnt, OldDeltaLabelPairs.Pairs, CurrentDeltaLabelPairs
+        
     Exit Sub
     
 CopyDeltaLabelPairsErrorHandler:
@@ -2597,7 +2683,7 @@ Private Sub CopyLegacyMassCalibrationInfoToData(ByRef CurrentGelData As Document
     End If
 End Sub
 
-Private Sub GelAnalysisInfoRead(InFileNum As Integer, fIndex As Long)
+Private Sub GelAnalysisInfoRead(ByVal InFileNum As Integer, ByVal fIndex As Long)
     Get #InFileNum, , mGelAnalysis
     If mGelAnalysis.ValidAnalysisDataPresent Then
         
@@ -2609,14 +2695,14 @@ Private Sub GelAnalysisInfoRead(InFileNum As Integer, fIndex As Long)
     
 End Sub
 
-Private Sub GelAnalysisInfoWrite(OutFileNum As Integer, fIndex As Long)
+Private Sub GelAnalysisInfoWrite(ByVal OutFileNum As Integer, ByVal fIndex As Long)
     
     FillGelAnalysisInfo mGelAnalysis, GelAnalysis(fIndex)
     
     Put #OutFileNum, , mGelAnalysis
 End Sub
 
-Private Sub ValidateDataArrays(lngGelIndex As Long)
+Private Sub ValidateDataArrays(ByVal lngGelIndex As Long)
     Dim lngIndex As Long
     
 On Error GoTo FixCSArray
@@ -2661,7 +2747,7 @@ Private Sub InitFileIOOffsetsAndVersions()
     FileInfoVersions(fioORFData) = 5#               ' Since GelORFData().ORFs() and GelORFMassTags().ORFs() are parallel arrays, be sure to change the fioORFData and fioORFMassTags version numbers together
     FileInfoVersions(fioORFMassTags) = 5#
     FileInfoVersions(fioGelPairs) = 2#
-    FileInfoVersions(fioGelDeltaLabeledPairs) = 7#  ' Note: Version 2# uses IsoPairsDltLbl2003Type; Version 3# uses IsoPairsDltLbl2004aType; Version 4# uses IsoPairsDltLbl2004bType; Version 5# uses IsoPairsDltLbl2004cType; Version 6# uses IsoPairsDltLbl2004dType; Version 7# uses the current definition
+    FileInfoVersions(fioGelDeltaLabeledPairs) = 8#  ' Note: Version 2# uses IsoPairsDltLbl2003Type; Version 3# uses IsoPairsDltLbl2004aType; Version 4# uses IsoPairsDltLbl2004bType; Version 5# uses IsoPairsDltLbl2004cType; Version 6# uses IsoPairsDltLbl2004dType; Version 7# uses IsoPairsDltLbl2004eType; Version 8# uses the current definition
     FileInfoVersions(fioGelIDP) = 2#
     FileInfoVersions(fioGelLM) = 2#
     FileInfoVersions(fioGelORFViewerSavedGelListAndOptions) = 3#

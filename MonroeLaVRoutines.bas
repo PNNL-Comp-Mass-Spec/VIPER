@@ -13,7 +13,7 @@ Public Sub AddOrUpdateCollectionArrayItem(ByRef udtCollectionArray() As udtColle
     ' If found, update the value to strValue
     ' If not found, then add a new entry
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim strItemName As String, strNameToUpdateForComparison As String
     Dim blnMatched As Boolean
     
@@ -28,19 +28,19 @@ On Error GoTo AddOrUpdateCollectionArrayItemErrorHandler
         strNameToUpdateForComparison = strNameToUpdate
     End If
 
-    For lngIndex = 0 To lngCollectionArrayCount - 1
+    For lngindex = 0 To lngCollectionArrayCount - 1
         
-        strItemName = udtCollectionArray(lngIndex).Name
+        strItemName = udtCollectionArray(lngindex).Name
         If Not blnCaseSensitive Then strItemName = UCase(strItemName)
         
         If strItemName = strNameToUpdateForComparison Then
             If Not blnAddIfMissingButDoNotUpdate Then
-                udtCollectionArray(lngIndex).Value = strValue
+                udtCollectionArray(lngindex).Value = strValue
             End If
             blnMatched = True
             Exit For
         End If
-    Next lngIndex
+    Next lngindex
         
     If Not blnMatched Then
         If lngCollectionArrayCount < DBSTUFF_COLLECTION_COUNT_MAX Then
@@ -60,7 +60,7 @@ AddOrUpdateCollectionArrayItemErrorHandler:
 
 End Sub
 
-Public Sub AddToAnalysisHistory(lngGelIndex As Long, ByVal strNewHistoryText As String, Optional blnRemoveCrLf As Boolean = True)
+Public Sub AddToAnalysisHistory(ByVal lngGelIndex As Long, ByVal strNewHistoryText As String, Optional ByVal blnRemoveCrLf As Boolean = True)
     ' Adds a new entry to the Analysis history for Analysis at lngGelIndex
     Dim lngCharLoc As Long
     Dim strHistoryTextFormatted As String
@@ -618,9 +618,9 @@ err_LoadMTDB:
     
 End Function
 
-Public Function ConstructUMCIndexList(lngGelIndex As Long, lngIonIndex As Long, intIonType As Integer) As String
+Public Function ConstructUMCIndexList(ByVal lngGelIndex As Long, ByVal lngIonIndex As Long, ByVal intIonType As Integer) As String
     Dim strUMCIndices As String
-    Dim lngIndex As Long
+    Dim lngindex As Long
 
 On Error GoTo ConstructUMCIndexListErrorHandler
 
@@ -628,17 +628,17 @@ On Error GoTo ConstructUMCIndexListErrorHandler
         Select Case intIonType
         Case glCSType
             With .CSUMCs(lngIonIndex)
-                For lngIndex = 0 To .UMCCount - 1
+                For lngindex = 0 To .UMCCount - 1
                     If Len(strUMCIndices) > 0 Then strUMCIndices = strUMCIndices & glARG_SEP
-                    strUMCIndices = strUMCIndices & Trim(.UMCs(lngIndex))
-                Next lngIndex
+                    strUMCIndices = strUMCIndices & Trim(.UMCs(lngindex))
+                Next lngindex
             End With
         Case glIsoType
             With .IsoUMCs(lngIonIndex)
-                For lngIndex = 0 To .UMCCount - 1
+                For lngindex = 0 To .UMCCount - 1
                     If Len(strUMCIndices) > 0 Then strUMCIndices = strUMCIndices & glARG_SEP
-                    strUMCIndices = strUMCIndices & Trim(.UMCs(lngIndex))
-                Next lngIndex
+                    strUMCIndices = strUMCIndices & Trim(.UMCs(lngindex))
+                Next lngindex
             End With
         End Select
     End With
@@ -651,7 +651,7 @@ ConstructUMCIndexListErrorHandler:
 
 End Function
 
-Public Function ConstructAnalysisParametersText(lngGelIndex As Long, strUMCSearchMode As String, strMassTagSearchMode As String, Optional strIniFileName As String = "") As String
+Public Function ConstructAnalysisParametersText(ByVal lngGelIndex As Long, ByVal strUMCSearchMode As String, ByVal strMassTagSearchMode As String, Optional ByVal strIniFileName As String = "") As String
     ' strUMCSearchMode should be AUTO_ANALYSIS_UMC2003 = "UMC2003" or AUTO_ANALYSIS_UMCIonNet = "UMCIonNet" or something similar
     ' strMassTagSearchMode should be AUTO_SEARCH_EXPORT_UMCS_ONLY, AUTO_SEARCH_ORGANISM_MTDB = "IndividualPeaks" or AUTO_SEARCH_UMC_MTDB = "IndividualPeaksInUMCsWithoutNET" etc.
     
@@ -909,7 +909,7 @@ Public Function ConstructNETFormulaWithDefaults(udtUMCNetAdjDef As NetAdjDefinit
 
 End Function
 
-Public Function ConstructUMCDefDescription(lngGelIndex As Long, strSearchModeTypeDesc As String, udtUMCDef As UMCDefinition, ByRef udtUMCAdvancedStatsOptions As udtUMCAdvancedStatsOptionsType, blnAllowMemberSharing As Boolean, Optional blnUMCIonNet As Boolean = False) As String
+Public Function ConstructUMCDefDescription(ByVal lngGelIndex As Long, ByVal strSearchModeTypeDesc As String, ByRef udtUMCDef As UMCDefinition, ByRef udtUMCAdvancedStatsOptions As udtUMCAdvancedStatsOptionsType, ByVal blnAllowMemberSharing As Boolean, Optional ByVal blnUMCIonNet As Boolean = False) As String
     
     Dim strDesc As String
     Dim strAddnlText As String
@@ -940,9 +940,9 @@ Public Function ConstructUMCDefDescription(lngGelIndex As Long, strSearchModeTyp
     strDesc = strDesc & "; Most Abu Charge State Group Type = " & Trim(udtUMCDef.ChargeStateStatsRepType)
     
     Select Case udtUMCDef.ClassMW
-        Case UMCClassMassConstants.UMCMassAvg: strAddnlText = "Average class mass"
+        Case UMCClassMassConstants.UMCMassAvg: strAddnlText = "Average of class member masses"
         Case UMCClassMassConstants.UMCMassRep: strAddnlText = "Mass of class representative"
-        Case UMCClassMassConstants.UMCMassMed: strAddnlText = "Median"
+        Case UMCClassMassConstants.UMCMassMed: strAddnlText = "Median of class member masses"
         Case UMCClassMassConstants.UMCMassAvgTopX, UMCClassMassConstants.UMCMassMedTopX
             If udtUMCDef.ClassMW = UMCClassMassConstants.UMCMassAvgTopX Then
                 strAddnlText = "Average of top X members"
@@ -960,6 +960,14 @@ Public Function ConstructUMCDefDescription(lngGelIndex As Long, strSearchModeTyp
         Case Else: strAddnlText = "Unknown type"
     End Select
     strDesc = strDesc & "; Class mass = " & strAddnlText
+    
+    Select Case udtUMCDef.MWField
+    Case isfMWAvg: strAddnlText = "Average molecular mass"
+    Case isfMWMono: strAddnlText = "Monoisotopic molecular mass"
+    Case isfMWTMA: strAddnlText = "Most abundant molecular mass"
+    Case Else: strAddnlText = "Unknown type"
+    End Select
+    strDesc = strDesc & "; Class mass type = " & strAddnlText
     
     Select Case udtUMCDef.ClassAbu
         Case UMCClassAbundanceConstants.UMCAbuAvg: strAddnlText = "Class average abundance"
@@ -1263,7 +1271,7 @@ Public Function LookupCollectionArrayValueByName(ByRef udtThisCollectionArray() 
     ' Returns .Value if found
     ' Returns strNotFoundIndicator if not found, or if an error occurs
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim strItemName As String, strValue As String
     Dim blnFound As Boolean
     
@@ -1273,16 +1281,16 @@ On Error GoTo LookupCollectionArrayValueErrorHandler
         strNameToFind = UCase(strNameToFind)
     End If
     
-    For lngIndex = 0 To lngArrayCount - 1
-        strItemName = udtThisCollectionArray(lngIndex).Name
+    For lngindex = 0 To lngArrayCount - 1
+        strItemName = udtThisCollectionArray(lngindex).Name
         If Not blnCaseSensitive Then strItemName = UCase(strItemName)
         
         If strItemName = strNameToFind Then
             blnFound = True
-            strValue = udtThisCollectionArray(lngIndex).Value
+            strValue = udtThisCollectionArray(lngindex).Value
             Exit For
         End If
-    Next lngIndex
+    Next lngindex
     
     If Not blnFound Then
         LookupCollectionArrayValueByName = strNotFoundIndicator
@@ -1316,7 +1324,7 @@ Public Function LookupDefaultSeparationCharacter() As String
 
 End Function
 
-Public Function LookupExpressionRatioValue(lngGelIndex As Long, lngIonIndex As Long, Optional blnIsotopicData As Boolean = True, Optional sngValueIfNotDefined As Single = ER_NO_RATIO) As Double
+Public Function LookupExpressionRatioValue(ByVal lngGelIndex As Long, ByVal lngIonIndex As Long, Optional ByVal blnIsotopicData As Boolean = True, Optional ByVal sngValueIfNotDefined As Single = ER_NO_RATIO) As Double
     ' Returns the value in GelData(lngGelIndex).IsoData(lngIonIndex).ExpressionRatio
     '                   or GelData(lngGelIndex).CSData(lngIonIndex).ExpressionRatio
     ' If the value is equal to ER_NO_RATIO, then returns sngValueIfNotDefined
@@ -1510,7 +1518,7 @@ Public Function LookupORFNamesForMTIDusingMTtoORFMapOptimized(ByVal lngMassTagID
     Dim blnSuccess As Boolean, blnMatched As Boolean
     Dim lngMatchingIndices() As Long
     Dim lngMatchingIndicesCount As Long
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim lngNameIndex As Long
     
     Dim ORFIDMatches() As Long                  ' 0-based array holding ORF ref ID's
@@ -1537,8 +1545,8 @@ On Error GoTo LookupORFNamesErrorHandler
         ReDim ORFIDMatches(lngMatchingIndicesCount)
         ReDim ORFNameMatches(lngMatchingIndicesCount)
 
-        For lngIndex = 0 To lngMatchingIndicesCount - 1
-            lngMTIndex = lngMatchingIndices(lngIndex)
+        For lngindex = 0 To lngMatchingIndicesCount - 1
+            lngMTIndex = lngMatchingIndices(lngindex)
         
             ' See if we already have this entry in ORFIDMatches() or in ORFRefNames()
             blnMatched = False
@@ -1563,7 +1571,7 @@ On Error GoTo LookupORFNamesErrorHandler
                 lngORFMatchCount = lngORFMatchCount + 1
             End If
         
-        Next lngIndex
+        Next lngindex
         
         If lngORFMatchCount > 1 Then
             ' Sort ORFNameMatches()
@@ -1583,7 +1591,7 @@ Public Function LookupParallelStringArrayItemByName(ByRef strNameArray() As Stri
     ' Looks for entry in strNameArray() matching strNameToFind, returning corresponding value in strValuesArray()
     ' Returns "" if strNameToFind is not found, or if an error occurs
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim strItemName As String, strValue As String
     
 On Error GoTo LookupParallelStringArrayItemErrorHandler
@@ -1593,15 +1601,15 @@ On Error GoTo LookupParallelStringArrayItemErrorHandler
         strNameToFind = UCase(strNameToFind)
     End If
     
-    For lngIndex = 0 To lngArrayCount
-        strItemName = strNameArray(lngIndex)
+    For lngindex = 0 To lngArrayCount
+        strItemName = strNameArray(lngindex)
         If Not blnCaseSensitive Then strItemName = UCase(strItemName)
         
         If strItemName = strNameToFind Then
-            strValue = strValuesArray(lngIndex)
+            strValue = strValuesArray(lngindex)
             Exit For
         End If
-    Next lngIndex
+    Next lngindex
     
     LookupParallelStringArrayItemByName = strValue
     Exit Function
@@ -1825,7 +1833,7 @@ Public Function NitrogenCount(ByVal strSequenceOneLetter As String) As Long
     
 End Function
 
-Public Function ExtractInputFilePath(lngGelIndex As Long) As String
+Public Function ExtractInputFilePath(ByVal lngGelIndex As Long) As String
     Dim strFilePath As String
     Dim lngCharLoc As Long
     
@@ -2067,12 +2075,12 @@ Private Sub FillNamesAndValuesArrays(ByRef SourceArray() As udtCollectionArrayTy
         ReDim strNamesArray(0 To lngArrayCount - 1)
         ReDim strValuesArray(0 To lngArrayCount - 1)
         
-        Dim lngIndex As Long
+        Dim lngindex As Long
         
-        For lngIndex = 0 To lngArrayCount - 1
-            strNamesArray(lngIndex) = SourceArray(lngIndex).Name
-            strValuesArray(lngIndex) = SourceArray(lngIndex).Value
-        Next lngIndex
+        For lngindex = 0 To lngArrayCount - 1
+            strNamesArray(lngindex) = SourceArray(lngindex).Name
+            strValuesArray(lngindex) = SourceArray(lngindex).Value
+        Next lngindex
     End If
     
 End Sub
@@ -2384,7 +2392,7 @@ Public Sub CopyIsoDataToLegacy(ByRef udtIsotopicData As udtIsotopicDataType, ByR
         IsoNum(lngIsoIndex, isfFit) = .Fit
         
         IsoNum(lngIsoIndex, isfMWMono) = .MonoisotopicMW
-        IsoNum(lngIsoIndex, isfMWavg) = .AverageMW
+        IsoNum(lngIsoIndex, isfMWAvg) = .AverageMW
         IsoNum(lngIsoIndex, isfMWTMA) = .MostAbundantMW
                 
         IsoNum(lngIsoIndex, isfIsotopicFitRatio) = 0            ' .IsotopicFitRatio
@@ -2489,7 +2497,7 @@ Public Sub CopyLegacyIsoToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, 
         .Fit = IsoNum(lngIsoIndex, isfFit)
         
         .MonoisotopicMW = IsoNum(lngIsoIndex, isfMWMono)
-        .AverageMW = IsoNum(lngIsoIndex, isfMWavg)
+        .AverageMW = IsoNum(lngIsoIndex, isfMWAvg)
         .MostAbundantMW = IsoNum(lngIsoIndex, isfMWTMA)
         .MassStDev = 0
         
@@ -2637,7 +2645,7 @@ End Function
 
 Public Sub DefineDefaultElutionTimes(udtScanInfo() As udtScanInfoType, Optional ByVal sngNETStart As Single = 0, Optional ByVal sngNETEnd As Single = 1)
 
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim lngMaxIndex As Long
     
     Dim lngMaxScanNumber As Long
@@ -2651,11 +2659,11 @@ On Error GoTo DefineDefaultElutionTimesErrorHandler
     If lngMaxIndex > 0 Then
         lngMaxScanNumber = udtScanInfo(lngMaxIndex).ScanNumber
         
-        For lngIndex = 1 To lngMaxIndex
-            With udtScanInfo(lngIndex)
+        For lngindex = 1 To lngMaxIndex
+            With udtScanInfo(lngindex)
                 .ElutionTime = .ScanNumber / lngMaxScanNumber * sngNETRange + sngNETStart
             End With
-        Next lngIndex
+        Next lngindex
     End If
     
     Exit Sub
@@ -2750,7 +2758,7 @@ Private Function FindTextInAnalysisHistory(ByVal lngGelIndex As Long, ByVal strT
     ' If found, returns the history text and sets lngHistoryIndexOfMatch to the HistoryIndex of the match
     ' If not found, returns "", and sets lngHistoryIndexOfMatch to -1
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim strMatchText As String
     
     strTextToFind = UCase(strTextToFind)
@@ -2760,13 +2768,13 @@ Private Function FindTextInAnalysisHistory(ByVal lngGelIndex As Long, ByVal strT
     
     If lngGelIndex >= 1 And lngGelIndex <= UBound(GelSearchDef()) Then
         With GelSearchDef(lngGelIndex)
-            For lngIndex = lngAnalysisHistoryIndexStartSearch To .AnalysisHistoryCount - 1
-                If InStr(UCase(.AnalysisHistory(lngIndex)), strTextToFind) Then
-                    strMatchText = .AnalysisHistory(lngIndex)
-                    lngHistoryIndexOfMatch = lngIndex
+            For lngindex = lngAnalysisHistoryIndexStartSearch To .AnalysisHistoryCount - 1
+                If InStr(UCase(.AnalysisHistory(lngindex)), strTextToFind) Then
+                    strMatchText = .AnalysisHistory(lngindex)
+                    lngHistoryIndexOfMatch = lngindex
                     Exit For
                 End If
-            Next lngIndex
+            Next lngindex
         End With
     End If
 
@@ -3063,7 +3071,7 @@ End Sub
 
 Public Function GetIsoDescription(intIsoField As Integer) As String
     Select Case intIsoField
-    Case isfMWavg
+    Case isfMWAvg
         GetIsoDescription = "Average mass"
     Case isfMWMono
         GetIsoDescription = "Monoisotopic mass"
@@ -3328,14 +3336,14 @@ Public Function MonoMassToMZ(dblMonoisotopicMass As Double, intCharge As Integer
     MonoMassToMZ = ConvoluteMass(dblMonoisotopicMass + glMASS_CC, 1, intCharge)
 End Function
 
-Public Function PairIndexLookupInitialize(lngGelIndex As Long, objP1IndFastSearch As FastSearchArrayLong, objP2IndFastSearch As FastSearchArrayLong) As Boolean
+Public Function PairIndexLookupInitialize(ByVal lngGelIndex As Long, ByRef objP1IndFastSearch As FastSearchArrayLong, ByRef objP2IndFastSearch As FastSearchArrayLong) As Boolean
     ' Initializes objP1IndFastSearch and objP2IndFastSearch with the .P1() and .P2() arrays
     '  in GelP_D_L for the gel specified by lngGelIndex
     ' Returns True if pairs are present; returns False otherwise
     
     Dim blnPairsPresent As Boolean
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim lngPairIndices() As Long
     
 On Error GoTo InitializePairIndexLookupObjectsErrorHandler
@@ -3349,17 +3357,17 @@ On Error GoTo InitializePairIndexLookupObjectsErrorHandler
             ' When using the .Fill function we need to send an array of longs
             ' However, since .Pairs() is a UDT array, we need to copy the data from .Pairs().P1 into lngPairIndices()
             ReDim lngPairIndices(UBound(.Pairs))
-            For lngIndex = 0 To UBound(.Pairs)
-                lngPairIndices(lngIndex) = .Pairs(lngIndex).P1
-            Next lngIndex
+            For lngindex = 0 To UBound(.Pairs)
+                lngPairIndices(lngindex) = .Pairs(lngindex).P1
+            Next lngindex
             
             blnPairsPresent = objP1IndFastSearch.Fill(lngPairIndices())
         
             If blnPairsPresent Then
                 
-                For lngIndex = 0 To UBound(.Pairs)
-                    lngPairIndices(lngIndex) = .Pairs(lngIndex).P2
-                Next lngIndex
+                For lngindex = 0 To UBound(.Pairs)
+                    lngPairIndices(lngindex) = .Pairs(lngindex).P2
+                Next lngindex
                 
                 blnPairsPresent = objP2IndFastSearch.Fill(lngPairIndices())
             End If
@@ -3376,7 +3384,7 @@ InitializePairIndexLookupObjectsErrorHandler:
     
 End Function
 
-Public Function PairsPresent(lngGelIndex As Long) As Boolean
+Public Function PairsPresent(ByVal lngGelIndex As Long) As Boolean
     ' Returns True if pairs are present
 
 On Error GoTo PairsPresentErrorHandler
@@ -3396,7 +3404,7 @@ PairsPresentErrorHandler:
 
 End Function
 
-Public Function PairIndexLookupSearch(lngGelIndex As Long, lngUMCIndex As Long, objP1IndFastSearch As FastSearchArrayLong, objP2IndFastSearch As FastSearchArrayLong, blnReturnAllPairInstances As Boolean, blnFavorHeavy As Boolean, ByRef lngPairMatchCount As Long, ByRef udtPairMatchStats() As udtPairMatchStatsType, Optional dblValueIfERNotDefined As Double = ER_NO_RATIO) As Long
+Public Function PairIndexLookupSearch(ByVal lngGelIndex As Long, ByVal lngUMCIndex As Long, ByRef objP1IndFastSearch As FastSearchArrayLong, ByRef objP2IndFastSearch As FastSearchArrayLong, ByVal blnReturnAllPairInstances As Boolean, ByVal blnFavorHeavy As Boolean, ByRef lngPairMatchCount As Long, ByRef udtPairMatchStats() As udtPairMatchStatsType, Optional ByVal dblValueIfERNotDefined As Double = ER_NO_RATIO) As Long
     ' Returns the index in GelP_D_L(lngGelIndex).P1() or GelP_D_L(lngGelIndex).P2() that contains lngUMCIndex
     ' In addition, returns various stats in udtPairMatchStats()
     '
@@ -4024,16 +4032,16 @@ End Function
 
 Public Sub SetEditCopyEMFOptions(blnIncludeFileNameAndDate As Boolean, blnIncludeTextLabels As Boolean)
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
     glbPreferencesExpanded.GraphicExportOptions.CopyEMFIncludeFilenameAndDate = blnIncludeFileNameAndDate
     glbPreferencesExpanded.GraphicExportOptions.CopyEMFIncludeTextLabels = blnIncludeTextLabels
     
     On Error Resume Next
-    For lngIndex = 1 To UBound(GelBody())
-        GelBody(lngIndex).mnuEditCopyEMFIncludeFileNameAndTime.Checked = glbPreferencesExpanded.GraphicExportOptions.CopyEMFIncludeFilenameAndDate
-        GelBody(lngIndex).mnuEditCopyEMFIncludeTextLabels.Checked = glbPreferencesExpanded.GraphicExportOptions.CopyEMFIncludeTextLabels
-    Next lngIndex
+    For lngindex = 1 To UBound(GelBody())
+        GelBody(lngindex).mnuEditCopyEMFIncludeFileNameAndTime.Checked = glbPreferencesExpanded.GraphicExportOptions.CopyEMFIncludeFilenameAndDate
+        GelBody(lngindex).mnuEditCopyEMFIncludeTextLabels.Checked = glbPreferencesExpanded.GraphicExportOptions.CopyEMFIncludeTextLabels
+    Next lngindex
 
 End Sub
 
@@ -4542,7 +4550,7 @@ UpdateNetAdjRangeStatsErrorHandler:
     lblNetAdjInitialNETStats = "Error computing Scan to NET examples"
 End Sub
 
-Public Function UpdateUMCStatArrays(lngGelIndex As Long, Optional blnUseProgressForm As Boolean = False, Optional frmCallingForm As VB.Form) As Boolean
+Public Function UpdateUMCStatArrays(ByVal lngGelIndex As Long, Optional ByVal blnUseProgressForm As Boolean = False, Optional ByRef frmCallingForm As VB.Form) As Boolean
     ' Returns True if success, False otherwise
     
     Dim blnSuccess As Boolean
@@ -4576,26 +4584,26 @@ Public Function LookupValueInStringByKey(ByVal strContainer As String, ByVal str
     
     Dim strSettings() As String
     Dim strCompare As String, strValue As String
-    Dim lngSettingCount As Long, lngIndex As Long, lngMatchIndex As Long
+    Dim lngSettingCount As Long, lngindex As Long, lngMatchIndex As Long
     Dim lngCharLoc As Long
     
     lngSettingCount = ParseString(strContainer, strSettings(), MAX_SETTING_COUNT, strEntryDelimeter, "", True, False, False)
     
     ' Find the desired setting
     lngMatchIndex = -1
-    For lngIndex = 0 To lngSettingCount - 1
-        lngCharLoc = InStr(strSettings(lngIndex), strSettingDelimeter)
+    For lngindex = 0 To lngSettingCount - 1
+        lngCharLoc = InStr(strSettings(lngindex), strSettingDelimeter)
         If lngCharLoc = 0 Then
-            strCompare = strSettings(lngIndex)
+            strCompare = strSettings(lngindex)
         Else
-            strCompare = Left(strSettings(lngIndex), lngCharLoc - 1)
+            strCompare = Left(strSettings(lngindex), lngCharLoc - 1)
         End If
         
         If LCase(strCompare) = LCase(strKey) Then
-            lngMatchIndex = lngIndex
+            lngMatchIndex = lngindex
             Exit For
         End If
-    Next lngIndex
+    Next lngindex
     
     
     If lngMatchIndex < 0 Then
@@ -4625,26 +4633,26 @@ Public Function UpdateValueInStringByKey(ByVal strContainer As String, ByVal str
     
     Dim strSettings() As String
     Dim strCompare As String
-    Dim lngSettingCount As Long, lngIndex As Long, lngMatchIndex As Long
+    Dim lngSettingCount As Long, lngindex As Long, lngMatchIndex As Long
     Dim lngCharLoc As Long
     
     lngSettingCount = ParseString(strContainer, strSettings(), MAX_SETTING_COUNT, strEntryDelimeter, "", True, False, False)
     
     ' Find the desired setting
     lngMatchIndex = -1
-    For lngIndex = 0 To lngSettingCount - 1
-        lngCharLoc = InStr(strSettings(lngIndex), strSettingDelimeter)
+    For lngindex = 0 To lngSettingCount - 1
+        lngCharLoc = InStr(strSettings(lngindex), strSettingDelimeter)
         If lngCharLoc = 0 Then
-            strCompare = strSettings(lngIndex)
+            strCompare = strSettings(lngindex)
         Else
-            strCompare = Left(strSettings(lngIndex), lngCharLoc - 1)
+            strCompare = Left(strSettings(lngindex), lngCharLoc - 1)
         End If
         
         If LCase(strCompare) = LCase(strKey) Then
-            lngMatchIndex = lngIndex
+            lngMatchIndex = lngindex
             Exit For
         End If
-    Next lngIndex
+    Next lngindex
     
     ' Add the setting if not found
     If lngMatchIndex < 0 Then
@@ -4666,10 +4674,10 @@ Public Function UpdateValueInStringByKey(ByVal strContainer As String, ByVal str
     strSettings(lngMatchIndex) = Left(strSettings(lngMatchIndex), lngCharLoc) & strNewValue
     
     strContainer = ""
-    For lngIndex = 0 To lngSettingCount - 1
+    For lngindex = 0 To lngSettingCount - 1
         If Len(strContainer) > 0 Then strContainer = strContainer & strEntryDelimeter
-        strContainer = strContainer & strSettings(lngIndex)
-    Next lngIndex
+        strContainer = strContainer & strSettings(lngindex)
+    Next lngindex
     
     UpdateValueInStringByKey = strContainer
     
@@ -4677,7 +4685,7 @@ End Function
 
 Public Sub CustomNETsClear(ByVal lngGelIndex As Long)
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
 On Error GoTo CustomNETsClearErrorHandler
     
@@ -4688,9 +4696,9 @@ On Error GoTo CustomNETsClearErrorHandler
 
     GelData(lngGelIndex).CustomNETsDefined = False
     With GelData(lngGelIndex)
-        For lngIndex = 1 To UBound(.ScanInfo)
-            .ScanInfo(lngIndex).CustomNET = 0
-        Next lngIndex
+        For lngindex = 1 To UBound(.ScanInfo)
+            .ScanInfo(lngindex).CustomNET = 0
+        Next lngindex
     End With
 
     Exit Sub
@@ -4703,7 +4711,7 @@ End Sub
 
 Public Sub CustomNETsValidateStatus(ByVal lngGelIndex As Long)
 
-    Dim lngIndex As Long
+    Dim lngindex As Long
 
 On Error GoTo CustomNETsValidateStatusErrorHandler
 
@@ -4717,12 +4725,12 @@ On Error GoTo CustomNETsValidateStatusErrorHandler
 
     ' See if 1 or more scans in .ScanInfo() contain a non-zero .CustomNET value
     With GelData(lngGelIndex)
-        For lngIndex = 1 To UBound(.ScanInfo)
-            If .ScanInfo(lngIndex).CustomNET <> 0 Then
+        For lngindex = 1 To UBound(.ScanInfo)
+            If .ScanInfo(lngindex).CustomNET <> 0 Then
                 GelData(lngGelIndex).CustomNETsDefined = True
                 Exit For
             End If
-        Next lngIndex
+        Next lngindex
     End With
 
     Exit Sub
@@ -4866,17 +4874,17 @@ Public Sub ValidateMTMinimimumHighNormalizedScore(ByRef udtAMTData() As udtAMTDa
     ' If not, divide by 2 (or subtract 0.5), and test again
     ' If any errors occur, set sngMTMinimumHighNormalizedScore to 0
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim lngMatchCount As Long
     
     On Error GoTo ValidateScoreErrorHandler
 
     Do
         lngMatchCount = 0
-        For lngIndex = lngIndexStart To lngIndexEnd
-            If udtAMTData(lngIndex).HighNormalizedScore >= sngMTMinimumHighNormalizedScore Then lngMatchCount = lngMatchCount + 1
+        For lngindex = lngIndexStart To lngIndexEnd
+            If udtAMTData(lngindex).HighNormalizedScore >= sngMTMinimumHighNormalizedScore Then lngMatchCount = lngMatchCount + 1
             If lngMatchCount >= lngMinMatchCount Then Exit Do
-        Next lngIndex
+        Next lngindex
         
         ' Not enough matching MT tags
         ' If score is > 2, then divide by 2; otherwise, subtract 0.5
@@ -4905,7 +4913,7 @@ Public Sub ValidateMTMinimumDiscriminantAndPepProphet(ByRef udtAMTData() As udtA
     Const DECREASE_AMOUNT As Single = 0.1
     Const MAX_ITERATIONS As Integer = 25
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim lngMatchCount As Long
     Dim intRepeatCount As Integer
     Dim intIterationCount As Integer
@@ -4918,16 +4926,16 @@ Public Sub ValidateMTMinimumDiscriminantAndPepProphet(ByRef udtAMTData() As udtA
     intRepeatCount = 0
     Do
         lngMatchCount = 0
-        For lngIndex = lngIndexStart To lngIndexEnd
-            If udtAMTData(lngIndex).HighDiscriminantScore >= sngMTMinimumHighDiscriminantScore And _
-               udtAMTData(lngIndex).PeptideProphetProbability >= sngMTMinimumPeptideProphetProbability And _
-               udtAMTData(lngIndex).HighNormalizedScore >= sngMTMinimumHighNormalizedScore Then
+        For lngindex = lngIndexStart To lngIndexEnd
+            If udtAMTData(lngindex).HighDiscriminantScore >= sngMTMinimumHighDiscriminantScore And _
+               udtAMTData(lngindex).PeptideProphetProbability >= sngMTMinimumPeptideProphetProbability And _
+               udtAMTData(lngindex).HighNormalizedScore >= sngMTMinimumHighNormalizedScore Then
                 lngMatchCount = lngMatchCount + 1
             End If
             If lngMatchCount >= lngMinMatchCount Then
                 Exit Do
             End If
-        Next lngIndex
+        Next lngindex
         
         ' Not enough matching MT tags; try lowering the thresholds
         If sngMTMinimumHighDiscriminantScore > 0 And sngMTMinimumHighDiscriminantScore >= sngMTMinimumPeptideProphetProbability Then
@@ -4982,7 +4990,7 @@ Public Function ValueToSqlDecimal(ByVal dblValue As Double, ByVal eSqlDecimalTyp
     ValueToSqlDecimal = dblValue
 End Function
 
-Public Sub ViewAnalysisHistory(lngGelIndex As Long)
+Public Sub ViewAnalysisHistory(ByVal lngGelIndex As Long)
     Dim strFilePath As String
     Dim intFileNum As Integer
     Dim lngHistoryIndex As Long
@@ -5025,7 +5033,7 @@ Public Function WithinToleranceDbl(ThisNumber As Double, CompareNumber As Double
     End If
 End Function
 
-Public Sub ZoomGelToDimensions(lngGelIndex As Long, ByRef sngScanNumberMin As Single, ByRef dblMassMin As Double, ByRef sngScanNumberMax As Single, ByRef dblMassMax As Double)
+Public Sub ZoomGelToDimensions(ByVal lngGelIndex As Long, ByRef sngScanNumberMin As Single, ByRef dblMassMin As Double, ByRef sngScanNumberMax As Single, ByRef dblMassMax As Double)
     ' Zoom the gel to the given dimension
     ' If dblMassMin and dblMassMax are 0, then leaves the mass range untouched and updates dblMassMin and dblMassMax with the current mass range
     ' If sngscanNumberMin and sngScanNumberMax are 0, then leaves the scan range untouched and updates sngscanNumberMin and sngScanNumberMax with the current scan range
@@ -5160,3 +5168,17 @@ Public Function WarnUserUnknownMassTags(ByVal lngGelIndex As Long, Optional blnS
     End If
 
 End Function
+
+Public Function TestAveragine(dblMonoMassTarget As Double) As String
+    Dim objAveragine As clsAveragine
+    Dim strFormula As String
+    
+    Set objAveragine = New clsAveragine
+    
+    strFormula = objAveragine.GetAveragineFormulaForMass(dblMonoMassTarget)
+    Debug.Print strFormula
+    
+    TestAveragine = strFormula
+    
+End Function
+

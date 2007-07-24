@@ -733,7 +733,7 @@ Public Type ScansIndex                  'used to enumerate scans;
     IsoLastInd() As Long
 End Type
 
-' Old structure, now split into IsoPairsDltLblType and udtIsoPairsDetailsType
+' Old structure, now split into IsoPairsDltLblType and udtIsoPairsDetails2004Type
 Public Type IsoPairsDltLbl2003Type
    SyncWithUMC As Boolean
    DltLblType As Long
@@ -768,8 +768,24 @@ Public Type udtIsoPairsDetails2004aType
     ERStDev As Double               'standard deviation of expression ratio, if averaging scan-by-scan or averaging several charge states
     ERChargeStateBasisCount As Integer      'count of number of charge states averaged together
     ERMemberBasisCount As Long              'count of number of values averaged together to give ER
-    STATE As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
+    State As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
 End Type
+
+' Old Structure
+Public Type udtIsoPairsDetails2004bType
+    P1 As Long                      'index of light member; pointer to index in GelUMC if UMC-based pairs
+    P1LblCnt As Integer             'number of PEO labels in light member
+    P2 As Long                      'index of heavy member; pointer to index in GelUMC if UMC-based pairs
+    P2DltCnt As Integer             'count of N deltas
+    P2LblCnt As Integer             'count of PEO labels in heavy member
+    ER As Double                    'expression ratio
+    ERStDev As Double               'standard deviation of expression ratio, if averaging scan-by-scan or averaging several charge states
+    ERChargeStateBasisCount As Integer      'count of number of charge states averaged together
+    ERChargesUsed() As Integer      'list of charge states used to compute the ER value for this pair; 0-based array, minimum length 1; value is 0 if no charge states used
+    ERMemberBasisCount As Long              'count of number of values averaged together to give ER
+    State As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
+End Type
+
 
 ' Old structure
 Public Type IsoPairsDltLbl2004aType
@@ -797,20 +813,32 @@ Public Type udtIsoPairsDetailsType
     P1 As Long                      'index of light member; pointer to index in GelUMC if UMC-based pairs
     P1LblCnt As Integer             'number of PEO labels in light member
     P2 As Long                      'index of heavy member; pointer to index in GelUMC if UMC-based pairs
-    P2DltCnt As Integer             'count of N deltas
+    P2DltCnt As Integer             'count of N or O or C deltas
     P2LblCnt As Integer             'count of PEO labels in heavy member
     ER As Double                    'expression ratio
     ERStDev As Double               'standard deviation of expression ratio, if averaging scan-by-scan or averaging several charge states
     ERChargeStateBasisCount As Integer      'count of number of charge states averaged together
     ERChargesUsed() As Integer      'list of charge states used to compute the ER value for this pair; 0-based array, minimum length 1; value is 0 if no charge states used
     ERMemberBasisCount As Long              'count of number of values averaged together to give ER
-    STATE As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
-    '1 for OK pair; -1 for not OK pair; 0 for initialized
-    'Pair can be declared not OK for various reasons; because delta
-    'and label counts do not match database information, because ER
-    'is out of required range because pair assignment conflicts with
-    'other pair assignments
+    State As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
+                                    '1 for OK pair; -1 for not OK pair; 0 for initialized
+                                    'Pair can be declared not OK for various reasons; because delta
+                                    'and label counts do not match database information, because ER
+                                    'is out of required range because pair assignment conflicts with
+                                    'other pair assignments
+    
+    DeltaAtomPercentIncorporation As Single     ' When searching for partially incorporated N15, the computed percent incorporation for the given atom is stored here; 0 to 100
+    
+    AdditionalValue1 As Long
+    AdditionalValue2 As Long
+    AdditionalValue3 As Long
+    AdditionalValue4 As Double
+    AdditionalValue5 As Double
+    AdditionalValue6 As Double
+    
+
 End Type
+
 
 ' Old structure
 Public Type IsoPairsDltLbl2004bType
@@ -829,7 +857,7 @@ Public Type IsoPairsDltLbl2004bType
     AverageERsWeightingMode As Integer          ' Actually enum aewAverageERsWeightingModeConstants
 
     PCnt As Long                                'count of pairs
-    Pairs() As udtIsoPairsDetailsType           ' 0-based array
+    Pairs() As udtIsoPairsDetails2004bType      ' 0-based array
 
     OtherInfo As String
 End Type
@@ -874,7 +902,7 @@ Public Type IsoPairsDltLbl2004cType
     SearchDef As udtIsoPairsSearchDef2004cType
 
     PCnt As Long                                ' Count of pairs
-    Pairs() As udtIsoPairsDetailsType           ' 0-based array
+    Pairs() As udtIsoPairsDetails2004bType      ' 0-based array
 
     OtherInfo As String
 End Type
@@ -945,13 +973,13 @@ Public Type IsoPairsDltLbl2004dType
     SearchDef As udtIsoPairsSearchDef2004dType
     
     PCnt As Long                                ' Count of pairs
-    Pairs() As udtIsoPairsDetailsType           ' 0-based array
+    Pairs() As udtIsoPairsDetails2004bType      ' 0-based array
     
     OtherInfo As String
 End Type
 
-' Used by IsoPairsDltLblType
-Public Type udtIsoPairsSearchDefType
+' Old Structure
+Public Type udtIsoPairsSearchDef2004eType
     DeltaMass As Double                         ' Typically glN14N15_DELTA or glO16O18_DELTA; note: see also .DeltaMass2 through .DeltaMass6 (defined below)
     DeltaMassTolerance As Double                ' on frmUMCLblPairs this is actually the label mass tolerance
     AutoCalculateDeltaMinMaxCount As Boolean
@@ -992,6 +1020,76 @@ Public Type udtIsoPairsSearchDefType
     OtherInfo As String
 End Type
 
+' Old Structure
+Public Type IsoPairsDltLbl2004eType
+    SyncWithUMC As Boolean                      ' True if the pairs are sync'd with the LC-MS Features in GelUMC()
+    DltLblType As Long                          ' Actually enum glPairsType; ptNone, ptUMCDlt, ptUMCLbl, etc.
+    
+    SearchDef As udtIsoPairsSearchDef2004eType
+    
+    PCnt As Long                                ' Count of pairs
+    Pairs() As udtIsoPairsDetails2004bType      ' 0-based array
+    
+    OtherInfo As String
+End Type
+
+' Used by IsoPairsDltLblType
+Public Type udtIsoPairsSearchDefType
+    DeltaMass As Double                         ' Typically glN14N15_DELTA or glO16O18_DELTA; note: see also .DeltaMass2 through .DeltaMass6 (defined below)
+    DeltaMassTolerance As Double                ' on frmUMCLblPairs this is actually the label mass tolerance
+    DeltaMassTolType As Integer                 ' Actually type glMassToleranceConstants  (New for this version)
+    
+    AutoCalculateDeltaMinMaxCount As Boolean
+    DeltaCountMin As Long
+    DeltaCountMax As Long
+    DeltaStepSize As Long
+    
+    LightLabelMass As Double
+    HeavyLightMassDifference As Double
+    LabelCountMin As Long
+    LabelCountMax As Long
+    MaxDifferenceInNumberOfLightHeavyLabels As Long
+
+    RequireUMCOverlap As Boolean                    ' Require overlap at UMC edges
+    RequireUMCOverlapAtApex As Boolean              ' Require overlap at peak apex
+    
+    ScanTolerance As Long                           ' Scan tolerance at UMC edges
+    ScanToleranceAtApex As Long                     ' Scan tolerance between UMC apexes
+
+    ERInclusionMin As Double
+    ERInclusionMax As Double
+    
+    RequireMatchingChargeStatesForPairMembers As Boolean
+    UseIdenticalChargesForER As Boolean                         ' If UseIdenticalChargesForER = True, but RequireMatchingChargeStatesForPairMembers = False, and matching charges cannot be found, then the ER is computed using the ratio of the most abundant charge state for the members of the pair
+    ComputeERScanByScan As Boolean                              ' When true, then computes an ER value for pairwise between the two LC-MS Features of a pair, stepping scan by scan, then averaging the values across all scans; if UseIdenticalChargesForER = True then does this for matching charge states; otherwise, sums all charge states together
+    AverageERsAllChargeStates As Boolean                        ' When true, then use a (weighted) average to combine the ER's for all matching charge states; this option is only valid if UseIdenticalChargesForER = True
+    AverageERsWeightingMode As Integer                          ' Actually enum aewAverageERsWeightingModeConstants; The weighting mode to use if AverageERsAllChargeStates = True
+    
+    ERCalcType As Integer                                       ' Actually enum ectERCalcTypeConstants, though can also be glER_None = 0; how to calculate expression ratio
+    
+    IReportEROptions As udtIReportPairOptionsType
+    
+    RemoveOutlierERs As Boolean
+    RemoveOutlierERsIterate As Boolean
+    RemoveOutlierERsMinimumDataPointCount As Long
+    RemoveOutlierERsConfidenceLevel As Integer              ' Actually of type eclConfidenceLevelConstants
+    
+    ' The following are new for this version
+    N15IncompleteIncorporationMode As Boolean         ' True to enable the N14/N15 incomplete incorporation mode
+    N15PercentIncorporationMinimum As Single         ' 0 to 100; will be rounded to 1 decimal place
+    N15PercentIncorporationMaximum As Single         ' 0 to 100, must be >= N14N15IncompleteIncorporationMinimum
+    N15PercentIncorporationStep As Single            ' 1 to 100; will be rounded to 1 decimal place
+    
+    AdditionalValue1 As Long                        ' New for this version
+    AdditionalValue2 As Long                        ' New for this version
+    AdditionalValue3 As Long                        ' New for this version
+    AdditionalValue4 As Double                      ' New for this version
+    AdditionalValue5 As Double                      ' New for this version
+    AdditionalValue6 As Double                      ' New for this version
+    
+    OtherInfo As String
+End Type
+
 'structure for isotopic pairs that use delta and label
 'this is used for PEO N14/N15 pairs as well as ICAT pairs
 'also structure works for individual as well as UMCListType pairs
@@ -1006,8 +1104,16 @@ Public Type IsoPairsDltLblType
     PCnt As Long                                ' Count of pairs
     Pairs() As udtIsoPairsDetailsType           ' 0-based array
     
+    AdditionalValue1 As Long                    ' New for this version
+    AdditionalValue2 As Long                    ' New for this version
+    AdditionalValue3 As Long                    ' New for this version
+    AdditionalValue4 As Double                  ' New for this version
+    AdditionalValue5 As Double                  ' New for this version
+    AdditionalValue6 As Double                  ' New for this version
+    
     OtherInfo As String
 End Type
+
 
 'Delta structure (used to read Expression ratios)
 'this will be parallel to FN arrays in DocumentData structure
@@ -1665,14 +1771,14 @@ Screen.MousePointer = vbDefault
 
 End Function
 
-Public Sub SetGelStateToDeleted(lngGelIndex As Long)
+Public Sub SetGelStateToDeleted(ByVal lngGelIndex As Long)
     With GelStatus(lngGelIndex)
         .Deleted = True
         .SourceDataRawFileType = rfcUnknown
     End With
 End Sub
 
-Public Sub UpdatePreferredFileExtension(strFileName As String)
+Public Sub UpdatePreferredFileExtension(ByVal strFileName As String)
     Dim eFileType As ifmInputFileModeConstants
     
     If DetermineFileType(strFileName, eFileType) Then

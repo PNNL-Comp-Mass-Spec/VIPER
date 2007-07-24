@@ -2116,7 +2116,99 @@ InitializeGelDataStructures ArrayCnt
 FindFreeIndex = UBound(GelBody)
 End Function
 
-Private Sub InitializeGelDataStructures(lngGelIndex As Long)
+Public Sub FixIsosMonoPlus2Abu(ByVal lngGelIndex As Long, Optional ByVal intMatchTolerancePPMStart As Integer = 15, Optional intMatchToleranceIterations As Integer = 4, Optional ByVal dblIsoPlus2SpacingDa As Double = 2.0038)
+    
+    ' Processes isotopic data to determine the correct IntensityMonoPlus2 value when an IntensityMono
+    ' value is defined but IntensityMonoPlus2 is 0
+    '
+    '
+    ' This function assumes the data in GelData.IsoData() is sorted by scan number and then
+    '  by mass.  Therefore, you MUST call SortIsotopicData prior to calling this function to assure
+    '  that the data is sorted properly (using .Preferences.IsoDataField)
+
+    Dim lngIndex As Long
+    Dim lngIndexCompare As Long
+    
+    Dim lngIndexMax As Long
+    Dim lngCurrentScan As Long
+    
+    Dim dblIsoPlus2MassCenter As Double
+    Dim dblIsoPlus2MassMin As Double
+    Dim dblIsoPlus2MassMax As Double
+    
+    Dim lngIsoPlus2AbuDataInRange As Long
+    Dim dblIsoPlus2AbuMax As Double
+    Dim dblCurrentAbu As Double
+    
+    Dim intMatchTolerancePPM As Integer
+    Dim intMatchToleranceIterationsElapsed As Integer
+    
+    If intMatchTolerancePPMStart < 1 Then intMatchTolerancePPMStart = 1
+    If intMatchToleranceIterations < 1 Then intMatchToleranceIterations = 1
+    
+    lngIndexMax = GelData(lngGelIndex).IsoLines
+    If lngIndexMax > 1 Then
+        
+        ' Step through the data and look for points with a non-zero .IntensityMono value but having IntensityMonoPlus2 = 0
+        For lngIndex = 1 To lngIndexMax
+            If GelData(lngGelIndex).IsoData(lngIndex).IntensityMono > 0 And GelData(lngGelIndex).IsoData(lngIndex).IntensityMonoPlus2 = 0 Then
+                
+                ' Match found; assure its monoisotopic mass is non-zero
+                If GelData(lngGelIndex).IsoData(lngIndex).MonoisotopicMW > 0 Then
+                    lngCurrentScan = GelData(lngGelIndex).IsoData(lngIndex).ScanNumber
+                    
+                    intMatchTolerancePPM = intMatchTolerancePPMStart
+                    
+                    intMatchToleranceIterationsElapsed = 0
+                    Do While intMatchToleranceIterationsElapsed < intMatchToleranceIterations
+                        
+                        dblIsoPlus2MassCenter = GelData(lngGelIndex).IsoData(lngIndex).MonoisotopicMW + dblIsoPlus2SpacingDa
+                        dblIsoPlus2MassMin = dblIsoPlus2MassCenter - intMatchTolerancePPM * (dblIsoPlus2MassCenter / 1000000#)
+                        dblIsoPlus2MassMax = dblIsoPlus2MassCenter + intMatchTolerancePPM * (dblIsoPlus2MassCenter / 1000000#)
+                        
+                        lngIsoPlus2AbuDataInRange = 0
+                        dblIsoPlus2AbuMax = 0
+                        
+                        ' Step through the subsequent data points, looking for those between dblIsoPlus2MassMin and dblIsoPlus2MassMax
+                        ' Abort the search if a point is found weighing more than dblIsoPlus2MassMax or with a different scan number
+                        For lngIndexCompare = lngIndex + 1 To lngIndexMax
+                            If GelData(lngGelIndex).IsoData(lngIndexCompare).ScanNumber <> lngCurrentScan Then
+                                Exit For
+                            ElseIf GelData(lngGelIndex).IsoData(lngIndexCompare).MonoisotopicMW > dblIsoPlus2MassMax Then
+                                Exit For
+                            ElseIf GelData(lngGelIndex).IsoData(lngIndexCompare).MonoisotopicMW > dblIsoPlus2MassMin Then
+                                ' Matching mass
+                                dblCurrentAbu = GelData(lngGelIndex).IsoData(lngIndexCompare).IntensityMono
+                                If dblCurrentAbu = 0 Then
+                                    dblCurrentAbu = GelData(lngGelIndex).IsoData(lngIndexCompare).Abundance
+                                End If
+                                    
+                                If dblCurrentAbu > dblIsoPlus2AbuMax Or lngIsoPlus2AbuDataInRange = 0 Then
+                                    dblIsoPlus2AbuMax = dblCurrentAbu
+                                End If
+                                lngIsoPlus2AbuDataInRange = lngIsoPlus2AbuDataInRange + 1
+                            End If
+                        Next lngIndexCompare
+                        
+                        If lngIsoPlus2AbuDataInRange > 0 Then
+                            ' A match was found; update the .IntensityMonoPlus2 value
+                            GelData(lngGelIndex).IsoData(lngIndex).IntensityMonoPlus2 = dblIsoPlus2AbuMax
+                            Exit Do
+                        Else
+                            intMatchTolerancePPM = intMatchTolerancePPM * 2
+                        End If
+                        
+                        intMatchToleranceIterationsElapsed = intMatchToleranceIterationsElapsed + 1
+                    Loop
+                    
+                End If
+            End If
+        Next lngIndex
+    End If
+
+End Sub
+
+Private Sub InitializeGelDataStructures(ByVal lngGelIndex As Long)
         
     With GelStatus(lngGelIndex)
         .Deleted = False

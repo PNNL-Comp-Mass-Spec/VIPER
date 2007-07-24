@@ -68,7 +68,6 @@ GetBadStDevs = Null
 LogErrors Err.Number, "GetBadStDevs"
 End Function
 
-
 Public Sub SortIsotopicData(ByVal Ind As Long)
 '---------------------------------------------------------------------------------------
 'sort .IsoData on the .IsoDataField inside one scan;

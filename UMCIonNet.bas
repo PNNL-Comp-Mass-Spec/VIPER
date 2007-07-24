@@ -118,7 +118,7 @@ Public UMCIonNetDef As UMCIonNetDefinition           ' Default UMCIonNetDefiniti
 '''Public MyRecPlotDef As RecPlotDef
 '''Public MyMassMania As MassManiaDefinition
 
-Public Function FindUMCClassRepIndex(lngGelIndex As Long, lngUMCIndex As Long, intUMCRepresentativeType As Integer, Optional ByRef eClassRepIonType As glDistType = gldtIS) As Long
+Public Function FindUMCClassRepIndex(ByVal lngGelIndex As Long, ByVal lngUMCIndex As Long, ByVal intUMCRepresentativeType As Integer, Optional ByRef eClassRepIonType As glDistType = gldtIS) As Long
     ' Determine the index of the ion in the given UMC that should be the class representative
     ' Returns the class rep index
     ' Note: this is the index of the ion in the UMC and NOT the index of the ion in GelData()

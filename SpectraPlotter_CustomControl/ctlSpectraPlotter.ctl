@@ -171,7 +171,7 @@ Public Sub AutoScaleXNow()
 End Sub
 
 Public Sub AutoScaleYNow()
-    Dim lngIndex As Long, lngNumPoints As Long
+    Dim lngindex As Long, lngNumPoints As Long
     Dim lngLeftMostPoint As Long, lngRightMostPoint As Long
     Dim dblDataXVal As Double
     Dim dblDataYVal As Double
@@ -188,9 +188,9 @@ Public Sub AutoScaleYNow()
         lngRightMostPoint = -1
         dblMaxVisibleValue = -1E+308
         lngNumPoints = .NumPoints(mCurrentSeries)
-        For lngIndex = 1 To lngNumPoints
-            dblDataXVal = .x(mCurrentSeries, lngIndex)
-            dblDataYVal = .y(mCurrentSeries, lngIndex)
+        For lngindex = 1 To lngNumPoints
+            dblDataXVal = .x(mCurrentSeries, lngindex)
+            dblDataYVal = .y(mCurrentSeries, lngindex)
             If dblDataXVal <= dblXEnd Then
                 If dblDataXVal >= dblXStart Then
                     If dblDataYVal > dblMaxVisibleValue Then dblMaxVisibleValue = dblDataYVal
@@ -199,7 +199,7 @@ Public Sub AutoScaleYNow()
             Else
                 Exit For
             End If
-        Next lngIndex
+        Next lngindex
     End With
     
     With Chart2D
@@ -720,20 +720,20 @@ Public Sub SetSeriesDataPointCount(mSeriesNumber As Integer, lngNumberOfPoints A
 End Sub
 
 Private Sub AssureOneBasedArray(ArrayIn() As Double, ArrayOut() As Double)
-    Dim lngUpperIndex As Long, lngIndex As Long
+    Dim lngUpperIndex As Long, lngindex As Long
     
     lngUpperIndex = UBound(ArrayIn)
     
     If LBound(ArrayIn) = 0 Then
         ReDim ArrayOut(1 To lngUpperIndex + 1)
-        For lngIndex = 1 To lngUpperIndex + 1
-            ArrayOut(lngIndex) = ArrayIn(lngIndex - 1)
-        Next lngIndex
+        For lngindex = 1 To lngUpperIndex + 1
+            ArrayOut(lngindex) = ArrayIn(lngindex - 1)
+        Next lngindex
     Else
         ReDim ArrayOut(1 To lngUpperIndex)
-        For lngIndex = 1 To lngUpperIndex
-            ArrayOut(lngIndex) = ArrayIn(lngIndex)
-        Next lngIndex
+        For lngindex = 1 To lngUpperIndex
+            ArrayOut(lngindex) = ArrayIn(lngindex)
+        Next lngindex
     End If
 End Sub
 

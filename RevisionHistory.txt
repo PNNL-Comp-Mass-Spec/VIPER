@@ -1,5 +1,32 @@
 VIPER Change Log
 
+Version 3.43 - Build 372; July 23, 2007
+	- Now logging the mass type used to compute the class mass when finding LC-MS features
+		- Typically the mass type is monoisotopic molecular mass, but the user can change it to average molecular mass or most abundant molecular mass
+
+Version 3.43 - Build 371; July 21, 2007
+	- When reading .Csv or .Pek files, added check for data points with a positive IntensityMono (I0) value but a value of zero for IntensityMonoPlus2 (I2)
+		- This will occur when the I+2 value is more abundant than the I0 value
+		- When cases like this are found, VIPER determines the appropriate IntensityMonoPlus2 value to use by looking for data 2 Da heavier in mass from the given data point (with a tolerance of +/-20 ppm)
+	- Added option for ppm-based mass tolerances when finding paired LC-MS features
+	- Added option for finding N14/N15 paired LC-MS features that do not have 100% incorporation of N15
+		- The pair spacing equation is only valid for LC-MS features with class masses that use average mass values 
+		- Equation is DeltaMass = (Estimated_N15_Incorporation - N15NaturalAbundance) * NitrogenAtomCount * N14N15DeltaMass
+			- Note that N15NaturalAbundance = 0.00368
+			- N14N15DeltaMass = 0.9970356
+		- The user can specify a range of percent incorporation values to try, including the step size between values
+	- Updated the GelP_D_L structure to support the new pair options
+		- Required updating the binary file version for DeltaLabeledPairs from 7 to 8
+	- Added option of computing LC-MS Feature class mass values using average, monoisotopic, or most abundant mass values of the members of the LC-MS feature
+	- Fixed bug related to reporting Scan-by-Scan Pair Details wherein only data for the highest charge state in common between two LC-MS features was being reported
+		- If two LC-MS features are paired and if both features have 2+ and 3+ data, then previously only the scan details for scans with 3+ data was being reported
+		- Now scan details for both 2+ and 3+ data would be reported
+	- Fixed progress bar indicator bug seen when loading a .Csv file (the bar would advance to 100% immediately when reading the _isos.csv file)
+	- Added class clsAveragine for computing the average elemental composition for a peptide given a molecular weight
+
+Version 3.42 - Build 370; July 13, 2007
+	- Added support for field Ref_ID being returned by stored procedure GetMassTagToProteinNameMap
+
 Version 3.42 - Build 369; May 22, 2007
 	- Updated the scan gap interpolation method used when computing the abundance values for LC-MS features (aka UMCs)
 		- Previously would interpolate by absolute scan number without respect to whether or not the intervening spectra were MS/MS (as acquired with an LTQ-FT or LTQ-Orbitrap)

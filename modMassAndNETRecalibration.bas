@@ -43,11 +43,11 @@ Private Sub AdjustAMTRefMwErrValues(ByRef strAMTRef As String, dblPPMAdjust As D
 
 End Sub
 
-Public Function MassCalibrationApplyBulkAdjustment(lngGelIndex As Long, dblIncrementalShift As Double, eMassType As glMassToleranceConstants, Optional blnMakeLogEntry As Boolean = True, Optional sngBinSizeUsedDuringAutoCalibration As Single = 0, Optional frmCallingForm As VB.Form) As Boolean
+Public Function MassCalibrationApplyBulkAdjustment(ByVal lngGelIndex As Long, ByVal dblIncrementalShift As Double, ByVal eMassType As glMassToleranceConstants, Optional ByVal blnMakeLogEntry As Boolean = True, Optional ByVal sngBinSizeUsedDuringAutoCalibration As Single = 0, Optional ByRef frmCallingForm As VB.Form) As Boolean
     ' Returns True if successful, False if not
     ' If called during Auto calibration, sngBinSizeUsedDuringAutoCalibration is sent so that it may be recorded in the analysis history
     
-    Dim lngIndex As Long
+    Dim lngindex As Long
     Dim dblMassShiftPPM As Double
     
     Dim blnProceed As Boolean, blnSuccess As Boolean
@@ -61,26 +61,26 @@ On Error GoTo ApplyMassCalibrationAdjustmentErrorHandler
             
             Select Case eMassType
             Case gltABS
-                For lngIndex = 1 To .CSLines
+                For lngindex = 1 To .CSLines
                     ' Convert the absolute shift to ppm then call MassCalibrationApplyAdjustmentOnePoint
-                    dblMassShiftPPM = MassToPPM(dblIncrementalShift, .CSData(lngIndex).AverageMW)
-                    MassCalibrationApplyAdjustmentOnePoint .CSData(lngIndex), dblMassShiftPPM, False
-                Next lngIndex
+                    dblMassShiftPPM = MassToPPM(dblIncrementalShift, .CSData(lngindex).AverageMW)
+                    MassCalibrationApplyAdjustmentOnePoint .CSData(lngindex), dblMassShiftPPM, False
+                Next lngindex
                 
-                For lngIndex = 1 To .IsoLines
+                For lngindex = 1 To .IsoLines
                     ' Convert the absolute shift to ppm then call MassCalibrationApplyAdjustmentOnePoint
                     ' Note that we're using the Monoisotopic mass to convert to ppm and then applying the same ppm value to the various isotopic-related masses
-                    dblMassShiftPPM = MassToPPM(dblIncrementalShift, .IsoData(lngIndex).MonoisotopicMW)
-                    MassCalibrationApplyAdjustmentOnePoint .IsoData(lngIndex), dblMassShiftPPM, True
-                Next lngIndex
+                    dblMassShiftPPM = MassToPPM(dblIncrementalShift, .IsoData(lngindex).MonoisotopicMW)
+                    MassCalibrationApplyAdjustmentOnePoint .IsoData(lngindex), dblMassShiftPPM, True
+                Next lngindex
             Case gltPPM
-                For lngIndex = 1 To .CSLines
-                    MassCalibrationApplyAdjustmentOnePoint .CSData(lngIndex), dblIncrementalShift, False
-                Next lngIndex
+                For lngindex = 1 To .CSLines
+                    MassCalibrationApplyAdjustmentOnePoint .CSData(lngindex), dblIncrementalShift, False
+                Next lngindex
                 
-                For lngIndex = 1 To .IsoLines
-                    MassCalibrationApplyAdjustmentOnePoint .IsoData(lngIndex), dblIncrementalShift, True
-                Next lngIndex
+                For lngindex = 1 To .IsoLines
+                    MassCalibrationApplyAdjustmentOnePoint .IsoData(lngindex), dblIncrementalShift, True
+                Next lngindex
             Case Else
                 ' This shouldn't happen
                 Debug.Assert False
@@ -153,12 +153,12 @@ Private Function MassCalibrationRevertAdjustmentOnePoint(ByVal dblMass As Double
 
 End Function
 
-Public Function MassCalibrationRevertToOriginal(lngGelIndex As Long, Optional blnQueryUserToConfirm As Boolean = True, Optional blnMakeLogEntry As Boolean = True, Optional frmCallingForm As VB.Form) As Boolean
+Public Function MassCalibrationRevertToOriginal(ByVal lngGelIndex As Long, Optional ByVal blnQueryUserToConfirm As Boolean = True, Optional ByVal blnMakeLogEntry As Boolean = True, Optional ByRef frmCallingForm As VB.Form) As Boolean
     ' Returns True if the mass calibration was averted
     ' Returns False if the user cancelled the operation or an error occurred
     
     Dim eResponse As VbMsgBoxResult
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
     Dim blnDataUpdated As Boolean
     Dim blnSuccess As Boolean
@@ -182,8 +182,8 @@ On Error GoTo MassCalibrationRevertToOriginalErrorHandler
     End If
     
     With GelData(lngGelIndex)
-        For lngIndex = 1 To .CSLines
-            With .CSData(lngIndex)
+        For lngindex = 1 To .CSLines
+            With .CSData(lngindex)
                 If .MassShiftCount > 0 Then
                     .AverageMW = MassCalibrationRevertAdjustmentOnePoint(.AverageMW, .MassShiftOverallPPM)
 
@@ -192,10 +192,10 @@ On Error GoTo MassCalibrationRevertToOriginalErrorHandler
                     blnDataUpdated = True
                 End If
             End With
-        Next lngIndex
+        Next lngindex
         
-        For lngIndex = 1 To .IsoLines
-            With .IsoData(lngIndex)
+        For lngindex = 1 To .IsoLines
+            With .IsoData(lngindex)
                 If .MassShiftCount > 0 Then
                     .AverageMW = MassCalibrationRevertAdjustmentOnePoint(.AverageMW, .MassShiftOverallPPM)
                     .MonoisotopicMW = MassCalibrationRevertAdjustmentOnePoint(.MonoisotopicMW, .MassShiftOverallPPM)
@@ -209,7 +209,7 @@ On Error GoTo MassCalibrationRevertToOriginalErrorHandler
                     blnDataUpdated = True
                 End If
             End With
-        Next lngIndex
+        Next lngindex
     End With
     
     With GelSearchDef(lngGelIndex).MassCalibrationInfo
@@ -240,7 +240,7 @@ MassCalibrationRevertToOriginalErrorHandler:
     
 End Function
 
-Public Function MassCalibrationUpdateHistory(lngGelIndex As Long, dblIncrementalShift As Double, eMassType As glMassToleranceConstants, blnResetHistoryIfConflictingMassType As Boolean, blnMakeLogEntry As Boolean, sngBinSizeUsedDuringAutoCalibration As Single, blnUsingMSAlign As Boolean) As Boolean
+Public Function MassCalibrationUpdateHistory(ByVal lngGelIndex As Long, ByVal dblIncrementalShift As Double, ByVal eMassType As glMassToleranceConstants, ByVal blnResetHistoryIfConflictingMassType As Boolean, ByVal blnMakeLogEntry As Boolean, ByVal sngBinSizeUsedDuringAutoCalibration As Single, ByVal blnUsingMSAlign As Boolean) As Boolean
     
     Dim blnProceed As Boolean
     Dim strMessage As String
