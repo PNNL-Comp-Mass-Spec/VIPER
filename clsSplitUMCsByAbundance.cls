@@ -33,7 +33,7 @@ Public Sub AbortProcessingNow()
     mAbortRequested = True
 End Sub
 
-Public Sub ExamineUMCs(ByVal lngGelIndex As Long, ByRef frmCallingForm As VB.Form, Optional ByVal blnShowMessages As Boolean = True, Optional ByVal blnUseStatusFunctionOnCallingForm As Boolean = False)
+Public Sub ExamineUMCs(ByVal lngGelIndex As Long, ByRef frmCallingForm As VB.Form, ByVal eOddEvenProcessingMode As oepUMCOddEvenProcessingMode, Optional ByVal blnShowMessages As Boolean = True, Optional ByVal blnUseStatusFunctionOnCallingForm As Boolean = False)
     
     ' Examines the intensities of the ions in each UMC
     ' Looks for LC-MS Features that have two or more distinct peaks in a localized TIC plot (total ion chromatogram)
@@ -123,7 +123,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
         ' This should only affect LC-MS Features found using UMCIonNet, and not UMCListType2002 or UMC2003
         For lngUMCIndex = 0 To lngUMCCountAtStart - 1
             If GelUMC(lngGelIndex).UMCs(lngUMCIndex).ClassCount > GelSearchDef(lngGelIndex).UMCDef.GapMaxSize Then
-                SplitUMCsPopulateArrays lngGelIndex, lngUMCIndex, dblXData(), dblYData(), lngDataCount, lngMemberScanNumbersRelative(), lngClassMemberCount
+                SplitUMCsPopulateArrays lngGelIndex, lngUMCIndex, dblXData(), dblYData(), lngDataCount, lngMemberScanNumbersRelative(), lngClassMemberCount, eOddEvenProcessingMode
                     
                 ' Look for gaps
                 ' Record their presence by recording each group as a peak in udtPeakLocs
@@ -173,7 +173,8 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
                     
                     ' I believe only UMC Ion Net will produce LC-MS Features that need to be split using scan gaps
                     ' Still, if .def.UMCType is not glUMC_TYPE_FROM_NET, then that is OK too
-                    Debug.Assert GelUMC(lngGelIndex).def.UMCType = glUMC_TYPE_FROM_NET
+                    ' August 2007: UMCSimple is also now doing this
+                    ' Debug.Assert GelUMC(lngGelIndex).def.UMCType = glUMC_TYPE_FROM_NET
                     
                     ' Now expand the peaks until their StartPoint and EndPoint values touch
                     SplitUMCsWidenAdjacentPeaks udtPeakLocs(), lngPeakCount, dblYData()
@@ -228,7 +229,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
         For lngUMCIndex = 0 To lngUMCCountAtStart - 1
             If GelUMC(lngGelIndex).UMCs(lngUMCIndex).ClassCount >= lngMinimumClassCountToCheck Then
                 
-                SplitUMCsPopulateArrays lngGelIndex, lngUMCIndex, dblXData(), dblYData(), lngDataCount, lngMemberScanNumbersRelative(), lngClassMemberCount
+                SplitUMCsPopulateArrays lngGelIndex, lngUMCIndex, dblXData(), dblYData(), lngDataCount, lngMemberScanNumbersRelative(), lngClassMemberCount, eOddEvenProcessingMode
                 
                 With udtOptions
                     lngPeakCount = objPeakFinder.DetectPeaks(dblXData(), dblYData(), lngDataCount, _
@@ -735,8 +736,8 @@ Private Sub SplitUMCsLookupMemberIndices(ByRef udtPeakLocs() As udtUMCPeakSplitT
     
 End Sub
 
-Private Sub SplitUMCsPopulateArrays(ByVal lngGelIndex As Long, ByVal lngUMCIndex As Long, ByRef dblXData() As Double, ByRef dblYData() As Double, ByRef lngDataCount As Long, ByRef lngMemberScanNumbersRelative() As Long, ByRef lngClassMemberCount As Long)
-
+Private Sub SplitUMCsPopulateArrays(ByVal lngGelIndex As Long, ByVal lngUMCIndex As Long, ByRef dblXData() As Double, ByRef dblYData() As Double, ByRef lngDataCount As Long, ByRef lngMemberScanNumbersRelative() As Long, ByRef lngClassMemberCount As Long, ByVal eOddEvenProcessingMode As oepUMCOddEvenProcessingMode)
+    
     Dim lngScanIndex As Long
     Dim lngMemberIndex As Long
     
@@ -802,6 +803,7 @@ Private Sub SplitUMCsPopulateArrays(ByVal lngGelIndex As Long, ByVal lngUMCIndex
                 dblYData(lngScanIndex) = dblYData(lngScanIndex) + dblCurrentIntensity
                 
                 lngMemberScanNumbersRelative(lngMemberIndex) = lngCurrentScanNumber
+            
             End If
         Next lngMemberIndex
     End With

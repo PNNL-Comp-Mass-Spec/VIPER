@@ -163,6 +163,13 @@ Public Enum UMCDrawType
     umcdt_UMCIntensity = 2
 End Enum
 
+Public Enum oepUMCOddEvenProcessingMode
+    oepProcessAll = 0
+    oepOddOnly = 1
+    oepEvenOnly = 2
+    oepOddEvenSequential = 3
+End Enum
+
 Public Enum ArrayManagementType
     amtErase = 0
     amtInitialize = 1

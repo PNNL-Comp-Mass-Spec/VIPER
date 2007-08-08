@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "July 23, 2007"
+Public Const APP_BUILD_DATE As String = "August 7, 2007"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -857,7 +857,7 @@ Public Type udtGraphicExportOptionsType
 End Type
 
 Public Type udtUMCMassTagMatchStats
-    UMCIndex As Long                ' Index of the UMC in GelUMCs().UMCs()  (Form frmSearchMT_ConglomerateUMC)
+    UMCIndex As Long                ' Index of the UMC in GelUMC().UMCs()  (Form frmSearchMT_ConglomerateUMC)
     PairIndex As Long               ' Index of the Pair                     (Form frmSearchMTPairs)
     IDIndex As Long                 ' Index of the AMT match in AMTData() or index in UMCInternalStandards.InternalStandards(); for some forms (namely frmSearchMT_ConglomerateUMC and frmSearchMTPairs) this is actually a pointer to an array that contains the actual index (mMT arrays); lastly, when copying LC-MS Features in view, this is the actual Mass_Tag_ID value
     IDIsInternalStd As Boolean      ' True if the ID is an Internal Std, False if a MT tag

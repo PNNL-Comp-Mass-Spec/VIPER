@@ -1425,10 +1425,22 @@ With udtUMCDef
     .GapMaxSize = 5                   ' Applies to "Maximum size of Scan Gap" in UMC2003; applies to SplitUMCs in UMCIonNet
     .GapMaxPct = 0.8
     .UMCNETType = UMCNetConstants.UMCNetAt
-    .UMCMaxAbuEtPctAf = -10           'Ignored
-    .UMCMaxAbuEtPctBf = -5            'Ignored
-    .UMCMaxAbuPctAf = -10             'Ignored
-    .UMCMaxAbuPctBf = -10             'Ignored
+    
+''    .UMCMaxAbuEtPctAf = -10           'Ignored
+''    .UMCMaxAbuEtPctBf = -5            'Ignored
+''    .UMCMaxAbuPctAf = -10             'Ignored
+''    .UMCMaxAbuPctBf = -10             'Ignored
+
+    .OddEvenProcessingMode = oepUMCOddEvenProcessingMode.oepProcessAll
+    .AdditionalValue1 = 0
+    .AdditionalValue2 = 0
+    .AdditionalValue3 = 0
+    .AdditionalValue4 = 0
+    .AdditionalValue5 = 0
+    .AdditionalValue6 = 0
+    .AdditionalValue7 = 0
+    .AdditionalValue8 = 0
+        
     .UMCMinCnt = 3
     .UMCMaxCnt = 100
     .InterpolateGaps = True

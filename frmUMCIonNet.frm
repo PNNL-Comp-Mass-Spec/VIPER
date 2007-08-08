@@ -18,7 +18,7 @@ Begin VB.Form frmUMCIonNet
       Default         =   -1  'True
       Height          =   375
       Left            =   120
-      TabIndex        =   137
+      TabIndex        =   141
       Top             =   5280
       Width           =   975
    End
@@ -32,17 +32,25 @@ Begin VB.Form frmUMCIonNet
       _ExtentY        =   8916
       _Version        =   393216
       Style           =   1
-      Tab             =   2
       TabHeight       =   520
       TabCaption(0)   =   "1. Find Connections"
       TabPicture(0)   =   "frmUMCIonNet.frx":0000
-      Tab(0).ControlEnabled=   0   'False
+      Tab(0).ControlEnabled=   -1  'True
       Tab(0).Control(0)=   "lblLCMSFeatureFinderInfo"
+      Tab(0).Control(0).Enabled=   0   'False
       Tab(0).Control(1)=   "fraNet(0)"
+      Tab(0).Control(1).Enabled=   0   'False
       Tab(0).Control(2)=   "fraUMCScope"
-      Tab(0).Control(3)=   "cmdFindConnectionsThenUMCs"
-      Tab(0).Control(4)=   "chkUseLCMSFeatureFinder"
-      Tab(0).ControlCount=   5
+      Tab(0).Control(2).Enabled=   0   'False
+      Tab(0).Control(3)=   "chkUseLCMSFeatureFinder"
+      Tab(0).Control(3).Enabled=   0   'False
+      Tab(0).Control(4)=   "fraDREAMS"
+      Tab(0).Control(4).Enabled=   0   'False
+      Tab(0).Control(5)=   "cmdAbortFindConnections"
+      Tab(0).Control(5).Enabled=   0   'False
+      Tab(0).Control(6)=   "cmdFindConnectionsThenUMCs"
+      Tab(0).Control(6).Enabled=   0   'False
+      Tab(0).ControlCount=   7
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
@@ -51,32 +59,84 @@ Begin VB.Form frmUMCIonNet
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
-      Tab(2).ControlEnabled=   -1  'True
+      Tab(2).ControlEnabled=   0   'False
       Tab(2).Control(0)=   "fraNet(1)"
-      Tab(2).Control(0).Enabled=   0   'False
       Tab(2).ControlCount=   1
-      Begin VB.CheckBox chkUseLCMSFeatureFinder 
-         Caption         =   "Use LCMSFeatureFinder external app"
-         Height          =   255
-         Left            =   -74760
-         TabIndex        =   143
-         Top             =   3840
-         Value           =   1  'Checked
-         Width           =   2985
-      End
       Begin VB.CommandButton cmdFindConnectionsThenUMCs 
          Caption         =   "&Find Connections then LC-MS Features"
          Height          =   615
-         Left            =   -66720
-         TabIndex        =   54
+         Left            =   8280
+         TabIndex        =   58
          ToolTipText     =   "Create Net based on current settings, then Find LC-MS Features"
          Top             =   3840
          Width           =   2175
       End
+      Begin VB.CommandButton cmdAbortFindConnections 
+         Caption         =   "Abort!"
+         Height          =   375
+         Left            =   8880
+         TabIndex        =   151
+         Top             =   3960
+         Width           =   975
+      End
+      Begin VB.Frame fraDREAMS 
+         Caption         =   "DREAMS Options"
+         Height          =   1935
+         Left            =   120
+         TabIndex        =   4
+         Top             =   1560
+         Width           =   1815
+         Begin VB.OptionButton optEvenOddScanFilter 
+            Caption         =   "Process Odd / Even sequentially"
+            Height          =   375
+            Index           =   3
+            Left            =   120
+            TabIndex        =   8
+            Top             =   1440
+            Width           =   1605
+         End
+         Begin VB.OptionButton optEvenOddScanFilter 
+            Caption         =   "Even-numbered spectra only"
+            Height          =   375
+            Index           =   2
+            Left            =   120
+            TabIndex        =   7
+            Top             =   960
+            Width           =   1485
+         End
+         Begin VB.OptionButton optEvenOddScanFilter 
+            Caption         =   "Use all spectra"
+            Height          =   255
+            Index           =   0
+            Left            =   120
+            TabIndex        =   5
+            Top             =   240
+            Value           =   -1  'True
+            Width           =   1485
+         End
+         Begin VB.OptionButton optEvenOddScanFilter 
+            Caption         =   "Odd-numbered spectra only"
+            Height          =   375
+            Index           =   1
+            Left            =   120
+            TabIndex        =   6
+            Top             =   500
+            Width           =   1485
+         End
+      End
+      Begin VB.CheckBox chkUseLCMSFeatureFinder 
+         Caption         =   "Use LCMSFeatureFinder external app"
+         Height          =   255
+         Left            =   240
+         TabIndex        =   147
+         Top             =   3840
+         Value           =   1  'Checked
+         Width           =   2985
+      End
       Begin VB.Frame fraUMCScope 
          Caption         =   "Definition Scope"
          Height          =   975
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   1
          Top             =   420
          Width           =   1815
@@ -84,7 +144,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "&All Data Points"
             Height          =   255
             Index           =   0
-            Left            =   240
+            Left            =   120
             TabIndex        =   2
             Top             =   280
             Width           =   1455
@@ -93,7 +153,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "&Current View"
             Height          =   255
             Index           =   1
-            Left            =   240
+            Left            =   120
             TabIndex        =   3
             Top             =   600
             Value           =   -1  'True
@@ -104,14 +164,14 @@ Begin VB.Form frmUMCIonNet
          Caption         =   "Net Edit"
          Height          =   1695
          Left            =   -74640
-         TabIndex        =   56
+         TabIndex        =   60
          Top             =   1260
          Width           =   4575
          Begin VB.TextBox txtNetEditTooDistant 
             Alignment       =   1  'Right Justify
             Height          =   315
             Left            =   2040
-            TabIndex        =   59
+            TabIndex        =   63
             Text            =   "0.1"
             Top             =   1080
             Width           =   585
@@ -120,7 +180,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Start"
             Height          =   375
             Left            =   3000
-            TabIndex        =   60
+            TabIndex        =   64
             Top             =   1080
             Width           =   855
          End
@@ -132,7 +192,7 @@ Begin VB.Form frmUMCIonNet
             ForeColor       =   &H80000008&
             Height          =   615
             Left            =   120
-            TabIndex        =   57
+            TabIndex        =   61
             Top             =   240
             Width           =   4215
             WordWrap        =   -1  'True
@@ -142,7 +202,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   495
             Index           =   0
             Left            =   120
-            TabIndex        =   58
+            TabIndex        =   62
             Top             =   960
             Width           =   1695
          End
@@ -150,15 +210,15 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   4455
          Index           =   1
-         Left            =   120
-         TabIndex        =   61
+         Left            =   -74880
+         TabIndex        =   65
          Top             =   360
          Width           =   10695
          Begin VB.CommandButton cmdFindUMCsUsingNETConnections 
             Caption         =   "Find &LC-MS Features"
             Height          =   495
             Left            =   9240
-            TabIndex        =   135
+            TabIndex        =   139
             Top             =   2760
             Width           =   1095
          End
@@ -166,7 +226,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Abort!"
             Height          =   375
             Left            =   9240
-            TabIndex        =   136
+            TabIndex        =   140
             Top             =   2760
             Width           =   1095
          End
@@ -174,7 +234,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "&Report"
             Height          =   375
             Left            =   9360
-            TabIndex        =   134
+            TabIndex        =   138
             Top             =   2160
             Width           =   855
          End
@@ -183,7 +243,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   375
             Index           =   1
             Left            =   9120
-            TabIndex        =   133
+            TabIndex        =   137
             Top             =   240
             Width           =   1455
          End
@@ -193,7 +253,7 @@ Begin VB.Form frmUMCIonNet
             Left            =   1680
             List            =   "frmUMCIonNet.frx":0056
             Style           =   2  'Dropdown List
-            TabIndex        =   132
+            TabIndex        =   136
             Top             =   4035
             Width           =   2175
          End
@@ -201,7 +261,7 @@ Begin VB.Form frmUMCIonNet
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   7200
-            TabIndex        =   130
+            TabIndex        =   134
             Text            =   "0"
             Top             =   4035
             Width           =   495
@@ -210,22 +270,22 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Interpolate abundances across gaps"
             Height          =   255
             Left            =   4080
-            TabIndex        =   128
+            TabIndex        =   132
             Top             =   3765
             Width           =   3015
          End
-         Begin VB.Frame Frame2 
+         Begin VB.Frame fraLCMSFeatureStats 
             Caption         =   "LC-MS Feature Stats"
             Height          =   3735
             Left            =   120
-            TabIndex        =   62
+            TabIndex        =   66
             Top             =   180
             Width           =   3735
             Begin VB.ComboBox cboMolecularMassField 
                Height          =   315
                Left            =   1560
                Style           =   2  'Dropdown List
-               TabIndex        =   145
+               TabIndex        =   149
                Top             =   2760
                Width           =   1935
             End
@@ -233,7 +293,7 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Use most abundant charge state group stats for class stats"
                Height          =   530
                Left            =   240
-               TabIndex        =   141
+               TabIndex        =   145
                ToolTipText     =   "Make single-member classes from unconnected nodes"
                Top             =   3120
                Width           =   2055
@@ -242,7 +302,7 @@ Begin VB.Form frmUMCIonNet
                Height          =   315
                Left            =   240
                Style           =   2  'Dropdown List
-               TabIndex        =   139
+               TabIndex        =   143
                Top             =   2360
                Width           =   3255
             End
@@ -250,7 +310,7 @@ Begin VB.Form frmUMCIonNet
                Height          =   315
                Left            =   240
                Style           =   2  'Dropdown List
-               TabIndex        =   64
+               TabIndex        =   68
                Top             =   540
                Width           =   3255
             End
@@ -258,7 +318,7 @@ Begin VB.Form frmUMCIonNet
                Height          =   315
                Left            =   240
                Style           =   2  'Dropdown List
-               TabIndex        =   68
+               TabIndex        =   72
                Top             =   1740
                Width           =   3255
             End
@@ -266,7 +326,7 @@ Begin VB.Form frmUMCIonNet
                Height          =   315
                Left            =   240
                Style           =   2  'Dropdown List
-               TabIndex        =   66
+               TabIndex        =   70
                Top             =   1140
                Width           =   3255
             End
@@ -274,7 +334,7 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Make single member classes"
                Height          =   530
                Left            =   2400
-               TabIndex        =   69
+               TabIndex        =   73
                ToolTipText     =   "Make single-member classes from unconnected nodes"
                Top             =   3120
                Width           =   1215
@@ -284,7 +344,7 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Mass field to use"
                Height          =   255
                Left            =   240
-               TabIndex        =   146
+               TabIndex        =   150
                Top             =   2760
                Width           =   1335
             End
@@ -293,7 +353,7 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Most Abu Charge State Group Type"
                Height          =   255
                Left            =   240
-               TabIndex        =   140
+               TabIndex        =   144
                Top             =   2120
                Width           =   3135
             End
@@ -302,7 +362,7 @@ Begin VB.Form frmUMCIonNet
                Height          =   255
                Index           =   3
                Left            =   240
-               TabIndex        =   63
+               TabIndex        =   67
                Top             =   300
                Width           =   1575
             End
@@ -311,7 +371,7 @@ Begin VB.Form frmUMCIonNet
                Height          =   255
                Index           =   2
                Left            =   240
-               TabIndex        =   67
+               TabIndex        =   71
                Top             =   1500
                Width           =   1335
             End
@@ -320,7 +380,7 @@ Begin VB.Form frmUMCIonNet
                Height          =   255
                Index           =   1
                Left            =   240
-               TabIndex        =   65
+               TabIndex        =   69
                Top             =   900
                Width           =   1335
             End
@@ -328,25 +388,24 @@ Begin VB.Form frmUMCIonNet
          Begin TabDlg.SSTab tbsUMCRefinementOptions 
             Height          =   3375
             Left            =   3960
-            TabIndex        =   70
+            TabIndex        =   74
             Top             =   180
             Width           =   4815
             _ExtentX        =   8493
             _ExtentY        =   5953
             _Version        =   393216
             Style           =   1
-            Tab             =   1
             TabHeight       =   520
             TabCaption(0)   =   "Auto-Refine Options"
             TabPicture(0)   =   "frmUMCIonNet.frx":0058
-            Tab(0).ControlEnabled=   0   'False
-            Tab(0).Control(0)=   "fraOptionFrame(10)"
+            Tab(0).ControlEnabled=   -1  'True
+            Tab(0).Control(0)=   "fraOptionFrame(0)"
+            Tab(0).Control(0).Enabled=   0   'False
             Tab(0).ControlCount=   1
             TabCaption(1)   =   "Split Features Options"
             TabPicture(1)   =   "frmUMCIonNet.frx":0074
-            Tab(1).ControlEnabled=   -1  'True
-            Tab(1).Control(0)=   "fraOptionFrame(15)"
-            Tab(1).Control(0).Enabled=   0   'False
+            Tab(1).ControlEnabled=   0   'False
+            Tab(1).Control(0)=   "fraOptionFrame(1)"
             Tab(1).ControlCount=   1
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
@@ -358,14 +417,14 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Class Mass Top X"
                Height          =   1215
                Left            =   -74880
-               TabIndex        =   121
+               TabIndex        =   125
                Top             =   1800
                Width           =   4095
                Begin VB.TextBox txtClassMassTopXMinAbu 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   123
+                  TabIndex        =   127
                   Text            =   "0"
                   Top             =   240
                   Width           =   900
@@ -374,7 +433,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   125
+                  TabIndex        =   129
                   Text            =   "0"
                   ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
                   Top             =   540
@@ -384,7 +443,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   127
+                  TabIndex        =   131
                   Text            =   "3"
                   Top             =   840
                   Width           =   900
@@ -394,7 +453,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   122
+                  TabIndex        =   126
                   Top             =   270
                   Width           =   2535
                End
@@ -403,7 +462,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Maximum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   124
+                  TabIndex        =   128
                   Top             =   560
                   Width           =   2535
                End
@@ -412,7 +471,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum members to include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   126
+                  TabIndex        =   130
                   Top             =   870
                   Width           =   2535
                End
@@ -421,14 +480,14 @@ Begin VB.Form frmUMCIonNet
                Caption         =   "Class Abundance Top X"
                Height          =   1215
                Left            =   -74880
-               TabIndex        =   114
+               TabIndex        =   118
                Top             =   480
                Width           =   4095
                Begin VB.TextBox txtClassAbuTopXMinMembers 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   120
+                  TabIndex        =   124
                   Text            =   "3"
                   Top             =   840
                   Width           =   900
@@ -437,7 +496,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   118
+                  TabIndex        =   122
                   Text            =   "0"
                   ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
                   Top             =   540
@@ -447,7 +506,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   116
+                  TabIndex        =   120
                   Text            =   "0"
                   Top             =   240
                   Width           =   900
@@ -457,7 +516,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum members to include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   119
+                  TabIndex        =   123
                   Top             =   870
                   Width           =   2535
                End
@@ -466,7 +525,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Maximum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   117
+                  TabIndex        =   121
                   Top             =   560
                   Width           =   2535
                End
@@ -475,23 +534,23 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum Abundance to Include"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   115
+                  TabIndex        =   119
                   Top             =   270
                   Width           =   2535
                End
             End
             Begin VB.Frame fraOptionFrame 
                Height          =   2920
-               Index           =   15
-               Left            =   120
-               TabIndex        =   93
+               Index           =   1
+               Left            =   -74880
+               TabIndex        =   97
                Top             =   330
                Width           =   4300
                Begin VB.TextBox txtSplitUMCsStdDevMultiplierForSplitting 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   99
+                  TabIndex        =   103
                   Text            =   "1"
                   Top             =   900
                   Width           =   495
@@ -500,7 +559,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   315
                   Left            =   1800
                   Style           =   2  'Dropdown List
-                  TabIndex        =   113
+                  TabIndex        =   117
                   Top             =   2580
                   Width           =   2295
                End
@@ -508,7 +567,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   110
+                  TabIndex        =   114
                   Text            =   "3"
                   Top             =   2220
                   Width           =   495
@@ -517,7 +576,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   107
+                  TabIndex        =   111
                   Text            =   "4"
                   Top             =   1890
                   Width           =   495
@@ -526,7 +585,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   104
+                  TabIndex        =   108
                   Text            =   "15"
                   Top             =   1560
                   Width           =   495
@@ -535,7 +594,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   101
+                  TabIndex        =   105
                   Text            =   "6"
                   Top             =   1230
                   Width           =   495
@@ -544,7 +603,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   2880
-                  TabIndex        =   96
+                  TabIndex        =   100
                   Text            =   "4"
                   Top             =   570
                   Width           =   495
@@ -553,7 +612,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Split LC-MS Features by examining abundance"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   94
+                  TabIndex        =   98
                   Top             =   240
                   Width           =   3975
                End
@@ -561,7 +620,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Mass Std Dev threshold multiplier"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   98
+                  TabIndex        =   102
                   Top             =   930
                   Width           =   2700
                End
@@ -569,7 +628,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Scan gap behavior:"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   112
+                  TabIndex        =   116
                   Top             =   2610
                   Width           =   1620
                End
@@ -578,7 +637,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   3
                   Left            =   3480
-                  TabIndex        =   111
+                  TabIndex        =   115
                   Top             =   2250
                   Width           =   600
                End
@@ -588,7 +647,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   1
                   Left            =   120
-                  TabIndex        =   109
+                  TabIndex        =   113
                   Top             =   2250
                   Width           =   2655
                End
@@ -596,7 +655,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Peak picking minimum width"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   106
+                  TabIndex        =   110
                   Top             =   1920
                   Width           =   2700
                End
@@ -605,7 +664,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   5
                   Left            =   3480
-                  TabIndex        =   108
+                  TabIndex        =   112
                   Top             =   1920
                   Width           =   600
                End
@@ -613,7 +672,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Peak picking intensity threshold"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   103
+                  TabIndex        =   107
                   Top             =   1590
                   Width           =   2700
                End
@@ -622,7 +681,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   0
                   Left            =   3480
-                  TabIndex        =   105
+                  TabIndex        =   109
                   Top             =   1590
                   Width           =   705
                End
@@ -630,7 +689,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Maximum peak count to split feature"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   100
+                  TabIndex        =   104
                   Top             =   1260
                   Width           =   2700
                End
@@ -639,7 +698,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   1
                   Left            =   3480
-                  TabIndex        =   102
+                  TabIndex        =   106
                   Top             =   1260
                   Width           =   600
                End
@@ -647,7 +706,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum difference in average mass"
                   Height          =   255
                   Left            =   120
-                  TabIndex        =   95
+                  TabIndex        =   99
                   Top             =   600
                   Width           =   2700
                End
@@ -656,23 +715,23 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   2
                   Left            =   3480
-                  TabIndex        =   97
+                  TabIndex        =   101
                   Top             =   600
                   Width           =   600
                End
             End
             Begin VB.Frame fraOptionFrame 
                Height          =   2700
-               Index           =   10
-               Left            =   -74880
-               TabIndex        =   71
+               Index           =   0
+               Left            =   120
+               TabIndex        =   75
                Top             =   300
                Width           =   4545
                Begin VB.TextBox txtMaxLengthPctAllScans 
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   3000
-                  TabIndex        =   85
+                  TabIndex        =   89
                   Text            =   "15"
                   Top             =   1520
                   Width           =   495
@@ -681,7 +740,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Remove cls. with length over"
                   Height          =   255
                   Left            =   240
-                  TabIndex        =   84
+                  TabIndex        =   88
                   Top             =   1520
                   Width           =   2535
                End
@@ -689,7 +748,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   3000
-                  TabIndex        =   88
+                  TabIndex        =   92
                   Text            =   "33"
                   Top             =   1840
                   Width           =   495
@@ -698,7 +757,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   3480
-                  TabIndex        =   92
+                  TabIndex        =   96
                   Text            =   "3"
                   Top             =   2300
                   Width           =   495
@@ -707,7 +766,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Test feature length using scan range"
                   Height          =   375
                   Left            =   240
-                  TabIndex        =   90
+                  TabIndex        =   94
                   ToolTipText     =   "If True, then considers scan range for the length tests; otherwise, considers member count"
                   Top             =   2200
                   Value           =   1  'Checked
@@ -717,7 +776,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Remove low intensity classes"
                   Height          =   255
                   Left            =   240
-                  TabIndex        =   72
+                  TabIndex        =   76
                   Top             =   240
                   Width           =   2550
                End
@@ -725,7 +784,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   3000
-                  TabIndex        =   73
+                  TabIndex        =   77
                   Text            =   "30"
                   Top             =   240
                   Width           =   495
@@ -734,7 +793,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Remove high intensity classes"
                   Height          =   255
                   Left            =   240
-                  TabIndex        =   75
+                  TabIndex        =   79
                   Top             =   560
                   Width           =   2550
                End
@@ -742,7 +801,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   3000
-                  TabIndex        =   76
+                  TabIndex        =   80
                   Text            =   "30"
                   Top             =   560
                   Width           =   495
@@ -751,7 +810,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Remove cls. with less than"
                   Height          =   255
                   Left            =   240
-                  TabIndex        =   78
+                  TabIndex        =   82
                   Top             =   880
                   Width           =   2295
                End
@@ -759,7 +818,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   3000
-                  TabIndex        =   79
+                  TabIndex        =   83
                   Text            =   "3"
                   Top             =   880
                   Width           =   495
@@ -768,7 +827,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Remove cls. with length over"
                   Height          =   255
                   Left            =   240
-                  TabIndex        =   81
+                  TabIndex        =   85
                   Top             =   1200
                   Width           =   2535
                End
@@ -776,7 +835,7 @@ Begin VB.Form frmUMCIonNet
                   Alignment       =   1  'Right Justify
                   Height          =   285
                   Left            =   3000
-                  TabIndex        =   82
+                  TabIndex        =   86
                   Text            =   "500"
                   Top             =   1200
                   Width           =   495
@@ -786,7 +845,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   5
                   Left            =   3600
-                  TabIndex        =   77
+                  TabIndex        =   81
                   Top             =   590
                   Width           =   270
                End
@@ -795,7 +854,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   4
                   Left            =   3600
-                  TabIndex        =   74
+                  TabIndex        =   78
                   Top             =   270
                   Width           =   270
                End
@@ -804,7 +863,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   3
                   Left            =   3600
-                  TabIndex        =   86
+                  TabIndex        =   90
                   Top             =   1545
                   Width           =   855
                End
@@ -813,7 +872,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   2
                   Left            =   3600
-                  TabIndex        =   89
+                  TabIndex        =   93
                   Top             =   1870
                   Width           =   285
                End
@@ -821,7 +880,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Percent max abu for gauging width"
                   Height          =   240
                   Left            =   360
-                  TabIndex        =   87
+                  TabIndex        =   91
                   Top             =   1845
                   Width           =   2565
                End
@@ -829,7 +888,7 @@ Begin VB.Form frmUMCIonNet
                   Caption         =   "Minimum member count:"
                   Height          =   375
                   Left            =   2280
-                  TabIndex        =   91
+                  TabIndex        =   95
                   Top             =   2200
                   Width           =   1125
                End
@@ -838,7 +897,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   0
                   Left            =   3600
-                  TabIndex        =   80
+                  TabIndex        =   84
                   Top             =   915
                   Width           =   900
                End
@@ -847,7 +906,7 @@ Begin VB.Form frmUMCIonNet
                   Height          =   255
                   Index           =   1
                   Left            =   3600
-                  TabIndex        =   83
+                  TabIndex        =   87
                   Top             =   1230
                   Width           =   900
                End
@@ -858,7 +917,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "FeatureDraw Type"
             Height          =   255
             Left            =   240
-            TabIndex        =   131
+            TabIndex        =   135
             Top             =   4065
             Width           =   1455
          End
@@ -867,7 +926,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Maximum size of gap to interpolate:"
             Height          =   255
             Left            =   4080
-            TabIndex        =   129
+            TabIndex        =   133
             Top             =   4065
             Width           =   2535
          End
@@ -875,16 +934,15 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   3255
          Index           =   0
-         Left            =   -72960
-         TabIndex        =   4
+         Left            =   2040
+         TabIndex        =   9
          Top             =   420
          Width           =   8535
          Begin VB.CommandButton cmdResetToOldDefaults 
             Caption         =   "Set to Old Defaults"
             Height          =   250
-            Index           =   2
             Left            =   5280
-            TabIndex        =   142
+            TabIndex        =   146
             Top             =   240
             Width           =   1575
          End
@@ -893,7 +951,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   375
             Index           =   0
             Left            =   6960
-            TabIndex        =   9
+            TabIndex        =   14
             Top             =   200
             Width           =   1455
          End
@@ -902,7 +960,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   4
             Left            =   7560
             Style           =   2  'Dropdown List
-            TabIndex        =   49
+            TabIndex        =   54
             Top             =   2222
             Width           =   855
          End
@@ -911,7 +969,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   3
             Left            =   7560
             Style           =   2  'Dropdown List
-            TabIndex        =   41
+            TabIndex        =   46
             Top             =   1860
             Width           =   855
          End
@@ -920,7 +978,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   2
             Left            =   7560
             Style           =   2  'Dropdown List
-            TabIndex        =   33
+            TabIndex        =   38
             Top             =   1500
             Width           =   855
          End
@@ -929,7 +987,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   1
             Left            =   7560
             Style           =   2  'Dropdown List
-            TabIndex        =   25
+            TabIndex        =   30
             Top             =   1140
             Width           =   855
          End
@@ -938,7 +996,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   0
             Left            =   7560
             Style           =   2  'Dropdown List
-            TabIndex        =   17
+            TabIndex        =   22
             Top             =   780
             Width           =   855
          End
@@ -946,25 +1004,17 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "&Find Connections Only"
             Height          =   375
             Left            =   6000
-            TabIndex        =   52
+            TabIndex        =   57
             ToolTipText     =   "Create Net based on current settings"
             Top             =   2760
             Width           =   2415
-         End
-         Begin VB.CommandButton cmdAbortFindConnections 
-            Caption         =   "Abort!"
-            Height          =   375
-            Left            =   6750
-            TabIndex        =   53
-            Top             =   2760
-            Width           =   975
          End
          Begin VB.TextBox txtConstraint 
             Alignment       =   1  'Right Justify
             Height          =   285
             Index           =   4
             Left            =   6720
-            TabIndex        =   48
+            TabIndex        =   53
             Text            =   "0.1"
             Top             =   2222
             Width           =   735
@@ -974,7 +1024,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   285
             Index           =   3
             Left            =   6720
-            TabIndex        =   40
+            TabIndex        =   45
             Text            =   "0.1"
             Top             =   1860
             Width           =   735
@@ -984,7 +1034,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   285
             Index           =   2
             Left            =   6720
-            TabIndex        =   32
+            TabIndex        =   37
             Text            =   "0.1"
             Top             =   1500
             Width           =   735
@@ -994,7 +1044,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   285
             Index           =   1
             Left            =   6720
-            TabIndex        =   24
+            TabIndex        =   29
             Text            =   "0.1"
             Top             =   1140
             Width           =   735
@@ -1004,7 +1054,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   4
             Left            =   5640
             Style           =   2  'Dropdown List
-            TabIndex        =   47
+            TabIndex        =   52
             Top             =   2222
             Width           =   975
          End
@@ -1013,7 +1063,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   3
             Left            =   5640
             Style           =   2  'Dropdown List
-            TabIndex        =   39
+            TabIndex        =   44
             Top             =   1860
             Width           =   975
          End
@@ -1022,7 +1072,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   2
             Left            =   5640
             Style           =   2  'Dropdown List
-            TabIndex        =   31
+            TabIndex        =   36
             Top             =   1500
             Width           =   975
          End
@@ -1031,7 +1081,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   1
             Left            =   5640
             Style           =   2  'Dropdown List
-            TabIndex        =   23
+            TabIndex        =   28
             Top             =   1140
             Width           =   975
          End
@@ -1040,7 +1090,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   285
             Index           =   0
             Left            =   6720
-            TabIndex        =   16
+            TabIndex        =   21
             Text            =   "0.1"
             Top             =   780
             Width           =   735
@@ -1050,7 +1100,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   0
             Left            =   5640
             Style           =   2  'Dropdown List
-            TabIndex        =   15
+            TabIndex        =   20
             Top             =   780
             Width           =   975
          End
@@ -1059,7 +1109,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   285
             Index           =   4
             Left            =   4080
-            TabIndex        =   45
+            TabIndex        =   50
             Text            =   "1"
             Top             =   2220
             Width           =   615
@@ -1069,7 +1119,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   285
             Index           =   3
             Left            =   4080
-            TabIndex        =   37
+            TabIndex        =   42
             Text            =   "1"
             Top             =   1860
             Width           =   615
@@ -1079,7 +1129,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   4
             Left            =   960
             Style           =   2  'Dropdown List
-            TabIndex        =   43
+            TabIndex        =   48
             Top             =   2220
             Width           =   2175
          End
@@ -1088,7 +1138,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   3
             Left            =   960
             Style           =   2  'Dropdown List
-            TabIndex        =   35
+            TabIndex        =   40
             Top             =   1860
             Width           =   2175
          End
@@ -1097,7 +1147,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   4
             Left            =   240
-            TabIndex        =   42
+            TabIndex        =   47
             Top             =   2280
             Width           =   700
          End
@@ -1106,7 +1156,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   3
             Left            =   240
-            TabIndex        =   34
+            TabIndex        =   39
             Top             =   1920
             Width           =   700
          End
@@ -1114,7 +1164,7 @@ Begin VB.Form frmUMCIonNet
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   4320
-            TabIndex        =   8
+            TabIndex        =   13
             Text            =   "1"
             Top             =   300
             Visible         =   0   'False
@@ -1124,7 +1174,7 @@ Begin VB.Form frmUMCIonNet
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2520
-            TabIndex        =   51
+            TabIndex        =   56
             Text            =   "1"
             Top             =   2760
             Width           =   615
@@ -1133,7 +1183,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   315
             Left            =   1200
             Style           =   2  'Dropdown List
-            TabIndex        =   6
+            TabIndex        =   11
             Top             =   300
             Width           =   1695
          End
@@ -1142,7 +1192,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   285
             Index           =   2
             Left            =   4080
-            TabIndex        =   29
+            TabIndex        =   34
             Text            =   "1"
             Top             =   1500
             Width           =   615
@@ -1152,7 +1202,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   285
             Index           =   1
             Left            =   4080
-            TabIndex        =   21
+            TabIndex        =   26
             Text            =   "1"
             Top             =   1140
             Width           =   615
@@ -1162,7 +1212,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   2
             Left            =   960
             Style           =   2  'Dropdown List
-            TabIndex        =   27
+            TabIndex        =   32
             Top             =   1500
             Width           =   2175
          End
@@ -1171,7 +1221,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   1
             Left            =   960
             Style           =   2  'Dropdown List
-            TabIndex        =   19
+            TabIndex        =   24
             Top             =   1140
             Width           =   2175
          End
@@ -1180,7 +1230,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   2
             Left            =   240
-            TabIndex        =   26
+            TabIndex        =   31
             Top             =   1560
             Width           =   700
          End
@@ -1189,7 +1239,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   1
             Left            =   240
-            TabIndex        =   18
+            TabIndex        =   23
             Top             =   1200
             Width           =   700
          End
@@ -1198,7 +1248,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   285
             Index           =   0
             Left            =   4080
-            TabIndex        =   13
+            TabIndex        =   18
             Text            =   "1"
             Top             =   780
             Width           =   615
@@ -1208,7 +1258,7 @@ Begin VB.Form frmUMCIonNet
             Index           =   0
             Left            =   960
             Style           =   2  'Dropdown List
-            TabIndex        =   11
+            TabIndex        =   16
             Top             =   780
             Width           =   2175
          End
@@ -1217,7 +1267,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   0
             Left            =   240
-            TabIndex        =   10
+            TabIndex        =   15
             Top             =   840
             Width           =   700
          End
@@ -1226,7 +1276,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   10
             Left            =   4800
-            TabIndex        =   46
+            TabIndex        =   51
             Top             =   2280
             Width           =   735
          End
@@ -1235,7 +1285,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   9
             Left            =   4800
-            TabIndex        =   38
+            TabIndex        =   43
             Top             =   1920
             Width           =   735
          End
@@ -1244,7 +1294,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   8
             Left            =   4800
-            TabIndex        =   30
+            TabIndex        =   35
             Top             =   1560
             Width           =   735
          End
@@ -1253,7 +1303,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   7
             Left            =   4800
-            TabIndex        =   22
+            TabIndex        =   27
             Top             =   1200
             Width           =   735
          End
@@ -1262,7 +1312,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   6
             Left            =   4800
-            TabIndex        =   14
+            TabIndex        =   19
             Top             =   840
             Width           =   735
          End
@@ -1271,7 +1321,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   0
             Left            =   240
-            TabIndex        =   50
+            TabIndex        =   55
             Top             =   2790
             Width           =   2175
          End
@@ -1280,7 +1330,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   5
             Left            =   3240
-            TabIndex        =   44
+            TabIndex        =   49
             Top             =   2280
             Width           =   855
          End
@@ -1289,7 +1339,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   4
             Left            =   3240
-            TabIndex        =   36
+            TabIndex        =   41
             Top             =   1920
             Width           =   855
          End
@@ -1297,7 +1347,7 @@ Begin VB.Form frmUMCIonNet
             Caption         =   "Net Type"
             Height          =   255
             Left            =   3360
-            TabIndex        =   7
+            TabIndex        =   12
             Top             =   320
             Visible         =   0   'False
             Width           =   855
@@ -1307,7 +1357,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   3
             Left            =   240
-            TabIndex        =   5
+            TabIndex        =   10
             Top             =   360
             Width           =   855
          End
@@ -1316,7 +1366,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   2
             Left            =   3240
-            TabIndex        =   28
+            TabIndex        =   33
             Top             =   1560
             Width           =   855
          End
@@ -1325,7 +1375,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   1
             Left            =   3240
-            TabIndex        =   20
+            TabIndex        =   25
             Top             =   1200
             Width           =   855
          End
@@ -1334,7 +1384,7 @@ Begin VB.Form frmUMCIonNet
             Height          =   255
             Index           =   0
             Left            =   3240
-            TabIndex        =   12
+            TabIndex        =   17
             Top             =   840
             Width           =   855
          End
@@ -1342,8 +1392,8 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Label lblLCMSFeatureFinderInfo 
          Caption         =   $"frmUMCIonNet.frx":00AC
          Height          =   400
-         Left            =   -74760
-         TabIndex        =   144
+         Left            =   240
+         TabIndex        =   148
          Top             =   4080
          Width           =   5415
       End
@@ -1351,7 +1401,7 @@ Begin VB.Form frmUMCIonNet
          Caption         =   $"frmUMCIonNet.frx":0147
          Height          =   615
          Left            =   -74640
-         TabIndex        =   55
+         TabIndex        =   59
          Top             =   540
          Width           =   5055
       End
@@ -1363,7 +1413,7 @@ Begin VB.Form frmUMCIonNet
       ForeColor       =   &H80000008&
       Height          =   255
       Left            =   1200
-      TabIndex        =   138
+      TabIndex        =   142
       Top             =   5340
       Width           =   9855
    End
@@ -1411,7 +1461,7 @@ Private DataCnt As Long     'count of isotopic data
 
 ' Unused variable
 '''Dim DataWeightFactor() As Double    'weighting factor for each dimension
-Private DataOInd() As Long              'original index in IsoData array
+Private DataOInd() As Long              'original index in IsoData array; thus, pointer into GelDraw(CallerID).IsoID()
 Private DataVal() As Double             'values to be used in calculations
 'this values are dimensioned and weighted to improve calculation speed
 
@@ -1645,6 +1695,32 @@ Private Sub ChangeStatus(ByVal StatusMsg As String)
     DoEvents
 End Sub
 
+Private Function CheckOddEvenIterationForDataPoint(ByVal intOddEvenIteration As Integer, ByVal lngOriginalIndex As Long) As Boolean
+    If intOddEvenIteration = 1 Then
+        ' Return True if the point has an odd scan number
+        CheckOddEvenIterationForDataPoint = GelData(CallerID).IsoData(GelDraw(CallerID).IsoID(DataOInd(lngOriginalIndex))).ScanNumber Mod 2 = 1
+    ElseIf intOddEvenIteration = 2 Then
+        ' Return True if the point has an even scan number
+        CheckOddEvenIterationForDataPoint = GelData(CallerID).IsoData(GelDraw(CallerID).IsoID(DataOInd(lngOriginalIndex))).ScanNumber Mod 2 = 0
+    Else
+        ' intOddEvenIteration is not 1 or 2; return True
+        CheckOddEvenIterationForDataPoint = True
+    End If
+End Function
+
+Private Function CheckOddEvenIterationForScan(ByVal intOddEvenIteration As Integer, ByVal lngScanNumber As Long) As Boolean
+    If intOddEvenIteration = 1 Then
+        ' Return True if the point has an odd scan number
+        CheckOddEvenIterationForScan = lngScanNumber Mod 2 = 1
+    ElseIf intOddEvenIteration = 2 Then
+        ' Return True if the point has an even scan number
+        CheckOddEvenIterationForScan = lngScanNumber Mod 2 = 0
+    Else
+        ' intOddEvenIteration is not 1 or 2; return True
+        CheckOddEvenIterationForScan = True
+    End If
+End Function
+
 Private Sub CreateNet()
 '------------------------------------------------------------------------------
 'fills permanent GelUMCIon structures with indexes;
@@ -1654,10 +1730,13 @@ Private Sub CreateNet()
 Dim i As Long
 Dim TmpCnt As Long
 Dim Ind1() As Long, Ind2() As Long, Dist() As Double, SortInd() As Long
+Dim blnEraseUMCIonNetworks As Boolean
 
 On Error GoTo CreateNetErrorHandler
 
+blnEraseUMCIonNetworks = False
 ChangeStatus " Creating Net structure..."
+
 If ResCnt > 0 Then
    TmpCnt = 0
    ReDim Ind1(ResCnt - 1):   ReDim Ind2(ResCnt - 1):
@@ -1685,8 +1764,21 @@ If ResCnt > 0 Then
              If Dist(SortInd(i)) > .MaxDist Then .MaxDist = Dist(SortInd(i))
          Next i
       End With
+   Else
+      blnEraseUMCIonNetworks = True
    End If
+Else
+   Call ManageResArrays(amtErase)
+   blnEraseUMCIonNetworks = True
 End If
+
+If blnEraseUMCIonNetworks Then
+    With GelUMCIon(CallerID)
+        .NetCount = 0
+         ReDim .NetInd1(0):   ReDim .NetInd2(0):   ReDim .NetDist(0)
+    End With
+End If
+
 ChangeStatus " Number of connections: " & GelUMCIon(CallerID).NetCount
 lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
 Exit Sub
@@ -1901,7 +1993,7 @@ LogErrors Err.Number, "frmUMCIonNet->EliminateLongConnections_NET"
 Resume Next
 End Function
 
-Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef strLCMSFeaturesFilePath As String, ByRef strIniFilePath As String) As Boolean
+Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef strLCMSFeaturesFilePath As String, ByRef strIniFilePath As String, ByVal intOddEvenIteration As Integer) As Boolean
     Const COL_DELIMITER As String = vbTab
     
     Dim lngindex As Long
@@ -1930,7 +2022,8 @@ Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef
     Dim blnFitDefined As Boolean
     
     Dim blnUseGenericNET As Boolean
-
+    Dim blnExportPoint As Boolean
+    
 On Error GoTo ExportPeaksForUMCFindingErrorHandler
 
     strBaseStatus = "Exporting loaded peaks to find LC-MS features with external application"
@@ -1972,23 +2065,31 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     
     With GelData(CallerID)
         For lngindex = 1 To DataCnt
-            With .IsoData(ISInd(lngindex))
-                strLineOut = Trim(.ScanNumber) & COL_DELIMITER & _
-                             Trim(.Charge) & COL_DELIMITER & _
-                             Trim(.Abundance) & COL_DELIMITER & _
-                             Trim(.MZ) & COL_DELIMITER & _
-                             Trim(.Fit) & COL_DELIMITER & _
-                             Trim(.AverageMW) & COL_DELIMITER & _
-                             Trim(.MonoisotopicMW) & COL_DELIMITER & _
-                             Trim(.MostAbundantMW) & COL_DELIMITER & _
-                             Trim(.FWHM) & COL_DELIMITER & _
-                             Trim(.SignalToNoise) & COL_DELIMITER & _
-                             Trim(.IntensityMono) & COL_DELIMITER & _
-                             Trim(.IntensityMonoPlus2) & COL_DELIMITER & _
-                             Trim(ISInd(lngindex))
-
-                tsOutfile.WriteLine strLineOut
-            End With
+            If intOddEvenIteration = 0 Then
+                blnExportPoint = True
+            Else
+                blnExportPoint = CheckOddEvenIterationForScan(intOddEvenIteration, .IsoData(ISInd(lngindex)).ScanNumber)
+            End If
+            
+            If blnExportPoint Then
+                With .IsoData(ISInd(lngindex))
+                    strLineOut = Trim(.ScanNumber) & COL_DELIMITER & _
+                                 Trim(.Charge) & COL_DELIMITER & _
+                                 Trim(.Abundance) & COL_DELIMITER & _
+                                 Trim(.MZ) & COL_DELIMITER & _
+                                 Trim(.Fit) & COL_DELIMITER & _
+                                 Trim(.AverageMW) & COL_DELIMITER & _
+                                 Trim(.MonoisotopicMW) & COL_DELIMITER & _
+                                 Trim(.MostAbundantMW) & COL_DELIMITER & _
+                                 Trim(.FWHM) & COL_DELIMITER & _
+                                 Trim(.SignalToNoise) & COL_DELIMITER & _
+                                 Trim(.IntensityMono) & COL_DELIMITER & _
+                                 Trim(.IntensityMonoPlus2) & COL_DELIMITER & _
+                                 Trim(ISInd(lngindex))
+    
+                    tsOutfile.WriteLine strLineOut
+                End With
+            End If
             
             If lngindex Mod 5000 = 0 Then
                 ChangeStatus strBaseStatus & ": " & Trim(lngindex) & " / " & Trim(DataCnt)
@@ -2231,7 +2332,7 @@ On Error GoTo FinalizeNewUMCsErrorHandler
             ' Be sure to call UpdateUMCStatArrays before using clsSplitUMCsByAbundance
             
             Set mSplitUMCs = New clsSplitUMCsByAbundance
-            mSplitUMCs.ExamineUMCs CallerID, Me, False, True
+            mSplitUMCs.ExamineUMCs CallerID, Me, GelUMC(CallerID).def.OddEvenProcessingMode, False, True
             
             Set mSplitUMCs = Nothing
         End If
@@ -2253,264 +2354,346 @@ FinalizeNewUMCsErrorHandler:
     
 End Function
 
-Private Sub FindBestMatches()
-Dim i As Long, j As Long                'loop controlers
-Dim iOInd As Long, jOInd As Long        'indexes in original Data arrays
-Dim BestForI As Long                    'index of best match for index i
-Dim ShortestDistance As Double, CurrDistance As Double
-Dim bTooFarAway As Boolean
-Dim lngTickCountLastUpdate As Long, lngNewTickCount As Long
-Dim dtLastUpdateTime As Date
+Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcessingMode)
+    Dim i As Long, j As Long                'loop controlers
+    Dim iOInd As Long, jOInd As Long        'indexes in original Data arrays
+    Dim BestForI As Long                    'index of best match for index i
+    Dim ShortestDistance As Double, CurrDistance As Double
+    Dim bTooFarAway As Boolean
+    Dim lngTickCountLastUpdate As Long, lngNewTickCount As Long
+    Dim dtLastUpdateTime As Date
 
-On Error GoTo err_FindBestMatches
-mAbortProcess = False
-Select Case MyDef.MetricType
-Case METRIC_EUCLIDEAN
-     Select Case MyDef.NETType
-     Case Net_SPIDER_66                                'remember all connections shorter than threshold
-         For i = 0 To DataCnt - 1
-             iOInd = OptIndO(i)
-             lngNewTickCount = GetTickCount()     ' Note that GetTickCount returns a negative number after 24 days of computer Uptime and resets to 0 after 48 days
-             If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
-                ' Only update 4 times per second
-                ChangeStatus "Calculating line " & i & " / " & Trim(DataCnt)
-                If mAbortProcess Then Exit For
-                lngTickCountLastUpdate = lngNewTickCount
-                dtLastUpdateTime = Now()
-             End If
-             j = i + 1
-             bTooFarAway = (j > DataCnt - 1)
-             Do Until bTooFarAway
-                If MetricEuclidDim1(i, j) > MyDef.TooDistant Then
-                   bTooFarAway = True
-                Else
-                   jOInd = OptIndO(j)
-                   CurrDistance = MetricEuclid(iOInd, jOInd)
-                   If CurrDistance < MyDef.TooDistant Then
-                      If Not SubjectToConstraintEuclid(iOInd, jOInd) Then
-                         ResCnt = ResCnt + 1
-                         'put in results original indexes; always smaller index first
-                         If iOInd < jOInd Then
-                            ResInd1(ResCnt - 1) = iOInd:   ResInd2(ResCnt - 1) = jOInd
-                         Else
-                            ResInd1(ResCnt - 1) = jOInd:   ResInd2(ResCnt - 1) = iOInd
-                         End If
-                         ResDist(ResCnt - 1) = CurrDistance
-                      End If
-                   End If
-                End If
-                j = j + 1
-                If j > DataCnt - 1 Then bTooFarAway = True
-             Loop
-         Next i
-     Case Else
-         For i = 0 To DataCnt - 1
-             iOInd = OptIndO(i)
-             BestForI = -1
-             ShortestDistance = glHugeDouble
-             If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
-                ' Only update 4 times per second
-                ChangeStatus "Calculating line " & i & " / " & Trim(DataCnt)
-                If mAbortProcess Then Exit For
-                lngTickCountLastUpdate = lngNewTickCount
-                dtLastUpdateTime = Now()
-             End If
-             If mAbortProcess Then Exit For
-             j = i + 1
-             bTooFarAway = (j > DataCnt - 1)
-             Do Until bTooFarAway
-                If MetricEuclidDim1(i, j) > MyDef.TooDistant Then
-                   bTooFarAway = True
-                Else
-                   jOInd = OptIndO(j)
-                   CurrDistance = MetricEuclid(iOInd, jOInd)
-                   If CurrDistance < ShortestDistance Then
-                      BestForI = j
-                      ShortestDistance = CurrDistance
-                   End If
-                End If
-                j = j + 1
-                If j > DataCnt - 1 Then bTooFarAway = True
-             Loop
-             If ShortestDistance < MyDef.TooDistant Then
-                If Not SubjectToConstraintEuclid(iOInd, jOInd) Then
-                   ResCnt = ResCnt + 1
-                   'put in results original indexes; always smaller first
-                   If iOInd < OptIndO(BestForI) Then
-                      ResInd1(ResCnt - 1) = iOInd:   ResInd2(ResCnt - 1) = OptIndO(BestForI)
-                   Else
-                      ResInd1(ResCnt - 1) = OptIndO(BestForI):   ResInd2(ResCnt - 1) = iOInd
-                   End If
-                   ResDist(ResCnt - 1) = ShortestDistance
-                End If
-             End If
-         Next i
-     End Select
-Case METRIC_HONDURAS
-     Select Case MyDef.NETType
-     Case Net_SPIDER_66                                'remember all connections shorter than threshold
-         For i = 0 To DataCnt - 1
-             iOInd = OptIndO(i)
-             If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
-                ' Only update 4 times per second
-                ChangeStatus "Calculating line " & i & " / " & Trim(DataCnt)
-                If mAbortProcess Then Exit For
-                lngTickCountLastUpdate = lngNewTickCount
-                dtLastUpdateTime = Now()
-             End If
-             If mAbortProcess Then Exit For
-             j = i + 1
-             bTooFarAway = (j > DataCnt - 1)
-             Do Until bTooFarAway
-                If MetricHondurasDim1(i, j) > MyDef.TooDistant Then
-                   bTooFarAway = True
-                Else
-                   jOInd = OptIndO(j)
-                   CurrDistance = MetricHonduras(iOInd, jOInd)
-                   If CurrDistance < MyDef.TooDistant Then
-                      If Not SubjectToConstraintHonduras(iOInd, jOInd) Then
-                         ResCnt = ResCnt + 1
-                         'put in results original indexes; always smaller index first
-                         If iOInd < jOInd Then
-                            ResInd1(ResCnt - 1) = iOInd:   ResInd2(ResCnt - 1) = jOInd
-                         Else
-                            ResInd1(ResCnt - 1) = jOInd:   ResInd2(ResCnt - 1) = iOInd
-                         End If
-                         ResDist(ResCnt - 1) = CurrDistance
-                      End If
-                   End If
-                End If
-                j = j + 1
-                If j > DataCnt - 1 Then bTooFarAway = True
-             Loop
-         Next i
-     Case Else
-         For i = 0 To DataCnt - 1
-             iOInd = OptIndO(i)
-             BestForI = -1
-             ShortestDistance = glHugeDouble
-             If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
-                ' Only update 4 times per second
-                ChangeStatus "Calculating line " & i & " / " & Trim(DataCnt)
-                If mAbortProcess Then Exit For
-                lngTickCountLastUpdate = lngNewTickCount
-                dtLastUpdateTime = Now()
-             End If
-             If mAbortProcess Then Exit For
-             j = i + 1
-             bTooFarAway = (j > DataCnt - 1)
-             Do Until bTooFarAway
-                If MetricHondurasDim1(i, j) > MyDef.TooDistant Then
-                   bTooFarAway = True
-                Else
-                   jOInd = OptIndO(j)
-                   CurrDistance = MetricHonduras(iOInd, jOInd)
-                   If CurrDistance < ShortestDistance Then
-                      BestForI = j
-                      ShortestDistance = CurrDistance
-                   End If
-                End If
-                j = j + 1
-                If j > DataCnt - 1 Then bTooFarAway = True
-             Loop
-             If ShortestDistance < MyDef.TooDistant Then
-                If Not SubjectToConstraintHonduras(iOInd, jOInd) Then
-                   ResCnt = ResCnt + 1
-                   'put in results original indexes; always smaller first
-                   If iOInd < OptIndO(BestForI) Then
-                      ResInd1(ResCnt - 1) = iOInd:   ResInd2(ResCnt - 1) = OptIndO(BestForI)
-                   Else
-                      ResInd1(ResCnt - 1) = OptIndO(BestForI):   ResInd2(ResCnt - 1) = iOInd
-                   End If
-                   ResDist(ResCnt - 1) = ShortestDistance
-                End If
-             End If
-         Next i
-     End Select
-Case METRIC_INFINITY
-     Select Case MyDef.NETType
-     Case Net_SPIDER_66                                'remember all connections shorter than threshold
-         For i = 0 To DataCnt - 1
-             iOInd = OptIndO(i)
-             If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
-                ' Only update 4 times per second
-                ChangeStatus "Calculating line " & i & " / " & Trim(DataCnt)
-                If mAbortProcess Then Exit For
-                lngTickCountLastUpdate = lngNewTickCount
-                dtLastUpdateTime = Now()
-             End If
-             If mAbortProcess Then Exit For
-             j = i + 1
-             bTooFarAway = (j > DataCnt - 1)
-             Do Until bTooFarAway
-                If MetricInfinityDim1(i, j) > MyDef.TooDistant Then
-                   bTooFarAway = True
-                Else
-                   jOInd = OptIndO(j)
-                   CurrDistance = MetricInfinity(iOInd, jOInd)
-                   If CurrDistance < MyDef.TooDistant Then
-                      If Not SubjectToConstraintInfinity(iOInd, jOInd) Then
-                         ResCnt = ResCnt + 1
-                         'put in results original indexes; always smaller index first
-                         If iOInd < jOInd Then
-                            ResInd1(ResCnt - 1) = iOInd:   ResInd2(ResCnt - 1) = jOInd
-                         Else
-                            ResInd1(ResCnt - 1) = jOInd:   ResInd2(ResCnt - 1) = iOInd
-                         End If
-                         ResDist(ResCnt - 1) = CurrDistance
-                      End If
-                   End If
-                End If
-                j = j + 1
-                If j > DataCnt - 1 Then bTooFarAway = True
-             Loop
-         Next i
-     Case Else
-         For i = 0 To DataCnt - 1
-             iOInd = OptIndO(i)
-             BestForI = -1
-             ShortestDistance = glHugeDouble
-             If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
-                ' Only update 4 times per second
-                ChangeStatus "Calculating line " & i & " / " & Trim(DataCnt)
-                If mAbortProcess Then Exit For
-                lngTickCountLastUpdate = lngNewTickCount
-                dtLastUpdateTime = Now()
-             End If
-             If mAbortProcess Then Exit For
-             j = i + 1
-             bTooFarAway = (j > DataCnt - 1)
-             Do Until bTooFarAway
-                If MetricInfinityDim1(i, j) > MyDef.TooDistant Then
-                   bTooFarAway = True
-                Else
-                   jOInd = OptIndO(j)
-                   CurrDistance = MetricInfinity(iOInd, jOInd)
-                   If CurrDistance < ShortestDistance Then
-                      BestForI = j
-                      ShortestDistance = CurrDistance
-                   End If
-                End If
-                j = j + 1
-                If j > DataCnt - 1 Then bTooFarAway = True
-             Loop
-             If ShortestDistance < MyDef.TooDistant Then
-                If Not SubjectToConstraintInfinity(iOInd, jOInd) Then
-                   ResCnt = ResCnt + 1
-                   'put in results original indexes; always smaller first
-                   If iOInd < OptIndO(BestForI) Then
-                      ResInd1(ResCnt - 1) = iOInd:   ResInd2(ResCnt - 1) = OptIndO(BestForI)
-                   Else
-                      ResInd1(ResCnt - 1) = OptIndO(BestForI):   ResInd2(ResCnt - 1) = iOInd
-                   End If
-                   ResDist(ResCnt - 1) = ShortestDistance
-                End If
-             End If
-         Next i
-     End Select
-End Select
-Call ManageResArrays(amtTrim)
-Exit Sub
+    Dim intOddEvenIteration As Integer
+    Dim intOddEvenIterationStart As Integer
+    Dim intOddEvenIterationEnd As Integer
+    Dim blnComputeDistance As Boolean
+    Dim strScanNumMode As String
+    
+    On Error GoTo err_FindBestMatches
+    mAbortProcess = False
+    
+    Select Case eOddEvenProcessingMode
+    Case oepUMCOddEvenProcessingMode.oepOddOnly
+        intOddEvenIterationStart = 1
+        intOddEvenIterationEnd = 1
+    Case oepUMCOddEvenProcessingMode.oepEvenOnly
+        intOddEvenIterationStart = 2
+        intOddEvenIterationEnd = 2
+    Case oepUMCOddEvenProcessingMode.oepOddEvenSequential
+        intOddEvenIterationStart = 1
+        intOddEvenIterationEnd = 2
+    Case Else
+        ' Includes case oepUMCOddEvenProcessingMode.oepProcessAll
+        intOddEvenIterationStart = 0
+        intOddEvenIterationEnd = 0
+    End Select
+    
+    For intOddEvenIteration = intOddEvenIterationStart To intOddEvenIterationEnd
+      Select Case intOddEvenIteration
+      Case 0: strScanNumMode = ""
+      Case 1: strScanNumMode = ", odd numbered spectra"
+      Case 2: strScanNumMode = ", even numbered spectra"
+      Case Else: strScanNumMode = ", Unknown spectrum numbering mode"
+      End Select
+      
+      Select Case MyDef.MetricType
+          Case METRIC_EUCLIDEAN
+              Select Case MyDef.NETType
+                  Case Net_SPIDER_66                                'remember all connections shorter than threshold
+                      For i = 0 To DataCnt - 1
+                          iOInd = OptIndO(i)
+    
+                         ' Only compute the distance if intOddEvenIteration = 0 or if the scan number for
+                         ' the data point is the appropriate odd or even value
+                          blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, iOInd)
+                          If blnComputeDistance Then
+                              lngNewTickCount = GetTickCount()     ' Note that GetTickCount returns a negative number after 24 days of computer Uptime and resets to 0 after 48 days
+                              If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
+                                  ' Only update 4 times per second
+                                  ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                                  If mAbortProcess Then Exit For
+                                  lngTickCountLastUpdate = lngNewTickCount
+                                  dtLastUpdateTime = Now()
+                              End If
+                              j = i + 1
+                              bTooFarAway = (j > DataCnt - 1)
+                              Do Until bTooFarAway
+                                  If MetricEuclidDim1(i, j) > MyDef.TooDistant Then
+                                      bTooFarAway = True
+                                  Else
+                                      jOInd = OptIndO(j)
+    
+                                      blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
+                                      If blnComputeDistance Then
+                                          CurrDistance = MetricEuclid(iOInd, jOInd)
+                                          If CurrDistance < MyDef.TooDistant Then
+                                              If Not SubjectToConstraintEuclid(iOInd, jOInd) Then
+                                                  ResCnt = ResCnt + 1
+                                                  'put in results original indexes; always smaller index first
+                                                  If iOInd < jOInd Then
+                                                      ResInd1(ResCnt - 1) = iOInd: ResInd2(ResCnt - 1) = jOInd
+                                                  Else
+                                                      ResInd1(ResCnt - 1) = jOInd: ResInd2(ResCnt - 1) = iOInd
+                                                  End If
+                                                  ResDist(ResCnt - 1) = CurrDistance
+                                              End If
+                                          End If
+                                      End If
+                                  End If
+                                  j = j + 1
+                                  If j > DataCnt - 1 Then bTooFarAway = True
+                              Loop
+                          End If
+                      Next i
+                  Case Else
+                      For i = 0 To DataCnt - 1
+                          iOInd = OptIndO(i)
+                          BestForI = -1
+                          ShortestDistance = glHugeDouble
+                          If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
+                              ' Only update 4 times per second
+                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              If mAbortProcess Then Exit For
+                              lngTickCountLastUpdate = lngNewTickCount
+                              dtLastUpdateTime = Now()
+                          End If
+                          If mAbortProcess Then Exit For
+                          j = i + 1
+                          bTooFarAway = (j > DataCnt - 1)
+                          Do Until bTooFarAway
+                              If MetricEuclidDim1(i, j) > MyDef.TooDistant Then
+                                  bTooFarAway = True
+                              Else
+                                  jOInd = OptIndO(j)
+                                  
+                                  blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
+                                  If blnComputeDistance Then
+                                      CurrDistance = MetricEuclid(iOInd, jOInd)
+                                      If CurrDistance < ShortestDistance Then
+                                          BestForI = j
+                                          ShortestDistance = CurrDistance
+                                      End If
+                                  End If
+                              End If
+                              j = j + 1
+                              If j > DataCnt - 1 Then bTooFarAway = True
+                          Loop
+                          If ShortestDistance < MyDef.TooDistant Then
+                              blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
+                              If blnComputeDistance Then
+                                  If Not SubjectToConstraintEuclid(iOInd, jOInd) Then
+                                      ResCnt = ResCnt + 1
+                                      'put in results original indexes; always smaller first
+                                      If iOInd < OptIndO(BestForI) Then
+                                          ResInd1(ResCnt - 1) = iOInd: ResInd2(ResCnt - 1) = OptIndO(BestForI)
+                                      Else
+                                          ResInd1(ResCnt - 1) = OptIndO(BestForI): ResInd2(ResCnt - 1) = iOInd
+                                      End If
+                                      ResDist(ResCnt - 1) = ShortestDistance
+                                  End If
+                              End If
+                          End If
+                      Next i
+              End Select
+          Case METRIC_HONDURAS
+              Select Case MyDef.NETType
+                  Case Net_SPIDER_66                                'remember all connections shorter than threshold
+                      For i = 0 To DataCnt - 1
+                          iOInd = OptIndO(i)
+                          If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
+                              ' Only update 4 times per second
+                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              If mAbortProcess Then Exit For
+                              lngTickCountLastUpdate = lngNewTickCount
+                              dtLastUpdateTime = Now()
+                          End If
+                          If mAbortProcess Then Exit For
+                          j = i + 1
+                          bTooFarAway = (j > DataCnt - 1)
+                          Do Until bTooFarAway
+                              If MetricHondurasDim1(i, j) > MyDef.TooDistant Then
+                                  bTooFarAway = True
+                              Else
+                                  jOInd = OptIndO(j)
+    
+                                ' Only compute the distance if intOddEvenIteration = 0 or if the scan number for
+                                ' the data point is the appropriate odd or even value
+                                  blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
+                                  If blnComputeDistance Then
+                                      CurrDistance = MetricHonduras(iOInd, jOInd)
+                                      If CurrDistance < MyDef.TooDistant Then
+                                          If Not SubjectToConstraintHonduras(iOInd, jOInd) Then
+                                              ResCnt = ResCnt + 1
+                                              'put in results original indexes; always smaller index first
+                                              If iOInd < jOInd Then
+                                                  ResInd1(ResCnt - 1) = iOInd: ResInd2(ResCnt - 1) = jOInd
+                                              Else
+                                                  ResInd1(ResCnt - 1) = jOInd: ResInd2(ResCnt - 1) = iOInd
+                                              End If
+                                              ResDist(ResCnt - 1) = CurrDistance
+                                          End If
+                                      End If
+                                  End If
+                              End If
+                              j = j + 1
+                              If j > DataCnt - 1 Then bTooFarAway = True
+                          Loop
+                      Next i
+                  Case Else
+                      For i = 0 To DataCnt - 1
+                          iOInd = OptIndO(i)
+                          BestForI = -1
+                          ShortestDistance = glHugeDouble
+                          If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
+                              ' Only update 4 times per second
+                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              If mAbortProcess Then Exit For
+                              lngTickCountLastUpdate = lngNewTickCount
+                              dtLastUpdateTime = Now()
+                          End If
+                          If mAbortProcess Then Exit For
+                          j = i + 1
+                          bTooFarAway = (j > DataCnt - 1)
+                          Do Until bTooFarAway
+                              If MetricHondurasDim1(i, j) > MyDef.TooDistant Then
+                                  bTooFarAway = True
+                              Else
+                                  jOInd = OptIndO(j)
+    
+                                  blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
+                                  If blnComputeDistance Then
+                                      CurrDistance = MetricHonduras(iOInd, jOInd)
+                                      If CurrDistance < ShortestDistance Then
+                                          BestForI = j
+                                          ShortestDistance = CurrDistance
+                                      End If
+                                  End If
+                              End If
+                              j = j + 1
+                              If j > DataCnt - 1 Then bTooFarAway = True
+                          Loop
+                          If ShortestDistance < MyDef.TooDistant Then
+                              blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
+                              If blnComputeDistance Then
+    
+                                  If Not SubjectToConstraintHonduras(iOInd, jOInd) Then
+                                      ResCnt = ResCnt + 1
+                                      'put in results original indexes; always smaller first
+                                      If iOInd < OptIndO(BestForI) Then
+                                          ResInd1(ResCnt - 1) = iOInd: ResInd2(ResCnt - 1) = OptIndO(BestForI)
+                                      Else
+                                          ResInd1(ResCnt - 1) = OptIndO(BestForI): ResInd2(ResCnt - 1) = iOInd
+                                      End If
+                                      ResDist(ResCnt - 1) = ShortestDistance
+                                  End If
+                              End If
+                          End If
+                      Next i
+              End Select
+          Case METRIC_INFINITY
+              Select Case MyDef.NETType
+                  Case Net_SPIDER_66                                'remember all connections shorter than threshold
+                      For i = 0 To DataCnt - 1
+                          iOInd = OptIndO(i)
+                          If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
+                              ' Only update 4 times per second
+                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              If mAbortProcess Then Exit For
+                              lngTickCountLastUpdate = lngNewTickCount
+                              dtLastUpdateTime = Now()
+                          End If
+                          If mAbortProcess Then Exit For
+                          j = i + 1
+                          bTooFarAway = (j > DataCnt - 1)
+                          Do Until bTooFarAway
+                              If MetricInfinityDim1(i, j) > MyDef.TooDistant Then
+                                  bTooFarAway = True
+                              Else
+                                  jOInd = OptIndO(j)
+    
+                                ' Only compute the distance if intOddEvenIteration = 0 or if the scan number for
+                                ' the data point is the appropriate odd or even value
+                                  blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
+                                  If blnComputeDistance Then
+                                      CurrDistance = MetricInfinity(iOInd, jOInd)
+                                      If CurrDistance < MyDef.TooDistant Then
+                                          If Not SubjectToConstraintInfinity(iOInd, jOInd) Then
+                                              ResCnt = ResCnt + 1
+                                              'put in results original indexes; always smaller index first
+                                              If iOInd < jOInd Then
+                                                  ResInd1(ResCnt - 1) = iOInd: ResInd2(ResCnt - 1) = jOInd
+                                              Else
+                                                  ResInd1(ResCnt - 1) = jOInd: ResInd2(ResCnt - 1) = iOInd
+                                              End If
+                                              ResDist(ResCnt - 1) = CurrDistance
+                                          End If
+                                      End If
+                                  End If
+                              End If
+                              j = j + 1
+                              If j > DataCnt - 1 Then bTooFarAway = True
+                          Loop
+                      Next i
+                  Case Else
+                      For i = 0 To DataCnt - 1
+                          iOInd = OptIndO(i)
+                          BestForI = -1
+                          ShortestDistance = glHugeDouble
+                          If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
+                              ' Only update 4 times per second
+                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              If mAbortProcess Then Exit For
+                              lngTickCountLastUpdate = lngNewTickCount
+                              dtLastUpdateTime = Now()
+                          End If
+                          If mAbortProcess Then Exit For
+                          j = i + 1
+                          bTooFarAway = (j > DataCnt - 1)
+                          Do Until bTooFarAway
+                              If MetricInfinityDim1(i, j) > MyDef.TooDistant Then
+                                  bTooFarAway = True
+                              Else
+                                  jOInd = OptIndO(j)
+    
+                                ' Only compute the distance if intOddEvenIteration = 0 or if the scan number for
+                                ' the data point is the appropriate odd or even value
+                                  blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
+                                  If blnComputeDistance Then
+                                      CurrDistance = MetricInfinity(iOInd, jOInd)
+                                      If CurrDistance < ShortestDistance Then
+                                          BestForI = j
+                                          ShortestDistance = CurrDistance
+                                      End If
+                                  End If
+                              End If
+                              j = j + 1
+                              If j > DataCnt - 1 Then bTooFarAway = True
+                          Loop
+                          If ShortestDistance < MyDef.TooDistant Then
+                              blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
+                              If blnComputeDistance Then
+    
+                                  If Not SubjectToConstraintInfinity(iOInd, jOInd) Then
+                                      ResCnt = ResCnt + 1
+                                      'put in results original indexes; always smaller first
+                                      If iOInd < OptIndO(BestForI) Then
+                                          ResInd1(ResCnt - 1) = iOInd: ResInd2(ResCnt - 1) = OptIndO(BestForI)
+                                      Else
+                                          ResInd1(ResCnt - 1) = OptIndO(BestForI): ResInd2(ResCnt - 1) = iOInd
+                                      End If
+                                      ResDist(ResCnt - 1) = ShortestDistance
+                                  End If
+                              End If
+                          End If
+                      Next i
+              End Select
+      End Select
+    
+    Next intOddEvenIteration
+    
+
+    Call ManageResArrays(amtTrim)
+    Exit Sub
 
 
 err_FindBestMatches:
@@ -2545,6 +2728,7 @@ Private Function FindUMCsUsingLCMSFeatureFinder(ByVal blnShowMessages As Boolean
     
     Dim strMessage As String
     Dim strStatusBase As String
+    Dim strStatusSpectrumType As String
     
     Dim fso As New FileSystemObject
     Dim objProgRunner As clsProgRunner
@@ -2556,8 +2740,15 @@ Private Function FindUMCsUsingLCMSFeatureFinder(ByVal blnShowMessages As Boolean
     Dim lngIteration As Long
     Dim lngStatusUpdateIterationCount As Long
         
+    Dim eOddEvenProcessingMode As oepUMCOddEvenProcessingMode
+    Dim intOddEvenIteration As Integer
+    Dim intOddEvenIterationStart As Integer
+    Dim intOddEvenIterationEnd As Integer
+    Dim intIterationSuccessCount As Integer
+        
     Dim blnAbortProcessing As Boolean
     Dim blnSuccess As Boolean
+    Dim blnSuccessCurrentIteration As Boolean
 
 On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
     
@@ -2565,9 +2756,11 @@ On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
     If sngMaxProcessingTimeMinutes < 1 Then sngMaxProcessingTimeMinutes = 1
     If sngMaxProcessingTimeMinutes > 300 Then sngMaxProcessingTimeMinutes = 300
     
-    blnSuccess = False
+    blnSuccess = True
+    blnSuccessCurrentIteration = False
     blnAbortProcessing = False
-  
+    intIterationSuccessCount = 0
+    
     ' Check for the existence of LCMSFeatureFinder.exe
     strFeatureFinderAppPath = fso.BuildPath(App.Path, LCMS_FEATURE_FINDER_APP_NAME)
     strWorkingDirPath = App.Path
@@ -2584,79 +2777,118 @@ On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
         mCalculating = True
         ShowHideCommandButtons mCalculating
         
-        ' Create two text files for LCMSFeatureFinder.exe to read
-        blnSuccess = ExportPeaksForUMCFinding(strWorkingDirPath, strLCMSFeaturesFilePath, strIniFilePath)
-                
-        If Not blnSuccess Or mAbortProcess Then
-            GoTo FindUMCsUsingLCMSFeatureFinderCleanup
-        End If
+        InitializeLCMSFeatureInfo
+    
+        eOddEvenProcessingMode = UMCDef.OddEvenProcessingMode
+        Select Case UMCDef.OddEvenProcessingMode
+        Case oepUMCOddEvenProcessingMode.oepOddOnly
+            intOddEvenIterationStart = 1
+            intOddEvenIterationEnd = 1
+        Case oepUMCOddEvenProcessingMode.oepEvenOnly
+            intOddEvenIterationStart = 2
+            intOddEvenIterationEnd = 2
+        Case oepUMCOddEvenProcessingMode.oepOddEvenSequential
+            intOddEvenIterationStart = 1
+            intOddEvenIterationEnd = 2
+        Case Else
+            ' Includes case oepUMCOddEvenProcessingMode.oepProcessAll
+            intOddEvenIterationStart = 0
+            intOddEvenIterationEnd = 0
+        End Select
         
-        strStatusBase = "Calling " & LCMS_FEATURE_FINDER_APP_NAME & " to find the LC-MS Features"
-        ChangeStatus strStatusBase
-                
-        strArguments = strLCMSFeaturesFilePath
-        If InStr(strArguments, " ") > 0 Then
-            strArguments = """" & strArguments & """"
-        End If
-        strArguments = "/I:" & strArguments
-
-        Set objProgRunner = New clsProgRunner
-        dtProcessingStartTime = Now()
+        For intOddEvenIteration = intOddEvenIterationStart To intOddEvenIterationEnd
         
-        If objProgRunner.StartProgram(strFeatureFinderAppPath, strArguments, vbNormalNoFocus) Then
-        
-            lngStatusUpdateIterationCount = CInt(STATUS_UPDATE_INTERVAL_MSEC / CSng(APP_MONITOR_INTERVAL_MSEC))
-            If lngStatusUpdateIterationCount < 1 Then lngStatusUpdateIterationCount = 1
-            
-            Do While objProgRunner.AppRunning
-                Sleep APP_MONITOR_INTERVAL_MSEC
-                
-                sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
-                If sngProcessingTimeSeconds / 60# >= sngMaxProcessingTimeMinutes Then
-                    blnAbortProcessing = True
-                    strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was aborted because over " & Trim(sngMaxProcessingTimeMinutes) & " minutes has elapsed."
-                ElseIf mAbortProcess Then
-                    blnAbortProcessing = True
-                    strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was manually aborted by the user after " & Trim(sngProcessingTimeSeconds) & " seconds of processing."
-                End If
-                
-                If blnAbortProcessing Then
-                    objProgRunner.AbortProcessing
-                    DoEvents
+            ' Create two text files for LCMSFeatureFinder.exe to read
+            blnSuccessCurrentIteration = ExportPeaksForUMCFinding(strWorkingDirPath, strLCMSFeaturesFilePath, strIniFilePath, intOddEvenIteration)
                     
-                    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-                       MsgBox strMessage, vbOKOnly, glFGTU
-                    Else
-                       Debug.Assert False
-                       LogErrors Err.Number, "frmUMCIonNet->FindUMCsUsingLCMSFeatureFinder", strMessage
-                       AddToAnalysisHistory CallerID, strMessage
+            If mAbortProcess Then
+                GoTo FindUMCsUsingLCMSFeatureFinderCleanup
+            End If
+            
+            If blnSuccessCurrentIteration Then
+                strStatusBase = "Calling " & LCMS_FEATURE_FINDER_APP_NAME & " to find the LC-MS Features"
+                ChangeStatus strStatusBase
+                        
+                strArguments = strLCMSFeaturesFilePath
+                If InStr(strArguments, " ") > 0 Then
+                    strArguments = """" & strArguments & """"
+                End If
+                strArguments = "/I:" & strArguments
+        
+                Set objProgRunner = New clsProgRunner
+                dtProcessingStartTime = Now()
+                
+                If objProgRunner.StartProgram(strFeatureFinderAppPath, strArguments, vbNormalNoFocus) Then
+                
+                    lngStatusUpdateIterationCount = CInt(STATUS_UPDATE_INTERVAL_MSEC / CSng(APP_MONITOR_INTERVAL_MSEC))
+                    If lngStatusUpdateIterationCount < 1 Then lngStatusUpdateIterationCount = 1
+                    
+                    Do While objProgRunner.AppRunning
+                        Sleep APP_MONITOR_INTERVAL_MSEC
+                        
+                        sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
+                        If sngProcessingTimeSeconds / 60# >= sngMaxProcessingTimeMinutes Then
+                            blnAbortProcessing = True
+                            strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was aborted because over " & Trim(sngMaxProcessingTimeMinutes) & " minutes has elapsed."
+                        ElseIf mAbortProcess Then
+                            blnAbortProcessing = True
+                            strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was manually aborted by the user after " & Trim(sngProcessingTimeSeconds) & " seconds of processing."
+                        End If
+                        
+                        If blnAbortProcessing Then
+                            objProgRunner.AbortProcessing
+                            DoEvents
+                            
+                            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                               MsgBox strMessage, vbOKOnly, glFGTU
+                            Else
+                               Debug.Assert False
+                               LogErrors Err.Number, "frmUMCIonNet->FindUMCsUsingLCMSFeatureFinder", strMessage
+                               AddToAnalysisHistory CallerID, strMessage
+                            End If
+                            
+                            ChangeStatus strMessage
+                            Exit Do
+                        End If
+                        
+                        If lngIteration Mod lngStatusUpdateIterationCount = 0 Then
+                            If intOddEvenIteration = 1 Then
+                                strStatusSpectrumType = "; odd-numbered spectra"
+                            ElseIf intOddEvenIteration = 2 Then
+                                strStatusSpectrumType = "; even-numbered spectra"
+                            End If
+                            
+                            ChangeStatus strStatusBase & strStatusSpectrumType & ": " & Round(sngProcessingTimeSeconds, 1) & " seconds elapsed"
+                        End If
+                        DoEvents
+                        
+                        lngIteration = lngIteration + 1
+                    Loop
+        
+                    blnSuccess = Not blnAbortProcessing
+                    
+                    If blnSuccess Then
+                        ' Read the data from the _Features.txt & _PeakToFeatureMap.txt files
+                        
+                        blnSuccessCurrentIteration = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages)
+                        If blnSuccessCurrentIteration Then
+                            intIterationSuccessCount = intIterationSuccessCount + 1
+                        End If
+                        If mAbortProcess Then blnSuccess = False
                     End If
-                    
-                    ChangeStatus strMessage
-                    Exit Do
-                End If
-                
-                If lngIteration Mod lngStatusUpdateIterationCount = 0 Then
-                    ChangeStatus strStatusBase & ": " & Round(sngProcessingTimeSeconds, 1) & " seconds elapsed"
-                End If
-                DoEvents
-                
-                lngIteration = lngIteration + 1
-            Loop
-
-            blnSuccess = Not blnAbortProcessing
-            
-            If blnSuccess Then
-                ' Read the data from the _Features.txt & _PeakToFeatureMap.txt files
-                
-                blnSuccess = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages)
-                If mAbortProcess Then blnSuccess = False
-                
-                If blnSuccess Then
-                    blnSuccess = BuildUMCsUsingmLCMSResultsMapping(blnShowMessages)
                 End If
             End If
+            
+            If Not blnSuccess Then Exit For
+        
+        Next intOddEvenIteration
+        
+        If intIterationSuccessCount > 0 Then
+            blnSuccess = BuildUMCsUsingmLCMSResultsMapping(blnShowMessages)
+        Else
+            blnSuccess = False
         End If
+
     End If
 
 FindUMCsUsingLCMSFeatureFinderCleanup:
@@ -2678,70 +2910,75 @@ Resume FindUMCsUsingLCMSFeatureFinderCleanup
 End Function
 
 Private Sub FindIonNetConnections()
-Dim eResponse As VbMsgBoxResult
-Dim lngConnectionsEliminated As Long
-Dim strUMCIsoDefinition As String
-
-On Error GoTo FindIonNetConnectionsErrorHandler
-
-If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-    If MyDef.NETType <= 0 Then
-       MsgBox "Net type should be positive integer.", vbOKOnly, glFGTU
-       txtNETType.SetFocus
-       Exit Sub
+    Dim eResponse As VbMsgBoxResult
+    Dim eOddEvenProcessingMode As oepUMCOddEvenProcessingMode
+    
+    Dim lngConnectionsEliminated As Long
+    Dim strUMCIsoDefinition As String
+    
+    On Error GoTo FindIonNetConnectionsErrorHandler
+    
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        If MyDef.NETType <= 0 Then
+           MsgBox "Net type should be positive integer.", vbOKOnly, glFGTU
+           txtNETType.SetFocus
+           Exit Sub
+        End If
+        If GelUMCIon(CallerID).NetCount > 0 Then
+           eResponse = MsgBox("Isotopic NET already established. Overwrite?", vbYesNo, glFGTU)
+           If eResponse = vbNo Then Exit Sub
+        End If
     End If
-    If GelUMCIon(CallerID).NetCount > 0 Then
-       eResponse = MsgBox("Isotopic NET already established. Overwrite?", vbYesNo, glFGTU)
-       If eResponse = vbNo Then Exit Sub
+    
+    mAbortProcess = False
+    mCalculating = True
+    ShowHideCommandButtons mCalculating
+    
+    GelUMC(CallerID).def.OddEvenProcessingMode = UMCDef.OddEvenProcessingMode
+    eOddEvenProcessingMode = UMCDef.OddEvenProcessingMode
+    
+    If PrepareDataArrays(eOddEvenProcessingMode) Then
+       If PrepareOptimization() Then
+          If ManageResArrays(amtInitialize) Then
+             FindBestMatches eOddEvenProcessingMode
+             
+             lngConnectionsEliminated = EliminateLongConnections(MyDef.TooDistant)
+             
+             'NOTE: EliminateRedundantConnectionsDirect is time consuming procedure and for now
+             'all connection creation procedures create non-redundant connections; it might be
+             'neccessary to uncomment it if future code creates redundant connections
+             'Call EliminateRedundantConnectionsDirect
+             Call CreateNet
+             
+             'copy current settings to caller structures
+             GelUMCIon(CallerID).ThisNetDef = MyDef
+             GelSearchDef(CallerID).UMCIonNetDef = MyDef
+          
+             strUMCIsoDefinition = GetUMCIsoDefinitionText(CallerID, False)
+             strUMCIsoDefinition = Replace(strUMCIsoDefinition, ": ", " = ")
+             strUMCIsoDefinition = Trim(Replace(strUMCIsoDefinition, vbCrLf, ""))
+             If Right(strUMCIsoDefinition, 1) = ";" Then
+                strUMCIsoDefinition = Left(strUMCIsoDefinition, Len(strUMCIsoDefinition) - 1)
+             End If
+             
+             AddToAnalysisHistory CallerID, "Found data-point connections (" & AUTO_ANALYSIS_UMCIonNet & "); Connection count = " & Trim(GelUMCIon(CallerID).NetCount) & "; " & strUMCIsoDefinition & "; Connections eliminated by max distance filter = " & Trim(lngConnectionsEliminated)
+          Else
+             ChangeStatus " Error initializing Net structures."
+          End If
+       End If
     End If
-End If
-
-mAbortProcess = False
-mCalculating = True
-ShowHideCommandButtons mCalculating
-
-If PrepareDataArrays() Then
-   If PrepareOptimization() Then
-      If ManageResArrays(amtInitialize) Then
-         Call FindBestMatches
-         
-         lngConnectionsEliminated = EliminateLongConnections(MyDef.TooDistant)
-         
-         'NOTE: EliminateRedundantConnectionsDirect is time consuming procedure and for now
-         'all connection creation procedures create non-redundant connections; it might be
-         'neccessary to uncomment it if future code creates redundant connections
-         'Call EliminateRedundantConnectionsDirect
-         Call CreateNet
-         
-         'copy current settings to caller structures
-         GelUMCIon(CallerID).ThisNetDef = MyDef
-         GelSearchDef(CallerID).UMCIonNetDef = MyDef
-      
-         strUMCIsoDefinition = GetUMCIsoDefinitionText(CallerID, False)
-         strUMCIsoDefinition = Replace(strUMCIsoDefinition, ": ", " = ")
-         strUMCIsoDefinition = Trim(Replace(strUMCIsoDefinition, vbCrLf, ""))
-         If Right(strUMCIsoDefinition, 1) = ";" Then
-            strUMCIsoDefinition = Left(strUMCIsoDefinition, Len(strUMCIsoDefinition) - 1)
-         End If
-         
-         AddToAnalysisHistory CallerID, "Found data-point connections (" & AUTO_ANALYSIS_UMCIonNet & "); Connection count = " & Trim(GelUMCIon(CallerID).NetCount) & "; " & strUMCIsoDefinition & "; Connections eliminated by max distance filter = " & Trim(lngConnectionsEliminated)
-      Else
-         ChangeStatus " Error initializing Net structures."
-      End If
-   End If
-End If
-
-mCalculating = False
-ShowHideCommandButtons mCalculating
-
-Exit Sub
-
+    
+    mCalculating = False
+    ShowHideCommandButtons mCalculating
+    
+    Exit Sub
+    
 FindIonNetConnectionsErrorHandler:
-Debug.Print "Error in FindIonNetConnections: " & Err.Description
-Debug.Assert False
-LogErrors Err.Number, "frmUMCIonNet->FindIonNetConnections"
-Resume Next
-
+    Debug.Print "Error in FindIonNetConnections: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "frmUMCIonNet->FindIonNetConnections"
+    Resume Next
+    
 End Sub
 
 Private Function FormClassesFromNETsWrapper(Optional ByVal blnShowMessages As Boolean = True) As Boolean
@@ -2836,7 +3073,7 @@ With GelUMC(CallerID)
     '  the user may have changed it since then, thus affecting UMCDef
     intScopeUsedForConnections = .def.DefScope
     
-    ' Copy the def
+    ' Copy the settings from UMCDef to GelUMC(CallerID)
     .def = UMCDef
     
     ' Make sure the scope in GelUMC() is correct
@@ -2993,10 +3230,11 @@ End Function
 
 Private Function GetUMCIsoDefinitionText(Ind As Long, Optional ByVal blnMultipleLines As Boolean = True) As String
 '-----------------------------------------------------------------------
-'returns formatted definition of the IonNet for 2D display with index Ind
+'returns formatted strDesc of the IonNet for 2D display with index Ind
 '-----------------------------------------------------------------------
 Dim i As Long
 Dim strLineSeparator As String
+Dim strAddnlText As String
 
 If blnMultipleLines Then
     strLineSeparator = vbCrLf
@@ -3005,83 +3243,95 @@ Else
 End If
 
 On Error Resume Next
-Dim Definition As String
+Dim strDesc As String
 With GelUMCIon(Ind).ThisNetDef
      Select Case .MetricType
      Case METRIC_EUCLIDEAN
-          Definition = "Metric type: Euclidean" & strLineSeparator
+          strDesc = "Metric type: Euclidean" & strLineSeparator
      Case METRIC_HONDURAS
-          Definition = "Metric type: Honduras (a.k.a. Taxicab)" & strLineSeparator
+          strDesc = "Metric type: Honduras (a.k.a. Taxicab)" & strLineSeparator
      Case METRIC_INFINITY
-          Definition = "Metric type: Infinity" & strLineSeparator
+          strDesc = "Metric type: Infinity" & strLineSeparator
      End Select
-     Definition = Definition & "Net type: " & .NETType & strLineSeparator
-     Definition = Definition & "Max distance: " & .TooDistant & strLineSeparator
+     strDesc = strDesc & "Net type: " & .NETType & strLineSeparator
+     strDesc = strDesc & "Max distance: " & .TooDistant & strLineSeparator
      If .NetActualDim > 0 Then
         If blnMultipleLines Then
-            Definition = Definition & "Metric dimensions description:" & strLineSeparator
+            strDesc = strDesc & "Metric dimensions description:" & strLineSeparator
         Else
-            Definition = Definition & "Metric dimensions description; "
+            strDesc = strDesc & "Metric dimensions description; "
         End If
         For i = 0 To .NetDim - 1
             If Not blnMultipleLines Then
-                Definition = Definition & "Dimension" & Trim(i + 1) & " = "
+                strDesc = strDesc & "Dimension" & Trim(i + 1) & " = "
             End If
             
             If .MetricData(i).Use Then
                Select Case .MetricData(i).DataType
                Case uindUMCIonNetDimConstants.uindMonoMW
-                    Definition = Definition & "Monoisotopic mass; "
+                    strAddnlText = "Monoisotopic mass; "
                Case uindUMCIonNetDimConstants.uindAvgMW
-                    Definition = Definition & "Average mass; "
+                    strAddnlText = "Average mass; "
                Case uindUMCIonNetDimConstants.uindTmaMW
-                    Definition = Definition & "The most abundant mass; "
+                    strAddnlText = "The most abundant mass; "
                Case uindUMCIonNetDimConstants.uindScan
-                    Definition = Definition & "Scan; "
+                    strAddnlText = "Scan; "
                Case uindUMCIonNetDimConstants.uindFit
-                    Definition = Definition & "Isotopic fit; "
+                    strAddnlText = "Isotopic fit; "
                Case uindUMCIonNetDimConstants.uindMZ
-                    Definition = Definition & "m/z; "
+                    strAddnlText = "m/z; "
                Case uindUMCIonNetDimConstants.uindGenericNET
-                    Definition = Definition & "Generic NET; "
+                    strAddnlText = "Generic NET; "
                Case uindUMCIonNetDimConstants.uindChargeState
-                    Definition = Definition & "Charge state; "
+                    strAddnlText = "Charge state; "
                Case uindUMCIonNetDimConstants.uindLogAbundance
-                    Definition = Definition & "Log(Abundance); "
+                    strAddnlText = "Log(Abundance); "
                End Select
-               Definition = Definition & "Weight factor: " & .MetricData(i).WeightFactor & "; "
-               Definition = Definition & "Constraint: "
+               strDesc = strDesc & strAddnlText
+               strDesc = strDesc & "Weight factor: " & .MetricData(i).WeightFactor & "; "
+               strDesc = strDesc & "Constraint: "
                Select Case .MetricData(i).ConstraintType
                Case Net_CT_None
-                    Definition = Definition & "none"
+                    strAddnlText = "none"
                Case Net_CT_LT
-                    Definition = Definition & "Distance < " & .MetricData(i).ConstraintValue
+                    strAddnlText = "Distance < " & .MetricData(i).ConstraintValue
                Case Net_CT_GT
-                    Definition = Definition & "Distance > " & .MetricData(i).ConstraintValue
+                    strAddnlText = "Distance > " & .MetricData(i).ConstraintValue
                Case Net_CT_EQ
-                    Definition = Definition & "Distance equal to " & .MetricData(i).ConstraintValue
+                    strAddnlText = "Distance equal to " & .MetricData(i).ConstraintValue
                End Select
                
+               strDesc = strDesc & strAddnlText
                If .MetricData(i).ConstraintType <> Net_CT_None Then
                     Select Case .MetricData(i).DataType
                     Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
-                        Definition = Definition & " " & GetMetricDataMassUnits(.MetricData(i).ConstraintUnits)
+                        strDesc = strDesc & " " & GetMetricDataMassUnits(.MetricData(i).ConstraintUnits)
                     Case Else
                         ' Do not append the units
                     End Select
                End If
             Else
-                Definition = Definition & "Unused"
+                strDesc = strDesc & "Unused"
             End If
-            Definition = Definition & strLineSeparator
+            strDesc = strDesc & strLineSeparator
         Next i
      Else
-        Definition = Definition & "Metric definition not dimensioned"
+        strDesc = strDesc & "Metric strDesc not dimensioned"
      End If
      
-     Definition = Definition & vbCrLf
+    Select Case UMCDef.OddEvenProcessingMode
+    Case oepUMCOddEvenProcessingMode.oepOddOnly: strAddnlText = "Process odd-numbered spectra only"
+    Case oepUMCOddEvenProcessingMode.oepEvenOnly: strAddnlText = "Process even-numbered  spectra only"
+    Case oepUMCOddEvenProcessingMode.oepOddEvenSequential: strAddnlText = "Process odd-numbered spectra then even-numbered spectra sequentially (and independently)"
+    Case oepUMCOddEvenProcessingMode.oepProcessAll: strAddnlText = "Process all spectra"
+    Case Else: strAddnlText = "Unknown type"
+    End Select
+    
+    strDesc = strDesc & strLineSeparator & strAddnlText
+    
+    strDesc = strDesc & vbCrLf
 End With
-GetUMCIsoDefinitionText = Definition
+GetUMCIsoDefinitionText = strDesc
 End Function
 
 Private Function HUMCAddingSingleMemberUMCs() As Long
@@ -3151,6 +3401,17 @@ Case Else
 End Select
 End Function
 
+Private Sub InitializeLCMSFeatureInfo()
+    Dim lngSpaceToReserve As Long
+    
+    lngSpaceToReserve = GelData(CallerID).IsoLines - 1
+    If lngSpaceToReserve < 10 Then lngSpaceToReserve = 10
+    
+    mLCMSResultsMappingCount = 0
+    ReDim mLCMSResultsMappingUMCs(lngSpaceToReserve - 1)
+    ReDim mLCMSResultsMappingDataIndices(lngSpaceToReserve - 1)
+End Sub
+
 Public Sub InitializeUMCSearch()
     
     ' MonroeMod: This code was in Form_Activate
@@ -3217,7 +3478,6 @@ Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, ByVal st
     
     Dim lngFileSizeBytes As Long
     Dim lngBytesRead As Long
-    Dim lngSpaceToReserve As Long
     
     Dim sngPercentComplete As Single
     
@@ -3242,17 +3502,12 @@ Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, ByVal st
         lngFileSizeBytes = objFile.Size
         If lngFileSizeBytes < 1 Then lngFileSizeBytes = 1
         
+        ' Populate mLCMSResultsMappingUMCs() with each item from the _PeakToFeatureMap file
+        ' The calling function should have previously called InitializeLCMSFeatureInfo
+        
         Set tsInFile = fso.OpenTextFile(strResultingMappingFilePath, ForReading, False)
         
         lngBytesRead = 0
-
-        ' Populate mLCMSResultsMappingUMCs() with each item from the _PeakToFeatureMap file
-        lngSpaceToReserve = GelData(CallerID).IsoLines - 1
-        If lngSpaceToReserve < 10 Then lngSpaceToReserve = 10
-        
-        mLCMSResultsMappingCount = 0
-        ReDim mLCMSResultsMappingUMCs(lngSpaceToReserve - 1)
-        ReDim mLCMSResultsMappingDataIndices(lngSpaceToReserve - 1)
         
         Do While Not tsInFile.AtEndOfStream
             strLineIn = tsInFile.ReadLine
@@ -3617,11 +3872,13 @@ Private Function PPMToDaIfNeeded(dblConstraintValue As Double, DimInd As Long, l
     
 End Function
 
-Private Function PrepareDataArrays() As Boolean
+Private Function PrepareDataArrays(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcessingMode) As Boolean
 '------------------------------------------------------------------------
 'prepares data arrays and returns True if successful
 '------------------------------------------------------------------------
     Dim i As Long, j As Long
+    Dim dblScanNumberRelativeIndex As Double
+    
     Dim strMessage As String
     Dim ISInd() As Long         ' In-scope index
 
@@ -3666,7 +3923,12 @@ On Error GoTo err_PrepareDataArrays
                   Case uindUMCIonNetDimConstants.uindScan
                       For i = 1 To DataCnt
                           DataOInd(i - 1) = ISInd(i)
-                          DataVal(i - 1, j) = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(i)).ScanNumber) * MyDef.MetricData(j).WeightFactor
+                          dblScanNumberRelativeIndex = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(i)).ScanNumber)
+                          If eOddEvenProcessingMode <> oepProcessAll Then
+                              ' Need to divide scan numbers by 2 to correct for odd only or even only processing of the data
+                              dblScanNumberRelativeIndex = dblScanNumberRelativeIndex / 2#
+                          End If
+                          DataVal(i - 1, j) = dblScanNumberRelativeIndex * MyDef.MetricData(j).WeightFactor
                       Next i
                   Case uindUMCIonNetDimConstants.uindFit
                       For i = 1 To DataCnt
@@ -3912,7 +4174,7 @@ End Sub
 
 Private Sub SetUMCDefinition()
 '----------------------------------------------------------------------------
-'sets definitions for UMC from Net procedure based on some settings of GelUMC().def
+'sets definitions for UMC from Net procedure based on some settings of UMCDef (mirred at GelUMC().def)
 '----------------------------------------------------------------------------
 On Error GoTo SetUMCDefinitionErrorHandler
 
@@ -3925,6 +4187,8 @@ With UMCDef
     SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
     
     optDefScope(.DefScope).Value = True
+    optEvenOddScanFilter(.OddEvenProcessingMode).Value = True
+    
     SetCheckBox chkInterpolateMissingIons, .InterpolateGaps
     txtInterpolateMaxGapSize = .InterpolateMaxGapSize
     txtHoleSize = .GapMaxSize
@@ -3950,9 +4214,18 @@ LogErrors Err.Number, "frmUMCIonNet->SetUMCDefinition"
 Resume Next
 End Sub
 
-Private Sub ShowHideCommandButtons(blnCalculating As Boolean)
+Private Sub ShowHideCommandButtons(ByVal blnCalculating As Boolean)
     Dim blnShowConnectionsButtons As Boolean
 
+    fraDREAMS.Enabled = Not blnCalculating
+    fraUMCScope.Enabled = Not blnCalculating
+    fraNET(0).Enabled = Not blnCalculating
+    fraLCMSFeatureStats.Enabled = Not blnCalculating
+    fraOptionFrame(0).Enabled = Not blnCalculating
+    fraOptionFrame(1).Enabled = Not blnCalculating
+    fraClassAbundanceTopX.Enabled = Not blnCalculating
+    fraClassMassTopX.Enabled = Not blnCalculating
+    
     blnShowConnectionsButtons = Not cChkBox(chkUseLCMSFeatureFinder.Value)
     
     cmdFindConnections.Visible = blnShowConnectionsButtons
@@ -3963,11 +4236,17 @@ Private Sub ShowHideCommandButtons(blnCalculating As Boolean)
     cmdFindUMCsUsingNETConnections.Visible = Not blnCalculating
     cmdClose.Visible = Not blnCalculating
     
+    cmdReportUMC.Visible = Not blnCalculating
+    cmdResetToOldDefaults.Visible = Not blnCalculating
+    cmdResetToDefaults(0).Visible = Not blnCalculating
+    cmdResetToDefaults(1).Visible = Not blnCalculating
+
     cmdAbortFindConnections.Visible = blnCalculating
     cmdAbortProcessing.Visible = blnCalculating
     
     chkUseLCMSFeatureFinder.Enabled = Not blnCalculating
 
+    txtInterpolateMaxGapSize.Enabled = Not blnCalculating
 End Sub
 
 Public Function StartUMCSearch() As Boolean
@@ -4209,11 +4488,11 @@ Private Function ValidateClassStatOptions() As Boolean
 End Function
 
 Private Sub cboMolecularMassField_Click()
-If mCalculating Then
-    SetMolecularMassFieldDropdown CInt(UMCDef.MWField)
-Else
-    UMCDef.MWField = GetMolecularMassFieldFromDropdown
-End If
+    If mCalculating Then
+        SetMolecularMassFieldDropdown CInt(UMCDef.MWField)
+    Else
+        UMCDef.MWField = GetMolecularMassFieldFromDropdown
+    End If
 End Sub
 
 Private Sub Form_Activate()
@@ -4234,7 +4513,19 @@ Private Sub Form_Unload(Cancel As Integer)
 End Sub
 
 Private Sub optDefScope_Click(Index As Integer)
-    UMCDef.DefScope = Index
+    If mCalculating Then
+        optDefScope(UMCDef.DefScope).Value = True
+    Else
+        UMCDef.DefScope = Index
+    End If
+End Sub
+
+Private Sub optEvenOddScanFilter_Click(Index As Integer)
+    If mCalculating Then
+        optEvenOddScanFilter(UMCDef.OddEvenProcessingMode).Value = True
+    Else
+        UMCDef.OddEvenProcessingMode = Index
+    End If
 End Sub
 
 Private Sub txtAutoRefineMinimumMemberCount_LostFocus()
@@ -4293,121 +4584,121 @@ Private Sub txtClassMassTopXMinMembers_Lostfocus()
 End Sub
 
 Private Sub txtConstraint_KeyDown(Index As Integer, KeyCode As Integer, Shift As Integer)
-If mCalculating Then KeyCode = 0
+    If mCalculating Then KeyCode = 0
 End Sub
 
 Private Sub txtConstraint_KeyPress(Index As Integer, KeyAscii As Integer)
-If mCalculating Then KeyAscii = 0
+    If mCalculating Then KeyAscii = 0
 End Sub
 
 Private Sub txtConstraint_LostFocus(Index As Integer)
-On Error Resume Next
-If IsNumeric(txtConstraint(Index).Text) Then
-   MyDef.MetricData(Index).ConstraintValue = CDbl(txtConstraint(Index).Text)
-Else
-   MsgBox "This argument should be positive number.", vbOKOnly, glFGTU
-   txtConstraint(Index).SetFocus
-End If
+    On Error Resume Next
+    If IsNumeric(txtConstraint(Index).Text) Then
+       MyDef.MetricData(Index).ConstraintValue = CDbl(txtConstraint(Index).Text)
+    Else
+       MsgBox "This argument should be positive number.", vbOKOnly, glFGTU
+       txtConstraint(Index).SetFocus
+    End If
 End Sub
 
 Private Sub txtHiAbuPct_LostFocus()
-If IsNumeric(txtHiAbuPct.Text) Then
-   glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctHighAbundance = Abs(CDbl(txtHiAbuPct.Text))
-Else
-   MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
-   txtHiAbuPct.SetFocus
-End If
+    If IsNumeric(txtHiAbuPct.Text) Then
+       glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctHighAbundance = Abs(CDbl(txtHiAbuPct.Text))
+    Else
+       MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
+       txtHiAbuPct.SetFocus
+    End If
 End Sub
 
 Private Sub txtHiCnt_LostFocus()
-If IsNumeric(txtHiCnt.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLength = Abs(CLng(txtHiCnt.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtHiCnt.SetFocus
-End If
+    If IsNumeric(txtHiCnt.Text) Then
+        glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLength = Abs(CLng(txtHiCnt.Text))
+    Else
+       MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+       txtHiCnt.SetFocus
+    End If
 End Sub
 
 Private Sub txtHoleSize_LostFocus()
-If IsNumeric(txtHoleSize.Text) Then
-   UMCDef.GapMaxSize = CLng(txtHoleSize.Text)
-Else
-   MsgBox "This argument should be integer value.", vbOKOnly
-   txtHoleSize.SetFocus
-End If
+    If IsNumeric(txtHoleSize.Text) Then
+       UMCDef.GapMaxSize = CLng(txtHoleSize.Text)
+    Else
+       MsgBox "This argument should be integer value.", vbOKOnly
+       txtHoleSize.SetFocus
+    End If
 End Sub
 
 Private Sub txtInterpolateMaxGapSize_LostFocus()
-If IsNumeric(txtInterpolateMaxGapSize.Text) Then
-   UMCDef.InterpolateMaxGapSize = CLng(txtInterpolateMaxGapSize.Text)
-Else
-   MsgBox "This argument should be integer value.", vbOKOnly
-   txtInterpolateMaxGapSize.SetFocus
-End If
+    If IsNumeric(txtInterpolateMaxGapSize.Text) Then
+       UMCDef.InterpolateMaxGapSize = CLng(txtInterpolateMaxGapSize.Text)
+    Else
+       MsgBox "This argument should be integer value.", vbOKOnly
+       txtInterpolateMaxGapSize.SetFocus
+    End If
 End Sub
 
 Private Sub txtLoAbuPct_LostFocus()
-If IsNumeric(txtLoAbuPct.Text) Then
-   glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctLowAbundance = Abs(CDbl(txtLoAbuPct.Text))
-Else
-   MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
-   txtLoAbuPct.SetFocus
-End If
+    If IsNumeric(txtLoAbuPct.Text) Then
+       glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctLowAbundance = Abs(CDbl(txtLoAbuPct.Text))
+    Else
+       MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
+       txtLoAbuPct.SetFocus
+    End If
 End Sub
 
 Private Sub txtLoCnt_LostFocus()
-If IsNumeric(txtLoCnt.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMinLength = Abs(CLng(txtLoCnt.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtLoCnt.SetFocus
-End If
+    If IsNumeric(txtLoCnt.Text) Then
+        glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMinLength = Abs(CLng(txtLoCnt.Text))
+    Else
+       MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+       txtLoCnt.SetFocus
+    End If
 End Sub
 
 Private Sub txtMaxLengthPctAllScans_Lostfocus()
-If IsNumeric(txtMaxLengthPctAllScans.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLengthPctAllScans = Abs(CLng(txtMaxLengthPctAllScans.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtMaxLengthPctAllScans.SetFocus
-End If
+    If IsNumeric(txtMaxLengthPctAllScans.Text) Then
+        glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLengthPctAllScans = Abs(CLng(txtMaxLengthPctAllScans.Text))
+    Else
+       MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+       txtMaxLengthPctAllScans.SetFocus
+    End If
 End Sub
 
 Private Sub txtNetEditTooDistant_Lostfocus()
-If IsNumeric(txtNetEditTooDistant.Text) Then
-    glbPreferencesExpanded.UMCIonNetOptions.ConnectionLengthPostFilterMaxNET = Abs(txtNetEditTooDistant.Text)
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtNetEditTooDistant.SetFocus
-End If
+    If IsNumeric(txtNetEditTooDistant.Text) Then
+        glbPreferencesExpanded.UMCIonNetOptions.ConnectionLengthPostFilterMaxNET = Abs(txtNetEditTooDistant.Text)
+    Else
+       MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+       txtNetEditTooDistant.SetFocus
+    End If
 End Sub
 
 Private Sub txtNETType_LostFocus()
-On Error Resume Next
-If IsNumeric(txtNETType.Text) Then
-   MyDef.NETType = CLng(txtNETType.Text)
-Else
-   MsgBox "This argument should be positive integer.", vbOKOnly, glFGTU
-   txtNETType.SetFocus
-End If
+    On Error Resume Next
+    If IsNumeric(txtNETType.Text) Then
+       MyDef.NETType = CLng(txtNETType.Text)
+    Else
+       MsgBox "This argument should be positive integer.", vbOKOnly, glFGTU
+       txtNETType.SetFocus
+    End If
 End Sub
 
 Private Sub txtPercentMaxAbuToUseToGaugeLength_LostFocus()
-If IsNumeric(txtPercentMaxAbuToUseToGaugeLength.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePercentMaxAbuToUseForLength = Abs(CLng(txtPercentMaxAbuToUseToGaugeLength.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtPercentMaxAbuToUseToGaugeLength.SetFocus
-End If
+    If IsNumeric(txtPercentMaxAbuToUseToGaugeLength.Text) Then
+        glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePercentMaxAbuToUseForLength = Abs(CLng(txtPercentMaxAbuToUseToGaugeLength.Text))
+    Else
+       MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+       txtPercentMaxAbuToUseToGaugeLength.SetFocus
+    End If
 End Sub
 
 Private Sub txtRejectLongConnections_LostFocus()
-If IsNumeric(txtRejectLongConnections.Text) Then
-   MyDef.TooDistant = CDbl(txtRejectLongConnections.Text)
-Else
-   MsgBox "This argument should be positive number.", vbOKOnly, glFGTU
-   txtRejectLongConnections.SetFocus
-End If
+    If IsNumeric(txtRejectLongConnections.Text) Then
+       MyDef.TooDistant = CDbl(txtRejectLongConnections.Text)
+    Else
+       MsgBox "This argument should be positive number.", vbOKOnly, glFGTU
+       txtRejectLongConnections.SetFocus
+    End If
 End Sub
     
 Private Sub txtSplitUMCsMaximumPeakCount_LostFocus()
@@ -4444,13 +4735,13 @@ Private Sub txtWeightingFactor_KeyPress(Index As Integer, KeyAscii As Integer)
 End Sub
 
 Private Sub txtWeightingFactor_LostFocus(Index As Integer)
-On Error Resume Next
-If IsNumeric(txtWeightingFactor(Index).Text) Then
-   MyDef.MetricData(Index).WeightFactor = CDbl(txtWeightingFactor(Index).Text)
-Else
-   MsgBox "This arument should be positive number.", vbOKOnly, glFGTU
-   txtWeightingFactor(Index).SetFocus
-End If
+    On Error Resume Next
+    If IsNumeric(txtWeightingFactor(Index).Text) Then
+       MyDef.MetricData(Index).WeightFactor = CDbl(txtWeightingFactor(Index).Text)
+    Else
+       MsgBox "This arument should be positive number.", vbOKOnly, glFGTU
+       txtWeightingFactor(Index).SetFocus
+    End If
 End Sub
 
 Private Sub cmdAbortFindConnections_Click()
@@ -4485,8 +4776,11 @@ End Sub
 
 Private Sub cmdFindConnectionsThenUMCs_Click()
     If mCalculating Then Exit Sub
+    Dim blnUseExternalFinder As Boolean
     
-    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
+    blnUseExternalFinder = cChkBox(chkUseLCMSFeatureFinder.Value)
+    
+    If blnUseExternalFinder Then
         FindUMCsUsingLCMSFeatureFinder True
     Else
         FindIonNetConnections
@@ -4518,28 +4812,31 @@ Private Sub cmdRemoveLongConnections_Click()
 End Sub
 
 Private Sub cmdReportUMC_Click()
-If mCalculating Then Exit Sub
-Me.MousePointer = vbHourglass
-ChangeStatus "Generating LC-MS Feature report..."
-Call ReportUMC(CallerID, "UMCIonNet" & vbCrLf & GetUMCIsoDefinitionText(CallerID))
-ChangeStatus ""
-Me.MousePointer = vbDefault
+    If mCalculating Then Exit Sub
+    
+    Me.MousePointer = vbHourglass
+    ChangeStatus "Generating LC-MS Feature report..."
+    
+    Call ReportUMC(CallerID, "UMCIonNet" & vbCrLf & GetUMCIsoDefinitionText(CallerID))
+    
+    ChangeStatus ""
+    Me.MousePointer = vbDefault
 End Sub
 
 Private Sub cmdResetToDefaults_Click(Index As Integer)
     ResetToDefaults
 End Sub
 
-Private Sub cmdResetToOldDefaults_Click(Index As Integer)
+Private Sub cmdResetToOldDefaults_Click()
     ResetToOldDefaults
 End Sub
 
 Private Sub cboChargeStateAbuType_Click()
-If mCalculating Then
-    cboChargeStateAbuType.ListIndex = UMCDef.ChargeStateStatsRepType
-Else
-    UMCDef.ChargeStateStatsRepType = cboChargeStateAbuType.ListIndex
-End If
+    If mCalculating Then
+        cboChargeStateAbuType.ListIndex = UMCDef.ChargeStateStatsRepType
+    Else
+        UMCDef.ChargeStateStatsRepType = cboChargeStateAbuType.ListIndex
+    End If
 End Sub
 
 Private Sub cboSplitUMCsScanGapBehavior_Click()
@@ -4547,11 +4844,11 @@ Private Sub cboSplitUMCsScanGapBehavior_Click()
 End Sub
 
 Private Sub chkInterpolateMissingIons_Click()
-If mCalculating Then
-    SetCheckBox chkInterpolateMissingIons, UMCDef.InterpolateGaps
-Else
-    UMCDef.InterpolateGaps = cChkBox(chkInterpolateMissingIons)
-End If
+    If mCalculating Then
+        SetCheckBox chkInterpolateMissingIons, UMCDef.InterpolateGaps
+    Else
+        UMCDef.InterpolateGaps = cChkBox(chkInterpolateMissingIons)
+    End If
 End Sub
 
 Private Sub chkRemoveMaxLengthPctAllScans_Click()
@@ -4584,12 +4881,12 @@ Private Sub chkSplitUMCsByExaminingAbundance_Click()
 End Sub
 
 Private Sub chkUse_Click(Index As Integer)
-On Error Resume Next
-If mCalculating Then
-    SetCheckBox chkUse(Index), MyDef.MetricData(Index).Use
-Else
-    MyDef.MetricData(Index).Use = (chkUse(Index).Value = vbChecked)
-End If
+    On Error Resume Next
+    If mCalculating Then
+        SetCheckBox chkUse(Index), MyDef.MetricData(Index).Use
+    Else
+        MyDef.MetricData(Index).Use = (chkUse(Index).Value = vbChecked)
+    End If
 End Sub
 
 Private Sub chkUseLCMSFeatureFinder_Click()
@@ -4598,104 +4895,108 @@ Private Sub chkUseLCMSFeatureFinder_Click()
 End Sub
 
 Private Sub chkUseMostAbuChargeStateStatsForClassStats_Click()
-If mCalculating Then
-    SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, UMCDef.UMCClassStatsUseStatsFromMostAbuChargeState
-Else
-    UMCDef.UMCClassStatsUseStatsFromMostAbuChargeState = cChkBox(chkUseMostAbuChargeStateStatsForClassStats)
-End If
+    If mCalculating Then
+        SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, UMCDef.UMCClassStatsUseStatsFromMostAbuChargeState
+    Else
+        UMCDef.UMCClassStatsUseStatsFromMostAbuChargeState = cChkBox(chkUseMostAbuChargeStateStatsForClassStats)
+    End If
 End Sub
 
 Private Sub chkUseUntangledAsSingle_Click()
-If mCalculating Then
-    SetCheckBox chkUseUntangledAsSingle, UMCMakeSingleMemberClasses
-Else
-    UMCMakeSingleMemberClasses = cChkBox(chkUseUntangledAsSingle.Value)
-    glbPreferencesExpanded.UMCIonNetOptions.MakeSingleMemberClasses = UMCMakeSingleMemberClasses
-End If
+    If mCalculating Then
+        SetCheckBox chkUseUntangledAsSingle, UMCMakeSingleMemberClasses
+    Else
+        UMCMakeSingleMemberClasses = cChkBox(chkUseUntangledAsSingle.Value)
+        glbPreferencesExpanded.UMCIonNetOptions.MakeSingleMemberClasses = UMCMakeSingleMemberClasses
+    End If
 End Sub
 
 Private Sub cmbConstraint_Click(Index As Integer)
-On Error Resume Next
-If mCalculating Then
-    cmbConstraint(Index).ListIndex = MyDef.MetricData(Index).ConstraintType
-Else
-    MyDef.MetricData(Index).ConstraintType = cmbConstraint(Index).ListIndex
-    DisplayDynamicUnits
-End If
+    On Error Resume Next
+    If mCalculating Then
+        cmbConstraint(Index).ListIndex = MyDef.MetricData(Index).ConstraintType
+    Else
+        MyDef.MetricData(Index).ConstraintType = cmbConstraint(Index).ListIndex
+        DisplayDynamicUnits
+    End If
 End Sub
 
 Private Sub cmbData_Click(Index As Integer)
-On Error Resume Next
-If mCalculating Then
-    cmbData(Index).ListIndex = MyDef.MetricData(Index).DataType
-Else
-    MyDef.MetricData(Index).DataType = cmbData(Index).ListIndex
-    DisplayDynamicUnits
-End If
+    On Error Resume Next
+    If mCalculating Then
+        cmbData(Index).ListIndex = MyDef.MetricData(Index).DataType
+    Else
+        MyDef.MetricData(Index).DataType = cmbData(Index).ListIndex
+        DisplayDynamicUnits
+    End If
 End Sub
 
 Private Sub cmbConstraintUnits_Click(Index As Integer)
-On Error Resume Next
-If mCalculating Then
-    cmbConstraintUnits(Index).ListIndex = MyDef.MetricData(Index).ConstraintUnits
-Else
-    MyDef.MetricData(Index).ConstraintUnits = cmbConstraintUnits(Index).ListIndex
-    
-    If Not bLoading Then
-        If cmbConstraintUnits(Index).ListIndex = DATA_UNITS_MASS_DA Then
-            ' Convert the constraint tolerance from ppm to Da, assuming 1000 m/z
-            txtConstraint(Index) = PPMToMass(txtConstraint(Index), 1000)
-        Else
-            ' Convert the constraint tolerance from Da to ppm, assuming 1000 m/z
-            txtConstraint(Index) = MassToPPM(txtConstraint(Index), 1000)
-        End If
-        If IsNumeric(txtConstraint(Index).Text) Then
-            MyDef.MetricData(Index).ConstraintValue = CDbl(txtConstraint(Index).Text)
+    On Error Resume Next
+    If mCalculating Then
+        cmbConstraintUnits(Index).ListIndex = MyDef.MetricData(Index).ConstraintUnits
+    Else
+        MyDef.MetricData(Index).ConstraintUnits = cmbConstraintUnits(Index).ListIndex
+        
+        If Not bLoading Then
+            If cmbConstraintUnits(Index).ListIndex = DATA_UNITS_MASS_DA Then
+                ' Convert the constraint tolerance from ppm to Da, assuming 1000 m/z
+                txtConstraint(Index) = PPMToMass(txtConstraint(Index), 1000)
+            Else
+                ' Convert the constraint tolerance from Da to ppm, assuming 1000 m/z
+                txtConstraint(Index) = MassToPPM(txtConstraint(Index), 1000)
+            End If
+            If IsNumeric(txtConstraint(Index).Text) Then
+                MyDef.MetricData(Index).ConstraintValue = CDbl(txtConstraint(Index).Text)
+            End If
         End If
     End If
-End If
-
 End Sub
 
 Private Sub cmbMetricType_Click()
-If mCalculating Then
-    cmbMetricType.ListIndex = MyDef.MetricType
-Else
-    MyDef.MetricType = cmbMetricType.ListIndex
-End If
+    If mCalculating Then
+        On Error Resume Next
+        cmbMetricType.ListIndex = MyDef.MetricType
+    Else
+        MyDef.MetricType = cmbMetricType.ListIndex
+    End If
 End Sub
 
 Private Sub cmbUMCAbu_Click()
-If mCalculating Then
-    cmbUMCAbu.ListIndex = UMCDef.ClassAbu
-Else
-    UMCDef.ClassAbu = cmbUMCAbu.ListIndex
-End If
+    If mCalculating Then
+        On Error Resume Next
+        cmbUMCAbu.ListIndex = UMCDef.ClassAbu
+    Else
+        UMCDef.ClassAbu = cmbUMCAbu.ListIndex
+    End If
 End Sub
 
 Private Sub cmbUMCDrawType_Click()
-If mCalculating Then
-    cmbUMCDrawType.ListIndex = GelUMCDraw(CallerID).DrawType
-Else
-    GelUMCDraw(CallerID).DrawType = cmbUMCDrawType.ListIndex
-    glbPreferencesExpanded.UMCDrawType = cmbUMCDrawType.ListIndex
-End If
+    If mCalculating Then
+        On Error Resume Next
+        cmbUMCDrawType.ListIndex = GelUMCDraw(CallerID).DrawType
+    Else
+        GelUMCDraw(CallerID).DrawType = cmbUMCDrawType.ListIndex
+        glbPreferencesExpanded.UMCDrawType = cmbUMCDrawType.ListIndex
+    End If
 End Sub
 
 Private Sub cmbUMCMW_Click()
-If mCalculating Then
-    cmbUMCMW.ListIndex = UMCDef.ClassMW
-Else
-    UMCDef.ClassMW = cmbUMCMW.ListIndex
-End If
+    If mCalculating Then
+        On Error Resume Next
+        cmbUMCMW.ListIndex = UMCDef.ClassMW
+    Else
+        UMCDef.ClassMW = cmbUMCMW.ListIndex
+    End If
 End Sub
 
 Private Sub cmbUMCRepresentative_Click()
-If mCalculating Then
-    cmbUMCRepresentative.ListIndex = UMCRepresentative
-Else
-    UMCRepresentative = cmbUMCRepresentative.ListIndex
-End If
+    If mCalculating Then
+        On Error Resume Next
+        cmbUMCRepresentative.ListIndex = UMCRepresentative
+    Else
+        UMCRepresentative = cmbUMCRepresentative.ListIndex
+    End If
 End Sub
 
 

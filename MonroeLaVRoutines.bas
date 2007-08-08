@@ -988,6 +988,16 @@ Public Function ConstructUMCDefDescription(ByVal lngGelIndex As Long, ByVal strS
     End Select
     strDesc = strDesc & "; Class abundance = " & strAddnlText
     
+    Select Case udtUMCDef.OddEvenProcessingMode
+    Case oepUMCOddEvenProcessingMode.oepOddOnly: strAddnlText = "Process odd-numbered spectra only"
+    Case oepUMCOddEvenProcessingMode.oepEvenOnly: strAddnlText = "Process even-numbered  spectra only"
+    Case oepUMCOddEvenProcessingMode.oepOddEvenSequential: strAddnlText = "Process odd-numbered spectra then even-numbered spectra sequentially (and independently)"
+    Case oepUMCOddEvenProcessingMode.oepProcessAll: strAddnlText = "Process all spectra"
+    Case Else: strAddnlText = "Unknown type"
+    End Select
+    
+    strDesc = strDesc & "; DREAMS Odd/Even Mode = " & strAddnlText
+    
     ConstructUMCDefDescription = strDesc
     Exit Function
     

@@ -1,5 +1,11 @@
 VIPER Change Log
 
+Version 3.43 - Build 373; August 7, 2007
+	- Added option for finding LC-MS features in odd-numbered scans only and/or in even-numbered scansonly
+		- Useful for DREAMS acquisition
+	- Updated the UMCDefinition structure to track the Odd/Even scan mode, and to include 8 other unused, additional values
+		- Required updating the binary file version for FileInfoVersions(fioGelUMC) from 4 to 5
+
 Version 3.43 - Build 372; July 23, 2007
 	- Now logging the mass type used to compute the class mass when finding LC-MS features
 		- Typically the mass type is monoisotopic molecular mass, but the user can change it to average molecular mass or most abundant molecular mass
@@ -7,7 +13,8 @@ Version 3.43 - Build 372; July 23, 2007
 Version 3.43 - Build 371; July 21, 2007
 	- When reading .Csv or .Pek files, added check for data points with a positive IntensityMono (I0) value but a value of zero for IntensityMonoPlus2 (I2)
 		- This will occur when the I+2 value is more abundant than the I0 value
-		- When cases like this are found, VIPER determines the appropriate IntensityMonoPlus2 value to use by looking for data 2 Da heavier in mass from the given data point (with a tolerance of +/-20 ppm)
+		- When cases like this are found, VIPER determines the appropriate IntensityMonoPlus2 value to use by looking for data 2 Da heavier in mass from the given data point, initially using a tolerance of +/- 15 ppm
+			- If no peak is found 2 Da +/- 15 ppm away, then the tolerance is doubled to 30, 60, then 120 ppm in search of a match
 	- Added option for ppm-based mass tolerances when finding paired LC-MS features
 	- Added option for finding N14/N15 paired LC-MS features that do not have 100% incorporation of N15
 		- The pair spacing equation is only valid for LC-MS features with class masses that use average mass values 

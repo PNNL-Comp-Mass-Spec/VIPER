@@ -150,7 +150,7 @@ Public Type UMCDefinition2003a
 End Type
        
 'definition type for the Unique Masses Classes
-'This corresponds to FileInfoVersions(fioSearchDefinitions) version 4
+'This corresponds to FileInfoVersions(fioSearchDefinitions) versions 4 and 5
 'and to FileInfoVersions(fioGelUMC) versions 3 and 4
 Public Type UMCDefinition
     UMCType As Integer                      'type; Options include glUMC_TYPE_INTENSITY = 0; glUMC_TYPE_FIT = 1; glUMC_TYPE_MINCNT = 2; glUMC_TYPE_MAXCNT = 3; glUMC_TYPE_UNQAMT = 4; glUMC_TYPE_ISHRINKINGBOX = 5; glUMC_TYPE_FSHRINKINGBOX = 6; glUMC_TYPE_FROM_NET = 7
@@ -166,10 +166,23 @@ Public Type UMCDefinition
     GapMaxSize As Long                      'max gap size           (Applies to "Maximum size of Scan Gap" in UMC2003; applies to SplitUMCs in UMCIonNet)
     GapMaxPct As Double                     'max gap percentage     (UMCListType2002 Search mode Only)
     UMCNETType As Integer                   'NET type               (Not used; June 2003, MEM))
-    UMCMaxAbuPctBf As Double                'max abundance percentage threshold before      (Not used)
-    UMCMaxAbuPctAf As Double                'max abundance percentage threshold after       (Not used)
-    UMCMaxAbuEtPctBf As Double              'max abundance elution percentage before        (Not used)
-    UMCMaxAbuEtPctAf As Double              'max abundance elution percentage after         (Not used)
+    
+    ' Note: The following four double variables were replaced with several 16 and 32 bit variables in August 2007
+'    UMCMaxAbuPctBf As Double                'max abundance percentage threshold before      (Not used)
+'    UMCMaxAbuPctAf As Double                'max abundance percentage threshold after       (Not used)
+'    UMCMaxAbuEtPctBf As Double              'max abundance elution percentage before        (Not used)
+'    UMCMaxAbuEtPctAf As Double              'max abundance elution percentage after         (Not used)
+    
+    OddEvenProcessingMode As Integer    ' Actually type oepUMCOddEvenProcessingMode
+    AdditionalValue1 As Integer         ' 2 bytes; use for future expansion (name can be changed in the future)
+    AdditionalValue2 As Long            ' 4 bytes
+    AdditionalValue3 As Long            ' 4 bytes
+    AdditionalValue4 As Long            ' 4 bytes
+    AdditionalValue5 As Long            ' 4 bytes
+    AdditionalValue6 As Long            ' 4 bytes
+    AdditionalValue7 As Long            ' 4 bytes
+    AdditionalValue8 As Long            ' 4 bytes
+    
     UMCMinCnt As Long                       'min count
     UMCMaxCnt As Long                       'max count
     'use following members in class abundance calculation to get better class abundance
@@ -1375,6 +1388,8 @@ Dim MassMin As Double, MassMax As Double, MassSum As Double, MassSumSq As Double
 Dim AbuMin As Double, AbuMax As Double
 Dim ChargeMin As Integer, ChargeMax As Integer
 Dim FitMin As Double, FitMax As Double, FitSum As Double, FitSumSq As Double, FitStDevSquared As Double
+Dim lngScanStart As Long, lngScanEnd As Long
+Dim lngScanNumberCurrent As Long
 
 On Error GoTo err_UMCStatistics1
 
@@ -1382,7 +1397,7 @@ With GelUMC(Ind)
   If .UMCCnt > 0 Then
      ReDim Stat(.UMCCnt - 1, UMC_STATISTICS1_MAX_INDEX)
      ISF = .def.MWField
-     If ISF <> isfMWavg And ISF <> isfMWMono And ISF <> isfMWTMA Then
+     If ISF <> isfMWAvg And ISF <> isfMWMono And ISF <> isfMWTMA Then
         Debug.Assert False
         ISF = isfMWMono
      End If
@@ -1391,6 +1406,7 @@ With GelUMC(Ind)
         With .UMCs(i)
           If .ClassCount > 0 Then
              Stat(i, 0) = i
+             
              'class representative(mass and intensity)
              Select Case .ClassRepType
              Case gldtCS
@@ -1400,28 +1416,24 @@ With GelUMC(Ind)
                Stat(i, ustClassRepMW) = GetIsoMass(GelData(Ind).IsoData(.ClassRepInd), ISF)
                Stat(i, ustClassRepIntensity) = GelData(Ind).IsoData(.ClassRepInd).Abundance
              End Select
-             'class members are ordered on scan numbers
-             'first scan number
+             
+             'class members are sometimes sorted on scan number, but not always
+             
+             ' Initialize the min/max variables
+             lngScanNumberCurrent = 0
              Select Case .ClassMType(0)
              Case gldtCS
-               Stat(i, ustScanStart) = GelData(Ind).CSData(.ClassMInd(0)).ScanNumber
+               lngScanStart = GelData(Ind).CSData(.ClassMInd(0)).ScanNumber
                MassMin = GelData(Ind).CSData(.ClassMInd(0)).AverageMW
                AbuMin = GelData(Ind).CSData(.ClassMInd(0)).Abundance
                ChargeMin = GelData(Ind).CSData(.ClassMInd(0)).Charge
                FitMin = GelData(Ind).CSData(.ClassMInd(0)).MassStDev
              Case gldtIS
-               Stat(i, ustScanStart) = GelData(Ind).IsoData(.ClassMInd(0)).ScanNumber
+               lngScanStart = GelData(Ind).IsoData(.ClassMInd(0)).ScanNumber
                MassMin = GetIsoMass(GelData(Ind).IsoData(.ClassMInd(0)), ISF)
                AbuMin = GelData(Ind).IsoData(.ClassMInd(0)).Abundance
                ChargeMin = GelData(Ind).IsoData(.ClassMInd(0)).Charge
                FitMin = GelData(Ind).IsoData(.ClassMInd(0)).Fit
-             End Select
-             'last scan number
-             Select Case .ClassMType(.ClassCount - 1)
-             Case gldtCS
-               Stat(i, ustScanEnd) = GelData(Ind).CSData(.ClassMInd(.ClassCount - 1)).ScanNumber
-             Case gldtIS
-               Stat(i, ustScanEnd) = GelData(Ind).IsoData(.ClassMInd(.ClassCount - 1)).ScanNumber
              End Select
              
              ' Reset the sum and sum of the squares variables
@@ -1435,6 +1447,7 @@ With GelUMC(Ind)
              AbuMax = AbuMin
              ChargeMax = ChargeMin
              FitMax = FitMin
+             lngScanEnd = lngScanStart
              
              For j = 0 To .ClassCount - 1
                 If .ClassMType(j) = gldtCS Then
@@ -1442,11 +1455,13 @@ With GelUMC(Ind)
                   dblAbu = GelData(Ind).CSData(.ClassMInd(j)).Abundance
                   intCharge = GelData(Ind).CSData(.ClassMInd(j)).Charge
                   dblFit = GelData(Ind).CSData(.ClassMInd(j)).MassStDev
+                  lngScanNumberCurrent = GelData(Ind).CSData(.ClassMInd(j)).ScanNumber
                 Else
                   dblMW = GetIsoMass(GelData(Ind).IsoData(.ClassMInd(j)), ISF)
                   dblAbu = GelData(Ind).IsoData(.ClassMInd(j)).Abundance
                   intCharge = GelData(Ind).IsoData(.ClassMInd(j)).Charge
                   dblFit = GelData(Ind).IsoData(.ClassMInd(j)).Fit
+                  lngScanNumberCurrent = GelData(Ind).IsoData(.ClassMInd(j)).ScanNumber
                 End If
              
                 If dblMW < MassMin Then MassMin = dblMW
@@ -1464,11 +1479,18 @@ With GelUMC(Ind)
                 If dblFit > FitMax Then FitMax = dblFit
                 FitSum = FitSum + dblFit
                 FitSumSq = FitSumSq + dblFit ^ 2
+                
+                If lngScanNumberCurrent < lngScanStart Then lngScanStart = lngScanNumberCurrent
+                If lngScanNumberCurrent > lngScanEnd Then lngScanEnd = lngScanNumberCurrent
              Next j
              
              ' Minimum and Maximum Mass
              Stat(i, ustMassMin) = MassMin
              Stat(i, ustMassMax) = MassMax
+             
+             ' Start and End Scan Number
+             Stat(i, ustScanStart) = lngScanStart
+             Stat(i, ustScanEnd) = lngScanEnd
              
              ' Compute pseudo StDev of Mass
              Stat(i, ustClassMW) = .ClassMW       'average or class representative
@@ -2766,357 +2788,359 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
 '          MinScan and MaxScan are still computed using the entire class
 '
 '--------------------------------------------------------------------------------
-Const MAX_CHARGE_STATE As Integer = 10             ' Any data with a charge state over this will be grouped with the 10+ charge state
-Const INITIAL_RESERVE_COUNT As Integer = 1000
 
-Dim i As Long, j As Long
-Dim lngMaxMemberIndex As Long
-
-Dim UMCMembersMaxIndex As Long
-Dim UMCMembersMW() As Double                   ' 0-based array; MW values for each of the LC-MS Features members
-Dim UMCMembersAbu() As Double                  ' 0-based array; Abu values for each of the LC-MS Features members
-Dim UMCMembersScan() As Long                   ' 0-based array; Scan numbers for each of the LC-MS Features members
-Dim UMCMembersFit() As Double                  ' 0-based array; Fit values for each of the LC-MS Features members
-Dim UMCMembersCharge() As Integer              ' 0-based array; Charge states for each of the LC-MS Features members
-
-Dim intUMCRepresentativeType As Integer
-Dim intChargeState As Integer
-Dim ChargeStatePresent(0 To MAX_CHARGE_STATE) As Long       ' 0-based array; Used to keep track of which charge states are present
-Dim intChargeStatesPresent As Integer
-
-Dim lngChargeStateValueCount As Long
-Dim lngChargeStateGroupRepIndex As Long      ' Index in the ChargeStateBased... arrays
-Dim lngClassMIndexPointer As Long
-
-Dim ChargeStateMaxIndex As Long
-Dim ChargeStateBasedMW() As Double      ' 0-based array; Used when computing charge state based stats
-Dim ChargeStateBasedAbu() As Double     ' 0-based array; Used when computing charge state based stats
-Dim ChargeStateBasedScan() As Long      ' 0-based array; Used when computing charge state based stats
-Dim ChargeStateBasedFit() As Double     ' 0-based array; Used when computing charge state based stats
-Dim ChargeStateBasedOrgIndex() As Long     ' Original index in the member arrays (UMCMembersMW, UMCMembersAbu, etc.) of each ion in the ChargeStateBased arrays
-
-Dim dblConglomerateMW As Double
-Dim dblConglomerateMWStD As Double
-Dim dblConglomerateAbu As Double
-
-Dim dblBestValue As Double, dblCompareValue As Double
-Dim intBestIndex As Integer
-
-Dim RepMW As Double
-Dim RepAbu As Double
-Dim ISMWField As Integer
-
-Dim strCaptionSaved As String
-Dim blnShowProgressUsingFormCaption As Boolean
-
-On Error GoTo err_CalculateClasses
-
-If blnUseProgressForm Then
-    frmProgress.InitializeSubtask "Updating LC-MS Feature Stats", 0, GelUMC(lngGelIndex).UMCCnt
-Else
-    If Not frmCallingForm Is Nothing Then
-        blnShowProgressUsingFormCaption = True
-        strCaptionSaved = frmCallingForm.Caption
+    Const MAX_CHARGE_STATE As Integer = 10             ' Any data with a charge state over this will be grouped with the 10+ charge state
+    Const INITIAL_RESERVE_COUNT As Integer = 1000
+    
+    Dim i As Long, j As Long
+    Dim lngMaxMemberIndex As Long
+    
+    Dim UMCMembersMaxIndex As Long
+    Dim UMCMembersMW() As Double                   ' 0-based array; MW values for each of the LC-MS Features members
+    Dim UMCMembersAbu() As Double                  ' 0-based array; Abu values for each of the LC-MS Features members
+    Dim UMCMembersScan() As Long                   ' 0-based array; Scan numbers for each of the LC-MS Features members
+    Dim UMCMembersFit() As Double                  ' 0-based array; Fit values for each of the LC-MS Features members
+    Dim UMCMembersCharge() As Integer              ' 0-based array; Charge states for each of the LC-MS Features members
+    
+    Dim intUMCRepresentativeType As Integer
+    Dim intChargeState As Integer
+    Dim ChargeStatePresent(0 To MAX_CHARGE_STATE) As Long       ' 0-based array; Used to keep track of which charge states are present
+    Dim intChargeStatesPresent As Integer
+    
+    Dim lngChargeStateValueCount As Long
+    Dim lngChargeStateGroupRepIndex As Long      ' Index in the ChargeStateBased... arrays
+    Dim lngClassMIndexPointer As Long
+    
+    Dim ChargeStateMaxIndex As Long
+    Dim ChargeStateBasedMW() As Double      ' 0-based array; Used when computing charge state based stats
+    Dim ChargeStateBasedAbu() As Double     ' 0-based array; Used when computing charge state based stats
+    Dim ChargeStateBasedScan() As Long      ' 0-based array; Used when computing charge state based stats
+    Dim ChargeStateBasedFit() As Double     ' 0-based array; Used when computing charge state based stats
+    Dim ChargeStateBasedOrgIndex() As Long     ' Original index in the member arrays (UMCMembersMW, UMCMembersAbu, etc.) of each ion in the ChargeStateBased arrays
+    
+    Dim dblConglomerateMW As Double
+    Dim dblConglomerateMWStD As Double
+    Dim dblConglomerateAbu As Double
+    
+    Dim dblBestValue As Double, dblCompareValue As Double
+    Dim intBestIndex As Integer
+    
+    Dim RepMW As Double
+    Dim RepAbu As Double
+    Dim ISMWField As Integer
+    
+    Dim strCaptionSaved As String
+    Dim blnShowProgressUsingFormCaption As Boolean
+    
+    On Error GoTo err_CalculateClasses
+    
+    If blnUseProgressForm Then
+        frmProgress.InitializeSubtask "Updating LC-MS Feature Stats", 0, GelUMC(lngGelIndex).UMCCnt
+    Else
+        If Not frmCallingForm Is Nothing Then
+            blnShowProgressUsingFormCaption = True
+            strCaptionSaved = frmCallingForm.Caption
+        End If
     End If
-End If
-
-With glbPreferencesExpanded.UMCAdvancedStatsOptions
-    If .ClassMassTopXMinMembers < 1 Then .ClassMassTopXMinMembers = 1
-    If .ClassAbuTopXMinMembers < 1 Then .ClassAbuTopXMinMembers = 1
-End With
-
-' Initially reserve space for LC-MS Features with INITIAL_RESERVE_COUNT members
-UMCMembersMaxIndex = 0
-ReDim UMCMembersMW(INITIAL_RESERVE_COUNT)
-ReDim UMCMembersAbu(INITIAL_RESERVE_COUNT)
-ReDim UMCMembersScan(INITIAL_RESERVE_COUNT)
-ReDim UMCMembersFit(INITIAL_RESERVE_COUNT)
-ReDim UMCMembersCharge(INITIAL_RESERVE_COUNT)
-
-ChargeStateMaxIndex = 0
-ReDim ChargeStateBasedMW(INITIAL_RESERVE_COUNT)
-ReDim ChargeStateBasedAbu(INITIAL_RESERVE_COUNT)
-ReDim ChargeStateBasedScan(INITIAL_RESERVE_COUNT)
-ReDim ChargeStateBasedFit(INITIAL_RESERVE_COUNT)
-ReDim ChargeStateBasedOrgIndex(INITIAL_RESERVE_COUNT)
-
-With GelUMC(lngGelIndex)
-    ISMWField = .def.MWField
-    If .UMCCnt > 0 Then
-       For i = 0 To .UMCCnt - 1
-           With .UMCs(i)
-               '
-               ' First, find the Min and Max scan numbers, the Min and Max MW,
-               ' and populate the UMCMembersMW, UMCMembersScan, etc. arrays
-               '
-               ' Also determine which charge states are present
-               '
-               .MinScan = glHugeLong:               .MaxScan = -glHugeLong
-               .MinMW = glHugeDouble:               .MaxMW = -glHugeDouble
-               If .ClassCount > 0 Then
-                  lngMaxMemberIndex = .ClassCount - 1
-                  UMCMembersMaxIndex = lngMaxMemberIndex
-                  Do While UMCMembersMaxIndex > UBound(UMCMembersMW)
-                    ReDim UMCMembersMW(UBound(UMCMembersMW) * 2)
-                    ReDim UMCMembersAbu(UBound(UMCMembersMW))
-                    ReDim UMCMembersScan(UBound(UMCMembersMW))
-                    ReDim UMCMembersFit(UBound(UMCMembersMW))
-                    ReDim UMCMembersCharge(UBound(UMCMembersMW))
-                  Loop
-                  Erase ChargeStatePresent()       ' Reset all to 0
-                  For j = 0 To lngMaxMemberIndex
-                      Select Case .ClassMType(j)
-                      Case glCSType
-                           UMCMembersMW(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).AverageMW
-                           UMCMembersAbu(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).Abundance
-                           UMCMembersScan(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).ScanNumber
-                           UMCMembersFit(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).MassStDev        ' Isotopic fit is not defined for charge state data; use standard deviation instead
-                           UMCMembersCharge(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).Charge
-                      Case glIsoType
-                           UMCMembersMW(j) = GetIsoMass(GelData(lngGelIndex).IsoData(.ClassMInd(j)), ISMWField)
-                           UMCMembersAbu(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Abundance
-                           UMCMembersScan(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).ScanNumber
-                           UMCMembersFit(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Fit
-                           UMCMembersCharge(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Charge
-                      End Select
-                      If UMCMembersMW(j) < .MinMW Then .MinMW = UMCMembersMW(j)
-                      If UMCMembersMW(j) > .MaxMW Then .MaxMW = UMCMembersMW(j)
-                      If UMCMembersScan(j) < .MinScan Then .MinScan = UMCMembersScan(j)
-                      If UMCMembersScan(j) > .MaxScan Then .MaxScan = UMCMembersScan(j)
-                      If UMCMembersCharge(j) >= 0 And UMCMembersCharge(j) <= MAX_CHARGE_STATE Then
-                         ChargeStatePresent(UMCMembersCharge(j)) = ChargeStatePresent(UMCMembersCharge(j)) + 1
-                      Else
-                         ChargeStatePresent(MAX_CHARGE_STATE) = ChargeStatePresent(MAX_CHARGE_STATE) + 1
-                      End If
-                  Next j
-               End If
-           End With
-           
-           ' Determine the number of charge states present
-           intChargeStatesPresent = 0
-           For intChargeState = 0 To MAX_CHARGE_STATE
-                If ChargeStatePresent(intChargeState) > 0 Then
-                    intChargeStatesPresent = intChargeStatesPresent + 1
-                End If
-           Next intChargeState
-           
-           ' Reset the charge state based stats
-           With .UMCs(i)
-                .ChargeStateStatsRepInd = 0
-                .ChargeStateCount = 0
-                
-                If intChargeStatesPresent > 0 Then
-                    ReDim .ChargeStateBasedStats(intChargeStatesPresent - 1)
-                Else
-                    ReDim .ChargeStateBasedStats(0)
-                End If
-           End With
-           
-           If .UMCs(i).ClassCount > 0 Then
-                ' Compute the charge state based stats
-                ' Step through UMCMembersCharge() and copy the MW, Abu, etc. values to the
-                '  appropriate place in the ChargeBasedStats arrays
-                ' We always compute the charge state based stats, even if .UMCClassStatsUseStatsFromMostAbuChargeState = False,
-                '  since this information is required for ER computations when finding pairs
-                For intChargeState = 0 To MAX_CHARGE_STATE
+    
+    With glbPreferencesExpanded.UMCAdvancedStatsOptions
+        If .ClassMassTopXMinMembers < 1 Then .ClassMassTopXMinMembers = 1
+        If .ClassAbuTopXMinMembers < 1 Then .ClassAbuTopXMinMembers = 1
+    End With
+    
+    ' Initially reserve space for LC-MS Features with INITIAL_RESERVE_COUNT members
+    UMCMembersMaxIndex = 0
+    ReDim UMCMembersMW(INITIAL_RESERVE_COUNT)
+    ReDim UMCMembersAbu(INITIAL_RESERVE_COUNT)
+    ReDim UMCMembersScan(INITIAL_RESERVE_COUNT)
+    ReDim UMCMembersFit(INITIAL_RESERVE_COUNT)
+    ReDim UMCMembersCharge(INITIAL_RESERVE_COUNT)
+    
+    ChargeStateMaxIndex = 0
+    ReDim ChargeStateBasedMW(INITIAL_RESERVE_COUNT)
+    ReDim ChargeStateBasedAbu(INITIAL_RESERVE_COUNT)
+    ReDim ChargeStateBasedScan(INITIAL_RESERVE_COUNT)
+    ReDim ChargeStateBasedFit(INITIAL_RESERVE_COUNT)
+    ReDim ChargeStateBasedOrgIndex(INITIAL_RESERVE_COUNT)
+    
+    With GelUMC(lngGelIndex)
+        ISMWField = .def.MWField
+        If .UMCCnt > 0 Then
+           For i = 0 To .UMCCnt - 1
+               With .UMCs(i)
+                   '
+                   ' First, find the Min and Max scan numbers, the Min and Max MW,
+                   ' and populate the UMCMembersMW, UMCMembersScan, etc. arrays
+                   '
+                   ' Also determine which charge states are present
+                   '
+                   .MinScan = glHugeLong:               .MaxScan = -glHugeLong
+                   .MinMW = glHugeDouble:               .MaxMW = -glHugeDouble
+                   If .ClassCount > 0 Then
+                      lngMaxMemberIndex = .ClassCount - 1
+                      UMCMembersMaxIndex = lngMaxMemberIndex
+                      Do While UMCMembersMaxIndex > UBound(UMCMembersMW)
+                        ReDim UMCMembersMW(UBound(UMCMembersMW) * 2)
+                        ReDim UMCMembersAbu(UBound(UMCMembersMW))
+                        ReDim UMCMembersScan(UBound(UMCMembersMW))
+                        ReDim UMCMembersFit(UBound(UMCMembersMW))
+                        ReDim UMCMembersCharge(UBound(UMCMembersMW))
+                      Loop
+                      Erase ChargeStatePresent()       ' Reset all to 0
+                      For j = 0 To lngMaxMemberIndex
+                          Select Case .ClassMType(j)
+                          Case glCSType
+                               UMCMembersMW(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).AverageMW
+                               UMCMembersAbu(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).Abundance
+                               UMCMembersScan(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).ScanNumber
+                               UMCMembersFit(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).MassStDev        ' Isotopic fit is not defined for charge state data; use standard deviation instead
+                               UMCMembersCharge(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).Charge
+                          Case glIsoType
+                               UMCMembersMW(j) = GetIsoMass(GelData(lngGelIndex).IsoData(.ClassMInd(j)), ISMWField)
+                               UMCMembersAbu(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Abundance
+                               UMCMembersScan(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).ScanNumber
+                               UMCMembersFit(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Fit
+                               UMCMembersCharge(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Charge
+                          End Select
+                          If UMCMembersMW(j) < .MinMW Then .MinMW = UMCMembersMW(j)
+                          If UMCMembersMW(j) > .MaxMW Then .MaxMW = UMCMembersMW(j)
+                          If UMCMembersScan(j) < .MinScan Then .MinScan = UMCMembersScan(j)
+                          If UMCMembersScan(j) > .MaxScan Then .MaxScan = UMCMembersScan(j)
+                          If UMCMembersCharge(j) >= 0 And UMCMembersCharge(j) <= MAX_CHARGE_STATE Then
+                             ChargeStatePresent(UMCMembersCharge(j)) = ChargeStatePresent(UMCMembersCharge(j)) + 1
+                          Else
+                             ChargeStatePresent(MAX_CHARGE_STATE) = ChargeStatePresent(MAX_CHARGE_STATE) + 1
+                          End If
+                      Next j
+                   End If
+               End With
+               
+               ' Determine the number of charge states present
+               intChargeStatesPresent = 0
+               For intChargeState = 0 To MAX_CHARGE_STATE
                     If ChargeStatePresent(intChargeState) > 0 Then
-                        lngChargeStateValueCount = 0
-                        ChargeStateMaxIndex = ChargeStatePresent(intChargeState) - 1
-                        Do While ChargeStateMaxIndex > UBound(ChargeStateBasedMW)
-                            ReDim ChargeStateBasedMW(UBound(ChargeStateBasedMW) * 2)
-                            ReDim ChargeStateBasedAbu(UBound(ChargeStateBasedMW))
-                            ReDim ChargeStateBasedScan(UBound(ChargeStateBasedMW))
-                            ReDim ChargeStateBasedFit(UBound(ChargeStateBasedMW))
-                            ReDim ChargeStateBasedOrgIndex(UBound(ChargeStateBasedMW))
-                        Loop
-
-                        For j = 0 To lngMaxMemberIndex
-                            If UMCMembersCharge(j) = intChargeState Or _
-                               (intChargeState = MAX_CHARGE_STATE And (UMCMembersCharge(j) < 0 Or UMCMembersCharge(j) > MAX_CHARGE_STATE)) Then
-
-                                ChargeStateBasedMW(lngChargeStateValueCount) = UMCMembersMW(j)
-                                ChargeStateBasedAbu(lngChargeStateValueCount) = UMCMembersAbu(j)
-                                ChargeStateBasedScan(lngChargeStateValueCount) = UMCMembersScan(j)
-                                ChargeStateBasedFit(lngChargeStateValueCount) = UMCMembersFit(j)
-                                ChargeStateBasedOrgIndex(lngChargeStateValueCount) = j
-
-                                lngChargeStateValueCount = lngChargeStateValueCount + 1
-                                Debug.Assert lngChargeStateValueCount <= ChargeStatePresent(intChargeState)
-                            End If
-                        Next j
-
-                        If lngChargeStateValueCount > 0 Then
-
-                            ' Determine the appropriate UMC Representative selection method
-                            Select Case .def.UMCType
-                            Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX, glUMC_TYPE_MINCNT, glUMC_TYPE_MAXCNT, glUMC_TYPE_UNQAMT
-                                intUMCRepresentativeType = UMCFROMNet_REP_ABU
-                            Case glUMC_TYPE_FIT, glUMC_TYPE_FSHRINKINGBOX
-                                intUMCRepresentativeType = UMCFROMNet_REP_FIT
-                            Case glUMC_TYPE_FROM_NET
-                                intUMCRepresentativeType = glbPreferencesExpanded.UMCIonNetOptions.UMCRepresentative
-                            Case Else
-                                ' Invalid option defined for .UMCType
-                                Debug.Assert False
-                                intUMCRepresentativeType = UMCFROMNet_REP_ABU
-                            End Select
-
-                            ' Determine the index of the representative ion for this charge state group
-                            lngChargeStateGroupRepIndex = CalculateClassesFindRepIndex(ChargeStateMaxIndex, ChargeStateBasedAbu(), ChargeStateBasedFit(), intUMCRepresentativeType)
-
-                            ' Lookup the Charge Group's Rep MW and Abu; needed for call to CalculateClassesComputeStats
-                            RepMW = ChargeStateBasedMW(lngChargeStateGroupRepIndex)
-                            RepAbu = ChargeStateBasedAbu(lngChargeStateGroupRepIndex)
-
-                            ' Compute the stats for this charge state group
-                            CalculateClassesComputeStats lngGelIndex, .def, ChargeStateMaxIndex, ChargeStateBasedMW(), ChargeStateBasedAbu(), ChargeStateBasedScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
-
-                            With .UMCs(i)
-                                With .ChargeStateBasedStats(.ChargeStateCount)
-                                    .Charge = intChargeState
-                                    .Count = lngChargeStateValueCount
-                                    .Mass = dblConglomerateMW
-                                    .MassStD = dblConglomerateMWStD
-                                    .Abundance = dblConglomerateAbu
-                                    .GroupRepIndex = ChargeStateBasedOrgIndex(lngChargeStateGroupRepIndex)
-                                End With
-
-                                .ChargeStateCount = .ChargeStateCount + 1
-                            End With
-                        Else
-                            ' This code shouldn't be reached
-                            Debug.Assert False
-                        End If
+                        intChargeStatesPresent = intChargeStatesPresent + 1
                     End If
-                Next intChargeState
-
-                If .UMCs(i).ChargeStateCount <= 1 Then
-                    ' The "Best" Charge State Index must be the only index: 0
-                    intBestIndex = 0
-                Else
-                    ' Determine .ChargeStateStatsRepInd based on the value of .ChargeStateStatsRepType
-                    intBestIndex = 0
-                    Select Case .def.ChargeStateStatsRepType
-                    Case UMCChargeStateGroupConstants.UMCCSGHighestSum
-                        ' Find the charge state group with the highest Abundance Sum
-                        With .UMCs(i)
-                            dblBestValue = -glHugeDouble
-                            intBestIndex = 0
-                            For intChargeState = 0 To .ChargeStateCount - 1
-                                If .ChargeStateBasedStats(intChargeState).Abundance > dblBestValue Then
-                                    dblBestValue = .ChargeStateBasedStats(intChargeState).Abundance
-                                    intBestIndex = intChargeState
+               Next intChargeState
+               
+               ' Reset the charge state based stats
+               With .UMCs(i)
+                    .ChargeStateStatsRepInd = 0
+                    .ChargeStateCount = 0
+                    
+                    If intChargeStatesPresent > 0 Then
+                        ReDim .ChargeStateBasedStats(intChargeStatesPresent - 1)
+                    Else
+                        ReDim .ChargeStateBasedStats(0)
+                    End If
+               End With
+               
+               If .UMCs(i).ClassCount > 0 Then
+                    ' Compute the charge state based stats
+                    ' Step through UMCMembersCharge() and copy the MW, Abu, etc. values to the
+                    '  appropriate place in the ChargeBasedStats arrays
+                    ' We always compute the charge state based stats, even if .UMCClassStatsUseStatsFromMostAbuChargeState = False,
+                    '  since this information is required for ER computations when finding pairs
+                    For intChargeState = 0 To MAX_CHARGE_STATE
+                        If ChargeStatePresent(intChargeState) > 0 Then
+                            lngChargeStateValueCount = 0
+                            ChargeStateMaxIndex = ChargeStatePresent(intChargeState) - 1
+                            Do While ChargeStateMaxIndex > UBound(ChargeStateBasedMW)
+                                ReDim ChargeStateBasedMW(UBound(ChargeStateBasedMW) * 2)
+                                ReDim ChargeStateBasedAbu(UBound(ChargeStateBasedMW))
+                                ReDim ChargeStateBasedScan(UBound(ChargeStateBasedMW))
+                                ReDim ChargeStateBasedFit(UBound(ChargeStateBasedMW))
+                                ReDim ChargeStateBasedOrgIndex(UBound(ChargeStateBasedMW))
+                            Loop
+    
+                            For j = 0 To lngMaxMemberIndex
+                                If UMCMembersCharge(j) = intChargeState Or _
+                                   (intChargeState = MAX_CHARGE_STATE And (UMCMembersCharge(j) < 0 Or UMCMembersCharge(j) > MAX_CHARGE_STATE)) Then
+    
+                                    ChargeStateBasedMW(lngChargeStateValueCount) = UMCMembersMW(j)
+                                    ChargeStateBasedAbu(lngChargeStateValueCount) = UMCMembersAbu(j)
+                                    ChargeStateBasedScan(lngChargeStateValueCount) = UMCMembersScan(j)
+                                    ChargeStateBasedFit(lngChargeStateValueCount) = UMCMembersFit(j)
+                                    ChargeStateBasedOrgIndex(lngChargeStateValueCount) = j
+    
+                                    lngChargeStateValueCount = lngChargeStateValueCount + 1
+                                    Debug.Assert lngChargeStateValueCount <= ChargeStatePresent(intChargeState)
                                 End If
-                            Next intChargeState
-                        End With
-                    Case UMCChargeStateGroupConstants.UMCCSGMostAbuMember
-                        ' Find the charge state group containing the highest intensity ion in this UMC
-                        With .UMCs(i)
-                            dblBestValue = -glHugeDouble
-                            intBestIndex = 0
-                            For intChargeState = 0 To .ChargeStateCount - 1
-                                lngClassMIndexPointer = .ChargeStateBasedStats(intChargeState).GroupRepIndex
-                                Select Case .ClassMType(lngClassMIndexPointer)
-                                Case glCSType
-                                     dblCompareValue = GelData(lngGelIndex).CSData(lngClassMIndexPointer).Abundance
-                                Case glIsoType
-                                     dblCompareValue = GelData(lngGelIndex).IsoData(lngClassMIndexPointer).Abundance
+                            Next j
+    
+                            If lngChargeStateValueCount > 0 Then
+    
+                                ' Determine the appropriate UMC Representative selection method
+                                Select Case .def.UMCType
+                                Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX, glUMC_TYPE_MINCNT, glUMC_TYPE_MAXCNT, glUMC_TYPE_UNQAMT
+                                    intUMCRepresentativeType = UMCFROMNet_REP_ABU
+                                Case glUMC_TYPE_FIT, glUMC_TYPE_FSHRINKINGBOX
+                                    intUMCRepresentativeType = UMCFROMNet_REP_FIT
+                                Case glUMC_TYPE_FROM_NET
+                                    intUMCRepresentativeType = glbPreferencesExpanded.UMCIonNetOptions.UMCRepresentative
+                                Case Else
+                                    ' Invalid option defined for .UMCType
+                                    Debug.Assert False
+                                    intUMCRepresentativeType = UMCFROMNet_REP_ABU
                                 End Select
-                                
-                                If dblCompareValue > dblBestValue Then
-                                    dblBestValue = dblCompareValue
-                                    intBestIndex = intChargeState
-                                End If
-                            Next intChargeState
-                        End With
-                    Case UMCChargeStateGroupConstants.UMCCSGMostMembers
-                        ' Find the charge state group with the most members
-                        With .UMCs(i)
-                            dblBestValue = 0
-                            intBestIndex = 0
-                            For intChargeState = 0 To .ChargeStateCount - 1
-                                If .ChargeStateBasedStats(intChargeState).Count > dblBestValue Then
-                                    dblBestValue = .ChargeStateBasedStats(intChargeState).Count
-                                    intBestIndex = intChargeState
-                                End If
-                            Next intChargeState
-                        End With
-                    Case Else
-                        ' Invalid type
-                        Debug.Assert False
-                    End Select
-                End If
-                .UMCs(i).ChargeStateStatsRepInd = intBestIndex
-
-                ' Populate .ClassMW, .ClassMWStD, and .ClassAbundance
-                If .def.UMCClassStatsUseStatsFromMostAbuChargeState Then
-                    With .UMCs(i)
-                        .ClassMW = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Mass
-                        .ClassMWStD = .ChargeStateBasedStats(.ChargeStateStatsRepInd).MassStD
-                        .ClassAbundance = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Abundance
-                        
-                        ' Update .ClassRepInd and .ClassRepType to contain the ClassRep values for
-                        '   for the class rep of the best charge state group
-                        lngClassMIndexPointer = .ChargeStateBasedStats(.ChargeStateStatsRepInd).GroupRepIndex
-                        .ClassRepInd = .ClassMInd(lngClassMIndexPointer)
-                        .ClassRepType = .ClassMType(lngClassMIndexPointer)
-                    End With
-                Else
-                    ' Lookup the Class Rep MW and Abu; needed for call to CalculateClassesComputeStats
-                    ' Note that .ClassRepInd and .ClassRepType will have already been correctly defined
-                    With .UMCs(i)
-                        Select Case .ClassRepType
-                        Case glCSType
-                             RepMW = GelData(lngGelIndex).CSData(.ClassRepInd).AverageMW
-                             RepAbu = GelData(lngGelIndex).CSData(.ClassRepInd).Abundance
-                        Case glIsoType
-                             RepMW = GetIsoMass(GelData(lngGelIndex).IsoData(.ClassRepInd), ISMWField)
-                             RepAbu = GelData(lngGelIndex).IsoData(.ClassRepInd).Abundance
+    
+                                ' Determine the index of the representative ion for this charge state group
+                                lngChargeStateGroupRepIndex = CalculateClassesFindRepIndex(ChargeStateMaxIndex, ChargeStateBasedAbu(), ChargeStateBasedFit(), intUMCRepresentativeType)
+    
+                                ' Lookup the Charge Group's Rep MW and Abu; needed for call to CalculateClassesComputeStats
+                                RepMW = ChargeStateBasedMW(lngChargeStateGroupRepIndex)
+                                RepAbu = ChargeStateBasedAbu(lngChargeStateGroupRepIndex)
+    
+                                ' Compute the stats for this charge state group
+                                CalculateClassesComputeStats lngGelIndex, .def, ChargeStateMaxIndex, ChargeStateBasedMW(), ChargeStateBasedAbu(), ChargeStateBasedScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
+    
+                                With .UMCs(i)
+                                    With .ChargeStateBasedStats(.ChargeStateCount)
+                                        .Charge = intChargeState
+                                        .Count = lngChargeStateValueCount
+                                        .Mass = dblConglomerateMW
+                                        .MassStD = dblConglomerateMWStD
+                                        .Abundance = dblConglomerateAbu
+                                        .GroupRepIndex = ChargeStateBasedOrgIndex(lngChargeStateGroupRepIndex)
+                                    End With
+    
+                                    .ChargeStateCount = .ChargeStateCount + 1
+                                End With
+                            Else
+                                ' This code shouldn't be reached
+                                Debug.Assert False
+                            End If
+                        End If
+                    Next intChargeState
+    
+                    If .UMCs(i).ChargeStateCount <= 1 Then
+                        ' The "Best" Charge State Index must be the only index: 0
+                        intBestIndex = 0
+                    Else
+                        ' Determine .ChargeStateStatsRepInd based on the value of .ChargeStateStatsRepType
+                        intBestIndex = 0
+                        Select Case .def.ChargeStateStatsRepType
+                        Case UMCChargeStateGroupConstants.UMCCSGHighestSum
+                            ' Find the charge state group with the highest Abundance Sum
+                            With .UMCs(i)
+                                dblBestValue = -glHugeDouble
+                                intBestIndex = 0
+                                For intChargeState = 0 To .ChargeStateCount - 1
+                                    If .ChargeStateBasedStats(intChargeState).Abundance > dblBestValue Then
+                                        dblBestValue = .ChargeStateBasedStats(intChargeState).Abundance
+                                        intBestIndex = intChargeState
+                                    End If
+                                Next intChargeState
+                            End With
+                        Case UMCChargeStateGroupConstants.UMCCSGMostAbuMember
+                            ' Find the charge state group containing the highest intensity ion in this UMC
+                            With .UMCs(i)
+                                dblBestValue = -glHugeDouble
+                                intBestIndex = 0
+                                For intChargeState = 0 To .ChargeStateCount - 1
+                                    lngClassMIndexPointer = .ChargeStateBasedStats(intChargeState).GroupRepIndex
+                                    Select Case .ClassMType(lngClassMIndexPointer)
+                                    Case glCSType
+                                         dblCompareValue = GelData(lngGelIndex).CSData(lngClassMIndexPointer).Abundance
+                                    Case glIsoType
+                                         dblCompareValue = GelData(lngGelIndex).IsoData(lngClassMIndexPointer).Abundance
+                                    End Select
+                                    
+                                    If dblCompareValue > dblBestValue Then
+                                        dblBestValue = dblCompareValue
+                                        intBestIndex = intChargeState
+                                    End If
+                                Next intChargeState
+                            End With
+                        Case UMCChargeStateGroupConstants.UMCCSGMostMembers
+                            ' Find the charge state group with the most members
+                            With .UMCs(i)
+                                dblBestValue = 0
+                                intBestIndex = 0
+                                For intChargeState = 0 To .ChargeStateCount - 1
+                                    If .ChargeStateBasedStats(intChargeState).Count > dblBestValue Then
+                                        dblBestValue = .ChargeStateBasedStats(intChargeState).Count
+                                        intBestIndex = intChargeState
+                                    End If
+                                Next intChargeState
+                            End With
+                        Case Else
+                            ' Invalid type
+                            Debug.Assert False
                         End Select
-                    End With
+                    End If
+                    .UMCs(i).ChargeStateStatsRepInd = intBestIndex
+    
+                    ' Populate .ClassMW, .ClassMWStD, and .ClassAbundance
+                    If .def.UMCClassStatsUseStatsFromMostAbuChargeState Then
+                        With .UMCs(i)
+                            .ClassMW = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Mass
+                            .ClassMWStD = .ChargeStateBasedStats(.ChargeStateStatsRepInd).MassStD
+                            .ClassAbundance = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Abundance
+                            
+                            ' Update .ClassRepInd and .ClassRepType to contain the ClassRep values for
+                            '   for the class rep of the best charge state group
+                            lngClassMIndexPointer = .ChargeStateBasedStats(.ChargeStateStatsRepInd).GroupRepIndex
+                            .ClassRepInd = .ClassMInd(lngClassMIndexPointer)
+                            .ClassRepType = .ClassMType(lngClassMIndexPointer)
+                        End With
+                    Else
+                        ' Lookup the Class Rep MW and Abu; needed for call to CalculateClassesComputeStats
+                        ' Note that .ClassRepInd and .ClassRepType will have already been correctly defined
+                        With .UMCs(i)
+                            Select Case .ClassRepType
+                            Case glCSType
+                                 RepMW = GelData(lngGelIndex).CSData(.ClassRepInd).AverageMW
+                                 RepAbu = GelData(lngGelIndex).CSData(.ClassRepInd).Abundance
+                            Case glIsoType
+                                 RepMW = GetIsoMass(GelData(lngGelIndex).IsoData(.ClassRepInd), ISMWField)
+                                 RepAbu = GelData(lngGelIndex).IsoData(.ClassRepInd).Abundance
+                            End Select
+                        End With
+                        
+                        ' Compute the class stats
+                        CalculateClassesComputeStats lngGelIndex, .def, UMCMembersMaxIndex, UMCMembersMW(), UMCMembersAbu(), UMCMembersScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
+                        
+                        With .UMCs(i)
+                            .ClassMW = dblConglomerateMW
+                            .ClassMWStD = dblConglomerateMWStD
+                            .ClassAbundance = dblConglomerateAbu
+                        End With
+                    End If
                     
-                    ' Compute the class stats
-                    CalculateClassesComputeStats lngGelIndex, .def, UMCMembersMaxIndex, UMCMembersMW(), UMCMembersAbu(), UMCMembersScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
-                    
+               Else                             'something is wrong
+                    ' This code shouldn't be reached
+                    Debug.Assert False
                     With .UMCs(i)
-                        .ClassMW = dblConglomerateMW
-                        .ClassMWStD = dblConglomerateMWStD
-                        .ClassAbundance = dblConglomerateAbu
+                        .ClassAbundance = -1
+                        .ClassMW = -1
+                        .ClassMWStD = -1
+                        .MinScan = -1
+                        .MaxScan = -1
                     End With
-                End If
-                
-           Else                             'something is wrong
-                ' This code shouldn't be reached
-                Debug.Assert False
-                With .UMCs(i)
-                    .ClassAbundance = -1
-                    .ClassMW = -1
-                    .ClassMWStD = -1
-                    .MinScan = -1
-                    .MaxScan = -1
-                End With
-           End If
-           If i Mod 500 = 0 Then
-              If blnShowProgressUsingFormCaption Then
-                  frmCallingForm.Caption = "Updating LC-MS Feature Stats: " & Trim(i) & " / " & (.UMCCnt)
-              ElseIf blnUseProgressForm Then
-                  frmProgress.UpdateSubtaskProgressBar i
-              End If
-           End If
-       Next i
-    End If
-End With
-If blnShowProgressUsingFormCaption Then frmCallingForm.Caption = strCaptionSaved
-CalculateClasses = True
-
-Exit Function
-
+               End If
+               If i Mod 500 = 0 Then
+                  If blnShowProgressUsingFormCaption Then
+                      frmCallingForm.Caption = "Updating LC-MS Feature Stats: " & Trim(i) & " / " & (.UMCCnt)
+                  ElseIf blnUseProgressForm Then
+                      frmProgress.UpdateSubtaskProgressBar i
+                  End If
+               End If
+           Next i
+        End If
+    End With
+    
+    If blnShowProgressUsingFormCaption Then frmCallingForm.Caption = strCaptionSaved
+    CalculateClasses = True
+    
+    Exit Function
+    
 err_CalculateClasses:
-Debug.Assert False
-'Resume Next
-LogErrors Err.Number, "CalculateClasses"
-On Error Resume Next
-If blnShowProgressUsingFormCaption Then frmCallingForm.Caption = strCaptionSaved
+    Debug.Assert False
+    'Resume Next
+    LogErrors Err.Number, "CalculateClasses"
+    On Error Resume Next
+    If blnShowProgressUsingFormCaption Then frmCallingForm.Caption = strCaptionSaved
 End Function
 
 Private Sub CalculateClassesComputeStats(ByVal lngGelIndex As Long, ByRef udtUMCDef As UMCDefinition, ByVal SrcMaxIndex As Long, ByRef MWArray() As Double, ByRef AbuArray() As Double, ByRef ScanArray() As Long, ByVal dblRepMW As Double, ByVal dblRepAbu As Double, ByRef dblConglomerateMW As Double, ByRef dblConglomerateMWStD As Double, ByRef dblConglomerateAbu As Double)

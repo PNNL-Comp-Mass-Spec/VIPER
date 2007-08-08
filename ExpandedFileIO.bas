@@ -216,6 +216,15 @@ On Error GoTo BinaryLoadDataErrorHandler
                 frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
                 CopyGelUMC2004ToCurrent GelUMC2004, GelUMC(lngGelIndex)
             
+            ElseIf sngVersionsInFile(fioGelUMC) = 4# Then
+                ' Update from version 4 to current version
+                Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
+                Get #InFileNum, , GelUMC(lngGelIndex)
+                blnUMCDataLoaded = True
+                
+                frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
+                InitializeAdditionalUMCDefVariables GelUMC(lngGelIndex).def
+                
             Else
                 MsgBox "The LC-MS Feature data " & FILE_FORMAT_ERROR_MESSAGE
             End If
@@ -224,7 +233,7 @@ On Error GoTo BinaryLoadDataErrorHandler
             Get #InFileNum, , GelUMC(lngGelIndex)
             blnUMCDataLoaded = True
         End If
-    
+        
         If blnUMCDataLoaded Then
             ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
             UpdateUMCStatArrays lngGelIndex, True
@@ -1144,7 +1153,7 @@ Private Sub CopyDeltaLabelPairDetails2004bToCurrent(ByVal OldPairDetailsCount As
                         End If
                         
                         .ERMemberBasisCount = OldDeltaLabelPairDetails(i).ERMemberBasisCount
-                        .State = OldDeltaLabelPairDetails(i).State
+                        .STATE = OldDeltaLabelPairDetails(i).STATE
                     End With
                 Next i
             Else
@@ -1210,7 +1219,7 @@ Private Sub CopyDeltaLabelPairs2003ToCurrent(OldDeltaLabelPairs As IsoPairsDltLb
                         .ERChargeStateBasisCount = 0
                         ReDim .ERChargesUsed(0)
                         .ERMemberBasisCount = 1
-                        .State = OldDeltaLabelPairs.PState(i)
+                        .STATE = OldDeltaLabelPairs.PState(i)
                     End With
                 Next i
             Else
@@ -1283,7 +1292,7 @@ Private Sub CopyDeltaLabelPairs2004aToCurrent(OldDeltaLabelPairs As IsoPairsDltL
                         .ERChargeStateBasisCount = OldDeltaLabelPairs.Pairs(i).ERChargeStateBasisCount
                         ReDim .ERChargesUsed(0)
                         .ERMemberBasisCount = OldDeltaLabelPairs.Pairs(i).ERMemberBasisCount
-                        .State = OldDeltaLabelPairs.Pairs(i).State
+                        .STATE = OldDeltaLabelPairs.Pairs(i).STATE
                     End With
                 Next i
             Else
@@ -2397,7 +2406,7 @@ Private Sub CopyGelSearchDef2003eToCurrent(OldDef As udtSearchDefinition2003eGro
 End Sub
 
 Private Sub CopyGelUMC2002ToCurrent(OldUMC As UMCListType2002, ByRef CurrentUMCList As UMCListType)
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
 On Error GoTo CopyUMCDataErrorHandler
 
@@ -2412,16 +2421,16 @@ On Error GoTo CopyUMCDataErrorHandler
         
         If .UMCCnt > 0 Then
             ReDim .UMCs(0 To .UMCCnt - 1)
-            For lngIndex = 0 To .UMCCnt - 1
-                With .UMCs(lngIndex)
-                    .ClassRepInd = OldUMC.UMCs(lngIndex).ClassRepInd
-                    .ClassRepType = OldUMC.UMCs(lngIndex).ClassRepType
-                    .ClassCount = OldUMC.UMCs(lngIndex).ClassCount
-                    .ClassMInd() = OldUMC.UMCs(lngIndex).ClassMInd()
-                    .ClassMType() = OldUMC.UMCs(lngIndex).ClassMType()
-                    .ClassAbundance = OldUMC.UMCs(lngIndex).ClassAbundance
-                    .ClassMW = OldUMC.UMCs(lngIndex).ClassMW
-                    .ClassMWStD = OldUMC.UMCs(lngIndex).ClassMWStD
+            For lngindex = 0 To .UMCCnt - 1
+                With .UMCs(lngindex)
+                    .ClassRepInd = OldUMC.UMCs(lngindex).ClassRepInd
+                    .ClassRepType = OldUMC.UMCs(lngindex).ClassRepType
+                    .ClassCount = OldUMC.UMCs(lngindex).ClassCount
+                    .ClassMInd() = OldUMC.UMCs(lngindex).ClassMInd()
+                    .ClassMType() = OldUMC.UMCs(lngindex).ClassMType()
+                    .ClassAbundance = OldUMC.UMCs(lngindex).ClassAbundance
+                    .ClassMW = OldUMC.UMCs(lngindex).ClassMW
+                    .ClassMWStD = OldUMC.UMCs(lngindex).ClassMWStD
                     .ClassScore = 0
                     .ClassNET = 0
                     .ClassStatusBits = 0
@@ -2436,7 +2445,7 @@ On Error GoTo CopyUMCDataErrorHandler
                     .ChargeStateCount = 0
                     ReDim .ChargeStateBasedStats(0)
                 End With
-            Next lngIndex
+            Next lngindex
         Else
             ReDim .UMCs(0)
         End If
@@ -2454,7 +2463,7 @@ CopyUMCDataErrorHandler:
 End Sub
 
 Private Sub CopyGelUMC2003aToCurrent(OldUMC As UMCListType2003a, ByRef CurrentUMCList As UMCListType)
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
 On Error GoTo CopyUMCDataErrorHandler
 
@@ -2469,31 +2478,31 @@ On Error GoTo CopyUMCDataErrorHandler
         
         If .UMCCnt > 0 Then
             ReDim .UMCs(0 To .UMCCnt - 1)
-            For lngIndex = 0 To .UMCCnt - 1
-                With .UMCs(lngIndex)
-                    .ClassRepInd = OldUMC.UMCs(lngIndex).ClassRepInd
-                    .ClassRepType = OldUMC.UMCs(lngIndex).ClassRepType
-                    .ClassCount = OldUMC.UMCs(lngIndex).ClassCount
-                    .ClassMInd() = OldUMC.UMCs(lngIndex).ClassMInd()
-                    .ClassMType() = OldUMC.UMCs(lngIndex).ClassMType()
-                    .ClassAbundance = OldUMC.UMCs(lngIndex).ClassAbundance
-                    .ClassMW = OldUMC.UMCs(lngIndex).ClassMW
-                    .ClassMWStD = OldUMC.UMCs(lngIndex).ClassMWStD
+            For lngindex = 0 To .UMCCnt - 1
+                With .UMCs(lngindex)
+                    .ClassRepInd = OldUMC.UMCs(lngindex).ClassRepInd
+                    .ClassRepType = OldUMC.UMCs(lngindex).ClassRepType
+                    .ClassCount = OldUMC.UMCs(lngindex).ClassCount
+                    .ClassMInd() = OldUMC.UMCs(lngindex).ClassMInd()
+                    .ClassMType() = OldUMC.UMCs(lngindex).ClassMType()
+                    .ClassAbundance = OldUMC.UMCs(lngindex).ClassAbundance
+                    .ClassMW = OldUMC.UMCs(lngindex).ClassMW
+                    .ClassMWStD = OldUMC.UMCs(lngindex).ClassMWStD
                     .ClassScore = 0
                     .ClassNET = 0
-                    .ClassStatusBits = OldUMC.UMCs(lngIndex).ClassStatusBits
+                    .ClassStatusBits = OldUMC.UMCs(lngindex).ClassStatusBits
                     
                     ' Note: The following will be updated by CalculateClasses() after exiting this function
-                    .MinScan = OldUMC.UMCs(lngIndex).MinScan
-                    .MaxScan = OldUMC.UMCs(lngIndex).MaxScan
-                    .MinMW = OldUMC.UMCs(lngIndex).MinMW
-                    .MaxMW = OldUMC.UMCs(lngIndex).MaxMW
+                    .MinScan = OldUMC.UMCs(lngindex).MinScan
+                    .MaxScan = OldUMC.UMCs(lngindex).MaxScan
+                    .MinMW = OldUMC.UMCs(lngindex).MinMW
+                    .MaxMW = OldUMC.UMCs(lngindex).MaxMW
                     
                     .ChargeStateStatsRepInd = 0
                     .ChargeStateCount = 0
                     ReDim .ChargeStateBasedStats(0)
                 End With
-            Next lngIndex
+            Next lngindex
         Else
             ReDim .UMCs(0)
         End If
@@ -2511,7 +2520,7 @@ CopyUMCDataErrorHandler:
 End Sub
 
 Private Sub CopyGelUMC2004ToCurrent(OldUMC As UMCListType2004, ByRef CurrentUMCList As UMCListType)
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
 On Error GoTo CopyUMCDataErrorHandler
 
@@ -2526,47 +2535,49 @@ On Error GoTo CopyUMCDataErrorHandler
         
         If .UMCCnt > 0 Then
             ReDim .UMCs(0 To .UMCCnt - 1)
-            For lngIndex = 0 To .UMCCnt - 1
-                With .UMCs(lngIndex)
-                    .ClassRepInd = OldUMC.UMCs(lngIndex).ClassRepInd
-                    .ClassRepType = OldUMC.UMCs(lngIndex).ClassRepType
-                    .ClassCount = OldUMC.UMCs(lngIndex).ClassCount
-                    .ClassMInd() = OldUMC.UMCs(lngIndex).ClassMInd()
-                    .ClassMType() = OldUMC.UMCs(lngIndex).ClassMType()
-                    .ClassAbundance = OldUMC.UMCs(lngIndex).ClassAbundance
-                    .ClassMW = OldUMC.UMCs(lngIndex).ClassMW
-                    .ClassMWStD = OldUMC.UMCs(lngIndex).ClassMWStD
+            For lngindex = 0 To .UMCCnt - 1
+                With .UMCs(lngindex)
+                    .ClassRepInd = OldUMC.UMCs(lngindex).ClassRepInd
+                    .ClassRepType = OldUMC.UMCs(lngindex).ClassRepType
+                    .ClassCount = OldUMC.UMCs(lngindex).ClassCount
+                    .ClassMInd() = OldUMC.UMCs(lngindex).ClassMInd()
+                    .ClassMType() = OldUMC.UMCs(lngindex).ClassMType()
+                    .ClassAbundance = OldUMC.UMCs(lngindex).ClassAbundance
+                    .ClassMW = OldUMC.UMCs(lngindex).ClassMW
+                    .ClassMWStD = OldUMC.UMCs(lngindex).ClassMWStD
                     
                     .ClassMassCorrectionDa = 0
                     
-                    .ClassScore = OldUMC.UMCs(lngIndex).ClassScore
-                    .ClassNET = OldUMC.UMCs(lngIndex).ClassNET
-                    .ClassStatusBits = OldUMC.UMCs(lngIndex).ClassStatusBits
+                    .ClassScore = OldUMC.UMCs(lngindex).ClassScore
+                    .ClassNET = OldUMC.UMCs(lngindex).ClassNET
+                    .ClassStatusBits = OldUMC.UMCs(lngindex).ClassStatusBits
                     
                     ' Note: The following will be updated by CalculateClasses() after exiting this function
-                    .MinScan = OldUMC.UMCs(lngIndex).MinScan
-                    .MaxScan = OldUMC.UMCs(lngIndex).MaxScan
-                    .MinMW = OldUMC.UMCs(lngIndex).MinMW
-                    .MaxMW = OldUMC.UMCs(lngIndex).MaxMW
+                    .MinScan = OldUMC.UMCs(lngindex).MinScan
+                    .MaxScan = OldUMC.UMCs(lngindex).MaxScan
+                    .MinMW = OldUMC.UMCs(lngindex).MinMW
+                    .MaxMW = OldUMC.UMCs(lngindex).MaxMW
                     
-                    .ChargeStateStatsRepInd = OldUMC.UMCs(lngIndex).ChargeStateStatsRepInd
-                    .ChargeStateCount = OldUMC.UMCs(lngIndex).ChargeStateCount
+                    .ChargeStateStatsRepInd = OldUMC.UMCs(lngindex).ChargeStateStatsRepInd
+                    .ChargeStateCount = OldUMC.UMCs(lngindex).ChargeStateCount
                     
                     If .ChargeStateCount > 0 Then
                         ReDim .ChargeStateBasedStats(.ChargeStateCount - 1)
                         ' Copy the entire array
-                        .ChargeStateBasedStats = OldUMC.UMCs(lngIndex).ChargeStateBasedStats
+                        .ChargeStateBasedStats = OldUMC.UMCs(lngindex).ChargeStateBasedStats
                     Else
                         ReDim .ChargeStateBasedStats(0)
                     End If
                 End With
-            Next lngIndex
+            Next lngindex
         Else
             ReDim .UMCs(0)
         End If
         
         .MassCorrectionValuesDefined = False
     End With
+
+    InitializeAdditionalUMCDefVariables CurrentUMCList.def
 
     Exit Sub
 
@@ -2593,10 +2604,6 @@ Private Sub CopyGelUMCDef2002ToCurrent(OldDef As UMCDefinition2002, ByRef Curren
         .GapMaxSize = OldDef.GapMaxSize
         .GapMaxPct = OldDef.GapMaxPct
         .UMCNETType = OldDef.UMCNETType
-        .UMCMaxAbuPctBf = OldDef.UMCMaxAbuPctBf
-        .UMCMaxAbuPctAf = OldDef.UMCMaxAbuPctAf
-        .UMCMaxAbuEtPctBf = OldDef.UMCMaxAbuEtPctBf
-        .UMCMaxAbuEtPctAf = OldDef.UMCMaxAbuEtPctAf
         .UMCMinCnt = OldDef.UMCMinCnt
         .UMCMaxCnt = OldDef.UMCMaxCnt
         .InterpolateGaps = True
@@ -2607,6 +2614,7 @@ Private Sub CopyGelUMCDef2002ToCurrent(OldDef As UMCDefinition2002, ByRef Curren
         .OtherInfo = ""
     End With
 
+    InitializeAdditionalUMCDefVariables CurrentUMCDef
 End Sub
 
 Private Sub CopyGelUMCDef2003aToCurrent(OldDef As UMCDefinition2003a, ByRef CurrentUMCDef As UMCDefinition)
@@ -2625,10 +2633,6 @@ Private Sub CopyGelUMCDef2003aToCurrent(OldDef As UMCDefinition2003a, ByRef Curr
         .GapMaxSize = OldDef.GapMaxSize
         .GapMaxPct = OldDef.GapMaxPct
         .UMCNETType = OldDef.UMCNETType
-        .UMCMaxAbuPctBf = OldDef.UMCMaxAbuPctBf
-        .UMCMaxAbuPctAf = OldDef.UMCMaxAbuPctAf
-        .UMCMaxAbuEtPctBf = OldDef.UMCMaxAbuEtPctBf
-        .UMCMaxAbuEtPctAf = OldDef.UMCMaxAbuEtPctAf
         .UMCMinCnt = OldDef.UMCMinCnt
         .UMCMaxCnt = OldDef.UMCMaxCnt
         .InterpolateGaps = True
@@ -2639,6 +2643,7 @@ Private Sub CopyGelUMCDef2003aToCurrent(OldDef As UMCDefinition2003a, ByRef Curr
         .OtherInfo = ""
     End With
 
+    InitializeAdditionalUMCDefVariables CurrentUMCDef
 End Sub
 
 Private Sub CopyLegacyMassCalibrationInfoToData(ByRef CurrentGelData As DocumentData, ByRef MassCalibrationInfo As udtMassCalibrationInfoType)
@@ -2702,16 +2707,31 @@ Private Sub GelAnalysisInfoWrite(ByVal OutFileNum As Integer, ByVal fIndex As Lo
     Put #OutFileNum, , mGelAnalysis
 End Sub
 
+Private Sub InitializeAdditionalUMCDefVariables(ByRef CurrentUMCDef As UMCDefinition)
+    With CurrentUMCDef
+        .OddEvenProcessingMode = oepUMCOddEvenProcessingMode.oepProcessAll
+        .AdditionalValue1 = 0
+        .AdditionalValue2 = 0
+        .AdditionalValue3 = 0
+        .AdditionalValue4 = 0
+        .AdditionalValue5 = 0
+        .AdditionalValue6 = 0
+        .AdditionalValue7 = 0
+        .AdditionalValue8 = 0
+    End With
+
+End Sub
+
 Private Sub ValidateDataArrays(ByVal lngGelIndex As Long)
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
 On Error GoTo FixCSArray
 
-    lngIndex = UBound(GelData(lngGelIndex).CSData)
+    lngindex = UBound(GelData(lngGelIndex).CSData)
 
 ResumeChecking:
 On Error GoTo FixIsoArray
-    lngIndex = UBound(GelData(lngGelIndex).IsoData)
+    lngindex = UBound(GelData(lngGelIndex).IsoData)
 
 Exit Sub
 
@@ -2740,7 +2760,7 @@ Private Sub InitFileIOOffsetsAndVersions()
     FileInfoHeaderOffsets(fioGelORFViewerSavedGelListAndOptions) = FileIO_Offset_FirstHeader + 550
         
     FileInfoVersions(fioGelData) = 7#               ' Note: Version 1# = DocumentData2000, Version 2# = DocumentData2003 type, with Iso_Field_Count = 10, Version 3# = DocumentData2003b type, Version 4# = DocumentData2004 type (Iso_Field_Count = 12), Version 5# = DocumentData2005a (now using udtIsotopicDataType instead of Iso_Field); Version 6# = DocumentData2005b; Version 7# = current DocumentData type
-    FileInfoVersions(fioGelUMC) = 4#                ' Note: Version 1# = UMCListType2002, Version 2# = UMCListType2003a, Version 3# = UMC2004, Version 4# = current UMC type
+    FileInfoVersions(fioGelUMC) = 5#                ' Note: Version 1# = UMCListType2002, Version 2# = UMCListType2003a, Version 3# = UMC2004, Version 4# is same structure size as 5#, but four old Double variables were turned into several new 16-bit and 32-bit integer variables, Version 5# = current UMC type
     FileInfoVersions(fioGelAnalysis) = 1#
     FileInfoVersions(fioUMCNetAdjDef) = 6#          ' Note: Version 1# = NetAdjDefinition2003, Version 2# was a short-lived beta version, Version 3# = NetAdjDefinition2004, Version 4# = NetAdjDefinition2005a,  Version 5# = NetAdjDefinition2005b, Version 6# = current NetAdjDef type
     FileInfoVersions(fioSearchDefinitions) = 8#     ' Note: Version 2# uses UMCDefinition2002, Version 3# uses UMCDefinition2003, Version 4#, 5#, 6#, and 7# use UMCDefinition2003a, Version 8# uses current UMCDefinition type

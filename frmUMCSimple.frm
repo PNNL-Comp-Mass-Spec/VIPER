@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmUMCSimple 
    BackColor       =   &H00FF8080&
    BorderStyle     =   3  'Fixed Dialog
@@ -7,20 +7,20 @@ Begin VB.Form frmUMCSimple
    ClientHeight    =   6630
    ClientLeft      =   45
    ClientTop       =   405
-   ClientWidth     =   7875
+   ClientWidth     =   8490
    ControlBox      =   0   'False
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
    ScaleHeight     =   6630
-   ScaleWidth      =   7875
+   ScaleWidth      =   8490
    ShowInTaskbar   =   0   'False
    StartUpPosition =   1  'CenterOwner
    Begin VB.CommandButton cmdResetToDefaults 
       Caption         =   "Set to Defaults"
       Height          =   375
       Left            =   120
-      TabIndex        =   19
+      TabIndex        =   15
       Top             =   4950
       Width           =   1455
    End
@@ -29,7 +29,7 @@ Begin VB.Form frmUMCSimple
       Caption         =   "UMC  Draw Type"
       Height          =   735
       Left            =   120
-      TabIndex        =   16
+      TabIndex        =   13
       Top             =   4080
       Width           =   2415
       Begin VB.ComboBox cmbUMCDrawType 
@@ -38,7 +38,7 @@ Begin VB.Form frmUMCSimple
          Left            =   120
          List            =   "frmUMCSimple.frx":000D
          Style           =   2  'Dropdown List
-         TabIndex        =   17
+         TabIndex        =   14
          Top             =   300
          Width           =   2175
       End
@@ -47,7 +47,7 @@ Begin VB.Form frmUMCSimple
       Caption         =   "&Report"
       Height          =   375
       Left            =   1080
-      TabIndex        =   2
+      TabIndex        =   18
       ToolTipText     =   "Generates various statistics on current UMC"
       Top             =   5460
       Width           =   735
@@ -57,14 +57,14 @@ Begin VB.Form frmUMCSimple
       Caption         =   "Molecular Mass Tolerance"
       Height          =   1095
       Left            =   120
-      TabIndex        =   11
+      TabIndex        =   8
       Top             =   2880
       Width           =   2415
       Begin VB.TextBox txtTol 
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   240
-         TabIndex        =   13
+         TabIndex        =   10
          Text            =   "10"
          Top             =   520
          Width           =   735
@@ -75,7 +75,7 @@ Begin VB.Form frmUMCSimple
          Height          =   255
          Index           =   1
          Left            =   1200
-         TabIndex        =   15
+         TabIndex        =   12
          Top             =   666
          Width           =   855
       End
@@ -85,7 +85,7 @@ Begin VB.Form frmUMCSimple
          Height          =   255
          Index           =   0
          Left            =   1200
-         TabIndex        =   14
+         TabIndex        =   11
          Top             =   333
          Value           =   -1  'True
          Width           =   735
@@ -96,7 +96,7 @@ Begin VB.Form frmUMCSimple
          Caption         =   "Tolerance:"
          Height          =   255
          Left            =   240
-         TabIndex        =   12
+         TabIndex        =   9
          Top             =   280
          Width           =   735
       End
@@ -106,7 +106,7 @@ Begin VB.Form frmUMCSimple
       Caption         =   "Molecular Mass Field"
       Height          =   1335
       Left            =   120
-      TabIndex        =   7
+      TabIndex        =   4
       Top             =   1440
       Width           =   2415
       Begin VB.OptionButton optMWField 
@@ -115,7 +115,7 @@ Begin VB.Form frmUMCSimple
          Height          =   255
          Index           =   2
          Left            =   240
-         TabIndex        =   10
+         TabIndex        =   7
          Top             =   920
          Width           =   1815
       End
@@ -125,7 +125,7 @@ Begin VB.Form frmUMCSimple
          Height          =   255
          Index           =   1
          Left            =   240
-         TabIndex        =   9
+         TabIndex        =   6
          Top             =   600
          Value           =   -1  'True
          Width           =   1335
@@ -136,7 +136,7 @@ Begin VB.Form frmUMCSimple
          Height          =   255
          Index           =   0
          Left            =   240
-         TabIndex        =   8
+         TabIndex        =   5
          Top             =   280
          Width           =   1335
       End
@@ -146,7 +146,7 @@ Begin VB.Form frmUMCSimple
       Caption         =   "Definition Scope"
       Height          =   975
       Left            =   120
-      TabIndex        =   4
+      TabIndex        =   1
       Top             =   360
       Width           =   2415
       Begin VB.OptionButton optDefScope 
@@ -155,7 +155,7 @@ Begin VB.Form frmUMCSimple
          Height          =   255
          Index           =   1
          Left            =   240
-         TabIndex        =   6
+         TabIndex        =   3
          Top             =   600
          Value           =   -1  'True
          Width           =   1455
@@ -166,17 +166,17 @@ Begin VB.Form frmUMCSimple
          Height          =   255
          Index           =   0
          Left            =   240
-         TabIndex        =   5
+         TabIndex        =   2
          Top             =   280
          Width           =   1455
       End
    End
-   Begin VB.CommandButton cmdCancel 
+   Begin VB.CommandButton cmdClose 
       Caption         =   "&Close"
       Default         =   -1  'True
       Height          =   375
       Left            =   1920
-      TabIndex        =   1
+      TabIndex        =   19
       Top             =   5460
       Width           =   735
    End
@@ -184,7 +184,7 @@ Begin VB.Form frmUMCSimple
       Caption         =   "Find Features"
       Height          =   495
       Left            =   120
-      TabIndex        =   0
+      TabIndex        =   16
       ToolTipText     =   "Find LC-MS Features"
       Top             =   5400
       Width           =   855
@@ -193,70 +193,276 @@ Begin VB.Form frmUMCSimple
       Caption         =   "Abort!"
       Height          =   375
       Left            =   120
-      TabIndex        =   89
+      TabIndex        =   17
       Top             =   5400
       Width           =   735
    End
    Begin TabDlg.SSTab tbsTabStrip 
       Height          =   5715
       Left            =   2760
-      TabIndex        =   18
+      TabIndex        =   20
       Top             =   360
-      Width           =   4935
-      _ExtentX        =   8705
+      Width           =   5535
+      _ExtentX        =   9763
       _ExtentY        =   10081
       _Version        =   393216
       Style           =   1
-      Tab             =   1
       TabHeight       =   520
       BackColor       =   16744576
       TabCaption(0)   =   "LC-MS Feature Definition"
       TabPicture(0)   =   "frmUMCSimple.frx":003D
-      Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "cboChargeStateAbuType"
-      Tab(0).Control(1)=   "chkUseMostAbuChargeStateStatsForClassStats"
-      Tab(0).Control(2)=   "cmbCountType"
-      Tab(0).Control(3)=   "txtHoleNum"
-      Tab(0).Control(4)=   "txtHoleSize"
-      Tab(0).Control(5)=   "cmbUMCAbu"
-      Tab(0).Control(6)=   "cmbUMCMW"
-      Tab(0).Control(7)=   "chkAllowSharing"
-      Tab(0).Control(8)=   "chkInterpolateMissingIons"
-      Tab(0).Control(9)=   "txtInterpolateMaxGapSize"
-      Tab(0).Control(10)=   "lblChargeStateAbuType"
-      Tab(0).Control(11)=   "Label1(0)"
-      Tab(0).Control(12)=   "Label3(0)"
-      Tab(0).Control(13)=   "Label3(1)"
-      Tab(0).Control(14)=   "Label1(1)"
-      Tab(0).Control(15)=   "Label1(2)"
-      Tab(0).Control(16)=   "Label3(2)"
-      Tab(0).ControlCount=   17
+      Tab(0).ControlEnabled=   -1  'True
+      Tab(0).Control(0)=   "fraDREAMS"
+      Tab(0).Control(0).Enabled=   0   'False
+      Tab(0).Control(1)=   "fraOptionFrame(0)"
+      Tab(0).Control(1).Enabled=   0   'False
+      Tab(0).Control(2)=   "fraOptionFrame(1)"
+      Tab(0).Control(2).Enabled=   0   'False
+      Tab(0).ControlCount=   3
       TabCaption(1)   =   "Auto Refine Options"
       TabPicture(1)   =   "frmUMCSimple.frx":0059
-      Tab(1).ControlEnabled=   -1  'True
+      Tab(1).ControlEnabled=   0   'False
       Tab(1).Control(0)=   "fraSplitUMCsOptions"
-      Tab(1).Control(0).Enabled=   0   'False
-      Tab(1).Control(1)=   "fraOptionFrame(10)"
-      Tab(1).Control(1).Enabled=   0   'False
+      Tab(1).Control(1)=   "fraOptionFrame(2)"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "Adv Class Stats"
       TabPicture(2)   =   "frmUMCSimple.frx":0075
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraClassAbundanceTopX"
-      Tab(2).Control(1)=   "fraClassMassTopX"
+      Tab(2).Control(0)=   "fraClassMassTopX"
+      Tab(2).Control(1)=   "fraClassAbundanceTopX"
       Tab(2).ControlCount=   2
       Begin VB.Frame fraOptionFrame 
-         Height          =   2790
-         Index           =   10
+         Height          =   1935
+         Index           =   1
          Left            =   120
-         TabIndex        =   90
+         TabIndex        =   31
+         Top             =   3600
+         Width           =   5055
+         Begin VB.TextBox txtInterpolateMaxGapSize 
+            Alignment       =   1  'Right Justify
+            Height          =   285
+            Left            =   3240
+            TabIndex        =   39
+            Text            =   "0"
+            Top             =   1460
+            Width           =   495
+         End
+         Begin VB.CheckBox chkInterpolateMissingIons 
+            Caption         =   "Interpolate gaps abundances"
+            Height          =   255
+            Left            =   240
+            TabIndex        =   37
+            Top             =   1200
+            Width           =   3015
+         End
+         Begin VB.CheckBox chkAllowSharing 
+            Caption         =   "Allow members sharing among LC-MS Features"
+            Height          =   375
+            Left            =   240
+            TabIndex        =   36
+            Top             =   860
+            Width           =   3975
+         End
+         Begin VB.TextBox txtHoleSize 
+            Alignment       =   1  'Right Justify
+            Height          =   285
+            Left            =   4320
+            TabIndex        =   35
+            Text            =   "0"
+            Top             =   560
+            Width           =   495
+         End
+         Begin VB.TextBox txtHoleNum 
+            Alignment       =   1  'Right Justify
+            Height          =   285
+            Left            =   4320
+            TabIndex        =   33
+            Text            =   "0"
+            Top             =   200
+            Width           =   495
+         End
+         Begin VB.Label Label3 
+            BackStyle       =   0  'Transparent
+            Caption         =   "Maximum size of gap to interpolate:"
+            Height          =   255
+            Index           =   2
+            Left            =   600
+            TabIndex        =   38
+            Top             =   1500
+            Width           =   2535
+         End
+         Begin VB.Label Label3 
+            BackStyle       =   0  'Transparent
+            Caption         =   "Maximum size of scan gap in the LC-MS Feature:"
+            Height          =   255
+            Index           =   1
+            Left            =   240
+            TabIndex        =   34
+            Top             =   560
+            Width           =   4005
+         End
+         Begin VB.Label Label3 
+            BackStyle       =   0  'Transparent
+            Caption         =   "Maximum number of scan gaps in the LC-MS Feature:"
+            Height          =   255
+            Index           =   0
+            Left            =   240
+            TabIndex        =   32
+            Top             =   240
+            Width           =   4000
+         End
+      End
+      Begin VB.Frame fraOptionFrame 
+         Height          =   3255
+         Index           =   0
+         Left            =   120
+         TabIndex        =   21
+         Top             =   360
+         Width           =   3375
+         Begin VB.ComboBox cmbUMCMW 
+            Height          =   315
+            ItemData        =   "frmUMCSimple.frx":0091
+            Left            =   120
+            List            =   "frmUMCSimple.frx":009E
+            Style           =   2  'Dropdown List
+            TabIndex        =   27
+            Top             =   1800
+            Width           =   3135
+         End
+         Begin VB.ComboBox cmbUMCAbu 
+            Height          =   315
+            ItemData        =   "frmUMCSimple.frx":00E1
+            Left            =   120
+            List            =   "frmUMCSimple.frx":00F4
+            Style           =   2  'Dropdown List
+            TabIndex        =   25
+            Top             =   1125
+            Width           =   3135
+         End
+         Begin VB.ComboBox cmbCountType 
+            Height          =   315
+            ItemData        =   "frmUMCSimple.frx":016E
+            Left            =   120
+            List            =   "frmUMCSimple.frx":0187
+            Style           =   2  'Dropdown List
+            TabIndex        =   23
+            Top             =   480
+            Width           =   3135
+         End
+         Begin VB.CheckBox chkUseMostAbuChargeStateStatsForClassStats 
+            Caption         =   "Use most abundant charge state group stats for class stats"
+            Height          =   405
+            Left            =   120
+            TabIndex        =   30
+            ToolTipText     =   "Make single-member classes from unconnected nodes"
+            Top             =   2760
+            Width           =   2535
+         End
+         Begin VB.ComboBox cboChargeStateAbuType 
+            Height          =   315
+            Left            =   120
+            Style           =   2  'Dropdown List
+            TabIndex        =   29
+            Top             =   2400
+            Width           =   3135
+         End
+         Begin VB.Label Label1 
+            BackStyle       =   0  'Transparent
+            Caption         =   "Class Molecular Mass"
+            Height          =   255
+            Index           =   2
+            Left            =   120
+            TabIndex        =   26
+            Top             =   1560
+            Width           =   1575
+         End
+         Begin VB.Label Label1 
+            BackStyle       =   0  'Transparent
+            Caption         =   "Class Abundance"
+            Height          =   255
+            Index           =   1
+            Left            =   120
+            TabIndex        =   24
+            Top             =   885
+            Width           =   1335
+         End
+         Begin VB.Label Label1 
+            BackStyle       =   0  'Transparent
+            Caption         =   "Count Type"
+            Height          =   255
+            Index           =   0
+            Left            =   120
+            TabIndex        =   22
+            Top             =   240
+            Width           =   1335
+         End
+         Begin VB.Label lblChargeStateAbuType 
+            BackStyle       =   0  'Transparent
+            Caption         =   "Most Abu Charge State Group Type"
+            Height          =   255
+            Left            =   120
+            TabIndex        =   28
+            Top             =   2160
+            Width           =   3135
+         End
+      End
+      Begin VB.Frame fraDREAMS 
+         Caption         =   "DREAMS Options"
+         Height          =   1935
+         Left            =   3600
+         TabIndex        =   40
+         Top             =   360
+         Width           =   1815
+         Begin VB.OptionButton optEvenOddScanFilter 
+            Caption         =   "Process Odd / Even sequentially"
+            Height          =   375
+            Index           =   3
+            Left            =   120
+            TabIndex        =   44
+            Top             =   1440
+            Width           =   1605
+         End
+         Begin VB.OptionButton optEvenOddScanFilter 
+            Caption         =   "Even-numbered spectra only"
+            Height          =   375
+            Index           =   2
+            Left            =   120
+            TabIndex        =   43
+            Top             =   960
+            Width           =   1485
+         End
+         Begin VB.OptionButton optEvenOddScanFilter 
+            Caption         =   "Use all spectra"
+            Height          =   255
+            Index           =   0
+            Left            =   120
+            TabIndex        =   41
+            Top             =   240
+            Value           =   -1  'True
+            Width           =   1485
+         End
+         Begin VB.OptionButton optEvenOddScanFilter 
+            Caption         =   "Odd-numbered spectra only"
+            Height          =   375
+            Index           =   1
+            Left            =   120
+            TabIndex        =   42
+            Top             =   540
+            Width           =   1485
+         End
+      End
+      Begin VB.Frame fraOptionFrame 
+         Height          =   2790
+         Index           =   2
+         Left            =   -74880
+         TabIndex        =   45
          Top             =   360
          Width           =   4545
          Begin VB.TextBox txtHiCnt 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   47
+            TabIndex        =   56
             Text            =   "500"
             Top             =   1200
             Width           =   495
@@ -265,7 +471,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Remove cls. with length over"
             Height          =   255
             Left            =   240
-            TabIndex        =   46
+            TabIndex        =   55
             Top             =   1200
             Width           =   2535
          End
@@ -273,7 +479,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   44
+            TabIndex        =   53
             Text            =   "3"
             Top             =   880
             Width           =   495
@@ -282,7 +488,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Remove cls. with less than"
             Height          =   255
             Left            =   240
-            TabIndex        =   43
+            TabIndex        =   52
             Top             =   880
             Width           =   2295
          End
@@ -290,7 +496,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   41
+            TabIndex        =   50
             Text            =   "30"
             Top             =   560
             Width           =   495
@@ -299,7 +505,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Remove high intensity classes"
             Height          =   255
             Left            =   240
-            TabIndex        =   40
+            TabIndex        =   49
             Top             =   560
             Width           =   2550
          End
@@ -307,7 +513,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   38
+            TabIndex        =   47
             Text            =   "30"
             Top             =   240
             Width           =   495
@@ -316,7 +522,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Remove low intensity classes"
             Height          =   255
             Left            =   240
-            TabIndex        =   37
+            TabIndex        =   46
             Top             =   240
             Width           =   2550
          End
@@ -324,7 +530,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Test feature length using scan range"
             Height          =   375
             Left            =   240
-            TabIndex        =   55
+            TabIndex        =   64
             ToolTipText     =   "If True, then considers scan range for the length tests; otherwise, considers member count"
             Top             =   2200
             Value           =   1  'Checked
@@ -334,7 +540,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3480
-            TabIndex        =   57
+            TabIndex        =   66
             Text            =   "3"
             Top             =   2300
             Width           =   495
@@ -343,7 +549,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   53
+            TabIndex        =   62
             Text            =   "33"
             Top             =   1840
             Width           =   495
@@ -352,7 +558,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Remove cls. with length over"
             Height          =   255
             Left            =   240
-            TabIndex        =   49
+            TabIndex        =   58
             Top             =   1520
             Width           =   2535
          End
@@ -360,7 +566,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   50
+            TabIndex        =   59
             Text            =   "20"
             Top             =   1520
             Width           =   495
@@ -370,7 +576,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   1
             Left            =   3600
-            TabIndex        =   48
+            TabIndex        =   57
             Top             =   1230
             Width           =   900
          End
@@ -379,7 +585,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   0
             Left            =   3600
-            TabIndex        =   45
+            TabIndex        =   54
             Top             =   915
             Width           =   900
          End
@@ -387,7 +593,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Minimum member count:"
             Height          =   375
             Left            =   2280
-            TabIndex        =   56
+            TabIndex        =   65
             Top             =   2200
             Width           =   1125
          End
@@ -395,7 +601,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Percent max abu for gauging width"
             Height          =   240
             Left            =   360
-            TabIndex        =   52
+            TabIndex        =   61
             Top             =   1845
             Width           =   2565
          End
@@ -404,7 +610,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   2
             Left            =   3600
-            TabIndex        =   54
+            TabIndex        =   63
             Top             =   1870
             Width           =   285
          End
@@ -413,7 +619,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   3
             Left            =   3600
-            TabIndex        =   51
+            TabIndex        =   60
             Top             =   1545
             Width           =   855
          End
@@ -422,7 +628,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   4
             Left            =   3600
-            TabIndex        =   39
+            TabIndex        =   48
             Top             =   270
             Width           =   270
          End
@@ -431,7 +637,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   5
             Left            =   3600
-            TabIndex        =   42
+            TabIndex        =   51
             Top             =   590
             Width           =   270
          End
@@ -440,14 +646,14 @@ Begin VB.Form frmUMCSimple
          Caption         =   "Class Abundance Top X"
          Height          =   1215
          Left            =   -74880
-         TabIndex        =   74
+         TabIndex        =   83
          Top             =   480
          Width           =   4095
          Begin VB.TextBox txtClassAbuTopXMinAbu 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2880
-            TabIndex        =   76
+            TabIndex        =   85
             Text            =   "0"
             Top             =   240
             Width           =   900
@@ -456,7 +662,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2880
-            TabIndex        =   78
+            TabIndex        =   87
             Text            =   "0"
             ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
             Top             =   540
@@ -466,7 +672,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2880
-            TabIndex        =   80
+            TabIndex        =   89
             Text            =   "3"
             Top             =   840
             Width           =   900
@@ -476,7 +682,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Minimum Abundance to Include"
             Height          =   255
             Left            =   120
-            TabIndex        =   75
+            TabIndex        =   84
             Top             =   270
             Width           =   2535
          End
@@ -485,7 +691,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Maximum Abundance to Include"
             Height          =   255
             Left            =   120
-            TabIndex        =   77
+            TabIndex        =   86
             Top             =   560
             Width           =   2535
          End
@@ -494,7 +700,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Minimum members to include"
             Height          =   255
             Left            =   120
-            TabIndex        =   79
+            TabIndex        =   88
             Top             =   870
             Width           =   2535
          End
@@ -503,14 +709,14 @@ Begin VB.Form frmUMCSimple
          Caption         =   "Class Mass Top X"
          Height          =   1215
          Left            =   -74880
-         TabIndex        =   81
+         TabIndex        =   90
          Top             =   1800
          Width           =   4095
          Begin VB.TextBox txtClassMassTopXMinMembers 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2880
-            TabIndex        =   87
+            TabIndex        =   96
             Text            =   "3"
             Top             =   840
             Width           =   900
@@ -519,7 +725,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2880
-            TabIndex        =   85
+            TabIndex        =   94
             Text            =   "0"
             ToolTipText     =   "Maximum abundance to include; use 0 to indicate there infinitely large abundance"
             Top             =   540
@@ -529,7 +735,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   2880
-            TabIndex        =   83
+            TabIndex        =   92
             Text            =   "0"
             Top             =   240
             Width           =   900
@@ -539,7 +745,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Minimum members to include"
             Height          =   255
             Left            =   120
-            TabIndex        =   86
+            TabIndex        =   95
             Top             =   870
             Width           =   2535
          End
@@ -548,7 +754,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Maximum Abundance to Include"
             Height          =   255
             Left            =   120
-            TabIndex        =   84
+            TabIndex        =   93
             Top             =   560
             Width           =   2535
          End
@@ -557,40 +763,23 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Minimum Abundance to Include"
             Height          =   255
             Left            =   120
-            TabIndex        =   82
+            TabIndex        =   91
             Top             =   270
             Width           =   2535
          End
       End
-      Begin VB.ComboBox cboChargeStateAbuType 
-         Height          =   315
-         Left            =   -74880
-         Style           =   2  'Dropdown List
-         TabIndex        =   27
-         Top             =   2520
-         Width           =   3135
-      End
-      Begin VB.CheckBox chkUseMostAbuChargeStateStatsForClassStats 
-         Caption         =   "Use most abundant charge state group stats for class stats"
-         Height          =   405
-         Left            =   -74880
-         TabIndex        =   28
-         ToolTipText     =   "Make single-member classes from unconnected nodes"
-         Top             =   2880
-         Width           =   2535
-      End
       Begin VB.Frame fraSplitUMCsOptions 
          Caption         =   "Split LC-MS Features Options"
          Height          =   2340
-         Left            =   120
-         TabIndex        =   58
+         Left            =   -74880
+         TabIndex        =   67
          Top             =   3240
          Width           =   4515
          Begin VB.TextBox txtSplitUMCsStdDevMultiplierForSplitting 
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   64
+            TabIndex        =   73
             Text            =   "1"
             Top             =   930
             Width           =   495
@@ -599,7 +788,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Split LC-MS Features by Examining Abundance"
             Height          =   255
             Left            =   120
-            TabIndex        =   59
+            TabIndex        =   68
             Top             =   240
             Width           =   3975
          End
@@ -607,7 +796,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   61
+            TabIndex        =   70
             Text            =   "4"
             Top             =   600
             Width           =   495
@@ -616,7 +805,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   66
+            TabIndex        =   75
             Text            =   "6"
             Top             =   1260
             Width           =   495
@@ -625,7 +814,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   69
+            TabIndex        =   78
             Text            =   "15"
             Top             =   1590
             Width           =   495
@@ -634,7 +823,7 @@ Begin VB.Form frmUMCSimple
             Alignment       =   1  'Right Justify
             Height          =   285
             Left            =   3000
-            TabIndex        =   72
+            TabIndex        =   81
             Text            =   "4"
             Top             =   1920
             Width           =   495
@@ -643,7 +832,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Mass Std Dev threshold multiplier"
             Height          =   255
             Left            =   120
-            TabIndex        =   63
+            TabIndex        =   72
             Top             =   960
             Width           =   2700
          End
@@ -652,7 +841,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   2
             Left            =   3600
-            TabIndex        =   62
+            TabIndex        =   71
             Top             =   600
             Width           =   495
          End
@@ -660,7 +849,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Minimum difference in average mass"
             Height          =   255
             Left            =   120
-            TabIndex        =   60
+            TabIndex        =   69
             Top             =   600
             Width           =   2775
          End
@@ -669,7 +858,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   3
             Left            =   3600
-            TabIndex        =   67
+            TabIndex        =   76
             Top             =   1290
             Width           =   495
          End
@@ -677,7 +866,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Maximum peak count to split feature"
             Height          =   255
             Left            =   120
-            TabIndex        =   65
+            TabIndex        =   74
             Top             =   1290
             Width           =   2775
          End
@@ -686,7 +875,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   4
             Left            =   3600
-            TabIndex        =   70
+            TabIndex        =   79
             Top             =   1620
             Width           =   735
          End
@@ -694,7 +883,7 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Peak picking intensity threshold"
             Height          =   255
             Left            =   120
-            TabIndex        =   68
+            TabIndex        =   77
             Top             =   1620
             Width           =   2775
          End
@@ -703,7 +892,7 @@ Begin VB.Form frmUMCSimple
             Height          =   255
             Index           =   5
             Left            =   3600
-            TabIndex        =   73
+            TabIndex        =   82
             Top             =   1950
             Width           =   735
          End
@@ -711,152 +900,10 @@ Begin VB.Form frmUMCSimple
             Caption         =   "Peak picking minimum width"
             Height          =   255
             Left            =   120
-            TabIndex        =   71
+            TabIndex        =   80
             Top             =   1950
             Width           =   2775
          End
-      End
-      Begin VB.ComboBox cmbCountType 
-         Height          =   315
-         ItemData        =   "frmUMCSimple.frx":0091
-         Left            =   -74880
-         List            =   "frmUMCSimple.frx":00AA
-         Style           =   2  'Dropdown List
-         TabIndex        =   21
-         Top             =   600
-         Width           =   3135
-      End
-      Begin VB.TextBox txtHoleNum 
-         Alignment       =   1  'Right Justify
-         Height          =   285
-         Left            =   -72240
-         TabIndex        =   30
-         Text            =   "0"
-         Top             =   3420
-         Width           =   495
-      End
-      Begin VB.TextBox txtHoleSize 
-         Alignment       =   1  'Right Justify
-         Height          =   285
-         Left            =   -72240
-         TabIndex        =   32
-         Text            =   "0"
-         Top             =   3900
-         Width           =   495
-      End
-      Begin VB.ComboBox cmbUMCAbu 
-         Height          =   315
-         ItemData        =   "frmUMCSimple.frx":012E
-         Left            =   -74880
-         List            =   "frmUMCSimple.frx":0141
-         Style           =   2  'Dropdown List
-         TabIndex        =   23
-         Top             =   1240
-         Width           =   3135
-      End
-      Begin VB.ComboBox cmbUMCMW 
-         Height          =   315
-         ItemData        =   "frmUMCSimple.frx":01BB
-         Left            =   -74880
-         List            =   "frmUMCSimple.frx":01C8
-         Style           =   2  'Dropdown List
-         TabIndex        =   25
-         Top             =   1920
-         Width           =   3135
-      End
-      Begin VB.CheckBox chkAllowSharing 
-         Caption         =   "Allow members sharing among LC-MS Features"
-         Height          =   255
-         Left            =   -74880
-         TabIndex        =   33
-         Top             =   4440
-         Width           =   4095
-      End
-      Begin VB.CheckBox chkInterpolateMissingIons 
-         Caption         =   "Interpolate gaps abundances"
-         Height          =   255
-         Left            =   -74880
-         TabIndex        =   34
-         Top             =   4800
-         Width           =   3015
-      End
-      Begin VB.TextBox txtInterpolateMaxGapSize 
-         Alignment       =   1  'Right Justify
-         Height          =   285
-         Left            =   -72240
-         TabIndex        =   36
-         Text            =   "0"
-         Top             =   5040
-         Width           =   495
-      End
-      Begin VB.Label lblChargeStateAbuType 
-         BackStyle       =   0  'Transparent
-         Caption         =   "Most Abu Charge State Group Type"
-         Height          =   255
-         Left            =   -74880
-         TabIndex        =   26
-         Top             =   2280
-         Width           =   3135
-      End
-      Begin VB.Label Label1 
-         BackStyle       =   0  'Transparent
-         Caption         =   "Count Type"
-         Height          =   255
-         Index           =   0
-         Left            =   -74880
-         TabIndex        =   20
-         Top             =   360
-         Width           =   1335
-      End
-      Begin VB.Label Label3 
-         BackStyle       =   0  'Transparent
-         Caption         =   "Maximum number of scan gaps in the LC-MS Feature:"
-         Height          =   495
-         Index           =   0
-         Left            =   -74880
-         TabIndex        =   29
-         Top             =   3360
-         Width           =   2535
-      End
-      Begin VB.Label Label3 
-         BackStyle       =   0  'Transparent
-         Caption         =   "Maximum size of scan gap in the LC-MS Feature:"
-         Height          =   495
-         Index           =   1
-         Left            =   -74880
-         TabIndex        =   31
-         Top             =   3840
-         Width           =   2535
-      End
-      Begin VB.Label Label1 
-         BackStyle       =   0  'Transparent
-         Caption         =   "Class Abundance"
-         Height          =   255
-         Index           =   1
-         Left            =   -74880
-         TabIndex        =   22
-         Top             =   1000
-         Width           =   1335
-      End
-      Begin VB.Label Label1 
-         BackStyle       =   0  'Transparent
-         Caption         =   "Class Molecular Mass"
-         Height          =   255
-         Index           =   2
-         Left            =   -74880
-         TabIndex        =   24
-         Top             =   1680
-         Width           =   1575
-      End
-      Begin VB.Label Label3 
-         BackStyle       =   0  'Transparent
-         Caption         =   "Maximum size of gap to interpolate:"
-         Height          =   255
-         Index           =   2
-         Left            =   -74880
-         TabIndex        =   35
-         Top             =   5100
-         Width           =   2535
       End
    End
    Begin VB.Label lblStatus 
@@ -866,17 +913,17 @@ Begin VB.Form frmUMCSimple
       ForeColor       =   &H80000008&
       Height          =   285
       Left            =   120
-      TabIndex        =   88
+      TabIndex        =   97
       Top             =   6240
-      Width           =   7455
+      Width           =   8175
    End
    Begin VB.Label lblGelName 
       BackStyle       =   0  'Transparent
       Height          =   255
       Left            =   120
-      TabIndex        =   3
+      TabIndex        =   0
       Top             =   60
-      Width           =   6255
+      Width           =   8175
    End
 End
 Attribute VB_Name = "frmUMCSimple"
@@ -928,7 +975,20 @@ Dim CurrMWRangeCnt As Long      'and their number
 Dim CurrRepMWRangeInd As Long   'index of current class representative in MWRange arrays(potential in fact)
 
 Dim mSplitUMCs As clsSplitUMCsByAbundance
-    
+Dim mCalculating As Boolean
+
+Private Function CheckOddEvenIterationForDataPoint(ByVal intOddEvenIteration As Integer, ByVal lngScanNumber As Long) As Boolean
+    If intOddEvenIteration = 1 Then
+        ' Return True if the point has an odd scan number
+        CheckOddEvenIterationForDataPoint = lngScanNumber Mod 2 = 1
+    ElseIf intOddEvenIteration = 2 Then
+        ' Return True if the point has an even scan number
+        CheckOddEvenIterationForDataPoint = lngScanNumber Mod 2 = 0
+    Else
+        ' intOddEvenIteration is not 1 or 2; return True
+        CheckOddEvenIterationForDataPoint = True
+    End If
+End Function
 
 Private Sub FillComboBoxes()
     With cmbCountType
@@ -978,91 +1038,95 @@ Private Sub FillComboBoxes()
 End Sub
 
 Public Sub InitializeUMCSearch()
-
-' MonroeMod: This code was in Form_Activate
-
-On Error GoTo InitializeUMCSearchErrorHandler
-
-CallerID = Me.Tag
-If CallerID >= 1 And CallerID <= UBound(GelBody) Then UMCDef = GelSearchDef(CallerID).UMCDef
-lblGelName.Caption = CompactPathString(GelBody(CallerID).Caption, 75)
-' MonroeMod: copy value from .UMCDrawType to .DrawType
-GelUMCDraw(CallerID).DrawType = glbPreferencesExpanded.UMCDrawType
-cmbUMCDrawType.ListIndex = GelUMCDraw(CallerID).DrawType
-
-With UMCDef
-    txtTol.Text = .Tol
-    If .UMCType = glUMC_TYPE_FROM_NET Then .UMCType = glUMC_TYPE_INTENSITY
-    cmbCountType.ListIndex = .UMCType
-    cmbUMCAbu.ListIndex = .ClassAbu
-    cmbUMCMW.ListIndex = .ClassMW
-    cboChargeStateAbuType.ListIndex = .ChargeStateStatsRepType
-    SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
     
-    optDefScope(.DefScope).Value = True
-    optMWField(.MWField - MW_FIELD_OFFSET).Value = True
-    Select Case .TolType
-    Case gltPPM
-      optTolType(0).Value = True
-    Case gltABS
-      optTolType(1).Value = True
-    Case Else
-      Debug.Assert False
-    End Select
-    txtHoleNum.Text = .GapMaxCnt
-    txtHoleSize.Text = .GapMaxSize
-    If .UMCSharing Then
-       chkAllowSharing.Value = vbChecked
-    Else
-       chkAllowSharing.Value = vbUnchecked
-    End If
-    If .InterpolateGaps Then
-       chkInterpolateMissingIons.Value = vbChecked
-    Else
-       chkInterpolateMissingIons.Value = vbUnchecked
-    End If
-    txtInterpolateMaxGapSize.Text = .InterpolateMaxGapSize
+    ' MonroeMod: This code was in Form_Activate
     
-End With
-
-With glbPreferencesExpanded.UMCAutoRefineOptions
-    SetCheckBox chkRemoveLoCnt, .UMCAutoRefineRemoveCountLow
-    SetCheckBox chkRemoveHiCnt, .UMCAutoRefineRemoveCountHigh
-    SetCheckBox chkRemoveMaxLengthPctAllScans, .UMCAutoRefineRemoveMaxLengthPctAllScans
+    On Error GoTo InitializeUMCSearchErrorHandler
     
-    txtLoCnt = .UMCAutoRefineMinLength
-    txtHiCnt = .UMCAutoRefineMaxLength
-    txtMaxLengthPctAllScans = .UMCAutoRefineMaxLengthPctAllScans
-    txtPercentMaxAbuToUseToGaugeLength = .UMCAutoRefinePercentMaxAbuToUseForLength
+    CallerID = Me.Tag
+    If CallerID >= 1 And CallerID <= UBound(GelBody) Then UMCDef = GelSearchDef(CallerID).UMCDef
+    lblGelName.Caption = CompactPathString(GelBody(CallerID).Caption, 75)
+    ' MonroeMod: copy value from .UMCDrawType to .DrawType
+    GelUMCDraw(CallerID).DrawType = glbPreferencesExpanded.UMCDrawType
+    cmbUMCDrawType.ListIndex = GelUMCDraw(CallerID).DrawType
     
-    SetCheckBox chkRefineUMCLengthByScanRange, .TestLengthUsingScanRange
-    txtAutoRefineMinimumMemberCount = .MinMemberCountWhenUsingScanRange
-    UpdateDynamicControls
-    
-    SetCheckBox chkRemoveLoAbu, .UMCAutoRefineRemoveAbundanceLow
-    SetCheckBox chkRemoveHiAbu, .UMCAutoRefineRemoveAbundanceHigh
-    txtLoAbuPct = .UMCAutoRefinePctLowAbundance
-    txtHiAbuPct = .UMCAutoRefinePctHighAbundance
-    
-    SetCheckBox chkSplitUMCsByExaminingAbundance, .SplitUMCsByAbundance
-    With .SplitUMCOptions
-        txtSplitUMCsMaximumPeakCount = Trim(.MaximumPeakCountToSplitUMC)
-        txtSplitUMCsMinimumDifferenceInAvgPpmMass = Trim(.MinimumDifferenceInAveragePpmMassToSplit)
-        txtSplitUMCsStdDevMultiplierForSplitting = Trim(.StdDevMultiplierForSplitting)
-        txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax = Trim(.PeakDetectIntensityThresholdPercentageOfMaximum)
-        txtSplitUMCsPeakPickingMinimumWidth = Trim(.PeakWidthPointsMinimum)
+    With UMCDef
+        txtTol.Text = .Tol
+        If .UMCType = glUMC_TYPE_FROM_NET Then .UMCType = glUMC_TYPE_INTENSITY
+        cmbCountType.ListIndex = .UMCType
+        cmbUMCAbu.ListIndex = .ClassAbu
+        cmbUMCMW.ListIndex = .ClassMW
+        cboChargeStateAbuType.ListIndex = .ChargeStateStatsRepType
+        SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
+        
+        optDefScope(.DefScope).Value = True
+        optMWField(.MWField - MW_FIELD_OFFSET).Value = True
+        optEvenOddScanFilter(.OddEvenProcessingMode).Value = True
+        
+        Select Case .TolType
+        Case gltPPM
+          optTolType(0).Value = True
+        Case gltABS
+          optTolType(1).Value = True
+        Case Else
+          Debug.Assert False
+        End Select
+        
+        
+        txtHoleNum.Text = .GapMaxCnt
+        txtHoleSize.Text = .GapMaxSize
+        If .UMCSharing Then
+           chkAllowSharing.Value = vbChecked
+        Else
+           chkAllowSharing.Value = vbUnchecked
+        End If
+        If .InterpolateGaps Then
+           chkInterpolateMissingIons.Value = vbChecked
+        Else
+           chkInterpolateMissingIons.Value = vbUnchecked
+        End If
+        txtInterpolateMaxGapSize.Text = .InterpolateMaxGapSize
+        
     End With
-End With
-
-With glbPreferencesExpanded.UMCAdvancedStatsOptions
-    txtClassAbuTopXMinAbu = .ClassAbuTopXMinAbu
-    txtClassAbuTopXMaxAbu = .ClassAbuTopXMaxAbu
-    txtClassAbuTopXMinMembers = .ClassAbuTopXMinMembers
     
-    txtClassMassTopXMinAbu = .ClassMassTopXMinAbu
-    txtClassMassTopXMaxAbu = .ClassMassTopXMaxAbu
-    txtClassMassTopXMinMembers = .ClassMassTopXMinMembers
-End With
+    With glbPreferencesExpanded.UMCAutoRefineOptions
+        SetCheckBox chkRemoveLoCnt, .UMCAutoRefineRemoveCountLow
+        SetCheckBox chkRemoveHiCnt, .UMCAutoRefineRemoveCountHigh
+        SetCheckBox chkRemoveMaxLengthPctAllScans, .UMCAutoRefineRemoveMaxLengthPctAllScans
+        
+        txtLoCnt = .UMCAutoRefineMinLength
+        txtHiCnt = .UMCAutoRefineMaxLength
+        txtMaxLengthPctAllScans = .UMCAutoRefineMaxLengthPctAllScans
+        txtPercentMaxAbuToUseToGaugeLength = .UMCAutoRefinePercentMaxAbuToUseForLength
+        
+        SetCheckBox chkRefineUMCLengthByScanRange, .TestLengthUsingScanRange
+        txtAutoRefineMinimumMemberCount = .MinMemberCountWhenUsingScanRange
+        UpdateDynamicControls
+        
+        SetCheckBox chkRemoveLoAbu, .UMCAutoRefineRemoveAbundanceLow
+        SetCheckBox chkRemoveHiAbu, .UMCAutoRefineRemoveAbundanceHigh
+        txtLoAbuPct = .UMCAutoRefinePctLowAbundance
+        txtHiAbuPct = .UMCAutoRefinePctHighAbundance
+        
+        SetCheckBox chkSplitUMCsByExaminingAbundance, .SplitUMCsByAbundance
+        With .SplitUMCOptions
+            txtSplitUMCsMaximumPeakCount = Trim(.MaximumPeakCountToSplitUMC)
+            txtSplitUMCsMinimumDifferenceInAvgPpmMass = Trim(.MinimumDifferenceInAveragePpmMassToSplit)
+            txtSplitUMCsStdDevMultiplierForSplitting = Trim(.StdDevMultiplierForSplitting)
+            txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax = Trim(.PeakDetectIntensityThresholdPercentageOfMaximum)
+            txtSplitUMCsPeakPickingMinimumWidth = Trim(.PeakWidthPointsMinimum)
+        End With
+    End With
+    
+    With glbPreferencesExpanded.UMCAdvancedStatsOptions
+        txtClassAbuTopXMinAbu = .ClassAbuTopXMinAbu
+        txtClassAbuTopXMaxAbu = .ClassAbuTopXMaxAbu
+        txtClassAbuTopXMinMembers = .ClassAbuTopXMinMembers
+        
+        txtClassMassTopXMinAbu = .ClassMassTopXMinAbu
+        txtClassMassTopXMaxAbu = .ClassMassTopXMaxAbu
+        txtClassMassTopXMinMembers = .ClassMassTopXMinMembers
+    End With
 
 Exit Sub
 
@@ -1075,15 +1139,28 @@ InitializeUMCSearchErrorHandler:
 End Sub
 
 Private Sub cboChargeStateAbuType_Click()
-    UMCDef.ChargeStateStatsRepType = cboChargeStateAbuType.ListIndex
+    If mCalculating Then
+        On Error Resume Next
+        cboChargeStateAbuType.ListIndex = UMCDef.ChargeStateStatsRepType
+    Else
+        UMCDef.ChargeStateStatsRepType = cboChargeStateAbuType.ListIndex
+    End If
 End Sub
 
 Private Sub chkAllowSharing_Click()
-UMCDef.UMCSharing = (chkAllowSharing.Value = vbChecked)
+    If mCalculating Then
+       SetCheckBox chkAllowSharing, UMCDef.UMCSharing
+    Else
+        UMCDef.UMCSharing = (chkAllowSharing.Value = vbChecked)
+    End If
 End Sub
 
 Private Sub chkInterpolateMissingIons_Click()
-UMCDef.InterpolateGaps = (chkInterpolateMissingIons.Value = vbChecked)
+    If mCalculating Then
+        SetCheckBox chkInterpolateMissingIons, UMCDef.InterpolateGaps
+    Else
+        UMCDef.InterpolateGaps = (chkInterpolateMissingIons.Value = vbChecked)
+    End If
 End Sub
 
 Private Sub chkRemoveMaxLengthPctAllScans_Click()
@@ -1120,16 +1197,31 @@ Private Sub chkUseMostAbuChargeStateStatsForClassStats_Click()
 End Sub
 
 Private Sub cmbUMCAbu_Click()
-UMCDef.ClassAbu = cmbUMCAbu.ListIndex
+    If mCalculating Then
+        On Error Resume Next
+        cmbUMCAbu.ListIndex = UMCDef.ClassAbu
+    Else
+        UMCDef.ClassAbu = cmbUMCAbu.ListIndex
+    End If
 End Sub
 
 Private Sub cmbUMCDrawType_Click()
-GelUMCDraw(CallerID).DrawType = cmbUMCDrawType.ListIndex
-glbPreferencesExpanded.UMCDrawType = cmbUMCDrawType.ListIndex
+    If mCalculating Then
+        On Error Resume Next
+        cmbUMCDrawType.ListIndex = GelUMCDraw(CallerID).DrawType
+    Else
+        GelUMCDraw(CallerID).DrawType = cmbUMCDrawType.ListIndex
+        glbPreferencesExpanded.UMCDrawType = cmbUMCDrawType.ListIndex
+    End If
 End Sub
 
 Private Sub cmbUMCMW_Click()
-UMCDef.ClassMW = cmbUMCMW.ListIndex
+    If mCalculating Then
+        On Error Resume Next
+        cmbUMCMW.ListIndex = UMCDef.ClassMW
+    Else
+        UMCDef.ClassMW = cmbUMCMW.ListIndex
+    End If
 End Sub
 
 Private Sub cmdAbortProcessing_Click()
@@ -1156,12 +1248,18 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub cmbCountType_Click()
-UMCDef.UMCType = cmbCountType.ListIndex
+    If mCalculating Then
+        On Error Resume Next
+        cmbCountType.ListIndex = UMCDef.UMCType
+    Else
+        UMCDef.UMCType = cmbCountType.ListIndex
+    End If
+    
 End Sub
 
-Private Sub cmdCancel_Click()
-If Not cmdOK.Visible Then glAbortUMCProcessing = True
-Unload Me
+Private Sub cmdClose_Click()
+    If Not cmdOK.Visible Then glAbortUMCProcessing = True
+    Unload Me
 End Sub
 
 Private Sub cmdOK_Click()
@@ -1169,36 +1267,70 @@ Private Sub cmdOK_Click()
 End Sub
 
 Private Sub cmdReport_Click()
-Me.MousePointer = vbHourglass
-Status "Generating LC-MS Feature report..."
-Call ReportUMC(CallerID, "UMC 2003" & vbCrLf & GetUMCDefDescLocal())
-Status ""
-Me.MousePointer = vbDefault
+    Me.MousePointer = vbHourglass
+    Status "Generating LC-MS Feature report..."
+    
+    Call ReportUMC(CallerID, "UMC 2003" & vbCrLf & GetUMCDefDescLocal())
+    
+    Status ""
+    Me.MousePointer = vbDefault
 End Sub
 
 Private Sub optDefScope_Click(Index As Integer)
-UMCDef.DefScope = Index
+    If mCalculating Then
+        On Error Resume Next
+        optDefScope(UMCDef.DefScope).Value = True
+    Else
+        UMCDef.DefScope = Index
+    End If
+End Sub
+
+Private Sub optEvenOddScanFilter_Click(Index As Integer)
+    If mCalculating Then
+        On Error Resume Next
+        optEvenOddScanFilter(UMCDef.OddEvenProcessingMode).Value = True
+    Else
+        UMCDef.OddEvenProcessingMode = Index
+    End If
 End Sub
 
 Private Sub optTolType_Click(Index As Integer)
-If Index = 0 Then
-   UMCDef.TolType = gltPPM
-Else
-   UMCDef.TolType = gltABS
-End If
+    If mCalculating Then
+        On Error Resume Next
+        
+        Select Case UMCDef.TolType
+        Case gltPPM
+            optTolType(0).Value = True
+        Case gltABS
+            optTolType(1).Value = True
+        Case Else
+            Debug.Assert False
+        End Select
+    Else
+        If Index = 0 Then
+           UMCDef.TolType = gltPPM
+        Else
+           UMCDef.TolType = gltABS
+        End If
+    End If
 End Sub
 
 Private Sub optMWField_Click(Index As Integer)
-UMCDef.MWField = 6 + Index
+    If mCalculating Then
+        On Error Resume Next
+        optMWField(UMCDef.MWField - 6).Value = True
+    Else
+        UMCDef.MWField = 6 + Index
+    End If
 End Sub
 
 Private Sub txtAutoRefineMinimumMemberCount_LostFocus()
-If IsNumeric(txtAutoRefineMinimumMemberCount.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.MinMemberCountWhenUsingScanRange = Abs(CLng(txtAutoRefineMinimumMemberCount.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtAutoRefineMinimumMemberCount.SetFocus
-End If
+    If IsNumeric(txtAutoRefineMinimumMemberCount.Text) Then
+        glbPreferencesExpanded.UMCAutoRefineOptions.MinMemberCountWhenUsingScanRange = Abs(CLng(txtAutoRefineMinimumMemberCount.Text))
+    Else
+        MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+        txtAutoRefineMinimumMemberCount.SetFocus
+    End If
 End Sub
 
 Private Sub txtClassAbuTopXMaxAbu_Change()
@@ -1248,84 +1380,84 @@ Private Sub txtClassMassTopXMinMembers_Lostfocus()
 End Sub
 
 Private Sub txtHiAbuPct_LostFocus()
-If IsNumeric(txtHiAbuPct.Text) Then
-   glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctHighAbundance = Abs(CDbl(txtHiAbuPct.Text))
-Else
-   MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
-   txtHiAbuPct.SetFocus
-End If
+    If IsNumeric(txtHiAbuPct.Text) Then
+       glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctHighAbundance = Abs(CDbl(txtHiAbuPct.Text))
+    Else
+       MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
+       txtHiAbuPct.SetFocus
+    End If
 End Sub
 
 Private Sub txtHiCnt_LostFocus()
-If IsNumeric(txtHiCnt.Text) Then
-   glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLength = Abs(CLng(txtHiCnt.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtHiCnt.SetFocus
-End If
+    If IsNumeric(txtHiCnt.Text) Then
+       glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLength = Abs(CLng(txtHiCnt.Text))
+    Else
+       MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+       txtHiCnt.SetFocus
+    End If
 End Sub
 
 Private Sub txtHoleNum_LostFocus()
-If IsNumeric(txtHoleNum.Text) Then
-   UMCDef.GapMaxCnt = CLng(txtHoleNum.Text)
-Else
-   MsgBox "This argument should be integer value.", vbOKOnly
-   txtHoleNum.SetFocus
-End If
+    If IsNumeric(txtHoleNum.Text) Then
+       UMCDef.GapMaxCnt = CLng(txtHoleNum.Text)
+    Else
+       MsgBox "This argument should be integer value.", vbOKOnly
+       txtHoleNum.SetFocus
+    End If
 End Sub
 
 Private Sub txtHoleSize_LostFocus()
-If IsNumeric(txtHoleSize.Text) Then
-   UMCDef.GapMaxSize = CLng(txtHoleSize.Text)
-Else
-   MsgBox "This argument should be integer value.", vbOKOnly
-   txtHoleSize.SetFocus
-End If
+    If IsNumeric(txtHoleSize.Text) Then
+       UMCDef.GapMaxSize = CLng(txtHoleSize.Text)
+    Else
+       MsgBox "This argument should be integer value.", vbOKOnly
+       txtHoleSize.SetFocus
+    End If
 End Sub
 
 Private Sub txtInterpolateMaxGapSize_LostFocus()
-If IsNumeric(txtInterpolateMaxGapSize.Text) Then
-   UMCDef.InterpolateMaxGapSize = CLng(txtInterpolateMaxGapSize.Text)
-Else
-   MsgBox "This argument should be integer value.", vbOKOnly
-   txtInterpolateMaxGapSize.SetFocus
-End If
+    If IsNumeric(txtInterpolateMaxGapSize.Text) Then
+       UMCDef.InterpolateMaxGapSize = CLng(txtInterpolateMaxGapSize.Text)
+    Else
+       MsgBox "This argument should be integer value.", vbOKOnly
+       txtInterpolateMaxGapSize.SetFocus
+    End If
 End Sub
 
 Private Sub txtLoAbuPct_LostFocus()
-If IsNumeric(txtLoAbuPct.Text) Then
-   glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctLowAbundance = Abs(CDbl(txtLoAbuPct.Text))
-Else
-   MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
-   txtLoAbuPct.SetFocus
-End If
+    If IsNumeric(txtLoAbuPct.Text) Then
+       glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePctLowAbundance = Abs(CDbl(txtLoAbuPct.Text))
+    Else
+       MsgBox "This argument should be non-negative number.", vbOKOnly, glFGTU
+       txtLoAbuPct.SetFocus
+    End If
 End Sub
 
 Private Sub txtLoCnt_LostFocus()
-If IsNumeric(txtLoCnt.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMinLength = Abs(CLng(txtLoCnt.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtLoCnt.SetFocus
-End If
+    If IsNumeric(txtLoCnt.Text) Then
+        glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMinLength = Abs(CLng(txtLoCnt.Text))
+    Else
+       MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+       txtLoCnt.SetFocus
+    End If
 End Sub
 
 Private Sub txtMaxLengthPctAllScans_Lostfocus()
-If IsNumeric(txtMaxLengthPctAllScans.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLengthPctAllScans = Abs(CLng(txtMaxLengthPctAllScans.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtMaxLengthPctAllScans.SetFocus
-End If
+    If IsNumeric(txtMaxLengthPctAllScans.Text) Then
+        glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineMaxLengthPctAllScans = Abs(CLng(txtMaxLengthPctAllScans.Text))
+    Else
+       MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+       txtMaxLengthPctAllScans.SetFocus
+    End If
 End Sub
 
 Private Sub txtPercentMaxAbuToUseToGaugeLength_LostFocus()
-If IsNumeric(txtPercentMaxAbuToUseToGaugeLength.Text) Then
-    glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePercentMaxAbuToUseForLength = Abs(CLng(txtPercentMaxAbuToUseToGaugeLength.Text))
-Else
-   MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
-   txtPercentMaxAbuToUseToGaugeLength.SetFocus
-End If
+    If IsNumeric(txtPercentMaxAbuToUseToGaugeLength.Text) Then
+        glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefinePercentMaxAbuToUseForLength = Abs(CLng(txtPercentMaxAbuToUseToGaugeLength.Text))
+    Else
+       MsgBox "This argument should be non-negative integer.", vbOKOnly, glFGTU
+       txtPercentMaxAbuToUseToGaugeLength.SetFocus
+    End If
 End Sub
 
 Private Sub txtSplitUMCsMaximumPeakCount_LostFocus()
@@ -1354,12 +1486,12 @@ Private Sub txtSplitUMCsStdDevMultiplierForSplitting_LostFocus()
 End Sub
 
 Private Sub txtTol_LostFocus()
-If IsNumeric(txtTol.Text) Then
-   UMCDef.Tol = txtTol.Text
-Else
-   MsgBox "Molecular Mass Tolerance should be numeric value.", vbOKOnly
-   txtTol.SetFocus
-End If
+    If IsNumeric(txtTol.Text) Then
+       UMCDef.Tol = txtTol.Text
+    Else
+       MsgBox "Molecular Mass Tolerance should be numeric value.", vbOKOnly
+       txtTol.SetFocus
+    End If
 End Sub
 
 Private Sub ResetToDefaults()
@@ -1381,25 +1513,59 @@ Private Sub ResetToDefaults()
     
 End Sub
 
+Private Sub ShowHideCommandButtons(ByVal blnCalculating As Boolean)
+
+    fraDREAMS.Enabled = Not blnCalculating
+    fraUMCScope.Enabled = Not blnCalculating
+    fraMWField.Enabled = Not blnCalculating
+    fraTol.Enabled = Not blnCalculating
+    fraSplitUMCsOptions.Enabled = Not blnCalculating
+    
+    fraOptionFrame(0).Enabled = Not blnCalculating
+    fraOptionFrame(1).Enabled = Not blnCalculating
+    fraOptionFrame(2).Enabled = Not blnCalculating
+    fraClassAbundanceTopX.Enabled = Not blnCalculating
+    fraClassMassTopX.Enabled = Not blnCalculating
+        
+    txtTol.Enabled = Not blnCalculating
+    txtHoleNum.Enabled = Not blnCalculating
+    txtHoleSize.Enabled = Not blnCalculating
+    txtInterpolateMaxGapSize.Enabled = Not blnCalculating
+    
+    cmdOK.Visible = Not blnCalculating
+    cmdClose.Visible = Not blnCalculating
+    cmdReport.Visible = Not blnCalculating
+    cmdResetToDefaults.Visible = Not blnCalculating
+    
+    cmdAbortProcessing.Visible = blnCalculating
+
+    If blnCalculating Then
+        Me.MousePointer = vbHourglass
+    Else
+        Me.MousePointer = vbDefault
+    End If
+End Sub
+
 Public Function StartUMCSearch() As Boolean
     ' Returns True if success, False if error or aborted
     
     Dim blnUMCIndicesUpdated As Boolean
+    Dim blnSuccess As Boolean
     
 On Error GoTo UMCSearchErrorHandler
     
-    If ((UMCDef.UMCType = glUMC_TYPE_MINCNT) Or (UMCDef.UMCType = glUMC_TYPE_MAXCNT) _
-                    Or (UMCDef.UMCType = glUMC_TYPE_UNQAMT)) Then
+    If (UMCDef.UMCType = glUMC_TYPE_MINCNT Or _
+        UMCDef.UMCType = glUMC_TYPE_MAXCNT Or _
+        UMCDef.UMCType = glUMC_TYPE_UNQAMT) Then
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             MsgBox "Selected option is not implemented.", vbOKOnly, glFGTU
         End If
         Exit Function
     End If
     
-    Me.MousePointer = vbHourglass
-    cmdOK.Visible = False
-    cmdCancel.Visible = False
     glAbortUMCProcessing = False
+    mCalculating = True
+    ShowHideCommandButtons mCalculating
     
     If GelUMC(CallerID).UMCCnt > 0 Then ManageClasses CallerID, UMCManageConstants.UMCMngErase
     If UMCLoadArraysLocal And Not glAbortUMCProcessing Then
@@ -1410,9 +1576,15 @@ On Error GoTo UMCSearchErrorHandler
        GelUMC(CallerID).def = UMCDef
        Select Case UMCDef.UMCType
        Case glUMC_TYPE_INTENSITY, glUMC_TYPE_FIT
-            If Not UMCLocalBreakStandard Or glAbortUMCProcessing Then GoTo ExitIfFailed
+            blnSuccess = UMCLocalBreakStandard
+            If Not blnSuccess Or glAbortUMCProcessing Then
+                GoTo ExitIfFailed
+            End If
        Case glUMC_TYPE_ISHRINKINGBOX, glUMC_TYPE_FSHRINKINGBOX
-            If Not UMCLocalBreakShrinkingBox Or glAbortUMCProcessing Then GoTo ExitIfFailed
+            blnSuccess = UMCLocalBreakShrinkingBox
+            If Not blnSuccess Or glAbortUMCProcessing Then
+                GoTo ExitIfFailed
+            End If
        Case Else
             ' Invalid search type
             Debug.Assert False
@@ -1433,7 +1605,7 @@ On Error GoTo UMCSearchErrorHandler
        
        If glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance Then
             Set mSplitUMCs = New clsSplitUMCsByAbundance
-            mSplitUMCs.ExamineUMCs CallerID, Me, False, True
+            mSplitUMCs.ExamineUMCs CallerID, Me, GelUMC(CallerID).def.OddEvenProcessingMode, False, True
             
             Set mSplitUMCs = Nothing
        End If
@@ -1448,10 +1620,10 @@ On Error GoTo UMCSearchErrorHandler
        GoTo ExitIfFailed
     End If
     
-    cmdOK.Visible = True
-    cmdCancel.Visible = True
+    mCalculating = False
+    ShowHideCommandButtons mCalculating
     glAbortUMCProcessing = False
-    Me.MousePointer = vbDefault
+    
     'if there is new UMC count everything done with pairs
     'has to be redone if pairs are UMC pairs
     With GelP_D_L(CallerID)
@@ -1465,10 +1637,11 @@ On Error GoTo UMCSearchErrorHandler
 ExitIfFailed:
     Status "Unique Mass Class function failed"
     DestroyStructuresLocal
-    cmdOK.Visible = True
-    cmdCancel.Visible = True
+    
+    mCalculating = False
+    ShowHideCommandButtons mCalculating
     glAbortUMCProcessing = False
-    Me.MousePointer = vbDefault
+    
     StartUMCSearch = False
     Exit Function
 
@@ -1520,597 +1693,740 @@ Private Sub UpdateDynamicControls()
 End Sub
 
 Private Function GetUMCDefDescLocal() As String
-'--------------------------------------------------------------------------
-'returns formated unique mass classes definition
-'--------------------------------------------------------------------------
-Dim sTmp As String
-On Error GoTo exit_GetUMCDefDescLocal
-With UMCDef
-    Select Case .DefScope
-    Case glScope.glSc_All
-      sTmp = "Unique Mass Classes(UMC) on all data points." & vbCrLf
-    Case glScope.glSc_Current
-      sTmp = "Unique Mass Classes(UMC) on currently visible data." & vbCrLf
-    End Select
-    Select Case .UMCType
-    Case glUMC_TYPE_INTENSITY
-      sTmp = sTmp & "UMC type: Intensity" & vbCrLf
-    Case glUMC_TYPE_FIT
-      sTmp = sTmp & "UMC type: Fit" & vbCrLf
-    Case glUMC_TYPE_MINCNT
-      sTmp = sTmp & "UMC type: Minimize count" & vbCrLf
-    Case glUMC_TYPE_MAXCNT
-      sTmp = sTmp & "UMC type: Maximize count" & vbCrLf
-    Case glUMC_TYPE_UNQAMT
-      sTmp = sTmp & "UMC type: Unique MT Hits" & vbCrLf
-    Case glUMC_TYPE_ISHRINKINGBOX
-      sTmp = sTmp & "UMC type: Intensity with shrinking box, "
-'      If ShrinkingBox_MW_Average_Type = 1 Then
-'        sTmp = sTmp & "Averaging: Weighted on Intensity" & vbCrLf
-'      Else
-'        sTmp = sTmp & "Averaging: Non-Weighted" & vbCrLf
-'      End If
-    Case glUMC_TYPE_ISHRINKINGBOX
-      sTmp = sTmp & "UMC type: Fit with shrinking box, "
-'      If ShrinkingBox_MW_Average_Type = 1 Then
-'        sTmp = sTmp & "Averaging: Weighted on Fit" & vbCrLf
-'      Else
-'        sTmp = sTmp & "Averaging: Non-Weighted" & vbCrLf
-'      End If
-    End Select
-    Select Case .MWField
-    Case 6
-      sTmp = sTmp & "Molecular mass: Average" & vbCrLf
-    Case 7
-      sTmp = sTmp & "Molecular mass: Monoisotopic" & vbCrLf
-    Case 8
-      sTmp = sTmp & "Molecular mass: Most Abundant" & vbCrLf
-    End Select
-    Select Case .ClassAbu
-    Case UMCClassAbundanceConstants.UMCAbuAvg
-      sTmp = sTmp & "Class abundance: Average of member abundances" & vbCrLf
-    Case UMCClassAbundanceConstants.UMCAbuSum
-      sTmp = sTmp & "Class abundance: Sum of member abundances" & vbCrLf
-    Case UMCClassAbundanceConstants.UMCAbuRep
-      sTmp = sTmp & "Class abundance: Abundance of class representative" & vbCrLf
-    Case UMCClassAbundanceConstants.UMCAbuMed
-      sTmp = sTmp & "Class abundance: Class median" & vbCrLf
-    Case UMCClassAbundanceConstants.UMCAbuMax
-      sTmp = sTmp & "Class abundance: Class max abundance" & vbCrLf
-    End Select
-    Select Case .ClassMW
-    Case UMCClassMassConstants.UMCMassAvg
-      sTmp = sTmp & "Class molecular mass: Average of member masses" & vbCrLf
-    Case UMCClassMassConstants.UMCMassRep
-      sTmp = sTmp & "Class molecular mass: Mass of class representative" & vbCrLf
-    Case UMCClassMassConstants.UMCMassMed
-      sTmp = sTmp & "Class molecular mass: Median of member masses" & vbCrLf
-    End Select
-    sTmp = sTmp & "Molecular mass tolerance: " & .Tol & " " & GetSearchToleranceUnitText(CInt(.TolType)) & vbCrLf
-    sTmp = sTmp & "Number of allowed gaps: " & .GapMaxCnt & vbCrLf
-    sTmp = sTmp & "Allowed size of gap: " & .GapMaxSize & vbCrLf
-    If .UMCSharing Then
-       sTmp = sTmp & "Classes overlap allowed."
-    Else
-       sTmp = sTmp & "Classes overlap not allowed."
-    End If
-End With
-
+    '--------------------------------------------------------------------------
+    'returns formated unique mass classes definition
+    '--------------------------------------------------------------------------
+    Dim sTmp As String
+    On Error GoTo exit_GetUMCDefDescLocal
+    With UMCDef
+        Select Case .DefScope
+        Case glScope.glSc_All
+          sTmp = "Unique Mass Classes(UMC) on all data points." & vbCrLf
+        Case glScope.glSc_Current
+          sTmp = "Unique Mass Classes(UMC) on currently visible data." & vbCrLf
+        End Select
+        Select Case .UMCType
+        Case glUMC_TYPE_INTENSITY
+          sTmp = sTmp & "UMC type: Intensity" & vbCrLf
+        Case glUMC_TYPE_FIT
+          sTmp = sTmp & "UMC type: Fit" & vbCrLf
+        Case glUMC_TYPE_MINCNT
+          sTmp = sTmp & "UMC type: Minimize count" & vbCrLf
+        Case glUMC_TYPE_MAXCNT
+          sTmp = sTmp & "UMC type: Maximize count" & vbCrLf
+        Case glUMC_TYPE_UNQAMT
+          sTmp = sTmp & "UMC type: Unique MT Hits" & vbCrLf
+        Case glUMC_TYPE_ISHRINKINGBOX
+          sTmp = sTmp & "UMC type: Intensity with shrinking box, "
+    '      If ShrinkingBox_MW_Average_Type = 1 Then
+    '        sTmp = sTmp & "Averaging: Weighted on Intensity" & vbCrLf
+    '      Else
+    '        sTmp = sTmp & "Averaging: Non-Weighted" & vbCrLf
+    '      End If
+        Case glUMC_TYPE_ISHRINKINGBOX
+          sTmp = sTmp & "UMC type: Fit with shrinking box, "
+    '      If ShrinkingBox_MW_Average_Type = 1 Then
+    '        sTmp = sTmp & "Averaging: Weighted on Fit" & vbCrLf
+    '      Else
+    '        sTmp = sTmp & "Averaging: Non-Weighted" & vbCrLf
+    '      End If
+        End Select
+        Select Case .MWField
+        Case 6
+          sTmp = sTmp & "Molecular mass: Average" & vbCrLf
+        Case 7
+          sTmp = sTmp & "Molecular mass: Monoisotopic" & vbCrLf
+        Case 8
+          sTmp = sTmp & "Molecular mass: Most Abundant" & vbCrLf
+        End Select
+        Select Case .ClassAbu
+        Case UMCClassAbundanceConstants.UMCAbuAvg
+          sTmp = sTmp & "Class abundance: Average of member abundances" & vbCrLf
+        Case UMCClassAbundanceConstants.UMCAbuSum
+          sTmp = sTmp & "Class abundance: Sum of member abundances" & vbCrLf
+        Case UMCClassAbundanceConstants.UMCAbuRep
+          sTmp = sTmp & "Class abundance: Abundance of class representative" & vbCrLf
+        Case UMCClassAbundanceConstants.UMCAbuMed
+          sTmp = sTmp & "Class abundance: Class median" & vbCrLf
+        Case UMCClassAbundanceConstants.UMCAbuMax
+          sTmp = sTmp & "Class abundance: Class max abundance" & vbCrLf
+        End Select
+        Select Case .ClassMW
+        Case UMCClassMassConstants.UMCMassAvg
+          sTmp = sTmp & "Class molecular mass: Average of member masses" & vbCrLf
+        Case UMCClassMassConstants.UMCMassRep
+          sTmp = sTmp & "Class molecular mass: Mass of class representative" & vbCrLf
+        Case UMCClassMassConstants.UMCMassMed
+          sTmp = sTmp & "Class molecular mass: Median of member masses" & vbCrLf
+        End Select
+        sTmp = sTmp & "Molecular mass tolerance: " & .Tol & " " & GetSearchToleranceUnitText(CInt(.TolType)) & vbCrLf
+        sTmp = sTmp & "Number of allowed gaps: " & .GapMaxCnt & vbCrLf
+        sTmp = sTmp & "Allowed size of gap: " & .GapMaxSize & vbCrLf
+        If .UMCSharing Then
+           sTmp = sTmp & "Classes overlap allowed."
+        Else
+           sTmp = sTmp & "Classes overlap not allowed."
+        End If
+    End With
+    
 exit_GetUMCDefDescLocal:
-GetUMCDefDescLocal = sTmp
+    GetUMCDefDescLocal = sTmp
 End Function
 
 
 Private Function UMCLoadArraysLocal() As Boolean
-'--------------------------------------------------------------------------------
-'load arrays neccessary for unique mass classes and creates neccessary structures
-'--------------------------------------------------------------------------------
-Dim MaxCnt As Long
-Dim CSInd() As Long
-Dim ISInd() As Long
-Dim i As Long
-On Error GoTo err_UMCLoadArraysLocal
-Status "Loading arrays"
-MaxCnt = GelData(CallerID).CSLines + GelData(CallerID).IsoLines
-If MaxCnt > 0 Then
-   ReDim O_Index(MaxCnt - 1)
-   ReDim O_Type(MaxCnt - 1)
-   ReDim O_MW(MaxCnt - 1)
-   ReDim O_Abu(MaxCnt - 1)
-   ReDim O_Order(MaxCnt - 1)
-   ReDim O_Scan(MaxCnt - 1)
-   O_Cnt = 0
-   With GelData(CallerID)
-     CSCnt = GetCSScope(CallerID, CSInd(), UMCDef.DefScope)
-     If CSCnt > 0 Then
-        For i = 1 To CSCnt
-            O_Cnt = O_Cnt + 1
-            O_Index(O_Cnt - 1) = CSInd(i)
-            O_Type(O_Cnt - 1) = gldtCS
-            O_MW(O_Cnt - 1) = .CSData(CSInd(i)).AverageMW
-            O_Abu(O_Cnt - 1) = .CSData(CSInd(i)).Abundance
-            O_Scan(O_Cnt - 1) = .CSData(CSInd(i)).ScanNumber
-            Select Case UMCDef.UMCType
-            Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX
-              O_Order(O_Cnt - 1) = .CSData(CSInd(i)).Abundance
-            Case glUMC_TYPE_FIT, glUMC_TYPE_FSHRINKINGBOX
-              O_Order(O_Cnt - 1) = .CSData(CSInd(i)).MassStDev         'St.Dev. in fact
-            Case Else
-                ' Invalid type
-                Debug.Assert False
-            End Select
-        Next i
-     End If
-     ISCnt = GetISScope(CallerID, ISInd(), UMCDef.DefScope)
-     If ISCnt > 0 Then
-        For i = 1 To ISCnt
-            O_Cnt = O_Cnt + 1
-            O_Index(O_Cnt - 1) = ISInd(i)
-            O_Type(O_Cnt - 1) = gldtIS
-            O_MW(O_Cnt - 1) = GetIsoMass(.IsoData(ISInd(i)), UMCDef.MWField)
-            O_Abu(O_Cnt - 1) = .IsoData(ISInd(i)).Abundance
-            O_Scan(O_Cnt - 1) = .IsoData(ISInd(i)).ScanNumber
-            Select Case UMCDef.UMCType
-            Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX
-              O_Order(O_Cnt - 1) = .IsoData(ISInd(i)).Abundance
-            Case glUMC_TYPE_FIT, glUMC_TYPE_FSHRINKINGBOX
-              O_Order(O_Cnt - 1) = .IsoData(ISInd(i)).Fit
-            Case Else
-                ' Invalid type
-                Debug.Assert False
-            End Select
-        Next i
-     End If
-   End With
-End If
-If O_Cnt <= 0 Then Status "No data found in scope"
+    '--------------------------------------------------------------------------------
+    'load arrays neccessary for unique mass classes and creates necessary structures
+    '--------------------------------------------------------------------------------
+    Dim MaxCnt As Long
+    Dim CSInd() As Long
+    Dim ISInd() As Long
+    Dim i As Long
+    On Error GoTo err_UMCLoadArraysLocal
+    Status "Loading arrays"
+    MaxCnt = GelData(CallerID).CSLines + GelData(CallerID).IsoLines
+    If MaxCnt > 0 Then
+       ReDim O_Index(MaxCnt - 1)
+       ReDim O_Type(MaxCnt - 1)
+       ReDim O_MW(MaxCnt - 1)
+       ReDim O_Abu(MaxCnt - 1)
+       ReDim O_Order(MaxCnt - 1)
+       ReDim O_Scan(MaxCnt - 1)
+       O_Cnt = 0
+       With GelData(CallerID)
+         CSCnt = GetCSScope(CallerID, CSInd(), UMCDef.DefScope)
+         If CSCnt > 0 Then
+            For i = 1 To CSCnt
+                O_Cnt = O_Cnt + 1
+                O_Index(O_Cnt - 1) = CSInd(i)
+                O_Type(O_Cnt - 1) = gldtCS
+                O_MW(O_Cnt - 1) = .CSData(CSInd(i)).AverageMW
+                O_Abu(O_Cnt - 1) = .CSData(CSInd(i)).Abundance
+                O_Scan(O_Cnt - 1) = .CSData(CSInd(i)).ScanNumber
+                Select Case UMCDef.UMCType
+                Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX
+                  O_Order(O_Cnt - 1) = .CSData(CSInd(i)).Abundance
+                Case glUMC_TYPE_FIT, glUMC_TYPE_FSHRINKINGBOX
+                  O_Order(O_Cnt - 1) = .CSData(CSInd(i)).MassStDev         'St.Dev. in fact
+                Case Else
+                    ' Invalid type
+                    Debug.Assert False
+                End Select
+            Next i
+         End If
+         ISCnt = GetISScope(CallerID, ISInd(), UMCDef.DefScope)
+         If ISCnt > 0 Then
+            For i = 1 To ISCnt
+                O_Cnt = O_Cnt + 1
+                O_Index(O_Cnt - 1) = ISInd(i)
+                O_Type(O_Cnt - 1) = gldtIS
+                O_MW(O_Cnt - 1) = GetIsoMass(.IsoData(ISInd(i)), UMCDef.MWField)
+                O_Abu(O_Cnt - 1) = .IsoData(ISInd(i)).Abundance
+                O_Scan(O_Cnt - 1) = .IsoData(ISInd(i)).ScanNumber
+                Select Case UMCDef.UMCType
+                Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX
+                  O_Order(O_Cnt - 1) = .IsoData(ISInd(i)).Abundance
+                Case glUMC_TYPE_FIT, glUMC_TYPE_FSHRINKINGBOX
+                  O_Order(O_Cnt - 1) = .IsoData(ISInd(i)).Fit
+                Case Else
+                    ' Invalid type
+                    Debug.Assert False
+                End Select
+            Next i
+         End If
+       End With
+    End If
+    If O_Cnt <= 0 Then Status "No data found in scope"
 exit_UMCLoadArraysLocal:
-If O_Cnt > 0 Then
-   ReDim Preserve O_Index(O_Cnt - 1)
-   ReDim Preserve O_Type(O_Cnt - 1)
-   ReDim Preserve O_MW(O_Cnt - 1)
-   ReDim Preserve O_Abu(O_Cnt - 1)
-   ReDim Preserve O_Order(O_Cnt - 1)
-   ReDim Preserve O_Scan(O_Cnt - 1)
-   'initialize index arrays
-   ReDim IndMW(O_Cnt - 1)
-   ReDim IndOrder(O_Cnt - 1)
-   ReDim IndScan(O_Cnt - 1)
-   For i = 0 To O_Cnt - 1
-       IndMW(i) = i
-       IndOrder(i) = i
-       IndScan(i) = i
-   Next i
-   ReDim IsRep(O_Cnt - 1)
-   ReDim IsUsed(O_Cnt - 1)
-   UMCLoadArraysLocal = True
-Else
-   Erase O_Index
-   Erase O_Type
-   Erase O_MW
-   Erase O_Abu
-   Erase O_Order
-   Erase O_Scan
-End If
-Exit Function
-
+    If O_Cnt > 0 Then
+       ReDim Preserve O_Index(O_Cnt - 1)
+       ReDim Preserve O_Type(O_Cnt - 1)
+       ReDim Preserve O_MW(O_Cnt - 1)
+       ReDim Preserve O_Abu(O_Cnt - 1)
+       ReDim Preserve O_Order(O_Cnt - 1)
+       ReDim Preserve O_Scan(O_Cnt - 1)
+       'initialize index arrays
+       ReDim IndMW(O_Cnt - 1)
+       ReDim IndOrder(O_Cnt - 1)
+       ReDim IndScan(O_Cnt - 1)
+       For i = 0 To O_Cnt - 1
+           IndMW(i) = i
+           IndOrder(i) = i
+           IndScan(i) = i
+       Next i
+       ReDim IsRep(O_Cnt - 1)
+       ReDim IsUsed(O_Cnt - 1)
+       UMCLoadArraysLocal = True
+    Else
+       Erase O_Index
+       Erase O_Type
+       Erase O_MW
+       Erase O_Abu
+       Erase O_Order
+       Erase O_Scan
+    End If
+    Exit Function
+    
 err_UMCLoadArraysLocal:
-O_Cnt = 0               'this will cause everything to be cleared
-Resume exit_UMCLoadArraysLocal
-Status "Error loading arrays"
+    O_Cnt = 0               'this will cause everything to be cleared
+    Resume exit_UMCLoadArraysLocal
+    Status "Error loading arrays"
 End Function
 
 Private Sub DestroyStructuresLocal()
-On Error Resume Next
-O_Cnt = 0
-CSCnt = 0
-ISCnt = 0
-Erase O_Index
-Erase O_Type
-Erase O_MW
-Erase O_Abu
-Erase O_Order
-Erase O_Scan
-Erase S_MW
-Erase IndMW
-Erase IndOrder
-Erase IndScan
-Erase IsRep
-Erase IsUsed
-Set MWRangeFinder = Nothing
+    On Error Resume Next
+    O_Cnt = 0
+    CSCnt = 0
+    ISCnt = 0
+    Erase O_Index
+    Erase O_Type
+    Erase O_MW
+    Erase O_Abu
+    Erase O_Order
+    Erase O_Scan
+    Erase S_MW
+    Erase IndMW
+    Erase IndOrder
+    Erase IndScan
+    Erase IsRep
+    Erase IsUsed
+    Set MWRangeFinder = Nothing
 End Sub
 
 Private Function CreateIndMW() As Boolean
-'--------------------------------------------------------------
-'creates index on molecular mass; sorts its members and creates
-'fast search object; returns True if successful
-'--------------------------------------------------------------
-Dim qsDbl As New QSDouble
-On Error GoTo err_CreateIndMW
-Status "Creating MW index"
-S_MW = O_MW             'array assignment
-CreateIndMW = qsDbl.QSAsc(S_MW, IndMW)
-Set MWRangeFinder = New MWUtil
-If Not MWRangeFinder.Fill(S_MW) Then GoTo err_CreateIndMW
-
+    '--------------------------------------------------------------
+    'creates index on molecular mass; sorts its members and creates
+    'fast search object; returns True if successful
+    '--------------------------------------------------------------
+    Dim qsDbl As New QSDouble
+    On Error GoTo err_CreateIndMW
+    Status "Creating MW index"
+    S_MW = O_MW             'array assignment
+    CreateIndMW = qsDbl.QSAsc(S_MW, IndMW)
+    Set MWRangeFinder = New MWUtil
+    If Not MWRangeFinder.Fill(S_MW) Then GoTo err_CreateIndMW
+    
 exit_CreateIndMW:
-Set qsDbl = Nothing
-Exit Function
-
+    Set qsDbl = Nothing
+    Exit Function
+    
 err_CreateIndMW:
-Erase IndMW
-Erase S_MW
-Resume exit_CreateIndMW
-Status "Error creating MW index"
+    Erase IndMW
+    Erase S_MW
+    Resume exit_CreateIndMW
+    Status "Error creating MW index"
 End Function
 
 Private Function CreateIndOrder() As Boolean
-'--------------------------------------------------------------
-'creates index on order and returns True if successful;
-'index means that members on lower index positions are prefered
-'to be selected as class representatives
-'--------------------------------------------------------------
-Dim TmpOrder() As Double
-Dim qsDbl As New QSDouble
-On Error GoTo err_CreateIndOrder
-Status "Creating order index"
-TmpOrder = O_Order                    'array assignment
-Select Case UMCDef.UMCType
-Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX
-    CreateIndOrder = qsDbl.QSDesc(TmpOrder, IndOrder)           'more is better
-Case glUMC_TYPE_FIT, glUMC_TYPE_FSHRINKINGBOX
-    CreateIndOrder = qsDbl.QSAsc(TmpOrder, IndOrder)            'less is better
-Case Else
-    Debug.Assert False
-End Select
-
+    '--------------------------------------------------------------
+    'creates index on order and returns True if successful;
+    'index means that members on lower index positions are prefered
+    'to be selected as class representatives
+    '--------------------------------------------------------------
+    Dim TmpOrder() As Double
+    Dim qsDbl As New QSDouble
+    On Error GoTo err_CreateIndOrder
+    Status "Creating order index"
+    TmpOrder = O_Order                    'array assignment
+    Select Case UMCDef.UMCType
+    Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX
+        CreateIndOrder = qsDbl.QSDesc(TmpOrder, IndOrder)           'more is better
+    Case glUMC_TYPE_FIT, glUMC_TYPE_FSHRINKINGBOX
+        CreateIndOrder = qsDbl.QSAsc(TmpOrder, IndOrder)            'less is better
+    Case Else
+        Debug.Assert False
+    End Select
+    
 exit_CreateIndOrder:
-Set qsDbl = Nothing
-Exit Function
-
+    Set qsDbl = Nothing
+    Exit Function
+    
 err_CreateIndOrder:
-Erase IndOrder
-Resume exit_CreateIndOrder
-Status "Error creating order index"
+    Erase IndOrder
+    Resume exit_CreateIndOrder
+    Status "Error creating order index"
 End Function
 
 Private Function CreateIndScan() As Boolean
-'--------------------------------------------------------------
-'creates index on scan numbers and returns True if successful
-'--------------------------------------------------------------
-Dim TmpScan() As Long
-Dim qsLng As New QSLong
-On Error GoTo err_CreateIndScan
-Status "Creating scan index"
-TmpScan = O_Scan                    'array assignment
-CreateIndScan = qsLng.QSAsc(TmpScan, IndScan)
-
+    '--------------------------------------------------------------
+    'creates index on scan numbers and returns True if successful
+    '--------------------------------------------------------------
+    Dim TmpScan() As Long
+    Dim qsLng As New QSLong
+    On Error GoTo err_CreateIndScan
+    Status "Creating scan index"
+    TmpScan = O_Scan                    'array assignment
+    CreateIndScan = qsLng.QSAsc(TmpScan, IndScan)
+    
 exit_CreateIndScan:
-Set qsLng = Nothing
-Exit Function
-
+    Set qsLng = Nothing
+    Exit Function
+    
 err_CreateIndScan:
-Erase IndScan
-Resume exit_CreateIndScan
-Status "Error creating scan index"
+    Erase IndScan
+    Resume exit_CreateIndScan
+    Status "Error creating scan index"
 End Function
 
-
-Private Function UMCLocalBreakStandard() As Boolean
-'------------------------------------------------------------------
-'breaks class to unique mass classes and returns True if successful
-'------------------------------------------------------------------
-Dim bDone As Long
-Dim bFoundNext As Boolean
-Dim AbsTol As Double
-Dim MWRangeMinInd As Long
-Dim MWRangeMaxInd As Long
-Dim AcceptedCnt As Long
-Dim CurrMWRangeScan() As Long       'scan numbers of potential class members
-Dim CurrMWRangeResInd() As Long     'indexes of accepted members
-Dim MyPattern As New ScanGapPattern
-Dim i As Long
-On Error GoTo err_UMCLocalBreakStandard
-CurrOrderInd = -1
-MyPattern.MaxGapCount = UMCDef.GapMaxCnt
-MyPattern.MaxGapSize = UMCDef.GapMaxSize
-If Not ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
-   Status "Error initializing LC-MS Feature memory structures."
-   Exit Function
-End If
-With GelUMC(CallerID)
-  Do Until bDone
-    bFoundNext = False
-    Do Until bFoundNext
-       CurrOrderInd = CurrOrderInd + 1
-       If CurrOrderInd > O_Cnt - 1 Then     'all data has been used
-          bDone = True
-          Exit Do
-       Else
-          'already used data can not be class representative
-          If Not IsUsed(IndOrder(CurrOrderInd)) Then bFoundNext = True
-       End If
-    Loop
-    If bFoundNext Then      'new class representative = new class
-       CurrMW = O_MW(IndOrder(CurrOrderInd))
-       CurrScan = O_Scan(IndOrder(CurrOrderInd))
-       'find all data points close enough in mass to be potential class members
-       Select Case UMCDef.TolType
-       Case gltPPM
-            AbsTol = UMCDef.Tol * CurrMW * glPPM
-       Case gltABS
-            AbsTol = UMCDef.Tol
-       Case Else
-            Debug.Assert False
-       End Select
-       MWRangeMinInd = 0
-       MWRangeMaxInd = O_Cnt - 1
-       If MWRangeFinder.FindIndexRange(CurrMW, AbsTol, MWRangeMinInd, MWRangeMaxInd) Then
-          If PreparePotentialMWRange(MWRangeMinInd, MWRangeMaxInd) Then
-             If CurrMWRangeCnt > 1 Then    'at least one more potential member beside representative
-                ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
-                ReDim CurrMWRangeResInd(CurrMWRangeCnt - 1)     'and indexes that should be accepted
-                For i = 0 To CurrMWRangeCnt - 1
-                    CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
-                Next i
-                AcceptedCnt = ProcessScanPatternWrapper(MyPattern, CurrMWRangeScan, CurrScan, CurrMWRangeResInd)
-             ElseIf CurrMWRangeCnt = 1 Then
-                AcceptedCnt = 1
-                ReDim CurrMWRangeResInd(0)
-                CurrMWRangeResInd(0) = 0
-             Else
-                AcceptedCnt = 0
-                Erase CurrMWRangeResInd
-             End If
-             If AcceptedCnt > 0 Then
-                'assemble class
-                .UMCCnt = .UMCCnt + 1
-                If .UMCCnt Mod 25 = 0 Then
-                    Status "Assembling features: " & .UMCCnt & " (" & Trim(Format(CurrOrderInd / O_Cnt * 100, "0.0")) & "% done)"
-                    If glAbortUMCProcessing Then Exit Do
-                End If
-                If UBound(.UMCs) + 1 < .UMCCnt Then     'increase size
-                   If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_UMCLocalBreakStandard
-                End If
-                With .UMCs(.UMCCnt - 1)
-                    .ClassCount = AcceptedCnt
-                    ReDim .ClassMInd(AcceptedCnt - 1)
-                    ReDim .ClassMType(AcceptedCnt - 1)
-                    For i = 0 To AcceptedCnt - 1
-                        .ClassMInd(i) = O_Index(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
-                        .ClassMType(i) = O_Type(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
-                        IsUsed(CurrMWRangeInd_O(CurrMWRangeResInd(i))) = True
-                    Next i
-                    .ClassRepInd = O_Index(IndOrder(CurrOrderInd))
-                    .ClassRepType = O_Type(IndOrder(CurrOrderInd))
-                End With
-                'mark class representative and class members as being used
-                IsRep(IndOrder(CurrOrderInd)) = True
-                IsUsed(IndOrder(CurrOrderInd)) = True
-             End If
-          End If
-       End If
-    End If
-  Loop
-End With
-Call ManageClasses(CallerID, UMCManageConstants.UMCMngTrim)
-Status "Number of LC-MS Features: " & GelUMC(CallerID).UMCCnt
-UMCLocalBreakStandard = True
-Exit Function
-
-err_UMCLocalBreakStandard:
-Status "Error creating Unique Mass Classes"
-End Function
-
-Private Function ProcessScanPatternWrapper(ByRef MyPattern As ScanGapPattern, ByRef Scans() As Long, ByVal CurrScan As Long, ByRef ResInd() As Long)
+Private Function ProcessScanPatternWrapper(ByRef MyPattern As ScanGapPattern, ByRef Scans() As Long, ByVal CurrScan As Long, ByRef ResInd() As Long, ByVal intOddEvenIteration As Integer) As Long
     
     Dim lngMaxIndex As Long
-    Dim lngIndex As Long
+    Dim lngindex As Long
     
-    Dim RelativeScans() As Long
     Dim CurrScanRelative As Long
+    
+    Dim lngRelativeScanCount As Long
+    Dim RelativeScansPointerIndex() As Long     ' Pointer into Scans()
+    Dim RelativeScans() As Long
+    
+    Dim lngAcceptedCount As Long
     
     ' For LTQ-FT data, there can be gaps between scan numbers due to MS/MS scans interleaved between the MS scans
     ' To account for this, we'll replace the scan numbers in Scans() with their relative position in .ScanInfo()
 
     lngMaxIndex = UBound(Scans)
+    
+    lngRelativeScanCount = 0
     ReDim RelativeScans(lngMaxIndex)
+    ReDim RelativeScansPointerIndex(lngMaxIndex)
     
-    For lngIndex = 0 To lngMaxIndex
-        RelativeScans(lngIndex) = LookupScanNumberRelativeIndex(CallerID, Scans(lngIndex))
-    Next lngIndex
+    ' Scans() holds the data that has mass values similar to the class representative
+    ' We now want to find the data adjacent to the class rep, allowing for some gaps
+    ' However, if intOddEvenIteration is not 0, then we need to filter Scans() to only contain the odd or the even spectra
     
-    CurrScanRelative = LookupScanNumberRelativeIndex(CallerID, CurrScan)
-    ProcessScanPatternWrapper = MyPattern.ProcessScanPattern(RelativeScans(), CurrScanRelative, ResInd())
+    If intOddEvenIteration = 0 Then
+        For lngindex = 0 To lngMaxIndex
+            RelativeScans(lngRelativeScanCount) = LookupScanNumberRelativeIndex(CallerID, Scans(lngindex))
+            RelativeScansPointerIndex(lngRelativeScanCount) = lngindex
+            lngRelativeScanCount = lngRelativeScanCount + 1
+        Next lngindex
+    Else
+        For lngindex = 0 To lngMaxIndex
+            If CheckOddEvenIterationForDataPoint(intOddEvenIteration, Scans(lngindex)) Then
+                RelativeScans(lngRelativeScanCount) = LookupScanNumberRelativeIndex(CallerID, Scans(lngindex))
+                RelativeScansPointerIndex(lngRelativeScanCount) = lngindex
+                
+                ' When processing odd-only or even-only scans, we divide RelativeScans by 2 (and round down) since we're only keep every other scan
+                RelativeScans(lngRelativeScanCount) = CInt(RelativeScans(lngRelativeScanCount) / 2#)
+                lngRelativeScanCount = lngRelativeScanCount + 1
+            End If
+        Next lngindex
+    End If
+    
+    If lngRelativeScanCount > 0 Then
+        If UBound(RelativeScans) > lngRelativeScanCount - 1 Then
+            ReDim Preserve RelativeScans(lngRelativeScanCount - 1)
+        End If
+        
+        CurrScanRelative = LookupScanNumberRelativeIndex(CallerID, CurrScan)
+        If intOddEvenIteration <> 0 Then
+            CurrScanRelative = CInt(CurrScanRelative / 2#)
+        End If
+        
+        lngAcceptedCount = MyPattern.ProcessScanPattern(RelativeScans(), CurrScanRelative, ResInd())
+        
+        ' Need to update the values of ResInd() using RelativeScansPointerIndex()
+        For lngindex = 0 To lngAcceptedCount - 1
+            If intOddEvenIteration = 0 Then
+                Debug.Assert ResInd(lngindex) = RelativeScansPointerIndex(ResInd(lngindex))
+            End If
+            
+            ResInd(lngindex) = RelativeScansPointerIndex(ResInd(lngindex))
+        Next lngindex
+    Else
+        lngAcceptedCount = 0
+    End If
+    
+    ProcessScanPatternWrapper = lngAcceptedCount
 
 End Function
 
-Private Function UMCLocalBreakShrinkingBox() As Boolean
-'----------------------------------------------------------------------
-'breaks class to unique mass classes and returns True if successful;
-'this function is a bit different from original Shrinking Box function
-'but practically the results should be the same; the most significant
-'difference is in the case of classes with shared elements
-'ShrinkingBox description:
-'Select class representative as before. Select data closer than 2*MWTol
-'from the class representative; score each of potential patterns that
-'contain class representative and does not stretch more than 2*MWTol
-'----------------------------------------------------------------------
-Dim bDone As Long
-Dim bFoundNext As Boolean
-Dim AbsTol As Double
-Dim MWRangeMinInd As Long
-Dim MWRangeMaxInd As Long
-Dim AcceptedCnt As Long
-Dim CurrMWRangeScan() As Long       'scan numbers of potential class members
-Dim CurrMWRangeResInd() As Long     'indexes of accepted members
-Dim MyPattern As New ScanGapPattern
-Dim i As Long, j As Long
-Dim BSC As Long
-Dim BSCStart As Long
-Dim BSCEnd As Long
-Dim CurrEnd As Long
-Dim EndFound As Boolean
-Dim TmpCnt As Long
-Dim TmpMWRangeScan() As Long
-Dim TmpMWRangeResInd() As Long
-Dim TmpAcceptedCnt As Long
-On Error GoTo err_UMCLocalBreakShrinkingBox
-CurrOrderInd = -1
-MyPattern.MaxGapCount = UMCDef.GapMaxCnt
-MyPattern.MaxGapSize = UMCDef.GapMaxSize
-If Not ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
-   Status "Error initializing LC-MS Feature memory structures."
-   Exit Function
-End If
-With GelUMC(CallerID)
-  Do Until bDone
-    DoEvents
-    bFoundNext = False
-    Do Until bFoundNext
-       CurrOrderInd = CurrOrderInd + 1
-       If CurrOrderInd > O_Cnt - 1 Then     'all data has been used
-          bDone = True
-          Exit Do
-       Else
-          'already used data can not be class representative
-          If Not IsUsed(IndOrder(CurrOrderInd)) Then bFoundNext = True
-       End If
-    Loop
-    If bFoundNext Then      'new class representative = new class
-       CurrMW = O_MW(IndOrder(CurrOrderInd))
-       CurrScan = O_Scan(IndOrder(CurrOrderInd))
-       'find all data points close enough in mass to be potential class members
-       'note that max mw band width is double of the same parameter in Standard function
-       Select Case UMCDef.TolType
-       Case gltPPM
-            AbsTol = 2 * UMCDef.Tol * CurrMW * glPPM
-       Case gltABS
-            AbsTol = 2 * UMCDef.Tol
-       Case Else
-            Debug.Assert False
-       End Select
-       MWRangeMinInd = 0
-       MWRangeMaxInd = O_Cnt - 1
-       If MWRangeFinder.FindIndexRange(CurrMW, AbsTol, MWRangeMinInd, MWRangeMaxInd) Then
-          If PreparePotentialMWRange(MWRangeMinInd, MWRangeMaxInd) Then
-             If CurrMWRangeCnt > 2 Then   'at least two more potential members beside representative
-                If (CurrRepMWRangeInd = 0) Or (CurrRepMWRangeInd = CurrMWRangeCnt - 1) Then
-                   'if representative is at the edge then everything could be included
-                   ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
-                   For i = 0 To CurrMWRangeCnt - 1
-                       CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
-                   Next i
-                Else    'find all potential scores and note the best for this class
-                   BSC = -1
-                   For i = 0 To CurrRepMWRangeInd
-                       'assume that class starts at position i and see how far it could go with 2*MWTol
-                       EndFound = False
-                       CurrEnd = CurrMWRangeCnt - 1
-                       Do Until EndFound                                'find the end
-                          If Abs(O_MW(CurrMWRangeInd_O(CurrEnd)) - O_MW(CurrMWRangeInd_O(i))) <= AbsTol Then
-                             EndFound = True
-                          Else
-                             CurrEnd = CurrEnd - 1
-                             If CurrEnd <= CurrRepMWRangeInd Then EndFound = True
-                          End If
-                       Loop
-                       'fill temporary arrays
-                       TmpCnt = CurrEnd - i + 1
-                       ReDim TmpMWRangeScan(TmpCnt - 1)
-                       ReDim TmpMWRangeResInd(TmpCnt - 1) As Long
-                       For j = i To CurrEnd
-                           TmpMWRangeScan(j - i) = O_Scan(CurrMWRangeInd_O(j))
-                       Next j
-                       'do patterns to obtain the score
-                       TmpAcceptedCnt = ProcessScanPatternWrapper(MyPattern, TmpMWRangeScan, CurrScan, TmpMWRangeResInd)
-                       If MyPattern.BestScore > BSC Then        'if more than one this way we will remember
-                          BSC = MyPattern.BestScore             'the first one(additional criteria could be
-                          BSCStart = i                          'easily added to improve the classes
-                          BSCEnd = CurrEnd
-                       End If
-                   Next i
-                   'now prepare the real stuff with best score
-                   If BSC > 0 Then
-                      CurrMWRangeCnt = BSCEnd - BSCStart + 1
-                      If CurrMWRangeCnt > 0 Then
-                         ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)
-                         For i = 0 To CurrMWRangeCnt - 1            'shift current range left
-                             CurrMWRangeInd_O(i) = CurrMWRangeInd_O(i + BSCStart)
-                             CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
-                         Next i
-                         ReDim Preserve CurrMWRangeInd_O(CurrMWRangeCnt - 1)
-                      Else
-                         Erase CurrMWRangeScan
-                         Erase CurrMWRangeInd_O
+Private Function UMCLocalBreakStandard() As Boolean
+    '------------------------------------------------------------------
+    'breaks class to unique mass classes and returns True if successful
+    '------------------------------------------------------------------
+    Dim bDone As Long
+    Dim bFoundNext As Boolean
+    Dim AbsTol As Double
+    Dim MWRangeMinInd As Long
+    Dim MWRangeMaxInd As Long
+    Dim AcceptedCnt As Long
+    Dim CurrMWRangeScan() As Long       'scan numbers of potential class members
+    Dim CurrMWRangeResInd() As Long     'indexes of accepted members
+    Dim MyPattern As New ScanGapPattern
+    Dim i As Long
+    
+    Dim eOddEvenProcessingMode As oepUMCOddEvenProcessingMode
+    Dim intOddEvenIteration As Integer
+    Dim intOddEvenIterationStart As Integer
+    Dim intOddEvenIterationEnd As Integer
+    
+    Dim sngPercentComplete As Single
+    
+    On Error GoTo err_UMCLocalBreakStandard
+    
+    CurrOrderInd = -1
+    MyPattern.MaxGapCount = UMCDef.GapMaxCnt
+    MyPattern.MaxGapSize = UMCDef.GapMaxSize
+     
+    If Not ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
+       Status "Error initializing LC-MS Feature memory structures."
+       Exit Function
+    End If
+   
+    eOddEvenProcessingMode = UMCDef.OddEvenProcessingMode
+    Select Case UMCDef.OddEvenProcessingMode
+    Case oepUMCOddEvenProcessingMode.oepOddOnly
+        intOddEvenIterationStart = 1
+        intOddEvenIterationEnd = 1
+    Case oepUMCOddEvenProcessingMode.oepEvenOnly
+        intOddEvenIterationStart = 2
+        intOddEvenIterationEnd = 2
+    Case oepUMCOddEvenProcessingMode.oepOddEvenSequential
+        intOddEvenIterationStart = 1
+        intOddEvenIterationEnd = 2
+    Case Else
+        ' Includes case oepUMCOddEvenProcessingMode.oepProcessAll
+        intOddEvenIterationStart = 0
+        intOddEvenIterationEnd = 0
+    End Select
+    
+    For intOddEvenIteration = intOddEvenIterationStart To intOddEvenIterationEnd
+        With GelUMC(CallerID)
+            bDone = False
+            CurrOrderInd = -1
+            Do Until bDone
+                bFoundNext = False
+                Do Until bFoundNext
+                    CurrOrderInd = CurrOrderInd + 1
+                    If CurrOrderInd > O_Cnt - 1 Then     'all data has been used
+                        bDone = True
+                        Exit Do
+                    Else
+                        'already used data can not be class representative
+                        If Not IsUsed(IndOrder(CurrOrderInd)) Then
+                            ' Only use data if intOddEvenIteration = 0 or if the scan number for the data point is the appropriate odd or even value
+                            If intOddEvenIteration = 0 Then
+                                bFoundNext = True
+                            Else
+                                bFoundNext = CheckOddEvenIterationForDataPoint(intOddEvenIteration, O_Scan(IndOrder(CurrOrderInd)))
+                            End If
+                        End If
+                    End If
+                Loop
+                
+                If bFoundNext Then      'new class representative = new class
+                   CurrMW = O_MW(IndOrder(CurrOrderInd))
+                   CurrScan = O_Scan(IndOrder(CurrOrderInd))
+                   'find all data points close enough in mass to be potential class members
+                   Select Case UMCDef.TolType
+                   Case gltPPM
+                        AbsTol = UMCDef.Tol * CurrMW * glPPM
+                   Case gltABS
+                        AbsTol = UMCDef.Tol
+                   Case Else
+                        Debug.Assert False
+                   End Select
+                   MWRangeMinInd = 0
+                   MWRangeMaxInd = O_Cnt - 1
+                   If MWRangeFinder.FindIndexRange(CurrMW, AbsTol, MWRangeMinInd, MWRangeMaxInd) Then
+                      If PreparePotentialMWRange(MWRangeMinInd, MWRangeMaxInd) Then
+                         If CurrMWRangeCnt > 1 Then    'at least one more potential member beside representative
+                            ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
+                            ReDim CurrMWRangeResInd(CurrMWRangeCnt - 1)     'and indexes that should be accepted
+                            For i = 0 To CurrMWRangeCnt - 1
+                                CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
+                            Next i
+                            AcceptedCnt = ProcessScanPatternWrapper(MyPattern, CurrMWRangeScan, CurrScan, CurrMWRangeResInd, intOddEvenIteration)
+                         ElseIf CurrMWRangeCnt = 1 Then
+                            AcceptedCnt = 1
+                            ReDim CurrMWRangeResInd(0)
+                            CurrMWRangeResInd(0) = 0
+                         Else
+                            AcceptedCnt = 0
+                            Erase CurrMWRangeResInd
+                         End If
+                         If AcceptedCnt > 0 Then
+                            'assemble class
+                            .UMCCnt = .UMCCnt + 1
+                            If .UMCCnt Mod 25 = 0 Then
+                                If intOddEvenIteration = 0 Or intOddEvenIterationStart = intOddEvenIterationEnd Then
+                                    sngPercentComplete = CurrOrderInd / O_Cnt * 100
+                                Else
+                                    If intOddEvenIteration = 1 Then
+                                        sngPercentComplete = CurrOrderInd / (O_Cnt * 2) * 100
+                                    Else
+                                        sngPercentComplete = (O_Cnt + CurrOrderInd) / (O_Cnt * 2) * 100
+                                    End If
+                                End If
+                                
+                                Status "Assembling features: " & .UMCCnt & " (" & Trim(Format(sngPercentComplete, "0.0")) & "% done)"
+                                If glAbortUMCProcessing Then Exit Do
+                            End If
+                            If UBound(.UMCs) + 1 < .UMCCnt Then     'increase size
+                               If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_UMCLocalBreakStandard
+                            End If
+                            With .UMCs(.UMCCnt - 1)
+                                .ClassCount = AcceptedCnt
+                                ReDim .ClassMInd(AcceptedCnt - 1)
+                                ReDim .ClassMType(AcceptedCnt - 1)
+                                For i = 0 To AcceptedCnt - 1
+                                    .ClassMInd(i) = O_Index(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
+                                    .ClassMType(i) = O_Type(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
+                                    IsUsed(CurrMWRangeInd_O(CurrMWRangeResInd(i))) = True
+                                Next i
+                                .ClassRepInd = O_Index(IndOrder(CurrOrderInd))
+                                .ClassRepType = O_Type(IndOrder(CurrOrderInd))
+                            End With
+                            'mark class representative and class members as being used
+                            IsRep(IndOrder(CurrOrderInd)) = True
+                            IsUsed(IndOrder(CurrOrderInd)) = True
+                         End If
                       End If
                    End If
                 End If
-             Else                                               'two or less
-                ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
-                For i = 0 To CurrMWRangeCnt - 1
-                    CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
-                Next i
-             End If
-             'finally do the patterns if neccessary
-             If CurrMWRangeCnt > 1 Then
-                If CurrMWRangeCnt = 2 Then
-                   DoEvents
-                End If
-                ReDim CurrMWRangeResInd(CurrMWRangeCnt - 1)     'indexes that should be accepted
-                AcceptedCnt = ProcessScanPatternWrapper(MyPattern, CurrMWRangeScan, CurrScan, CurrMWRangeResInd)
-'             ElseIf CurrMWRangeCnt = 2 Then         'class representative and one more - has to be the same class
-'                AcceptedCnt = 2
-'                ReDim CurrMWRangeResInd(1)
-'                CurrMWRangeResInd(0) = 0
-'                CurrMWRangeResInd(1) = 1
-             ElseIf CurrMWRangeCnt = 1 Then
-                AcceptedCnt = 1
-                ReDim CurrMWRangeResInd(0)
-                CurrMWRangeResInd(0) = 0            'this is not neccessary but to make things clear
-             Else
-                AcceptedCnt = 0
-                Erase CurrMWRangeResInd
-             End If
-                          
-             If AcceptedCnt > 0 Then
-                'assemble class
-                .UMCCnt = .UMCCnt + 1
-                If .UMCCnt Mod 2 = 0 Then
-                    Status "Assembling feature: " & .UMCCnt & " (" & Trim(Format(CurrOrderInd / O_Cnt * 100, "0.0")) & "% done)"
-                    If glAbortUMCProcessing Then Exit Do
-                End If
-                If UBound(.UMCs) + 1 < .UMCCnt Then     'increase size
-                   If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_UMCLocalBreakShrinkingBox
-                End If
-                With .UMCs(.UMCCnt - 1)
-                    .ClassCount = AcceptedCnt
-                    ReDim .ClassMInd(AcceptedCnt - 1)
-                    ReDim .ClassMType(AcceptedCnt - 1)
-                    For i = 0 To AcceptedCnt - 1
-                        .ClassMInd(i) = O_Index(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
-                        .ClassMType(i) = O_Type(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
-                        IsUsed(CurrMWRangeInd_O(CurrMWRangeResInd(i))) = True
-                    Next i
-                    .ClassRepInd = O_Index(IndOrder(CurrOrderInd))
-                    .ClassRepType = O_Type(IndOrder(CurrOrderInd))
-                End With
-                'mark class representative and class members as being used
-                IsRep(IndOrder(CurrOrderInd)) = True
-                IsUsed(IndOrder(CurrOrderInd)) = True
-             End If
-          End If
-       End If
-    End If
-  Loop
-End With
-Call ManageClasses(CallerID, UMCManageConstants.UMCMngTrim)
-Status "Number of LC-MS Features: " & GelUMC(CallerID).UMCCnt
-UMCLocalBreakShrinkingBox = True
+            Loop
+        End With
+    Next intOddEvenIteration
+    
+    Call ManageClasses(CallerID, UMCManageConstants.UMCMngTrim)
+    Status "Number of LC-MS Features: " & GelUMC(CallerID).UMCCnt
+    UMCLocalBreakStandard = True
+    
 Exit Function
 
+err_UMCLocalBreakStandard:
+    Status "Error creating Unique Mass Classes"
+End Function
+
+Private Function UMCLocalBreakShrinkingBox() As Boolean
+    '----------------------------------------------------------------------
+    'breaks class to unique mass classes and returns True if successful;
+    'this function is a bit different from original Shrinking Box function
+    'but practically the results should be the same; the most significant
+    'difference is in the case of classes with shared elements
+    'ShrinkingBox description:
+    'Select class representative as before. Select data closer than 2*MWTol
+    'from the class representative; score each of potential patterns that
+    'contain class representative and does not stretch more than 2*MWTol
+    '----------------------------------------------------------------------
+    
+    Dim bDone As Boolean
+    Dim bFoundNext As Boolean
+    Dim AbsTol As Double
+    Dim MWRangeMinInd As Long
+    Dim MWRangeMaxInd As Long
+    Dim AcceptedCnt As Long
+    Dim CurrMWRangeScan() As Long       'scan numbers of potential class members
+    Dim CurrMWRangeResInd() As Long     'indexes of accepted members
+    Dim MyPattern As New ScanGapPattern
+    Dim i As Long, j As Long
+    Dim BSC As Long
+    Dim BSCStart As Long
+    Dim BSCEnd As Long
+    Dim CurrEnd As Long
+    Dim EndFound As Boolean
+    
+    Dim TmpCnt As Long
+    Dim TmpMWRangeScan() As Long
+    Dim TmpMWRangeResInd() As Long
+    Dim TmpAcceptedCnt As Long
+    
+    Dim eOddEvenProcessingMode As oepUMCOddEvenProcessingMode
+    Dim intOddEvenIteration As Integer
+    Dim intOddEvenIterationStart As Integer
+    Dim intOddEvenIterationEnd As Integer
+        
+    On Error GoTo err_UMCLocalBreakShrinkingBox
+    CurrOrderInd = -1
+    MyPattern.MaxGapCount = UMCDef.GapMaxCnt
+    MyPattern.MaxGapSize = UMCDef.GapMaxSize
+    
+    If Not ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
+       Status "Error initializing LC-MS Feature memory structures."
+       Exit Function
+    End If
+    
+    eOddEvenProcessingMode = UMCDef.OddEvenProcessingMode
+    Select Case UMCDef.OddEvenProcessingMode
+    Case oepUMCOddEvenProcessingMode.oepOddOnly
+        intOddEvenIterationStart = 1
+        intOddEvenIterationEnd = 1
+    Case oepUMCOddEvenProcessingMode.oepEvenOnly
+        intOddEvenIterationStart = 2
+        intOddEvenIterationEnd = 2
+    Case oepUMCOddEvenProcessingMode.oepOddEvenSequential
+        intOddEvenIterationStart = 1
+        intOddEvenIterationEnd = 2
+    Case Else
+        ' Includes case oepUMCOddEvenProcessingMode.oepProcessAll
+        intOddEvenIterationStart = 0
+        intOddEvenIterationEnd = 0
+    End Select
+    
+    For intOddEvenIteration = intOddEvenIterationStart To intOddEvenIterationEnd
+        With GelUMC(CallerID)
+            bDone = False
+            CurrOrderInd = -1
+            Do Until bDone
+                DoEvents
+                
+                bFoundNext = False
+                Do Until bFoundNext
+                    CurrOrderInd = CurrOrderInd + 1
+                    If CurrOrderInd > O_Cnt - 1 Then     'all data has been used
+                        bDone = True
+                        Exit Do
+                    Else
+                        'already used data can not be class representative
+                        If Not IsUsed(IndOrder(CurrOrderInd)) Then
+                            ' Only use data if intOddEvenIteration = 0 or if the scan number for the data point is the appropriate odd or even value
+                            If intOddEvenIteration = 0 Then
+                                bFoundNext = True
+                            Else
+                                bFoundNext = CheckOddEvenIterationForDataPoint(intOddEvenIteration, O_Scan(IndOrder(CurrOrderInd)))
+                            End If
+                        End If
+                    End If
+                Loop
+                
+                If bFoundNext Then      'new class representative = new class
+                   CurrMW = O_MW(IndOrder(CurrOrderInd))
+                   CurrScan = O_Scan(IndOrder(CurrOrderInd))
+                   'find all data points close enough in mass to be potential class members
+                   'note that max mw band width is double of the same parameter in Standard function
+                   Select Case UMCDef.TolType
+                   Case gltPPM
+                        AbsTol = 2 * UMCDef.Tol * CurrMW * glPPM
+                   Case gltABS
+                        AbsTol = 2 * UMCDef.Tol
+                   Case Else
+                        Debug.Assert False
+                   End Select
+                   MWRangeMinInd = 0
+                   MWRangeMaxInd = O_Cnt - 1
+                   If MWRangeFinder.FindIndexRange(CurrMW, AbsTol, MWRangeMinInd, MWRangeMaxInd) Then
+                      If PreparePotentialMWRange(MWRangeMinInd, MWRangeMaxInd) Then
+                         If CurrMWRangeCnt > 2 Then   'at least two more potential members beside representative
+                            If (CurrRepMWRangeInd = 0) Or (CurrRepMWRangeInd = CurrMWRangeCnt - 1) Then
+                               'if representative is at the edge then everything could be included
+                               ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
+                               For i = 0 To CurrMWRangeCnt - 1
+                                   CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
+                               Next i
+                            Else    'find all potential scores and note the best for this class
+                               BSC = -1
+                               For i = 0 To CurrRepMWRangeInd
+                                   'assume that class starts at position i and see how far it could go with 2*MWTol
+                                   EndFound = False
+                                   CurrEnd = CurrMWRangeCnt - 1
+                                   Do Until EndFound                                'find the end
+                                      If Abs(O_MW(CurrMWRangeInd_O(CurrEnd)) - O_MW(CurrMWRangeInd_O(i))) <= AbsTol Then
+                                         EndFound = True
+                                      Else
+                                         CurrEnd = CurrEnd - 1
+                                         If CurrEnd <= CurrRepMWRangeInd Then EndFound = True
+                                      End If
+                                   Loop
+                                   'fill temporary arrays
+                                   TmpCnt = CurrEnd - i + 1
+                                   ReDim TmpMWRangeScan(TmpCnt - 1)
+                                   ReDim TmpMWRangeResInd(TmpCnt - 1) As Long
+                                   For j = i To CurrEnd
+                                       TmpMWRangeScan(j - i) = O_Scan(CurrMWRangeInd_O(j))
+                                   Next j
+                                   'do patterns to obtain the score
+                                   TmpAcceptedCnt = ProcessScanPatternWrapper(MyPattern, TmpMWRangeScan, CurrScan, TmpMWRangeResInd, intOddEvenIteration)
+                                   If MyPattern.BestScore > BSC Then        'if more than one this way we will remember
+                                      BSC = MyPattern.BestScore             'the first one(additional criteria could be
+                                      BSCStart = i                          'easily added to improve the classes
+                                      BSCEnd = CurrEnd
+                                   End If
+                               Next i
+                               'now prepare the real stuff with best score
+                               If BSC > 0 Then
+                                  CurrMWRangeCnt = BSCEnd - BSCStart + 1
+                                  If CurrMWRangeCnt > 0 Then
+                                     ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)
+                                     For i = 0 To CurrMWRangeCnt - 1            'shift current range left
+                                         CurrMWRangeInd_O(i) = CurrMWRangeInd_O(i + BSCStart)
+                                         CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
+                                     Next i
+                                     ReDim Preserve CurrMWRangeInd_O(CurrMWRangeCnt - 1)
+                                  Else
+                                     Erase CurrMWRangeScan
+                                     Erase CurrMWRangeInd_O
+                                  End If
+                               End If
+                            End If
+                         Else                                               'two or less
+                            ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
+                            For i = 0 To CurrMWRangeCnt - 1
+                                CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
+                            Next i
+                         End If
+                         'finally do the patterns if neccessary
+                         If CurrMWRangeCnt > 1 Then
+                            If CurrMWRangeCnt = 2 Then
+                               DoEvents
+                            End If
+                            ReDim CurrMWRangeResInd(CurrMWRangeCnt - 1)     'indexes that should be accepted
+                            AcceptedCnt = ProcessScanPatternWrapper(MyPattern, CurrMWRangeScan, CurrScan, CurrMWRangeResInd, intOddEvenIteration)
+                '             ElseIf CurrMWRangeCnt = 2 Then         'class representative and one more - has to be the same class
+                '                AcceptedCnt = 2
+                '                ReDim CurrMWRangeResInd(1)
+                '                CurrMWRangeResInd(0) = 0
+                '                CurrMWRangeResInd(1) = 1
+                         ElseIf CurrMWRangeCnt = 1 Then
+                            AcceptedCnt = 1
+                            ReDim CurrMWRangeResInd(0)
+                            CurrMWRangeResInd(0) = 0            'this is not neccessary but to make things clear
+                         Else
+                            AcceptedCnt = 0
+                            Erase CurrMWRangeResInd
+                         End If
+                                      
+                         If AcceptedCnt > 0 Then
+                            'assemble class
+                            .UMCCnt = .UMCCnt + 1
+                            If .UMCCnt Mod 2 = 0 Then
+                                Status "Assembling feature: " & .UMCCnt & " (" & Trim(Format(CurrOrderInd / O_Cnt * 100, "0.0")) & "% done)"
+                                If glAbortUMCProcessing Then Exit Do
+                            End If
+                            If UBound(.UMCs) + 1 < .UMCCnt Then     'increase size
+                               If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_UMCLocalBreakShrinkingBox
+                            End If
+                            With .UMCs(.UMCCnt - 1)
+                                .ClassCount = AcceptedCnt
+                                ReDim .ClassMInd(AcceptedCnt - 1)
+                                ReDim .ClassMType(AcceptedCnt - 1)
+                                For i = 0 To AcceptedCnt - 1
+                                    .ClassMInd(i) = O_Index(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
+                                    .ClassMType(i) = O_Type(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
+                                    IsUsed(CurrMWRangeInd_O(CurrMWRangeResInd(i))) = True
+                                Next i
+                                .ClassRepInd = O_Index(IndOrder(CurrOrderInd))
+                                .ClassRepType = O_Type(IndOrder(CurrOrderInd))
+                            End With
+                            'mark class representative and class members as being used
+                            IsRep(IndOrder(CurrOrderInd)) = True
+                            IsUsed(IndOrder(CurrOrderInd)) = True
+                         End If
+                      End If
+                   End If
+                End If
+            Loop
+        End With
+    Next intOddEvenIteration
+    
+    Call ManageClasses(CallerID, UMCManageConstants.UMCMngTrim)
+    Status "Number of LC-MS Features: " & GelUMC(CallerID).UMCCnt
+    UMCLocalBreakShrinkingBox = True
+    
+    Exit Function
+
 err_UMCLocalBreakShrinkingBox:
-Status "Error creating Unique Mass Classes"
+    Status "Error creating Unique Mass Classes"
 End Function
 
 

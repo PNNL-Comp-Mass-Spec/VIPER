@@ -995,7 +995,9 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
            If Not udtAutoRefine.TestLengthUsingScanRange Then
                 UpdateStatus "Removing classes with too few members ..."
                 For i = 0 To .UMCCnt - 1
-                    If .UMCs(i).ClassCount < udtAutoRefine.UMCAutoRefineMinLength Then TmpInc(i) = REMOVE_UMC_MARK
+                    If .UMCs(i).ClassCount < udtAutoRefine.UMCAutoRefineMinLength Then
+                        TmpInc(i) = REMOVE_UMC_MARK
+                    End If
                 Next i
                 strProcessSummary = strProcessSummary & "Removed features with low member count (count < " & Trim(udtAutoRefine.UMCAutoRefineMinLength) & ")"
            Else
@@ -1017,7 +1019,9 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
             UpdateStatus "Removing classes with too many members ..."
             With tmp
                 For i = 0 To .UMCCnt - 1
-                    If .UMCs(i).ClassCount > udtAutoRefine.UMCAutoRefineMaxLength Then TmpInc(i) = REMOVE_UMC_MARK
+                    If .UMCs(i).ClassCount > udtAutoRefine.UMCAutoRefineMaxLength Then
+                        TmpInc(i) = REMOVE_UMC_MARK
+                    End If
                 Next i
             End With
             strProcessSummary = strProcessSummary & "Removed features with high member count (count > " & Trim(udtAutoRefine.UMCAutoRefineMaxLength) & ")"
@@ -2337,8 +2341,8 @@ With tmp
            .UMCs(i).ClassCount = 0
            RemoveCnt = RemoveCnt + 1
         Else
+           .UMCs(Cnt) = .UMCs(i)
            Cnt = Cnt + 1
-           .UMCs(Cnt - 1) = .UMCs(i)
         End If
     Next i
     If Cnt > 0 Then
