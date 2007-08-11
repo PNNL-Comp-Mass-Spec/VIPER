@@ -54,8 +54,8 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "lblFilterConnections"
-      Tab(1).Control(1)=   "Frame1"
+      Tab(1).Control(0)=   "Frame1"
+      Tab(1).Control(1)=   "lblFilterConnections"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
@@ -410,8 +410,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassMassTopX"
-            Tab(2).Control(1)=   "fraClassAbundanceTopX"
+            Tab(2).Control(0)=   "fraClassAbundanceTopX"
+            Tab(2).Control(1)=   "fraClassMassTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -2013,7 +2013,7 @@ Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef
     Dim lngGelScanNumberMin As Long
     Dim lngGelScanNumberMax As Long
     Dim intMinLength As Integer
-    
+        
     Dim blnMonoMassDefined As Boolean
     Dim blnAvgMassDefined As Boolean
     Dim blnLogAbundanceDefined As Boolean
@@ -2073,6 +2073,12 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
             
             If blnExportPoint Then
                 With .IsoData(ISInd(lngindex))
+                    ' Note that we're sending the unaltered scan number to the LCMSFeatureFinder, not the relative scan number returned by LookupScanNumberRelativeIndex
+                    ' This is required because we're not providing NET values, just scan numbers.
+                    ' If we sent the relative scan number, then the NET values computed by the LCMSFeatureFinder would be wrong (unless we also changed the MinScan and MaxScan values written to the Parameter File, but that would confuse the matter even more)
+                    ' Therefore, the default settings for calling the LCMSFeatureFinder are to weight by NET but not by scan number
+                    ' If the user does weight by scan number and if they're processing LTQ_FT or LTQ_Orbitrap datasets, then they'll likely need to change the scan-number weighting factor
+
                     strLineOut = Trim(.ScanNumber) & COL_DELIMITER & _
                                  Trim(.Charge) & COL_DELIMITER & _
                                  Trim(.Abundance) & COL_DELIMITER & _
@@ -2937,7 +2943,7 @@ Private Sub FindIonNetConnections()
     GelUMC(CallerID).def.OddEvenProcessingMode = UMCDef.OddEvenProcessingMode
     eOddEvenProcessingMode = UMCDef.OddEvenProcessingMode
     
-    If PrepareDataArrays(eOddEvenProcessingMode) Then
+    If PrepareDataArrays() Then
        If PrepareOptimization() Then
           If ManageResArrays(amtInitialize) Then
              FindBestMatches eOddEvenProcessingMode
@@ -3872,12 +3878,12 @@ Private Function PPMToDaIfNeeded(dblConstraintValue As Double, DimInd As Long, l
     
 End Function
 
-Private Function PrepareDataArrays(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcessingMode) As Boolean
+Private Function PrepareDataArrays() As Boolean
 '------------------------------------------------------------------------
 'prepares data arrays and returns True if successful
 '------------------------------------------------------------------------
     Dim i As Long, j As Long
-    Dim dblScanNumberRelativeIndex As Double
+    Dim lngScanNumberRelativeIndex As Long
     
     Dim strMessage As String
     Dim ISInd() As Long         ' In-scope index
@@ -3923,12 +3929,10 @@ On Error GoTo err_PrepareDataArrays
                   Case uindUMCIonNetDimConstants.uindScan
                       For i = 1 To DataCnt
                           DataOInd(i - 1) = ISInd(i)
-                          dblScanNumberRelativeIndex = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(i)).ScanNumber)
-                          If eOddEvenProcessingMode <> oepProcessAll Then
-                              ' Need to divide scan numbers by 2 to correct for odd only or even only processing of the data
-                              dblScanNumberRelativeIndex = dblScanNumberRelativeIndex / 2#
-                          End If
-                          DataVal(i - 1, j) = dblScanNumberRelativeIndex * MyDef.MetricData(j).WeightFactor
+                          ' When processing odd-only or even-only scans in frmUMCSimple, we divide lngScanNumberRelativeIndex by 2 since we're only keeping every other scan
+                          ' However, we will not do that in this function, since a scan gap of 1 is allowed for, and since that can mess up the minimum Scan Width filters applied by the LCMSFeatureFinder
+                          lngScanNumberRelativeIndex = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(i)).ScanNumber)
+                          DataVal(i - 1, j) = lngScanNumberRelativeIndex * MyDef.MetricData(j).WeightFactor
                       Next i
                   Case uindUMCIonNetDimConstants.uindFit
                       For i = 1 To DataCnt

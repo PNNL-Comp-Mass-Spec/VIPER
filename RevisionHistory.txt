@@ -1,8 +1,14 @@
 VIPER Change Log
 
+Version 3.43 - Build 374; August 10, 2007
+	- Changed from CInt() to Int() in function ProcessScanPatternWrapper in the UMC 2003 window
+		- Change required to emulate the Floor() function rather than the Round() function
+	- No longer dividing the relative scan number by 2 when processing odd and even scans separately in the UMC Ion Networks window
+		- Note also that when calling the LCMSFeatureFinder, the unaltered scan number is provided, not the relative scan number (these values are different for LTQ-FT and LTQ-Orbitrap instruments that have interleaved MS and MS/MS spectra)
+
 Version 3.43 - Build 373; August 7, 2007
-	- Added option for finding LC-MS features in odd-numbered scans only and/or in even-numbered scansonly
-		- Useful for DREAMS acquisition
+	- Added option for finding LC-MS features in odd-numbered scans only and/or in even-numbered scans only
+		- Useful for DREAMS acquisition when a normal MS spectrum is acquired, then the abundant peaks are ejected from the detection cell, and then a second MS spectrum is acquired, leading to alternating high/low abundance levels for many of the detected species
 	- Updated the UMCDefinition structure to track the Odd/Even scan mode, and to include 8 other unused, additional values
 		- Required updating the binary file version for FileInfoVersions(fioGelUMC) from 4 to 5
 

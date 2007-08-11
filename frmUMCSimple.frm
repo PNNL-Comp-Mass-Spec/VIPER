@@ -222,14 +222,14 @@ Begin VB.Form frmUMCSimple
       TabCaption(1)   =   "Auto Refine Options"
       TabPicture(1)   =   "frmUMCSimple.frx":0059
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "fraSplitUMCsOptions"
-      Tab(1).Control(1)=   "fraOptionFrame(2)"
+      Tab(1).Control(0)=   "fraOptionFrame(2)"
+      Tab(1).Control(1)=   "fraSplitUMCsOptions"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "Adv Class Stats"
       TabPicture(2)   =   "frmUMCSimple.frx":0075
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraClassMassTopX"
-      Tab(2).Control(1)=   "fraClassAbundanceTopX"
+      Tab(2).Control(0)=   "fraClassAbundanceTopX"
+      Tab(2).Control(1)=   "fraClassMassTopX"
       Tab(2).ControlCount=   2
       Begin VB.Frame fraOptionFrame 
          Height          =   1935
@@ -2006,8 +2006,10 @@ Private Function ProcessScanPatternWrapper(ByRef MyPattern As ScanGapPattern, By
                 RelativeScans(lngRelativeScanCount) = LookupScanNumberRelativeIndex(CallerID, Scans(lngindex))
                 RelativeScansPointerIndex(lngRelativeScanCount) = lngindex
                 
-                ' When processing odd-only or even-only scans, we divide RelativeScans by 2 (and round down) since we're only keep every other scan
-                RelativeScans(lngRelativeScanCount) = CInt(RelativeScans(lngRelativeScanCount) / 2#)
+                ' When processing odd-only or even-only scans, we divide RelativeScans by 2 (and round down) since we're only keeping every other scan
+                ' This is required prior to calling MyPattern.ProcessScanPattern, otherwise it things every other scan has a gap
+                ' Use Int() and not CInt() since CInt() will round up, not down
+                RelativeScans(lngRelativeScanCount) = Int(RelativeScans(lngRelativeScanCount) / 2#)
                 lngRelativeScanCount = lngRelativeScanCount + 1
             End If
         Next lngindex
@@ -2020,7 +2022,10 @@ Private Function ProcessScanPatternWrapper(ByRef MyPattern As ScanGapPattern, By
         
         CurrScanRelative = LookupScanNumberRelativeIndex(CallerID, CurrScan)
         If intOddEvenIteration <> 0 Then
-            CurrScanRelative = CInt(CurrScanRelative / 2#)
+            ' When processing odd-only or even-only scans, we divide RelativeScans by 2 (and round down) since we're only keeping every other scan
+            ' This is required prior to calling MyPattern.ProcessScanPattern, otherwise it things every other scan has a gap
+            ' Use Int() and not CInt() since CInt() will round up, not down
+            CurrScanRelative = Int(CurrScanRelative / 2#)
         End If
         
         lngAcceptedCount = MyPattern.ProcessScanPattern(RelativeScans(), CurrScanRelative, ResInd())

@@ -160,3 +160,4 @@ clsNormUnifEM = 0, 0, 0, 0, C
 clsProgRunner = 0, 0, 0, 0, C
 clsSplitUMCsByAbundance = 0, 0, 0, 0, C
 clsDltLblPairsUMC = 0, 0, 0, 0, C
+clsAveragine = 0, 0, 0, 0, C
