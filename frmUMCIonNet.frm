@@ -54,8 +54,8 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "Frame1"
-      Tab(1).Control(1)=   "lblFilterConnections"
+      Tab(1).Control(0)=   "lblFilterConnections"
+      Tab(1).Control(1)=   "Frame1"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
@@ -410,8 +410,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassAbundanceTopX"
-            Tab(2).Control(1)=   "fraClassMassTopX"
+            Tab(2).Control(0)=   "fraClassMassTopX"
+            Tab(2).Control(1)=   "fraClassAbundanceTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -1522,7 +1522,7 @@ End Sub
 Private Function BuildCurrentClass() As Boolean
 '---------------------------------------------------------------------------------------
 'builds class for the current settings in the HUMCEquCls array; returns True on success
-'class has to be sorted if more than 2 elements(to preserve scan order)
+'class has to be sorted if more than 2 elements (to preserve scan order)
 '---------------------------------------------------------------------------------------
 Dim i As Long
 Dim BestInd As Long
@@ -1570,7 +1570,7 @@ ChangeStatus " Error building LC-MS Feature."
 End Function
 
 Private Function BuildUMCsUsingmLCMSResultsMapping(ByVal blnShowMessages As Boolean) As Boolean
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim lngCurrentUMC As Long
     Dim intScopeUsedForConnections As Integer
     
@@ -1628,12 +1628,12 @@ On Error GoTo BuildUMCsUsingmLCMSResultsMappingErrorHandler
             ReDim HUMCEquCls(999)
             
             lngCurrentUMC = mLCMSResultsMappingUMCs(0)
-            For lngindex = 0 To mLCMSResultsMappingCount - 1
+            For lngIndex = 0 To mLCMSResultsMappingCount - 1
                   
-                If mLCMSResultsMappingUMCs(lngindex) <> lngCurrentUMC Then
+                If mLCMSResultsMappingUMCs(lngIndex) <> lngCurrentUMC Then
                     BuildCurrentClass
                     
-                    lngCurrentUMC = mLCMSResultsMappingUMCs(lngindex)
+                    lngCurrentUMC = mLCMSResultsMappingUMCs(lngIndex)
                     HUMCEquClsCnt = 0
                 End If
                 
@@ -1641,15 +1641,15 @@ On Error GoTo BuildUMCsUsingmLCMSResultsMappingErrorHandler
                     ReDim Preserve HUMCEquCls((UBound(HUMCEquCls) + 1) * 2 - 1)
                 End If
                 
-                HUMCEquCls(HUMCEquClsCnt) = mLCMSResultsMappingDataIndices(lngindex)
+                HUMCEquCls(HUMCEquClsCnt) = mLCMSResultsMappingDataIndices(lngIndex)
                 HUMCEquClsCnt = HUMCEquClsCnt + 1
                 
-                If lngindex Mod 1000 = 999 Then
-                    ChangeStatus strBaseStatus & ": " & (lngindex + 1) & " / " & mLCMSResultsMappingCount
+                If lngIndex Mod 1000 = 999 Then
+                    ChangeStatus strBaseStatus & ": " & (lngIndex + 1) & " / " & mLCMSResultsMappingCount
                 End If
                 
                 If mAbortProcess Then Exit For
-            Next lngindex
+            Next lngIndex
                 
             If mAbortProcess Then
                 ChangeStatus "Processing aborted."
@@ -1996,7 +1996,7 @@ End Function
 Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef strLCMSFeaturesFilePath As String, ByRef strIniFilePath As String, ByVal intOddEvenIteration As Integer) As Boolean
     Const COL_DELIMITER As String = vbTab
     
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim ISInd() As Long         ' In-scope index
     
     Dim tsOutfile As TextStream
@@ -2064,15 +2064,15 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     tsOutfile.WriteLine strLineOut
     
     With GelData(CallerID)
-        For lngindex = 1 To DataCnt
+        For lngIndex = 1 To DataCnt
             If intOddEvenIteration = 0 Then
                 blnExportPoint = True
             Else
-                blnExportPoint = CheckOddEvenIterationForScan(intOddEvenIteration, .IsoData(ISInd(lngindex)).ScanNumber)
+                blnExportPoint = CheckOddEvenIterationForScan(intOddEvenIteration, .IsoData(ISInd(lngIndex)).ScanNumber)
             End If
             
             If blnExportPoint Then
-                With .IsoData(ISInd(lngindex))
+                With .IsoData(ISInd(lngIndex))
                     ' Note that we're sending the unaltered scan number to the LCMSFeatureFinder, not the relative scan number returned by LookupScanNumberRelativeIndex
                     ' This is required because we're not providing NET values, just scan numbers.
                     ' If we sent the relative scan number, then the NET values computed by the LCMSFeatureFinder would be wrong (unless we also changed the MinScan and MaxScan values written to the Parameter File, but that would confuse the matter even more)
@@ -2091,18 +2091,18 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                                  Trim(.SignalToNoise) & COL_DELIMITER & _
                                  Trim(.IntensityMono) & COL_DELIMITER & _
                                  Trim(.IntensityMonoPlus2) & COL_DELIMITER & _
-                                 Trim(ISInd(lngindex))
+                                 Trim(ISInd(lngIndex))
     
                     tsOutfile.WriteLine strLineOut
                 End With
             End If
             
-            If lngindex Mod 5000 = 0 Then
-                ChangeStatus strBaseStatus & ": " & Trim(lngindex) & " / " & Trim(DataCnt)
+            If lngIndex Mod 5000 = 0 Then
+                ChangeStatus strBaseStatus & ": " & Trim(lngIndex) & " / " & Trim(DataCnt)
             End If
             
             If mAbortProcess Then Exit For
-        Next lngindex
+        Next lngIndex
     End With
    
     tsOutfile.Close
@@ -2130,11 +2130,11 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     
     blnUseGenericNET = False
     
-    For lngindex = 0 To MyDef.NetDim - 1
+    For lngIndex = 0 To MyDef.NetDim - 1
         strDimensionName = ""
         strConstraint = ""
         
-        With MyDef.MetricData(lngindex)
+        With MyDef.MetricData(lngIndex)
             Select Case .DataType
                Case uindUMCIonNetDimConstants.uindMonoMW
                     strDimensionName = "MonoMass"
@@ -2203,7 +2203,7 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                 Debug.Assert False
             End If
         End With
-    Next lngindex
+    Next lngIndex
 
     If Not blnMonoMassDefined Then tsOutfile.WriteLine "MonoMassWeight=0"
     If Not blnAvgMassDefined Then tsOutfile.WriteLine "AvgMassWeight=0"

@@ -2,15 +2,58 @@ VERSION 5.00
 Begin VB.Form frmUMCDltPairs 
    BackColor       =   &H00C0FFC0&
    Caption         =   "LC-MS Feature Delta Pairing Analysis"
-   ClientHeight    =   7320
+   ClientHeight    =   7365
    ClientLeft      =   60
    ClientTop       =   630
    ClientWidth     =   10725
    Icon            =   "frmUMCDltPairs.frx":0000
    LinkTopic       =   "Form1"
-   ScaleHeight     =   7320
+   ScaleHeight     =   7365
    ScaleWidth      =   10725
    StartUpPosition =   1  'CenterOwner
+   Begin VB.Frame fraERCalc 
+      BackColor       =   &H00C0FFC0&
+      Caption         =   "ER Calculation Mode"
+      Height          =   615
+      Left            =   5400
+      TabIndex        =   68
+      Top             =   5880
+      Width           =   5175
+      Begin VB.OptionButton optERCalc 
+         BackColor       =   &H00C0FFC0&
+         Caption         =   "Ratio (L/H)"
+         Height          =   195
+         Index           =   0
+         Left            =   120
+         TabIndex        =   71
+         ToolTipText     =   "Ratio (Abundance of Light member/ Abundance of Heavy Member)"
+         Top             =   240
+         Value           =   -1  'True
+         Width           =   1215
+      End
+      Begin VB.OptionButton optERCalc 
+         BackColor       =   &H00C0FFC0&
+         Caption         =   "Natural Log Ratio"
+         Height          =   195
+         Index           =   1
+         Left            =   1440
+         TabIndex        =   70
+         ToolTipText     =   "Logarithmic Ratio; Ln(AbuLight/AbuHeavy)"
+         Top             =   240
+         Width           =   1575
+      End
+      Begin VB.OptionButton optERCalc 
+         BackColor       =   &H00C0FFC0&
+         Caption         =   "Symmetric Ratio"
+         Height          =   195
+         Index           =   2
+         Left            =   3240
+         TabIndex        =   69
+         ToolTipText     =   "0-Shifted Symmetric Ratio; (AbuL/AbuH)-1 for AbuL>=AbuH; 1-(AbuH/AbuL) for AbuL<AbuH"
+         Top             =   240
+         Width           =   1575
+      End
+   End
    Begin VB.CommandButton cmdResetToDefaults 
       Caption         =   "Set to Defaults"
       Height          =   300
@@ -210,21 +253,21 @@ Begin VB.Form frmUMCDltPairs
       TabIndex        =   55
       Top             =   3960
       Width           =   5175
-      Begin VB.CheckBox chkOutlierRemovalUsesSymmetricERs 
+      Begin VB.CheckBox chkScanByScanAverageUsesWeightedAvg 
          BackColor       =   &H00C0FFC0&
-         Caption         =   "Use symmetric ERs"
-         Height          =   300
-         Left            =   360
-         TabIndex        =   64
-         Top             =   2160
+         Caption         =   "Scan-by-scan average uses weighted avg"
+         Height          =   375
+         Left            =   3000
+         TabIndex        =   67
+         Top             =   1080
          Value           =   1  'Checked
-         Width           =   2175
+         Width           =   1935
       End
       Begin VB.TextBox txtRemoveOutlierERsMinimumDataPointCount 
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   4320
-         TabIndex        =   66
+         TabIndex        =   65
          Text            =   "3"
          Top             =   2000
          Width           =   615
@@ -312,7 +355,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Minimum final data point count"
          Height          =   400
          Left            =   2880
-         TabIndex        =   65
+         TabIndex        =   64
          Top             =   1940
          Width           =   1455
       End
@@ -649,8 +692,8 @@ Begin VB.Form frmUMCDltPairs
       BackStyle       =   0  'Transparent
       Height          =   600
       Left            =   120
-      TabIndex        =   67
-      Top             =   6600
+      TabIndex        =   66
+      Top             =   6720
       Width           =   10455
    End
    Begin VB.Menu mnuFunction 
@@ -872,351 +915,352 @@ End Sub
 Public Function FindPairsWrapper(Optional blnShowMessages As Boolean = True) As Boolean
     ' Returns True if success, False if error or searching was cancelled prematurely
 
-Dim eResponse As vbMsgBoxResult
-Dim blnSuccess As Boolean
-
+    Dim eResponse As VbMsgBoxResult
+    Dim blnSuccess As Boolean
+    
 On Error GoTo exit_cmdFindPairs
-
-blnSuccess = True
-If blnShowMessages Then
-    If GelP_D_L(CallerID).PCnt > 0 And Me.AutoClearPairsWhenFindingPairs() Then
-        ' Data is already in pairs structure; give user chance to change their mind
-        eResponse = MsgBox("Pairs structure already contains pairs. Selected procedure will clear all existing pairs. Continue?", vbOKCancel, glFGTU)
-        If eResponse <> vbOK Then
-            blnSuccess = False
+    
+    blnSuccess = True
+    If blnShowMessages Then
+        If GelP_D_L(CallerID).PCnt > 0 And Me.AutoClearPairsWhenFindingPairs() Then
+            ' Data is already in pairs structure; give user chance to change their mind
+            eResponse = MsgBox("Pairs structure already contains pairs. Selected procedure will clear all existing pairs. Continue?", vbOKCancel, glFGTU)
+            If eResponse <> vbOK Then
+                blnSuccess = False
+            End If
         End If
     End If
-End If
-    
-If blnSuccess Then
-    Me.MousePointer = vbHourglass
-    blnSuccess = False
-    
-    If GelP_D_L(CallerID).PCnt > 0 And Me.AutoClearPairsWhenFindingPairs() Then
-        ClearAllPairs
+        
+    If blnSuccess Then
+        Me.MousePointer = vbHourglass
+        blnSuccess = False
+        
+        If GelP_D_L(CallerID).PCnt > 0 And Me.AutoClearPairsWhenFindingPairs() Then
+            ClearAllPairs
+        End If
+        
+        UpdateStatus "Validating LC-MS Feature status ..."
+        If GelUMC(CallerID).UMCCnt <= 0 Then
+           If blnShowMessages Then MsgBox "You must cluster the data into Unique Mass Classes before finding pairs. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' in the main window to cluster the data into unique mass classes.", vbOKOnly, glFGTU
+        Else
+            UpdateStatus "Finding pair classes ..."
+            blnSuccess = FindPairs(mFormMode, blnShowMessages)
+        End If
     End If
     
-    UpdateStatus "Validating LC-MS Feature status ..."
-    If GelUMC(CallerID).UMCCnt <= 0 Then
-       If blnShowMessages Then MsgBox "You must cluster the data into Unique Mass Classes before finding pairs. Please use menu item 'Steps->2. Find LC-MS Features (UMCs)' in the main window to cluster the data into unique mass classes.", vbOKOnly, glFGTU
-    Else
-        UpdateStatus "Finding pair classes ..."
-        blnSuccess = FindPairs(mFormMode, blnShowMessages)
-    End If
-End If
-
 exit_cmdFindPairs:
-Me.MousePointer = vbDefault
-FindPairsWrapper = blnSuccess
+    Me.MousePointer = vbDefault
+    FindPairsWrapper = blnSuccess
 
 End Function
 
 Private Function FindPairs(ePairFormMode As pfmPairFormMode, Optional blnShowMessages As Boolean = True) As Boolean
+        
+    '-----------------------------------------------------
+    'Delta pairing function; finds and put into structure all potential pairs
+    ' pairs based on numerical criteria
+    'Returns True if success, False if error or searching was cancelled prematurely
+    '-----------------------------------------------------
     
-'-----------------------------------------------------
-'Delta pairing function; finds and put into structure all potential pairs
-' pairs based on numerical criteria
-'Returns True if success, False if error or searching was cancelled prematurely
-'-----------------------------------------------------
-
-Static WarnedUserInapproporiateMassModeForN14N15 As Boolean
-
-Dim lngIndexLight As Long, lngIndexHeavy As Long
-Dim ClsMinDelta As Long
-Dim ClsMaxDelta As Long
-Dim ClsStepDelta As Long
-Dim ClsMidDelta As Long
-Dim LClsMW As Double            ' Light member MW
-Dim HClsMW As Double            ' Heavy member mw
-Dim OverlapOK As Boolean
-
-Dim strStatus As String
-Dim strSearchMode As String, strMessage As String
-Dim eResponse As vbMsgBoxResult
-Dim blnDeltaInfo As Boolean, blnLabelInfo As Boolean
-
-Dim blnSuccess As Boolean
-Dim blnAutoCalculateDeltaMinMax As Boolean
-
-Dim ScanMaxAbuLight As Double
-Dim ScanMaxAbuHeavy As Double
-
+    Static WarnedUserInapproporiateMassModeForN14N15 As Boolean
+    
+    Dim lngIndexLight As Long, lngIndexHeavy As Long
+    Dim ClsMinDelta As Long
+    Dim ClsMaxDelta As Long
+    Dim ClsStepDelta As Long
+    Dim ClsMidDelta As Long
+    Dim LClsMW As Double            ' Light member MW
+    Dim HClsMW As Double            ' Heavy member mw
+    Dim OverlapOK As Boolean
+    
+    Dim strStatus As String
+    Dim strSearchMode As String, strMessage As String
+    Dim eResponse As VbMsgBoxResult
+    Dim blnDeltaInfo As Boolean, blnLabelInfo As Boolean
+    
+    Dim blnSuccess As Boolean
+    Dim blnAutoCalculateDeltaMinMax As Boolean
+    
+    Dim ScanMaxAbuLight As Double
+    Dim ScanMaxAbuHeavy As Double
+    
 On Error GoTo err_FindPairs
-
-Select Case ePairFormMode
-Case pfmDelta, pfmLabel, pfmDeltaLabel
-    ' All is fine
-Case Else
-    MsgBox "Unknown pair search mode (sub FindPairsWrapper)", vbExclamation + vbOKOnly, "Error"
-    FindPairs = False
-    Exit Function
-End Select
-
-' Validate the N15 incorporation settings
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
-    ValidateN15IncorporationSettings
     
-    ' See if the UMC mass values are based on average masses; warn the user if they're not
-    If GelUMC(CallerID).def.MWField <> isfMWAvg Then
-        strMessage = "Warning: The N14/N15 incomplete incorporation mode is designed to be used with LC-MS Features that have class masses based on the average masses of the members of the LC-MS feature.  The features in memory have mass values based on the "
-        If GelUMC(CallerID).def.MWField = isfMWTMA Then
-            strMessage = strMessage & "most abundant molecular"
-        Else
-            strMessage = strMessage & "monoisotopic"
-        End If
-        strMessage = strMessage & " masses of the members of the LC-MS Feature.  The pair spacing values computed may not be appropriate for this mass type."
-        
-        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            AddToAnalysisHistory CallerID, strMessage
-        Else
-            If blnShowMessages Then
-                If Not WarnedUserInapproporiateMassModeForN14N15 Then
-                    strMessage = strMessage & " Continue finding pairs?"
-                    eResponse = MsgBox(strMessage, vbYesNoCancel + vbDefaultButton3, "Invalid Mass Mode")
-                    If eResponse <> vbYes Then Exit Function
-                    
-                    WarnedUserInapproporiateMassModeForN14N15 = True
-                End If
-            End If
-        End If
-    End If
-End If
-
-
-mPairInfoChanged = True
-
-' Copy current settings to GelP_D_L(Ind)
-GelP_D_L(CallerID).SearchDef = glbPreferencesExpanded.PairSearchOptions.SearchDef
-
-mAbortProcess = False
-
-ShowHideControls True
-
-If GelP_D_L(CallerID).PCnt = 0 Or Me.AutoClearPairsWhenFindingPairs() Then
-    ' Initially reserve space for 40000 pairs
-    blnSuccess = InitDltLblPairs(CallerID)
-Else
-    blnSuccess = True
-End If
-
-If blnSuccess Then
-    With GelP_D_L(CallerID)
-        Select Case ePairFormMode
-        Case pfmDelta
-            .DltLblType = ptUMCDlt
-            .SearchDef.LightLabelMass = 0
-        Case pfmLabel
-            .DltLblType = ptUMCLbl
-            .SearchDef.DeltaMass = 0
-        Case pfmDeltaLabel
-            .DltLblType = ptUMCDltLbl
-        End Select
-         
-        .SyncWithUMC = True    'whatever happens we have tried
-        
-        blnAutoCalculateDeltaMinMax = .SearchDef.AutoCalculateDeltaMinMaxCount
-        If Not blnAutoCalculateDeltaMinMax Then
-           ClsMinDelta = GelP_D_L(CallerID).SearchDef.DeltaCountMin
-           ClsMaxDelta = GelP_D_L(CallerID).SearchDef.DeltaCountMax
-        End If
-        ClsStepDelta = GelP_D_L(CallerID).SearchDef.DeltaStepSize
-    End With
-   
-    With glbPreferencesExpanded.PairSearchOptions.SearchDef
-        If .N15IncompleteIncorporationMode Then
-            ' Check that the values are <= 100 to avoid overflow errors
-            If .N15PercentIncorporationMinimum > 100 Then .N15PercentIncorporationMinimum = 100
-            If .N15PercentIncorporationMaximum > 100 Then .N15PercentIncorporationMaximum = 100
-            If .N15PercentIncorporationStep > 100 Then .N15PercentIncorporationStep = 100
-        End If
-    End With
-    
-    ' Step through the LC-MS Features, treating each lngIndexHeavy'th UMC as the heavy member of the pair
-    For lngIndexHeavy = 0 To GelUMC(CallerID).UMCCnt - 1
-        HClsMW = GelUMC(CallerID).UMCs(lngIndexHeavy).ClassMW
-       
-        ' The ClsMinDelta and ClsMaxDelta variables are not used for labeled pairs, but are calculated anyway
-        If blnAutoCalculateDeltaMinMax Then         'calculate for this specific mass
-           ClsMidDelta = CLng(0.012 * HClsMW)
-           ClsMinDelta = CLng(0.5 * ClsMidDelta)
-           ClsMaxDelta = CLng(1.5 * ClsMidDelta)
-        End If
-        
-        strStatus = "Examining LC-MS Features: " & Trim(lngIndexHeavy + 1) & " / " & Trim(GelUMC(CallerID).UMCCnt) & "; Pairs found: " & Trim(GelP_D_L(CallerID).PCnt)
-        UpdateStatus strStatus
-        If mAbortProcess Then Exit For
-       
-        ' Step through the LC-MS Features, treating each lngIndexLight'th UMC as the light member of the pair
-        For lngIndexLight = 0 To GelUMC(CallerID).UMCCnt - 1
-            If lngIndexHeavy <> lngIndexLight Then
-                'check if 'overlap' condition is required and if yes do class lngIndexHeavy and lngIndexLight overlap at the edges?
-                OverlapOK = True
-                If GelP_D_L(CallerID).SearchDef.RequireUMCOverlap Then
-                    If ((GelUMC(CallerID).UMCs(lngIndexLight).MaxScan < GelUMC(CallerID).UMCs(lngIndexHeavy).MinScan) Or _
-                       (GelUMC(CallerID).UMCs(lngIndexHeavy).MaxScan < GelUMC(CallerID).UMCs(lngIndexLight).MinScan)) Then
-                            OverlapOK = False                       'no overlap
-                    End If
-                End If
-                
-                If OverlapOK And GelP_D_L(CallerID).SearchDef.RequireUMCOverlapAtApex Then
-                    Select Case GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepType
-                    Case glCSType
-                        ScanMaxAbuLight = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngIndexLight).ClassRepInd).ScanNumber
-                        ScanMaxAbuHeavy = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepInd).ScanNumber
-                    Case glIsoType
-                        ScanMaxAbuLight = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngIndexLight).ClassRepInd).ScanNumber
-                        ScanMaxAbuHeavy = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepInd).ScanNumber
-                    Case Else
-                        ' This shouldn't happen
-                        Debug.Assert False
-                        ScanMaxAbuLight = 0
-                        ScanMaxAbuHeavy = GelP_D_L(CallerID).SearchDef.ScanToleranceAtApex + 1
-                    End Select
-                
-                    ' Future: Make this more sophisticated by fitting a Gaussian curve to each of the LC-MS Features
-                    '         and comparing the alignment of the fitted curves
-                    ' For now, just check the scan distance between the apexes of the two LC-MS Features
-                    If Abs(ScanMaxAbuLight - ScanMaxAbuHeavy) > GelP_D_L(CallerID).SearchDef.ScanToleranceAtApex Then
-                        OverlapOK = False                       'no overlap
-                    End If
-                
-                End If
-             
-                If OverlapOK Then
-                    'check is it possible that this is a pair
-                    LClsMW = GelUMC(CallerID).UMCs(lngIndexLight).ClassMW
-                          
-                    Select Case ePairFormMode
-                    Case pfmDelta
-                        FindPairsWorkDelta blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy, ClsMinDelta, ClsMaxDelta, ClsStepDelta
-                    Case pfmLabel
-                        FindPairsWorkLabeled blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy
-                    Case pfmDeltaLabel
-                        FindPairsWorkDeltaLabeled blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy, ClsMinDelta, ClsMaxDelta, ClsStepDelta
-                    End Select
-                
-                End If
-            End If
-        Next lngIndexLight
-    Next lngIndexHeavy
-   
     Select Case ePairFormMode
-    Case pfmDelta
-        If Not GelAnalysis(CallerID) Is Nothing Then
-            If GelP_D_L(CallerID).SearchDef.DeltaMass = glO16O18_DELTA Then
-                GelAnalysis(CallerID).MD_Type = stPairsO16O18
-            Else
-                ' Use N14/N15 type by default
-                GelAnalysis(CallerID).MD_Type = stPairsN14N15
-            End If
-        End If
-
-        blnDeltaInfo = True
-        blnLabelInfo = False
-        strSearchMode = "Delta"
-        
-    Case pfmLabel
-        If Not GelAnalysis(CallerID) Is Nothing Then
-            GelAnalysis(CallerID).MD_Type = stPairsICAT
-        End If
-        
-        blnDeltaInfo = False
-        blnLabelInfo = True
-        strSearchMode = "Labeled"
-        
-    Case pfmDeltaLabel
-        If Not GelAnalysis(CallerID) Is Nothing Then
-            GelAnalysis(CallerID).MD_Type = stPairsPEON14N15
-        End If
-        
-        blnDeltaInfo = True
-        blnLabelInfo = True
-        strSearchMode = "Delta-Label"
+    Case pfmDelta, pfmLabel, pfmDeltaLabel
+        ' All is fine
     Case Else
-        strSearchMode = "??"
+        MsgBox "Unknown pair search mode (sub FindPairsWrapper)", vbExclamation + vbOKOnly, "Error"
+        FindPairs = False
+        Exit Function
     End Select
     
-    'MonroeMod
-    With GelP_D_L(CallerID)
-        strMessage = "Searched for " & strSearchMode & " pairs (using LC-MS Features); Pair Count = " & Trim(.PCnt)
-        With .SearchDef
-            If blnDeltaInfo Then
-                strMessage = strMessage & "; Delta = " & Trim(.DeltaMass) & " Da"
-                strMessage = strMessage & "; Auto-calculated Min/Max Delta = " & CStr(.AutoCalculateDeltaMinMaxCount)
-                strMessage = strMessage & "; Min Deltas = " & Trim(.DeltaCountMin) & "; Max Deltas = " & Trim(.DeltaCountMax)
-                strMessage = strMessage & "; Delta Step Size = " & Trim(.DeltaStepSize)
-            End If
-            
-            If blnLabelInfo Then
-                strMessage = strMessage & "; Label = " & Trim(.LightLabelMass) & " Da; Heavy/Light Delta = " & Trim(.HeavyLightMassDifference) & " Da"
-                strMessage = strMessage & "; Min Labels = " & Trim(.LabelCountMin) & "; Max Labels = " & Trim(.LabelCountMax)
-                strMessage = strMessage & "; Max difference in number of labels = " & Trim(.MaxDifferenceInNumberOfLightHeavyLabels)
-            End If
-            
-            strMessage = strMessage & "; Pair Tolerance = " & Trim(.DeltaMassTolerance) & " " & GetSearchToleranceUnitText(CInt(.DeltaMassTolType))
+    ' Validate the N15 incorporation settings
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+        ValidateN15IncorporationSettings
         
-            strMessage = strMessage & "; Scan Tolerance at Edges = " & Trim(.ScanTolerance) & "; Require Overlap at Edges = " & CStr(.RequireUMCOverlap)
-            strMessage = strMessage & "; Scan Tolerance at Apex = " & Trim(.ScanToleranceAtApex) & "; Require Overlap at Apex = " & CStr(.RequireUMCOverlapAtApex)
-            strMessage = strMessage & "; ER Inclusion Range = " & Trim(.ERInclusionMin) & " to " & Trim(.ERInclusionMax)
-            strMessage = strMessage & "; Require Matching Charge States = " & CStr(.RequireMatchingChargeStatesForPairMembers)
-            strMessage = strMessage & "; Use Identical Charges for ER = " & CStr(.UseIdenticalChargesForER)
-            strMessage = strMessage & "; Compute ER Scan by Scan = " & CStr(.ComputeERScanByScan)
-            strMessage = strMessage & "; Avg ER All Charge States = " & CStr(.AverageERsAllChargeStates)
-            strMessage = strMessage & "; Avg ERs Weighting Mode = " & CStr(.AverageERsWeightingMode)
+        ' See if the UMC mass values are based on average masses; warn the user if they're not
+        If GelUMC(CallerID).def.MWField <> isfMWAvg Then
+            strMessage = "Warning: The N14/N15 incomplete incorporation mode is designed to be used with LC-MS Features that have class masses based on the average masses of the members of the LC-MS feature.  The features in memory have mass values based on the "
+            If GelUMC(CallerID).def.MWField = isfMWTMA Then
+                strMessage = strMessage & "most abundant molecular"
+            Else
+                strMessage = strMessage & "monoisotopic"
+            End If
+            strMessage = strMessage & " masses of the members of the LC-MS Feature.  The pair spacing values computed may not be appropriate for this mass type."
+            
+            If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                AddToAnalysisHistory CallerID, strMessage
+            Else
+                If blnShowMessages Then
+                    If Not WarnedUserInapproporiateMassModeForN14N15 Then
+                        strMessage = strMessage & " Continue finding pairs?"
+                        eResponse = MsgBox(strMessage, vbYesNoCancel + vbDefaultButton3, "Invalid Mass Mode")
+                        If eResponse <> vbYes Then Exit Function
+                        
+                        WarnedUserInapproporiateMassModeForN14N15 = True
+                    End If
+                End If
+            End If
+        End If
+    End If
+    
+    
+    mPairInfoChanged = True
+    
+    ' Copy current settings to GelP_D_L(Ind)
+    GelP_D_L(CallerID).SearchDef = glbPreferencesExpanded.PairSearchOptions.SearchDef
+    
+    mAbortProcess = False
+    
+    ShowHideControls True
+    
+    If GelP_D_L(CallerID).PCnt = 0 Or Me.AutoClearPairsWhenFindingPairs() Then
+        ' Initially reserve space for 40000 pairs
+        blnSuccess = InitDltLblPairs(CallerID)
+    Else
+        blnSuccess = True
+    End If
+    
+    If blnSuccess Then
+        With GelP_D_L(CallerID)
+            Select Case ePairFormMode
+            Case pfmDelta
+                .DltLblType = ptUMCDlt
+                .SearchDef.LightLabelMass = 0
+            Case pfmLabel
+                .DltLblType = ptUMCLbl
+                .SearchDef.DeltaMass = 0
+            Case pfmDeltaLabel
+                .DltLblType = ptUMCDltLbl
+            End Select
+             
+            .SyncWithUMC = True    'whatever happens we have tried
+            
+            blnAutoCalculateDeltaMinMax = .SearchDef.AutoCalculateDeltaMinMaxCount
+            If Not blnAutoCalculateDeltaMinMax Then
+               ClsMinDelta = GelP_D_L(CallerID).SearchDef.DeltaCountMin
+               ClsMaxDelta = GelP_D_L(CallerID).SearchDef.DeltaCountMax
+            End If
+            ClsStepDelta = GelP_D_L(CallerID).SearchDef.DeltaStepSize
         End With
-        
+       
         With glbPreferencesExpanded.PairSearchOptions.SearchDef
             If .N15IncompleteIncorporationMode Then
-                strMessage = strMessage & "; N15 Incomplete Incorporation Search Enabled"
-                strMessage = strMessage & "; Minimum Incorporation = " & Round(.N15PercentIncorporationMinimum, 1) & "%"
-                strMessage = strMessage & "; Maximum Incorporation = " & Round(.N15PercentIncorporationMaximum, 1) & "%"
-                strMessage = strMessage & "; Step size = " & Round(.N15PercentIncorporationStep, 1) & "%"
+                ' Check that the values are <= 100 to avoid overflow errors
+                If .N15PercentIncorporationMinimum > 100 Then .N15PercentIncorporationMinimum = 100
+                If .N15PercentIncorporationMaximum > 100 Then .N15PercentIncorporationMaximum = 100
+                If .N15PercentIncorporationStep > 100 Then .N15PercentIncorporationStep = 100
             End If
         End With
         
-        AddToAnalysisHistory CallerID, strMessage
-    End With
+        ' Step through the LC-MS Features, treating each lngIndexHeavy'th UMC as the heavy member of the pair
+        For lngIndexHeavy = 0 To GelUMC(CallerID).UMCCnt - 1
+            HClsMW = GelUMC(CallerID).UMCs(lngIndexHeavy).ClassMW
+           
+            ' The ClsMinDelta and ClsMaxDelta variables are not used for labeled pairs, but are calculated anyway
+            If blnAutoCalculateDeltaMinMax Then         'calculate for this specific mass
+               ClsMidDelta = CLng(0.012 * HClsMW)
+               ClsMinDelta = CLng(0.5 * ClsMidDelta)
+               ClsMaxDelta = CLng(1.5 * ClsMidDelta)
+            End If
+            
+            strStatus = "Examining LC-MS Features: " & Trim(lngIndexHeavy + 1) & " / " & Trim(GelUMC(CallerID).UMCCnt) & "; Pairs found: " & Trim(GelP_D_L(CallerID).PCnt)
+            UpdateStatus strStatus
+            If mAbortProcess Then Exit For
+           
+            ' Step through the LC-MS Features, treating each lngIndexLight'th UMC as the light member of the pair
+            For lngIndexLight = 0 To GelUMC(CallerID).UMCCnt - 1
+                If lngIndexHeavy <> lngIndexLight Then
+                    'check if 'overlap' condition is required and if yes do class lngIndexHeavy and lngIndexLight overlap at the edges?
+                    OverlapOK = True
+                    If GelP_D_L(CallerID).SearchDef.RequireUMCOverlap Then
+                        If ((GelUMC(CallerID).UMCs(lngIndexLight).MaxScan < GelUMC(CallerID).UMCs(lngIndexHeavy).MinScan) Or _
+                           (GelUMC(CallerID).UMCs(lngIndexHeavy).MaxScan < GelUMC(CallerID).UMCs(lngIndexLight).MinScan)) Then
+                                OverlapOK = False                       'no overlap
+                        End If
+                    End If
+                    
+                    If OverlapOK And GelP_D_L(CallerID).SearchDef.RequireUMCOverlapAtApex Then
+                        Select Case GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepType
+                        Case glCSType
+                            ScanMaxAbuLight = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngIndexLight).ClassRepInd).ScanNumber
+                            ScanMaxAbuHeavy = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepInd).ScanNumber
+                        Case glIsoType
+                            ScanMaxAbuLight = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngIndexLight).ClassRepInd).ScanNumber
+                            ScanMaxAbuHeavy = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepInd).ScanNumber
+                        Case Else
+                            ' This shouldn't happen
+                            Debug.Assert False
+                            ScanMaxAbuLight = 0
+                            ScanMaxAbuHeavy = GelP_D_L(CallerID).SearchDef.ScanToleranceAtApex + 1
+                        End Select
+                    
+                        ' Future: Make this more sophisticated by fitting a Gaussian curve to each of the LC-MS Features
+                        '         and comparing the alignment of the fitted curves
+                        ' For now, just check the scan distance between the apexes of the two LC-MS Features
+                        If Abs(ScanMaxAbuLight - ScanMaxAbuHeavy) > GelP_D_L(CallerID).SearchDef.ScanToleranceAtApex Then
+                            OverlapOK = False                       'no overlap
+                        End If
+                    
+                    End If
+                 
+                    If OverlapOK Then
+                        'check is it possible that this is a pair
+                        LClsMW = GelUMC(CallerID).UMCs(lngIndexLight).ClassMW
+                              
+                        Select Case ePairFormMode
+                        Case pfmDelta
+                            FindPairsWorkDelta blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy, ClsMinDelta, ClsMaxDelta, ClsStepDelta
+                        Case pfmLabel
+                            FindPairsWorkLabeled blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy
+                        Case pfmDeltaLabel
+                            FindPairsWorkDeltaLabeled blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy, ClsMinDelta, ClsMaxDelta, ClsStepDelta
+                        End Select
+                    
+                    End If
+                End If
+            Next lngIndexLight
+        Next lngIndexHeavy
+       
+        Select Case ePairFormMode
+        Case pfmDelta
+            If Not GelAnalysis(CallerID) Is Nothing Then
+                If GelP_D_L(CallerID).SearchDef.DeltaMass = glO16O18_DELTA Then
+                    GelAnalysis(CallerID).MD_Type = stPairsO16O18
+                Else
+                    ' Use N14/N15 type by default
+                    GelAnalysis(CallerID).MD_Type = stPairsN14N15
+                End If
+            End If
     
-    ' Calculate expression ratios here (note that GelP_D_L().SearchDef was updated earlier in this function)
-    If mDltLblPairsUMC Is Nothing Then
-        Set mDltLblPairsUMC = New clsDltLblPairsUMC
-    End If
-    mDltLblPairsUMC.CalcDltLblPairsER_UMC CallerID, strMessage
-    
-    blnSuccess = True
-Else
-    strMessage = "Unable to reserve space for pairs structures."
-    If blnShowMessages Then
-        MsgBox strMessage, vbOKOnly, glFGTU
+            blnDeltaInfo = True
+            blnLabelInfo = False
+            strSearchMode = "Delta"
+            
+        Case pfmLabel
+            If Not GelAnalysis(CallerID) Is Nothing Then
+                GelAnalysis(CallerID).MD_Type = stPairsICAT
+            End If
+            
+            blnDeltaInfo = False
+            blnLabelInfo = True
+            strSearchMode = "Labeled"
+            
+        Case pfmDeltaLabel
+            If Not GelAnalysis(CallerID) Is Nothing Then
+                GelAnalysis(CallerID).MD_Type = stPairsPEON14N15
+            End If
+            
+            blnDeltaInfo = True
+            blnLabelInfo = True
+            strSearchMode = "Delta-Label"
+        Case Else
+            strSearchMode = "??"
+        End Select
+        
+        'MonroeMod
+        With GelP_D_L(CallerID)
+            strMessage = "Searched for " & strSearchMode & " pairs (using LC-MS Features); Pair Count = " & Trim(.PCnt)
+            With .SearchDef
+                If blnDeltaInfo Then
+                    strMessage = strMessage & "; Delta = " & Trim(.DeltaMass) & " Da"
+                    strMessage = strMessage & "; Auto-calculated Min/Max Delta = " & CStr(.AutoCalculateDeltaMinMaxCount)
+                    strMessage = strMessage & "; Min Deltas = " & Trim(.DeltaCountMin) & "; Max Deltas = " & Trim(.DeltaCountMax)
+                    strMessage = strMessage & "; Delta Step Size = " & Trim(.DeltaStepSize)
+                End If
+                
+                If blnLabelInfo Then
+                    strMessage = strMessage & "; Label = " & Trim(.LightLabelMass) & " Da; Heavy/Light Delta = " & Trim(.HeavyLightMassDifference) & " Da"
+                    strMessage = strMessage & "; Min Labels = " & Trim(.LabelCountMin) & "; Max Labels = " & Trim(.LabelCountMax)
+                    strMessage = strMessage & "; Max difference in number of labels = " & Trim(.MaxDifferenceInNumberOfLightHeavyLabels)
+                End If
+                
+                strMessage = strMessage & "; Pair Tolerance = " & Trim(.DeltaMassTolerance) & " " & GetSearchToleranceUnitText(CInt(.DeltaMassTolType))
+            
+                strMessage = strMessage & "; Scan Tolerance at Edges = " & Trim(.ScanTolerance) & "; Require Overlap at Edges = " & CStr(.RequireUMCOverlap)
+                strMessage = strMessage & "; Scan Tolerance at Apex = " & Trim(.ScanToleranceAtApex) & "; Require Overlap at Apex = " & CStr(.RequireUMCOverlapAtApex)
+                strMessage = strMessage & "; ER Inclusion Range = " & Trim(.ERInclusionMin) & " to " & Trim(.ERInclusionMax)
+                strMessage = strMessage & "; Require Matching Charge States = " & CStr(.RequireMatchingChargeStatesForPairMembers)
+                strMessage = strMessage & "; Use Identical Charges for ER = " & CStr(.UseIdenticalChargesForER)
+                strMessage = strMessage & "; Compute ER Scan by Scan = " & CStr(.ComputeERScanByScan)
+                strMessage = strMessage & "; Scan By Scan Average Uses Weighted Average = " & CStr(Not .ScanByScanAverageIsNotWeighted)
+                strMessage = strMessage & "; Avg ER All Charge States = " & CStr(.AverageERsAllChargeStates)
+                strMessage = strMessage & "; Avg ERs Weighting Mode = " & CStr(.AverageERsWeightingMode)
+            End With
+            
+            With glbPreferencesExpanded.PairSearchOptions.SearchDef
+                If .N15IncompleteIncorporationMode Then
+                    strMessage = strMessage & "; N15 Incomplete Incorporation Search Enabled"
+                    strMessage = strMessage & "; Minimum Incorporation = " & Round(.N15PercentIncorporationMinimum, 1) & "%"
+                    strMessage = strMessage & "; Maximum Incorporation = " & Round(.N15PercentIncorporationMaximum, 1) & "%"
+                    strMessage = strMessage & "; Step size = " & Round(.N15PercentIncorporationStep, 1) & "%"
+                End If
+            End With
+            
+            AddToAnalysisHistory CallerID, strMessage
+        End With
+        
+        ' Calculate expression ratios here (note that GelP_D_L().SearchDef was updated earlier in this function)
+        If mDltLblPairsUMC Is Nothing Then
+            Set mDltLblPairsUMC = New clsDltLblPairsUMC
+        End If
+        mDltLblPairsUMC.CalcDltLblPairsER_UMC CallerID, strMessage
+        
+        blnSuccess = True
     Else
-        LogErrors -1, "frmUMCDltPairs.FindPairs", strMessage
+        strMessage = "Unable to reserve space for pairs structures."
+        If blnShowMessages Then
+            MsgBox strMessage, vbOKOnly, glFGTU
+        Else
+            LogErrors -1, "frmUMCDltPairs.FindPairs", strMessage
+        End If
+        blnSuccess = False
     End If
-    blnSuccess = False
-End If
-
+    
 exit_FindPairs:
-If GelP_D_L(CallerID).PCnt > 0 Then
-    Call TrimDltLblPairs(CallerID)
-    UpdateStatus strMessage
-Else
-    DestroyDltLblPairs CallerID, False
-    UpdateStatus "No pairs were found"
-End If
-
+    If GelP_D_L(CallerID).PCnt > 0 Then
+        Call TrimDltLblPairs(CallerID)
+        UpdateStatus strMessage
+    Else
+        DestroyDltLblPairs CallerID, False
+        UpdateStatus "No pairs were found"
+    End If
+    
 exit_Cleanup:
-ShowHideControls False
-FindPairs = blnSuccess
-Exit Function
+    ShowHideControls False
+    FindPairs = blnSuccess
+    Exit Function
 
 err_FindPairs:
-If blnShowMessages Then
-    MsgBox "Error establishing delta pairs " & vbCrLf & "Error: " & Err.Number & ", " & Err.Description, vbOKOnly, glFGTU
-Else
-    LogErrors Err.Number, "frmUMCDltPairs.FindPairs"
-End If
-
-blnSuccess = False
-Resume exit_Cleanup
+    If blnShowMessages Then
+        MsgBox "Error establishing delta pairs " & vbCrLf & "Error: " & Err.Number & ", " & Err.Description, vbOKOnly, glFGTU
+    Else
+        LogErrors Err.Number, "frmUMCDltPairs.FindPairs"
+    End If
+    
+    blnSuccess = False
+    Resume exit_Cleanup
 
 End Function
 
@@ -1585,33 +1629,35 @@ With GelP_D_L(CallerID)
                  If BinInd >= 1000 Then Done = True
               End If
            Loop
+           
            'add counts
            ERAllS.ERCnt = ERAllS.ERCnt + 1
-           If .Pairs(i).State = glPAIR_Inc Then
+           If .Pairs(i).STATE = glPAIR_Inc Then
               ERIncS.ERCnt = ERIncS.ERCnt + 1
-           ElseIf .Pairs(i).State = glPAIR_Exc Then
+           ElseIf .Pairs(i).STATE = glPAIR_Exc Then
               ERExcS.ERCnt = ERExcS.ERCnt + 1
            End If
+           
            Select Case BinInd
            Case Is < 0
                 ERAllS.ERBadL = ERAllS.ERBadL + 1
-                If .Pairs(i).State = glPAIR_Inc Then
+                If .Pairs(i).STATE = glPAIR_Inc Then
                     ERIncS.ERBadL = ERIncS.ERBadL + 1
-                ElseIf .Pairs(i).State = glPAIR_Exc Then
+                ElseIf .Pairs(i).STATE = glPAIR_Exc Then
                     ERExcS.ERBadL = ERExcS.ERBadL + 1
                 End If
            Case Is > 1000
                 ERAllS.ERBadR = ERAllS.ERBadR + 1
-                If .Pairs(i).State = glPAIR_Inc Then
+                If .Pairs(i).STATE = glPAIR_Inc Then
                     ERIncS.ERBadR = ERIncS.ERBadR + 1
-                ElseIf .Pairs(i).State = glPAIR_Exc Then
+                ElseIf .Pairs(i).STATE = glPAIR_Exc Then
                     ERExcS.ERBadR = ERExcS.ERBadR + 1
                 End If
            Case Else            'some of our cases
                 ERBinAll(BinInd) = ERBinAll(BinInd) + 1
-                If .Pairs(i).State = glPAIR_Inc Then
+                If .Pairs(i).STATE = glPAIR_Inc Then
                    ERBinInc(BinInd) = ERBinInc(BinInd) + 1
-                ElseIf .Pairs(i).State = glPAIR_Exc Then
+                ElseIf .Pairs(i).STATE = glPAIR_Exc Then
                    ERBinExc(BinInd) = ERBinExc(BinInd) + 1
                 End If
            End Select
@@ -1641,10 +1687,6 @@ Public Sub InitializeForm()
         ' Validate the N15 incorporation settings
         ValidateN15IncorporationSettings
        
-        With glbPreferencesExpanded.PairSearchOptions
-            SetCheckBox chkOutlierRemovalUsesSymmetricERs, .OutlierRemovalUsesSymmetricERs
-        End With
-        
         With glbPreferencesExpanded.PairSearchOptions.SearchDef
             txtDelta.Text = .DeltaMass
                         
@@ -1686,6 +1728,8 @@ Public Sub InitializeForm()
             SetCheckBox chkRequireMatchingChargeStates, .RequireMatchingChargeStatesForPairMembers
             SetCheckBox chkUseIdenticalChargeStatesForER, .UseIdenticalChargesForER
             SetCheckBox chkComputeERScanByScan, .ComputeERScanByScan
+            SetCheckBox chkScanByScanAverageUsesWeightedAvg, Not .ScanByScanAverageIsNotWeighted
+            
             SetCheckBox chkAverageERsAllChargeStates, .AverageERsAllChargeStates
             
             cboAverageERsWeightingMode.ListIndex = .AverageERsWeightingMode
@@ -1698,6 +1742,8 @@ Public Sub InitializeForm()
             
             If .RemoveOutlierERsMinimumDataPointCount < 2 Then .RemoveOutlierERsMinimumDataPointCount = 2
             txtRemoveOutlierERsMinimumDataPointCount.Text = .RemoveOutlierERsMinimumDataPointCount
+            
+            optERCalc(glbPreferencesExpanded.PairSearchOptions.SearchDef.ERCalcType).Value = True
             
             UpdateDynamicControls
         End With
@@ -1713,71 +1759,72 @@ InitializeFormErrorHandler:
 End Sub
 
 Public Sub MarkBadERPairs()
-Dim strMessage As String
-strMessage = PairsSearchMarkBadER(glbPreferencesExpanded.PairSearchOptions.SearchDef.ERInclusionMin, glbPreferencesExpanded.PairSearchOptions.SearchDef.ERInclusionMax, CallerID, True)
-mPairInfoChanged = True
-UpdateStatus strMessage
+    Dim strMessage As String
+    strMessage = PairsSearchMarkBadER(glbPreferencesExpanded.PairSearchOptions.SearchDef.ERInclusionMin, glbPreferencesExpanded.PairSearchOptions.SearchDef.ERInclusionMax, CallerID, True)
+    mPairInfoChanged = True
+    UpdateStatus strMessage
 End Sub
 
 Private Sub PickParameters()
-'--------------------------------------------------------
-'click on the menu bar does not trigger LostFocus event;
-'we have to pick parameters after menu is clicked to make
-'sure we have most recent typed parameters
-'--------------------------------------------------------
-If mFormMode <> pfmLabel Then
-    Call txtDelta_LostFocus
-    Call txtMinDelta_LostFocus
-    Call txtMaxDelta_LostFocus
-    Call txtDeltaStepSize_LostFocus
-    Call txtN15PercentIncorporationMinimum_LostFocus
-    Call txtN15PercentIncorporationMaximum_LostFocus
-    Call txtN15PercentIncorporationStep_LostFocus
-End If
-
-If mFormMode <> pfmDelta Then
-    Call txtLabel_LostFocus
-    Call txtHeavyLightDelta_LostFocus
-    Call txtMinLbl_LostFocus
-    Call txtMaxLbl_LostFocus
-    Call txtMaxLblDiff_LostFocus
-End If
-
-Call txtPairTol_LostFocus
-Call txtPairsScanTolEdge_LostFocus
-Call txtPairsScanTolApex_LostFocus
-Call txtERMin_LostFocus
-Call txtERMax_LostFocus
-
-Call txtRemoveOutlierERsMinimumDataPointCount_LostFocus
+    '--------------------------------------------------------
+    'click on the menu bar does not trigger LostFocus event;
+    'we have to pick parameters after menu is clicked to make
+    'sure we have most recent typed parameters
+    '--------------------------------------------------------
+    
+    If mFormMode <> pfmLabel Then
+        Call txtDelta_LostFocus
+        Call txtMinDelta_LostFocus
+        Call txtMaxDelta_LostFocus
+        Call txtDeltaStepSize_LostFocus
+        Call txtN15PercentIncorporationMinimum_LostFocus
+        Call txtN15PercentIncorporationMaximum_LostFocus
+        Call txtN15PercentIncorporationStep_LostFocus
+    End If
+    
+    If mFormMode <> pfmDelta Then
+        Call txtLabel_LostFocus
+        Call txtHeavyLightDelta_LostFocus
+        Call txtMinLbl_LostFocus
+        Call txtMaxLbl_LostFocus
+        Call txtMaxLblDiff_LostFocus
+    End If
+    
+    Call txtPairTol_LostFocus
+    Call txtPairsScanTolEdge_LostFocus
+    Call txtPairsScanTolApex_LostFocus
+    Call txtERMin_LostFocus
+    Call txtERMax_LostFocus
+    
+    Call txtRemoveOutlierERsMinimumDataPointCount_LostFocus
 End Sub
 
 Public Sub ReportPairs(PState As Integer, Optional strFilePath As String = "")
-' PState can be 0 for all pairs, 1 for Included only (aka glPAIR_Inc), or
-'   -1 for Excluded only (aka glPAIR_Exc)
-' If Len(strFilePath) = 0, then displays report using frmDataInfo;
-'   otherwise, saves the report to strFilePath
-
-UpdateStatus "Generating report ..."
-Me.MousePointer = vbHourglass
-ReportDltLblPairsUMCWrapper CallerID, PState, strFilePath
-Me.MousePointer = vbDefault
-UpdateStatus ""
+    ' PState can be 0 for all pairs, 1 for Included only (aka glPAIR_Inc), or
+    '   -1 for Excluded only (aka glPAIR_Exc)
+    ' If Len(strFilePath) = 0, then displays report using frmDataInfo;
+    '   otherwise, saves the report to strFilePath
+    
+    UpdateStatus "Generating report ..."
+    Me.MousePointer = vbHourglass
+    ReportDltLblPairsUMCWrapper CallerID, PState, strFilePath
+    Me.MousePointer = vbDefault
+    UpdateStatus ""
 
 End Sub
 
 Public Sub ReportERStatistics(Optional strFilePath As String = "")
-' If Len(strFilePath) = 0, then displays report using frmDataInfo;
-'   otherwise, saves the report to strFilePath
-
-UpdateStatus "Generating report ..."
-Me.MousePointer = vbHourglass
-If GenerateERStat Then
-   ReportERStat CallerID, ERBin(), ERBinAll(), ERBinInc(), _
-                ERBinExc(), ERAllS, ERIncS, ERExcS, strFilePath
-End If
-Me.MousePointer = vbDefault
-UpdateStatus ""
+    ' If Len(strFilePath) = 0, then displays report using frmDataInfo;
+    '   otherwise, saves the report to strFilePath
+    
+    UpdateStatus "Generating report ..."
+    Me.MousePointer = vbHourglass
+    If GenerateERStat Then
+       ReportERStat CallerID, ERBin(), ERBinAll(), ERBinInc(), _
+                    ERBinExc(), ERAllS, ERIncS, ERExcS, strFilePath
+    End If
+    Me.MousePointer = vbDefault
+    UpdateStatus ""
 
 End Sub
 
@@ -1812,12 +1859,16 @@ Private Sub ReportScanByScanDetails(Optional strFilePath As String = "")
     Dim dblHvAbundance() As Double
     Dim sngAbu2DaCorrected() As Single
     Dim sngAbu4DaCorected() As Single
+    Dim sngLabellingEfficiency() As Single
+    Dim sngERCorrectedForF() As Single
     
 On Error GoTo ReportScanByScanDetailsErrorHandler
     
     UpdateStatus "Generating report ..."
     Me.MousePointer = vbHourglass
 
+    ' Initially reserve space for INITIAL_DIM_COUNT items
+    ' GetScanByScanStatsForPair() will expand these arrays if needed
     ReDim lngScanNumbers(INITIAL_DIM_COUNT - 1)
     ReDim intCharges(INITIAL_DIM_COUNT - 1)
     ReDim dblER(INITIAL_DIM_COUNT - 1)
@@ -1825,6 +1876,8 @@ On Error GoTo ReportScanByScanDetailsErrorHandler
     ReDim dblHvAbundance(INITIAL_DIM_COUNT - 1)
     ReDim sngAbu2DaCorrected(INITIAL_DIM_COUNT - 1)
     ReDim sngAbu4DaCorected(INITIAL_DIM_COUNT - 1)
+    ReDim sngLabellingEfficiency(INITIAL_DIM_COUNT - 1)
+    ReDim sngERCorrectedForF(INITIAL_DIM_COUNT - 1)
 
     If Len(strFilePath) > 0 Then
        strOutFilePath = strFilePath
@@ -1849,7 +1902,7 @@ On Error GoTo ReportScanByScanDetailsErrorHandler
             Case ectER_RAT
                 ts.WriteLine "ER calculation: Ratio; AbuLight/AbuHeavy"
             Case ectER_LOG
-                ts.WriteLine "ER calculation: Logarithmic Ratio; Log(AbuLight/AbuHeavy)"
+                ts.WriteLine "ER calculation: Logarithmic Ratio; Ln(AbuLight/AbuHeavy)"
             Case ectER_ALT
                 ts.WriteLine "ER calculation: 0-Shifted Symmetric Ratio; (AbuL/AbuH)-1 for AbuL>=AbuH; 1-(AbuH/AbuL) for AbuL<AbuH"
             Case Else
@@ -1868,8 +1921,10 @@ On Error GoTo ReportScanByScanDetailsErrorHandler
             strLineOut = strLineOut & "UMC Heavy Index" & strSepChar & "Heavy MW" & strSepChar & "Heavy Abu" & strSepChar
             strLineOut = strLineOut & "Delta Count" & strSepChar
             strLineOut = strLineOut & "ER" & strSepChar & "ER StDev" & strSepChar & "ER Charge State Basis Count" & strSepChar & "ER Member Basis Count" & strSepChar
-            strLineOut = strLineOut & "Scan_Number" & strSepChar & "Charge_State" & strSepChar & "Scan_Light_Abundance" & strSepChar & "Scan_Heavy_Abundance" & strSepChar
-            strLineOut = strLineOut & "Scan_Abu2DaCorrected" & strSepChar & "Scan_Abu4DaCorrected" & strSepChar & "Scan_ER"
+            strLineOut = strLineOut & "Scan Number" & strSepChar & "Charge State" & strSepChar & "Scan Light Abundance" & strSepChar & "Scan Heavy Abundance" & strSepChar
+            strLineOut = strLineOut & "Scan Abu2DaCorrected" & strSepChar & "Scan Abu4DaCorrected" & strSepChar & "Scan ER" & strSepChar
+            strLineOut = strLineOut & "Scan Labelling Efficiency (F)" & strSepChar & "Scan Log2(ER) Corrected for F"
+            
             ts.WriteLine strLineOut
             
             For lngPairIndex = 0 To .PCnt - 1
@@ -1891,7 +1946,7 @@ On Error GoTo ReportScanByScanDetailsErrorHandler
                         ts.WriteLine strLineOut
                     Else
                     
-                        mDltLblPairsUMC.GetScanByScanStatsForPair lngPairIndex, lngAlignedScanCount, lngScanNumbers(), intCharges(), dblLtAbundance(), dblHvAbundance(), dblER(), sngAbu2DaCorrected(), sngAbu4DaCorected()
+                        mDltLblPairsUMC.GetScanByScanStatsForPair lngPairIndex, lngAlignedScanCount, lngScanNumbers(), intCharges(), dblLtAbundance(), dblHvAbundance(), dblER(), sngAbu2DaCorrected(), sngAbu4DaCorected(), sngLabellingEfficiency(), sngERCorrectedForF()
                         
                         If lngAlignedScanCount = 0 Then
                             ts.WriteLine strLineOut
@@ -1903,8 +1958,10 @@ On Error GoTo ReportScanByScanDetailsErrorHandler
                                                 Round(dblHvAbundance(lngAlignedScanIndex), 6) & strSepChar & _
                                                 sngAbu2DaCorrected(lngAlignedScanIndex) & strSepChar & _
                                                 sngAbu4DaCorected(lngAlignedScanIndex) & strSepChar & _
-                                                Round(dblER(lngAlignedScanIndex), 6)
-                    
+                                                Round(dblER(lngAlignedScanIndex), 6) & strSepChar & _
+                                                sngLabellingEfficiency(lngAlignedScanIndex) & strSepChar & _
+                                                sngERCorrectedForF(lngAlignedScanIndex)
+
                                 ts.WriteLine strLineOut & strSepChar & strAdditional
                             Next lngAlignedScanIndex
                         End If
@@ -1984,6 +2041,9 @@ Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
             fraDeltaOptions.Visible = True
             fraLabelOptions.Visible = False
             lngGeneralOptionsFrameTop = fraDeltaOptions.Top + fraDeltaOptions.Height + CONTROL_SPACING
+            
+            fraERCalc.Top = lngGeneralOptionsFrameTop
+            
             Me.Caption = "LC-MS Feature Delta Pairing Analysis"
             
             If txtDelta = "0" Then cmdSetToO18_Click
@@ -1992,6 +2052,9 @@ Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
             fraDeltaOptions.Visible = False
             fraLabelOptions.Visible = True
             lngGeneralOptionsFrameTop = fraLabelOptions.Top + fraLabelOptions.Height + CONTROL_SPACING
+            
+            fraERCalc.Top = fraInclusionOptions.Top + fraInclusionOptions.Height + CONTROL_SPACING
+            
             Me.Caption = "LC-MS Feature Labeled Pairing Analysis"
             
             If txtLabel = "0" Then cmdSetToICAT_Click
@@ -2006,6 +2069,9 @@ Private Sub SetFormMode(ByVal eNewFormMode As pfmPairFormMode)
         fraDeltaOptions.Visible = True
         fraLabelOptions.Visible = True
         lngGeneralOptionsFrameTop = fraLabelOptions.Top + fraLabelOptions.Height + CONTROL_SPACING
+        
+        fraERCalc.Top = lngGeneralOptionsFrameTop
+        
         Me.Caption = "LC-MS Feature N14/N15 Cys-based Labeled Pairing"
         
         MsgBox "Warning, the Delta/Label Pairs search algorithm is under development and has not been fully implemented.  In particular, the settings for Label mass and Heavy/Light Delta mass are not utilized in the search (MEM - July 2004).", vbInformation + vbOKOnly, "Warning"
@@ -2076,11 +2142,11 @@ Private Sub UpdateDynamicControls()
         cboAverageERsWeightingMode.Enabled = (.AverageERsAllChargeStates And chkAverageERsAllChargeStates.Enabled)
     
         chkRemoveOutlierERs.Enabled = .ComputeERScanByScan
+        chkScanByScanAverageUsesWeightedAvg.Enabled = .ComputeERScanByScan
         
         blnEnableOutlierControls = .ComputeERScanByScan And .RemoveOutlierERs
         chkRemoveOutlierERsIterate.Enabled = blnEnableOutlierControls
         txtRemoveOutlierERsMinimumDataPointCount.Enabled = blnEnableOutlierControls
-        chkOutlierRemovalUsesSymmetricERs.Enabled = blnEnableOutlierControls
         lblRemoveOutlierERsMinimumDataPointCount.Enabled = blnEnableOutlierControls
         
         mnuRScanByScanDetails.Enabled = .ComputeERScanByScan
@@ -2093,22 +2159,6 @@ Private Sub UpdateDynamicControls()
         chkIReportEREnabled.Enabled = False
     End If
     
-End Sub
-
-Private Sub UpdateERCalculationOptions()
-
-    With glbPreferencesExpanded.PairSearchOptions.SearchDef
-        GelP_D_L(CallerID).SearchDef.RequireMatchingChargeStatesForPairMembers = .RequireMatchingChargeStatesForPairMembers
-        GelP_D_L(CallerID).SearchDef.UseIdenticalChargesForER = .UseIdenticalChargesForER
-        GelP_D_L(CallerID).SearchDef.ComputeERScanByScan = .ComputeERScanByScan
-        GelP_D_L(CallerID).SearchDef.AverageERsAllChargeStates = .AverageERsAllChargeStates
-        GelP_D_L(CallerID).SearchDef.IReportEROptions.Enabled = .IReportEROptions.Enabled
-        GelP_D_L(CallerID).SearchDef.RemoveOutlierERs = .RemoveOutlierERs
-        GelP_D_L(CallerID).SearchDef.RemoveOutlierERsIterate = .RemoveOutlierERsIterate
-        GelP_D_L(CallerID).SearchDef.RemoveOutlierERsMinimumDataPointCount = .RemoveOutlierERsMinimumDataPointCount
-        GelP_D_L(CallerID).SearchDef.RemoveOutlierERsConfidenceLevel = .RemoveOutlierERsConfidenceLevel
-    End With
-     
 End Sub
 
 Private Sub UpdateStatus(ByVal Status As String)
@@ -2208,10 +2258,6 @@ Private Sub chkN14N15IncompleteIncorporationMode_Click()
     ValidateN15IncorporationSettings
 End Sub
 
-Private Sub chkOutlierRemovalUsesSymmetricERs_Click()
-    glbPreferencesExpanded.PairSearchOptions.OutlierRemovalUsesSymmetricERs = cChkBox(chkOutlierRemovalUsesSymmetricERs)
-End Sub
-
 Private Sub chkPairsExcludeAmbiguousKeepMostConfident_Click()
     glbPreferencesExpanded.PairSearchOptions.KeepMostConfidentAmbiguous = cChkBox(chkPairsExcludeAmbiguousKeepMostConfident)
 End Sub
@@ -2236,6 +2282,10 @@ End Sub
 Private Sub chkRequireMatchingChargeStates_Click()
     glbPreferencesExpanded.PairSearchOptions.SearchDef.RequireMatchingChargeStatesForPairMembers = cChkBox(chkRequireMatchingChargeStates)
     UpdateDynamicControls
+End Sub
+
+Private Sub chkScanByScanAverageUsesWeightedAvg_Click()
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.ScanByScanAverageIsNotWeighted = Not cChkBox(chkScanByScanAverageUsesWeightedAvg)
 End Sub
 
 Private Sub chkUseIdenticalChargeStatesForER_Click()
@@ -2354,7 +2404,7 @@ End Sub
 Private Sub mnuFERRecalculation_Click()
     Dim strMessage As String
     
-    UpdateERCalculationOptions
+    GelP_D_L(CallerID).SearchDef = glbPreferencesExpanded.PairSearchOptions.SearchDef
     
     If mDltLblPairsUMC Is Nothing Then
         Set mDltLblPairsUMC = New clsDltLblPairsUMC
@@ -2395,31 +2445,35 @@ Me.MousePointer = vbDefault
 End Sub
 
 Private Sub mnuFunction_Click()
-Call PickParameters
+    Call PickParameters
 End Sub
 
 Private Sub mnuReport_Click()
-Call PickParameters
+    Call PickParameters
 End Sub
 
 Private Sub mnuRERStat_Click()
-ReportERStatistics
+    ReportERStatistics
 End Sub
 
 Private Sub mnuRPairsAll_Click()
-ReportPairs 0
+    ReportPairs 0
 End Sub
 
 Private Sub mnuRPairsExcluded_Click()
-ReportPairs glPAIR_Exc
+    ReportPairs glPAIR_Exc
 End Sub
 
 Private Sub mnuRPairsIncluded_Click()
-ReportPairs glPAIR_Inc
+    ReportPairs glPAIR_Inc
 End Sub
 
 Private Sub mnuRScanByScanDetails_Click()
     ReportScanByScanDetails
+End Sub
+
+Private Sub optERCalc_Click(Index As Integer)
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.ERCalcType = Index
 End Sub
 
 Private Sub optPairTolType_Click(Index As Integer)
@@ -2431,12 +2485,12 @@ Private Sub optPairTolType_Click(Index As Integer)
 End Sub
 
 Private Sub txtDelta_LostFocus()
-On Error GoTo err_Delta
-glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMass = CDbl(txtDelta.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMass > 0 Then Exit Sub
+    On Error GoTo err_Delta
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMass = CDbl(txtDelta.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMass > 0 Then Exit Sub
 err_Delta:
-MsgBox "Delta should be positive number.", vbOKOnly, glFGTU
-txtDelta.SetFocus
+    MsgBox "Delta should be positive number.", vbOKOnly, glFGTU
+    txtDelta.SetFocus
 End Sub
 
 Private Sub txtDeltaStepSize_KeyPress(KeyAscii As Integer)
@@ -2444,30 +2498,30 @@ Private Sub txtDeltaStepSize_KeyPress(KeyAscii As Integer)
 End Sub
 
 Private Sub txtDeltaStepSize_LostFocus()
-On Error GoTo err_DeltaStep
-glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaStepSize = CLng(txtDeltaStepSize.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaStepSize >= 0 Then Exit Sub
+    On Error GoTo err_DeltaStep
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaStepSize = CLng(txtDeltaStepSize.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaStepSize >= 0 Then Exit Sub
 err_DeltaStep:
-MsgBox "Delta step size should be 0 or greater.", vbOKOnly, glFGTU
-txtDeltaStepSize.SetFocus
+    MsgBox "Delta step size should be 0 or greater.", vbOKOnly, glFGTU
+    txtDeltaStepSize.SetFocus
 End Sub
 
 Private Sub txtHeavyLightDelta_LostFocus()
-On Error GoTo err_Delta
-glbPreferencesExpanded.PairSearchOptions.SearchDef.HeavyLightMassDifference = CDbl(txtHeavyLightDelta.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.HeavyLightMassDifference > 0 Then Exit Sub
+    On Error GoTo err_Delta
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.HeavyLightMassDifference = CDbl(txtHeavyLightDelta.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.HeavyLightMassDifference > 0 Then Exit Sub
 err_Delta:
-MsgBox "Delta should be positive number.", vbOKOnly, glFGTU
-txtHeavyLightDelta.SetFocus
+    MsgBox "Delta should be positive number.", vbOKOnly, glFGTU
+    txtHeavyLightDelta.SetFocus
 End Sub
 
 Private Sub txtLabel_LostFocus()
-On Error GoTo err_Label
-glbPreferencesExpanded.PairSearchOptions.SearchDef.LightLabelMass = CDbl(txtLabel.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.LightLabelMass >= 0 Then Exit Sub
+    On Error GoTo err_Label
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.LightLabelMass = CDbl(txtLabel.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.LightLabelMass >= 0 Then Exit Sub
 err_Label:
-MsgBox "Label mass should be non-negative number.", vbOKOnly, glFGTU
-txtLabel.SetFocus
+    MsgBox "Label mass should be non-negative number.", vbOKOnly, glFGTU
+    txtLabel.SetFocus
 End Sub
 
 Private Sub txtMaxDelta_KeyPress(KeyAscii As Integer)
@@ -2479,12 +2533,12 @@ Private Sub txtMaxLbl_KeyPress(KeyAscii As Integer)
 End Sub
 
 Private Sub txtMaxLbl_LostFocus()
-On Error GoTo err_MaxLbl
-glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMax = CLng(txtMaxLbl.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMax > 0 Then Exit Sub
+    On Error GoTo err_MaxLbl
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMax = CLng(txtMaxLbl.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMax > 0 Then Exit Sub
 err_MaxLbl:
-MsgBox "Maximum number of labels should be non-negative integer.", vbOKOnly, glFGTU
-txtMaxLbl.SetFocus
+    MsgBox "Maximum number of labels should be non-negative integer.", vbOKOnly, glFGTU
+    txtMaxLbl.SetFocus
 End Sub
 
 Private Sub txtMaxLblDiff_KeyPress(KeyAscii As Integer)
@@ -2492,12 +2546,12 @@ Private Sub txtMaxLblDiff_KeyPress(KeyAscii As Integer)
 End Sub
 
 Private Sub txtMaxLblDiff_LostFocus()
-On Error GoTo err_MaxLblDiff
-glbPreferencesExpanded.PairSearchOptions.SearchDef.MaxDifferenceInNumberOfLightHeavyLabels = CLng(txtMaxLblDiff.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.MaxDifferenceInNumberOfLightHeavyLabels >= 0 Then Exit Sub
+    On Error GoTo err_MaxLblDiff
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.MaxDifferenceInNumberOfLightHeavyLabels = CLng(txtMaxLblDiff.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.MaxDifferenceInNumberOfLightHeavyLabels >= 0 Then Exit Sub
 err_MaxLblDiff:
-MsgBox "Maximum difference between number of light and heavy labels should be non-negative integer.", vbOKOnly, glFGTU
-txtMaxLblDiff.SetFocus
+    MsgBox "Maximum difference between number of light and heavy labels should be non-negative integer.", vbOKOnly, glFGTU
+    txtMaxLblDiff.SetFocus
 End Sub
 
 Private Sub txtMinDelta_KeyPress(KeyAscii As Integer)
@@ -2509,12 +2563,12 @@ Private Sub txtMinLbl_KeyPress(KeyAscii As Integer)
 End Sub
 
 Private Sub txtMinLbl_LostFocus()
-On Error GoTo err_MinLbl
-glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMin = CLng(txtMinLbl.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMin >= 0 Then Exit Sub
+    On Error GoTo err_MinLbl
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMin = CLng(txtMinLbl.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.LabelCountMin >= 0 Then Exit Sub
 err_MinLbl:
-MsgBox "Minimum number of labels should be non-negative integer.", vbOKOnly, glFGTU
-txtMinLbl.SetFocus
+    MsgBox "Minimum number of labels should be non-negative integer.", vbOKOnly, glFGTU
+    txtMinLbl.SetFocus
 End Sub
 
 Private Sub txtN15PercentIncorporationMaximum_KeyPress(KeyAscii As Integer)
@@ -2565,48 +2619,48 @@ Private Sub txtPairsScanTolEdge_KeyPress(KeyAscii As Integer)
 End Sub
 
 Private Sub txtPairTol_LostFocus()
-On Error GoTo err_DeltaTol
-glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMassTolerance = CDbl(txtPairTol.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMassTolerance > 0 Then Exit Sub
+    On Error GoTo err_DeltaTol
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMassTolerance = CDbl(txtPairTol.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaMassTolerance > 0 Then Exit Sub
 err_DeltaTol:
-MsgBox "Delta tolerance should be positive number.", vbOKOnly, glFGTU
-txtPairTol.SetFocus
+    MsgBox "Delta tolerance should be positive number.", vbOKOnly, glFGTU
+    txtPairTol.SetFocus
 End Sub
 
 Private Sub txtERMax_LostFocus()
-On Error GoTo err_ERMax
-glbPreferencesExpanded.PairSearchOptions.SearchDef.ERInclusionMax = CDbl(txtERMax.Text)
-Exit Sub
+    On Error GoTo err_ERMax
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.ERInclusionMax = CDbl(txtERMax.Text)
+    Exit Sub
 err_ERMax:
-MsgBox "Maximum of ER range should be a number.", vbOKOnly, glFGTU
-txtERMax.SetFocus
+    MsgBox "Maximum of ER range should be a number.", vbOKOnly, glFGTU
+    txtERMax.SetFocus
 End Sub
 
 Private Sub txtERMin_LostFocus()
-On Error GoTo err_ERMin
-glbPreferencesExpanded.PairSearchOptions.SearchDef.ERInclusionMin = CDbl(txtERMin.Text)
-Exit Sub
+    On Error GoTo err_ERMin
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.ERInclusionMin = CDbl(txtERMin.Text)
+    Exit Sub
 err_ERMin:
-MsgBox "Minimum of ER range should be a number.", vbOKOnly, glFGTU
-txtERMin.SetFocus
+    MsgBox "Minimum of ER range should be a number.", vbOKOnly, glFGTU
+    txtERMin.SetFocus
 End Sub
 
 Private Sub txtMaxDelta_LostFocus()
-On Error GoTo err_MaxDelta
-glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaCountMax = CLng(txtMaxDelta.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaCountMax > 0 Then Exit Sub
+    On Error GoTo err_MaxDelta
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaCountMax = CLng(txtMaxDelta.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaCountMax > 0 Then Exit Sub
 err_MaxDelta:
-MsgBox "Maximum Delta should be positive integer.", vbOKOnly, glFGTU
-txtMaxDelta.SetFocus
+    MsgBox "Maximum Delta should be positive integer.", vbOKOnly, glFGTU
+    txtMaxDelta.SetFocus
 End Sub
 
 Private Sub txtMinDelta_LostFocus()
-On Error GoTo err_MinDelta
-glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaCountMin = CLng(txtMinDelta.Text)
-If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaCountMin > 0 Then Exit Sub
+    On Error GoTo err_MinDelta
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaCountMin = CLng(txtMinDelta.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.DeltaCountMin > 0 Then Exit Sub
 err_MinDelta:
-MsgBox "Minimum Delta should be positive integer.", vbOKOnly, glFGTU
-txtMinDelta.SetFocus
+    MsgBox "Minimum Delta should be positive integer.", vbOKOnly, glFGTU
+    txtMinDelta.SetFocus
 End Sub
 
 Private Sub txtPairsScanTolApex_LostFocus()

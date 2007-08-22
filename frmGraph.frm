@@ -1068,15 +1068,15 @@ Private Sub AddVisiblePointsToSelection()
     
     Dim lngIonPointerArray() As Long           ' 1-based array
     Dim lngIonCount As Long
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     ' Retrieve an array of the ion indices of the ions currently "In Scope"
     ' Note that GetISScope will ReDim lngIonPointerArray() automatically
     lngIonCount = GetISScope(nMyIndex, lngIonPointerArray(), glScope.glSc_Current)
     
-    For lngindex = 1 To lngIonCount
-        GelSel.AddToIsoSelection lngIonPointerArray(lngindex)
-    Next lngindex
+    For lngIndex = 1 To lngIonCount
+        GelSel.AddToIsoSelection lngIonPointerArray(lngIndex)
+    Next lngIndex
     
     bNeedToUpdate = True
 End Sub
@@ -1384,7 +1384,7 @@ Private Sub ShowMSSpectrumForAllSelected(ByVal blnSumSpectra As Boolean)
     Dim lngSpecCountUnique As Long
     Dim udtSpectraUnique() As udtRawSpectraDisplayStatsType
     
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim lngPointerIndex As Long             ' Pointer into GelData().IsoData or .CSData
    
     Dim eResponse As VbMsgBoxResult
@@ -1403,8 +1403,8 @@ On Error GoTo ShowSpectrumErrorHandler
     If GelBody(nMyIndex).GelSel.CSSelCnt > 0 Then
         ReDim udtSpectra(GelBody(nMyIndex).GelSel.CSSelCnt - 1)
         
-        For lngindex = 1 To GelBody(nMyIndex).GelSel.CSSelCnt
-            lngPointerIndex = GelBody(nMyIndex).GelSel.Value(lngindex, glCSType)
+        For lngIndex = 1 To GelBody(nMyIndex).GelSel.CSSelCnt
+            lngPointerIndex = GelBody(nMyIndex).GelSel.Value(lngIndex, glCSType)
             
             With udtSpectra(lngSpecCount)
                 .ScanNumber = GelData(nMyIndex).CSData(lngPointerIndex).ScanNumber
@@ -1417,14 +1417,14 @@ On Error GoTo ShowSpectrumErrorHandler
             
             lngSpecCount = lngSpecCount + 1
             
-        Next lngindex
+        Next lngIndex
     End If
     
     If GelBody(nMyIndex).GelSel.IsoSelCnt > 0 Then
         ReDim Preserve udtSpectra(lngSpecCount + GelBody(nMyIndex).GelSel.IsoSelCnt - 1)
         
-        For lngindex = 1 To GelBody(nMyIndex).GelSel.IsoSelCnt
-           lngPointerIndex = GelBody(nMyIndex).GelSel.Value(lngindex, glIsoType)
+        For lngIndex = 1 To GelBody(nMyIndex).GelSel.IsoSelCnt
+           lngPointerIndex = GelBody(nMyIndex).GelSel.Value(lngIndex, glIsoType)
         
             With udtSpectra(lngSpecCount)
                 .ScanNumber = GelData(nMyIndex).IsoData(lngPointerIndex).ScanNumber
@@ -1445,7 +1445,7 @@ On Error GoTo ShowSpectrumErrorHandler
             
             lngSpecCount = lngSpecCount + 1
             
-        Next lngindex
+        Next lngIndex
     End If
 
     
@@ -1455,10 +1455,10 @@ On Error GoTo ShowSpectrumErrorHandler
         ReDim dblSortKey(lngSpecCount - 1)
         ReDim lngPointerArray(lngSpecCount - 1)
         
-        For lngindex = 0 To lngSpecCount - 1
-            dblSortKey(lngindex) = udtSpectra(lngindex).ScanNumber + udtSpectra(lngindex).ChargeState / 10
-            lngPointerArray(lngindex) = lngindex
-        Next lngindex
+        For lngIndex = 0 To lngSpecCount - 1
+            dblSortKey(lngIndex) = udtSpectra(lngIndex).ScanNumber + udtSpectra(lngIndex).ChargeState / 10
+            lngPointerArray(lngIndex) = lngIndex
+        Next lngIndex
         
         Set objQS = New QSDouble
         If objQS.QSAsc(dblSortKey, lngPointerArray) Then
@@ -1467,21 +1467,21 @@ On Error GoTo ShowSpectrumErrorHandler
             udtSpectraUnique(0) = udtSpectra(lngPointerArray(0))
             lngSpecCountUnique = 1
 
-            For lngindex = 1 To lngSpecCount - 1
-                With udtSpectra(lngPointerArray(lngindex - 1))
-                    If udtSpectra(lngPointerArray(lngindex)).ScanNumber <> .ScanNumber Then
-                        udtSpectraUnique(lngSpecCountUnique) = udtSpectra(lngPointerArray(lngindex))
+            For lngIndex = 1 To lngSpecCount - 1
+                With udtSpectra(lngPointerArray(lngIndex - 1))
+                    If udtSpectra(lngPointerArray(lngIndex)).ScanNumber <> .ScanNumber Then
+                        udtSpectraUnique(lngSpecCountUnique) = udtSpectra(lngPointerArray(lngIndex))
                         lngSpecCountUnique = lngSpecCountUnique + 1
                     ElseIf Not blnSumSpectra Then
                         ' Keep the second spectrum if it has a different charge state,
                         '  but not if we're summing spectra
-                        If udtSpectra(lngPointerArray(lngindex)).ChargeState <> .ChargeState Then
-                            udtSpectraUnique(lngSpecCountUnique) = udtSpectra(lngPointerArray(lngindex))
+                        If udtSpectra(lngPointerArray(lngIndex)).ChargeState <> .ChargeState Then
+                            udtSpectraUnique(lngSpecCountUnique) = udtSpectra(lngPointerArray(lngIndex))
                             lngSpecCountUnique = lngSpecCountUnique + 1
                         End If
                     End If
                 End With
-            Next lngindex
+            Next lngIndex
             
             If lngSpecCount <> lngSpecCountUnique Then
                 ' Copy the data back into udtSpectra
@@ -1514,8 +1514,8 @@ On Error GoTo ShowSpectrumErrorHandler
         ' Note: hScope will be -1 if things didn't work right
         If hScope >= 0 Then
             hScopeBase = hScope
-            For lngindex = 1 To lngSpecCount - 1
-                With udtSpectra(lngindex)
+            For lngIndex = 1 To lngSpecCount - 1
+                With udtSpectra(lngIndex)
                     hScope = -1
                     blnSuccess = ShowMSSpectrum(.ScanNumber, .IsMoverZ, .TargetMZ, hScope, .VisibleMZMinimum, .VisibleMZMaximum, False)
                     DoEvents
@@ -1524,10 +1524,10 @@ On Error GoTo ShowSpectrumErrorHandler
                 objICR2LS.ScopeMath hScopeBase, hScope, "+"
                 objICR2LS.KillScope = hScope
                 
-                frmProgress.UpdateProgressBar lngindex + 1
+                frmProgress.UpdateProgressBar lngIndex + 1
                 DoEvents
                 If KeyPressAbortProcess > 1 Or Not blnSuccess Then Exit For
-            Next lngindex
+            Next lngIndex
         
         
 '            Dim intStatus As Integer
@@ -1549,18 +1549,18 @@ On Error GoTo ShowSpectrumErrorHandler
             lngSpecCount = MAX_SPECTRA_TO_SHOW
         End If
         
-        For lngindex = 0 To lngSpecCount - 1
-            With udtSpectra(lngindex)
+        For lngIndex = 0 To lngSpecCount - 1
+            With udtSpectra(lngIndex)
                 blnSuccess = ShowMSSpectrum(.ScanNumber, .IsMoverZ, .TargetMZ, hScope, .VisibleMZMinimum, .VisibleMZMaximum, True)
             End With
         
             If lngSpecCount > 1 Then
-                frmProgress.UpdateProgressBar lngindex + 1
+                frmProgress.UpdateProgressBar lngIndex + 1
                 DoEvents
                 If KeyPressAbortProcess > 1 Or Not blnSuccess Then Exit For
             End If
         
-        Next lngindex
+        Next lngIndex
     End If
     
     If lngSpecCount > 1 Then frmProgress.HideForm
@@ -1705,7 +1705,7 @@ Private Function ShowMSSpectrumGetViewRange(ByVal lngScanNumber As Long, ByVal d
     Dim dblBestDistance As Double
     
     Dim dblDistance As Double
-    Dim lngindex As Long
+    Dim lngIndex As Long
 
     Dim dblMWMinimum As Double      ' Monoisotopic mass minimum
     Dim dblMWMaximum As Double      ' Monoisotopic mass maximum
@@ -1726,11 +1726,11 @@ Private Function ShowMSSpectrumGetViewRange(ByVal lngScanNumber As Long, ByVal d
             dblMWMinimum = .IsoData(lngBestIndex).MonoisotopicMW
             dblMWMaximum = .IsoData(lngBestIndex).MonoisotopicMW
             
-            For lngindex = 1 To lngIonCount
-                dblDistance = Sqr((.IsoData(lngIonPointerArray(lngindex)).ScanNumber - lngScanNumber) ^ 2 + (.IsoData(lngIonPointerArray(lngindex)).MonoisotopicMW - dblTargetMonoIsoMass) ^ 2)
+            For lngIndex = 1 To lngIonCount
+                dblDistance = Sqr((.IsoData(lngIonPointerArray(lngIndex)).ScanNumber - lngScanNumber) ^ 2 + (.IsoData(lngIonPointerArray(lngIndex)).MonoisotopicMW - dblTargetMonoIsoMass) ^ 2)
                 If dblDistance < dblBestDistance Then
                     dblBestDistance = dblDistance
-                    lngBestIndex = lngIonPointerArray(lngindex)
+                    lngBestIndex = lngIonPointerArray(lngIndex)
                     If .IsoData(lngBestIndex).MonoisotopicMW < dblMWMinimum Then
                         dblMWMinimum = .IsoData(lngBestIndex).MonoisotopicMW
                     End If
@@ -1739,7 +1739,7 @@ Private Function ShowMSSpectrumGetViewRange(ByVal lngScanNumber As Long, ByVal d
                         dblMWMaximum = .IsoData(lngBestIndex).MonoisotopicMW
                     End If
                 End If
-            Next lngindex
+            Next lngIndex
             
             ' Determine the currently zoomed view range
             csMyCooSys.GetVisibleDimensions 0, 0, dblCurrentViewMassMin, dblCurrentViewMassMax
@@ -3645,7 +3645,7 @@ Public Sub CopyAllPointsInView(Optional ByVal lngMaxPointsCountToCopy As Long = 
     '  the user can get this information using the official Results by UMC or Results by Ion report on the search form
     Dim blnIncludeAMTMassDetails As Boolean
     Dim lngAMTID() As Long, lngAMTIDPointer() As Long
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim QSL As New QSLong
     
     Dim lngMassTagIndexPointer As Long, lngMassTagIndexOriginal As Long
@@ -3745,10 +3745,10 @@ On Error GoTo CopyAllPointsInViewErrorHandler
         ReDim lngAMTID(0 To AMTCnt - 1)
         ReDim lngAMTIDPointer(0 To AMTCnt - 1)
         
-        For lngindex = 0 To AMTCnt - 1
-            lngAMTID(lngindex) = AMTData(lngindex + 1).ID        ' Note: AMTData() is 1-based and is sorted based on AMT MW
-            lngAMTIDPointer(lngindex) = lngindex + 1
-        Next lngindex
+        For lngIndex = 0 To AMTCnt - 1
+            lngAMTID(lngIndex) = AMTData(lngIndex + 1).ID        ' Note: AMTData() is 1-based and is sorted based on AMT MW
+            lngAMTIDPointer(lngIndex) = lngIndex + 1
+        Next lngIndex
         
         If Not QSL.QSAsc(lngAMTID(), lngAMTIDPointer()) Then
             ' This is unexpected
@@ -4004,12 +4004,16 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     '  the user can get this information using the official Results by UMC or Results by Ion report on the search form
     Dim blnIncludeAMTMass As Boolean
     Dim lngAMTID() As Long, lngAMTIDPointer() As Long
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim QSL As New QSLong
     
     Dim strDBMatchList As String
 
-    Dim strLineOut As String, strLineOutMiddle As String, strLineOutEnd As String
+    Dim strLineOut As String
+    Dim strLineOutMiddle As String
+    Dim strLineOutEnd As String
+    Dim strLineOutEndAddnl As String
+    
     Dim strMinMaxCharges As String
     Dim strFlattenedList As String
     Dim strExport() As String
@@ -4019,16 +4023,17 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     
     Dim eResponse As VbMsgBoxResult
     Dim blnMatchFound As Boolean
-        
+    
     Dim strFilePath As String
     Dim strSepChar As String
     Dim OutFileNum As Integer
     
     Dim lngPairIndex As Long
+    Dim blnPairsPresent As Boolean
+    Dim blnCorrectedIReportEREnabled As Boolean
     
     Dim objP1IndFastSearch As FastSearchArrayLong
     Dim objP2IndFastSearch As FastSearchArrayLong
-    Dim blnPairsPresent As Boolean
     Dim lngPairMatchCount As Long, lngPairMatchIndex As Long
     Dim udtPairMatchStats() As udtPairMatchStatsType
     
@@ -4112,10 +4117,10 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
         ReDim lngAMTID(0 To AMTCnt - 1)
         ReDim lngAMTIDPointer(0 To AMTCnt - 1)
         
-        For lngindex = 0 To AMTCnt - 1
-            lngAMTID(lngindex) = AMTData(lngindex + 1).ID        ' Note: AMTData() is 1-based and is sorted based on AMT MW
-            lngAMTIDPointer(lngindex) = lngindex + 1
-        Next lngindex
+        For lngIndex = 0 To AMTCnt - 1
+            lngAMTID(lngIndex) = AMTData(lngIndex + 1).ID        ' Note: AMTData() is 1-based and is sorted based on AMT MW
+            lngAMTIDPointer(lngIndex) = lngIndex + 1
+        Next lngIndex
         
         If Not QSL.QSAsc(lngAMTID(), lngAMTIDPointer()) Then
             ' This is unexpected
@@ -4204,6 +4209,13 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability"
+    
+    With GelP_D_L(nMyIndex)
+        If blnPairsPresent And .SearchDef.IReportEROptions.Enabled And .SearchDef.ComputeERScanByScan Then
+            strLineOut = strLineOut & strSepChar & "Labelling Efficiency F" & strSepChar & "Log2(ER) Corrected for F" & strSepChar & "Log2(ER) Corrected Standard Error"
+            blnCorrectedIReportEREnabled = True
+        End If
+    End With
     
     strExport(0) = strLineOut
     If Len(strFilePath) > 0 Then
@@ -4309,18 +4321,29 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             lngPairIndex = PairIndexLookupSearch(nMyIndex, lngUMCIndexOriginal, objP1IndFastSearch, objP2IndFastSearch, True, False, lngPairMatchCount, udtPairMatchStats())
         End If
         
+       
+        strLineOutEndAddnl = ""
         If lngPairMatchCount > 0 Then
             For lngPairMatchIndex = 0 To lngPairMatchCount - 1
                 With udtPairMatchStats(lngPairMatchIndex)
                     strLineOutMiddle = Trim(.PairIndex) & strSepChar & Trim(.ExpressionRatio) & strSepChar & Trim(.ExpressionRatioStDev) & strSepChar & Trim(.ExpressionRatioChargeStateBasisCount) & strSepChar & Trim(.ExpressionRatioMemberBasisCount) & strSepChar
-                    CopyAllUMCsInViewAppendLine strLineOut & strLineOutMiddle & strLineOutEnd, strExport(), strFilePath, OutFileNum, lngExportCount, lngExportCountDimmed
+                    
+                    If blnCorrectedIReportEREnabled Then
+                        strLineOutEndAddnl = strSepChar & Round(.LabellingEfficiencyF, 4) & strSepChar & .LogERCorrectedForF & strSepChar & .LogERStandardError
+                    End If
+                    
+                    CopyAllUMCsInViewAppendLine strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl, strExport(), strFilePath, OutFileNum, lngExportCount, lngExportCountDimmed
                 End With
             Next lngPairMatchIndex
         Else
             ' No pair, and thus no expression ratio values
             strLineOutMiddle = Trim(-1) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar
             
-            strLineOut = strLineOut & strLineOutMiddle & strLineOutEnd
+            If blnCorrectedIReportEREnabled Then
+                strLineOutEndAddnl = strSepChar & "0" & strSepChar & "0" & strSepChar & "0"
+            End If
+            
+            strLineOut = strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl
             CopyAllUMCsInViewAppendLine strLineOut, strExport(), strFilePath, OutFileNum, lngExportCount, lngExportCountDimmed
         End If
 
@@ -4371,6 +4394,8 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     Exit Sub
 
 CopyAllUMCsInViewErrorHandler:
+    Debug.Assert False
+    
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox "Error occurred in CopyAllUMCsInView:" & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
     Else

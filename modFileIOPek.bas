@@ -2581,6 +2581,9 @@ With GelData(Ind)
                         Format$(.IsoData(Indx(i)).MonoisotopicMW, "0.0000") & vbTab & _
                         Format$(.IsoData(Indx(i)).MostAbundantMW, "0.0000") & vbTab
 
+              ' ToDo: Implement this (will require a file format change by adding a new text field to udtIsotopicDataType
+''              If Len(.IsoData(Indx(i)).IsotopeLabel) > 0 Then
+''                sLine = sLine & vbTab & .IsoData(Indx(i)).IsotopeLabel
 ''              strAppendText = ""
 ''              If Len(strIsotopeLabel) > 0 Then
 ''                If IsNumeric(strIsotopeLabel) Or blnLegacyIsotopeLabel Then

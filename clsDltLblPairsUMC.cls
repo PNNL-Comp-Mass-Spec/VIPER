@@ -14,13 +14,17 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type udtERStatsType
-    ERAvg As Double             ' Single ER or average ER
-    ERStDev As Double           ' ER Standard Deviation if averaging
-    ERCount As Long             ' Number of values used to average, or 1 if no averaging
-    EROutlierCountRemoved As Long       ' Number of ER values removed, since they were found to be outliers
+    ERAvg As Double                 ' Single ER or average ER
+    ERStDev As Double               ' ER Standard Deviation if averaging
+    ERCount As Long                 ' Number of values used to average, or 1 if no averaging
+    EROutlierCountRemoved As Long   ' Number of ER values removed, since they were found to be outliers
     
-    TotalAbundance As Double    ' The sum of the abundances in both members of the pair, possibly for a given charge state
-    TotalMemberCount As Long    ' The sum of the member counts in both members of a pair, possibly for a given charge state
+    TotalAbundance As Double        ' The sum of the abundances in both members of the pair, possibly for a given charge state
+    TotalMemberCount As Long        ' The sum of the member counts in both members of a pair, possibly for a given charge state
+
+    LabellingEfficiencyF As Single
+    LogERCorrectedForF As Single    ' Base-2 log value
+    LogERStandardError As Single
 End Type
 
 Private Type udtPairsERChargeStateStatsType
@@ -43,10 +47,12 @@ Private Type udtScanByScanStatsType
     ScanNumCount As Long
     ScanDetailsLt() As udtScanByScanDetailsType
     ScanDetailsHv() As udtScanByScanDetailsType
-    ScanER() As Double
+    ScanER() As Double                          ' Ratio-based ER value
     ScanAbu2PlusCorrected() As Single
     ScanAbu4PlusCorrected() As Single
-    
+    ScanLabellingEfficiency() As Single
+    ScanLogERCorrectedForF() As Single          ' Base-2 log value
+                        
     ERStats As udtERStatsType
 End Type
 
@@ -58,6 +64,8 @@ Private Type udtCorrectedAbundanceStatsByScanType
     ER As Double
     ScanAbu2PlusCorrected As Single
     ScanAbu4PlusCorrected As Single
+    ScanLabellingEfficiency As Single
+    ScanLogERCorrectedForF As Single            ' Base-2 log value
 End Type
 
 Private Type udtCorrectedAbundanceStatsType
@@ -124,19 +132,23 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
     Dim udtERStats As udtERStatsType
     
     ' Note: When computing a weighted average, use ER = dblERProductSum / dblWeightingSum
-    Dim dblERProductSum As Double       ' Sum of ER times value used for weighting
-    Dim dblStDevProductSum As Double    ' Sum of ER StDev times value used for weighting
-    Dim dblMemberCountProductSum As Double  ' Sum of ER member count value times value used for weighting
-    Dim dblOutlierCountRemovedProductSum As Double        ' Sum of ER outlier count removed times value used for weighting
-    Dim dblWeightingSum As Double       ' Sum of values used for weighting
+    Dim dblERAvg As Double
+    Dim dblERProductSum As Double                   ' Sum of ER times value used for weighting
+    Dim dblStDevProductSum As Double                ' Sum of ER StDev times value used for weighting
+    Dim dblMemberCountProductSum As Double          ' Sum of ER member count value times value used for weighting
+    Dim dblOutlierCountRemovedProductSum As Double  ' Sum of ER outlier count removed times value used for weighting
+    Dim dblWeightingSum As Double                   ' Sum of values used for weighting
     
     Dim eWeightingMode As aewAverageERsWeightingModeConstants
-
+    Dim eERCalcType As ectERCalcTypeConstants
+    
     Dim blnValidER As Boolean
     Dim blnAveragedAcrossChargeStates As Boolean
     Dim blnIReportData As Boolean
     
     eWeightingMode = GelP_D_L(mGelIndex).SearchDef.AverageERsWeightingMode
+    eERCalcType = GelP_D_L(mGelIndex).SearchDef.ERCalcType
+    
     If (GelData(mGelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IREPORT) = GEL_DATA_STATUS_BIT_IREPORT Then
         ' Enable I-Report based ER computation
         ' This will only be used if .ComputeERScanByScan = True
@@ -148,7 +160,9 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
     If GelP_D_L(mGelIndex).SearchDef.RequireMatchingChargeStatesForPairMembers And _
        GelP_D_L(mGelIndex).SearchDef.UseIdenticalChargesForER And _
        GelP_D_L(mGelIndex).SearchDef.AverageERsAllChargeStates Then
-        ' Need to compute ER value for each charge state matching between the LC-MS Features, then average them together with a weighted average
+       
+        ' Need to compute ER value for each charge state matching between the LC-MS Features,
+        '  then average them together with a weighted average
         
         udtUMCA = GelUMC(mGelIndex).UMCs(GelP_D_L(mGelIndex).Pairs(lngPairIndex).P1)
         udtUMCB = GelUMC(mGelIndex).UMCs(GelP_D_L(mGelIndex).Pairs(lngPairIndex).P2)
@@ -176,8 +190,7 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                         
                         ' Call CalcDltLblPairsERWork to compute the ER for this charge state pair
                         ' Note that .ERStats is returned ByRef
-                        ' Also, note that we pass ectER_RAT for the ERCalcType since we need normal ER ratios for the weighted averaging
-                        blnValidER = CalcDltLblPairsERWork(mGelIndex, lngPairIndex, .Charge, ectER_RAT, .ERStats, blnIReportData)
+                        blnValidER = CalcDltLblPairsERWork(mGelIndex, lngPairIndex, .Charge, eERCalcType, .ERStats, blnIReportData)
                    End With
                    
                    If blnValidER Then intChargeStateStatsCount = intChargeStateStatsCount + 1
@@ -199,6 +212,7 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
             
             Else
                 ' Average the ER values for all of the charge states, optionally weighting by Abundance or member count
+                ' If eERCalcType is ectER_RAT, then we have to use symmetric ERs or log-based ER values
                 
                 dblERProductSum = 0
                 dblStDevProductSum = 0
@@ -211,15 +225,23 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                         ' This code shouldn't be reached
                         Debug.Assert False
                     Else
+                        dblERAvg = udtPairsERChargeStateStats(intIndex).ERStats.ERAvg
+                        
+                        If eERCalcType = ectER_RAT Then
+                            ' Convert dblERAvg from Ratio ER to Symmetric ER
+                            dblERAvg = ConvertRatioERtoAltER(dblERAvg)
+                        End If
+                        
                         If eWeightingMode = aewAbundance Then
-                            dblERProductSum = dblERProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERAvg * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
+                            dblERProductSum = dblERProductSum + dblERAvg * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
                             dblStDevProductSum = dblStDevProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERStDev * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
                             dblMemberCountProductSum = dblMemberCountProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERCount * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
                             dblOutlierCountRemovedProductSum = dblOutlierCountRemovedProductSum + udtPairsERChargeStateStats(intIndex).ERStats.EROutlierCountRemoved * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
                             
                             dblWeightingSum = dblWeightingSum + udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
+                            
                         ElseIf eWeightingMode = aewMemberCounts Then
-                            dblERProductSum = dblERProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERAvg * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
+                            dblERProductSum = dblERProductSum + dblERAvg * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
                             dblStDevProductSum = dblStDevProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERStDev * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
                             dblMemberCountProductSum = dblMemberCountProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERCount * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
                             dblOutlierCountRemovedProductSum = dblOutlierCountRemovedProductSum + udtPairsERChargeStateStats(intIndex).ERStats.EROutlierCountRemoved * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
@@ -227,7 +249,7 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                             dblWeightingSum = dblWeightingSum + udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
                         Else
                             ' aewNoWeighting
-                            dblERProductSum = dblERProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERAvg
+                            dblERProductSum = dblERProductSum + dblERAvg
                             dblStDevProductSum = dblStDevProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERStDev
                             dblMemberCountProductSum = dblMemberCountProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERCount
                             dblOutlierCountRemovedProductSum = dblOutlierCountRemovedProductSum + udtPairsERChargeStateStats(intIndex).ERStats.EROutlierCountRemoved
@@ -239,6 +261,12 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                 
                 If dblWeightingSum > 0 Then
                     udtERStats.ERAvg = dblERProductSum / dblWeightingSum
+
+                    If eERCalcType = ectER_RAT Then
+                        ' Convert udtERStats.ERAvg from Symmetric ER to Ratio ER
+                        dblERAvg = ConvertAltERtoRatioER(dblERAvg)
+                    End If
+                    
                     udtERStats.ERStDev = dblStDevProductSum / dblWeightingSum
                     udtERStats.ERCount = Round(dblMemberCountProductSum / dblWeightingSum, 0)
                     If dblOutlierCountRemovedProductSum > 0 Then
@@ -259,27 +287,13 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                     udtERStats.EROutlierCountRemoved = 0
                 End If
                 
-                If udtERStats.ERAvg <> ER_CALC_ERR Then
-                    ' We specified an ERCalcType of Ratio (ectER_RAT=0) when calling CalcDltLblPairsERWork
-                    ' Convert to the correct ratio type, if necessary
-                    Select Case GelP_D_L(mGelIndex).SearchDef.ERCalcType
-                    Case ectER_RAT
-                        ' Nothing to convert
-                    Case ectER_LOG
-                        udtERStats.ERAvg = LogERViaRatER(udtERStats.ERAvg)
-                        udtERStats.ERStDev = LogERViaRatER(udtERStats.ERStDev)
-                    Case ectER_ALT
-                        udtERStats.ERAvg = AltERViaRatER(udtERStats.ERAvg)
-                        udtERStats.ERStDev = AltERViaRatER(udtERStats.ERStDev)
-                    End Select
-                End If
             End If
         End If
         
     Else
         ' Not averaging ER's across charge states
         ' Just compute one ER value for this pair
-        blnValidER = CalcDltLblPairsERWork(mGelIndex, lngPairIndex, 0, GelP_D_L(mGelIndex).SearchDef.ERCalcType, udtERStats, blnIReportData)
+        blnValidER = CalcDltLblPairsERWork(mGelIndex, lngPairIndex, 0, eERCalcType, udtERStats, blnIReportData)
         blnAveragedAcrossChargeStates = False
         intChargeStateStatsCount = 1
         
@@ -313,11 +327,15 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
         
         .ERMemberBasisCount = udtERStats.ERCount
         
+        .LabellingEfficiencyF = udtERStats.LabellingEfficiencyF
+        .LogERCorrectedForF = udtERStats.LogERCorrectedForF
+        .LogERStandardError = udtERStats.LogERStandardError
+        
     End With
 
 End Sub
 
-Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairIndex As Long, ByVal intChargeStateToMatch As Integer, eERCalcType As Integer, ByRef udtERStats As udtERStatsType, blnIReportData As Boolean) As Boolean
+Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairIndex As Long, ByVal intChargeStateToMatch As Integer, eERCalcType As ectERCalcTypeConstants, ByRef udtERStats As udtERStatsType, blnIReportData As Boolean) As Boolean
     ' Computes and returns an ER value and associated stats in udtERStats
     ' Function returns True if success, false if an error
     ' Sets udtERStats.ERAvg = ER_CALC_ERR if an error occurs
@@ -364,6 +382,10 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
         .ERStDev = 0
         .TotalAbundance = 0
         .TotalMemberCount = 0
+    
+        .LabellingEfficiencyF = 0
+        .LogERCorrectedForF = 0
+        .LogERStandardError = 0
     End With
     
     If GelP_D_L(lngGelIndex).SearchDef.UseIdenticalChargesForER Then
@@ -534,7 +556,7 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
             
                 If intChargeStateToMatch > 0 Then Debug.Assert intChargeStateToMatch = intTargetChargeLt And intChargeStateToMatch = intTargetChargeHv
                 
-                blnValidER = CalcDltLblPairsERScanByScan(udtScanByScanStats, lngGelIndex, LtUMCIndex, HvUMCIndex, intTargetChargeLt, intTargetChargeHv, blnIReportData)
+                blnValidER = CalcDltLblPairsERScanByScan(udtScanByScanStats, lngGelIndex, LtUMCIndex, HvUMCIndex, intTargetChargeLt, intTargetChargeHv, eERCalcType, blnIReportData)
                 blnComputedERScanByScan = True
                 
                 If blnValidER Then
@@ -545,11 +567,11 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
                 ' Do not compute the ER scan by scan
                 Select Case eERCalcType
                 Case ectER_RAT
-                    udtERStats.ERAvg = RatER(LtAbu, HvAbu)
+                    udtERStats.ERAvg = ComputeRatioER(LtAbu, HvAbu)
                 Case ectER_LOG
-                    udtERStats.ERAvg = LogER(LtAbu, HvAbu)
+                    udtERStats.ERAvg = ComputeLogER(LtAbu, HvAbu)
                 Case ectER_ALT
-                    udtERStats.ERAvg = AltER(LtAbu, HvAbu)
+                    udtERStats.ERAvg = ComputeAltER(LtAbu, HvAbu)
                 End Select
                 udtERStats.ERCount = 1
                 
@@ -571,7 +593,8 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
         ' Do not require identical charges for ER
         If GelP_D_L(lngGelIndex).SearchDef.ComputeERScanByScan Then
             ' Compute the ER scan by scan
-            blnValidER = CalcDltLblPairsERScanByScan(udtScanByScanStats, lngGelIndex, LtUMCIndex, HvUMCIndex, 0, 0, blnIReportData)
+            
+            blnValidER = CalcDltLblPairsERScanByScan(udtScanByScanStats, lngGelIndex, LtUMCIndex, HvUMCIndex, 0, 0, eERCalcType, blnIReportData)
             blnComputedERScanByScan = True
             
             If blnValidER Then
@@ -593,11 +616,11 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
         
             Select Case eERCalcType
             Case ectER_RAT
-                  udtERStats.ERAvg = RatER(LtAbu, HvAbu)
+                  udtERStats.ERAvg = ComputeRatioER(LtAbu, HvAbu)
             Case ectER_LOG
-                  udtERStats.ERAvg = LogER(LtAbu, HvAbu)
+                  udtERStats.ERAvg = ComputeLogER(LtAbu, HvAbu)
             Case ectER_ALT
-                  udtERStats.ERAvg = AltER(LtAbu, HvAbu)
+                  udtERStats.ERAvg = ComputeAltER(LtAbu, HvAbu)
             End Select
             udtERStats.ERCount = 1
             
@@ -612,8 +635,6 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
         ReDim Preserve mCorrectedAbundanceStats((UBound(mCorrectedAbundanceStats) + 1) * 2 - 1)
     End If
     
-    ' ToDo: Fix the bug that is occurring when multiple charge states are being processed for a given pair
-    '       The result is that data is being overwrrite in mCorrectedAbundanceStats() for the same lngPairIndex value, effectively only keeping the highest charge state value
     
     With mCorrectedAbundanceStats(lngPairIndex)
         If blnComputedERScanByScan Then
@@ -629,6 +650,7 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
             Next lngScanIndex
             
             If lngAlignedScanCountNew > 0 Then
+            
                 If .AlignedScanCount + lngAlignedScanCountNew - 1 > UBound(.AlignedScanStats) Then
                     ReDim Preserve .AlignedScanStats(.AlignedScanCount + lngAlignedScanCountNew - 1)
                 End If
@@ -644,6 +666,9 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
                             .ER = udtScanByScanStats.ScanER(lngScanIndex)
                             .ScanAbu2PlusCorrected = udtScanByScanStats.ScanAbu2PlusCorrected(lngScanIndex)
                             .ScanAbu4PlusCorrected = udtScanByScanStats.ScanAbu4PlusCorrected(lngScanIndex)
+                            
+                            .ScanLabellingEfficiency = udtScanByScanStats.ScanLabellingEfficiency(lngScanIndex)
+                            .ScanLogERCorrectedForF = udtScanByScanStats.ScanLogERCorrectedForF(lngScanIndex)
                        End With
                        .AlignedScanCount = .AlignedScanCount + 1
                     End If
@@ -672,8 +697,8 @@ Private Function CalcDltLblPairsERWork(ByVal lngGelIndex As Long, ByVal lngPairI
     CalcDltLblPairsERWork = blnValidER
 
 End Function
-
-Private Function CalcDltLblPairsERScanByScan(ByRef udtScanByScanStats As udtScanByScanStatsType, ByVal lngGelIndex As Long, ByVal LtUMCIndex As Long, ByVal HvUMCIndex As Long, ByVal intTargetChargeLt As Integer, ByVal intTargetChargeHv As Integer, blnIReportData As Boolean) As Boolean
+            
+Private Function CalcDltLblPairsERScanByScan(ByRef udtScanByScanStats As udtScanByScanStatsType, ByVal lngGelIndex As Long, ByVal LtUMCIndex As Long, ByVal HvUMCIndex As Long, ByVal intTargetChargeLt As Integer, ByVal intTargetChargeHv As Integer, ByVal eERCalcType As ectERCalcTypeConstants, ByVal blnIReportData As Boolean) As Boolean
     ' Compares the data in the LC-MS Features given by LtUMCIndex and HvUMCIndex and computes ER values scan-by-scan
     ' If intTargetChargeLt or intTargetChargeHv is non-zero, then only uses the data with the given charge state;
     '  otherwise, uses all data in the UMC
@@ -691,35 +716,39 @@ Private Function CalcDltLblPairsERScanByScan(ByRef udtScanByScanStats As udtScan
     
     
     Dim lngScanIndex As Long
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     Dim blnUseMaxValueEachScan As Boolean
+    Dim blnComputeWeightedAverage As Boolean
+    
     Dim blnSuccess As Boolean
-    Dim blnConvertedToSymmetricER As Boolean
     
     Dim lngERListCount As Long
-    Dim dblERList() As Double                 ' Note that the ER values are converted to base-10 Log values prior to filtering with the Grubb's test filter
+    Dim dblERList() As Double                 ' The values in this list are ratio-based (Light/Heavy) ER values
+    Dim dblERListSymmetricERs() As Double     ' Symmetric ER values values, required for Grubb's test filter and used for weighted average if eERCalcType = ectER_RAT
     Dim lngERListIndexPointers() As Long      ' Pointer of index that ER value comes from
+        
+    Dim dblValueListForWeightedAvg() As Double
     
     Dim dblAbu2DaCorrected As Double      ' Corrected monoisotopic + 2 Da abundance
     Dim dblAbu4DaCorrected As Double      ' Corrected monoisotopic + 4 Da abundance
     
-    Dim dblERListLtOverHv() As Double
+    Dim sngLabellingEfficiency As Single
+    Dim sngLogERCorrectedForF As Single     ' Base-2 log value
     
     Dim lngScanCountInvalidER As Long
     Dim dblFractionValid As Double
     
+    Dim objStatDoubles As New StatDoubles
     Dim dblLightHeavyAbuSum As Double
     
-    ' Note: When computing a weighted average, use ER = dblERProductSum / dblWeightingSum
-    Dim dblERProductSum As Double
-    Dim dblWeightingSum As Double
+    Dim dblWeightedAvg As Double
+    Dim dblStDev As Double
     
     Dim lngMinFinalValueCount As Long
     Dim lngEROutlierCountRemoved As Long
     Dim eConfidenceLevel As eclConfidenceLevelConstants
 
-    Dim objStatDoubles As New StatDoubles
     Dim objOutlierFilter As New clsGrubbsTestOutlierFilter
     
 On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
@@ -732,6 +761,10 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
         .EROutlierCountRemoved = 0
         .TotalAbundance = 0
         .TotalMemberCount = 0
+    
+        .LabellingEfficiencyF = 0
+        .LogERCorrectedForF = 0
+        .LogERStandardError = 0
     End With
 
     ' Determine the minimum and maximum scan numbers
@@ -762,7 +795,8 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
                 ReDim .ScanER(.ScanNumCount - 1)
                 ReDim .ScanAbu2PlusCorrected(.ScanNumCount - 1)
                 ReDim .ScanAbu4PlusCorrected(.ScanNumCount - 1)
-
+                ReDim .ScanLabellingEfficiency(.ScanNumCount - 1)
+                ReDim .ScanLogERCorrectedForF(.ScanNumCount - 1)
                 blnSuccess = True
             End If
         End With
@@ -771,6 +805,7 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
     If blnSuccess Then
         ' Populate the .ScanDetails arrays
         blnUseMaxValueEachScan = GelP_D_L(lngGelIndex).SearchDef.UseIdenticalChargesForER
+        blnComputeWeightedAverage = Not GelP_D_L(lngGelIndex).SearchDef.ScanByScanAverageIsNotWeighted
         
         CalcDltLblPairsScanByScanPopulate udtScanByScanStats.ScanDetailsLt, lngGelIndex, LtUMCIndex, intTargetChargeLt, udtScanByScanStats.ScanNumStart, blnUseMaxValueEachScan
         CalcDltLblPairsScanByScanPopulate udtScanByScanStats.ScanDetailsHv, lngGelIndex, HvUMCIndex, intTargetChargeHv, udtScanByScanStats.ScanNumStart, blnUseMaxValueEachScan
@@ -788,15 +823,21 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
                 For lngScanIndex = 0 To .ScanNumCount - 1
                     If .ScanDetailsLt(lngScanIndex).Abundance > 0 And .ScanDetailsHv(lngScanIndex).Abundance > 0 Then
                         If blnIReportData Then
-                            .ScanER(lngScanIndex) = CalcDltLblPairsERViaIReport(lngGelIndex, .ScanDetailsLt(lngScanIndex), .ScanDetailsHv(lngScanIndex), dblAbu2DaCorrected, dblAbu4DaCorrected)
+                            .ScanER(lngScanIndex) = CalcDltLblPairsERViaIReport(lngGelIndex, .ScanDetailsLt(lngScanIndex), .ScanDetailsHv(lngScanIndex), dblAbu2DaCorrected, dblAbu4DaCorrected, sngLabellingEfficiency, sngLogERCorrectedForF)
                         Else
                             dblAbu2DaCorrected = 0
                             dblAbu4DaCorrected = 0
-                            .ScanER(lngScanIndex) = RatER(.ScanDetailsLt(lngScanIndex).Abundance, .ScanDetailsHv(lngScanIndex).Abundance)
+                            sngLabellingEfficiency = 0
+                            sngLogERCorrectedForF = 0
+                            .ScanER(lngScanIndex) = ComputeRatioER(.ScanDetailsLt(lngScanIndex).Abundance, .ScanDetailsHv(lngScanIndex).Abundance)
                         End If
+                        
                         
                         .ScanAbu2PlusCorrected(lngScanIndex) = dblAbu2DaCorrected
                         .ScanAbu4PlusCorrected(lngScanIndex) = dblAbu4DaCorrected
+                        
+                        .ScanLabellingEfficiency(lngScanIndex) = sngLabellingEfficiency
+                        .ScanLogERCorrectedForF(lngScanIndex) = sngLogERCorrectedForF
                         
                         If .ScanER(lngScanIndex) <> ER_CALC_ERR Then
                             dblERList(lngERListCount) = .ScanER(lngScanIndex)
@@ -821,51 +862,46 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
                             lngERListCount = 1
                             dblERList(0) = ER_CALC_ERR
                             lngERListIndexPointers(0) = 0
-                            
-                            dblERProductSum = ER_CALC_ERR
-                            dblWeightingSum = 1
                         End If
-
                     End If
-                    
                 End If
             End If
             
         End With
         
-        ' Call objStatDoubles to compute the StDev and Count stats
-        ' Use dblERProductSum and dblWeightingSum to compute a Weighted ER value
-        blnConvertedToSymmetricER = False
+        ' Optionally filter out outliers, then compute a single weighted average ER value
+        ' Do a similar rollup for the .ScanLabellingEfficiency and .ScanLogERCorrectedForF values
+        
         lngEROutlierCountRemoved = 0
         If lngERListCount > 0 Then
             
-            If glbPreferencesExpanded.PairSearchOptions.OutlierRemovalUsesSymmetricERs Then
-                ' Convert the ER values to symmetric ER values (0 means unchanged)
-                If lngERListCount = 1 And dblERList(lngindex) = ER_CALC_ERR Then
-                    ' Do not convert to symmetric ER
-                Else
-                    For lngindex = 0 To lngERListCount - 1
-                        If dblERList(lngindex) > 0 Then
-                            dblERList(lngindex) = AltERViaRatER(dblERList(lngindex))
-                        Else
-                            Debug.Assert False
-                            dblERList(lngindex) = 0
-                        End If
-                    Next lngindex
-                    blnConvertedToSymmetricER = True
-                End If
+            ' Shrink dblERList and lngERListIndexPointers to only include the non-zero ER values
+            If UBound(dblERList) > lngERListCount - 1 Then
+                ReDim Preserve dblERList(lngERListCount - 1)
+                ReDim Preserve lngERListIndexPointers(lngERListCount - 1)
             End If
             
-            ' Need to shrink dblERList and lngERListIndexPointers to only include the non-zero ER values
-            ReDim Preserve dblERList(lngERListCount - 1)
-            ReDim Preserve lngERListIndexPointers(lngERListCount - 1)
-            
-            If GelP_D_L(lngGelIndex).SearchDef.RemoveOutlierERs Then
-                
+            ' Populate dblERListSymmetricERs()
+            ReDim dblERListSymmetricERs(lngERListCount - 1)
+            If lngERListCount = 1 And dblERList(0) = ER_CALC_ERR Then
+                dblERListSymmetricERs(0) = dblERList(0)
+            Else
+                For lngIndex = 0 To lngERListCount - 1
+                    If dblERList(lngIndex) > 0 Then
+                        dblERListSymmetricERs(lngIndex) = ConvertRatioERtoAltER(dblERList(lngIndex))
+                    Else
+                        Debug.Assert False
+                        dblERListSymmetricERs(lngIndex) = 0
+                    End If
+                Next lngIndex
+            End If
+           
+            If GelP_D_L(lngGelIndex).SearchDef.RemoveOutlierERs And lngERListCount > 1 Then
+
                 ' Remove outlier ER values
                 lngMinFinalValueCount = GelP_D_L(lngGelIndex).SearchDef.RemoveOutlierERsMinimumDataPointCount
                 If lngMinFinalValueCount < 2 Then lngMinFinalValueCount = 2
-                
+
                 If lngERListCount > lngMinFinalValueCount Then
                     Select Case GelP_D_L(lngGelIndex).SearchDef.RemoveOutlierERsConfidenceLevel
                     Case ecl97Pct
@@ -873,118 +909,118 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
                     Case ecl99Pct
                         eConfidenceLevel = ecl99Pct
                     Case Else
-                         ' Includes ecl95Pct
-                         eConfidenceLevel = ecl95Pct
+                        ' Includes ecl95Pct
+                        eConfidenceLevel = ecl95Pct
                     End Select
-                    
+
                     objOutlierFilter.ConfidenceLevel = eConfidenceLevel
                     objOutlierFilter.MinFinalValueCount = lngMinFinalValueCount
                     objOutlierFilter.RemoveMultipleValues = GelP_D_L(lngGelIndex).SearchDef.RemoveOutlierERsIterate
 
-                    If objOutlierFilter.RemoveOutliers(dblERList, lngERListIndexPointers, lngEROutlierCountRemoved) Then
+                    ' Always use symmetric-based ERs when removing outliers
+                    ' Note that dblERListSymmetricERs() will get sorted ascending by .RemoveOutliers()
+                    ' lngERListIndexPointers will get sorted in parallel
+                    blnSuccess = objOutlierFilter.RemoveOutliers(dblERListSymmetricERs, lngERListIndexPointers, lngEROutlierCountRemoved)
+                    
+                    If blnSuccess Then
                         ' Successfully removed outliers
-                        
+
                         If lngEROutlierCountRemoved > 0 Then
-                            'Debug.Print "Removed " & lngEROutlierCountRemoved & " outliers for pair with LC-MS Features " & LtUMCIndex & " and " & HvUMCIndex
-                        End If
-                        
-                        lngERListCount = lngERListCount - lngEROutlierCountRemoved
-                        If lngERListCount <> UBound(dblERList) + 1 Then
-                            ' Array size doesn't agree with expected value
-                            Debug.Assert False
-                            lngERListCount = UBound(dblERList) + 1
-                        End If
-                    Else
-                        Debug.Assert False
-                    End If
-                
-                End If
-            End If
-            
-            If lngERListCount > 1 Then
-                ' Now that outliers have been removed, populate the weighting variables
-                
-                With udtScanByScanStats
-                    dblLightHeavyAbuSum = 0
-                    dblERProductSum = 0
-                    dblWeightingSum = 0
-                    
-                    For lngindex = 0 To lngERListCount - 1
-                    
-                        Debug.Assert dblERList(lngindex) <> ER_CALC_ERR
-                    
-                        dblLightHeavyAbuSum = .ScanDetailsLt(lngERListIndexPointers(lngindex)).Abundance + .ScanDetailsHv(lngERListIndexPointers(lngindex)).Abundance
-                        dblERProductSum = dblERProductSum + dblERList(lngindex) * dblLightHeavyAbuSum
-                      
-                        dblWeightingSum = dblWeightingSum + dblLightHeavyAbuSum
-                        
-                        .ERStats.TotalAbundance = .ERStats.TotalAbundance + dblLightHeavyAbuSum
-                        .ERStats.TotalMemberCount = .ERStats.TotalMemberCount + .ScanDetailsLt(lngERListIndexPointers(lngindex)).MemberCount + .ScanDetailsHv(lngERListIndexPointers(lngindex)).MemberCount
-                
-                    Next lngindex
-                End With
-            Else
-                If dblERList(0) <> ER_CALC_ERR Then
-                    dblERProductSum = dblERList(0)
-                
-                    udtScanByScanStats.ERStats.TotalAbundance = udtScanByScanStats.ScanDetailsLt(lngERListIndexPointers(0)).Abundance + udtScanByScanStats.ScanDetailsHv(lngERListIndexPointers(0)).Abundance
-                    udtScanByScanStats.ERStats.TotalMemberCount = udtScanByScanStats.ScanDetailsLt(lngERListIndexPointers(0)).MemberCount + udtScanByScanStats.ScanDetailsHv(lngERListIndexPointers(0)).MemberCount
-                
-                End If
-                dblWeightingSum = 1
-            End If
-            
-            ' Note: If .OutlierRemovalUsesSymmetricERs, then objStatDoubles
-            '       is filled with the symmetric ER values
-            
-            If lngERListCount = 1 And dblERList(0) = ER_CALC_ERR Then
-                blnSuccess = False
-            Else
-                blnSuccess = objStatDoubles.Fill(dblERList)
-            End If
-            
-            If blnSuccess Then
-                With udtScanByScanStats.ERStats
-                    If dblWeightingSum > 0 Then
-                        ' Store a weighed mean ER
-                        .ERAvg = dblERProductSum / dblWeightingSum
-                    Else
-                        ' This shouldn't happen
-                        Debug.Assert False
-                        
-                        ' Could use the following to store an unweighted mean ER
-                        .ERAvg = objStatDoubles.Mean
-                    End If
-                    
-                    .ERCount = objStatDoubles.Count
-                    .EROutlierCountRemoved = lngEROutlierCountRemoved
-                    
-                    .ERStDev = objStatDoubles.StDev
-                    If blnConvertedToSymmetricER Then
-                        ' If .erAvg >=0 then we can use objStatDoubles.StDev for the StDev
-                        ' Otherwise, need to recompute the StDev using the regular light/heavy values
-                        If .ERAvg < 0 Then
-                            ReDim dblERListLtOverHv(lngERListCount - 1)
-                            For lngindex = 0 To lngERListCount - 1
-                                dblERListLtOverHv(lngindex) = RatERViaAltER(dblERList(lngindex))
-                            Next lngindex
-                            
-                            If objStatDoubles.Fill(dblERListLtOverHv) Then
-                                .ERStDev = objStatDoubles.StDev
+                            lngERListCount = lngERListCount - lngEROutlierCountRemoved
+                            If lngERListCount <> UBound(dblERListSymmetricERs) + 1 Then
+                                ' Array size doesn't agree with expected value
+                                Debug.Assert False
+                                lngERListCount = UBound(dblERListSymmetricERs) + 1
                             End If
                         End If
+                    Else
+                        Debug.Assert False
                     End If
-                
-                    If blnConvertedToSymmetricER And .ERAvg <> ER_CALC_ERR Then
-                        ' Convert the ER value back to regular light/heavy values
-                        ' Note: Do not convert the .ERStDev value (this was handled above)
-                        .ERAvg = RatERViaAltER(.ERAvg)
+
+                    ' Re-sync dblERList() with dblERListSymmetricERs()
+                    ' Necessary since dblERListSymmetricERs was sorted
+                    For lngIndex = 0 To lngERListCount - 1
+                        dblERList(lngIndex) = ConvertAltERtoRatioER(dblERListSymmetricERs(lngIndex))
+                    Next lngIndex
+                    
+                    If UBound(dblERList) <> lngERListCount - 1 Then
+                        Debug.Assert lngEROutlierCountRemoved > 0
+                        ReDim Preserve dblERList(lngERListCount - 1)
                     End If
-                
-                End With
-            Else
-                udtScanByScanStats.ERStats.ERAvg = ER_CALC_ERR
+
+                End If
             End If
+
+            ' Populate .TotalAbundance & .TotalMemberCount
+            With udtScanByScanStats
+                For lngIndex = 0 To lngERListCount - 1
+                    dblLightHeavyAbuSum = .ScanDetailsLt(lngERListIndexPointers(lngIndex)).Abundance + .ScanDetailsHv(lngERListIndexPointers(lngIndex)).Abundance
+                    .ERStats.TotalAbundance = .ERStats.TotalAbundance + dblLightHeavyAbuSum
+                    .ERStats.TotalMemberCount = .ERStats.TotalMemberCount + .ScanDetailsLt(lngERListIndexPointers(lngIndex)).MemberCount + .ScanDetailsHv(lngERListIndexPointers(lngIndex)).MemberCount
+                Next lngIndex
+            End With
+
+            If lngERListCount = 1 And dblERList(0) = ER_CALC_ERR Then
+                dblWeightedAvg = dblERList(0)
+                dblStDev = 0
+            Else
+                ' Compute a weighted average ER for the pair using the appropriate ER mode
+                Select Case eERCalcType
+                Case ectER_LOG
+                    ' Natural-log based ER
+                    For lngIndex = 0 To lngERListCount - 1
+                        dblERList(lngIndex) = ConvertRatioERToLogER(dblERList(lngIndex))
+                    Next lngIndex
+                    blnSuccess = ComputeStatsPossiblyWeight(objStatDoubles, udtScanByScanStats, dblERList, lngERListIndexPointers, lngERListCount, dblWeightedAvg, dblStDev, blnComputeWeightedAverage)
+                    
+                Case ectER_ALT
+                    ' Symmetric ER
+                   blnSuccess = ComputeStatsPossiblyWeight(objStatDoubles, udtScanByScanStats, dblERListSymmetricERs, lngERListIndexPointers, lngERListCount, dblWeightedAvg, dblStDev, blnComputeWeightedAverage)
+                   
+                Case Else
+                    ' Ratio-based ER (ectER_RAT)
+                    
+                    blnSuccess = ComputeStatsPossiblyWeight(objStatDoubles, udtScanByScanStats, dblERListSymmetricERs, lngERListIndexPointers, lngERListCount, dblWeightedAvg, dblStDev, blnComputeWeightedAverage)
+                    
+                    If eERCalcType = ectER_RAT Then
+                        ' If dblWeightedAvg >=0 then we can use dblStDev for the StDev
+                        ' Otherwise, need to recompute the StDev using the regular light/heavy values
+                        If dblWeightedAvg < 0 Then
+                            If objStatDoubles.Fill(dblERList) Then
+                                dblStDev = objStatDoubles.StDev
+                            End If
+                        End If
+                    
+                        dblWeightedAvg = ConvertAltERtoRatioER(dblWeightedAvg)
+                    End If
+                End Select
+            End If
+            
+            With udtScanByScanStats.ERStats
+                .ERAvg = dblWeightedAvg
+                .ERStDev = dblStDev
+
+                .ERCount = lngERListCount
+                .EROutlierCountRemoved = lngEROutlierCountRemoved
+            End With
+
+            ' Compute a weighted average for the values in .ScanLabellingEfficiency()
+            ReDim dblValueListForWeightedAvg(lngERListCount - 1)
+            
+            For lngIndex = 0 To lngERListCount - 1
+                dblValueListForWeightedAvg(lngIndex) = udtScanByScanStats.ScanLabellingEfficiency(lngERListIndexPointers(lngIndex))
+            Next lngIndex
+            blnSuccess = ComputeStatsPossiblyWeight(objStatDoubles, udtScanByScanStats, dblValueListForWeightedAvg, lngERListIndexPointers, lngERListCount, dblWeightedAvg, dblStDev, blnComputeWeightedAverage)
+            udtScanByScanStats.ERStats.LabellingEfficiencyF = dblWeightedAvg
+            
+            ' Compute a weighted average for the values in .ScanLogERCorrectedForF()
+            For lngIndex = 0 To lngERListCount - 1
+                dblValueListForWeightedAvg(lngIndex) = udtScanByScanStats.ScanLogERCorrectedForF(lngERListIndexPointers(lngIndex))
+            Next lngIndex
+            blnSuccess = ComputeStatsPossiblyWeight(objStatDoubles, udtScanByScanStats, dblValueListForWeightedAvg, lngERListIndexPointers, lngERListCount, dblWeightedAvg, dblStDev, blnComputeWeightedAverage)
+            udtScanByScanStats.ERStats.LogERCorrectedForF = dblWeightedAvg
+            udtScanByScanStats.ERStats.LogERStandardError = dblStDev / lngERListCount
+            
         Else
             ' No overlapping scans; store 0 but set blnSuccess = False
             With udtScanByScanStats.ERStats
@@ -992,6 +1028,10 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
                 .ERStDev = 0
                 .ERCount = 0
                 .EROutlierCountRemoved = 0
+
+                .LabellingEfficiencyF = 0
+                .LogERCorrectedForF = 0
+                .LogERStandardError = 0
             End With
             blnSuccess = False
         End If
@@ -1013,27 +1053,34 @@ CalcDltLblPairsERScanByScanErrorHandler:
     udtScanByScanStats.ERStats.ERAvg = ER_CALC_ERR
 End Function
 
-Private Function CalcDltLblPairsERViaIReport(ByVal lngGelIndex As Long, ByRef udtScanDetailsLt As udtScanByScanDetailsType, ByRef udtScanDetailsHv As udtScanByScanDetailsType, ByRef dblAbu2DaCorrected As Double, ByRef dblAbu4DaCorrected As Double) As Double
+Private Function CalcDltLblPairsERViaIReport(ByVal lngGelIndex As Long, ByRef udtScanDetailsLt As udtScanByScanDetailsType, ByRef udtScanDetailsHv As udtScanByScanDetailsType, ByRef dblAbu2DaCorrected As Double, ByRef dblAbu4DaCorrected As Double, ByRef sngLabellingEfficiency As Single, ByRef sngLogERCorrectedForF As Single) As Double
 
     ' Use udtScanDetailsLt.MemberIndexMostAbu and udtScanDetailsHv.MemberIndexMostAbu
     '  to compute corrected abundances for the MonoIsotopic peak, the M + 2Da peak, and the M + 4 Da peak
     
+    ' Note: dblAbu2DaCorrected is B1
+    ' Note: dblAbu4DaCorrected is B2
+    
     Dim dblMonoIsoMass As Double
     
-    Dim dblAbuMonoIso As Double     ' Raw monoisotopic abundance
-    Dim dblAbu2DaRaw As Double      ' Raw (uncorrected) monoisotopic + 2 Da abundance
-    Dim dblAbu4DaRaw As Double      ' Raw (uncorrected) monoisotopic + 4 Da abundance
+    Dim dblAbuMonoIso As Double     ' Raw monoisotopic abundance, aka I0
+    Dim dblAbu2DaRaw As Double      ' Raw (uncorrected) monoisotopic + 2 Da abundance, aka I2
+    Dim dblAbu4DaRaw As Double      ' Raw (uncorrected) monoisotopic + 4 Da abundance, aka I4
     
     Dim dblM2OverM0 As Double
     Dim dblM4OverM0 As Double
     
     Dim dblER As Double
+    Dim dblERCorrectedForF As Double
     
     Dim blnError As Boolean
     
 On Error GoTo CalcDltLblPairsERViaIReportErrorHandler
 
     dblER = ER_CALC_ERR
+    sngLogERCorrectedForF = CDblToSng(ER_CALC_ERR)
+    sngLabellingEfficiency = 0
+    
     blnError = False
     
     With GelData(lngGelIndex)
@@ -1080,25 +1127,46 @@ On Error GoTo CalcDltLblPairsERViaIReportErrorHandler
                     dblM4OverM0 = .Multiplier * dblMonoIsoMass ^ .Exponent
                 End With
                 
+                ' B1 = I2-(M2/M0)*I0
                 dblAbu2DaCorrected = dblAbu2DaRaw - dblM2OverM0 * dblAbuMonoIso
                 
-                dblAbu4DaCorrected = dblAbu4DaRaw - dblM4OverM0 * dblAbuMonoIso
+                ' B2 = I4-(M2/M0)*B1-(M4/M0)*I0
+                ' Simplified form: = dblAbu4DaRaw -                                    dblM4OverM0 * dblAbuMonoIso
+                dblAbu4DaCorrected = dblAbu4DaRaw - dblM2OverM0 * dblAbu2DaCorrected - dblM4OverM0 * dblAbuMonoIso
+                
+                ' f = 2*B2/(B1+2B2)
+                sngLabellingEfficiency = 2 * dblAbu4DaCorrected / (dblAbu2DaCorrected + 2 * dblAbu4DaCorrected)
                 
                 If dblAbu4DaCorrected <= 0 Then
                     ' Condition 1
                     ' False pair
                     dblER = ER_CALC_ERR
+                    sngLogERCorrectedForF = CDblToSng(ER_CALC_ERR)
+                    sngLabellingEfficiency = 0
                 ElseIf dblAbu2DaCorrected < 0.15 * dblAbu4DaCorrected Then
                     ' Condition 2
                     udtScanDetailsHv.Abundance = Round(1.15 * dblAbu4DaCorrected, 0)
                     dblER = dblAbuMonoIso / udtScanDetailsHv.Abundance
+                    If dblER > 0 Then
+                        sngLogERCorrectedForF = CDblToSng(Log2(dblER))
+                    Else
+                        sngLogERCorrectedForF = CDblToSng(ER_CALC_ERR)
+                    End If
+                    sngLabellingEfficiency = 1
                 Else
                     ' Condition 3
                     If dblAbu2DaCorrected + dblAbu4DaCorrected > 0 Then
                         udtScanDetailsHv.Abundance = Round(dblAbu2DaCorrected + dblAbu4DaCorrected, 0)
                         dblER = dblAbuMonoIso / udtScanDetailsHv.Abundance
+                        
+                        dblERCorrectedForF = dblER * (2 * sngLabellingEfficiency - sngLabellingEfficiency ^ 2) - (1 - sngLabellingEfficiency) ^ 2
+                        If dblERCorrectedForF > 0 Then
+                            sngLogERCorrectedForF = CDblToSng(Log2(dblERCorrectedForF))
+                        Else
+                            sngLogERCorrectedForF = CDblToSng(ER_CALC_ERR)
+                        End If
                     Else
-                        dblER = ER_CALC_ERR
+                        ' Error; leave dblER as ER_CALC_ERR
                     End If
                 End If
                 
@@ -1120,6 +1188,16 @@ CalcDltLblPairsERViaIReportErrorHandler:
     End If
     
     CalcDltLblPairsERViaIReport = ER_CALC_ERR
+End Function
+
+Private Function CDblToSng(ByVal dblValue As Double) As Single
+    If dblValue < -3.4E+38 Then
+        CDblToSng = -3.4E+38
+    ElseIf dblValue > 3.4E+38 Then
+        CDblToSng = 3.4E+38
+    Else
+        CDblToSng = CSng(dblValue)
+    End If
 End Function
 
 Private Sub CalcDltLblPairsScanByScanPopulate(ByRef udtScanDetails() As udtScanByScanDetailsType, ByVal lngGelIndex As Long, ByVal UMCIndex As Long, ByVal intTargetCharge As Integer, ByVal lngScanByScanStatsScanNumStart As Long, blnUseMaxValueEachScan As Boolean)
@@ -1193,7 +1271,159 @@ CalcDltLblPairsScanByScanPopulateErrorHandler:
 
 End Sub
 
-Public Sub GetScanByScanStatsForPair(ByVal lngPairIndex As Long, ByRef lngAlignedScanCount As Long, ByRef lngScanNumbers() As Long, ByRef intCharges() As Integer, ByRef dblLtAbundance() As Double, ByRef dblHvAbundance() As Double, ByRef dblER() As Double, ByRef sngAbu2DaCorrected() As Single, ByRef sngAbu4DaCorrected() As Single)
+Private Function ComputeStatsPossiblyWeight(ByRef objStatDoubles As StatDoubles, ByRef udtScanByScanStats As udtScanByScanStatsType, ByRef dblValueList() As Double, ByRef lngERListIndexPointers() As Long, ByVal lngERListCount As Long, ByRef dblWeightedAvg As Double, ByRef dblStDev As Double, ByVal blnComputeWeightedAvg As Boolean) As Boolean
+
+    Dim dblLightHeavyAbuSum As Double
+    Dim dblProductSum As Double
+    Dim dblWeightingSum As Double
+    Dim lngIndex As Long
+    
+    Dim blnSuccess As Boolean
+    
+    dblWeightedAvg = ER_CALC_ERR
+    dblStDev = 0
+    
+    If lngERListCount > 1 Then
+
+        If blnComputeWeightedAvg Then
+            ' Populate the weighting variables then compute a weighted average of the data in dblValueList()
+            
+            With udtScanByScanStats
+                dblLightHeavyAbuSum = 0
+                dblProductSum = 0
+                dblWeightingSum = 0
+                
+                For lngIndex = 0 To lngERListCount - 1
+                
+                    Debug.Assert dblValueList(lngIndex) <> ER_CALC_ERR
+                
+                    dblLightHeavyAbuSum = .ScanDetailsLt(lngERListIndexPointers(lngIndex)).Abundance + .ScanDetailsHv(lngERListIndexPointers(lngIndex)).Abundance
+                    dblProductSum = dblProductSum + dblValueList(lngIndex) * dblLightHeavyAbuSum
+                  
+                    dblWeightingSum = dblWeightingSum + dblLightHeavyAbuSum
+                Next lngIndex
+            End With
+        
+            ' Use objStatDoubles to compute the Standard Deviation of the values in dblValueList
+            blnSuccess = objStatDoubles.Fill(dblValueList)
+        
+            If blnSuccess Then
+                If dblWeightingSum > 0 Then
+                    ' Store a weighted mean ER
+                    dblWeightedAvg = dblProductSum / dblWeightingSum
+                Else
+                    ' This shouldn't happen
+                    Debug.Assert False
+                    
+                    ' Could use the following to store an unweighted mean ER
+                    dblWeightedAvg = objStatDoubles.Mean
+                End If
+               
+                dblStDev = objStatDoubles.StDev
+            End If
+        
+        Else
+            ' Use objStatDoubles to compute the Mean and Standard Deviation of the values in dblValueList
+            blnSuccess = objStatDoubles.Fill(dblValueList)
+            If blnSuccess Then
+                dblWeightedAvg = objStatDoubles.Mean
+                dblStDev = objStatDoubles.StDev
+            End If
+        End If
+    
+    ElseIf lngERListCount = 1 Then
+        dblWeightedAvg = dblValueList(0)
+        dblStDev = 0
+    End If
+
+    ComputeStatsPossiblyWeight = blnSuccess
+
+End Function
+
+Public Function ComputeRatioER(ByVal LtAbu As Double, ByVal HvAbu As Double) As Double
+    '------------------------------------------------------
+    'returns ER as standard ratio of abundance of light and
+    'heavy pair members
+    '------------------------------------------------------
+    On Error Resume Next
+    ComputeRatioER = LtAbu / HvAbu
+    If Err Then ComputeRatioER = ER_CALC_ERR
+End Function
+
+Public Function ComputeLogER(ByVal LtAbu As Double, ByVal HvAbu As Double) As Double
+    '------------------------------------------------------
+    'returns ER as natural log of abundance ratio of light
+    'and heavy pair members
+    '------------------------------------------------------
+    On Error Resume Next
+    ComputeLogER = Log(LtAbu / HvAbu)
+    If Err Then ComputeLogER = ER_CALC_ERR
+End Function
+
+Public Function ComputeAltER(ByVal LtAbu As Double, ByVal HvAbu As Double) As Double
+    '------------------------------------------------------
+    'returns ER as shifted symmetric abundance ratio of light
+    'and heavy pair members
+    '------------------------------------------------------
+    On Error GoTo err_ComputeAltER
+    ComputeAltER = ConvertRatioERtoAltER(ComputeRatioER(LtAbu, HvAbu))
+    Exit Function
+    
+err_ComputeAltER:
+    ComputeAltER = ER_CALC_ERR
+End Function
+
+Public Function ConvertAltERtoRatioER(ByVal dblAltER As Double) As Double
+    '------------------------------------------------------
+    'Converts shifted symmetric abundance ratio values to normal ratio-based ER values
+    '------------------------------------------------------
+    On Error GoTo err_ComputeAltER
+    
+    If dblAltER >= 0 Then
+        ConvertAltERtoRatioER = dblAltER + 1
+    Else
+        ConvertAltERtoRatioER = 1 / (1 - dblAltER)
+    End If
+    Exit Function
+    
+err_ComputeAltER:
+    ConvertAltERtoRatioER = ER_CALC_ERR
+End Function
+
+Public Function ConvertRatioERtoAltER(ByVal dblRatER As Double) As Double
+    '------------------------------------------------------
+    'Converts ratio-based ER to shifted symmetric abundance ratio
+    '------------------------------------------------------
+    On Error GoTo err_ComputeAltER
+    If dblRatER >= 1 Then
+       ConvertRatioERtoAltER = dblRatER - 1
+    Else
+       ConvertRatioERtoAltER = 1 - (1 / dblRatER)
+    End If
+    Exit Function
+    
+err_ComputeAltER:
+    ConvertRatioERtoAltER = ER_CALC_ERR
+End Function
+
+Public Function ConvertRatioERToLogER(ByVal dblRatER As Double) As Double
+    '------------------------------------------------------
+    'Converts ratio-based ER to a natural log scale
+    '------------------------------------------------------
+    On Error GoTo err_ComputeLogER
+     
+    If dblRatER > 0 Then
+        ConvertRatioERToLogER = Log(dblRatER)
+    Else
+        ConvertRatioERToLogER = ER_CALC_ERR
+    End If
+    Exit Function
+    
+err_ComputeLogER:
+    ConvertRatioERToLogER = ER_CALC_ERR
+End Function
+
+Public Sub GetScanByScanStatsForPair(ByVal lngPairIndex As Long, ByRef lngAlignedScanCount As Long, ByRef lngScanNumbers() As Long, ByRef intCharges() As Integer, ByRef dblLtAbundance() As Double, ByRef dblHvAbundance() As Double, ByRef dblER() As Double, ByRef sngAbu2DaCorrected() As Single, ByRef sngAbu4DaCorrected() As Single, ByRef sngLabellingEfficiency() As Single, ByRef sngLogERCorrectedForF() As Single)
     Dim lngScanIndex As Long
     
     If lngPairIndex <= mCorrectedAbundanceStatsMaxIndex Then
@@ -1202,11 +1432,14 @@ Public Sub GetScanByScanStatsForPair(ByVal lngPairIndex As Long, ByRef lngAligne
             
             If lngAlignedScanCount >= UBound(lngScanNumbers) Then
                 ReDim lngScanNumbers(lngAlignedScanCount - 1)
+                ReDim intCharges(lngAlignedScanCount - 1)
                 ReDim dblLtAbundance(lngAlignedScanCount - 1)
                 ReDim dblHvAbundance(lngAlignedScanCount - 1)
                 ReDim dblER(lngAlignedScanCount - 1)
                 ReDim sngAbu2DaCorrected(lngAlignedScanCount - 1)
                 ReDim sngAbu4DaCorrected(lngAlignedScanCount - 1)
+                ReDim sngLabellingEfficiency(lngAlignedScanCount - 1)
+                ReDim sngLogERCorrectedForF(lngAlignedScanCount - 1)
             End If
             
             For lngScanIndex = 0 To .AlignedScanCount - 1
@@ -1218,6 +1451,8 @@ Public Sub GetScanByScanStatsForPair(ByVal lngPairIndex As Long, ByRef lngAligne
                     dblER(lngScanIndex) = .ER
                     sngAbu2DaCorrected(lngScanIndex) = .ScanAbu2PlusCorrected
                     sngAbu4DaCorrected(lngScanIndex) = .ScanAbu4PlusCorrected
+                    sngLabellingEfficiency(lngScanIndex) = .ScanLabellingEfficiency
+                    sngLogERCorrectedForF(lngScanIndex) = .ScanLogERCorrectedForF
                 End With
             Next lngScanIndex
         End With
@@ -1227,7 +1462,7 @@ Public Sub GetScanByScanStatsForPair(ByVal lngPairIndex As Long, ByRef lngAligne
 End Sub
 
 Private Sub InitializeLocalVariables(ByVal lngPairCount As Long)
-    Dim lngindex As Long
+    Dim lngIndex As Long
 
     mCorrectedAbundanceStatsMaxIndex = 0
     
@@ -1237,44 +1472,17 @@ Private Sub InitializeLocalVariables(ByVal lngPairCount As Long)
         ReDim mCorrectedAbundanceStats(lngPairCount - 1)
     End If
     
-    For lngindex = 0 To UBound(mCorrectedAbundanceStats)
-        With mCorrectedAbundanceStats(lngindex)
+    For lngIndex = 0 To UBound(mCorrectedAbundanceStats)
+        With mCorrectedAbundanceStats(lngIndex)
             .AlignedScanCount = 0
             
             ' Initially reserve space for 10 entries
             ReDim .AlignedScanStats(9)
         End With
-    Next lngindex
+    Next lngIndex
 
 End Sub
 
-Private Function AltERViaRatER(ByVal dblRatER As Double) As Double
-    '------------------------------------------------------
-    'Converts ratio-based ER to shifted symmetric abundance ratio
-    '------------------------------------------------------
-    On Error GoTo err_AltER
-    If dblRatER >= 1 Then
-       AltERViaRatER = dblRatER - 1
-    Else
-       AltERViaRatER = 1 - (1 / dblRatER)
-    End If
-    Exit Function
-    
-err_AltER:
-    AltERViaRatER = ER_CALC_ERR
+Private Function Log2(ByVal dblValue As Double) As Double
+    Log2 = Log(dblValue) / Log(2#)
 End Function
-
-Private Function LogERViaRatER(ByVal dblRatER As Double) As Double
-    '------------------------------------------------------
-    'Converts ratio-based ER to a logarithmic scale
-    '------------------------------------------------------
-    On Error Resume Next
-    If dblRatER > 0 Then
-        LogERViaRatER = Log(dblRatER)
-        If Err Then LogERViaRatER = ER_CALC_ERR
-    Else
-        LogERViaRatER = ER_CALC_ERR
-    End If
-End Function
-
-

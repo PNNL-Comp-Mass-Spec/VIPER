@@ -277,26 +277,32 @@ Public Sub CalcDltLblPairsER_Solo(ByVal Ind As Long)
 'of isotopic peak type
 '-----------------------------------------------------
 Dim i As Long
+Dim objDltLblPairsUMC As clsDltLblPairsUMC
+Set objDltLblPairsUMC = New clsDltLblPairsUMC
+
 GelP_D_L(Ind).SearchDef.ERCalcType = glbPreferencesExpanded.PairSearchOptions.SearchDef.ERCalcType
 Call InitDltLblPairsER(Ind, GelP_D_L(Ind).SearchDef.ERCalcType, False)
 With GelP_D_L(Ind)
   Select Case .SearchDef.ERCalcType
   Case ectER_RAT
     For i = 0 To .PCnt - 1
-        .Pairs(i).ER = RatER(GelData(Ind).IsoData(.Pairs(i).P1).Abundance, _
-                           GelData(Ind).IsoData(.Pairs(i).P2).Abundance)
+        .Pairs(i).ER = objDltLblPairsUMC.ComputeRatioER( _
+                            GelData(Ind).IsoData(.Pairs(i).P1).Abundance, _
+                            GelData(Ind).IsoData(.Pairs(i).P2).Abundance)
         .Pairs(i).ERMemberBasisCount = 1
     Next i
   Case ectER_LOG
     For i = 0 To .PCnt - 1
-        .Pairs(i).ER = LogER(GelData(Ind).IsoData(.Pairs(i).P1).Abundance, _
-                           GelData(Ind).IsoData(.Pairs(i).P2).Abundance)
+        .Pairs(i).ER = objDltLblPairsUMC.ComputeLogER( _
+                            GelData(Ind).IsoData(.Pairs(i).P1).Abundance, _
+                            GelData(Ind).IsoData(.Pairs(i).P2).Abundance)
         .Pairs(i).ERMemberBasisCount = 1
     Next i
   Case ectER_ALT
     For i = 0 To .PCnt - 1
-        .Pairs(i).ER = AltER(GelData(Ind).IsoData(.Pairs(i).P1).Abundance, _
-                           GelData(Ind).IsoData(.Pairs(i).P2).Abundance)
+        .Pairs(i).ER = objDltLblPairsUMC.ComputeAltER( _
+                            GelData(Ind).IsoData(.Pairs(i).P1).Abundance, _
+                            GelData(Ind).IsoData(.Pairs(i).P2).Abundance)
         .Pairs(i).ERMemberBasisCount = 1
     Next i
   End Select
@@ -559,7 +565,7 @@ Public Function PairsSearchMarkAmbiguousPairsWithHitsOnly(frmCallingForm As VB.F
     
     Dim strMessage As String
     
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     Dim blnPairHasUMCWithHit() As Boolean       ' 0-based; Parallel to GelP_D_L().Pairs(); true if the pair has a UMC with one or more hits
     
@@ -577,42 +583,42 @@ On Error GoTo PairsSearchMarkAmbiguousPairsWithHitsOnlyErrorHandler
             ReDim intPairsWithoutHitsStateSaved(.PCnt - 1)
             
             ' Determine which pairs have hits
-            For lngindex = 0 To .PCnt - 1
-                With .Pairs(lngindex)
+            For lngIndex = 0 To .PCnt - 1
+                With .Pairs(lngIndex)
                     If IsAMTReferencedByUMC(GelUMC(lngGelIndex).UMCs(.P1), lngGelIndex) Then
-                        blnPairHasUMCWithHit(lngindex) = True
+                        blnPairHasUMCWithHit(lngIndex) = True
                     Else
                         If IsAMTReferencedByUMC(GelUMC(lngGelIndex).UMCs(.P2), lngGelIndex) Then
-                            blnPairHasUMCWithHit(lngindex) = True
+                            blnPairHasUMCWithHit(lngIndex) = True
                         End If
                     End If
                 End With
-            Next lngindex
+            Next lngIndex
             
             ' Step through the pairs again, and exclude those that are currently included but don't have any hits
             ' Keep track of the excluded pairs using lngPairsWithoutHits()
             lngPairsWithoutHitsCount = 0
-            For lngindex = 0 To .PCnt - 1
-                With .Pairs(lngindex)
-                    If Not blnPairHasUMCWithHit(lngindex) And .STATE <> glPAIR_Exc Then
-                        lngPairsWithoutHits(lngPairsWithoutHitsCount) = lngindex
+            For lngIndex = 0 To .PCnt - 1
+                With .Pairs(lngIndex)
+                    If Not blnPairHasUMCWithHit(lngIndex) And .STATE <> glPAIR_Exc Then
+                        lngPairsWithoutHits(lngPairsWithoutHitsCount) = lngIndex
                         intPairsWithoutHitsStateSaved(lngPairsWithoutHitsCount) = .STATE
                         lngPairsWithoutHitsCount = lngPairsWithoutHitsCount + 1
                         
                         .STATE = glPAIR_Exc
                     End If
                 End With
-            Next lngindex
+            Next lngIndex
             
             ' Now exclude the ambiguous pairs
             strMessage = PairsSearchMarkAmbiguous(frmCallingForm, lngGelIndex, True, lngPairsWithoutHitsCount)
             
             ' Now restore the pairs that were excluded because they had no hits
-            For lngindex = 0 To lngPairsWithoutHitsCount - 1
-                With .Pairs(lngPairsWithoutHits(lngindex))
-                    .STATE = intPairsWithoutHitsStateSaved(lngindex)
+            For lngIndex = 0 To lngPairsWithoutHitsCount - 1
+                With .Pairs(lngPairsWithoutHits(lngIndex))
+                    .STATE = intPairsWithoutHitsStateSaved(lngIndex)
                 End With
-            Next lngindex
+            Next lngIndex
         
         Else
             strMessage = "No pairs found."
@@ -708,62 +714,6 @@ PairsSearchMarkBadERErrorHandler:
 
 End Function
 
-Public Function RatER(ByVal LtAbu As Double, ByVal HvAbu As Double) As Double
-'------------------------------------------------------
-'returns ER as standard ratio of abundance of light and
-'heavy pair members
-'------------------------------------------------------
-On Error Resume Next
-RatER = LtAbu / HvAbu
-If Err Then RatER = ER_CALC_ERR
-End Function
-
-Public Function RatERViaAltER(ByVal dblAltER As Double) As Double
-'------------------------------------------------------
-'Converts shifted symmetric abundance ratio values to normal ratio-based ER values
-'------------------------------------------------------
-On Error GoTo err_AltER
-
-If dblAltER >= 0 Then
-    RatERViaAltER = dblAltER + 1
-Else
-    RatERViaAltER = 1 / (1 - dblAltER)
-End If
-Exit Function
-
-err_AltER:
-RatERViaAltER = ER_CALC_ERR
-End Function
-
-Public Function LogER(ByVal LtAbu As Double, ByVal HvAbu As Double) As Double
-'------------------------------------------------------
-'returns ER as logarithm of abundance ratio of light
-'and heavy pair members
-'------------------------------------------------------
-On Error Resume Next
-LogER = Log(LtAbu / HvAbu)
-If Err Then LogER = ER_CALC_ERR
-End Function
-
-Public Function AltER(ByVal LtAbu As Double, ByVal HvAbu As Double) As Double
-'------------------------------------------------------
-'returns ER as shifted symmetric abundance ratio of light
-'and heavy pair members
-'------------------------------------------------------
-Dim tmpER As Double
-On Error GoTo err_AltER
-tmpER = LtAbu / HvAbu
-If tmpER >= 1 Then
-   AltER = tmpER - 1
-Else
-   AltER = 1 - (1 / tmpER)
-End If
-Exit Function
-
-err_AltER:
-AltER = ER_CALC_ERR
-End Function
-
 Public Sub ReportDltLblPairs_S(ByVal Ind As Long, PState As Integer, Optional strFilePath As String = "")
 '-------------------------------------------------------------------
 'report all pairs results (for individual peaks) in temporary file
@@ -811,7 +761,7 @@ With GelP_D_L(Ind)
       Case ectER_RAT
         ts.WriteLine "ER calculation: Ratio; AbuLight/AbuHeavy"
       Case ectER_LOG
-        ts.WriteLine "ER calculation: Logarithmic Ratio; Log(AbuLight/AbuHeavy)"
+        ts.WriteLine "ER calculation: Logarithmic Ratio; Ln(AbuLight/AbuHeavy)"
       Case ectER_ALT
         ts.WriteLine "ER calculation: 0-Shifted Symmetric Ratio; (AbuL/AbuH)-1 for AbuL>=AbuH; 1-(AbuH/AbuL) for AbuL<AbuH"
       Case Else
@@ -888,171 +838,186 @@ Private Sub ReportDltLblPairs_UMC(ByVal Ind As Long, _
                                  ClsStat() As Double, _
                                  PState As Integer, _
                                  Optional strFilePath As String = "")
-'------------------------------------------------------
-'report all pairs results (for unique mass classes) in
-'temporary file; PState determines which pairs will be
-'reported; excluded, included or all
-'If Len(strFilePath) = 0, then displays report using frmDataInfo;
-'  otherwise, saves the report to strFilePath
-'PState can be 0 (aka glPAIR_Inc) for all pairs, 1 for Included only (aka glPAIR_Inc),
-'  or -1 for Excluded only (aka glPAIR_Exc)
-'------------------------------------------------------
-Dim fname As String
-Dim sLine As String
-Dim i As Long
-Dim intChargeStateBasis As Integer
-Dim fso As New FileSystemObject
-Dim ts As TextStream
-Dim blnSaveToDiskOnly As Boolean
-Dim blnUserNotifiedOfError As Boolean
-Dim blnReportN15IncompleteIncorporation As Boolean
-
-Dim strSepChar As String
-
-On Error GoTo ReportDltLblPairsUMCErrorHandler
-
-If Len(strFilePath) > 0 Then
-   fname = strFilePath
-   blnSaveToDiskOnly = True
-Else
-   fname = GetTempFolder() & RawDataTmpFile
-End If
-
-strSepChar = LookupDefaultSeparationCharacter()
-
-With GelP_D_L(Ind)
-    If .PCnt >= 0 Then
-        Set ts = fso.OpenTextFile(fname, ForWriting, True)
-        ts.WriteLine "Generated by: " & GetMyNameVersion() & " on " & Now()
-        'print gel file name and pairs definitions as reference
-        ts.WriteLine "Gel File: " & GelBody(Ind).Caption
-        ts.WriteLine "Reporting delta-label pairs for unique mass classes."
-        Select Case PState
-        Case glPAIR_Inc
-            ts.WriteLine "Included pairs."
-        Case glPAIR_Exc
-            ts.WriteLine "Excluded pairs."
-        Case Else
-            ts.WriteLine "All pairs."
-        End Select
-        
-        ts.WriteLine "Label mass: " & .SearchDef.LightLabelMass
-        ts.WriteLine "Delta mass: " & .SearchDef.DeltaMass
-        
-        Select Case .SearchDef.ERCalcType
-        Case ectER_RAT
-            ts.WriteLine "ER calculation: Ratio; AbuLight/AbuHeavy"
-        Case ectER_LOG
-            ts.WriteLine "ER calculation: Logarithmic Ratio; Log(AbuLight/AbuHeavy)"
-        Case ectER_ALT
-            ts.WriteLine "ER calculation: 0-Shifted Symmetric Ratio; (AbuL/AbuH)-1 for AbuL>=AbuH; 1-(AbuH/AbuL) for AbuL<AbuH"
-        Case Else
-            ts.WriteLine "ER calculation: Unknown"
-        End Select
-        ts.WriteLine
-        ts.WriteLine "Unique Mass Class definition"
-        ts.Write GetUMCDefDesc(GelUMC(Ind).def)
-        ts.WriteLine
-        ts.WriteLine
-        
-        'header line
-        sLine = ""
-        sLine = sLine & "Pair Index" & strSepChar & "UMC Light Index" & strSepChar & "Light MW" & strSepChar & "Light Abu" & strSepChar
-        sLine = sLine & "Light Lbl Count" & strSepChar & "Light ScanStart" & strSepChar & "Light ScanEnd" & strSepChar & "Light Charge State Basis" & strSepChar & "Light Charge Basis MZ" & strSepChar
-        sLine = sLine & "UMC Heavy Index" & strSepChar & "Heavy MW" & strSepChar & "Heavy Abu" & strSepChar
-        sLine = sLine & "Heavy Lbl Count" & strSepChar & "Delta Count" & strSepChar
-        sLine = sLine & "Heavy ScanStart" & strSepChar & "Heavy ScanEnd" & strSepChar & "Heavy Charge State Basis" & strSepChar & "Heavy Charge Basis MZ" & strSepChar
-        sLine = sLine & "ER" & strSepChar & "ER StDev" & strSepChar & "ER Charge State Basis Count" & strSepChar & "ER Member Basis Count"
-        
-        If .SearchDef.N15IncompleteIncorporationMode Then
-            sLine = sLine & strSepChar & "N15 Incorporation %"
-            blnReportN15IncompleteIncorporation = True
-        Else
-            blnReportN15IncompleteIncorporation = False
-        End If
-        
-        If PState = glPair_All Then
-            ' Only report the state if the reporting mode is All Pairs
-            sLine = sLine & strSepChar & "State"
-        End If
-          
-        ts.WriteLine sLine
-        
-        For i = 0 To .PCnt - 1
-            With .Pairs(i)
-                If .STATE = PState Or Abs(PState) <> 1 Then
-                    sLine = ""
-                    
-                    ' Old method, referencing ClsStat()
-                    'sLine = sLine & i & strSepChar & .P1 & strSepChar & Round(ClsStat(.P1, ustClassMW), 6) & strSepChar & ClsStat(.P1, ustClassIntensity) & strSepChar
-                    'sLine = sLine & .P1LblCnt & strSepChar & ClsStat(.P1, ustScanStart) & strSepChar & ClsStat(.P1, ustScanEnd) & strSepChar
-                    
-                    ' First the light member
-                    ' New method, grabbing values directly from GelUMC().UMCs()
-                    sLine = sLine & i & strSepChar & .P1 & strSepChar & Round(GelUMC(Ind).UMCs(.P1).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.P1).ClassAbundance & strSepChar
-                    sLine = sLine & .P1LblCnt & strSepChar & GelUMC(Ind).UMCs(.P1).MinScan & strSepChar & GelUMC(Ind).UMCs(.P1).MaxScan & strSepChar
-                
-                    ' Record ChargeBasis and UMCMZForChargeBasis
-                    If GelUMC(Ind).def.UMCClassStatsUseStatsFromMostAbuChargeState Then
-                        intChargeStateBasis = GelUMC(Ind).UMCs(.P1).ChargeStateBasedStats(GelUMC(Ind).UMCs(.P1).ChargeStateStatsRepInd).Charge
-                        sLine = sLine & Trim(intChargeStateBasis) & strSepChar
-                    Else
-                        intChargeStateBasis = CInt(GelData(Ind).IsoData(GelUMC(Ind).UMCs(.P1).ClassRepInd).Charge)
-                        sLine = sLine & 0 & strSepChar
-                    End If
-                    sLine = sLine & Round(MonoMassToMZ(GelUMC(Ind).UMCs(.P1).ClassMW, intChargeStateBasis), 6) & strSepChar
-                        
-                    ' Now the heavy menber
-                    sLine = sLine & .P2 & strSepChar & Round(GelUMC(Ind).UMCs(.P2).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.P2).ClassAbundance & strSepChar
-                    sLine = sLine & .P2LblCnt & strSepChar & .P2DltCnt & strSepChar
-                    sLine = sLine & GelUMC(Ind).UMCs(.P2).MinScan & strSepChar & GelUMC(Ind).UMCs(.P2).MaxScan & strSepChar
-                    
-                    ' Record ChargeBasis and UMCMZForChargeBasis
-                    If GelUMC(Ind).def.UMCClassStatsUseStatsFromMostAbuChargeState Then
-                        intChargeStateBasis = GelUMC(Ind).UMCs(.P2).ChargeStateBasedStats(GelUMC(Ind).UMCs(.P2).ChargeStateStatsRepInd).Charge
-                        sLine = sLine & Trim(intChargeStateBasis) & strSepChar
-                    Else
-                        intChargeStateBasis = CInt(GelData(Ind).IsoData(GelUMC(Ind).UMCs(.P2).ClassRepInd).Charge)
-                        sLine = sLine & 0 & strSepChar
-                    End If
-                    sLine = sLine & Round(MonoMassToMZ(GelUMC(Ind).UMCs(.P2).ClassMW, intChargeStateBasis), 6) & strSepChar
-                    
-                    sLine = sLine & Round(.ER, 6) & strSepChar & Round(.ERStDev, 6) & strSepChar & .ERChargeStateBasisCount & strSepChar & .ERMemberBasisCount
-                    
-                    If blnReportN15IncompleteIncorporation Then
-                        sLine = sLine & strSepChar & Round(.DeltaAtomPercentIncorporation, 1)
-                    End If
-                    
-                    If PState = glPair_All Then
-                        Select Case .STATE
-                        Case glPAIR_Inc
-                            sLine = sLine & strSepChar & "Included"
-                        Case glPAIR_Exc
-                            sLine = sLine & strSepChar & "Excluded"
-                        Case Else
-                            ' Neutral; we'll call it Included
-                            ' If this code gets encountered, it means we may want to call
-                            '  PairSearchIncludeNeutralPairs() prior to calling this function
-                            sLine = sLine & strSepChar & "Included"
-                        End Select
-                    End If
-                    ts.WriteLine sLine
-                End If
-            End With
-        Next i
-        ts.Close
-        DoEvents
-        
-        If Not blnSaveToDiskOnly Then
-            frmDataInfo.Tag = "DLT_LBL"
-            frmDataInfo.Show vbModal
-        End If
+    '------------------------------------------------------
+    'report all pairs results (for unique mass classes) in
+    'temporary file; PState determines which pairs will be
+    'reported; excluded, included or all
+    'If Len(strFilePath) = 0, then displays report using frmDataInfo;
+    '  otherwise, saves the report to strFilePath
+    'PState can be 0 (aka glPAIR_Inc) for all pairs, 1 for Included only (aka glPAIR_Inc),
+    '  or -1 for Excluded only (aka glPAIR_Exc)
+    '------------------------------------------------------
+    Dim fname As String
+    Dim sLine As String
+    Dim i As Long
+    Dim intChargeStateBasis As Integer
+    Dim fso As New FileSystemObject
+    Dim ts As TextStream
+    
+    Dim blnSaveToDiskOnly As Boolean
+    Dim blnUserNotifiedOfError As Boolean
+    Dim blnReportN15IncompleteIncorporation As Boolean
+    Dim blnCorrectedIReportEREnabled As Boolean
+    
+    Dim strSepChar As String
+    
+    On Error GoTo ReportDltLblPairsUMCErrorHandler
+    
+    If Len(strFilePath) > 0 Then
+       fname = strFilePath
+       blnSaveToDiskOnly = True
     Else
-        If Not blnSaveToDiskOnly And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "No pairs found.", vbOKOnly, glFGTU
-        End If
+       fname = GetTempFolder() & RawDataTmpFile
     End If
-End With
+    
+    strSepChar = LookupDefaultSeparationCharacter()
+    
+    With GelP_D_L(Ind)
+        If .PCnt >= 0 Then
+            Set ts = fso.OpenTextFile(fname, ForWriting, True)
+            ts.WriteLine "Generated by: " & GetMyNameVersion() & " on " & Now()
+            'print gel file name and pairs definitions as reference
+            ts.WriteLine "Gel File: " & GelBody(Ind).Caption
+            ts.WriteLine "Reporting delta-label pairs for unique mass classes."
+            Select Case PState
+            Case glPAIR_Inc
+                ts.WriteLine "Included pairs."
+            Case glPAIR_Exc
+                ts.WriteLine "Excluded pairs."
+            Case Else
+                ts.WriteLine "All pairs."
+            End Select
+            
+            ts.WriteLine "Label mass: " & .SearchDef.LightLabelMass
+            ts.WriteLine "Delta mass: " & .SearchDef.DeltaMass
+            
+            Select Case .SearchDef.ERCalcType
+            Case ectER_RAT
+                ts.WriteLine "ER calculation: Ratio; AbuLight/AbuHeavy"
+            Case ectER_LOG
+                ts.WriteLine "ER calculation: Logarithmic Ratio; Ln(AbuLight/AbuHeavy)"
+            Case ectER_ALT
+                ts.WriteLine "ER calculation: 0-Shifted Symmetric Ratio; (AbuL/AbuH)-1 for AbuL>=AbuH; 1-(AbuH/AbuL) for AbuL<AbuH"
+            Case Else
+                ts.WriteLine "ER calculation: Unknown"
+            End Select
+            ts.WriteLine
+            ts.WriteLine "Unique Mass Class definition"
+            ts.Write GetUMCDefDesc(GelUMC(Ind).def)
+            ts.WriteLine
+            ts.WriteLine
+            
+            'header line
+            sLine = ""
+            sLine = sLine & "Pair Index" & strSepChar & "UMC Light Index" & strSepChar & "Light MW" & strSepChar & "Light Abu" & strSepChar
+            sLine = sLine & "Light Lbl Count" & strSepChar & "Light ScanStart" & strSepChar & "Light ScanEnd" & strSepChar & "Light Charge State Basis" & strSepChar & "Light Charge Basis MZ" & strSepChar
+            sLine = sLine & "UMC Heavy Index" & strSepChar & "Heavy MW" & strSepChar & "Heavy Abu" & strSepChar
+            sLine = sLine & "Heavy Lbl Count" & strSepChar & "Delta Count" & strSepChar
+            sLine = sLine & "Heavy ScanStart" & strSepChar & "Heavy ScanEnd" & strSepChar & "Heavy Charge State Basis" & strSepChar & "Heavy Charge Basis MZ" & strSepChar
+            sLine = sLine & "ER" & strSepChar & "ER StDev" & strSepChar & "ER Charge State Basis Count" & strSepChar & "ER Member Basis Count"
+            
+            If .SearchDef.N15IncompleteIncorporationMode Then
+                sLine = sLine & strSepChar & "N15 Incorporation %"
+                blnReportN15IncompleteIncorporation = True
+            Else
+                blnReportN15IncompleteIncorporation = False
+            End If
+            
+            If .SearchDef.ComputeERScanByScan And .SearchDef.IReportEROptions.Enabled Then
+                sLine = sLine & strSepChar & "Labelling Efficiency F" & strSepChar & "Log2(ER) Corrected for F" & strSepChar & "Log2(ER) Corrected Standard Error"
+                blnCorrectedIReportEREnabled = True
+            Else
+                blnCorrectedIReportEREnabled = False
+            End If
+            
+            If PState = glPair_All Then
+                ' Only report the state if the reporting mode is All Pairs
+                sLine = sLine & strSepChar & "State"
+            End If
+              
+            ts.WriteLine sLine
+            
+            For i = 0 To .PCnt - 1
+                With .Pairs(i)
+                    If .STATE = PState Or Abs(PState) <> 1 Then
+                        sLine = ""
+                        
+                        ' Old method, referencing ClsStat()
+                        'sLine = sLine & i & strSepChar & .P1 & strSepChar & Round(ClsStat(.P1, ustClassMW), 6) & strSepChar & ClsStat(.P1, ustClassIntensity) & strSepChar
+                        'sLine = sLine & .P1LblCnt & strSepChar & ClsStat(.P1, ustScanStart) & strSepChar & ClsStat(.P1, ustScanEnd) & strSepChar
+                        
+                        ' First the light member
+                        ' New method, grabbing values directly from GelUMC().UMCs()
+                        sLine = sLine & i & strSepChar & .P1 & strSepChar & Round(GelUMC(Ind).UMCs(.P1).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.P1).ClassAbundance & strSepChar
+                        sLine = sLine & .P1LblCnt & strSepChar & GelUMC(Ind).UMCs(.P1).MinScan & strSepChar & GelUMC(Ind).UMCs(.P1).MaxScan & strSepChar
+                    
+                        ' Record ChargeBasis and UMCMZForChargeBasis
+                        If GelUMC(Ind).def.UMCClassStatsUseStatsFromMostAbuChargeState Then
+                            intChargeStateBasis = GelUMC(Ind).UMCs(.P1).ChargeStateBasedStats(GelUMC(Ind).UMCs(.P1).ChargeStateStatsRepInd).Charge
+                            sLine = sLine & Trim(intChargeStateBasis) & strSepChar
+                        Else
+                            intChargeStateBasis = CInt(GelData(Ind).IsoData(GelUMC(Ind).UMCs(.P1).ClassRepInd).Charge)
+                            sLine = sLine & 0 & strSepChar
+                        End If
+                        sLine = sLine & Round(MonoMassToMZ(GelUMC(Ind).UMCs(.P1).ClassMW, intChargeStateBasis), 6) & strSepChar
+                            
+                        ' Now the heavy menber
+                        sLine = sLine & .P2 & strSepChar & Round(GelUMC(Ind).UMCs(.P2).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.P2).ClassAbundance & strSepChar
+                        sLine = sLine & .P2LblCnt & strSepChar & .P2DltCnt & strSepChar
+                        sLine = sLine & GelUMC(Ind).UMCs(.P2).MinScan & strSepChar & GelUMC(Ind).UMCs(.P2).MaxScan & strSepChar
+                        
+                        ' Record ChargeBasis and UMCMZForChargeBasis
+                        If GelUMC(Ind).def.UMCClassStatsUseStatsFromMostAbuChargeState Then
+                            intChargeStateBasis = GelUMC(Ind).UMCs(.P2).ChargeStateBasedStats(GelUMC(Ind).UMCs(.P2).ChargeStateStatsRepInd).Charge
+                            sLine = sLine & Trim(intChargeStateBasis) & strSepChar
+                        Else
+                            intChargeStateBasis = CInt(GelData(Ind).IsoData(GelUMC(Ind).UMCs(.P2).ClassRepInd).Charge)
+                            sLine = sLine & 0 & strSepChar
+                        End If
+                        sLine = sLine & Round(MonoMassToMZ(GelUMC(Ind).UMCs(.P2).ClassMW, intChargeStateBasis), 6) & strSepChar
+                        
+                        sLine = sLine & Round(.ER, 6) & strSepChar & Round(.ERStDev, 6) & strSepChar & .ERChargeStateBasisCount & strSepChar & .ERMemberBasisCount
+                        
+                        If blnReportN15IncompleteIncorporation Then
+                            sLine = sLine & strSepChar & Round(.DeltaAtomPercentIncorporation, 1)
+                        End If
+                        
+                        If blnCorrectedIReportEREnabled Then
+                            sLine = sLine & strSepChar & .LabellingEfficiencyF
+                            sLine = sLine & strSepChar & .LogERCorrectedForF
+                            sLine = sLine & strSepChar & .LogERStandardError
+                        End If
+                        
+                        If PState = glPair_All Then
+                            Select Case .STATE
+                            Case glPAIR_Inc
+                                sLine = sLine & strSepChar & "Included"
+                            Case glPAIR_Exc
+                                sLine = sLine & strSepChar & "Excluded"
+                            Case Else
+                                ' Neutral; we'll call it Included
+                                ' If this code gets encountered, it means we may want to call
+                                '  PairSearchIncludeNeutralPairs() prior to calling this function
+                                sLine = sLine & strSepChar & "Included"
+                            End Select
+                        End If
+                        ts.WriteLine sLine
+                    End If
+                End With
+            Next i
+            ts.Close
+            DoEvents
+            
+            If Not blnSaveToDiskOnly Then
+                frmDataInfo.Tag = "DLT_LBL"
+                frmDataInfo.Show vbModal
+            End If
+        Else
+            If Not blnSaveToDiskOnly And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                MsgBox "No pairs found.", vbOKOnly, glFGTU
+            End If
+        End If
+    End With
 
 Exit Sub
 
@@ -1113,7 +1078,7 @@ Select Case GelP_D_L(Ind).SearchDef.ERCalcType
 Case ectER_RAT
   ts.WriteLine "ER calculation: Ratio; AbuL/AbuH"
 Case ectER_LOG
-  ts.WriteLine "ER calculation: Logarithmic Ratio; Log(AbuL/AbuH)"
+  ts.WriteLine "ER calculation: Logarithmic Ratio; Ln(AbuL/AbuH)"
 Case ectER_ALT
   ts.WriteLine "ER calculation: 0-Shifted Symmetric Ratio; (AbuL/AbuH)-1 for AbuL>=AbuH; 1-(AbuH/AbuL) for AbuL<AbuH"
 Case Else

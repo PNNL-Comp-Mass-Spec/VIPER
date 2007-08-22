@@ -235,13 +235,13 @@ On Error GoTo errormsg
 
 MousePointer = vbHourglass
 With Chart3D1
-    .ChartArea.View3D.ZRotation = Val(frmGraphOptions.inputRotation)
-    .ChartArea.View3D.XRotation = Val(frmGraphOptions.inputElevation)
-    If Val(frmGraphOptions.inputPerspective) > 0 Then
-        .ChartArea.View3D.Perspective = Val(frmGraphOptions.inputPerspective)
+    .ChartArea.View3D.ZRotation = val(frmGraphOptions.inputRotation)
+    .ChartArea.View3D.XRotation = val(frmGraphOptions.inputElevation)
+    If val(frmGraphOptions.inputPerspective) > 0 Then
+        .ChartArea.View3D.Perspective = val(frmGraphOptions.inputPerspective)
     End If
-    If Val(frmGraphOptions.inputFontSize) >= 10 Then
-        .ChartArea.Axes(1).AnnotationFont.Size = Val(frmGraphOptions.inputFontSize)
+    If val(frmGraphOptions.inputFontSize) >= 10 Then
+        .ChartArea.Axes(1).AnnotationFont.Size = val(frmGraphOptions.inputFontSize)
     End If
     
     SynchronizeChartOptions
@@ -283,7 +283,7 @@ Public Sub ResetToDefaults()
     
 End Sub
 
-Public Sub SaveGraphPicture(blnSaveAsPNG As Boolean, Optional strFilepath As String = "")
+Public Sub SaveGraphPicture(blnSaveAsPNG As Boolean, Optional strFilePath As String = "")
 'Save the chart as a JPG or PNG file
 
 Dim strPictureFormat As String
@@ -299,21 +299,21 @@ Else
     strPictureExtension = ".jpg"
 End If
 
-If Len(strFilepath) = 0 Then
-    strFilepath = SelectFile(Me.hwnd, "Enter filename", "", True, "MassDiffs" & strPictureExtension, strPictureFormat & " Files (*." & strPictureExtension & ")|*." & strPictureExtension & "|All Files (*.*)|*.*")
+If Len(strFilePath) = 0 Then
+    strFilePath = SelectFile(Me.hwnd, "Enter filename", "", True, "MassDiffs" & strPictureExtension, strPictureFormat & " Files (*." & strPictureExtension & ")|*." & strPictureExtension & "|All Files (*.*)|*.*")
 End If
 
-If Len(strFilepath) > 0 Then
-    strFilepath = FileExtensionForce(strFilepath, strPictureExtension)
+If Len(strFilePath) > 0 Then
+    strFilePath = FileExtensionForce(strFilePath, strPictureExtension)
 
     If blnSaveAsPNG Then
-        If Not Chart3D1.SaveImageAsPng(strFilepath, False) Then
+        If Not Chart3D1.SaveImageAsPng(strFilePath, False) Then
             If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                 MsgBox "Could not save file for some reason.", vbOKOnly + vbExclamation, "Error Saving File."
             End If
         End If
     Else
-        If Not Chart3D1.SaveImageAsJpeg(strFilepath, 90, False, True, False) Then
+        If Not Chart3D1.SaveImageAsJpeg(strFilePath, 90, False, True, False) Then
             If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                 MsgBox "Could not save file for some reason.", vbOKOnly + vbExclamation, "Error Saving File."
             End If

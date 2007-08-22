@@ -808,6 +808,7 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          _ExtentX        =   9551
          _ExtentY        =   3889
          _Version        =   393217
+         Enabled         =   -1  'True
          ScrollBars      =   2
          TextRTF         =   $"frmSearchForNETAdjustmentUMC.frx":0054
       End
@@ -2233,7 +2234,6 @@ ShowHideControls False
 Exit Sub
 
 CalculateIterationWorkErrorHandler:
-' ToDo: Figure out why an "Overflow" error is occuring a lot in this sub
 LogErrors Err.Number, "CalculateIterationWork"
 'Debug.Assert False
 ' Using Resume Next error handling if the error is a divide by zero error
@@ -2942,7 +2942,7 @@ End Sub
 ''    For lngTrial = 1 To lngTrialsPerStep
 ''
 ''        ' Pick a new slope, intercept, MassShift, and TopAbuPct
-''        ' ToDo: Use our prior search history to guide these guesses
+''        ' Improved algorithm: Use our prior search history to guide these guesses
 ''
 ''        With UMCNetAdjDef
 ''            AdjSlp = (.RobustNETSlopeEnd - .RobustNETSlopeStart) * Rnd + .RobustNETSlopeStart

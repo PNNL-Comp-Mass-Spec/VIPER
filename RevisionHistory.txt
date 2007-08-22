@@ -1,5 +1,16 @@
 VIPER Change Log
 
+Version 3.43 - Build 376; August 16, 2007
+	- Switched from Ln(ER) to Log2(ER) where Log2() is the base-2 logarithm
+	- Updated "Copy LC-MS Features (UMCs) in View" on the main form and "Report Results by UMCs" in the Search MT Tag DB window to include Labelling Efficiency, Log2(ER), and Log2(ER) Standard Error
+	- Updated Pair Search window to let user switch the final ER calculation mode used (Ratio, Natural Log, or Symmetric Ratio)
+
+Version 3.43 - Build 375; August 15, 2007
+	- Updated pair finding to compute the labelling efficiency (f) and use that to compute an ER value corrected for f (stored and reported as "Ln(ER) Corrected for F")
+	- Updated outlier removal for pairs to always use symmetric ERs
+	- Updated weighted average computation for pairs to use symmetric ER values or natural log-based values, since weighted averages of normal ratio values are invalid when the ER values are a mix of values greater than 1 and less than 1	
+		- Removed option OutlierRemovalUsesSymmetricERs; it is now effectively always set to True
+
 Version 3.43 - Build 374; August 10, 2007
 	- Changed from CInt() to Int() in function ProcessScanPatternWrapper in the UMC 2003 window
 		- Change required to emulate the Floor() function rather than the Round() function

@@ -36,6 +36,11 @@ Public Type udtPutUMCParamsListType
     UMCResultsIDReturn As ADODB.Parameter           ' Return value of the index of the row just added
     ClassStatsChargeBasis As ADODB.Parameter        ' Charge state of the charge group used for determing Class Mass and Class Abundance when GelUMC().def.UMCClassStatsUseStatsFromMostAbuChargeState = True; Otherwise use 0
     InternalStdCount As ADODB.Parameter             ' The number of Internal Standards that this UMC matched
+
+' Future parameters
+''    LabellingEfficiencyF As ADODB.Parameter
+''    LogERCorrectedForF As ADODB.Parameter           ' Base-2 log
+''    LogERStandardError As ADODB.Parameter
 End Type
 
 Public Type udtPutUMCMemberParamsListType
@@ -453,6 +458,10 @@ With udtPutUMCParams
     Set .ClassStatsChargeBasis = New ADODB.Parameter
     Set .InternalStdCount = New ADODB.Parameter
 
+' Future parameters
+''    Set .LabellingEfficiencyF = New ADODB.Parameter
+''    Set .LogERCorrectedForF = New ADODB.Parameter
+''    Set .LogERStandardError = New ADODB.Parameter
 
     Set .MDID = cmdPutNewUMC.CreateParameter("MDID", adInteger, adParamInput, , lngMDID)
     cmdPutNewUMC.Parameters.Append .MDID
@@ -535,6 +544,14 @@ With udtPutUMCParams
 
     Set .MemberCountUsedForAbu = cmdPutNewUMC.CreateParameter("MemberCountUsedForAbu", adInteger, adParamInput, , 0)
     cmdPutNewUMC.Parameters.Append .MemberCountUsedForAbu
+
+' Future parameters
+''    Set .LabellingEfficiencyF = cmdPutNewUMC.CreateParameter("LabellingEfficiencyF", adSingle, adParamInput, , 0)
+''    cmdPutNewUMC.Parameters.Append .LabellingEfficiencyF
+''    Set .LogERCorrectedForF = cmdPutNewUMC.CreateParameter("LogERCorrectedForF", adSingle, adParamInput, , 0)
+''    cmdPutNewUMC.Parameters.Append .LogERCorrectedForF
+''    Set .LogERStandardError = cmdPutNewUMC.CreateParameter("LogERStandardError", adSingle, adParamInput, , 0)
+''    cmdPutNewUMC.Parameters.Append .LogERStandardError
 
 End With
 
@@ -704,7 +721,20 @@ End With
 
 End Sub
 
-Public Sub ExportMTDBAddUMCResultRow(cmdPutNewUMC As ADODB.Command, udtPutUMCParams As udtPutUMCParamsListType, cmdPutNewUMCMember As ADODB.Command, udtPutUMCMemberParams As udtPutUMCMemberParamsListType, blnExportUMCMembers As Boolean, lngGelIndex As Long, lngUMCIndexOriginal As Long, lngMassTagHitCount As Long, ByRef ClsStat() As Double, ByRef udtPairMatchStats As udtPairMatchStatsType, Optional ByVal lngPeakFPRType As Long = FPR_Type_Standard, Optional lngInternalStdMatchCount As Long = 0)
+Public Sub ExportMTDBAddUMCResultRow( _
+            ByRef cmdPutNewUMC As ADODB.Command, _
+            ByRef udtPutUMCParams As udtPutUMCParamsListType, _
+            ByRef cmdPutNewUMCMember As ADODB.Command, _
+            ByRef udtPutUMCMemberParams As udtPutUMCMemberParamsListType, _
+            ByVal blnExportUMCMembers As Boolean, _
+            ByVal lngGelIndex As Long, _
+            ByVal lngUMCIndexOriginal As Long, _
+            ByVal lngMassTagHitCount As Long, _
+            ByRef ClsStat() As Double, _
+            ByRef udtPairMatchStats As udtPairMatchStatsType, _
+            Optional ByVal lngPeakFPRType As Long = FPR_Type_Standard, _
+            Optional lngInternalStdMatchCount As Long = 0)
+            
     ' Adds row to T_FTICR_UMC_Results table
     ' If blnExportUMCMembers, then adds rows to T_FTICR_UMC_Members table
     ' Note that DBs must have DB Schema Version >= 2 in order to save UMC members
@@ -757,6 +787,8 @@ On Error GoTo AddUMCErrorHandler
         udtPutUMCParams.ExpressionRatioChargeStateBasisCount.Value = udtPairMatchStats.ExpressionRatioChargeStateBasisCount
         udtPutUMCParams.ExpressionRatioMemberBasisCount.Value = udtPairMatchStats.ExpressionRatioMemberBasisCount
         
+        udtPutUMCParams.ExpressionRatio.Value = Round(udtPairMatchStats.ExpressionRatio, 6)
+        
         ' The following should always be true:
         Debug.Assert Round(ClsStat(lngUMCIndexOriginal, ustClassRepMW), MASS_PRECISION) = Round(udtPutUMCParams.MonoisotopicMassMaxAbu.Value, MASS_PRECISION)
     
@@ -802,6 +834,12 @@ On Error GoTo AddUMCErrorHandler
         End If
 
         udtPutUMCParams.InternalStdCount.Value = lngInternalStdMatchCount
+    
+' Future parameters
+''        udtPutUMCParams.LabellingEfficiencyF = udtPairMatchStats.LabellingEfficiencyF
+''        udtPutUMCParams.LogERCorrectedForF = udtPairMatchStats.LogERCorrectedForF
+''        udtPutUMCParams.LogERStandardError = udtPairMatchStats.LogERStandardError
+    
     End With
     
     cmdPutNewUMC.Execute

@@ -768,7 +768,7 @@ Public Type udtIsoPairsDetails2004aType
     ERStDev As Double               'standard deviation of expression ratio, if averaging scan-by-scan or averaging several charge states
     ERChargeStateBasisCount As Integer      'count of number of charge states averaged together
     ERMemberBasisCount As Long              'count of number of values averaged together to give ER
-    State As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
+    STATE As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
 End Type
 
 ' Old Structure
@@ -783,7 +783,7 @@ Public Type udtIsoPairsDetails2004bType
     ERChargeStateBasisCount As Integer      'count of number of charge states averaged together
     ERChargesUsed() As Integer      'list of charge states used to compute the ER value for this pair; 0-based array, minimum length 1; value is 0 if no charge states used
     ERMemberBasisCount As Long              'count of number of values averaged together to give ER
-    State As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
+    STATE As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
 End Type
 
 
@@ -810,31 +810,32 @@ Public Type IsoPairsDltLbl2004aType
 End Type
 
 Public Type udtIsoPairsDetailsType
-    P1 As Long                      'index of light member; pointer to index in GelUMC if UMC-based pairs
-    P1LblCnt As Integer             'number of PEO labels in light member
-    P2 As Long                      'index of heavy member; pointer to index in GelUMC if UMC-based pairs
-    P2DltCnt As Integer             'count of N or O or C deltas
-    P2LblCnt As Integer             'count of PEO labels in heavy member
-    ER As Double                    'expression ratio
-    ERStDev As Double               'standard deviation of expression ratio, if averaging scan-by-scan or averaging several charge states
+    P1 As Long                              'index of light member; pointer to index in GelUMC if UMC-based pairs
+    P1LblCnt As Integer                     'number of PEO labels in light member
+    P2 As Long                              'index of heavy member; pointer to index in GelUMC if UMC-based pairs
+    P2DltCnt As Integer                     'count of N or O or C deltas
+    P2LblCnt As Integer                     'count of PEO labels in heavy member
+    ER As Double                            'expression ratio; format is defined by glbPreferencesExpanded.PairSearchOptions.SearchDef.ERCalcType
+    ERStDev As Double                       'standard deviation of expression ratio, if averaging scan-by-scan or averaging several charge states
     ERChargeStateBasisCount As Integer      'count of number of charge states averaged together
-    ERChargesUsed() As Integer      'list of charge states used to compute the ER value for this pair; 0-based array, minimum length 1; value is 0 if no charge states used
+    ERChargesUsed() As Integer              'list of charge states used to compute the ER value for this pair; 0-based array, minimum length 1; value is 0 if no charge states used
     ERMemberBasisCount As Long              'count of number of values averaged together to give ER
-    State As Integer                '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
-                                    '1 for OK pair; -1 for not OK pair; 0 for initialized
-                                    'Pair can be declared not OK for various reasons; because delta
-                                    'and label counts do not match database information, because ER
-                                    'is out of required range because pair assignment conflicts with
-                                    'other pair assignments
+    STATE As Integer                        '3 states: glPAIR_Exc = -1, glPAIR_Neu = 0 , glPAIR_Inc = 1
+                                            '1 for OK pair; -1 for not OK pair; 0 for initialized
+                                            'Pair can be declared not OK for various reasons; because delta
+                                            'and label counts do not match database information, because ER
+                                            'is out of required range because pair assignment conflicts with
+                                            'other pair assignments
     
     DeltaAtomPercentIncorporation As Single     ' When searching for partially incorporated N15, the computed percent incorporation for the given atom is stored here; 0 to 100
     
-    AdditionalValue1 As Long
-    AdditionalValue2 As Long
-    AdditionalValue3 As Long
-    AdditionalValue4 As Double
-    AdditionalValue5 As Double
-    AdditionalValue6 As Double
+    LabellingEfficiencyF As Single        '                                                                                                   Was AdditionalValue1
+    LogERCorrectedForF As Single          ' Base-2 log value of the Light/Heavy ER value where ER was corrected using LabellingEfficiencyF;   Was AdditionalValue2
+    LogERStandardError As Single          '                                                                                                   Was AdditionalValue3
+    
+    AdditionalValue4 As Double      ' 8 bytes
+    AdditionalValue5 As Double      ' 8 bytes
+    AdditionalValue6 As Double      ' 8 bytes
     
 
 End Type
@@ -1080,12 +1081,14 @@ Public Type udtIsoPairsSearchDefType
     N15PercentIncorporationMaximum As Single         ' 0 to 100, must be >= N14N15IncompleteIncorporationMinimum
     N15PercentIncorporationStep As Single            ' 1 to 100; will be rounded to 1 decimal place
     
-    AdditionalValue1 As Long                        ' New for this version
-    AdditionalValue2 As Long                        ' New for this version
-    AdditionalValue3 As Long                        ' New for this version
-    AdditionalValue4 As Double                      ' New for this version
-    AdditionalValue5 As Double                      ' New for this version
-    AdditionalValue6 As Double                      ' New for this version
+    ScanByScanAverageIsNotWeighted As Boolean       ' When False, then computes a weighted average across scans; when true, then does not weight
+    
+    AdditionalValue1 As Boolean                     ' 2 bytes; New for this version
+    AdditionalValue2 As Long                        ' 4 bytes; New for this version
+    AdditionalValue3 As Long                        ' 4 bytes; New for this version
+    AdditionalValue4 As Double                      ' 8 bytes; New for this version
+    AdditionalValue5 As Double                      ' 8 bytes; New for this version
+    AdditionalValue6 As Double                      ' 8 bytes; New for this version
     
     OtherInfo As String
 End Type

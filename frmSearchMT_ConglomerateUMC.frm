@@ -3561,93 +3561,107 @@ Resume ShowOrSaveResultsCleanup
 End Function
 
 Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = "", Optional blnDisplayResults As Boolean = True, Optional ByVal blnIncludeORFInfo As Boolean = True) As Long
-'-------------------------------------
-'report identified unique mass classes
-' If strOutputFilePath = "", then saves the results to a temporary file and shows them to the user using frmDataInfo
-' If strOutputFilePath is not blank, then saves the results to the file, but does not display them
-' If blnIncludeORFInfo = True, then attempts to connect to the database and retrieve the ORF information for each MT tag
-'
-' Returns 0 if no error, the error number if an error
-'-------------------------------------
-Dim fso As New FileSystemObject
-Dim ts As TextStream
-Dim strLineOut As String, strLineOutMiddle As String, strLineOutEnd As String
-Dim strMinMaxCharges As String
-Dim fname As String
-Dim mgInd As Long
-Dim lngUMCIndexOriginal As Long                     'absolute index of UMC
-Dim lngMassTagIndexPointer As Long                  'absolute index in mMT... arrays
-Dim lngMassTagIndexOriginal As Long                 'absolute index in AMT... arrays
-Dim lngInternalStdIndexOriginal As Long
-Dim strSepChar As String
-
-Dim dblMatchMass As Double
-Dim dblMatchNET As Double
-Dim strMatchID As String
-Dim strInternalStdDescription As String
-Dim sngPeptideProphetProbability As Single
-
-Dim dblMassErrorPPM As Double
-Dim lngScanClassRep As Long
-Dim lngScanIndex As Long
-
-Dim dblGANETClassRep As Double
-Dim dblGANETError As Double
-Dim objORFNameFastSearch As New FastSearchArrayLong
-Dim blnSuccess As Boolean
-
-Dim lngPairIndex As Long
-
-Dim objP1IndFastSearch As FastSearchArrayLong
-Dim objP2IndFastSearch As FastSearchArrayLong
-Dim blnPairsPresent As Boolean
-
-Dim lngPairMatchCount As Long, lngPairMatchIndex As Long
-Dim udtPairMatchStats() As udtPairMatchStatsType
-
+    '-------------------------------------
+    'report identified unique mass classes
+    ' If strOutputFilePath = "", then saves the results to a temporary file and shows them to the user using frmDataInfo
+    ' If strOutputFilePath is not blank, then saves the results to the file, but does not display them
+    ' If blnIncludeORFInfo = True, then attempts to connect to the database and retrieve the ORF information for each MT tag
+    '
+    ' Returns 0 if no error, the error number if an error
+    '-------------------------------------
+    Dim fso As New FileSystemObject
+    Dim ts As TextStream
+    
+    Dim strLineOut As String
+    Dim strLineOutMiddle As String
+    Dim strLineOutEnd As String
+    Dim strLineOutEndAddnl As String
+    
+    Dim strMinMaxCharges As String
+    Dim fname As String
+    Dim mgInd As Long
+    Dim lngUMCIndexOriginal As Long                     'absolute index of UMC
+    Dim lngMassTagIndexPointer As Long                  'absolute index in mMT... arrays
+    Dim lngMassTagIndexOriginal As Long                 'absolute index in AMT... arrays
+    Dim lngInternalStdIndexOriginal As Long
+    Dim strSepChar As String
+    
+    Dim dblMatchMass As Double
+    Dim dblMatchNET As Double
+    Dim strMatchID As String
+    Dim strInternalStdDescription As String
+    Dim sngPeptideProphetProbability As Single
+    
+    Dim dblMassErrorPPM As Double
+    Dim lngScanClassRep As Long
+    Dim lngScanIndex As Long
+    
+    Dim dblGANETClassRep As Double
+    Dim dblGANETError As Double
+    Dim objORFNameFastSearch As New FastSearchArrayLong
+    Dim blnSuccess As Boolean
+    
+    Dim lngPairIndex As Long
+    Dim blnPairsPresent As Boolean
+    Dim blnCorrectedIReportEREnabled As Boolean
+        
+    Dim objP1IndFastSearch As FastSearchArrayLong
+    Dim objP2IndFastSearch As FastSearchArrayLong
+    Dim lngPairMatchCount As Long, lngPairMatchIndex As Long
+    Dim udtPairMatchStats() As udtPairMatchStatsType
+    
 On Error GoTo ShowOrSaveResultsByUMCErrorHandler
-
-If blnIncludeORFInfo Then
-    UpdateStatus "Sorting Protein lookup arrays"
-    If MTtoORFMapCount = 0 Then
-        blnIncludeORFInfo = InitializeORFInfo(False)
-    Else
-        ' We can use MTIDMap(), ORFIDMap(), and ORFRefNames() to get the ORF name
-        blnSuccess = objORFNameFastSearch.Fill(MTIDMap())
-        Debug.Assert blnSuccess
+    
+    If blnIncludeORFInfo Then
+        UpdateStatus "Sorting Protein lookup arrays"
+        If MTtoORFMapCount = 0 Then
+            blnIncludeORFInfo = InitializeORFInfo(False)
+        Else
+            ' We can use MTIDMap(), ORFIDMap(), and ORFRefNames() to get the ORF name
+            blnSuccess = objORFNameFastSearch.Fill(MTIDMap())
+            Debug.Assert blnSuccess
+        End If
     End If
-End If
-
-UpdateStatus "Preparing results: 0 / " & Trim(mMatchStatsCount)
-mKeyPressAbortProcess = 0
-Me.MousePointer = vbHourglass
-
-'temporary file for results output
-fname = GetTempFolder() & RawDataTmpFile
-If Len(strOutputFilePath) > 0 Then fname = strOutputFilePath
-Set ts = fso.OpenTextFile(fname, ForWriting, True)
-
-Select Case LastSearchTypeN14N15
-Case SEARCH_N14
-     NTypeStr = MOD_TKN_N14
-Case SEARCH_N15
-     NTypeStr = MOD_TKN_N15
-End Select
-
-' Initialize the PairIndex lookup objects
-blnPairsPresent = PairIndexLookupInitialize(CallerID, objP1IndFastSearch, objP2IndFastSearch)
-
-strSepChar = LookupDefaultSeparationCharacter()
-
-' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
-strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
-strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar
-strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
-strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar
-strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar
-strLineOut = strLineOut & "TIC_from_Raw_Data" & strSepChar & "Deisotoping_Peak_Count"
-If blnIncludeORFInfo Then strLineOut = strLineOut & strSepChar & "MultiORFCount" & strSepChar & "ORFName"
-ts.WriteLine strLineOut
+    
+    UpdateStatus "Preparing results: 0 / " & Trim(mMatchStatsCount)
+    mKeyPressAbortProcess = 0
+    Me.MousePointer = vbHourglass
+    
+    'temporary file for results output
+    fname = GetTempFolder() & RawDataTmpFile
+    If Len(strOutputFilePath) > 0 Then fname = strOutputFilePath
+    Set ts = fso.OpenTextFile(fname, ForWriting, True)
+    
+    Select Case LastSearchTypeN14N15
+    Case SEARCH_N14
+         NTypeStr = MOD_TKN_N14
+    Case SEARCH_N15
+         NTypeStr = MOD_TKN_N15
+    End Select
+    
+    ' Initialize the PairIndex lookup objects
+    blnPairsPresent = PairIndexLookupInitialize(CallerID, objP1IndFastSearch, objP2IndFastSearch)
+    
+    strSepChar = LookupDefaultSeparationCharacter()
+    
+    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
+    strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
+    strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar
+    strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
+    strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar
+    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar
+    strLineOut = strLineOut & "TIC_from_Raw_Data" & strSepChar & "Deisotoping_Peak_Count"
+    
+    With GelP_D_L(CallerID)
+        If blnPairsPresent And .SearchDef.IReportEROptions.Enabled And .SearchDef.ComputeERScanByScan Then
+            strLineOut = strLineOut & strSepChar & "Labelling Efficiency F" & strSepChar & "Log2(ER) Corrected for F" & strSepChar & "Log2(ER) Corrected Standard Error"
+            blnCorrectedIReportEREnabled = True
+        End If
+    End With
+    
+    If blnIncludeORFInfo Then strLineOut = strLineOut & strSepChar & "MultiORFCount" & strSepChar & "ORFName"
+    
+    ts.WriteLine strLineOut
 
     For mgInd = 0 To mMatchStatsCount - 1
         lngUMCIndexOriginal = mUMCMatchStats(mgInd).UMCIndex
@@ -3770,18 +3784,23 @@ ts.WriteLine strLineOut
             lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndexOriginal, objP1IndFastSearch, objP2IndFastSearch, False, (LastSearchTypeN14N15 = SEARCH_N15), lngPairMatchCount, udtPairMatchStats())
         End If
         
+        strLineOutEndAddnl = ""
         If lngPairMatchCount > 0 Then
             For lngPairMatchIndex = 0 To lngPairMatchCount - 1
                 With udtPairMatchStats(lngPairMatchIndex)
                     strLineOutMiddle = Trim(.PairIndex) & strSepChar & Trim(.ExpressionRatio) & strSepChar & Trim(.ExpressionRatioStDev) & strSepChar & Trim(.ExpressionRatioChargeStateBasisCount) & strSepChar & Trim(.ExpressionRatioMemberBasisCount) & strSepChar
                     
+                    If blnCorrectedIReportEREnabled Then
+                        strLineOutEndAddnl = strSepChar & Round(.LabellingEfficiencyF, 4) & strSepChar & .LogERCorrectedForF & strSepChar & .LogERStandardError
+                    End If
+                    
                     If Not blnIncludeORFInfo Then
-                        ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd
+                        ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl
                     Else
                         If mUMCMatchStats(mgInd).IDIsInternalStd Then
-                            ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd & strSepChar & "1" & strSepChar & strInternalStdDescription
+                            ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl & strSepChar & "1" & strSepChar & strInternalStdDescription
                         Else
-                            WriteORFResults ts, strLineOut & strLineOutMiddle & strLineOutEnd, CLngSafe(AMTData(lngMassTagIndexOriginal).ID), objORFNameFastSearch, strSepChar
+                            WriteORFResults ts, strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl, CLngSafe(AMTData(lngMassTagIndexOriginal).ID), objORFNameFastSearch, strSepChar
                         End If
                     End If
                     
@@ -3791,13 +3810,17 @@ ts.WriteLine strLineOut
             ' No pair, and thus no expression ratio values
             strLineOutMiddle = Trim(-1) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar
             
+            If blnCorrectedIReportEREnabled Then
+                strLineOutEndAddnl = strSepChar & "0" & strSepChar & "0" & strSepChar & "0"
+            End If
+            
             If Not blnIncludeORFInfo Then
-                ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd
+                ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl
             Else
                 If mUMCMatchStats(mgInd).IDIsInternalStd Then
-                    ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd & strSepChar & "1" & strSepChar & strInternalStdDescription
+                    ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl & strSepChar & "1" & strSepChar & strInternalStdDescription
                 Else
-                    WriteORFResults ts, strLineOut & strLineOutMiddle & strLineOutEnd, CLngSafe(AMTData(lngMassTagIndexOriginal).ID), objORFNameFastSearch, strSepChar
+                    WriteORFResults ts, strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl, CLngSafe(AMTData(lngMassTagIndexOriginal).ID), objORFNameFastSearch, strSepChar
                 End If
             End If
             
@@ -3809,28 +3832,29 @@ ts.WriteLine strLineOut
         End If
     Next mgInd
     ts.Close
-
-If Len(strOutputFilePath) > 0 Then
-    AddToAnalysisHistory CallerID, "Saved search results to disk: " & strOutputFilePath
-End If
-
-Me.MousePointer = vbDefault
-UpdateStatus ""
-If blnDisplayResults Then
-     frmDataInfo.Tag = "UMC_MTID"
-     frmDataInfo.Show vbModal
-End If
-
-Set ts = Nothing
-Set fso = Nothing
-Set objORFNameFastSearch = Nothing
+    
+    If Len(strOutputFilePath) > 0 Then
+        AddToAnalysisHistory CallerID, "Saved search results to disk: " & strOutputFilePath
+    End If
+    
+    Me.MousePointer = vbDefault
+    UpdateStatus ""
+    If blnDisplayResults Then
+         frmDataInfo.Tag = "UMC_MTID"
+         frmDataInfo.Show vbModal
+    End If
+    
+    Set ts = Nothing
+    Set fso = Nothing
+    Set objORFNameFastSearch = Nothing
 Exit Function
 
 ShowOrSaveResultsByUMCErrorHandler:
-Debug.Assert False
-ShowOrSaveResultsByUMC = Err.Number
-LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.ShowOrSaveResultsByUMC"
-Set fso = Nothing
+    Debug.Assert False
+    
+    ShowOrSaveResultsByUMC = Err.Number
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.ShowOrSaveResultsByUMC"
+    Set fso = Nothing
 End Function
 
 Private Sub StartExportResultsToDBbyUMC()

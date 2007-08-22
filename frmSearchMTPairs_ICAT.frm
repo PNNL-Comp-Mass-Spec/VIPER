@@ -1602,7 +1602,7 @@ With GelUMC(CallerID).UMCs(ClsInd1)   'search all members of
      End Select
      If TmpCnt > 0 Then
         For j = 0 To TmpCnt - 1
-        'accept only IDs with possible number of deltas (# of Dlts <= # of Cys)
+            'accept only IDs with possible number of deltas (# of Dlts <= # of Cys)
             ' ToDo for Weijun (Dec 2003): If DltCnt <= AMTData(Hits(j)).CNT_Cys and DltCnt = "# Modified Cysteines" Then
             If AMTData(Hits(j)).CNT_Cys >= DltCnt Then
                PairIDCnt = PairIDCnt + 1

@@ -227,21 +227,21 @@ Dim fso As New FileSystemObject
 '''        For i = 0 To .PCnt - 1
 '''            LtAbu = GelData(CallerID).IsoData(.Pairs(i).P1).Abundance
 '''            HvAbu = GelData(CallerID).IsoData(.Pairs(i).P2).Abundance
-'''            .pairs(i).er = RatER(LtAbu, HvAbu)
+'''            .pairs(i).er = ComputeRatioER(LtAbu, HvAbu)
 '''            .Pairs(i).ERMemberBasisCount = 1
 '''        Next i
 '''    Case glER_SOLO_LOG
 '''        For i = 0 To .PCnt - 1
 '''            LtAbu = GelData(CallerID).IsoData(.Pairs(i).P1).Abundance
 '''            HvAbu = GelData(CallerID).IsoData(.Pairs(i).P2).Abundance
-'''            .pairs(i).er = LogER(LtAbu, HvAbu)
+'''            .pairs(i).er = ComputeLogER(LtAbu, HvAbu)
 '''            .Pairs(i).ERMemberBasisCount = 1
 '''        Next i
 '''    Case glER_SOLO_ALT
 '''        For i = 0 To .PCnt - 1
 '''            LtAbu = GelData(CallerID).IsoData(.Pairs(i).P1).Abundance
 '''            HvAbu = GelData(CallerID).IsoData(.Pairs(i).P2).Abundance
-'''            .pairs(i).er = AltER(LtAbu, HvAbu)
+'''            .pairs(i).er = ComputeAltER(LtAbu, HvAbu)
 '''            .Pairs(i).ERMemberBasisCount = 1
 '''        Next i
 '''    Case Else
@@ -405,11 +405,11 @@ With tsTmpStat
    .WriteLine "Individual distributions ER statistics"
    Select Case GelP_D_L(CallerID).SearchDef.ERCalcType
    Case glER_SOLO_RAT
-        .WriteLine "ER Type: Light/Heavy Ratio"
+        .WriteLine "ER Type: Light/Heavy Ratio; AbuLight/AbuHeavy"
    Case glER_SOLO_LOG
-        .WriteLine "ER Type: Logarithmic Light/Heavy Ratio"
+        .WriteLine "ER Type: Logarithmic Light/Heavy Ratio; Ln(AbuLight/AbuHeavy)"
    Case glER_SOLO_ALT
-        .WriteLine "ER Type: 0-Centered symmetric Light/Heavy Ratio"
+        .WriteLine "ER Type: 0-Centered symmetric Light/Heavy Ratio; (AbuL/AbuH)-1 for AbuL>=AbuH; 1-(AbuH/AbuL) for AbuL<AbuH"
    End Select
    
    .WriteLine "Min ER: " & StatERMin & " - Max ER: " & StatERMax

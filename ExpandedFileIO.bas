@@ -1197,6 +1197,8 @@ Private Sub CopyDeltaLabelPairs2003ToCurrent(OldDeltaLabelPairs As IsoPairsDltLb
             .RequireMatchingChargeStatesForPairMembers = True
             .UseIdenticalChargesForER = True
             .ComputeERScanByScan = False
+            .ScanByScanAverageIsNotWeighted = False
+            
             .AverageERsAllChargeStates = False
             .AverageERsWeightingMode = aewAbundance
         End With
@@ -1270,6 +1272,8 @@ Private Sub CopyDeltaLabelPairs2004aToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .RequireMatchingChargeStatesForPairMembers = OldDeltaLabelPairs.RequireMatchingChargeStatesForPairMembers
             .UseIdenticalChargesForER = OldDeltaLabelPairs.UseIdenticalChargesForER
             .ComputeERScanByScan = OldDeltaLabelPairs.ComputeERScanByScan
+            .ScanByScanAverageIsNotWeighted = False
+            
             .AverageERsAllChargeStates = OldDeltaLabelPairs.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.AverageERsWeightingMode
         End With
@@ -1342,6 +1346,8 @@ Private Sub CopyDeltaLabelPairs2004bToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .RequireMatchingChargeStatesForPairMembers = OldDeltaLabelPairs.RequireMatchingChargeStatesForPairMembers
             .UseIdenticalChargesForER = OldDeltaLabelPairs.UseIdenticalChargesForER
             .ComputeERScanByScan = OldDeltaLabelPairs.ComputeERScanByScan
+            .ScanByScanAverageIsNotWeighted = False
+            
             .AverageERsAllChargeStates = OldDeltaLabelPairs.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.AverageERsWeightingMode
         End With
@@ -1396,6 +1402,8 @@ Private Sub CopyDeltaLabelPairs2004cToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .RequireMatchingChargeStatesForPairMembers = OldDeltaLabelPairs.SearchDef.RequireMatchingChargeStatesForPairMembers
             .UseIdenticalChargesForER = OldDeltaLabelPairs.SearchDef.UseIdenticalChargesForER
             .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
+            .ScanByScanAverageIsNotWeighted = False
+            
             .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode
             
@@ -1456,6 +1464,8 @@ Private Sub CopyDeltaLabelPairs2004dToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .RequireMatchingChargeStatesForPairMembers = OldDeltaLabelPairs.SearchDef.RequireMatchingChargeStatesForPairMembers
             .UseIdenticalChargesForER = OldDeltaLabelPairs.SearchDef.UseIdenticalChargesForER
             .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
+            .ScanByScanAverageIsNotWeighted = False
+            
             .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode
             
@@ -1523,6 +1533,8 @@ Private Sub CopyDeltaLabelPairs2004eToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .RequireMatchingChargeStatesForPairMembers = OldDeltaLabelPairs.SearchDef.RequireMatchingChargeStatesForPairMembers
             .UseIdenticalChargesForER = OldDeltaLabelPairs.SearchDef.UseIdenticalChargesForER
             .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
+            .ScanByScanAverageIsNotWeighted = False
+            
             .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode
             
@@ -2406,7 +2418,7 @@ Private Sub CopyGelSearchDef2003eToCurrent(OldDef As udtSearchDefinition2003eGro
 End Sub
 
 Private Sub CopyGelUMC2002ToCurrent(OldUMC As UMCListType2002, ByRef CurrentUMCList As UMCListType)
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
 On Error GoTo CopyUMCDataErrorHandler
 
@@ -2421,16 +2433,16 @@ On Error GoTo CopyUMCDataErrorHandler
         
         If .UMCCnt > 0 Then
             ReDim .UMCs(0 To .UMCCnt - 1)
-            For lngindex = 0 To .UMCCnt - 1
-                With .UMCs(lngindex)
-                    .ClassRepInd = OldUMC.UMCs(lngindex).ClassRepInd
-                    .ClassRepType = OldUMC.UMCs(lngindex).ClassRepType
-                    .ClassCount = OldUMC.UMCs(lngindex).ClassCount
-                    .ClassMInd() = OldUMC.UMCs(lngindex).ClassMInd()
-                    .ClassMType() = OldUMC.UMCs(lngindex).ClassMType()
-                    .ClassAbundance = OldUMC.UMCs(lngindex).ClassAbundance
-                    .ClassMW = OldUMC.UMCs(lngindex).ClassMW
-                    .ClassMWStD = OldUMC.UMCs(lngindex).ClassMWStD
+            For lngIndex = 0 To .UMCCnt - 1
+                With .UMCs(lngIndex)
+                    .ClassRepInd = OldUMC.UMCs(lngIndex).ClassRepInd
+                    .ClassRepType = OldUMC.UMCs(lngIndex).ClassRepType
+                    .ClassCount = OldUMC.UMCs(lngIndex).ClassCount
+                    .ClassMInd() = OldUMC.UMCs(lngIndex).ClassMInd()
+                    .ClassMType() = OldUMC.UMCs(lngIndex).ClassMType()
+                    .ClassAbundance = OldUMC.UMCs(lngIndex).ClassAbundance
+                    .ClassMW = OldUMC.UMCs(lngIndex).ClassMW
+                    .ClassMWStD = OldUMC.UMCs(lngIndex).ClassMWStD
                     .ClassScore = 0
                     .ClassNET = 0
                     .ClassStatusBits = 0
@@ -2445,7 +2457,7 @@ On Error GoTo CopyUMCDataErrorHandler
                     .ChargeStateCount = 0
                     ReDim .ChargeStateBasedStats(0)
                 End With
-            Next lngindex
+            Next lngIndex
         Else
             ReDim .UMCs(0)
         End If
@@ -2463,7 +2475,7 @@ CopyUMCDataErrorHandler:
 End Sub
 
 Private Sub CopyGelUMC2003aToCurrent(OldUMC As UMCListType2003a, ByRef CurrentUMCList As UMCListType)
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
 On Error GoTo CopyUMCDataErrorHandler
 
@@ -2478,31 +2490,31 @@ On Error GoTo CopyUMCDataErrorHandler
         
         If .UMCCnt > 0 Then
             ReDim .UMCs(0 To .UMCCnt - 1)
-            For lngindex = 0 To .UMCCnt - 1
-                With .UMCs(lngindex)
-                    .ClassRepInd = OldUMC.UMCs(lngindex).ClassRepInd
-                    .ClassRepType = OldUMC.UMCs(lngindex).ClassRepType
-                    .ClassCount = OldUMC.UMCs(lngindex).ClassCount
-                    .ClassMInd() = OldUMC.UMCs(lngindex).ClassMInd()
-                    .ClassMType() = OldUMC.UMCs(lngindex).ClassMType()
-                    .ClassAbundance = OldUMC.UMCs(lngindex).ClassAbundance
-                    .ClassMW = OldUMC.UMCs(lngindex).ClassMW
-                    .ClassMWStD = OldUMC.UMCs(lngindex).ClassMWStD
+            For lngIndex = 0 To .UMCCnt - 1
+                With .UMCs(lngIndex)
+                    .ClassRepInd = OldUMC.UMCs(lngIndex).ClassRepInd
+                    .ClassRepType = OldUMC.UMCs(lngIndex).ClassRepType
+                    .ClassCount = OldUMC.UMCs(lngIndex).ClassCount
+                    .ClassMInd() = OldUMC.UMCs(lngIndex).ClassMInd()
+                    .ClassMType() = OldUMC.UMCs(lngIndex).ClassMType()
+                    .ClassAbundance = OldUMC.UMCs(lngIndex).ClassAbundance
+                    .ClassMW = OldUMC.UMCs(lngIndex).ClassMW
+                    .ClassMWStD = OldUMC.UMCs(lngIndex).ClassMWStD
                     .ClassScore = 0
                     .ClassNET = 0
-                    .ClassStatusBits = OldUMC.UMCs(lngindex).ClassStatusBits
+                    .ClassStatusBits = OldUMC.UMCs(lngIndex).ClassStatusBits
                     
                     ' Note: The following will be updated by CalculateClasses() after exiting this function
-                    .MinScan = OldUMC.UMCs(lngindex).MinScan
-                    .MaxScan = OldUMC.UMCs(lngindex).MaxScan
-                    .MinMW = OldUMC.UMCs(lngindex).MinMW
-                    .MaxMW = OldUMC.UMCs(lngindex).MaxMW
+                    .MinScan = OldUMC.UMCs(lngIndex).MinScan
+                    .MaxScan = OldUMC.UMCs(lngIndex).MaxScan
+                    .MinMW = OldUMC.UMCs(lngIndex).MinMW
+                    .MaxMW = OldUMC.UMCs(lngIndex).MaxMW
                     
                     .ChargeStateStatsRepInd = 0
                     .ChargeStateCount = 0
                     ReDim .ChargeStateBasedStats(0)
                 End With
-            Next lngindex
+            Next lngIndex
         Else
             ReDim .UMCs(0)
         End If
@@ -2520,7 +2532,7 @@ CopyUMCDataErrorHandler:
 End Sub
 
 Private Sub CopyGelUMC2004ToCurrent(OldUMC As UMCListType2004, ByRef CurrentUMCList As UMCListType)
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
 On Error GoTo CopyUMCDataErrorHandler
 
@@ -2535,41 +2547,41 @@ On Error GoTo CopyUMCDataErrorHandler
         
         If .UMCCnt > 0 Then
             ReDim .UMCs(0 To .UMCCnt - 1)
-            For lngindex = 0 To .UMCCnt - 1
-                With .UMCs(lngindex)
-                    .ClassRepInd = OldUMC.UMCs(lngindex).ClassRepInd
-                    .ClassRepType = OldUMC.UMCs(lngindex).ClassRepType
-                    .ClassCount = OldUMC.UMCs(lngindex).ClassCount
-                    .ClassMInd() = OldUMC.UMCs(lngindex).ClassMInd()
-                    .ClassMType() = OldUMC.UMCs(lngindex).ClassMType()
-                    .ClassAbundance = OldUMC.UMCs(lngindex).ClassAbundance
-                    .ClassMW = OldUMC.UMCs(lngindex).ClassMW
-                    .ClassMWStD = OldUMC.UMCs(lngindex).ClassMWStD
+            For lngIndex = 0 To .UMCCnt - 1
+                With .UMCs(lngIndex)
+                    .ClassRepInd = OldUMC.UMCs(lngIndex).ClassRepInd
+                    .ClassRepType = OldUMC.UMCs(lngIndex).ClassRepType
+                    .ClassCount = OldUMC.UMCs(lngIndex).ClassCount
+                    .ClassMInd() = OldUMC.UMCs(lngIndex).ClassMInd()
+                    .ClassMType() = OldUMC.UMCs(lngIndex).ClassMType()
+                    .ClassAbundance = OldUMC.UMCs(lngIndex).ClassAbundance
+                    .ClassMW = OldUMC.UMCs(lngIndex).ClassMW
+                    .ClassMWStD = OldUMC.UMCs(lngIndex).ClassMWStD
                     
                     .ClassMassCorrectionDa = 0
                     
-                    .ClassScore = OldUMC.UMCs(lngindex).ClassScore
-                    .ClassNET = OldUMC.UMCs(lngindex).ClassNET
-                    .ClassStatusBits = OldUMC.UMCs(lngindex).ClassStatusBits
+                    .ClassScore = OldUMC.UMCs(lngIndex).ClassScore
+                    .ClassNET = OldUMC.UMCs(lngIndex).ClassNET
+                    .ClassStatusBits = OldUMC.UMCs(lngIndex).ClassStatusBits
                     
                     ' Note: The following will be updated by CalculateClasses() after exiting this function
-                    .MinScan = OldUMC.UMCs(lngindex).MinScan
-                    .MaxScan = OldUMC.UMCs(lngindex).MaxScan
-                    .MinMW = OldUMC.UMCs(lngindex).MinMW
-                    .MaxMW = OldUMC.UMCs(lngindex).MaxMW
+                    .MinScan = OldUMC.UMCs(lngIndex).MinScan
+                    .MaxScan = OldUMC.UMCs(lngIndex).MaxScan
+                    .MinMW = OldUMC.UMCs(lngIndex).MinMW
+                    .MaxMW = OldUMC.UMCs(lngIndex).MaxMW
                     
-                    .ChargeStateStatsRepInd = OldUMC.UMCs(lngindex).ChargeStateStatsRepInd
-                    .ChargeStateCount = OldUMC.UMCs(lngindex).ChargeStateCount
+                    .ChargeStateStatsRepInd = OldUMC.UMCs(lngIndex).ChargeStateStatsRepInd
+                    .ChargeStateCount = OldUMC.UMCs(lngIndex).ChargeStateCount
                     
                     If .ChargeStateCount > 0 Then
                         ReDim .ChargeStateBasedStats(.ChargeStateCount - 1)
                         ' Copy the entire array
-                        .ChargeStateBasedStats = OldUMC.UMCs(lngindex).ChargeStateBasedStats
+                        .ChargeStateBasedStats = OldUMC.UMCs(lngIndex).ChargeStateBasedStats
                     Else
                         ReDim .ChargeStateBasedStats(0)
                     End If
                 End With
-            Next lngindex
+            Next lngIndex
         Else
             ReDim .UMCs(0)
         End If
@@ -2723,15 +2735,15 @@ Private Sub InitializeAdditionalUMCDefVariables(ByRef CurrentUMCDef As UMCDefini
 End Sub
 
 Private Sub ValidateDataArrays(ByVal lngGelIndex As Long)
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
 On Error GoTo FixCSArray
 
-    lngindex = UBound(GelData(lngGelIndex).CSData)
+    lngIndex = UBound(GelData(lngGelIndex).CSData)
 
 ResumeChecking:
 On Error GoTo FixIsoArray
-    lngindex = UBound(GelData(lngGelIndex).IsoData)
+    lngIndex = UBound(GelData(lngGelIndex).IsoData)
 
 Exit Sub
 

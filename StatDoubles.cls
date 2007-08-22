@@ -132,7 +132,6 @@ End If
 End Function
 
 
-
 Public Function Fill(DblArr() As Double) As Boolean
 '-------------------------------------------------------------------------
 'returns True if array is successfully sorted and has at least one element

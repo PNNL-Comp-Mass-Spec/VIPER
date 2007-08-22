@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmEditAnalysisSettings 
    Caption         =   "Edit Analysis Settings"
    ClientHeight    =   9870
@@ -27,7 +27,7 @@ Begin VB.Form frmEditAnalysisSettings
       _Version        =   393216
       Style           =   1
       Tabs            =   8
-      Tab             =   1
+      Tab             =   3
       TabsPerRow      =   8
       TabHeight       =   520
       OLEDropMode     =   1
@@ -46,39 +46,23 @@ Begin VB.Form frmEditAnalysisSettings
       Tab(0).ControlCount=   9
       TabCaption(1)   =   "2. LC-MS Features"
       TabPicture(1)   =   "frmEditAnalysisSettings.frx":001C
-      Tab(1).ControlEnabled=   -1  'True
-      Tab(1).Control(0)=   "lblDescription(115)"
-      Tab(1).Control(0).Enabled=   0   'False
-      Tab(1).Control(1)=   "lblDescription(63)"
-      Tab(1).Control(1).Enabled=   0   'False
-      Tab(1).Control(2)=   "lblDescription(64)"
-      Tab(1).Control(2).Enabled=   0   'False
-      Tab(1).Control(3)=   "lblDescription(58)"
-      Tab(1).Control(3).Enabled=   0   'False
-      Tab(1).Control(4)=   "lblDescription(61)"
-      Tab(1).Control(4).Enabled=   0   'False
-      Tab(1).Control(5)=   "cboUMCSearchMode"
-      Tab(1).Control(5).Enabled=   0   'False
-      Tab(1).Control(6)=   "fraUMCSearch200x"
-      Tab(1).Control(6).Enabled=   0   'False
-      Tab(1).Control(7)=   "cmbUMCMW"
-      Tab(1).Control(7).Enabled=   0   'False
-      Tab(1).Control(8)=   "cmbUMCAbu"
-      Tab(1).Control(8).Enabled=   0   'False
-      Tab(1).Control(9)=   "txtInterpolateMaxGapSize"
-      Tab(1).Control(9).Enabled=   0   'False
-      Tab(1).Control(10)=   "chkInterpolateMissingIons"
-      Tab(1).Control(10).Enabled=   0   'False
-      Tab(1).Control(11)=   "fraUMCIonNetOptions"
-      Tab(1).Control(11).Enabled=   0   'False
-      Tab(1).Control(12)=   "tbsUMCRefinementOptions"
-      Tab(1).Control(12).Enabled=   0   'False
-      Tab(1).Control(13)=   "chkUseMostAbuChargeStateStatsForClassStats"
-      Tab(1).Control(13).Enabled=   0   'False
-      Tab(1).Control(14)=   "cboChargeStateAbuType"
-      Tab(1).Control(14).Enabled=   0   'False
-      Tab(1).Control(15)=   "chkSkipFindUMCs"
-      Tab(1).Control(15).Enabled=   0   'False
+      Tab(1).ControlEnabled=   0   'False
+      Tab(1).Control(0)=   "chkSkipFindUMCs"
+      Tab(1).Control(1)=   "cboChargeStateAbuType"
+      Tab(1).Control(2)=   "chkUseMostAbuChargeStateStatsForClassStats"
+      Tab(1).Control(3)=   "tbsUMCRefinementOptions"
+      Tab(1).Control(4)=   "fraUMCIonNetOptions"
+      Tab(1).Control(5)=   "chkInterpolateMissingIons"
+      Tab(1).Control(6)=   "txtInterpolateMaxGapSize"
+      Tab(1).Control(7)=   "cmbUMCAbu"
+      Tab(1).Control(8)=   "cmbUMCMW"
+      Tab(1).Control(9)=   "fraUMCSearch200x"
+      Tab(1).Control(10)=   "cboUMCSearchMode"
+      Tab(1).Control(11)=   "lblDescription(61)"
+      Tab(1).Control(12)=   "lblDescription(58)"
+      Tab(1).Control(13)=   "lblDescription(64)"
+      Tab(1).Control(14)=   "lblDescription(63)"
+      Tab(1).Control(15)=   "lblDescription(115)"
       Tab(1).ControlCount=   16
       TabCaption(2)   =   "3. MT Tags"
       TabPicture(2)   =   "frmEditAnalysisSettings.frx":0038
@@ -92,17 +76,27 @@ Begin VB.Form frmEditAnalysisSettings
       Tab(2).ControlCount=   6
       TabCaption(3)   =   "4. Pairs"
       TabPicture(3)   =   "frmEditAnalysisSettings.frx":0054
-      Tab(3).ControlEnabled=   0   'False
-      Tab(3).Control(0)=   "fraOptionFrame(56)"
-      Tab(3).Control(1)=   "fraOptionFrame(53)"
-      Tab(3).Control(2)=   "fraOptionFrame(52)"
-      Tab(3).Control(3)=   "fraOptionFrame(48)"
-      Tab(3).Control(4)=   "fraOptionFrame(41)"
-      Tab(3).Control(5)=   "fraOptionFrame(40)"
-      Tab(3).Control(6)=   "fraOptionFrame(38)"
-      Tab(3).Control(7)=   "fraOptionFrame(37)"
-      Tab(3).Control(8)=   "cboPairsIdentificationMode"
-      Tab(3).Control(9)=   "lblDescription(16)"
+      Tab(3).ControlEnabled=   -1  'True
+      Tab(3).Control(0)=   "lblDescription(16)"
+      Tab(3).Control(0).Enabled=   0   'False
+      Tab(3).Control(1)=   "cboPairsIdentificationMode"
+      Tab(3).Control(1).Enabled=   0   'False
+      Tab(3).Control(2)=   "fraOptionFrame(37)"
+      Tab(3).Control(2).Enabled=   0   'False
+      Tab(3).Control(3)=   "fraOptionFrame(38)"
+      Tab(3).Control(3).Enabled=   0   'False
+      Tab(3).Control(4)=   "fraOptionFrame(40)"
+      Tab(3).Control(4).Enabled=   0   'False
+      Tab(3).Control(5)=   "fraOptionFrame(41)"
+      Tab(3).Control(5).Enabled=   0   'False
+      Tab(3).Control(6)=   "fraOptionFrame(48)"
+      Tab(3).Control(6).Enabled=   0   'False
+      Tab(3).Control(7)=   "fraOptionFrame(52)"
+      Tab(3).Control(7).Enabled=   0   'False
+      Tab(3).Control(8)=   "fraOptionFrame(53)"
+      Tab(3).Control(8).Enabled=   0   'False
+      Tab(3).Control(9)=   "fraOptionFrame(56)"
+      Tab(3).Control(9).Enabled=   0   'False
       Tab(3).ControlCount=   10
       TabCaption(4)   =   "5. NET Adjustment"
       TabPicture(4)   =   "frmEditAnalysisSettings.frx":0070
@@ -381,7 +375,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.CheckBox chkSkipFindUMCs 
          Caption         =   "Skip Finding LC-MS Features (only appropriate if auto-processing .Gel files)"
          Height          =   420
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   68
          Top             =   420
          Width           =   4455
@@ -478,7 +472,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "ER Calculation Mode"
          Height          =   615
          Index           =   56
-         Left            =   -71040
+         Left            =   3960
          TabIndex        =   600
          Top             =   720
          Width           =   5055
@@ -528,7 +522,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Pair member removal after database search"
          Height          =   1215
          Index           =   53
-         Left            =   -64800
+         Left            =   10200
          TabIndex        =   287
          Top             =   6120
          Visible         =   0   'False
@@ -626,7 +620,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Pair Search and ER Calculation Options"
          Height          =   2415
          Index           =   52
-         Left            =   -69360
+         Left            =   5640
          TabIndex        =   273
          Top             =   3600
          Width           =   5295
@@ -730,7 +724,7 @@ Begin VB.Form frmEditAnalysisSettings
       End
       Begin VB.ComboBox cboChargeStateAbuType 
          Height          =   315
-         Left            =   240
+         Left            =   -74760
          Style           =   2  'Dropdown List
          TabIndex        =   76
          Top             =   2880
@@ -739,7 +733,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.CheckBox chkUseMostAbuChargeStateStatsForClassStats 
          Caption         =   "Use most abundant charge state group stats for class stats"
          Height          =   520
-         Left            =   3240
+         Left            =   -71760
          TabIndex        =   80
          Top             =   2760
          Width           =   2175
@@ -748,7 +742,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Text file saving options"
          Height          =   855
          Index           =   48
-         Left            =   -69360
+         Left            =   5640
          TabIndex        =   284
          Top             =   6480
          Width           =   3375
@@ -828,7 +822,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Pairs Search Options"
          Height          =   2175
          Index           =   41
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   264
          Top             =   5160
          Width           =   5295
@@ -920,7 +914,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Tolerances"
          Height          =   1250
          Index           =   40
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   256
          Top             =   3760
          Width           =   5295
@@ -1002,7 +996,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Isotopic Labeling Values (e.g. ICAT)"
          Height          =   2055
          Index           =   38
-         Left            =   -71040
+         Left            =   3960
          TabIndex        =   245
          Top             =   1440
          Width           =   5055
@@ -1108,7 +1102,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Isotopic Ratio Delta Values"
          Height          =   2295
          Index           =   37
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   232
          Top             =   1440
          Width           =   3495
@@ -1223,7 +1217,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.ComboBox cboPairsIdentificationMode 
          Height          =   315
          ItemData        =   "frmEditAnalysisSettings.frx":43D4C
-         Left            =   -74760
+         Left            =   240
          List            =   "frmEditAnalysisSettings.frx":43D4E
          Style           =   2  'Dropdown List
          TabIndex        =   231
@@ -2961,7 +2955,7 @@ Begin VB.Form frmEditAnalysisSettings
       End
       Begin TabDlg.SSTab tbsUMCRefinementOptions 
          Height          =   3120
-         Left            =   5640
+         Left            =   -69360
          TabIndex        =   155
          Top             =   480
          Width           =   5295
@@ -3521,7 +3515,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.Frame fraUMCIonNetOptions 
          Caption         =   "LC-MS Feature Ion Network Options"
          Height          =   4095
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   104
          Top             =   3600
          Width           =   9135
@@ -3988,7 +3982,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.CheckBox chkInterpolateMissingIons 
          Caption         =   "Interpolate abundances across gaps"
          Height          =   375
-         Left            =   3240
+         Left            =   -71760
          TabIndex        =   77
          Top             =   1680
          Width           =   2055
@@ -3996,7 +3990,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.TextBox txtInterpolateMaxGapSize 
          Alignment       =   1  'Right Justify
          Height          =   285
-         Left            =   4800
+         Left            =   -70200
          TabIndex        =   79
          Text            =   "0"
          Top             =   2280
@@ -4005,7 +3999,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.ComboBox cmbUMCAbu 
          Height          =   315
          ItemData        =   "frmEditAnalysisSettings.frx":43E3B
-         Left            =   240
+         Left            =   -74760
          List            =   "frmEditAnalysisSettings.frx":43E3D
          Style           =   2  'Dropdown List
          TabIndex        =   74
@@ -4015,7 +4009,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.ComboBox cmbUMCMW 
          Height          =   315
          ItemData        =   "frmEditAnalysisSettings.frx":43E3F
-         Left            =   240
+         Left            =   -74760
          List            =   "frmEditAnalysisSettings.frx":43E41
          Style           =   2  'Dropdown List
          TabIndex        =   72
@@ -4025,7 +4019,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.Frame fraUMCSearch200x 
          Caption         =   "UMC 2002/2003 Options"
          Height          =   3855
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   81
          Top             =   3600
          Width           =   6375
@@ -4501,7 +4495,7 @@ Begin VB.Form frmEditAnalysisSettings
       End
       Begin VB.ComboBox cboUMCSearchMode 
          Height          =   315
-         Left            =   3120
+         Left            =   -71880
          Style           =   2  'Dropdown List
          TabIndex        =   70
          Top             =   960
@@ -5689,7 +5683,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Most Abu Charge State Group Type"
          Height          =   255
          Index           =   61
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   75
          Top             =   2640
          Width           =   2775
@@ -5698,7 +5692,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Pairs Identification Mode"
          Height          =   255
          Index           =   16
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   230
          Top             =   720
          Width           =   3375
@@ -5741,7 +5735,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Maximum size of gap to interpolate:"
          Height          =   420
          Index           =   58
-         Left            =   3240
+         Left            =   -71760
          TabIndex        =   78
          Top             =   2160
          Width           =   1455
@@ -5750,7 +5744,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Class Molecular Mass"
          Height          =   255
          Index           =   64
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   71
          Top             =   1320
          Width           =   1575
@@ -5759,7 +5753,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Class Abundance"
          Height          =   255
          Index           =   63
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   73
          Top             =   1965
          Width           =   1335
@@ -5777,7 +5771,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "LC-MS Feature Search Mode"
          Height          =   255
          Index           =   115
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   69
          Top             =   975
          Width           =   2655

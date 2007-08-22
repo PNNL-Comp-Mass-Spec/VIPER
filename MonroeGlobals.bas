@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "August 10, 2007"
+Public Const APP_BUILD_DATE As String = "August 16, 2007"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -812,7 +812,8 @@ Public Type udtPairSearchOptionsType
     
     NETAdjustmentPairedSearchUMCSelection As punaPairsUMCNetAdjustmentConstants
     
-    OutlierRemovalUsesSymmetricERs As Boolean
+    '' This variable is no longer used and is effectively assumed to always be true
+    ''OutlierRemovalUsesSymmetricERs As Boolean                   ' Affects both outlier removal and the weighted average value computed
     
     AutoAnalysisDeltaMassAddnlCount As Integer
     AutoAnalysisDeltaMassAddnl() As Double
@@ -824,6 +825,9 @@ Public Type udtPairMatchStatsType
     ExpressionRatioStDev As Double
     ExpressionRatioChargeStateBasisCount As Integer
     ExpressionRatioMemberBasisCount As Long
+    LabellingEfficiencyF As Single
+    LogERCorrectedForF As Single
+    LogERStandardError As Single
 End Type
 
 Public Type udtAMTStalenessOptionsType

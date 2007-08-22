@@ -1228,6 +1228,8 @@ On Error GoTo LoadSettingsFileHandler
             .RequireMatchingChargeStatesForPairMembers = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "RequireMatchingChargeStatesForPairMembers", .RequireMatchingChargeStatesForPairMembers)
             .UseIdenticalChargesForER = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "UseIdenticalChargesForER", .UseIdenticalChargesForER)
             .ComputeERScanByScan = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "ComputeERScanByScan", .ComputeERScanByScan)
+            .ScanByScanAverageIsNotWeighted = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "ScanByScanAverageIsNotWeighted", .ScanByScanAverageIsNotWeighted)
+            
             .AverageERsAllChargeStates = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "AverageERsAllChargeStates", .AverageERsAllChargeStates)
             .AverageERsWeightingMode = GetIniFileSettingInt(IniStuff, "PairSearchOptions", "AverageERsWeightingMode", CInt(.AverageERsWeightingMode))
             .ERCalcType = GetIniFileSettingInt(IniStuff, "PairSearchOptions", "ERCalcType", CInt(.ERCalcType))
@@ -1256,7 +1258,6 @@ On Error GoTo LoadSettingsFileHandler
         .AutoAnalysisSavePairsStatisticsToTextFile = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "AutoAnalysisSavePairsStatisticsToTextFile", .AutoAnalysisSavePairsStatisticsToTextFile)
     
         .NETAdjustmentPairedSearchUMCSelection = GetIniFileSettingLng(IniStuff, "PairSearchOptions", "NETAdjustmentPairedSearchUMCSelection", CInt(.NETAdjustmentPairedSearchUMCSelection))
-        .OutlierRemovalUsesSymmetricERs = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "OutlierRemovalUsesSymmetricERs", .OutlierRemovalUsesSymmetricERs)
         
         .AutoAnalysisDeltaMassAddnlCount = GetIniFileSettingInt(IniStuff, "PairSearchOptions", "AutoAnalysisDeltaMassAddnlCount", .AutoAnalysisDeltaMassAddnlCount)
         
@@ -2295,37 +2296,37 @@ On Error GoTo SaveSettingsFileHandler
             strKeys(18) = "RequireMatchingChargeStatesForPairMembers": strValues(18) = .RequireMatchingChargeStatesForPairMembers
             strKeys(19) = "UseIdenticalChargesForER": strValues(19) = .UseIdenticalChargesForER
             strKeys(20) = "ComputeERScanByScan": strValues(20) = .ComputeERScanByScan
-            strKeys(21) = "AverageERsAllChargeStates": strValues(21) = .AverageERsAllChargeStates
-            strKeys(22) = "AverageERsWeightingMode": strValues(22) = .AverageERsWeightingMode
-            strKeys(23) = "ERCalcType": strValues(23) = .ERCalcType
+            strKeys(21) = "ScanByScanAverageIsNotWeighted": strValues(21) = .ScanByScanAverageIsNotWeighted
+            
+            strKeys(22) = "AverageERsAllChargeStates": strValues(22) = .AverageERsAllChargeStates
+            strKeys(23) = "AverageERsWeightingMode": strValues(23) = .AverageERsWeightingMode
+            strKeys(24) = "ERCalcType": strValues(24) = .ERCalcType
         
-            strKeys(24) = "RemoveOutlierERs": strValues(24) = .RemoveOutlierERs
-            strKeys(25) = "RemoveOutlierERsIterate": strValues(25) = .RemoveOutlierERsIterate
-            strKeys(26) = "RemoveOutlierERsMinimumDataPointCount": strValues(26) = .RemoveOutlierERsMinimumDataPointCount
-            strKeys(27) = "RemoveOutlierERsConfidenceLevel": strValues(27) = .RemoveOutlierERsConfidenceLevel
+            strKeys(25) = "RemoveOutlierERs": strValues(25) = .RemoveOutlierERs
+            strKeys(26) = "RemoveOutlierERsIterate": strValues(26) = .RemoveOutlierERsIterate
+            strKeys(27) = "RemoveOutlierERsMinimumDataPointCount": strValues(27) = .RemoveOutlierERsMinimumDataPointCount
+            strKeys(28) = "RemoveOutlierERsConfidenceLevel": strValues(28) = .RemoveOutlierERsConfidenceLevel
         
-            strKeys(28) = .N15IncompleteIncorporationMode: strValues(28) = .N15IncompleteIncorporationMode
-            strKeys(29) = .N15PercentIncorporationMinimum: strValues(29) = .N15PercentIncorporationMinimum
-            strKeys(30) = .N15PercentIncorporationMaximum: strValues(30) = .N15PercentIncorporationMaximum
-            strKeys(31) = .N15PercentIncorporationStep: strValues(31) = .N15PercentIncorporationStep
+            strKeys(29) = .N15IncompleteIncorporationMode: strValues(29) = .N15IncompleteIncorporationMode
+            strKeys(30) = .N15PercentIncorporationMinimum: strValues(30) = .N15PercentIncorporationMinimum
+            strKeys(31) = .N15PercentIncorporationMaximum: strValues(31) = .N15PercentIncorporationMaximum
+            strKeys(32) = .N15PercentIncorporationStep: strValues(32) = .N15PercentIncorporationStep
         
         End With
         
-        strKeys(32) = "PairSearchMode": strValues(32) = .PairSearchMode
+        strKeys(33) = "PairSearchMode": strValues(33) = .PairSearchMode
         
-        strKeys(33) = "AutoExcludeOutOfERRange": strValues(33) = .AutoExcludeOutOfERRange
-        strKeys(34) = "AutoExcludeAmbiguous": strValues(34) = .AutoExcludeAmbiguous
-        strKeys(35) = "KeepMostConfidentAmbiguous": strValues(35) = .KeepMostConfidentAmbiguous
+        strKeys(34) = "AutoExcludeOutOfERRange": strValues(34) = .AutoExcludeOutOfERRange
+        strKeys(35) = "AutoExcludeAmbiguous": strValues(35) = .AutoExcludeAmbiguous
+        strKeys(36) = "KeepMostConfidentAmbiguous": strValues(36) = .KeepMostConfidentAmbiguous
         
-        strKeys(36) = "AutoAnalysisRemovePairMemberHitsAfterDBSearch": strValues(36) = .AutoAnalysisRemovePairMemberHitsAfterDBSearch
-        strKeys(37) = "AutoAnalysisRemovePairMemberHitsRemoveHeavy": strValues(37) = .AutoAnalysisRemovePairMemberHitsRemoveHeavy
+        strKeys(37) = "AutoAnalysisRemovePairMemberHitsAfterDBSearch": strValues(37) = .AutoAnalysisRemovePairMemberHitsAfterDBSearch
+        strKeys(38) = "AutoAnalysisRemovePairMemberHitsRemoveHeavy": strValues(38) = .AutoAnalysisRemovePairMemberHitsRemoveHeavy
         
-        strKeys(38) = "AutoAnalysisSavePairsToTextFile": strValues(38) = .AutoAnalysisSavePairsToTextFile
-        strKeys(39) = "AutoAnalysisSavePairsStatisticsToTextFile": strValues(39) = .AutoAnalysisSavePairsStatisticsToTextFile
+        strKeys(39) = "AutoAnalysisSavePairsToTextFile": strValues(39) = .AutoAnalysisSavePairsToTextFile
+        strKeys(40) = "AutoAnalysisSavePairsStatisticsToTextFile": strValues(40) = .AutoAnalysisSavePairsStatisticsToTextFile
         
-        strKeys(40) = "NETAdjustmentPairedSearchUMCSelection": strValues(40) = .NETAdjustmentPairedSearchUMCSelection
-        strKeys(41) = "OutlierRemovalUsesSymmetricERs": strValues(41) = .OutlierRemovalUsesSymmetricERs
-    
+        strKeys(41) = "NETAdjustmentPairedSearchUMCSelection": strValues(41) = .NETAdjustmentPairedSearchUMCSelection
         strKeys(42) = "AutoAnalysisDeltaMassAddnlCount": strValues(42) = .AutoAnalysisDeltaMassAddnlCount
         
         If .AutoAnalysisDeltaMassAddnlCount > 0 Then
@@ -2816,7 +2817,7 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
                     .ProcessingType = CLngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "ProcessingType"))
                     .Results_Folder = LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "Results_Folder")
                     .Settings_File_Name = LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "Settings_File_Name")
-                    .State = CLngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "STATE"))
+                    .STATE = CLngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "STATE"))
                     .Storage_Path = LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "Storage_Path")
                     .Total_Scans = CLngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "Total_Scans"))
                     .ValidAnalysisDataPresent = CBoolSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "ValidAnalysisDataPresent"))
@@ -3016,7 +3017,7 @@ Private Sub IniFileWriteSingleDBConnection(objIniStuff As clsIniStuff, strSectio
                 strKeys(45) = "ProcessingType": strValues(45) = .ProcessingType
                 strKeys(46) = "Results_Folder": strValues(46) = .Results_Folder
                 strKeys(47) = "Settings_File_Name": strValues(47) = .Settings_File_Name
-                strKeys(48) = "State": strValues(48) = .State
+                strKeys(48) = "State": strValues(48) = .STATE
                 strKeys(49) = "Storage_Path": strValues(49) = .Storage_Path
                 strKeys(50) = "Total_Scans": strValues(50) = .Total_Scans
                 strKeys(51) = "Vol_Client": strValues(51) = .Vol_Client
@@ -3490,6 +3491,8 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .RequireMatchingChargeStatesForPairMembers = True
                     .UseIdenticalChargesForER = True
                     .ComputeERScanByScan = True
+                    .ScanByScanAverageIsNotWeighted = False
+                    
                     .AverageERsAllChargeStates = True
                     .AverageERsWeightingMode = aewAbundance
                     
@@ -3529,8 +3532,6 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 ' Note: If you change the following default, you should also change the setting in Sub DisplayDefaultSettings() of frmSearchForNETAdjustmentUMC
                 .NETAdjustmentPairedSearchUMCSelection = punaUnpairedPlusPairedLight
                 
-                .OutlierRemovalUsesSymmetricERs = True
-                            
                 .AutoAnalysisDeltaMassAddnlCount = 0
                 ReDim .AutoAnalysisDeltaMassAddnl(0)
             End With

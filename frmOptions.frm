@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmOptions 
    Caption         =   "Options"
    ClientHeight    =   6315
@@ -24,12 +24,12 @@ Begin VB.Form frmOptions
       _ExtentY        =   9763
       _Version        =   393216
       Style           =   1
-      Tab             =   2
       TabHeight       =   520
       TabCaption(0)   =   "Data"
       TabPicture(0)   =   "frmOptions.frx":000C
-      Tab(0).ControlEnabled=   0   'False
+      Tab(0).ControlEnabled=   -1  'True
       Tab(0).Control(0)=   "picOpt(0)"
+      Tab(0).Control(0).Enabled=   0   'False
       Tab(0).ControlCount=   1
       TabCaption(1)   =   "Graph"
       TabPicture(1)   =   "frmOptions.frx":0028
@@ -38,16 +38,15 @@ Begin VB.Form frmOptions
       Tab(1).ControlCount=   1
       TabCaption(2)   =   "Miscellaneous"
       TabPicture(2)   =   "frmOptions.frx":0044
-      Tab(2).ControlEnabled=   -1  'True
+      Tab(2).ControlEnabled=   0   'False
       Tab(2).Control(0)=   "picOpt(2)"
-      Tab(2).Control(0).Enabled=   0   'False
       Tab(2).ControlCount=   1
       Begin VB.PictureBox picOpt 
          BorderStyle     =   0  'None
          FillStyle       =   0  'Solid
          Height          =   4695
          Index           =   2
-         Left            =   120
+         Left            =   -74880
          ScaleHeight     =   4695
          ScaleWidth      =   6135
          TabIndex        =   86
@@ -709,7 +708,7 @@ Begin VB.Form frmOptions
          FillStyle       =   0  'Solid
          Height          =   4695
          Index           =   0
-         Left            =   -74880
+         Left            =   120
          ScaleHeight     =   4695
          ScaleWidth      =   6135
          TabIndex        =   1
@@ -1294,7 +1293,7 @@ Iris
 End Sub
 
 Private Sub optERCalc_Click(Index As Integer)
-glbPreferencesExpanded.PairSearchOptions.SearchDef.ERCalcType = Index
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.ERCalcType = Index
 End Sub
 
 Private Sub optHorOrientation_Click(Index As Integer)
@@ -1306,7 +1305,7 @@ Select Case Index
 Case 0
      WorkPref.IsoDataField = isfMWMono      ' 7
 Case 1
-     WorkPref.IsoDataField = isfMWavg       ' 6
+     WorkPref.IsoDataField = isfMWAvg       ' 6
 Case 2
      WorkPref.IsoDataField = isfMWTMA       ' 8
 End Select

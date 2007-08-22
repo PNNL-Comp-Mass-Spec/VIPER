@@ -171,7 +171,7 @@ Public Sub AutoScaleXNow()
 End Sub
 
 Public Sub AutoScaleYNow()
-    Dim lngindex As Long, lngNumPoints As Long
+    Dim lngIndex As Long, lngNumPoints As Long
     Dim lngLeftMostPoint As Long, lngRightMostPoint As Long
     Dim dblDataXVal As Double
     Dim dblDataYVal As Double
@@ -188,9 +188,9 @@ Public Sub AutoScaleYNow()
         lngRightMostPoint = -1
         dblMaxVisibleValue = -1E+308
         lngNumPoints = .NumPoints(mCurrentSeries)
-        For lngindex = 1 To lngNumPoints
-            dblDataXVal = .x(mCurrentSeries, lngindex)
-            dblDataYVal = .y(mCurrentSeries, lngindex)
+        For lngIndex = 1 To lngNumPoints
+            dblDataXVal = .X(mCurrentSeries, lngIndex)
+            dblDataYVal = .Y(mCurrentSeries, lngIndex)
             If dblDataXVal <= dblXEnd Then
                 If dblDataXVal >= dblXStart Then
                     If dblDataYVal > dblMaxVisibleValue Then dblMaxVisibleValue = dblDataYVal
@@ -199,7 +199,7 @@ Public Sub AutoScaleYNow()
             Else
                 Exit For
             End If
-        Next lngindex
+        Next lngIndex
     End With
     
     With Chart2D
@@ -575,7 +575,7 @@ Public Sub SetLocationDisplay(blnShowLocNearestDataPoint As Boolean, blnShowLocA
 
 End Sub
 
-Private Sub ReportCursorLocation(x As Single, y As Single)
+Private Sub ReportCursorLocation(X As Single, Y As Single)
     ' Update value of nearest data point in lblLocation
     
     Dim Distance As Long, Point As Long, series As Long
@@ -586,8 +586,8 @@ Private Sub ReportCursorLocation(x As Single, y As Single)
     Dim strPointCoords As String, strLocationCoords As String, strOutput As String
     Const DECIMAL_PLACES = 3
     
-    XPixel = x / Screen.TwipsPerPixelX
-    YPixel = y / Screen.TwipsPerPixelY
+    XPixel = X / Screen.TwipsPerPixelX
+    YPixel = Y / Screen.TwipsPerPixelY
     
     With Chart2D.ChartGroups(mCurrentGroup)
         Region = .CoordToDataIndex(XPixel, YPixel, oc2dFocusXY, series, Point, Distance)
@@ -595,7 +595,7 @@ Private Sub ReportCursorLocation(x As Single, y As Single)
         'strLocationDescription = Distance & " units away from point " & Point & " on series " & series
         
         If Point > 0 Then
-            strPointCoords = FormatNumber(.Data.x(series, Point), DECIMAL_PLACES) & ", " & FormatNumber(.Data.y(series, Point), DECIMAL_PLACES)
+            strPointCoords = FormatNumber(.Data.X(series, Point), DECIMAL_PLACES) & ", " & FormatNumber(.Data.Y(series, Point), DECIMAL_PLACES)
         Else
             strPointCoords = ""
         End If
@@ -720,20 +720,20 @@ Public Sub SetSeriesDataPointCount(mSeriesNumber As Integer, lngNumberOfPoints A
 End Sub
 
 Private Sub AssureOneBasedArray(ArrayIn() As Double, ArrayOut() As Double)
-    Dim lngUpperIndex As Long, lngindex As Long
+    Dim lngUpperIndex As Long, lngIndex As Long
     
     lngUpperIndex = UBound(ArrayIn)
     
     If LBound(ArrayIn) = 0 Then
         ReDim ArrayOut(1 To lngUpperIndex + 1)
-        For lngindex = 1 To lngUpperIndex + 1
-            ArrayOut(lngindex) = ArrayIn(lngindex - 1)
-        Next lngindex
+        For lngIndex = 1 To lngUpperIndex + 1
+            ArrayOut(lngIndex) = ArrayIn(lngIndex - 1)
+        Next lngIndex
     Else
         ReDim ArrayOut(1 To lngUpperIndex)
-        For lngindex = 1 To lngUpperIndex
-            ArrayOut(lngindex) = ArrayIn(lngindex)
-        Next lngindex
+        For lngIndex = 1 To lngUpperIndex
+            ArrayOut(lngIndex) = ArrayIn(lngIndex)
+        Next lngIndex
     End If
 End Sub
 
@@ -1106,7 +1106,7 @@ Private Sub chart2d_Click()
 '    Next
 End Sub
 
-Private Sub Chart2D_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Chart2D_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
     If Button = vbRightButton Then
         ' Zoom to previous zoom settings in history
         ZoomToPreviousHistoryValue
@@ -1115,8 +1115,8 @@ Private Sub Chart2D_MouseDown(Button As Integer, Shift As Integer, x As Single, 
     End If
 End Sub
 
-Private Sub Chart2d_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    ReportCursorLocation x, y
+Private Sub Chart2d_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    ReportCursorLocation X, Y
 End Sub
 
 Private Sub Chart2D_ZoomAxisModify(XAxisMin As Double, XAxisMax As Double, YAxisMin As Double, YAxisMax As Double, Y2AxisMin As Double, Y2AxisMax As Double, IsOK As Boolean)
