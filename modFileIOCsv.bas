@@ -134,10 +134,18 @@ GetColumnValueErrorHandler:
 End Function
 
 Private Function GetColumnValueSng(ByRef strData() As String, ByVal intColumnIndex As Integer, Optional ByVal sngDefaultValue As Single = 0) As Single
+    Dim dblValue As Double
+    
     On Error GoTo GetColumnValueErrorHandler
     
     If intColumnIndex >= 0 Then
-        GetColumnValueSng = CSng(strData(intColumnIndex))
+        dblValue = CDbl(strData(intColumnIndex))
+        If dblValue > 1E+38 Then
+            dblValue = 1E+38
+        ElseIf dblValue < -1E+38 Then
+            dblValue = -1E+38
+        End If
+        GetColumnValueSng = CSng(dblValue)
     Else
         GetColumnValueSng = sngDefaultValue
     End If

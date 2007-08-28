@@ -54,8 +54,8 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "lblFilterConnections"
-      Tab(1).Control(1)=   "Frame1"
+      Tab(1).Control(0)=   "Frame1"
+      Tab(1).Control(1)=   "lblFilterConnections"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
@@ -410,8 +410,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassMassTopX"
-            Tab(2).Control(1)=   "fraClassAbundanceTopX"
+            Tab(2).Control(0)=   "fraClassAbundanceTopX"
+            Tab(2).Control(1)=   "fraClassMassTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -2250,17 +2250,17 @@ ExportPeaksForUMCFinding = False
 
 End Function
 
-Private Sub SetMolecularMassFieldDropdown(eMWField As glDocDataISFields)
-    If eMWField <> isfMWAvg And eMWField <> isfMWMono And eMWField <> isfMWTMA Then
+Private Sub SetMolecularMassFieldDropdown(eMWField As mftMassFieldTypeConstants)
+    If eMWField <> mftMWAvg And eMWField <> mftMWMono And eMWField <> mftMWTMA Then
         eMWField = GelData(CallerID).Preferences.IsoDataField
     End If
     
     Select Case eMWField
-    Case isfMWAvg
+    Case mftMWAvg
         cboMolecularMassField.ListIndex = 0
-    Case isfMWMono
+    Case mftMWMono
         cboMolecularMassField.ListIndex = 1
-    Case isfMWTMA
+    Case mftMWTMA
         cboMolecularMassField.ListIndex = 2
     Case Else
         cboMolecularMassField.ListIndex = 1
@@ -2268,16 +2268,16 @@ Private Sub SetMolecularMassFieldDropdown(eMWField As glDocDataISFields)
 End Sub
 
 Private Function GetMolecularMassFieldFromDropdown() As Integer
-    Dim eMWField As glDocDataISFields
+    Dim eMWField As mftMassFieldTypeConstants
     
     Select Case cboMolecularMassField.ListIndex
     Case 0
-        eMWField = isfMWAvg
+        eMWField = mftMWAvg
     Case 2
-        eMWField = isfMWTMA
+        eMWField = mftMWTMA
     Case Else
         ' Includes case 1
-        eMWField = isfMWMono
+        eMWField = mftMWMono
     End Select
 
     GetMolecularMassFieldFromDropdown = eMWField

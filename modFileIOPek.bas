@@ -26,6 +26,8 @@ Private Const t8FILENAME = "Filename"
 Private Const t8DATABASE = "Database"
 Public Const t8DATA_CS = "First CS"
 Public Const t8DATA_ISO = "CS,  Abu"
+Public Const t8DATA_ISO_Tabbed = "CS" & vbTab & "Abund"
+
 Private Const t8MEDIATYPE = "Media ty"
 Private Const t8FREQSHIFT = " Freq sh"
 ''Private Const t8DELTADATABLOCK = "Monoisot"
@@ -80,46 +82,76 @@ Private Const LINE_NUMBER_OF_ISOTOPIC_DISTRIBUTIONS = 20
 Private Const SCAN_INFO_DIM_CHUNK As Long = 10000
 Private Const ISO_DATA_DIM_CHUNK As Long = 25000
 
+Private Const ISONUM_FIELD_COUNT_MAX = 12       ' Reserve space for up to 12 numeric fields; we may not use all of these
+
+' Note: These should all be lowercase string values
+Private Const ISOS_COLUMN_CS As String = "cs"
+Private Const ISOS_COLUMN_ABUNDANCE As String = "abundance"
+Private Const ISOS_COLUMN_MZ As String = "m/z"
+Private Const ISOS_COLUMN_ISO_FIT As String = "fit"
+Private Const ISOS_COLUMN_AVG_MASS As String = "average mw"
+Private Const ISOS_COLUMN_MONO_MASS As String = "monoisotopic mw"
+Private Const ISOS_COLUMN_MOST_ABU_MASS As String = "most abundant mw"          ' Aka TMA (The Most Abundant)
+Private Const ISOS_COLUMN_IREP_MW_MONO_ABU As String = "imono"
+Private Const ISOS_COLUMN_IREP_2DA As String = "i+2"
+Private Const ISOS_COLUMN_PCT_MOST_ABUNDANT As String = "pct most abundant"
+Private Const ISOS_COLUMN_ELEMENT_LABEL_N14N15 As String = "n14/n15"
+Private Const ISOS_COLUMN_ELEMENT_LABEL_N14N15_RATIO As String = "n14/n15 ratio"
+
+
+' Note: These should all be lowercase string values
+Private Const CS_COLUMN_FIRST_CS As String = "first cs"
+Private Const CS_COLUMN_NUMBER_OF_CS As String = "number of cs"
+Private Const CS_COLUMN_ABUNDANCE As String = "abundance"
+Private Const CS_COLUMN_MASS As String = "mass"
+Private Const CS_COLUMN_STD_DEV As String = "standard deviation"
 
 ' The following corresponds to varData() in LoadNewPEK and LineNow for Isotopic data
+' The values represent the column number in the file that holds the given type of data, though the data after column irdMWMono can vary
+' If a header row is present, then use ???? to map column number to column content type
+Private Const ISOS_DATA_COLUMN_COUNT As Integer = 14
 Private Enum irdIsoRawDataIndex
-    irdCS = 1
-    irdAbu = 2
-    irdMOverZ = 3
-    irdIsoFit = 4
-    irdMWavg = 5
-    irdMWMono = 6
-    irdMWTMA = 7
-    irdERorN14N15OrIRepMWMonoAbu = 8
-    irdN14N15RatioOrIRep2Da = 9
-    irdDBMatchMassError = 10
-    irdPeptideIdentity = 11
+    irdCS = 0
+    irdAbu = 1
+    irdMZ = 2
+    irdIsoFit = 3
+    irdMWavg = 4
+    irdMWMono = 5
+    irdMWTMA = 6                    ' Aka TMA (The Most Abundant)
+    irdIRepMWMonoAbu = 7            ' Previously was irdERorN14N15OrIRepMWMonoAbu = 7
+    irdIRep2Da = 8                  ' Previously was irdN14N15RatioOrIRep2Da = 8
+    irdIsotopeTag = 9
+    irdIsotopeTagRatio = 10
+    irdPctMostAbundant = 11
+    irdDBMatchMassError = 12
+    irdPeptideIdentity = 13
 End Enum
 
 ' The following corresponds to varData() in LoadNewPEK and LineNow for Charge state data
+Private Const CS_DATA_COLUMN_COUNT As Integer = 5
 Private Enum crdCSRawDataIndex
-    crdCS = 1
-    crdNumberOfCS = 2
-    crdAbu = 3
-    crdAverageMW = 4
-    crdMWStDev = 5
-    crdMTID = 9
+    crdCS = 0
+    crdNumberOfCS = 1
+    crdAbu = 2
+    crdAverageMW = 3
+    crdMWStDev = 4
+    crdMTID = 5
 End Enum
 
-' The following corresponds to the TmpNum() array in LoadNewPEK
-Private Enum itmIsoTempNumIndex
-    itmLineType = 1
-    itmScanNumber = 2
-    itmCS = 3
-    itmAbu = 4
-    itmMOverZ = 5
-    itmFit = 6
-    itmMWavg = 7
-    itmMWMono = 8
-    itmMWMA = 9
-    itmIsotopicFitRatio = 10
-    itmIsotopicAtomCount = 11
-End Enum
+''' The following corresponds to the TmpNum() array in LoadNewPEK
+''Private Enum itmIsoTempNumIndex
+''    itmLineType = 1
+''    itmScanNumber = 2
+''    itmCS = 3
+''    itmAbu = 4
+''    itmMOverZ = 5
+''    itmFit = 6
+''    itmMWavg = 7
+''    itmMWMono = 8
+''    itmMWMA = 9
+''    itmIsotopicFitRatio = 10
+''    itmIsotopicAtomCount = 11
+''End Enum
 
 Private Enum rmReadModeConstants
     rmPrescanData = 0
@@ -153,6 +185,12 @@ Private mSubtaskMessage As String
 
 Private mReadMode As rmReadModeConstants
 Private mCurrentProgressStep As Integer
+
+Private mWarnedMissingRequiredIsosColumnHeaders As Boolean
+Private mWarnedUnknownIsosColumnHeader As Boolean
+
+Private mWarnedMissingRequiredCSColumnHeaders As Boolean
+Private mWarnedUnknownCSColumnHeader As Boolean
 
 'control of loading
 ' Note: ThisLine keeps track of whether we are reading Charge State (not deisotoped) or Isotopic (deisotoped) data
@@ -475,6 +513,11 @@ On Error GoTo LoadNewPEKErrorHandler
         mReadMode = rmReadModeConstants.rmStoreData
     End If
     
+    mWarnedMissingRequiredIsosColumnHeaders = False
+    mWarnedUnknownIsosColumnHeader = False
+    mWarnedMissingRequiredCSColumnHeaders = False
+    mWarnedUnknownCSColumnHeader = False
+
     Do While mReadMode < rmReadModeConstants.rmReadComplete
         If mMaximumDataCountEnabled Then
             If mReadMode = rmPrescanData Then
@@ -695,10 +738,10 @@ Private Function ReadPEKFile(ByRef fso As FileSystemObject, ByVal strPEKFilePath
     Dim Special As String
     Dim CalArgCnt As Long
 
-    ' The following holds the data read from the .Pek file
-    ' varData(0) holds the number of columns of data found while varData(1) through varData(varData(0)) holds the data
+    ' The following holds the data read from the .Pek file (varData(0) through varData(intDataColumnCount-1))
     ' It is a variant array to allow for both text and numbers
-    Dim varData(0 To ISONUM_FIELD_COUNT) As Variant
+    Dim intDataColumnCount As Integer
+    Dim varData(0 To ISONUM_FIELD_COUNT_MAX) As Variant
 
     Dim CurrDataFName As String
     Dim lngScanNumber As Long
@@ -709,6 +752,7 @@ Private Function ReadPEKFile(ByRef fso As FileSystemObject, ByVal strPEKFilePath
     Dim CurrDataBPImz As Double
 
     Dim sngAbundance As Single
+    Dim sngFit As Single
     
     Dim strResponse As String
     Dim eResponse As VbMsgBoxResult
@@ -718,7 +762,17 @@ Private Function ReadPEKFile(ByRef fso As FileSystemObject, ByVal strPEKFilePath
     
     Dim lngReturnValue As Long
     
+    Dim intIsosColumnMapping() As Integer
+    Dim intCSColumnMapping() As Integer
+   
 On Error GoTo ReadPEKFileErrorHandler
+    
+    ReDim intIsosColumnMapping(ISOS_DATA_COLUMN_COUNT) As Integer
+    ReDim intCSColumnMapping(CS_DATA_COLUMN_COUNT) As Integer
+    
+    ' Initialize intIsosColumnMapping to the default column mappings
+    SetDefaultIsosColumnMapping intIsosColumnMapping
+    SetDefaultCSColumnMapping intCSColumnMapping
     
     ' Initialize control variables
     lngLinesRead = 0
@@ -755,24 +809,24 @@ On Error GoTo ReadPEKFileErrorHandler
             GelData(mGelIndex).LinesRead = lngLinesRead
         End If
         
-        LineNow strLineIn, LineType, Special, varData, strPEKFilePath
+        LineNow strLineIn, LineType, Special, varData, intDataColumnCount, intIsosColumnMapping, intCSColumnMapping, strPEKFilePath
         Select Case LineType
         Case LINE_FILENAME_AKA_SCAN_NUMBER
-            CurrDataFName = varData(1)
+            CurrDataFName = varData(0)
             
             If blnAutoNumberScans Then
-                varData(2) = objScanNumberTracker.GetNextAutoNumberedScan()
+                varData(1) = objScanNumberTracker.GetNextAutoNumberedScan()
             Else
                 ' Update the average increment value
-                objScanNumberTracker.AddScanNumberAndUpdateAverageIncrement CLng(varData(2))
+                objScanNumberTracker.AddScanNumberAndUpdateAverageIncrement CLng(varData(1))
             End If
            
-            If lngScanNumber > varData(2) Then     'cannot accept non-ascending scan numbers
+            If lngScanNumber > varData(1) Then     'cannot accept non-ascending scan numbers
                 If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Or mReadMode = rmReadModeConstants.rmPrescanData Then
                     ' Assume auto-numbering is OK
                     eResponse = vbYes
                 Else
-                    eResponse = MsgBox("Error in scan order found after scan " & lngScanNumber & ".  Next scan number is " & varData(2) & ". Choose Yes to auto-number remaining spectra sequentially.  Choose No to keep the data loaded up to this point.  Choose Cancel to abort loading.", vbYesNoCancel + vbDefaultButton1, glFGTU)
+                    eResponse = MsgBox("Error in scan order found after scan " & lngScanNumber & ".  Next scan number is " & varData(1) & ". Choose Yes to auto-number remaining spectra sequentially.  Choose No to keep the data loaded up to this point.  Choose Cancel to abort loading.", vbYesNoCancel + vbDefaultButton1, glFGTU)
                 End If
                 
                 If eResponse = vbCancel Then
@@ -799,11 +853,11 @@ On Error GoTo ReadPEKFileErrorHandler
                         AddToAnalysisHistory mGelIndex, "Non-ascending scan number found.  Auto-numbering sequentially starting with scan " & Trim(Round(lngScanNumber + objScanNumberTracker.AutoNumberIncrement, 0)) & "; Increment value = " & Trim(objScanNumberTracker.AutoNumberIncrement)
                         blnAutoNumberScans = True
                     End If
-                    varData(2) = objScanNumberTracker.GetNextAutoNumberedScan()
+                    varData(1) = objScanNumberTracker.GetNextAutoNumberedScan()
                 End If
             End If
            
-            lngScanNumber = varData(2)
+            lngScanNumber = varData(1)
             If mReadMode = rmReadModeConstants.rmStoreData Then
                 With GelData(mGelIndex)
                     If mScanInfoCount > 0 Then
@@ -834,25 +888,25 @@ On Error GoTo ReadPEKFileErrorHandler
             
        Case LINE_FREQUENCY  'frequency shifts
             If mReadMode = rmReadModeConstants.rmStoreData Then
-                GelData(mGelIndex).ScanInfo(mScanInfoCount).FrequencyShift = varData(1)
-                ''GelData(mGelIndex).DFFS(mScanInfoCount) = varData(1)
+                GelData(mGelIndex).ScanInfo(mScanInfoCount).FrequencyShift = varData(0)
+                ''GelData(mGelIndex).DFFS(mScanInfoCount) = varData(0)
             End If
        Case LINE_INTENSITY  ' MonrodMod: Storing Time Domain Signal Level here (found in function ExtractTimeDomainSignalFromPEK)
             If mReadMode = rmReadModeConstants.rmStoreData Then
-                GelData(mGelIndex).ScanInfo(mScanInfoCount).TimeDomainSignal = varData(1)
-                ''GelData(mGelIndex).DFIN(mScanInfoCount) = varData(1)
+                GelData(mGelIndex).ScanInfo(mScanInfoCount).TimeDomainSignal = varData(0)
+                ''GelData(mGelIndex).DFIN(mScanInfoCount) = varData(0)
             End If
        Case LINE_DATABASE                         'this can happen only once
             ' No longer supported (March 2006)
-            ''GelData(mGelIndex).PathtoDatabase = varData(1)
+            ''GelData(mGelIndex).PathtoDatabase = varData(0)
        Case LINE_MEDIA
             If mReadMode = rmReadModeConstants.rmStoreData Then
-                GelData(mGelIndex).MediaType = varData(1)
+                GelData(mGelIndex).MediaType = varData(0)
             End If
        Case LINE_EQUATION
             If mReadMode = rmReadModeConstants.rmStoreData Then
                 If Not CalibrationIn Then    'read calibration only once
-                   GelData(mGelIndex).CalEquation = varData(1)
+                   GelData(mGelIndex).CalEquation = varData(0)
                    CalibrationIn = True
                 Else
                    CalibrationIn = False
@@ -862,16 +916,18 @@ On Error GoTo ReadPEKFileErrorHandler
             If mReadMode = rmReadModeConstants.rmStoreData Then
                 If CalibrationIn Then        'read only once(looks strange but it works)
                    CalArgCnt = CalArgCnt + 1
-                   If CalArgCnt <= 10 Then GelData(mGelIndex).CalArg(CalArgCnt) = varData(1)
+                   If CalArgCnt <= 10 Then GelData(mGelIndex).CalArg(CalArgCnt) = varData(0)
                 End If
             End If
        Case LINE_DATA_CS
             If Not mEvenOddScanFilter Or (lngScanNumber Mod 2 = mEvenOddModCompareVal) Then
               
+                sngAbundance = GetColumnValueSng(varData, intCSColumnMapping(crdCSRawDataIndex.crdAbu), -1)
+              
                 blnValidDataPoint = True
                 If mFilterByAbundance Then
-                    If IsNumeric(varData(crdAbu)) Then
-                        If varData(crdAbu) < mAbundanceMin Or varData(crdAbu) > mAbundanceMax Then blnValidDataPoint = False
+                    If sngAbundance > -1 Then
+                        If sngAbundance < mAbundanceMin Or sngAbundance > mAbundanceMax Then blnValidDataPoint = False
                     Else
                         blnValidDataPoint = False
                     End If
@@ -884,11 +940,7 @@ On Error GoTo ReadPEKFileErrorHandler
                 
                 If blnValidDataPoint Then
                     If mReadMode = rmReadModeConstants.rmPrescanData Then
-                        If varData(crdAbu) > 1E+38 Then
-                            sngAbundance = 1E+38
-                        Else
-                            sngAbundance = CSng(varData(crdAbu))
-                        End If
+                        sngAbundance = GetColumnValueSng(varData, intCSColumnMapping(crdCSRawDataIndex.crdAbu), -1)
                         mPrescannedData.AddDataPoint sngAbundance, mValidDataPointCount
                     Else
                         If mMaximumDataCountEnabled Then
@@ -908,21 +960,32 @@ On Error GoTo ReadPEKFileErrorHandler
                                 If .CSLines > UBound(.CSData) Then
                                     ReDim Preserve .CSData(UBound(.CSData) + ISO_DATA_DIM_CHUNK)
                                 End If
-                                
+
                                 With .CSData(.CSLines)
                                     .ScanNumber = lngScanNumber
-                                    If IsNumeric(varData(crdCS)) Then .Charge = CInt(varData(crdCS))
-                                    If IsNumeric(varData(crdNumberOfCS)) Then .ChargeCount = CInt(varData(crdNumberOfCS))
-                                    If IsNumeric(varData(crdAbu)) Then .Abundance = CSng(varData(crdAbu))
-                                    If IsNumeric(varData(crdAverageMW)) Then .AverageMW = CDbl(varData(crdAverageMW))
-                                    If IsNumeric(varData(crdMWStDev)) Then .MassStDev = CDbl(varData(crdMWStDev))
                                     
-                                    ''If IsNumeric(varData(7)) Then .IsotopicFitRatio = varData(7)  'Now holds ratio of N14/N15; Legacy: expected mw
-                                    ''If IsNumeric(varData(8)) Then .IsotopicAtomCount = varData(8)  'Legacy: DB match mass error
-                                    If Not IsNull(varData(crdMTID)) Then
-                                        If Len(CStr(varData(crdMTID))) > 0 Then .MTID = varData(crdMTID)
-                                    End If
+                                    .Charge = CInt(GetColumnValueLng(varData, intCSColumnMapping(crdCSRawDataIndex.crdCS), 1))
+                                    .ChargeCount = CInt(GetColumnValueLng(varData, intCSColumnMapping(crdCSRawDataIndex.crdNumberOfCS), 1))
+                                    .Abundance = sngAbundance
+                                    .Fit = 0
+                                    .AverageMW = GetColumnValueDbl(varData, intCSColumnMapping(crdCSRawDataIndex.crdAverageMW), 0)
+                                    .MonoisotopicMW = 0
+                                    .MostAbundantMW = 0
+                                    .MassStDev = GetColumnValueDbl(varData, intCSColumnMapping(crdCSRawDataIndex.crdMWStDev), 0)
                                     
+                                    .MZ = 0
+                                    
+                                    .FWHM = 0
+                                    .SignalToNoise = 0
+                                    .IntensityMono = 0
+                                    .IntensityMonoPlus2 = 0
+
+                                    ''If IsNumeric(varData(6)) Then .IsotopicFitRatio = varData(6)  'Now holds ratio of N14/N15; Legacy: expected mw
+                                    ''If IsNumeric(varData(7)) Then .IsotopicAtomCount = varData(7)  'Legacy: DB match mass error
+''                                    If Not IsNull(varData(crdMTID)) Then
+''                                        If Len(CStr(varData(crdMTID))) > 0 Then .MTID = varData(crdMTID)
+''                                    End If
+''
                                     ' Update the TIC and BPI data
                                     CurrDataTIC = CurrDataTIC + .Abundance
                                     If .Abundance > CurrDataBPI Then
@@ -939,12 +1002,17 @@ On Error GoTo ReadPEKFileErrorHandler
             End If
        Case LINE_DATA_ISO   'data line - isotopic
             ' Possibly filter on Fit
-            If varData(irdIsoFit) <= mMaxFit Or mMaxFit <= 0 Then
+            sngFit = GetColumnValueSng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdIsoFit), 0)
+            
+            If sngFit <= mMaxFit Or mMaxFit <= 0 Then
                 If Not mEvenOddScanFilter Or (lngScanNumber Mod 2 = mEvenOddModCompareVal) Then
+                    
+                    sngAbundance = GetColumnValueDbl(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdAbu), -1)
+                    
                     blnValidDataPoint = True
                     If mFilterByAbundance Then
-                        If IsNumeric(varData(irdAbu)) Then
-                            If varData(irdAbu) < mAbundanceMin Or varData(irdAbu) > mAbundanceMax Then blnValidDataPoint = False
+                        If sngAbundance > -1 Then
+                            If sngAbundance < mAbundanceMin Or sngAbundance > mAbundanceMax Then blnValidDataPoint = False
                         Else
                             blnValidDataPoint = False
                         End If
@@ -957,11 +1025,7 @@ On Error GoTo ReadPEKFileErrorHandler
                     
                     If blnValidDataPoint Then
                         If mReadMode = rmReadModeConstants.rmPrescanData Then
-                            If varData(crdAbu) > 1E+38 Then
-                                sngAbundance = 1E+38
-                            Else
-                                sngAbundance = CSng(varData(irdAbu))
-                            End If
+                            sngAbundance = GetColumnValueSng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdAbu), -1)
                             mPrescannedData.AddDataPoint sngAbundance, mValidDataPointCount
                         Else
                             If mMaximumDataCountEnabled Then
@@ -985,36 +1049,77 @@ On Error GoTo ReadPEKFileErrorHandler
                                     With .IsoData(.IsoLines)
                                         .ScanNumber = lngScanNumber
                                         
-                                        If IsNumeric(varData(irdCS)) Then .Charge = varData(irdCS)
-                                        If IsNumeric(varData(irdAbu)) Then .Abundance = varData(irdAbu)
-                                        If IsNumeric(varData(irdMOverZ)) Then .MZ = varData(irdMOverZ)
-                                        If IsNumeric(varData(irdIsoFit)) Then .Fit = varData(irdIsoFit)
-                                        If IsNumeric(varData(irdMWavg)) Then .AverageMW = varData(irdMWavg)
-                                        If IsNumeric(varData(irdMWMono)) Then .MonoisotopicMW = varData(irdMWMono)
-                                        If IsNumeric(varData(irdMWTMA)) Then .MostAbundantMW = varData(irdMWTMA)
+                                        .Charge = CInt(GetColumnValueLng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdCS), 1))
+                                        .Abundance = sngAbundance
+                                        .MZ = GetColumnValueDbl(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdMZ), 0)
+                                        .Fit = sngFit
+                                        .AverageMW = GetColumnValueDbl(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdMWavg), 0)
+                                        .MonoisotopicMW = GetColumnValueDbl(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdMWMono), 0)
+                                        .MostAbundantMW = GetColumnValueDbl(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdMWTMA), 0)
+                                        .FWHM = 0
+                                        .SignalToNoise = 0
                                         
-                                        If mIReportFile Or IsNumeric(varData(irdERorN14N15OrIRepMWMonoAbu)) And IsNumeric(varData(irdN14N15RatioOrIRep2Da)) Then
-                                            ' Assume IReport data
-                                            If IsNumeric(varData(irdERorN14N15OrIRepMWMonoAbu)) Then
-                                                .IntensityMono = varData(irdERorN14N15OrIRepMWMonoAbu)
-                                                mIReportFile = True
-                                            End If
-                                            
-                                            If IsNumeric(varData(irdN14N15RatioOrIRep2Da)) Then
-                                                .IntensityMonoPlus2 = varData(irdN14N15RatioOrIRep2Da)
-                                                mIReportFile = True
-                                            End If
+                                        .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
+                                        
+                                        If intIsosColumnMapping(irdIsoRawDataIndex.irdIsotopeTag) >= 0 Or _
+                                           intIsosColumnMapping(irdIsoRawDataIndex.irdIRepMWMonoAbu) >= 0 Then
+                                            ' IReport values are defined
+                                            .IntensityMono = GetColumnValueSng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdIRepMWMonoAbu), 0)
+                                            .IntensityMonoPlus2 = GetColumnValueSng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdIRep2Da), 0)
                                         Else
-                                            ' Assume varData(irdN14N15RatioOrIRep2Da) contains .IsotopicFitRatio data
-                                            If IsNumeric(varData(irdN14N15RatioOrIRep2Da)) Then
-                                                '.IsotopicFitRatio = varData(irdN14N15RatioOrIRep2Da)        'Now holds ratio of N14/N15; Legacy: expected mw
+                                            .IntensityMono = 0
+                                            .IntensityMonoPlus2 = 0
+                                            
+                                            If intIsosColumnMapping(irdIsoRawDataIndex.irdIsotopeTag) > 0 Then
+                                                .IsotopeLabel = GetIsotopeLabelTagCode(GetColumnValueString(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdIsotopeTag), ""))
+                                            Else
+                                                ' See if vardata(7) contains some text
+                                            
+                                                If Not IsNumeric(varData(7)) Then
+                                                    ' Assume varData(7) contains an isotope label
+                                                    .IsotopeLabel = GetIsotopeLabelTagCode(CStr(varData(7)))
+
+                                                    If .IsotopeLabel <> iltNone Then
+                                                        If IsNumeric(varData(8)) Then
+                                                            ' Assume varData(8) contains the ratio of N14 to N15
+                                                            '.IsotopicFitRatio = CSng(varData(8))
+                                                        End If
+                                                    End If
+                                                End If
                                             End If
                                         End If
                                         
-                                        If Not IsNull(varData(irdPeptideIdentity)) Then
-                                            If Len(CStr(varData(irdPeptideIdentity))) > 0 Then .MTID = varData(irdPeptideIdentity)
-                                        End If
                                         
+                                 
+
+                                        '' Old method used before switch to intIsosColumnMapping()
+                                        ''    If mIReportFile Or IsNumeric(varData(irdERorN14N15OrIRepMWMonoAbu)) And IsNumeric(varData(irdN14N15RatioOrIRep2Da)) Then
+                                        ''        ' Assume IReport data
+                                        ''        If IsNumeric(varData(irdERorN14N15OrIRepMWMonoAbu)) Then
+                                        ''            .IntensityMono = varData(irdERorN14N15OrIRepMWMonoAbu)
+                                        ''            mIReportFile = True
+                                        ''        End If
+                                        ''
+                                        ''        If IsNumeric(varData(irdN14N15RatioOrIRep2Da)) Then
+                                        ''            .IntensityMonoPlus2 = varData(irdN14N15RatioOrIRep2Da)
+                                        ''            mIReportFile = True
+                                        ''        End If
+                                        ''    Else
+                                        ''        If Not IsNumeric(varData(irdERorN14N15OrIRepMWMonoAbu)) Then
+                                        ''            ' Assume irdERorN14N15OrIRepMWMonoAbu contains an isotope label
+                                        ''            '.IsotopeLabel = varData(irdERorN14N15OrIRepMWMonoAbu)        'Now holds ratio of N14/N15; Legacy: expected mw
+                                        ''
+                                        ''            ' Assume varData(irdN14N15RatioOrIRep2Da) contains .IsotopicFitRatio data
+                                        ''            If IsNumeric(varData(irdN14N15RatioOrIRep2Da)) Then
+                                        ''                '.IsotopicFitRatio = varData(irdN14N15RatioOrIRep2Da)        'Now holds ratio of N14/N15; Legacy: expected mw
+                                        ''            End If
+                                        ''        End If
+                                        ''    End If
+                                        ''
+                                        ''    If Not IsNull(varData(irdPeptideIdentity)) Then
+                                        ''        If Len(CStr(varData(irdPeptideIdentity))) > 0 Then .MTID = varData(irdPeptideIdentity)
+                                        ''    End If
+                                                                            
                                         ' Update the TIC and BPI data
                                         CurrDataTIC = CurrDataTIC + .Abundance
                                         If .Abundance > CurrDataBPI Then
@@ -1033,37 +1138,37 @@ On Error GoTo ReadPEKFileErrorHandler
                 End If
             End If
     ''    Case LINE_DELTA
-    ''       Deltas(mScanInfoCount).Delta = varData(1)
+    ''       Deltas(mScanInfoCount).Delta = varData(0)
     ''    Case LINE_DELTA_TOLERANCE
-    ''       Deltas(mScanInfoCount).Tolerance = varData(1)
+    ''       Deltas(mScanInfoCount).Tolerance = varData(0)
     ''    Case LINE_DELTA_TAGMASS
-    ''       Deltas(mScanInfoCount).TagMass = varData(1)
+    ''       Deltas(mScanInfoCount).TagMass = varData(0)
     ''    Case LINE_DELTA_MAX
-    ''       Deltas(mScanInfoCount).MaxDeltas = varData(1)
+    ''       Deltas(mScanInfoCount).MaxDeltas = varData(0)
     ''    Case LINE_DATA_DD
     ''       DDCnt = DDCnt + 1
     ''       If Deltas(mScanInfoCount).MinInd < 0 Then Deltas(mScanInfoCount).MinInd = DDCnt
     ''       Deltas(mScanInfoCount).MaxInd = DDCnt
     ''       'read data here
     ''       DDFNs(DDCnt) = GelData(mGelIndex).ScanInfo(mScanInfoCount).ScanNumber
-    ''       DDMWs(DDCnt) = varData(1)
-    ''       DDD(DDCnt) = varData(2)
-    ''       DDRatio(DDCnt) = varData(3)
+    ''       DDMWs(DDCnt) = varData(0)
+    ''       DDD(DDCnt) = varData(1)
+    ''       DDRatio(DDCnt) = varData(2)
         Case LINE_RETENTION_TIME
-            If IsNumeric(varData(1)) Then
-                CurrDataElutionTime = varData(1)
+            If IsNumeric(varData(0)) Then
+                CurrDataElutionTime = varData(0)
                 If CurrDataElutionTime > mMaxElutionTime Then mMaxElutionTime = CurrDataElutionTime
             End If
         Case LINE_NUMBER_OF_PEAKS
             If mReadMode = rmReadModeConstants.rmStoreData Then
-                If IsNumeric(varData(1)) Then
-                    GelData(mGelIndex).ScanInfo(mScanInfoCount).NumPeaks = CLng(varData(1))
+                If IsNumeric(varData(0)) Then
+                    GelData(mGelIndex).ScanInfo(mScanInfoCount).NumPeaks = CLng(varData(0))
                 End If
             End If
         Case LINE_NUMBER_OF_ISOTOPIC_DISTRIBUTIONS
             If mReadMode = rmReadModeConstants.rmStoreData Then
-                If IsNumeric(varData(1)) Then
-                    GelData(mGelIndex).ScanInfo(mScanInfoCount).NumDeisotoped = CLng(varData(1))
+                If IsNumeric(varData(0)) Then
+                    GelData(mGelIndex).ScanInfo(mScanInfoCount).NumDeisotoped = CLng(varData(0))
                 End If
             End If
        End Select
@@ -1149,194 +1254,202 @@ LookupICR2LSParFileSettingErrorHandler:
 
 End Function
 
-Private Sub LineNow(ByVal L As String, ByRef TL As Integer, ByRef Special As String, ByRef varData As Variant, ByVal strFilePath As String)
-'L is line, TL returns type of line, Special string to be carried back
-'varData is array of variants that returns actual values
-Dim k As Integer
-On Error GoTo err_LineNow
-
-varData(0) = 0   '0 element of the array is a count of the elements
-For k = 1 To UBound(varData)
-    varData(k) = Null
-Next k
-
-Special = ""
-
-Select Case Left(L, 8)
-Case t8FILENAME
-   varData(1) = Right(Trim(L), Len(L) - 9)     'File name
-   varData(2) = ExtractScanNumberFromFilenameLine(CStr(varData(1)))
-   TL = LINE_FILENAME_AKA_SCAN_NUMBER
-Case t8FREQSHIFT
-   varData(1) = GetNumberEqual(L)
-   If Len(varData(1)) > 0 Then
-      varData(1) = val(varData(1))
-   Else
-      varData(1) = 0
-   End If
-   TL = LINE_FREQUENCY
-Case t8DATABASE
-   If Not DatabaseIn Then
-      varData(1) = Right(Trim(L), Len(L) - 9)
-      TL = LINE_DATABASE
-      If Len(varData(1)) > 0 Then DatabaseIn = True
-   Else
-      TL = LINE_NOTHING
-   End If
-Case t8MEDIATYPE
-   If Not MediaTypeIn Then
-      varData(1) = Trim$(Right(Trim(L), Len(L) - 11))
-      TL = LINE_MEDIA
-      MediaTypeIn = True
-   Else
-      TL = LINE_NOTHING
-   End If
-Case t8DATA_CS
-   ThisLine = LINE_DATA_CS
-   TL = LINE_NOTHING
-Case t8DATA_ISO
-   ThisLine = LINE_DATA_ISO
-   TL = LINE_NOTHING
-Case t8CALIBRATION1, t8CALIBRATION2
-   If Not CalibrationIn Then
-      ThisLine = LINE_CALIBRATION
-      TL = LINE_NOTHING
-   End If
-''Case t8DELTA
-''   varData(1) = GetNumberEqual(L)      'delta
-''   If Len(varData(1)) > 0 Then
-''      varData(1) = Val(varData(1))
-''   Else
-''      varData(1) = -1
-''   End If
-''   TL = LINE_DELTA
-''Case t8DELTA_TOL, t8DELTA_TOL_1
-''   varData(1) = GetNumberEqual(L)      'delta
-''   If Len(varData(1)) > 0 Then
-''      varData(1) = Val(varData(1))
-''   Else
-''      varData(1) = -1
-''   End If
-''   TL = LINE_DELTA_TOLERANCE
-''Case t8TAG_MASS
-''   varData(1) = GetNumberEqual(L)      'delta
-''   If Len(varData(1)) > 0 Then
-''      varData(1) = Val(varData(1))
-''   Else
-''      varData(1) = -1
-''   End If
-''   TL = LINE_DELTA_TAGMASS
-''Case t8MAX_DELTAS
-''   varData(1) = GetNumberEqual(L)      'delta
-''   If Len(varData(1)) > 0 Then
-''      varData(1) = Val(varData(1))
-''   Else
-''      varData(1) = -1
-''   End If
-''   TL = LINE_DELTA_MAX
-''Case t8DELTADATABLOCK
-''   ThisLine = LINE_DATA_DD
-''   TL = LINE_NOTHING
-Case Else
-    If Left(L, 4) = t4RT Then
-        varData(1) = GetNumberEqual(L)      ' Retention time
-        If Len(varData(1)) > 0 Then
-            varData(1) = val(varData(1))
-            TL = LINE_RETENTION_TIME
-        Else
-            varData(1) = 0
-            TL = LINE_NOTHING
-        End If
+Private Sub LineNow(ByVal strLineIn As String, ByRef LineType As Integer, ByRef Special As String, _
+                    ByRef varData As Variant, ByRef intDataColumnCount As Integer, _
+                    ByRef intIsosColumnMapping() As Integer, ByRef intCSColumnMapping() As Integer, _
+                    ByVal strFilePath As String)
+                    
+    'strLineIn is line, LineType returns type of line, Special string to be carried back
+    'varData is array of variants that returns actual values
+    Dim k As Integer
+    On Error GoTo err_LineNow
     
-    ElseIf Left(L, Len(PEK_D_PEAKS_CNT)) = PEK_D_PEAKS_CNT Then
-        varData(1) = GetNumberEqual(L)      ' Number of peaks
-        If Len(varData(1)) > 0 Then
-            varData(1) = val(varData(1))
-            TL = LINE_NUMBER_OF_PEAKS
-        Else
-            varData(1) = 0
-            TL = LINE_NOTHING
-        End If
+    intDataColumnCount = 0
+    For k = 0 To UBound(varData)
+        varData(k) = Null
+    Next k
     
-    ElseIf Left(L, Len(PEK_D_IS_CNT)) = PEK_D_IS_CNT Then
-        varData(1) = GetNumberEqual(L)      ' Number of isotopic distributions
-        If Len(varData(1)) > 0 Then
-            varData(1) = val(varData(1))
-            TL = LINE_NUMBER_OF_ISOTOPIC_DISTRIBUTIONS
-        Else
-            varData(1) = 0
-            TL = LINE_NOTHING
-        End If
-
-    Else
-        Select Case ThisLine
-        Case LINE_DATA_CS
-             If IsDataLine(Trim$(L), varData, Special, strFilePath) Then
-                If varData(0) >= 5 Then
-                   TL = LINE_DATA_CS
-                Else
-                   TL = LINE_NOTHING
-                End If
-                ' The 6th entry in a charge state based line of data could be various things
-                ' In a legacy .PEK file, it could be a number, in which case we used to append "M" to Special; now, we ignore it
-                ' If the 6th entry isn't a number, then we used to append just the first letter of the entry to Special
-                ' We now ignore the 8th entry in this function and deal with it in the LoadNewPEK function instead
-             Else
-                TL = LINE_NOTHING
-                ThisLine = LINE_NOTHING
-             End If
-        Case LINE_DATA_ISO
-             If IsDataLine(Trim$(L), varData, Special, strFilePath) Then
-                If varData(0) >= 7 Then
-                   TL = LINE_DATA_ISO
-                Else
-                   TL = LINE_NOTHING
-                End If
-                ' The 8th entry in a isotopic based line of data could be various things
-                ' In a legacy .PEK file, it could be a number, in which case we append "M" to Special
-                ' If the 8th entry wasn't a number, then we used to append just the first letter of the entry to Special
-                ' We now ignore the 8th entry in this function and deal with it in the LoadNewPEK function instead
-             Else
-                TL = LINE_NOTHING
-                ThisLine = LINE_NOTHING
-             End If
-        Case LINE_CALIBRATION
-             Select Case Left$(Trim$(L), 3)
-             Case t3EQUATION
-                  varData(1) = Trim$(L)
-                  TL = LINE_EQUATION
-             Case t3ARG_A, t3ARG_B, t3ARG_C, t3ARG_D, t3ARG_E, _
-                  t3ARG_F, t3ARG_G, t3ARG_H, t3ARG_H, t3ARG_I
-                  varData(1) = Trim$(Right$(Trim$(L), Len(Trim$(L)) - 3))
-                  If Not IsNumeric(varData(1)) Then varData(1) = 0
-                  TL = LINE_CAL_ARGUMENT
-             Case Else
-                  ThisLine = LINE_NOTHING
-                  TL = LINE_NOTHING
-             End Select
-''        Case LINE_DATA_DD
-''             If IsDataLine(Trim$(L), varData, Special, strFilePath) Then
-''                If varData(0) = 3 Then
-''                   TL = LINE_DATA_DD
-''                Else
-''                   TL = LINE_NOTHING
-''                End If
-''             Else
-''                TL = LINE_NOTHING
-''                ThisLine = LINE_NOTHING
-''             End If
-        Case Else
-             ThisLine = LINE_NOTHING
-             TL = LINE_NOTHING
-        End Select
+    Special = ""
     
-    End If
-   
-End Select
-Exit Sub
+    Select Case Left(strLineIn, 8)
+    Case t8FILENAME
+       varData(0) = Right(Trim(strLineIn), Len(strLineIn) - 9)     'File name
+       varData(1) = ExtractScanNumberFromFilenameLine(CStr(varData(0)))
+       LineType = LINE_FILENAME_AKA_SCAN_NUMBER
+    Case t8FREQSHIFT
+       varData(0) = GetNumberEqual(strLineIn)
+       If Len(varData(0)) > 0 Then
+          varData(0) = val(varData(0))
+       Else
+          varData(0) = 0
+       End If
+       LineType = LINE_FREQUENCY
+    Case t8DATABASE
+       If Not DatabaseIn Then
+          varData(0) = Right(Trim(strLineIn), Len(strLineIn) - 9)
+          LineType = LINE_DATABASE
+          If Len(varData(0)) > 0 Then DatabaseIn = True
+       Else
+          LineType = LINE_NOTHING
+       End If
+    Case t8MEDIATYPE
+       If Not MediaTypeIn Then
+          varData(0) = Trim$(Right(Trim(strLineIn), Len(strLineIn) - 11))
+          LineType = LINE_MEDIA
+          MediaTypeIn = True
+       Else
+          LineType = LINE_NOTHING
+       End If
+    Case t8DATA_CS
+        ThisLine = LINE_DATA_CS
+        LineType = LINE_NOTHING
+        ParseCSColumnHeaders strLineIn, intCSColumnMapping, strFilePath
+        
+    Case t8DATA_ISO, t8DATA_ISO_Tabbed
+        ThisLine = LINE_DATA_ISO
+        LineType = LINE_NOTHING
+        ParseIsosColumnHeaders strLineIn, intIsosColumnMapping, strFilePath
+    
+    Case t8CALIBRATION1, t8CALIBRATION2
+       If Not CalibrationIn Then
+          ThisLine = LINE_CALIBRATION
+          LineType = LINE_NOTHING
+       End If
+    ''Case t8DELTA
+    ''   varData(0) = GetNumberEqual(strLineIn)      'delta
+    ''   If Len(varData(0)) > 0 Then
+    ''      varData(0) = Val(varData(0))
+    ''   Else
+    ''      varData(0) = -1
+    ''   End If
+    ''   LineType = LINE_DELTA
+    ''Case t8DELTA_TOL, t8DELTA_TOL_1
+    ''   varData(0) = GetNumberEqual(strLineIn)      'delta
+    ''   If Len(varData(0)) > 0 Then
+    ''      varData(0) = Val(varData(0))
+    ''   Else
+    ''      varData(0) = -1
+    ''   End If
+    ''   LineType = LINE_DELTA_TOLERANCE
+    ''Case t8TAG_MASS
+    ''   varData(0) = GetNumberEqual(strLineIn)      'delta
+    ''   If Len(varData(0)) > 0 Then
+    ''      varData(0) = Val(varData(0))
+    ''   Else
+    ''      varData(0) = -1
+    ''   End If
+    ''   LineType = LINE_DELTA_TAGMASS
+    ''Case t8MAX_DELTAS
+    ''   varData(0) = GetNumberEqual(strLineIn)      'delta
+    ''   If Len(varData(0)) > 0 Then
+    ''      varData(0) = Val(varData(0))
+    ''   Else
+    ''      varData(0) = -1
+    ''   End If
+    ''   LineType = LINE_DELTA_MAX
+    ''Case t8DELTADATABLOCK
+    ''   ThisLine = LINE_DATA_DD
+    ''   LineType = LINE_NOTHING
+    Case Else
+        If Left(strLineIn, 4) = t4RT Then
+            varData(0) = GetNumberEqual(strLineIn)      ' Retention time
+            If Len(varData(0)) > 0 Then
+                varData(0) = val(varData(0))
+                LineType = LINE_RETENTION_TIME
+            Else
+                varData(0) = 0
+                LineType = LINE_NOTHING
+            End If
+        
+        ElseIf Left(strLineIn, Len(PEK_D_PEAKS_CNT)) = PEK_D_PEAKS_CNT Then
+            varData(0) = GetNumberEqual(strLineIn)      ' Number of peaks
+            If Len(varData(0)) > 0 Then
+                varData(0) = val(varData(0))
+                LineType = LINE_NUMBER_OF_PEAKS
+            Else
+                varData(0) = 0
+                LineType = LINE_NOTHING
+            End If
+        
+        ElseIf Left(strLineIn, Len(PEK_D_IS_CNT)) = PEK_D_IS_CNT Then
+            varData(0) = GetNumberEqual(strLineIn)      ' Number of isotopic distributions
+            If Len(varData(0)) > 0 Then
+                varData(0) = val(varData(0))
+                LineType = LINE_NUMBER_OF_ISOTOPIC_DISTRIBUTIONS
+            Else
+                varData(0) = 0
+                LineType = LINE_NOTHING
+            End If
+    
+        Else
+            Select Case ThisLine
+            Case LINE_DATA_CS
+                 If IsDataLine(Trim$(strLineIn), varData, intDataColumnCount, Special, strFilePath) Then
+                    If intDataColumnCount >= 5 Then
+                       LineType = LINE_DATA_CS
+                    Else
+                       LineType = LINE_NOTHING
+                    End If
+                    ' The 6th entry in a charge state based line of data could be various things
+                    ' In a legacy .PEK file, it could be a number, in which case we used to append "M" to Special; now, we ignore it
+                    ' If the 6th entry isn't a number, then we used to append just the first letter of the entry to Special
+                    ' We now ignore the 8th entry in this function and deal with it in the LoadNewPEK function instead
+                 Else
+                    LineType = LINE_NOTHING
+                    ThisLine = LINE_NOTHING
+                 End If
+            Case LINE_DATA_ISO
+                 If IsDataLine(Trim$(strLineIn), varData, intDataColumnCount, Special, strFilePath) Then
+                    If intDataColumnCount >= 7 Then
+                       LineType = LINE_DATA_ISO
+                    Else
+                       LineType = LINE_NOTHING
+                    End If
+                    ' The 8th entry in a isotopic based line of data could be various things
+                    ' In a legacy .PEK file, it could be a number, in which case we append "M" to Special
+                    ' If the 8th entry wasn't a number, then we used to append just the first letter of the entry to Special
+                    ' We now ignore the 8th entry in this function and deal with it in the LoadNewPEK function instead
+                 Else
+                    LineType = LINE_NOTHING
+                    ThisLine = LINE_NOTHING
+                 End If
+            Case LINE_CALIBRATION
+                 Select Case Left$(Trim$(strLineIn), 3)
+                 Case t3EQUATION
+                      varData(0) = Trim$(strLineIn)
+                      LineType = LINE_EQUATION
+                 Case t3ARG_A, t3ARG_B, t3ARG_C, t3ARG_D, t3ARG_E, _
+                      t3ARG_F, t3ARG_G, t3ARG_H, t3ARG_H, t3ARG_I
+                      varData(0) = Trim$(Right$(Trim$(strLineIn), Len(Trim$(strLineIn)) - 3))
+                      If Not IsNumeric(varData(0)) Then varData(0) = 0
+                      LineType = LINE_CAL_ARGUMENT
+                 Case Else
+                      ThisLine = LINE_NOTHING
+                      LineType = LINE_NOTHING
+                 End Select
+    ''        Case LINE_DATA_DD
+    ''             If IsDataLine(Trim$(strLineIn), varData, intDataColumnCount, Special, strFilePath) Then
+    ''                If intDataColumnCount = 3 Then
+    ''                   LineType = LINE_DATA_DD
+    ''                Else
+    ''                   LineType = LINE_NOTHING
+    ''                End If
+    ''             Else
+    ''                LineType = LINE_NOTHING
+    ''                ThisLine = LINE_NOTHING
+    ''             End If
+            Case Else
+                 ThisLine = LINE_NOTHING
+                 LineType = LINE_NOTHING
+            End Select
+        
+        End If
+       
+    End Select
+    Exit Sub
 
 err_LineNow: 'ignore the line
-TL = LINE_NOTHING
+    LineType = LINE_NOTHING
 End Sub
 
 Public Function ExtractScanNumberFromFilenameLine(ByVal strLine As String, Optional ByRef strTextBeforeScanNumber As String = "", Optional ByRef strTextAfterScanNumber As String = "") As Long
@@ -1447,68 +1560,85 @@ LineNowScanNumberOrTimeDomainSignalErrorHandler:
 End Sub
 
 
-Private Function IsDataLine(ByVal L As String, ByRef aN As Variant, ByRef Special As String, ByVal strFilePath As String) As Boolean
-Dim k As Integer, i As Integer
-Dim LineElement As Variant
-Dim TmpLine As String
-Dim Done As Boolean
-
-Static blnMaxColCountReachedErrorLogged As Boolean
-
-TmpLine = Trim$(L)
-If Len(TmpLine) > 0 Then
-   If Not IsNumeric(Left(TmpLine, 1)) Then
-      ' Line doesn't start with a number
-      Special = Left(TmpLine, 1)
+Private Function IsDataLine(ByVal strLineIn As String, ByRef varData As Variant, ByRef intDataColumnCount As Integer, ByRef Special As String, ByVal strFilePath As String) As Boolean
+    Dim k As Integer, i As Integer
+    Dim LineElement As Variant
+    Dim TmpLine As String
+    Dim Done As Boolean
     
-      TmpLine = Mid(TmpLine, 2)
-      
-      If Special <> "*" Then Special = ""
-   Else
-      Special = ""
-   End If
-End If
-If Len(TmpLine) > 0 Then
-   If IsNumeric(Left(TmpLine, 1)) Then
-      aN(0) = 0
-      Do While Not Done
-         k = InStr(TmpLine, vbTab)
-         If k > 0 Then
-            LineElement = Left(TmpLine, k - 1)
-         Else
-            LineElement = Trim(TmpLine)
-            Done = True
-         End If
-         aN(0) = aN(0) + 1
-         If Len(LineElement) > 0 Then
-            If IsNumeric(LineElement) Then
-               aN(aN(0)) = val(LineElement)
-            Else
-               aN(aN(0)) = LineElement
-            End If
-         End If
-         If aN(0) >= ISONUM_FIELD_COUNT Then
-            ' Data file has more than ISONUM_FIELD_COUNT fields; stop parsing the line
-            If Not blnMaxColCountReachedErrorLogged Then
-                blnMaxColCountReachedErrorLogged = True
-                LogErrors 0, "Module1.bas->IsDataLine", "PEK data file encountered with more than " & ISONUM_FIELD_COUNT & " columns in the data block: " & strFilePath
-            End If
-            Done = True
-         Else
-            TmpLine = Mid(TmpLine, k + 1)
-         End If
-      Loop
-      'make sure that there is no dot-zeros among data
-      If aN(0) > 0 Then
-         For i = 1 To UBound(aN)
-             If aN(i) = "." Then aN(i) = 0
-         Next i
-         IsDataLine = True
-      End If
-   End If
-End If
+    Static blnMaxColCountReachedErrorLogged As Boolean
+    
+    intDataColumnCount = 0
+    
+    TmpLine = Trim$(strLineIn)
+    If Len(TmpLine) > 0 Then
+       If Not IsNumeric(Left(TmpLine, 1)) Then
+          ' Line doesn't start with a number
+          Special = Left(TmpLine, 1)
+        
+          TmpLine = Mid(TmpLine, 2)
+          
+          If Special <> "*" Then Special = ""
+       Else
+          Special = ""
+       End If
+    End If
+    If Len(TmpLine) > 0 Then
+       If IsNumeric(Left(TmpLine, 1)) Then
+          intDataColumnCount = 0
+          Do While Not Done
+             k = InStr(TmpLine, vbTab)
+             If k > 0 Then
+                LineElement = Left(TmpLine, k - 1)
+             Else
+                LineElement = Trim(TmpLine)
+                Done = True
+             End If
+             If Len(LineElement) > 0 Then
+                If IsNumeric(LineElement) Then
+                   varData(intDataColumnCount) = val(LineElement)
+                Else
+                   varData(intDataColumnCount) = LineElement
+                End If
+             End If
+             intDataColumnCount = intDataColumnCount + 1
+             
+             If intDataColumnCount > ISONUM_FIELD_COUNT_MAX Or intDataColumnCount > UBound(varData) Then
+                ' Data file has more than ISONUM_FIELD_COUNT_MAX fields; stop parsing the line
+                If Not blnMaxColCountReachedErrorLogged Then
+                    blnMaxColCountReachedErrorLogged = True
+                    LogErrors 0, "Module1.bas->IsDataLine", "PEK data file encountered with more than " & ISONUM_FIELD_COUNT_MAX & " columns in the data block: " & strFilePath
+                End If
+                Done = True
+             Else
+                TmpLine = Mid(TmpLine, k + 1)
+             End If
+          Loop
+          
+          'make sure that there are no dot-zeros among data
+          If intDataColumnCount > 0 Then
+             For i = 0 To intDataColumnCount - 1
+                 If varData(i) = "." Then varData(i) = 0
+             Next i
+             IsDataLine = True
+          End If
+       End If
+    End If
 End Function
 
+Private Function GetIsotopeLabelTagCode(ByVal strIsotopeTag As String) As iltIsotopeLabelTagConstants
+    
+    Select Case LCase(Trim(strIsotopeTag))
+    Case "n14": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltN14
+    Case "n15": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltN15
+    Case "o16": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltO16
+    Case "o18": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltO18
+    Case "c12": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltC12
+    Case "c13": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltC13
+    Case Else: GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltUnsupportedTag
+    End Select
+    
+End Function
 
 Private Function GetNumberEqual(ByVal sLine As String) As String
 'returns number as string after "=";
@@ -1714,7 +1844,7 @@ On Error GoTo GeneratePEKFileUsingDataPointsErrorHandler
                 ' Scan only contained CS Data
                 If blnIsotopicDataPresent Then
                     ' However, there is Isotopic data in the data file, so write the Isotopic Header anyway
-                    GeneratePEKFileWriteIsoHeader tsOutfile
+                    GeneratePEKFileWriteIsoHeader tsOutfile, lngGelIndex
                     tsOutfile.WriteLine "Number of peaks in spectrum = " & Trim(lngDataPointCountInScan)
                     tsOutfile.WriteLine "Number of isotopic distributions detected = " & Trim(0)
                 Else
@@ -1769,7 +1899,7 @@ On Error GoTo GeneratePEKFileUsingDataPointsErrorHandler
         Else
             If Not blnIsoHeaderWritten Then
                 ' This is the first isotopic-based UMC encountered for this scan; Write the scan header
-                GeneratePEKFileWriteIsoHeader tsOutfile
+                GeneratePEKFileWriteIsoHeader tsOutfile, lngGelIndex
                 blnIsoHeaderWritten = True
 
                 ' Reset lngDataPointCountInScan since it ignores CS data when Isotopic data is present
@@ -2089,7 +2219,7 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
                 ' Scan only contained CS Data
                 If blnIsotopicUMCsPresent Then
                     ' However, there are Isotopic LC-MS Features in the data file, so write the Isotopic Header anyway
-                    GeneratePEKFileWriteIsoHeader tsOutfile
+                    GeneratePEKFileWriteIsoHeader tsOutfile, lngGelIndex
                     tsOutfile.WriteLine "Number of peaks in spectrum = " & Trim(lngUMCCountInScan)
                     tsOutfile.WriteLine "Number of isotopic distributions detected = " & Trim(0)
                 Else
@@ -2140,7 +2270,7 @@ On Error GoTo GeneratePEKFileUsingUMCsErrorHandler
             Case gldtIS
                 If Not blnIsoHeaderWritten Then
                     ' This is the first isotopic-based UMC encountered for this scan; Write the scan header
-                    GeneratePEKFileWriteIsoHeader tsOutfile
+                    GeneratePEKFileWriteIsoHeader tsOutfile, lngGelIndex
                     blnIsoHeaderWritten = True
                     
                     ' Reset lngUMCCountInScan since it ignores CS data when Isotopic data is present
@@ -2241,23 +2371,345 @@ GeneratePEKFileUsingUMCsErrorHandler:
 End Function
 
 Private Sub GeneratePEKFileWriteCSandScanHeader(ByRef tsOutfile As TextStream, lngGelIndex As Long, lngScanIndex As Long, strFileName As String)
-
+    Dim strHeader As String
+    
     tsOutfile.WriteLine "Time domain signal level:  " & GelData(lngGelIndex).ScanInfo(lngScanIndex).TimeDomainSignal
     tsOutfile.WriteLine "Filename: " & strFileName & "." & Format(GelData(lngGelIndex).ScanInfo(lngScanIndex).ScanNumber, "00000")
     tsOutfile.WriteLine "ScanType: Survey Scan"
     tsOutfile.WriteLine "Charge state mass transform results:"
-    tsOutfile.WriteLine "First CS,    Number of CS,   Abundance,   Mass,   Standard deviation"
+    
+    strHeader = GetDefaultPEKFileCSHeader()
+    tsOutfile.WriteLine strHeader
 
 End Sub
 
-Private Sub GeneratePEKFileWriteIsoHeader(ByRef tsOutfile As TextStream)
+Private Sub GeneratePEKFileWriteIsoHeader(ByRef tsOutfile As TextStream, ByVal lngGelIndex As Long)
+    Dim strHeader As String
 
     tsOutfile.WriteLine "Isotopic mass transform results:"
-    tsOutfile.WriteLine "CS,  Abundance,   m/z,   Fit,    Average MW, Monoisotopic MW,    Most abundant MW"
+    
+    strHeader = GetDefaultPEKFileIsoHeader(lngGelIndex)
+    tsOutfile.WriteLine strHeader
 
 End Sub
 
-Public Function WriteGELAsPEK(ByVal Ind As Long, ByVal hwndOwner As Long) As Boolean
+Private Function GetDefaultPEKFileCSHeader() As String
+    GetDefaultPEKFileCSHeader = "First CS,    Number of CS,   Abundance,   Mass,   Standard deviation"
+End Function
+
+Private Function GetColumnValueDbl(ByRef varData() As Variant, ByVal intColumnIndex As Integer, Optional ByVal dblDefaultValue As Double = 0) As Double
+    On Error GoTo GetColumnValueErrorHandler
+    
+    If intColumnIndex >= 0 Then
+        GetColumnValueDbl = CDbl(varData(intColumnIndex))
+    Else
+        GetColumnValueDbl = dblDefaultValue
+    End If
+    
+    Exit Function
+    
+GetColumnValueErrorHandler:
+    Debug.Assert False
+    GetColumnValueDbl = 0
+    
+End Function
+
+Private Function GetColumnValueLng(ByRef varData() As Variant, ByVal intColumnIndex As Integer, Optional ByVal lngDefaultValue As Long = 0) As Long
+    
+    On Error GoTo GetColumnValueErrorHandler
+    
+    If intColumnIndex >= 0 Then
+        GetColumnValueLng = CLng(varData(intColumnIndex))
+    Else
+        GetColumnValueLng = lngDefaultValue
+    End If
+    
+    Exit Function
+    
+GetColumnValueErrorHandler:
+    Debug.Assert False
+    GetColumnValueLng = 0
+    
+End Function
+
+Private Function GetColumnValueSng(ByRef varData() As Variant, ByVal intColumnIndex As Integer, Optional ByVal sngDefaultValue As Single = 0) As Single
+    Dim dblValue As Double
+    
+    On Error GoTo GetColumnValueErrorHandler
+    
+    If intColumnIndex >= 0 Then
+        dblValue = CDbl(varData(intColumnIndex))
+        If dblValue > 1E+38 Then
+            dblValue = 1E+38
+        ElseIf dblValue < -1E+38 Then
+            dblValue = -1E+38
+        End If
+        GetColumnValueSng = CSng(dblValue)
+    Else
+        GetColumnValueSng = sngDefaultValue
+    End If
+    
+    Exit Function
+    
+GetColumnValueErrorHandler:
+    Debug.Assert False
+    GetColumnValueSng = 0
+    
+End Function
+
+Private Function GetColumnValueString(ByRef varData() As Variant, ByVal intColumnIndex As Integer, Optional ByVal strDefaultValue As String = "") As String
+    On Error GoTo GetColumnValueErrorHandler
+    
+    If intColumnIndex >= 0 Then
+        If Not IsNull(varData(intColumnIndex)) Then
+            GetColumnValueString = CStr(varData(intColumnIndex))
+        Else
+            GetColumnValueString = strDefaultValue
+        End If
+    Else
+        GetColumnValueString = strDefaultValue
+    End If
+    
+    Exit Function
+    
+GetColumnValueErrorHandler:
+    Debug.Assert False
+    GetColumnValueString = ""
+    
+End Function
+
+Private Function GetDefaultPEKFileIsoHeader(ByVal lngGelIndex As Long) As String
+    ' If lngGelIndex is > 0, then will optionally add the "IsotopeLabel" header if .IsoData().IsotopeLabel is not blank
+    
+    Dim strHeader As String
+    
+    strHeader = "CS,  Abundance,   m/z,   Fit,    Average MW, Monoisotopic MW,    Most abundant MW"
+    
+On Error GoTo GetDefaultPEKFileIsoHeaderErrorHandler
+
+    If lngGelIndex > 0 Then
+        ' ToDo (August 2007): Uncomment this once .IsotopeLabel exists
+''        If GelData(lngGelIndex).IsoLines > 0 Then
+''            If Len(GelData(lngGelIndex).IsoData(1).IsotopeLabel) > 0 Then
+''                strHeader = strHeader & ",  IsotopeLabel,  IsotopeRatio"
+''            End If
+''        End If
+    End If
+    
+    GetDefaultPEKFileIsoHeader = strHeader
+    Exit Function
+
+GetDefaultPEKFileIsoHeaderErrorHandler:
+    Debug.Print "Error in GetDefaultPEKFileIsoHeader: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "GetDefaultPEKFileIsoHeader"
+    
+    GetDefaultPEKFileIsoHeader = strHeader
+    
+End Function
+
+Private Sub ParseCSColumnHeaders(ByVal strLineIn As String, ByRef intColumnMapping() As Integer, ByVal strInputFilePath As String)
+    ' Examine strLineIn to define the column mappings
+    
+    Dim strUnknownColumnList As String
+    Dim strData() As String
+    
+    Dim strMessage As String
+    
+    Dim intNewColumnMapping(CS_DATA_COLUMN_COUNT) As Integer
+    Dim lngIndex As Long
+    
+    ' First replace any commas in strLineIn with tabs
+    strLineIn = Replace(strLineIn, ",", vbTab)
+    
+    ' Now split on tabs
+    strData = Split(strLineIn, vbTab)
+    strUnknownColumnList = ""
+    
+    For lngIndex = 0 To UBound(intNewColumnMapping)
+        intNewColumnMapping(lngIndex) = -1
+    Next lngIndex
+    
+    For lngIndex = 0 To UBound(strData)
+        If lngIndex >= CS_DATA_COLUMN_COUNT Then
+            ' Too many column headers
+            Debug.Assert False
+            Exit For
+        End If
+        
+        Select Case LCase(Trim(strData(lngIndex)))
+        Case CS_COLUMN_FIRST_CS: intNewColumnMapping(crdCSRawDataIndex.crdCS) = lngIndex
+        Case CS_COLUMN_NUMBER_OF_CS: intNewColumnMapping(crdCSRawDataIndex.crdNumberOfCS) = lngIndex
+        Case CS_COLUMN_ABUNDANCE: intNewColumnMapping(crdCSRawDataIndex.crdAbu) = lngIndex
+        Case CS_COLUMN_MASS: intNewColumnMapping(crdCSRawDataIndex.crdAverageMW) = lngIndex
+        Case CS_COLUMN_STD_DEV: intNewColumnMapping(crdCSRawDataIndex.crdMWStDev) = lngIndex
+        Case Else
+            ' Unknown column header; ignore it, but post an entry to the analysis history
+            If Len(strUnknownColumnList) > 0 Then
+                strUnknownColumnList = strUnknownColumnList & ", "
+            End If
+            strUnknownColumnList = strUnknownColumnList & Trim(strData(lngIndex))
+            
+            Debug.Assert False
+        End Select
+        
+    Next lngIndex
+                    
+    If intNewColumnMapping(crdCSRawDataIndex.crdCS) >= 0 And _
+       intNewColumnMapping(crdCSRawDataIndex.crdAbu) >= 0 And _
+       intNewColumnMapping(crdCSRawDataIndex.crdAverageMW) >= 0 Then
+       
+        ' Required columns are present; we can continue
+        For lngIndex = 0 To UBound(intColumnMapping)
+            intColumnMapping(lngIndex) = intNewColumnMapping(lngIndex)
+        Next lngIndex
+    
+    Else
+        ' Warn the user that the column headers weren't recognized
+        If mReadMode = rmStoreData And Not mWarnedMissingRequiredCSColumnHeaders Then
+            strMessage = CSV_COLUMN_HEADER_MISSING_WARNING & " not found in file " & strInputFilePath & "; default columns are: " & vbCrLf & GetDefaultPEKFileCSHeader
+            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                MsgBox strMessage, vbExclamation + vbOKOnly, glFGTU
+            End If
+            AddToAnalysisHistory mGelIndex, strMessage
+            mWarnedMissingRequiredCSColumnHeaders = True
+        End If
+    End If
+                    
+    If Len(strUnknownColumnList) > 0 Then
+        If mReadMode = rmStoreData And Not mWarnedUnknownCSColumnHeader Then
+            ' Unknown column header; ignore it, but post an entry to the
+            AddToAnalysisHistory mGelIndex, CSV_COLUMN_HEADER_UNKNOWN_WARNING & " found in file " & strInputFilePath & ": " & strUnknownColumnList & "; default columns are: " & vbCrLf & GetDefaultPEKFileCSHeader
+            mWarnedUnknownCSColumnHeader = True
+        End If
+    End If
+
+End Sub
+
+Private Sub ParseIsosColumnHeaders(ByVal strLineIn As String, ByRef intColumnMapping() As Integer, ByVal strInputFilePath As String)
+    ' Examine strLineIn to define the column mappings
+    
+    Dim strUnknownColumnList As String
+    Dim strData() As String
+    
+    Dim strMessage As String
+    
+    Dim intNewColumnMapping(ISOS_DATA_COLUMN_COUNT) As Integer
+    Dim lngIndex As Long
+
+    ' First replace any commas in strLineIn with tabs
+    strLineIn = Replace(strLineIn, ",", vbTab)
+    
+    ' Now split on tabs
+    strData = Split(strLineIn, vbTab)
+    strUnknownColumnList = ""
+    
+    For lngIndex = 0 To UBound(intNewColumnMapping)
+        intNewColumnMapping(lngIndex) = -1
+    Next lngIndex
+    
+    For lngIndex = 0 To UBound(strData)
+        If lngIndex >= ISOS_DATA_COLUMN_COUNT Then
+            ' Too many column headers
+            Debug.Assert False
+            Exit For
+        End If
+        
+        Select Case LCase(Trim(strData(lngIndex)))
+        Case ISOS_COLUMN_CS: intNewColumnMapping(irdIsoRawDataIndex.irdCS) = lngIndex
+        Case ISOS_COLUMN_ABUNDANCE: intNewColumnMapping(irdIsoRawDataIndex.irdAbu) = lngIndex
+        Case ISOS_COLUMN_MZ: intNewColumnMapping(irdIsoRawDataIndex.irdMZ) = lngIndex
+        Case ISOS_COLUMN_ISO_FIT: intNewColumnMapping(irdIsoRawDataIndex.irdIsoFit) = lngIndex
+        Case ISOS_COLUMN_AVG_MASS: intNewColumnMapping(irdIsoRawDataIndex.irdMWavg) = lngIndex
+        Case ISOS_COLUMN_MONO_MASS: intNewColumnMapping(irdIsoRawDataIndex.irdMWMono) = lngIndex
+        Case ISOS_COLUMN_MOST_ABU_MASS: intNewColumnMapping(irdIsoRawDataIndex.irdMWTMA) = lngIndex
+        Case ISOS_COLUMN_IREP_MW_MONO_ABU: intNewColumnMapping(irdIsoRawDataIndex.irdIRepMWMonoAbu) = lngIndex
+        Case ISOS_COLUMN_IREP_2DA: intNewColumnMapping(irdIsoRawDataIndex.irdIRep2Da) = lngIndex
+        Case ISOS_COLUMN_PCT_MOST_ABUNDANT: intNewColumnMapping(irdIsoRawDataIndex.irdPctMostAbundant) = lngIndex
+        Case ISOS_COLUMN_ELEMENT_LABEL_N14N15: intNewColumnMapping(irdIsoRawDataIndex.irdIsotopeTag) = lngIndex
+        Case ISOS_COLUMN_ELEMENT_LABEL_N14N15_RATIO: intNewColumnMapping(irdIsoRawDataIndex.irdIsotopeTagRatio) = lngIndex
+        Case Else
+            ' Unknown column header; ignore it, but post an entry to the analysis history
+            If Len(strUnknownColumnList) > 0 Then
+                strUnknownColumnList = strUnknownColumnList & ", "
+            End If
+            strUnknownColumnList = strUnknownColumnList & Trim(strData(lngIndex))
+            
+            Debug.Assert False
+        End Select
+        
+    Next lngIndex
+                    
+    If intNewColumnMapping(irdIsoRawDataIndex.irdCS) >= 0 And _
+       intNewColumnMapping(irdIsoRawDataIndex.irdAbu) >= 0 And _
+       intNewColumnMapping(irdIsoRawDataIndex.irdMWMono) >= 0 Then
+       
+        ' Required columns are present; we can continue
+        For lngIndex = 0 To UBound(intColumnMapping)
+            intColumnMapping(lngIndex) = intNewColumnMapping(lngIndex)
+        Next lngIndex
+    
+    Else
+        ' Warn the user that the column headers weren't recognized
+        If mReadMode = rmStoreData And Not mWarnedMissingRequiredIsosColumnHeaders Then
+            strMessage = CSV_COLUMN_HEADER_MISSING_WARNING & " not found in file " & strInputFilePath & "; default columns are: " & vbCrLf & GetDefaultPEKFileIsoHeader(mGelIndex)
+            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                MsgBox strMessage, vbExclamation + vbOKOnly, glFGTU
+            End If
+            AddToAnalysisHistory mGelIndex, strMessage
+            mWarnedMissingRequiredIsosColumnHeaders = True
+        End If
+    End If
+                    
+    If Len(strUnknownColumnList) > 0 Then
+        If mReadMode = rmStoreData And Not mWarnedUnknownIsosColumnHeader Then
+            ' Unknown column header; ignore it, but post an entry to the
+            AddToAnalysisHistory mGelIndex, CSV_COLUMN_HEADER_UNKNOWN_WARNING & " found in file " & strInputFilePath & ": " & strUnknownColumnList & "; default columns are: " & vbCrLf & GetDefaultPEKFileIsoHeader(mGelIndex)
+            mWarnedUnknownIsosColumnHeader = True
+        End If
+    End If
+
+End Sub
+
+Private Sub SetDefaultCSColumnMapping(ByRef intCSColumnMapping() As Integer)
+    Dim lngIndex As Long
+    
+    ' First set the column mappings to -1 (not present)
+    For lngIndex = 0 To UBound(intCSColumnMapping)
+        intCSColumnMapping(lngIndex) = -1
+    Next lngIndex
+     
+    ' Now set the default columns
+    intCSColumnMapping(crdCSRawDataIndex.crdCS) = 0
+    intCSColumnMapping(crdCSRawDataIndex.crdNumberOfCS) = 1
+    intCSColumnMapping(crdCSRawDataIndex.crdAbu) = 2
+    intCSColumnMapping(crdCSRawDataIndex.crdAverageMW) = 3
+    intCSColumnMapping(crdCSRawDataIndex.crdMWStDev) = 4
+
+End Sub
+
+Private Sub SetDefaultIsosColumnMapping(ByRef intIsosColumnMapping() As Integer)
+    Dim lngIndex As Long
+    
+    ' First set the column mappings to -1 (not present)
+    For lngIndex = 0 To UBound(intIsosColumnMapping)
+        intIsosColumnMapping(lngIndex) = -1
+    Next lngIndex
+    
+    ' Now set the default columns
+    intIsosColumnMapping(irdIsoRawDataIndex.irdCS) = 0
+    intIsosColumnMapping(irdIsoRawDataIndex.irdAbu) = 1
+    intIsosColumnMapping(irdIsoRawDataIndex.irdMZ) = 2
+    intIsosColumnMapping(irdIsoRawDataIndex.irdIsoFit) = 3
+    intIsosColumnMapping(irdIsoRawDataIndex.irdMWavg) = 4
+    intIsosColumnMapping(irdIsoRawDataIndex.irdMWMono) = 5
+    intIsosColumnMapping(irdIsoRawDataIndex.irdMWTMA) = 6
+    intIsosColumnMapping(irdIsoRawDataIndex.irdIRepMWMonoAbu) = 7
+    intIsosColumnMapping(irdIsoRawDataIndex.irdIRep2Da) = 8
+
+End Sub
+
+Public Function WriteGELAsPEK(ByVal lngGelIndex As Long, ByVal hwndOwner As Long) As Boolean
     '------------------------------------------------------------------------------------
     'writes gel file as PEK file; recreates PEK file by combining lines from PEK file and
     'data from the display; returns True on success; False otherwise
@@ -2285,12 +2737,12 @@ Public Function WriteGELAsPEK(ByVal Ind As Long, ByVal hwndOwner As Long) As Boo
     
     Set fso = New FileSystemObject
     
-    OldPEK = GelData(Ind).FileName
+    OldPEK = GelData(lngGelIndex).FileName
     If Not fso.FileExists(OldPEK) Then
         eResponse = MsgBox("Original PEK file not found. Without the original file, this function cannot proceed. Do you want to specify path to the original PEK file?", vbYesNo, glFGTU)
         If eResponse = vbYes Then
-            If Len(GelData(Ind).FileName) > 0 Then
-                OldPEK = fso.GetFileName(GelData(Ind).FileName)
+            If Len(GelData(lngGelIndex).FileName) > 0 Then
+                OldPEK = fso.GetFileName(GelData(lngGelIndex).FileName)
             Else
                 OldPEK = ""
             End If
@@ -2298,7 +2750,7 @@ Public Function WriteGELAsPEK(ByVal Ind As Long, ByVal hwndOwner As Long) As Boo
             OldPEK = SelectFile(hwndOwner, "Choose original PEK file:", "", False, OldPEK, "All Files (*.*)|*.*|PEK Files (*.pek)|*.pek", 2)
             If Len(OldPEK) > 0 Then
                 DoEvents
-                GelData(Ind).FileName = OldPEK     'note new path to original PEK
+                GelData(lngGelIndex).FileName = OldPEK     'note new path to original PEK
             Else
                 Exit Function
             End If
@@ -2340,25 +2792,31 @@ Public Function WriteGELAsPEK(ByVal Ind As Long, ByVal hwndOwner As Long) As Boo
         End If
        
         LineNow1 CurrLine, LineType, FN, OldPEK
-       Select Case LineType
-       Case LINE_FILENAME_AKA_SCAN_NUMBER
-            CurrFN = FN
-            Print #TmpPEKNum, CurrLine
-            'print also frequency shift if asked
-            If glWriteFreqShift Then Print #TmpPEKNum, glLaV2DG_FREQUENCY_SHIFT _
-                                & Format$(GelData(Ind).ScanInfo(GetDFIndex(Ind, CurrFN)).FrequencyShift, "0.0000")
-       Case LINE_DATA_CS
-            Print #TmpPEKNum, CurrLine
-            WriteCSDataToPEK TmpPEKNum, Ind, CurrFN
-       Case LINE_DATA_ISO
-            Print #TmpPEKNum, CurrLine
-            WriteIsoDataToPEK TmpPEKNum, Ind, CurrFN, lngIsoDataStartIndex
-       Case LINE_WHATEVER
-            Print #TmpPEKNum, CurrLine
-       Case LINE_NOTHING     'ignore CS & Iso data from original file
-       Case Else             'should not happen but ...
-            Print #TmpPEKNum, CurrLine
-       End Select
+        Select Case LineType
+        Case LINE_FILENAME_AKA_SCAN_NUMBER
+             CurrFN = FN
+             Print #TmpPEKNum, CurrLine
+             'print also frequency shift if asked
+             If glWriteFreqShift Then Print #TmpPEKNum, glLaV2DG_FREQUENCY_SHIFT _
+                                 & Format$(GelData(lngGelIndex).ScanInfo(GetDFIndex(lngGelIndex, CurrFN)).FrequencyShift, "0.0000")
+        Case LINE_DATA_CS
+             ' Get the default CS header line
+             CurrLine = GetDefaultPEKFileCSHeader
+             Print #TmpPEKNum, CurrLine
+             WriteCSDataToPEK TmpPEKNum, lngGelIndex, CurrFN
+        Case LINE_DATA_ISO
+             ' Get the default ISO header line
+             CurrLine = GetDefaultPEKFileIsoHeader(lngGelIndex)
+             Print #TmpPEKNum, CurrLine
+             WriteIsoDataToPEK TmpPEKNum, lngGelIndex, CurrFN, lngIsoDataStartIndex
+        Case LINE_WHATEVER
+             Print #TmpPEKNum, CurrLine
+        Case LINE_NOTHING
+             ' Ignore CS & Iso data from original file
+        Case Else
+             ' Shouldn't normally reach this code, but if we do, just write out CurrLine
+             Print #TmpPEKNum, CurrLine
+        End Select
     Loop
     Close TmpPEKNum
     Close OldPEKNum
@@ -2375,7 +2833,7 @@ Public Function WriteGELAsPEK(ByVal Ind As Long, ByVal hwndOwner As Long) As Boo
         End If
     Else
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "Save complete; saved " & Trim(GelData(Ind).CSLines + GelData(Ind).IsoLines) & " data points to file:" & vbCrLf & NewPEK, vbInformation + vbOKOnly, "Done"
+            MsgBox "Save complete; saved " & Trim(GelData(lngGelIndex).CSLines + GelData(lngGelIndex).IsoLines) & " data points to file:" & vbCrLf & NewPEK, vbInformation + vbOKOnly, "Done"
         End If
     End If
     
@@ -2397,50 +2855,52 @@ WriteGELAsPEKErrorHandler:
     
 End Function
 
-Private Sub LineNow1(ByVal L As String, ByRef TL As Integer, ByRef FN As Integer, ByVal strFilePath As String)
-'------------------------------------------------------------------------------
-'this is simpler version of LineNow used when PEK file is created from display
-'L is line, TL returns type of line, FN returns scan number
-'------------------------------------------------------------------------------
-Dim aN(11) As Variant
-Dim Special As String
-On Error GoTo err_LineNow1
+Private Sub LineNow1(ByVal strLineIn As String, ByRef LineType As Integer, ByRef FN As Integer, ByVal strFilePath As String)
+    '------------------------------------------------------------------------------
+    'this is simpler version of LineNow used when PEK file is created from display
+    'strLineIn is line, LineType returns type of line, FN returns scan number
+    '------------------------------------------------------------------------------
+    Dim intDataColumnCount As Integer
+    Dim varData(ISONUM_FIELD_COUNT_MAX) As Variant
+    Dim Special As String
 
-Select Case Left(L, 8)
-Case t8FILENAME
-    FN = ExtractScanNumberFromFilenameLine(L)
-    TL = LINE_FILENAME_AKA_SCAN_NUMBER
-Case t8DATA_CS
-   ThisLine = LINE_DATA_CS
-   TL = LINE_DATA_CS
-Case t8DATA_ISO
-   ThisLine = LINE_DATA_ISO
-   TL = LINE_DATA_ISO
-Case Else
-   Select Case ThisLine
-   Case LINE_DATA_CS
-        If IsDataLine(Trim$(L), aN, Special, strFilePath) Then
-           TL = LINE_NOTHING
-        Else
-           TL = LINE_WHATEVER
-           ThisLine = LINE_NOTHING
-        End If
-   Case LINE_DATA_ISO
-        If IsDataLine(Trim$(L), aN, Special, strFilePath) Then
-           TL = LINE_NOTHING
-        Else
-           TL = LINE_WHATEVER
-           ThisLine = LINE_NOTHING
-        End If
-   Case Else
-        ThisLine = LINE_NOTHING
-        TL = LINE_WHATEVER
-   End Select
-End Select
-Exit Sub
+On Error GoTo err_LineNow1
+    
+    Select Case Left(strLineIn, 8)
+    Case t8FILENAME
+        FN = ExtractScanNumberFromFilenameLine(strLineIn)
+        LineType = LINE_FILENAME_AKA_SCAN_NUMBER
+    Case t8DATA_CS
+       ThisLine = LINE_DATA_CS
+       LineType = LINE_DATA_CS
+    Case t8DATA_ISO, t8DATA_ISO_Tabbed
+       ThisLine = LINE_DATA_ISO
+       LineType = LINE_DATA_ISO
+    Case Else
+       Select Case ThisLine
+       Case LINE_DATA_CS
+            If IsDataLine(Trim$(strLineIn), varData, intDataColumnCount, Special, strFilePath) Then
+               LineType = LINE_NOTHING
+            Else
+               LineType = LINE_WHATEVER
+               ThisLine = LINE_NOTHING
+            End If
+       Case LINE_DATA_ISO
+            If IsDataLine(Trim$(strLineIn), varData, intDataColumnCount, Special, strFilePath) Then
+               LineType = LINE_NOTHING
+            Else
+               LineType = LINE_WHATEVER
+               ThisLine = LINE_NOTHING
+            End If
+       Case Else
+            ThisLine = LINE_NOTHING
+            LineType = LINE_WHATEVER
+       End Select
+    End Select
+    Exit Sub
 
 err_LineNow1:        'write unrecognized line
-TL = LINE_WHATEVER
+    LineType = LINE_WHATEVER
 End Sub
 
 Private Sub WriteCSDataToPEK(ByVal hfile As Integer, ByVal Ind As Long, ByVal FN As Integer)
@@ -2581,9 +3041,11 @@ With GelData(Ind)
                         Format$(.IsoData(Indx(i)).MonoisotopicMW, "0.0000") & vbTab & _
                         Format$(.IsoData(Indx(i)).MostAbundantMW, "0.0000") & vbTab
 
-              ' ToDo: Implement this (will require a file format change by adding a new text field to udtIsotopicDataType
+              ' ToDo (August 2007): Implement this (will require a file format change by adding a new text field to udtIsotopicDataType
 ''              If Len(.IsoData(Indx(i)).IsotopeLabel) > 0 Then
 ''                sLine = sLine & vbTab & .IsoData(Indx(i)).IsotopeLabel
+''              End If
+
 ''              strAppendText = ""
 ''              If Len(strIsotopeLabel) > 0 Then
 ''                If IsNumeric(strIsotopeLabel) Or blnLegacyIsotopeLabel Then
@@ -2619,7 +3081,4 @@ With GelData(Ind)
   End If
 End With
 End Sub
-
-
-
 

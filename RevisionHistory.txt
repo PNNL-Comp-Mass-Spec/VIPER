@@ -1,5 +1,13 @@
 VIPER Change Log
 
+Version 3.43 - Build 376; August 23, 2007
+	- Updated PEK file loader to read the column headers at the top of each Isos or CS section and use those to determine the data present in the 7th and 8th columns
+	- Now tracking the Isotope Tag reported by ICR-2LS (e.g. N14 or N15)
+		- Required update to the GelData structure by splitting AdditionalValue1 (a single) into two integers (IsotopeLabel and AdditionalIntValue)
+	- Removed legacy Public Enums 
+		- glDocDataCSFields, glDocDataCSVarFields, glDocDataISFields, & glDocDataISVarFields
+		- Created mftMassFieldTypeConstants to track the MW modes (e.g. mftMWMono replaces isfMWMono)
+
 Version 3.43 - Build 376; August 16, 2007
 	- Switched from Ln(ER) to Log2(ER) where Log2() is the base-2 logarithm
 	- Updated "Copy LC-MS Features (UMCs) in View" on the main form and "Report Results by UMCs" in the Search MT Tag DB window to include Labelling Efficiency, Log2(ER), and Log2(ER) Standard Error

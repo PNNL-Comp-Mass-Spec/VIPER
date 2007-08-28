@@ -15,46 +15,10 @@ Attribute VB_Exposed = False
 '---------------------------------------------------------
 Option Explicit
 
-' Note: Update CSNUM_FIELD_COUNT if changing this enum
-Public Enum glDocDataCSFields
-    csfScan = 1             'scan number
-    csfFirstCS = 2          'first charge state
-    csfCSNum = 3            'number of charge states
-    csfAbu = 4              'intensity(abundance)
-    csfMW = 5               'molecular mass
-    csfStD = 6              'standard deviation
-    csfIsotopicFitRatio = 7         ' Fit from ICR-2LS based pairs finding; Legacy: matching DB mass(obsolete)
-    csfIsotopicAtomCount = 8        ' Atom count from ICR-2LS based pairs finding; Legacy: error of matching DB mass
-End Enum
-
-' Note: Update CSVAR_FIELD_COUNT if changing this enum
-Public Enum glDocDataCSVarFields
-    csvfIsotopeLabel = 1    'AMT NET
-    csvfMTDDRatio = 2       'When reading .Pek file, this is filled with isotopic ratio values determined by ICR-2LS (if they exist, aka DD ratio); Later, if pairs are searched for, then filled with Expression Ratio values by function FillUMC_ERs
-    csvfMTID = 3            'MT tag ID description (could contain multiple ID's, of the form AMT:12345); can also contain NETLK: entries
-End Enum
-
-' Note: Update ISONUM_FIELD_COUNT if changing this enum
-Public Enum glDocDataISFields
-    isfScan = 1             'scan number
-    isfCS = 2               'charge state
-    isfAbu = 3              'intensity(abundance)
-    isfMOverZ = 4           'm/z
-    isfFit = 5              'calculated fit
-    isfMWAvg = 6            'average molecular mass
-    isfMWMono = 7           'monoisotopic molecular mass
-    isfMWTMA = 8            'the most abundant molecular mass
-    isfIsotopicFitRatio = 9         ' Fit from ICR-2LS based pairs finding; Legacy: matching DB mass(obsolete)
-    isfIsotopicAtomCount = 10       ' Atom count from ICR-2LS based pairs finding; Legacy: error of matching DB mass
-    isfIReportMWMonoAbu = 11
-    isfIReport2DaAbundance = 12
-End Enum
-
-' Note: Update ISOVAR_FIELD_COUNT if changing this enum
-Public Enum glDocDataISVarFields
-    ''isvfIsotopeLabel = 1    'Could be N14, N15, C12, C13, O16, or O18; Also could be blank.  In legacy .PEK files this held the NET value for the AMT matched by ICR2LS, and was thus called isvfMTNet; In legacy .PEK files this also could hold an Asterisk, indicating it was a second guess charge state entry according to ICR-2LS
-    ''isvfMTDDRatio = 2       'When reading .Pek file, this is filled with isotopic ratio values determined by ICR-2LS (if they exist, aka DD ratio); Later, if pairs are searched for, then filled with Expression Ratio values by function FillUMC_ERs
-    isvfMTID = 3            'MT tag ID description (could contain multiple ID's, of the form AMT:12345); can also contain NETLK: entries
+Public Enum mftMassFieldTypeConstants
+    mftMWAvg = 6            'average molecular mass
+    mftMWMono = 7           'monoisotopic molecular mass
+    mftMWTMA = 8            'the most abundant molecular mass
 End Enum
 
 Public Enum glScope

@@ -319,7 +319,7 @@ For i = 1 To UBound(GelData)
 Next i
 ExpType = EXP_DATA
 ExpScope = glScope.glSc_All
-ExpMWField = isfMWMono
+ExpMWField = mftMWMono
 ExpNETType = etGenericNET
 End Sub
 
@@ -395,11 +395,11 @@ ts.WriteLine "First scan=" & FirstScan
 ts.WriteLine "Last scan=" & LastScan
 ts.WriteLine "NET formula=" & txtNETFormula.Text
 Select Case ExpMWField
-Case isfMWavg
+Case mftMWAvg
     ts.WriteLine "Isotopic mass=Average"
-Case isfMWMono
+Case mftMWMono
     ts.WriteLine "Isotopic mass=Monoisotopic"
-Case isfMWTMA
+Case mftMWTMA
     ts.WriteLine "Isotopic mass=The Most Abundant"
 End Select
 ts.WriteLine "NET; MW; Abundance; Text"

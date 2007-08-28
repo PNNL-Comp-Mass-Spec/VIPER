@@ -43,6 +43,12 @@ Private Type udtCertificateType
     strCertificate As String
 End Type
 
+Private Const CSNUM_FIELD_COUNT = 8      ' Reserve space for up to 8 numeric fields; we may not use all of these
+Private Const CSVAR_FIELD_COUNT = 3
+
+Private Const ISONUM_FIELD_COUNT = 12    ' Reserve space for up to 12 numeric fields; we may not use all of these
+Private Const ISOVAR_FIELD_COUNT = 3
+
 ' Local variables
 Private mGelAnalysis As udtGelAnalysisInfoType      ' Used to hold data copied from the GelAnalysis() object (type FTICRAnalysis, which is part of a class)
 

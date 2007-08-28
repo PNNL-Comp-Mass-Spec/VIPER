@@ -957,7 +957,7 @@ On Error GoTo FindUMCsErrorHandler
         With objUMCSearchForm
             If GelSearchDef(udtWorkingParams.GelIndex).UMCDef.MWField = 0 Then
                 Debug.Assert False
-                GelSearchDef(udtWorkingParams.GelIndex).UMCDef.MWField = isfMWMono
+                GelSearchDef(udtWorkingParams.GelIndex).UMCDef.MWField = mftMWMono
             End If
             
             .Tag = udtWorkingParams.GelIndex
@@ -1930,12 +1930,12 @@ On Error GoTo LoadOptionsErrorHandler
             
             If UMCDef.MWField = 0 Then
                 Debug.Assert False
-                UMCDef.MWField = isfMWMono
+                UMCDef.MWField = mftMWMono
             End If
             
             If samtDef.MWField = 0 Then
                 Debug.Assert False
-                UMCDef.MWField = isfMWMono
+                UMCDef.MWField = mftMWMono
             End If
             
             ' Update GelSearchDef accordingly

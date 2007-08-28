@@ -101,7 +101,7 @@ End Enum
 Public Type UMCDefinition2002
     UMCType As Integer                      'type
     DefScope As Integer
-    MWField As Integer                      'mass type (isfMWAvg or isfMWMono or isfMWTMA)
+    MWField As Integer                      'mass type (mftMWAvg or mftMWMono or mftMWTMA)
     TolType As Integer                      'MW width type
     Tol As Double                           'MW width
     UMCSharing As Boolean                   'members sharing
@@ -126,7 +126,7 @@ End Type
 Public Type UMCDefinition2003a
     UMCType As Integer                      'type
     DefScope As Integer
-    MWField As Integer                      'mass type (isfMWAvg or isfMWMono or isfMWTMA)
+    MWField As Integer                      'mass type (mftMWAvg or mftMWMono or mftMWTMA)
     TolType As Integer                      'MW width type                          (actually type glMassToleranceConstants)
     Tol As Double                           'MW width
     UMCSharing As Boolean                   'members sharing
@@ -155,7 +155,7 @@ End Type
 Public Type UMCDefinition
     UMCType As Integer                      'type; Options include glUMC_TYPE_INTENSITY = 0; glUMC_TYPE_FIT = 1; glUMC_TYPE_MINCNT = 2; glUMC_TYPE_MAXCNT = 3; glUMC_TYPE_UNQAMT = 4; glUMC_TYPE_ISHRINKINGBOX = 5; glUMC_TYPE_FSHRINKINGBOX = 6; glUMC_TYPE_FROM_NET = 7
     DefScope As Integer
-    MWField As Integer                      'mass type (isfMWAvg or isfMWMono or isfMWTMA)
+    MWField As Integer                      'mass type (mftMWAvg or mftMWMono or mftMWTMA)
     TolType As Integer                      'MW width type                          (actually type glMassToleranceConstants)
     Tol As Double                           'MW width
     UMCSharing As Boolean                   'members sharing
@@ -1397,9 +1397,9 @@ With GelUMC(Ind)
   If .UMCCnt > 0 Then
      ReDim Stat(.UMCCnt - 1, UMC_STATISTICS1_MAX_INDEX)
      ISF = .def.MWField
-     If ISF <> isfMWAvg And ISF <> isfMWMono And ISF <> isfMWTMA Then
+     If ISF <> mftMWAvg And ISF <> mftMWMono And ISF <> mftMWTMA Then
         Debug.Assert False
-        ISF = isfMWMono
+        ISF = mftMWMono
      End If
      
      For i = 0 To .UMCCnt - 1
@@ -2678,7 +2678,7 @@ Private Function UMCInterpolateGapsAbundance_Lin( _
 
 Const INTERPOLATE_USING_RELATIVE_SCAN_NUMBERS As Boolean = True
 
-Dim lngindex As Long
+Dim lngIndex As Long
 Dim lngScanCount As Long
 Dim dblAbundanceSum As Double
 Dim lngScanGap As Long
@@ -2690,22 +2690,22 @@ lngScanCount = UBound(Scans) + 1
 If lngScanCount > 0 Then
     dblAbundanceSum = Abundances(0)
     If lngScanCount > 1 Then
-        For lngindex = 1 To lngScanCount - 1
-            dblAbundanceSum = dblAbundanceSum + Abundances(lngindex)         'add regular abundance
+        For lngIndex = 1 To lngScanCount - 1
+            dblAbundanceSum = dblAbundanceSum + Abundances(lngIndex)         'add regular abundance
             
             If INTERPOLATE_USING_RELATIVE_SCAN_NUMBERS Then
                 
                 ' Since LTQ-FT and LTQ-Orbitrap data can have gaps between scans, need to use
                 ' LookupScanNumberRelativeIndex to determine the relative index for each scan number
     
-                lngScanNumber1 = Scans(lngindex - 1)
+                lngScanNumber1 = Scans(lngIndex - 1)
                 lngScanIndex1 = LookupScanNumberRelativeIndex(lngGelIndex, lngScanNumber1)
                 If lngScanIndex1 = 0 Then
                     lngScanNumber1 = LookupScanNumberClosest(lngGelIndex, lngScanNumber1)
                     lngScanIndex1 = LookupScanNumberRelativeIndex(lngGelIndex, lngScanNumber1)
                 End If
             
-                lngScanNumber2 = Scans(lngindex)
+                lngScanNumber2 = Scans(lngIndex)
                 lngScanIndex2 = LookupScanNumberRelativeIndex(lngGelIndex, lngScanNumber2)
                 If lngScanIndex2 = 0 Then
                     lngScanNumber2 = LookupScanNumberClosest(lngGelIndex, lngScanNumber2)
@@ -2714,18 +2714,18 @@ If lngScanCount > 0 Then
                 
                 lngScanGap = lngScanIndex2 - lngScanIndex1
             Else
-                lngScanGap = Scans(lngindex) - Scans(lngindex - 1)
+                lngScanGap = Scans(lngIndex) - Scans(lngIndex - 1)
             End If
                 
             If lngScanGap > 1 Then
                 ' Have to insert (lngScanGap-1) ions (for each missing scan)
                 
                 If lngScanGap - 1 <= MaxGapToInterpolate Then
-                    dblAbundanceSum = dblAbundanceSum + (lngScanGap - 1) * (Abundances(lngindex - 1) + Abundances(lngindex)) / 2
+                    dblAbundanceSum = dblAbundanceSum + (lngScanGap - 1) * (Abundances(lngIndex - 1) + Abundances(lngIndex)) / 2
                 End If
             End If
             
-        Next lngindex
+        Next lngIndex
     End If
     UMCInterpolateGapsAbundance_Lin = dblAbundanceSum
 Else
@@ -3149,7 +3149,7 @@ Private Sub CalculateClassesComputeStats(ByVal lngGelIndex As Long, ByRef udtUMC
     ' However, this can lead to poor performance in the compiled version of the program, so we've now switched to computing the stats locally
     
     Dim blnValidData As Boolean
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     Dim dblMWWork() As Double
     Dim dblAbuWork() As Double
@@ -3178,9 +3178,9 @@ On Error GoTo CalculateClassesComputeStatsErrorHandler
         ReDim dblMWWork(0 To SrcMaxIndex)
         lngDataCount = SrcMaxIndex + 1
         
-        For lngindex = 0 To SrcMaxIndex
-            dblMWWork(lngindex) = MWArray(lngindex)
-        Next lngindex
+        For lngIndex = 0 To SrcMaxIndex
+            dblMWWork(lngIndex) = MWArray(lngIndex)
+        Next lngIndex
     Else
         lngDataCount = UBound(dblMWWork) + 1
     End If
@@ -3189,13 +3189,13 @@ On Error GoTo CalculateClassesComputeStatsErrorHandler
     dblStatSum = 0
     dblStatSumSquares = 0
     dblStatMaximum = dblMWWork(0)
-    For lngindex = 0 To lngDataCount - 1
-        If dblMWWork(lngindex) > dblStatMaximum Then
-            dblStatMaximum = dblMWWork(lngindex)
+    For lngIndex = 0 To lngDataCount - 1
+        If dblMWWork(lngIndex) > dblStatMaximum Then
+            dblStatMaximum = dblMWWork(lngIndex)
         End If
-        dblStatSum = dblStatSum + dblMWWork(lngindex)
-        dblStatSumSquares = dblStatSumSquares + dblMWWork(lngindex) * dblMWWork(lngindex)
-    Next lngindex
+        dblStatSum = dblStatSum + dblMWWork(lngIndex)
+        dblStatSumSquares = dblStatSumSquares + dblMWWork(lngIndex) * dblMWWork(lngIndex)
+    Next lngIndex
     
     ' Determine class mass
     If lngDataCount > 0 Then
@@ -3255,10 +3255,10 @@ On Error GoTo CalculateClassesComputeStatsErrorHandler
         ReDim lngScanWork(0 To SrcMaxIndex)
         lngDataCount = SrcMaxIndex + 1
         
-        For lngindex = 0 To SrcMaxIndex
-            dblAbuWork(lngindex) = AbuArray(lngindex)
-            lngScanWork(lngindex) = ScanArray(lngindex)
-        Next lngindex
+        For lngIndex = 0 To SrcMaxIndex
+            dblAbuWork(lngIndex) = AbuArray(lngIndex)
+            lngScanWork(lngIndex) = ScanArray(lngIndex)
+        Next lngIndex
     Else
         lngDataCount = UBound(dblAbuWork) + 1
     End If
@@ -3267,12 +3267,12 @@ On Error GoTo CalculateClassesComputeStatsErrorHandler
     dblStatSum = 0
     dblStatSumSquares = 0
     dblStatMaximum = dblAbuWork(0)
-    For lngindex = 0 To lngDataCount - 1
-        If dblAbuWork(lngindex) > dblStatMaximum Then
-            dblStatMaximum = dblAbuWork(lngindex)
+    For lngIndex = 0 To lngDataCount - 1
+        If dblAbuWork(lngIndex) > dblStatMaximum Then
+            dblStatMaximum = dblAbuWork(lngIndex)
         End If
-        dblStatSum = dblStatSum + dblAbuWork(lngindex)
-    Next lngindex
+        dblStatSum = dblStatSum + dblAbuWork(lngIndex)
+    Next lngIndex
     
     ' Determine class abundance
     If lngDataCount > 0 Then
@@ -3326,7 +3326,7 @@ Private Function CalculateClassesFindMemberSubsetByAbu(ByVal SrcMaxIndex As Long
     
     Dim dblAbuSorted() As Double
     Dim lngAbuPointers() As Long
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim lngIndexToCopy As Long          ' Pointer to location in dblAbuSorted
     Dim lngIndexHighAbundanceThreshold As Long
     
@@ -3341,15 +3341,15 @@ On Error GoTo CalculateClassesFindMemberSubsetByAbuErrorHandler
     End If
     
     ReDim dblAbuSorted(0 To SrcMaxIndex)
-    For lngindex = 0 To SrcMaxIndex
-        dblAbuSorted(lngindex) = AbuArray(lngindex)
-    Next lngindex
+    For lngIndex = 0 To SrcMaxIndex
+        dblAbuSorted(lngIndex) = AbuArray(lngIndex)
+    Next lngIndex
 
     ' Initialize an index array
     ReDim lngAbuPointers(SrcMaxIndex)
-    For lngindex = 0 To SrcMaxIndex
-        lngAbuPointers(lngindex) = lngindex
-    Next lngindex
+    For lngIndex = 0 To SrcMaxIndex
+        lngAbuPointers(lngIndex) = lngIndex
+    Next lngIndex
 
     ' Sort Ascending
     ShellSortDoubleWithParallelLong dblAbuSorted, lngAbuPointers, 0, SrcMaxIndex

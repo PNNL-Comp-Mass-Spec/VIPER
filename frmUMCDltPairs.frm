@@ -1000,9 +1000,9 @@ On Error GoTo err_FindPairs
         ValidateN15IncorporationSettings
         
         ' See if the UMC mass values are based on average masses; warn the user if they're not
-        If GelUMC(CallerID).def.MWField <> isfMWAvg Then
+        If GelUMC(CallerID).def.MWField <> mftMWAvg Then
             strMessage = "Warning: The N14/N15 incomplete incorporation mode is designed to be used with LC-MS Features that have class masses based on the average masses of the members of the LC-MS feature.  The features in memory have mass values based on the "
-            If GelUMC(CallerID).def.MWField = isfMWTMA Then
+            If GelUMC(CallerID).def.MWField = mftMWTMA Then
                 strMessage = strMessage & "most abundant molecular"
             Else
                 strMessage = strMessage & "monoisotopic"

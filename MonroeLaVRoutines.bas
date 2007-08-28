@@ -8,6 +8,49 @@ Public Enum sdcSqlDecimalConstants
     sdcSqlDecimal9x5 = 1
 End Enum
 
+' Note: Update CSNUM_FIELD_COUNT if changing this enum
+Private Enum glDocDataCSFields
+    csfScan = 1             'scan number
+    csfFirstCS = 2          'first charge state
+    csfCSNum = 3            'number of charge states
+    csfAbu = 4              'intensity(abundance)
+    csfMW = 5               'molecular mass
+    csfStD = 6              'standard deviation
+    csfIsotopicFitRatio = 7         ' Fit from ICR-2LS based pairs finding; Legacy: matching DB mass(obsolete)
+    csfIsotopicAtomCount = 8        ' Atom count from ICR-2LS based pairs finding; Legacy: error of matching DB mass
+End Enum
+
+' Note: Update CSVAR_FIELD_COUNT if changing this enum
+Private Enum glDocDataCSVarFields
+    csvfIsotopeLabel = 1    'AMT NET
+    csvfMTDDRatio = 2       'When reading .Pek file, this is filled with isotopic ratio values determined by ICR-2LS (if they exist, aka DD ratio); Later, if pairs are searched for, then filled with Expression Ratio values by function FillUMC_ERs
+    csvfMTID = 3            'MT tag ID description (could contain multiple ID's, of the form AMT:12345); can also contain NETLK: entries
+End Enum
+
+' Note: Update ISONUM_FIELD_COUNT if changing this enum
+Private Enum glDocDataISFields
+    isfScan = 1             'scan number
+    isfCS = 2               'charge state
+    isfAbu = 3              'intensity(abundance)
+    isfMOverZ = 4           'm/z
+    isfFit = 5              'calculated fit
+    mftMWAvg = 6            'average molecular mass ; Equivalent to mftMassFieldTypeConstants.mftMWAvg
+    mftMWMono = 7           'monoisotopic molecular mass ; Equivalent to mftMassFieldTypeConstants.mftMWMono
+    mftMWTMA = 8            'the most abundant molecular mass ; Equivalent to mftMassFieldTypeConstants.mftMWTMA
+    isfIsotopicFitRatio = 9         ' Fit from ICR-2LS based pairs finding; Legacy: matching DB mass(obsolete)
+    isfIsotopicAtomCount = 10       ' Atom count from ICR-2LS based pairs finding; Legacy: error of matching DB mass
+    isfIReportMWMonoAbu = 11
+    isfIReport2DaAbundance = 12
+End Enum
+
+' Note: Update ISOVAR_FIELD_COUNT if changing this enum
+Private Enum glDocDataISVarFields
+    ''isvfIsotopeLabel = 1    'Could be N14, N15, C12, C13, O16, or O18; Also could be blank.  In legacy .PEK files this held the NET value for the AMT matched by ICR2LS, and was thus called isvfMTNet; In legacy .PEK files this also could hold an Asterisk, indicating it was a second guess charge state entry according to ICR-2LS
+    ''isvfMTDDRatio = 2       'When reading .Pek file, this is filled with isotopic ratio values determined by ICR-2LS (if they exist, aka DD ratio); Later, if pairs are searched for, then filled with Expression Ratio values by function FillUMC_ERs
+    isvfMTID = 3            'MT tag ID description (could contain multiple ID's, of the form AMT:12345); can also contain NETLK: entries
+End Enum
+
+
 Public Sub AddOrUpdateCollectionArrayItem(ByRef udtCollectionArray() As udtCollectionArrayType, ByRef lngCollectionArrayCount As Long, strNameToUpdate As String, strValue As String, Optional blnAddIfMissingButDoNotUpdate As Boolean = False)
     ' Look in udtCollectionArray() for an entry with .Name = strNameToUpdate
     ' If found, update the value to strValue
@@ -962,9 +1005,9 @@ Public Function ConstructUMCDefDescription(ByVal lngGelIndex As Long, ByVal strS
     strDesc = strDesc & "; Class mass = " & strAddnlText
     
     Select Case udtUMCDef.MWField
-    Case isfMWAvg: strAddnlText = "Average molecular mass"
-    Case isfMWMono: strAddnlText = "Monoisotopic molecular mass"
-    Case isfMWTMA: strAddnlText = "Most abundant molecular mass"
+    Case mftMWAvg: strAddnlText = "Average molecular mass"
+    Case mftMWMono: strAddnlText = "Monoisotopic molecular mass"
+    Case mftMWTMA: strAddnlText = "Most abundant molecular mass"
     Case Else: strAddnlText = "Unknown type"
     End Select
     strDesc = strDesc & "; Class mass type = " & strAddnlText
@@ -2401,9 +2444,9 @@ Public Sub CopyIsoDataToLegacy(ByRef udtIsotopicData As udtIsotopicDataType, ByR
         IsoNum(lngIsoIndex, isfMOverZ) = .MZ
         IsoNum(lngIsoIndex, isfFit) = .Fit
         
-        IsoNum(lngIsoIndex, isfMWMono) = .MonoisotopicMW
-        IsoNum(lngIsoIndex, isfMWAvg) = .AverageMW
-        IsoNum(lngIsoIndex, isfMWTMA) = .MostAbundantMW
+        IsoNum(lngIsoIndex, mftMWMono) = .MonoisotopicMW
+        IsoNum(lngIsoIndex, mftMWAvg) = .AverageMW
+        IsoNum(lngIsoIndex, mftMWTMA) = .MostAbundantMW
                 
         IsoNum(lngIsoIndex, isfIsotopicFitRatio) = 0            ' .IsotopicFitRatio
         IsoNum(lngIsoIndex, isfIsotopicAtomCount) = 0           ' .IsotopicAtomCount
@@ -2506,9 +2549,9 @@ Public Sub CopyLegacyIsoToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, 
         .MZ = IsoNum(lngIsoIndex, isfMOverZ)
         .Fit = IsoNum(lngIsoIndex, isfFit)
         
-        .MonoisotopicMW = IsoNum(lngIsoIndex, isfMWMono)
-        .AverageMW = IsoNum(lngIsoIndex, isfMWAvg)
-        .MostAbundantMW = IsoNum(lngIsoIndex, isfMWTMA)
+        .MonoisotopicMW = IsoNum(lngIsoIndex, mftMWMono)
+        .AverageMW = IsoNum(lngIsoIndex, mftMWAvg)
+        .MostAbundantMW = IsoNum(lngIsoIndex, mftMWTMA)
         .MassStDev = 0
         
         .MassShiftCount = 0
@@ -3081,11 +3124,11 @@ End Sub
 
 Public Function GetIsoDescription(intIsoField As Integer) As String
     Select Case intIsoField
-    Case isfMWAvg
+    Case mftMWAvg
         GetIsoDescription = "Average mass"
-    Case isfMWMono
+    Case mftMWMono
         GetIsoDescription = "Monoisotopic mass"
-    Case isfMWTMA
+    Case mftMWTMA
         GetIsoDescription = "Most abundant monoiso mass"
     Case Else
         GetIsoDescription = "?? MW"
@@ -3093,9 +3136,9 @@ Public Function GetIsoDescription(intIsoField As Integer) As String
 End Function
 
 Public Function GetIsoMass(ByRef udtIsoData As udtIsotopicDataType, intIsoDataField As Integer) As Double
-    'Const isfMWMono = 7           'monoisotopic molecular mass
-    'Const isfMWavg = 6            'average molecular mass
-    'Const isfMWTMA = 8            'the most abundant mol.mass
+    'Const mftMWMono = 7           'monoisotopic molecular mass
+    'Const mftMWAvg = 6            'average molecular mass
+    'Const mftMWTMA = 8            'the most abundant mol.mass
     
     Select Case intIsoDataField
     Case 7: GetIsoMass = udtIsoData.MonoisotopicMW

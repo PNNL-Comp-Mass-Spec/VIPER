@@ -1303,11 +1303,11 @@ End Sub
 Private Sub optIsoDataFrom_Click(Index As Integer)
 Select Case Index
 Case 0
-     WorkPref.IsoDataField = isfMWMono      ' 7
+     WorkPref.IsoDataField = mftMWMono      ' 7
 Case 1
-     WorkPref.IsoDataField = isfMWAvg       ' 6
+     WorkPref.IsoDataField = mftMWAvg       ' 6
 Case 2
-     WorkPref.IsoDataField = isfMWTMA       ' 8
+     WorkPref.IsoDataField = mftMWTMA       ' 8
 End Select
 End Sub
 

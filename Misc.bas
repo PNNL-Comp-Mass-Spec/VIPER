@@ -102,13 +102,7 @@ Public Const glMIL = 1000000
 
 Public Const glDONT_DISPLAY = -51       'mark that something shouldn't be displayed
 
-Public Const CSNUM_FIELD_COUNT = 8      ' Reserve space for up to 8 numeric fields; we may not use all of these
-Public Const CSVAR_FIELD_COUNT = 3
-
-Public Const ISONUM_FIELD_COUNT = 12    ' Reserve space for up to 12 numeric fields; we may not use all of these
-Public Const ISOVAR_FIELD_COUNT = 3
-
-Public Const MW_FIELD_OFFSET = 6        ' Related to isfMWavg, isfMWMono, and isfMWTMA
+Public Const MW_FIELD_OFFSET = 6        ' Related to mftMWAvg, mftMWMono, and mftMWTMA
 
 'LOGICAL COORDINATE SYSTEM CONSTANTS-SIZE
 Public Const LDfX0 = 0          'logical coordinates defaults
@@ -1414,7 +1408,7 @@ Public Sub SetDefaultUMCDef(ByRef udtUMCDef As UMCDefinition)
 With udtUMCDef
     .UMCType = glUMC_TYPE_INTENSITY
     .DefScope = glScope.glSc_Current         ' Current view only
-    .MWField = isfMWMono
+    .MWField = mftMWMono
     .TolType = gltPPM
     .Tol = 12.5
     .UMCSharing = False
@@ -1482,7 +1476,7 @@ Public Sub SetDefaultSearchAMTDef(ByRef udtAMTDef As SearchAMTDefinition, ByRef 
 With udtAMTDef
     .SearchScope = glSc_All
     .SearchFlag = glAMT_CONFIRM_PPM     'search among all AMTs confirmed with good precision
-    .MWField = isfMWMono
+    .MWField = mftMWMono
     .MWTol = 6
     .NETorRT = glAMT_NET
     .Formula = ConstructNETFormulaWithDefaults(udtUMCNetAdjDef)
@@ -1648,7 +1642,7 @@ Public Sub SetDefaultDefinitions()
     
 With sorfDef
     .SearchScope = 0    'all data
-    .MWField = isfMWMono
+    .MWField = mftMWMono
     .MWTol = 25
     .MWTolType = gltPPM
     Set .Mods = New Collection

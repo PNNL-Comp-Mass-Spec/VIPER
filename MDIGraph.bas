@@ -56,6 +56,17 @@ Public Enum eosEvenOddScanFilterModeConstants
     eosLoadEvenScansOnly = 2
 End Enum
 
+Public Enum iltIsotopeLabelTagConstants
+    iltNone = 0
+    iltUnsupportedTag = 1
+    iltN14 = 2
+    iltN15 = 3
+    iltO16 = 4
+    iltO18 = 5
+    iltC12 = 6
+    iltC13 = 7
+End Enum
+
 'global data types (this information is not saved with the .Gel file)
 Public Type GelState
     Deleted As Integer
@@ -365,7 +376,7 @@ Public Type DocumentData2005a            'file format for Certificate = glCERT20
   LinesRead As Long
   DataLines As Long
   CSLines As Long
-  IsoLines As Long             ' Number of isotopic data points:  Note, .IsoNum() is 1-based
+  IsoLines As Long             ' Number of isotopic data points:  Note, .CSData() and .IsoData() range from 1 to .IsoLines and are thus 1-based arrays (this is for historical reasons)
   CalEquation As String
   CalArg(1 To 10) As Double  'arguments in calibration equation
   MinMW As Double            'FN & PI extremes extracted from DF arrays
@@ -401,7 +412,7 @@ Public Type DocumentData2005b            'file format for Certificate = glCERT20
   LinesRead As Long
   DataLines As Long
   CSLines As Long
-  IsoLines As Long             ' Number of isotopic data points:  Note, .IsoNum() is 1-based
+  IsoLines As Long             ' Number of isotopic data points:  Note, .CSData() and .IsoData() range from 1 to .IsoLines and are thus 1-based arrays (this is for historical reasons)
   CalEquation As String
   CalArg(1 To 10) As Double  'arguments in calibration equation
   MinMW As Double            'FN & PI extremes extracted from DF arrays
@@ -431,7 +442,9 @@ Public Type DocumentData2005b            'file format for Certificate = glCERT20
   OtherInfo As String
 End Type
 
+
 ' This is used with type DocumentData
+' This structure was added in December 2005
 Public Type udtIsotopicDataType
     ScanNumber As Long
     Charge As Integer               ' Charge for isotopic data; first charge state for CS data
@@ -457,15 +470,17 @@ Public Type udtIsotopicDataType
 
     ExpressionRatio As Single
     
-    AdditionalValue1 As Single        ' New for this version; use for future expansion (name can be changed in the future)
-    AdditionalValue2 As Single        ' New for this version; use for future expansion (name can be changed in the future)
+    IsotopeLabel As Integer         ' 2 bytes Actually type iltIsotopeLabelTagConstants (was previously part of AdditionalValue1, which was a single)
+
+    AdditionalIntValue As Integer   ' New for this version; was previously part of AdditionalValue1, which was a single)
+    AdditionalValue2 As Single      ' 4 bytes; New for this version; use for future expansion (name can be changed in the future)
     
     MTID As String                      ' List of MT tags and/or Internal Standards that match this data point
 
 End Type
 
 Public Const MAX_FILTER_COUNT = 20
-Public Type DocumentData            'file format for Certificate = glCERT2004_Modular with fioGelData = 7# (current data format)
+Public Type DocumentData           'file format for Certificate = glCERT2004_Modular with fioGelData = 7# (current data format)
   Certificate As String
   Comment As String
   FileName As String            ' Holds the full path to the .Pek, .CSV, .mzXML, or .mzData file that the data was loaded from; in previous versions this would get updated with the path to the .Gel file
@@ -477,7 +492,7 @@ Public Type DocumentData            'file format for Certificate = glCERT2004_Mo
   LinesRead As Long
   DataLines As Long
   CSLines As Long
-  IsoLines As Long             ' Number of isotopic data points:  Note, .IsoNum() is 1-based
+  IsoLines As Long             ' Number of isotopic data points:  Note, .CSData() and .IsoData() range from 1 to .IsoLines and are thus 1-based arrays (this is for historical reasons)
   CalEquation As String
   CalArg(1 To 10) As Double  'arguments in calibration equation
   MinMW As Double            'FN & PI extremes extracted from DF arrays

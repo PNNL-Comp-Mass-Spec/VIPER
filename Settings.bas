@@ -89,7 +89,7 @@ End Sub
 
 Private Sub ResetSwitchPreferences(gp As GelPrefs)
 With gp
-    .IsoDataField = isfMWMono       ' 7
+    .IsoDataField = mftMWMono       ' 7
     .Case2Results = 1
     .DRDefinition = glNormal
     .IsoICR2LSMOverZ = True

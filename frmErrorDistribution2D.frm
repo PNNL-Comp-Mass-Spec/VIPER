@@ -579,14 +579,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabCaption(1)   =   "Tolerance Refinement"
          TabPicture(1)   =   "frmErrorDistribution2D.frx":0196
          Tab(1).ControlEnabled=   0   'False
-         Tab(1).Control(0)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
-         Tab(1).Control(1)=   "fraExpecationMaximizationOptions"
-         Tab(1).Control(2)=   "cboToleranceRefinementMethod"
-         Tab(1).Control(3)=   "cmdAbortProcessing(1)"
-         Tab(1).Control(4)=   "cmdNETToleranceRefinementStart"
-         Tab(1).Control(5)=   "fraToleranceRefinementGANET"
-         Tab(1).Control(6)=   "fraToleranceRefinementMass"
-         Tab(1).Control(7)=   "cmdMassToleranceRefinementStart"
+         Tab(1).Control(0)=   "cmdMassToleranceRefinementStart"
+         Tab(1).Control(1)=   "fraToleranceRefinementMass"
+         Tab(1).Control(2)=   "fraToleranceRefinementGANET"
+         Tab(1).Control(3)=   "cmdNETToleranceRefinementStart"
+         Tab(1).Control(4)=   "cmdAbortProcessing(1)"
+         Tab(1).Control(5)=   "cboToleranceRefinementMethod"
+         Tab(1).Control(6)=   "fraExpecationMaximizationOptions"
+         Tab(1).Control(7)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
          Tab(1).ControlCount=   8
          Begin VB.CommandButton cmdResetToDefaults 
             Caption         =   "Set to Defaults"
@@ -1427,7 +1427,7 @@ Private Function CalcDistributionViaExpectationMaximation(ByRef sngValues() As S
     ' Note: Set dblVariance to the estimated initial variance
     ' This value will also be updated with the final variance value
     
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     Dim dblValues() As Double
     Dim blnSuccess As Boolean
@@ -1448,18 +1448,18 @@ On Error GoTo CalcDistributionViaExpectationMaximationErrorHandler
     ReDim dblValues(lngDataCount - 1)
     
     If sngMaximumValueToUseAbs = 0 Then
-        For lngindex = 0 To lngDataCount - 1
-            dblValues(lngindex) = sngValues(lngindex)
-        Next lngindex
+        For lngIndex = 0 To lngDataCount - 1
+            dblValues(lngIndex) = sngValues(lngIndex)
+        Next lngIndex
     Else
         ' Only use the values in sngValues with absolute values <= sngMaximumValueToUseAbs
         lngDataCountToUse = 0
-        For lngindex = 0 To lngDataCount - 1
-            If Abs(sngValues(lngindex)) <= sngMaximumValueToUseAbs Then
-                dblValues(lngDataCountToUse) = sngValues(lngindex)
+        For lngIndex = 0 To lngDataCount - 1
+            If Abs(sngValues(lngIndex)) <= sngMaximumValueToUseAbs Then
+                dblValues(lngDataCountToUse) = sngValues(lngIndex)
                 lngDataCountToUse = lngDataCountToUse + 1
             End If
-        Next lngindex
+        Next lngIndex
         
         If lngDataCountToUse <= 0 Then
             CalcDistributionViaExpectationMaximation = False
@@ -1542,7 +1542,7 @@ End Sub
 Private Sub ComputeCurrentUMCStats()
     ' Update UMC Statistics
     
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     Dim dblMassWidthsPPM() As Double
     Dim dblMassWidthsDa() As Double
@@ -1563,15 +1563,15 @@ On Error GoTo ComputeCurrentUMCStatsErrorHandler
             ReDim dblMassStDevPPM(0 To .UMCCnt - 1)
             ReDim dblMassStDevDa(0 To .UMCCnt - 1)
                          
-            For lngindex = 0 To .UMCCnt - 1
-                With .UMCs(lngindex)
-                    dblMassWidthsDa(lngindex) = .MaxMW - .MinMW
-                    dblMassWidthsPPM(lngindex) = MassToPPM(dblMassWidthsDa(lngindex), .ClassMW)
+            For lngIndex = 0 To .UMCCnt - 1
+                With .UMCs(lngIndex)
+                    dblMassWidthsDa(lngIndex) = .MaxMW - .MinMW
+                    dblMassWidthsPPM(lngIndex) = MassToPPM(dblMassWidthsDa(lngIndex), .ClassMW)
                     
-                    dblMassStDevDa(lngindex) = .ClassMWStD
-                    dblMassStDevPPM(lngindex) = MassToPPM(dblMassStDevDa(lngindex), .ClassMW)
+                    dblMassStDevDa(lngIndex) = .ClassMWStD
+                    dblMassStDevPPM(lngIndex) = MassToPPM(dblMassStDevDa(lngIndex), .ClassMW)
                 End With
-            Next lngindex
+            Next lngIndex
         End If
     End With
     
@@ -1621,7 +1621,7 @@ End Sub
 
 Private Sub ComputeErrors(blnForceUpdate As Boolean)
     
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     Dim lngDataWithHits As Long
 
@@ -1688,9 +1688,9 @@ On Error GoTo ComputeMassErrorsErrorHandler
             .BinRangeMaximum = objHistogram.BinRangeMaximum
             
             ReDim .SmoothedBins(UBound(.Binned))
-            For lngindex = 0 To UBound(.Binned)
-                .SmoothedBins(lngindex) = .Binned(lngindex)
-            Next lngindex
+            For lngIndex = 0 To UBound(.Binned)
+                .SmoothedBins(lngIndex) = .Binned(lngIndex)
+            Next lngIndex
         End With
         
         ' Now the mass errors (in Da)
@@ -1708,9 +1708,9 @@ On Error GoTo ComputeMassErrorsErrorHandler
             .BinRangeMaximum = objHistogram.BinRangeMaximum
         
             ReDim .SmoothedBins(UBound(.Binned))
-            For lngindex = 0 To UBound(.Binned)
-                .SmoothedBins(lngindex) = .Binned(lngindex)
-            Next lngindex
+            For lngIndex = 0 To UBound(.Binned)
+                .SmoothedBins(lngIndex) = .Binned(lngIndex)
+            Next lngIndex
         End With
 
         ' Finally, the GANET errors
@@ -1728,9 +1728,9 @@ On Error GoTo ComputeMassErrorsErrorHandler
             .BinRangeMaximum = objHistogram.BinRangeMaximum
         
             ReDim .SmoothedBins(UBound(.Binned))
-            For lngindex = 0 To UBound(.Binned)
-                .SmoothedBins(lngindex) = .Binned(lngindex)
-            Next lngindex
+            For lngIndex = 0 To UBound(.Binned)
+                .SmoothedBins(lngIndex) = .Binned(lngIndex)
+            Next lngIndex
         End With
 
     Else
@@ -1765,7 +1765,7 @@ End Sub
 
 Private Sub ComputeErrorsIndividualPoints(ByVal blnForceUpdate As Boolean)
 
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim lngCSDataIndex As Long
     Dim lngIsoDataIndex As Long
     
@@ -1804,7 +1804,7 @@ End Sub
 Private Sub ComputeErrorsWork(ByRef sngRawMassErrorsPPM() As Single, ByRef sngRawMassErrorsDa() As Single, ByRef sngRawNETErrors() As Single, ByRef lngRawErrorsCount As Long, ByVal blnUseUMCClassStats As Boolean, ByRef lngDataWithHits As Long)
 
     Dim IsoField As Integer
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim lngCSDataIndex As Long
     Dim lngIsoDataIndex As Long
     
@@ -1821,7 +1821,7 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
     ''ReDim sngDataSourceIonIndex(INITIAL_DATA_COUNT - 1)
     
     IsoField = GelData(CallerID).Preferences.IsoDataField
-    If IsoField < isfMWavg Or IsoField > isfMWavg Then IsoField = isfMWMono
+    If IsoField < mftMWAvg Or IsoField > mftMWAvg Then IsoField = mftMWMono
 
     lngDataWithHits = 0
     
@@ -1829,8 +1829,8 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
     If blnUseUMCClassStats Then
         ' Working with LC-MS Features
         With GelUMC(CallerID)
-            For lngindex = 0 To .UMCCnt - 1
-                With .UMCs(lngindex)
+            For lngIndex = 0 To .UMCCnt - 1
+                With .UMCs(lngIndex)
                     ' Just examine the class rep for each UMC
                     Select Case .ClassRepType
                     Case gldtCS
@@ -1852,11 +1852,11 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
                         Debug.Assert False
                     End Select
                 End With
-                If lngindex Mod 500 = 0 Then
-                    UpdateStatus "Extracting mass/NET errors: " & Trim(lngindex) & " / " & Trim(.UMCCnt)
+                If lngIndex Mod 500 = 0 Then
+                    UpdateStatus "Extracting mass/NET errors: " & Trim(lngIndex) & " / " & Trim(.UMCCnt)
                     If mAbortProcessing Then Exit For
                 End If
-            Next lngindex
+            Next lngIndex
         End With
     Else
         ' Working with individual data points
@@ -1957,7 +1957,7 @@ End Function
 
 Private Sub ConstructLookupArrays()
     Dim objQSLong As New QSLong
-    Dim lngindex As Long
+    Dim lngIndex As Long
 
     UpdateStatus "Initializing index arrays"
     
@@ -1967,11 +1967,11 @@ On Error GoTo ConstructAMTIndexLookupArrayErrorHandler
         ReDim mAMTIDSorted(0 To AMTCnt - 1)
         ReDim mAMTIDSortedInd(0 To AMTCnt - 1)
     
-        For lngindex = 1 To AMTCnt
-            Debug.Assert IsNumeric(AMTData(lngindex).ID)
-            mAMTIDSorted(lngindex - 1) = AMTData(lngindex).ID        ' Note that AMTData() is a 1-based array
-            mAMTIDSortedInd(lngindex - 1) = lngindex
-        Next lngindex
+        For lngIndex = 1 To AMTCnt
+            Debug.Assert IsNumeric(AMTData(lngIndex).ID)
+            mAMTIDSorted(lngIndex - 1) = AMTData(lngIndex).ID        ' Note that AMTData() is a 1-based array
+            mAMTIDSortedInd(lngIndex - 1) = lngIndex
+        Next lngIndex
     
         If objQSLong.QSAsc(mAMTIDSorted(), mAMTIDSortedInd()) Then
             ' All is fine
@@ -1990,10 +1990,10 @@ On Error GoTo ConstructAMTIndexLookupArrayErrorHandler
             ReDim mInternalStdIDSorted(0 To .Count - 1)
             ReDim mInternalStdIDSortedInd(0 To .Count - 1)
         
-            For lngindex = 0 To .Count - 1
-                mInternalStdIDSorted(lngindex) = .InternalStandards(lngindex).SeqID
-                mInternalStdIDSortedInd(lngindex) = lngindex
-            Next lngindex
+            For lngIndex = 0 To .Count - 1
+                mInternalStdIDSorted(lngIndex) = .InternalStandards(lngIndex).SeqID
+                mInternalStdIDSortedInd(lngIndex) = lngIndex
+            Next lngIndex
         
             If objQSLong.QSAsc(mInternalStdIDSorted(), mInternalStdIDSortedInd()) Then
                 ' All is fine
@@ -2337,7 +2337,7 @@ Private Function ExportErrorsToClipboardOrFile(Optional strFilePath As String = 
     Dim strTextToCopy As String
     
     Dim OutFileNum As Integer
-    Dim lngindex As Long, lngOutputArrayCount As Long
+    Dim lngIndex As Long, lngOutputArrayCount As Long
     
     If mRawErrorsCount = 0 Then
         If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
@@ -2359,20 +2359,20 @@ On Error GoTo ExportMassErrorsErrorHandler
     ' Fill strErrorData() with the Mass Errors and GANET errors
     strErrorData(0) = "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError"
     
-    For lngindex = 0 To mRawErrorsCount - 1
-        strErrorData(lngindex + 1) = Trim(mRawMassErrorsPPM(lngindex)) & vbTab & Trim(mRawMassErrorsDa(lngindex)) & vbTab & Trim(mRawNETErrors(lngindex))
+    For lngIndex = 0 To mRawErrorsCount - 1
+        strErrorData(lngIndex + 1) = Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRawNETErrors(lngIndex))
         
-        If lngindex Mod 1000 = 0 Then UpdateStatus "Exporting: " & Trim(lngindex) & " / " & mRawErrorsCount
-    Next lngindex
+        If lngIndex Mod 1000 = 0 Then UpdateStatus "Exporting: " & Trim(lngIndex) & " / " & mRawErrorsCount
+    Next lngIndex
     lngOutputArrayCount = mRawErrorsCount + 1
     
     If Len(strFilePath) > 0 Then
         OutFileNum = FreeFile()
         Open strFilePath For Output As #OutFileNum
         
-        For lngindex = 0 To lngOutputArrayCount - 1
-            Print #OutFileNum, strErrorData(lngindex)
-        Next lngindex
+        For lngIndex = 0 To lngOutputArrayCount - 1
+            Print #OutFileNum, strErrorData(lngIndex)
+        Next lngIndex
         
         Close #OutFileNum
     Else
@@ -2410,7 +2410,7 @@ Public Function ExportErrorsBinnedToClipboardOrFile(strFilePath As String, blnSh
     Dim lngCharLoc As Long
     
     Dim OutFileNum As Integer
-    Dim lngindex As Long, lngOutputArrayCount As Long
+    Dim lngIndex As Long, lngOutputArrayCount As Long
     Dim lngCountAvailable As Long
     Dim sngErrorValue As Single
     
@@ -2484,16 +2484,16 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
             lngDigitsToRound = 1
         End If
         
-        For lngindex = 0 To mMassPPMErrors.BinnedCount - 1
-            sngErrorValue = mMassPPMErrors.StartBin + lngindex * mMassPPMErrors.BinSize
-            strYValues = Trim(mMassPPMErrors.Binned(lngindex))
+        For lngIndex = 0 To mMassPPMErrors.BinnedCount - 1
+            sngErrorValue = mMassPPMErrors.StartBin + lngIndex * mMassPPMErrors.BinSize
+            strYValues = Trim(mMassPPMErrors.Binned(lngIndex))
             If cChkBox(chkShowSmoothedData) Then
-                strYValues = strYValues & vbTab & Trim(mMassPPMErrors.SmoothedBins(lngindex))
+                strYValues = strYValues & vbTab & Trim(mMassPPMErrors.SmoothedBins(lngIndex))
             End If
             
-            strErrors(lngOutputArrayCount) = Round(sngErrorValue, lngDigitsToRound) & vbTab & strYValues & vbTab & LookupErrorBinComment(lngindex, mMassCalErrorPeakCached)
+            strErrors(lngOutputArrayCount) = Round(sngErrorValue, lngDigitsToRound) & vbTab & strYValues & vbTab & LookupErrorBinComment(lngIndex, mMassCalErrorPeakCached)
             lngOutputArrayCount = lngOutputArrayCount + 1
-        Next lngindex
+        Next lngIndex
     End If
     
     If Not blnVisibleDifferencesOnly Or intDisplayModeSaved = mdmMassErrorDisplayModeConstants.mdmMassErrorDa Then
@@ -2518,16 +2518,16 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
             lngDigitsToRound = 1
         End If
         
-        For lngindex = 0 To mMassDaErrors.BinnedCount - 1
-            sngErrorValue = mMassDaErrors.StartBin + lngindex * mMassDaErrors.BinSize
-            strYValues = Trim(mMassDaErrors.Binned(lngindex))
+        For lngIndex = 0 To mMassDaErrors.BinnedCount - 1
+            sngErrorValue = mMassDaErrors.StartBin + lngIndex * mMassDaErrors.BinSize
+            strYValues = Trim(mMassDaErrors.Binned(lngIndex))
             If cChkBox(chkShowSmoothedData) Then
-                strYValues = strYValues & vbTab & Trim(mMassDaErrors.SmoothedBins(lngindex))
+                strYValues = strYValues & vbTab & Trim(mMassDaErrors.SmoothedBins(lngIndex))
             End If
             
-            strErrors(lngOutputArrayCount) = Round(sngErrorValue, lngDigitsToRound) & vbTab & strYValues & vbTab & LookupErrorBinComment(lngindex, mMassCalErrorPeakCached)
+            strErrors(lngOutputArrayCount) = Round(sngErrorValue, lngDigitsToRound) & vbTab & strYValues & vbTab & LookupErrorBinComment(lngIndex, mMassCalErrorPeakCached)
             lngOutputArrayCount = lngOutputArrayCount + 1
-        Next lngindex
+        Next lngIndex
     End If
     
     
@@ -2553,16 +2553,16 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
             lngDigitsToRound = 1
         End If
         
-        For lngindex = 0 To mGanetErrors.BinnedCount - 1
-            sngErrorValue = mGanetErrors.StartBin + lngindex * mGanetErrors.BinSize
-            strYValues = Trim(mGanetErrors.Binned(lngindex))
+        For lngIndex = 0 To mGanetErrors.BinnedCount - 1
+            sngErrorValue = mGanetErrors.StartBin + lngIndex * mGanetErrors.BinSize
+            strYValues = Trim(mGanetErrors.Binned(lngIndex))
             If cChkBox(chkShowSmoothedData) Then
-                strYValues = strYValues & vbTab & Trim(mGanetErrors.SmoothedBins(lngindex))
+                strYValues = strYValues & vbTab & Trim(mGanetErrors.SmoothedBins(lngIndex))
             End If
             
-            strErrors(lngOutputArrayCount) = Round(sngErrorValue, lngDigitsToRound) & vbTab & strYValues & vbTab & LookupErrorBinComment(lngindex, mNETTolErrorPeakCached)
+            strErrors(lngOutputArrayCount) = Round(sngErrorValue, lngDigitsToRound) & vbTab & strYValues & vbTab & LookupErrorBinComment(lngIndex, mNETTolErrorPeakCached)
             lngOutputArrayCount = lngOutputArrayCount + 1
-        Next lngindex
+        Next lngIndex
         
     End If
     
@@ -2571,9 +2571,9 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
         OutFileNum = FreeFile()
         Open strFilePath For Output As #OutFileNum
         
-        For lngindex = 0 To lngOutputArrayCount - 1
-            Print #OutFileNum, strErrors(lngindex)
-        Next lngindex
+        For lngIndex = 0 To lngOutputArrayCount - 1
+            Print #OutFileNum, strErrors(lngIndex)
+        Next lngIndex
         
         Close #OutFileNum
     Else
@@ -2752,9 +2752,9 @@ Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
 
 End Sub
 
-Private Function LookupErrorBinComment(lngindex As Long, ByRef udtErrorPlottingPeakCache As udtErrorPlottingPeakCacheType) As String
+Private Function LookupErrorBinComment(lngIndex As Long, ByRef udtErrorPlottingPeakCache As udtErrorPlottingPeakCacheType) As String
 
-    Select Case lngindex
+    Select Case lngIndex
         Case udtErrorPlottingPeakCache.PeakStats.IndexBaseLeft
             LookupErrorBinComment = "Left base"
         Case udtErrorPlottingPeakCache.PeakStats.IndexLeft
@@ -4163,7 +4163,7 @@ End Sub
 
 Private Sub UpdatePlotAddData(ByVal intSeriesNumber As Integer, ByVal blnUseSmoothedData As Boolean, ByRef udtBinnedData As udtBinnedDataType)
     
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim dblXData() As Double    ' 1-based array
     Dim dblYData() As Double    ' 1-based array
     
@@ -4185,21 +4185,21 @@ Private Sub UpdatePlotAddData(ByVal intSeriesNumber As Integer, ByVal blnUseSmoo
                     lngMaxIndex = .BinnedCount
                 End If
                 
-                For lngindex = 0 To .BinnedCount
-                    dblXData(lngindex + 1) = .StartBin + lngindex * .BinSize
+                For lngIndex = 0 To .BinnedCount
+                    dblXData(lngIndex + 1) = .StartBin + lngIndex * .BinSize
                     
                     ' Note: The smoothed data can sometimes be a negative number; we'll clip the data at 0
                     '       to avoid plotting irregularities
-                    If .SmoothedBins(lngindex) > 0 Then
-                        dblYData(lngindex + 1) = .SmoothedBins(lngindex)
+                    If .SmoothedBins(lngIndex) > 0 Then
+                        dblYData(lngIndex + 1) = .SmoothedBins(lngIndex)
                     End If
-                Next lngindex
+                Next lngIndex
                 
             Else
-                For lngindex = 0 To .BinnedCount
-                    dblXData(lngindex + 1) = .StartBin + lngindex * .BinSize
-                    dblYData(lngindex + 1) = .Binned(lngindex)
-                Next lngindex
+                For lngIndex = 0 To .BinnedCount
+                    dblXData(lngIndex + 1) = .StartBin + lngIndex * .BinSize
+                    dblYData(lngIndex + 1) = .Binned(lngIndex)
+                Next lngIndex
             End If
             
             ctlPlotter.SetDataX intSeriesNumber, dblXData()
