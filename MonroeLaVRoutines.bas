@@ -1041,6 +1041,10 @@ Public Function ConstructUMCDefDescription(ByVal lngGelIndex As Long, ByVal strS
     
     strDesc = strDesc & "; DREAMS Odd/Even Mode = " & strAddnlText
     
+    If udtUMCDef.RequireMatchingIsotopeTag Then
+        strDesc = strDesc & "; Require Matching Isotope Tags = True"
+    End If
+    
     ConstructUMCDefDescription = strDesc
     Exit Function
     
@@ -2490,7 +2494,9 @@ Public Sub CopyLegacyCSToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, B
         .SignalToNoise = 0
         .ExpressionRatio = ER_NO_RATIO
          
-        .AdditionalValue1 = 0
+        .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
+         
+        .AdditionalIntValue = 0
         .AdditionalValue2 = 0
         
         On Error Resume Next
@@ -2530,7 +2536,10 @@ Public Sub CopyLegacyIso2005ToCurrentIso(ByRef udtIsotopicData As udtIsotopicDat
         .SignalToNoise = udtIsotopicDataOld.SignalToNoise
     
         .ExpressionRatio = udtIsotopicDataOld.ExpressionRatio
-        .AdditionalValue1 = 0
+      
+        .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
+         
+        .AdditionalIntValue = 0
         .AdditionalValue2 = 0
         
         .MTID = udtIsotopicDataOld.MTID
@@ -2573,7 +2582,9 @@ Public Sub CopyLegacyIsoToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, 
         
         .ExpressionRatio = ER_NO_RATIO
                  
-        .AdditionalValue1 = 0
+        .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
+         
+        .AdditionalIntValue = 0
         .AdditionalValue2 = 0
         
         On Error Resume Next
@@ -3161,6 +3172,35 @@ Public Sub SetIsoMass(ByRef udtIsoData As udtIsotopicDataType, intIsoDataField A
         Debug.Assert False
     End Select
 End Sub
+
+Public Function GetIsotopeLabelTagCode(ByVal strIsotopeTag As String) As iltIsotopeLabelTagConstants
+    
+    Select Case LCase(Trim(strIsotopeTag))
+    Case "n14": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltN14
+    Case "n15": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltN15
+    Case "o16": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltO16
+    Case "o18": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltO18
+    Case "c12": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltC12
+    Case "c13": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltC13
+    Case Else: GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltUnsupportedTag
+    End Select
+    
+End Function
+
+Public Function GetIsotopeLabelTagName(intIsotopeTag As Integer) As String
+    ' Note: intIsotopeTag is actually type iltIsotopeLabelTagConstants
+    
+    Select Case intIsotopeTag
+    Case iltIsotopeLabelTagConstants.iltN14: GetIsotopeLabelTagName = "N14"
+    Case iltIsotopeLabelTagConstants.iltN15: GetIsotopeLabelTagName = "N15"
+    Case iltIsotopeLabelTagConstants.iltO16: GetIsotopeLabelTagName = "O16"
+    Case iltIsotopeLabelTagConstants.iltO18: GetIsotopeLabelTagName = "O18"
+    Case iltIsotopeLabelTagConstants.iltC12: GetIsotopeLabelTagName = "C12"
+    Case iltIsotopeLabelTagConstants.iltC13: GetIsotopeLabelTagName = "C13"
+    Case Else: GetIsotopeLabelTagName = "unsupported"
+    End Select
+    
+End Function
 
 Public Function GetMassTagMatchCount(ByRef udtDBSettings As udtDBSettingsType, ByVal lngCurrentJob As Long, ByRef frmCallingForm As VB.Form) As Long
     ' Retrieves a count of the MT tags that would be returned by the connection values

@@ -11,16 +11,16 @@ Public Const DEFAULT_TOLERANCE_REFINEMENT_MW_TOL As Double = 25
 Public Const DEFAULT_TOLERANCE_REFINEMENT_MW_TOL_TYPE As Integer = gltPPM
 Public Const DEFAULT_TOLERANCE_REFINEMENT_NET_TOL As Double = 0.05
 
-Private Const RECENT_DB_CONNECTIONS_MAX_COUNT = 25
-Private Const RECENT_DB_CONNECTIONS_SECTION_NAME = "RecentDBConnections"
-Private Const RECENT_DB_CONNECTIONS_KEY_COUNT_NAME = "ConnectionCount"
-Private Const RECENT_DB_CONNECTION_SUBSECTION_NAME = "Connection"
-Private Const RECENT_DB_CONNECTION_INFOVERSION_NAME = "InfoVersion"
-Private Const RECENT_DB_CONNECTION_INFOVERSION = 2
+Private Const RECENT_DB_CONNECTIONS_MAX_COUNT As Integer = 25
+Private Const RECENT_DB_CONNECTIONS_SECTION_NAME As String = "RecentDBConnections"
+Private Const RECENT_DB_CONNECTIONS_KEY_COUNT_NAME As String = "ConnectionCount"
+Private Const RECENT_DB_CONNECTION_SUBSECTION_NAME As String = "Connection"
+Private Const RECENT_DB_CONNECTION_INFOVERSION_NAME As String = "InfoVersion"
+Private Const RECENT_DB_CONNECTION_INFOVERSION As Integer = 2
 
-Private Const NET_ADJ_SECTION_OLDNAME = "UMCNetDef"
-Private Const NET_ADJ_SECTION_NEWNAME = "UMCNETAdjDef"
-Private Const NET_ADJ_MS_WARP_SECTION = "UMCNETAdjMSWarpDef"
+Private Const NET_ADJ_SECTION_OLDNAME As String = "UMCNetDef"
+Private Const NET_ADJ_SECTION_NEWNAME As String = "UMCNETAdjDef"
+Private Const NET_ADJ_MS_WARP_SECTION As String = "UMCNETAdjMSWarpDef"
 
 'Settings Variables
 Private sCooSysPref As String            'type,origin,Horientation,Vorientation
@@ -43,188 +43,40 @@ Public Const DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD As Long = 400000
 
 Private Const ENTRY_NOT_FOUND = "<<NOT_FOUND>>"
 
-Public Sub SaveCurrentSettingsToIniFile(ByVal lngGelIndex As Long)
-    Dim strIniFilePath As String
-    
-    strIniFilePath = SelectFile(MDIForm1.hwnd, "Select existing Ini file or enter a new name", "", True, "*.ini", "Ini files (*.*)|*.*|All Files (*.*)|*.*")
-    
-    If Len(strIniFilePath) > 0 Then
-        ' Update glbPreferencesExpanded.AutoAnalysisDBInfo with the DB settings for the current gel
-        
-        strIniFilePath = FileExtensionForce(strIniFilePath, ".ini")
-        
-        If Not GelAnalysis(lngGelIndex) Is Nothing Then
-            With glbPreferencesExpanded
-                FillGelAnalysisInfo .AutoAnalysisDBInfo, GelAnalysis(lngGelIndex)
-                .AutoAnalysisDBInfoIsValid = .AutoAnalysisDBInfo.ValidAnalysisDataPresent
-            End With
-        End If
-        
-        IniFileSaveSettings glbPreferencesExpanded, UMCDef, UMCIonNetDef, UMCNetAdjDef, UMCInternalStandards, samtDef, glPreferences, strIniFilePath, True
+Private Sub AddKeyValueSetting(ByRef strKeys() As String, ByRef strValues() As String, ByRef intKeyValueCount As Integer, ByRef strKey As String, ByRef strValue As String, Optional ByVal blnResetList As Boolean)
+    If blnResetList Then
+        intKeyValueCount = 0
     End If
-End Sub
-
-Public Sub ResetOptions(gp As GelPrefs)
-'put options on default values
     
-    ResetGelPrefs gp
-    ResetICR2LSPreferences
-    ResetOtherColorsPreferences
-    ResetCSIsoShapePreferences
-    ResetDDClrPreferences
+    If intKeyValueCount >= UBound(strKeys) Then
+        ' Expand strKeys() & strValues()
+        ReDim Preserve strKeys((UBound(strKeys) + 1) * 2 - 1)
+        ReDim Preserve strValues(UBound(strKeys))
+    End If
     
-    ' No longer supported (March 2006)
-    ''ResetAMTPreferences
-    ''ResetFTICR_AMTPreferences
-    
-    ResetExpandedPreferences glbPreferencesExpanded
+    strKeys(intKeyValueCount) = strKey
+    strValues(intKeyValueCount) = strValue
+    intKeyValueCount = intKeyValueCount + 1
 End Sub
 
-Public Sub ResetGelPrefs(gp As GelPrefs)
-    ResetSwitchPreferences gp
-    ResetTolerancesPreferences gp
-    ResetDrawingPreferences gp
-    ResetCooSysPreferences gp
+Private Sub AddKeyValueSettingBln(ByRef strKeys() As String, ByRef strValues() As String, ByRef intKeyValueCount As Integer, ByRef strKey As String, ByRef blnValue As Boolean, Optional ByVal blnResetList As Boolean)
+    AddKeyValueSetting strKeys, strValues, intKeyValueCount, strKey, Trim(Str(blnValue)), blnResetList
 End Sub
 
-Private Sub ResetSwitchPreferences(gp As GelPrefs)
-With gp
-    .IsoDataField = mftMWMono       ' 7
-    .Case2Results = 1
-    .DRDefinition = glNormal
-    .IsoICR2LSMOverZ = True
-End With
+Private Sub AddKeyValueSettingSng(ByRef strKeys() As String, ByRef strValues() As String, ByRef intKeyValueCount As Integer, ByRef strKey As String, ByRef sngValue As Single, Optional ByVal blnResetList As Boolean)
+    AddKeyValueSetting strKeys, strValues, intKeyValueCount, strKey, Trim(Str(sngValue)), blnResetList
 End Sub
 
-Private Sub ResetTolerancesPreferences(gp As GelPrefs)
-With gp
-    .DBTolerance = -1
-    .DupTolerance = 2
-    .IsoDataFit = 0.15
-End With
+Private Sub AddKeyValueSettingDbl(ByRef strKeys() As String, ByRef strValues() As String, ByRef intKeyValueCount As Integer, ByRef strKey As String, ByRef dblValue As Double, Optional ByVal blnResetList As Boolean)
+    AddKeyValueSetting strKeys, strValues, intKeyValueCount, strKey, Trim(Str(dblValue)), blnResetList
 End Sub
 
-Private Sub ResetDrawingPreferences(gp As GelPrefs)
-With gp
-    .BorderClrSameAsInt = True
-    .MaxPointFactor = 2
-    .MinPointFactor = 0.5
-    .AbuAspectRatio = 1
-End With
+Private Sub AddKeyValueSettingInt(ByRef strKeys() As String, ByRef strValues() As String, ByRef intKeyValueCount As Integer, ByRef strKey As String, ByRef intValue As Integer, Optional ByVal blnResetList As Boolean)
+    AddKeyValueSetting strKeys, strValues, intKeyValueCount, strKey, Trim(Str(intValue)), blnResetList
 End Sub
 
-Private Sub ResetAutoSearchModeEntry(udtAutoSearchModeEntry As udtAutoAnalysisSearchModeOptionsType)
-    With udtAutoSearchModeEntry
-        .SearchMode = AUTO_SEARCH_NONE
-        .AlternateOutputFolderPath = ""
-        .WriteResultsToTextFile = False
-        .ExportResultsToDatabase = False
-        .ExportUMCMembers = False
-        .PairSearchAssumeMassTagsAreLabeled = False
-        
-        If APP_BUILD_DISABLE_MTS Then
-            .InternalStdSearchMode = issmFindOnlyMassTags
-        Else
-            .InternalStdSearchMode = issmFindWithMassTags
-        End If
-        
-        .DBSearchMinimumHighNormalizedScore = 0
-        .DBSearchMinimumHighDiscriminantScore = 0
-        .DBSearchMinimumPeptideProphetProbability = 0
-        ResetDBSearchMassMods .MassMods
-    End With
-End Sub
-
-Public Sub ResetDBSearchMassMods(udtMassMods As udtDBSearchMassModificationOptionsType)
-    With udtMassMods
-        .DynamicMods = True
-        .N15InsteadOfN14 = False
-        .PEO = False
-        .ICATd0 = False
-        .ICATd8 = False
-        .Alkylation = False
-        .AlkylationMass = glALKYLATION
-        .ResidueToModify = ""
-        .ResidueMassModification = 0
-        .OtherInfo = ""
-    End With
-End Sub
-
-Private Sub ResetCooSysPreferences(gp As GelPrefs)
-With gp
-    .CooType = glFNCooSys
-    .CooOrigin = glOriginBL
-    .CooHOrientation = glNormal
-    .CooVOrientation = glNormal
-    .CooVAxisScale = glVAxisLin
-End With
-End Sub
-
-Private Sub ResetICR2LSPreferences()
-sICR2LSCommand = "C:\Program Files\ICR-2LS\icr-2ls.exe "
-End Sub
-
-Public Sub ResetDataFilters(ByVal lngGelIndex As Long, ByRef udtPreferences As GelPrefs)
-    Dim i As Integer
-    
-On Error GoTo ResetDataFiltersErrorHandler
-
-    With udtPreferences
-        .DBTolerance = -1
-        .DupTolerance = 2
-        .IsoDataFit = 0.15
-    End With
-    
-    With GelData(lngGelIndex)
-       For i = 1 To MAX_FILTER_COUNT              'Do not use any filter initially
-         .DataFilter(i, 0) = False
-       Next i
-       .Preferences = udtPreferences
-       .DataFilter(fltDupTolerance, 1) = udtPreferences.DupTolerance
-       .DataFilter(fltDBTolerance, 1) = udtPreferences.DBTolerance
-       .DataFilter(fltIsoFit, 1) = udtPreferences.IsoDataFit
-       .DataFilter(fltCase2CloseResults, 1) = udtPreferences.Case2Results
-       .DataFilter(fltAR, 0) = 0
-       .DataFilter(fltAR, 1) = -1
-       .DataFilter(fltAR, 2) = -1
-       .DataFilter(fltID, 1) = 0
-       .DataFilter(fltCSAbu, 1) = 0             'min abundance
-       .DataFilter(fltIsoAbu, 1) = 0
-       .DataFilter(fltCSMW, 1) = 0              'min mass range
-       .DataFilter(fltIsoMW, 1) = 0
-       .DataFilter(fltIsoCS, 1) = 0
-       .DataFilter(fltCSStDev, 1) = 1
-       .DataFilter(fltIsoMZ, 1) = 0             'min m/z range
-       .DataFilter(fltEvenOddScanNumber, 1) = 0     ' Use all scans
-    End With
-    
-    Exit Sub
-
-ResetDataFiltersErrorHandler:
-    Debug.Print "Error in ResetDataFilters: " & Err.Description
-    Debug.Assert False
-    LogErrors Err.Number, "ResetDataFilters"
-    Resume Next
-End Sub
-
-Private Sub ResetDDClrPreferences()
-glUnderColor = glUnderColorDefault
-glMidColor = glMidColorDefault
-glOverColor = glOverColorDefault
-glDDRatioMax = glHugeOverReal
-End Sub
-
-Private Sub ResetOtherColorsPreferences()
-glBackColor = vbWhite
-glForeColor = vbBlack
-glCSColor = glCSColorDefault
-glIsoColor = glIsoColorDefault
-glSelColor = vbRed
-End Sub
-
-Private Sub ResetCSIsoShapePreferences()
-glCSShape = 0       'oval
-glIsoShape = 0
+Private Sub AddKeyValueSettingLng(ByRef strKeys() As String, ByRef strValues() As String, ByRef intKeyValueCount As Integer, ByRef strKey As String, ByRef lngValue As Long, Optional ByVal blnResetList As Boolean)
+    AddKeyValueSetting strKeys, strValues, intKeyValueCount, strKey, Trim(Str(lngValue)), blnResetList
 End Sub
 
 Private Function GetCooSysPrefs(udtPrefs As GelPrefs) As String
@@ -645,6 +497,8 @@ On Error GoTo LoadSettingsFileHandler
         .InterpolationType = GetIniFileSettingLng(IniStuff, "UMCDef", "InterpolationType", .InterpolationType)
         .ChargeStateStatsRepType = GetIniFileSettingInt(IniStuff, "UMCDef", "ChargeStateStatsRepType", .ChargeStateStatsRepType)
         .UMCClassStatsUseStatsFromMostAbuChargeState = GetIniFileSettingBln(IniStuff, "UMCDef", "UMCClassStatsUseStatsFromMostAbuChargeState", .UMCClassStatsUseStatsFromMostAbuChargeState)
+        .OddEvenProcessingMode = GetIniFileSettingInt(IniStuff, "UMCDef", "OddEvenProcessingMode", .OddEvenProcessingMode)
+        .RequireMatchingIsotopeTag = GetIniFileSettingBln(IniStuff, "UMCDef", "RequireMatchingIsotopeTag", .RequireMatchingIsotopeTag)
     End With
     
     ' udtUMCDef preferences stored in udtPrefsExpanded
@@ -904,7 +758,7 @@ On Error GoTo LoadSettingsFileHandler
         ReDim strValues(0)
         strKeys(0) = "NewSectionName"
         strValues(0) = "UMCNETAdjDef"
-        IniStuff.WriteSection strUMCNetAdjDefSectionName, strKeys(), strValues()
+        IniStuff.WriteSection strUMCNetAdjDefSectionName, strKeys(), strValues(), 0
     End If
     
     ' Search AMT preferences
@@ -1229,6 +1083,8 @@ On Error GoTo LoadSettingsFileHandler
             .UseIdenticalChargesForER = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "UseIdenticalChargesForER", .UseIdenticalChargesForER)
             .ComputeERScanByScan = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "ComputeERScanByScan", .ComputeERScanByScan)
             .ScanByScanAverageIsNotWeighted = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "ScanByScanAverageIsNotWeighted", .ScanByScanAverageIsNotWeighted)
+            
+            .RequireMatchingIsotopeTagLabels = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "RequireMatchingIsotopeTagLabels", .RequireMatchingIsotopeTagLabels)
             
             .AverageERsAllChargeStates = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "AverageERsAllChargeStates", .AverageERsAllChargeStates)
             .AverageERsWeightingMode = GetIniFileSettingInt(IniStuff, "PairSearchOptions", "AverageERsWeightingMode", CInt(.AverageERsWeightingMode))
@@ -1629,8 +1485,10 @@ Public Sub IniFileSaveSettings(udtPrefsExpanded As udtPreferencesExpandedType, u
     Dim DBIniStuff As clsIniStuff
     Dim strDBIniFilePath As String
     Dim intIndex As Integer, intAutoSearchModeIndex As Integer
-    Dim intTargetIndexBase As Integer
-    Dim strKeys() As String, strValues() As String
+    
+    Dim iKVCount As Integer
+    Dim sKeys() As String, sVals() As String
+    
     Dim strKeyPrefix As String
     Dim udtDBSettingsSingle As udtDBSettingsType
     Dim strMassTagSubsetID As String
@@ -1656,190 +1514,187 @@ On Error GoTo SaveSettingsFileHandler
     ' I don't check for errors again after this
     If Not blnSuccess Then GoTo SaveSettingsFileHandler
     
-    ReDim strKeys(0 To 42)
-    ReDim strValues(0 To 42)
-        
+    ReDim sKeys(99)
+    ReDim sVals(99)
+    
     ' UMC options stored in udtPrefsExpanded.AutoAnalysisOptions
     With udtPrefsExpanded.AutoAnalysisOptions
-        strKeys(0) = "UMCSearchModeList": strValues(0) = "; Options are " & GetUMCSearchModeList()
-        strKeys(1) = "UMCSearchMode": strValues(1) = .UMCSearchMode
-        strKeys(2) = "UMCShrinkingBoxWeightAverageMassByIntensity": strValues(2) = .UMCShrinkingBoxWeightAverageMassByIntensity
+        iKVCount = 0
+        AddKeyValueSetting sKeys, sVals, iKVCount, "UMCSearchModeList", "; Options are " & GetUMCSearchModeList()
+        AddKeyValueSetting sKeys, sVals, iKVCount, "UMCSearchMode", .UMCSearchMode
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCShrinkingBoxWeightAverageMassByIntensity", .UMCShrinkingBoxWeightAverageMassByIntensity
     End With
     
     ' UMC options stored in udtUMCDef
     With udtUMCDef
-        strKeys(3) = "UMCTypeList": strValues(3) = "; Options are " & GetUMCTypeList()
-        strKeys(4) = "UMCType": strValues(4) = .UMCType
-        strKeys(5) = "MWField": strValues(5) = .MWField
-        strKeys(6) = "TolType": strValues(6) = .TolType
-        strKeys(7) = "Tol": strValues(7) = .Tol
-        strKeys(8) = "UMCSharing": strValues(8) = .UMCSharing
-        strKeys(9) = "UMCUniCS": strValues(9) = .UMCUniCS
-        strKeys(10) = "ClassAbu": strValues(10) = .ClassAbu
-        strKeys(11) = "ClassMW": strValues(11) = .ClassMW
-        strKeys(12) = "GapMaxCnt": strValues(12) = .GapMaxCnt
-        strKeys(13) = "GapMaxSize": strValues(13) = .GapMaxSize
-        strKeys(14) = "GapMaxPct": strValues(14) = .GapMaxPct
-        strKeys(15) = "UMCNETType": strValues(15) = .UMCNETType
-        strKeys(16) = "InterpolateGaps": strValues(16) = .InterpolateGaps
-        strKeys(17) = "InterpolateMaxGapSize": strValues(17) = .InterpolateMaxGapSize
-        strKeys(18) = "InterpolationType": strValues(18) = .InterpolationType
-        strKeys(19) = "ChargeStateStatsRepType": strValues(19) = .ChargeStateStatsRepType
-        strKeys(20) = "UMCClassStatsUseStatsFromMostAbuChargeState": strValues(20) = .UMCClassStatsUseStatsFromMostAbuChargeState
+        AddKeyValueSetting sKeys, sVals, iKVCount, "UMCTypeList", "; Options are " & GetUMCTypeList()
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "UMCType", .UMCType
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "MWField", .MWField
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "TolType", .TolType
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "Tol", .Tol
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCSharing", .UMCSharing
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCUniCS", .UMCUniCS
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "ClassAbu", .ClassAbu
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "ClassMW", .ClassMW
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "GapMaxCnt", .GapMaxCnt
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "GapMaxSize", .GapMaxSize
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "GapMaxPct", .GapMaxPct
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "UMCNETType", .UMCNETType
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "InterpolateGaps", .InterpolateGaps
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "InterpolateMaxGapSize", .InterpolateMaxGapSize
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "InterpolationType", .InterpolationType
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "ChargeStateStatsRepType", .ChargeStateStatsRepType
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCClassStatsUseStatsFromMostAbuChargeState", .UMCClassStatsUseStatsFromMostAbuChargeState
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "OddEvenProcessingMode", .OddEvenProcessingMode
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RequireMatchingIsotopeTag", .RequireMatchingIsotopeTag
     End With
     
     ' UMC options stored in udtPrefsExpanded
     With udtPrefsExpanded.UMCAutoRefineOptions
-        strKeys(21) = "UMCAutoRefineRemoveCountLow": strValues(21) = .UMCAutoRefineRemoveCountLow
-        strKeys(22) = "UMCAutoRefineRemoveCountHigh": strValues(22) = .UMCAutoRefineRemoveCountHigh
-        strKeys(23) = "UMCAutoRefineRemoveMaxLengthPctAllScans": strValues(23) = .UMCAutoRefineRemoveMaxLengthPctAllScans
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCAutoRefineRemoveCountLow", .UMCAutoRefineRemoveCountLow
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCAutoRefineRemoveCountHigh", .UMCAutoRefineRemoveCountHigh
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCAutoRefineRemoveMaxLengthPctAllScans", .UMCAutoRefineRemoveMaxLengthPctAllScans
         
-        strKeys(24) = "UMCAutoRefineMinLength": strValues(24) = .UMCAutoRefineMinLength
-        strKeys(25) = "UMCAutoRefineMaxLength": strValues(25) = .UMCAutoRefineMaxLength
-        strKeys(26) = "UMCAutoRefineMaxLengthPctAllScans": strValues(26) = .UMCAutoRefineMaxLengthPctAllScans
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "UMCAutoRefineMinLength", .UMCAutoRefineMinLength
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "UMCAutoRefineMaxLength", .UMCAutoRefineMaxLength
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "UMCAutoRefineMaxLengthPctAllScans", .UMCAutoRefineMaxLengthPctAllScans
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "UMCAutoRefinePercentMaxAbuToUseForLength", .UMCAutoRefinePercentMaxAbuToUseForLength
         
-        strKeys(27) = "UMCAutoRefinePercentMaxAbuToUseForLength": strValues(27) = .UMCAutoRefinePercentMaxAbuToUseForLength
-        strKeys(28) = "TestLengthUsingScanRange": strValues(28) = .TestLengthUsingScanRange
-        strKeys(29) = "MinMemberCountWhenUsingScanRange": strValues(29) = .MinMemberCountWhenUsingScanRange
-        strKeys(30) = "UMCAutoRefineRemoveAbundanceLow": strValues(30) = .UMCAutoRefineRemoveAbundanceLow
-        strKeys(31) = "UMCAutoRefineRemoveAbundanceHigh": strValues(31) = .UMCAutoRefineRemoveAbundanceHigh
-        strKeys(32) = "UMCAutoRefinePctLowAbundance": strValues(32) = .UMCAutoRefinePctLowAbundance
-        strKeys(33) = "UMCAutoRefinePctHighAbundance": strValues(33) = .UMCAutoRefinePctHighAbundance
-        strKeys(34) = "SplitUMCsByAbundance": strValues(34) = .SplitUMCsByAbundance
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "TestLengthUsingScanRange", .TestLengthUsingScanRange
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MinMemberCountWhenUsingScanRange", .MinMemberCountWhenUsingScanRange
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCAutoRefineRemoveAbundanceLow", .UMCAutoRefineRemoveAbundanceLow
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCAutoRefineRemoveAbundanceHigh", .UMCAutoRefineRemoveAbundanceHigh
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "UMCAutoRefinePctLowAbundance", .UMCAutoRefinePctLowAbundance
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "UMCAutoRefinePctHighAbundance", .UMCAutoRefinePctHighAbundance
+        
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SplitUMCsByAbundance", .SplitUMCsByAbundance
         With .SplitUMCOptions
-            strKeys(35) = "MinimumDifferenceInAveragePpmMassToSplit": strValues(35) = .MinimumDifferenceInAveragePpmMassToSplit
-            strKeys(36) = "StdDevMultiplierForSplitting": strValues(36) = .StdDevMultiplierForSplitting
-            strKeys(37) = "MaximumPeakCountToSplitUMC": strValues(37) = .MaximumPeakCountToSplitUMC
-            strKeys(38) = "PeakDetectIntensityThresholdPercentageOfMaximum": strValues(38) = .PeakDetectIntensityThresholdPercentageOfMaximum
-            strKeys(39) = "PeakDetectIntensityThresholdAbsoluteMinimum": strValues(39) = .PeakDetectIntensityThresholdAbsoluteMinimum
-            strKeys(40) = "PeakWidthPointsMinimum": strValues(40) = .PeakWidthPointsMinimum
-            strKeys(41) = "PeakWidthInSigma": strValues(41) = .PeakWidthInSigma
-            strKeys(42) = "ScanGapBehavior": strValues(42) = .ScanGapBehavior
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MinimumDifferenceInAveragePpmMassToSplit", .MinimumDifferenceInAveragePpmMassToSplit
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "StdDevMultiplierForSplitting", .StdDevMultiplierForSplitting
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "MaximumPeakCountToSplitUMC", .MaximumPeakCountToSplitUMC
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "PeakDetectIntensityThresholdPercentageOfMaximum", .PeakDetectIntensityThresholdPercentageOfMaximum
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "PeakDetectIntensityThresholdAbsoluteMinimum", .PeakDetectIntensityThresholdAbsoluteMinimum
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "PeakWidthPointsMinimum", .PeakWidthPointsMinimum
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "PeakWidthInSigma", .PeakWidthInSigma
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "ScanGapBehavior", CInt(.ScanGapBehavior)
         End With
     End With
-    IniStuff.WriteSection "UMCDef", strKeys(), strValues()
+    IniStuff.WriteSection "UMCDef", sKeys(), sVals(), iKVCount
     
-    ' Reserve 0 to 100 to give lots of extra space
-    ' Will redim below before calling IniStuff.WriteSection
-    ReDim strKeys(0 To 100)
-    ReDim strValues(0 To 100)
     With udtUMCIonNetDef
-        strKeys(0) = "NetDim": strValues(0) = .NetDim
-        strKeys(1) = "NetActualDim": strValues(1) = .NetActualDim
-        strKeys(2) = "MetricType": strValues(2) = .MetricType
-        strKeys(3) = "NETType": strValues(3) = .NETType
-        strKeys(4) = "TooDistant": strValues(4) = .TooDistant
+        iKVCount = 0
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "NetDim", .NetDim
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "NetActualDim", .NetActualDim
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MetricType", .MetricType
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "NETType", .NETType
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "TooDistant", .TooDistant
         For intIndex = 0 To UBound(.MetricData())
-            intTargetIndexBase = 5 + intIndex * 6
             strKeyPrefix = "Dim" & Trim(intIndex + 1)
             With .MetricData(intIndex)
-                strKeys(intTargetIndexBase) = strKeyPrefix & "Use": strValues(intTargetIndexBase) = .Use
-                strKeys(intTargetIndexBase + 1) = strKeyPrefix & "DataType": strValues(intTargetIndexBase + 1) = .DataType
-                strKeys(intTargetIndexBase + 2) = strKeyPrefix & "WeightFactor": strValues(intTargetIndexBase + 2) = .WeightFactor
-                strKeys(intTargetIndexBase + 3) = strKeyPrefix & "ConstraintType": strValues(intTargetIndexBase + 3) = .ConstraintType
-                strKeys(intTargetIndexBase + 4) = strKeyPrefix & "ConstraintValue": strValues(intTargetIndexBase + 4) = .ConstraintValue
-                strKeys(intTargetIndexBase + 5) = strKeyPrefix & "ConstraintUnits": strValues(intTargetIndexBase + 5) = .ConstraintUnits
+                AddKeyValueSettingBln sKeys, sVals, iKVCount, strKeyPrefix & "Use", .Use
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, strKeyPrefix & "DataType", .DataType
+                AddKeyValueSettingDbl sKeys, sVals, iKVCount, strKeyPrefix & "WeightFactor", .WeightFactor
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, strKeyPrefix & "ConstraintType", .ConstraintType
+                AddKeyValueSettingDbl sKeys, sVals, iKVCount, strKeyPrefix & "ConstraintValue", .ConstraintValue
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, strKeyPrefix & "ConstraintUnits", .ConstraintUnits
             End With
         Next intIndex
-    
-        Debug.Assert intTargetIndexBase + 5 <= 100
     End With
     
     ' UMCIso options stored in udtPrefsExpanded
     ' If .MetricData() is changed to not have 6 items, then the following + # values must be changed
     With udtPrefsExpanded.UMCIonNetOptions
-        strKeys(intTargetIndexBase + 6) = "UMCRepresentative": strValues(intTargetIndexBase + 6) = .UMCRepresentative
-        strKeys(intTargetIndexBase + 7) = "MakeSingleMemberClasses": strValues(intTargetIndexBase + 7) = .MakeSingleMemberClasses
-        strKeys(intTargetIndexBase + 8) = "ConnectionLengthPostFilterMaxNET": strValues(intTargetIndexBase + 8) = .ConnectionLengthPostFilterMaxNET
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "UMCRepresentative", .UMCRepresentative
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "MakeSingleMemberClasses", .MakeSingleMemberClasses
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ConnectionLengthPostFilterMaxNET", .ConnectionLengthPostFilterMaxNET
     End With
     
-    ' The following ReDim statments should match the last item saved in strKeys() above
-    ReDim Preserve strKeys(0 To intTargetIndexBase + 8)
-    ReDim Preserve strValues(0 To intTargetIndexBase + 8)
-    IniStuff.WriteSection "UMCIonNetDef", strKeys(), strValues()
+    IniStuff.WriteSection "UMCIonNetDef", sKeys(), sVals(), iKVCount
     
-    ReDim strKeys(0 To 5)
-    ReDim strValues(0 To 5)
     With udtPrefsExpanded.UMCAdvancedStatsOptions
-        strKeys(0) = "ClassAbuTopXMinAbu": strValues(0) = .ClassAbuTopXMinAbu
-        strKeys(1) = "ClassAbuTopXMaxAbu": strValues(1) = .ClassAbuTopXMaxAbu
-        strKeys(2) = "ClassAbuTopXMinMembers": strValues(2) = .ClassAbuTopXMinMembers
+        iKVCount = 0
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ClassAbuTopXMinAbu", .ClassAbuTopXMinAbu
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ClassAbuTopXMaxAbu", .ClassAbuTopXMaxAbu
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "ClassAbuTopXMinMembers", .ClassAbuTopXMinMembers
 
-        strKeys(3) = "ClassMassTopXMinAbu": strValues(3) = .ClassMassTopXMinAbu
-        strKeys(4) = "ClassMassTopXMaxAbu": strValues(4) = .ClassMassTopXMaxAbu
-        strKeys(5) = "ClassMassTopXMinMembers": strValues(5) = .ClassMassTopXMinMembers
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ClassMassTopXMinAbu", .ClassMassTopXMinAbu
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ClassMassTopXMaxAbu", .ClassMassTopXMaxAbu
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "ClassMassTopXMinMembers", .ClassMassTopXMinMembers
     End With
-    IniStuff.WriteSection "UMCAdvancedStatsOptions", strKeys(), strValues()
+    IniStuff.WriteSection "UMCAdvancedStatsOptions", sKeys(), sVals(), iKVCount
     
     
-    ReDim strKeys(0 To 46)
-    ReDim strValues(0 To 46)
     With udtUMCNetAdjDef
-        strKeys(0) = "MinUMCCount": strValues(0) = .MinUMCCount
-        strKeys(1) = "MinScanRange": strValues(1) = .MinScanRange
-        strKeys(2) = "MaxScanPct": strValues(2) = .MaxScanPct
-        strKeys(3) = "TopAbuPct": strValues(3) = .TopAbuPct
+        iKVCount = 0
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MinUMCCount", .MinUMCCount
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MinScanRange", .MinScanRange
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MaxScanPct", .MaxScanPct
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "TopAbuPct", .TopAbuPct
         ' Ignored: .PeakSelection
         ' Ignored: .PeakMaxAbuPct
-        strKeys(4) = "MWTolType": strValues(4) = .MWTolType
-        strKeys(5) = "MWTol": strValues(5) = .MWTol
-        strKeys(6) = "NETorRT": strValues(6) = .NETorRT
-        strKeys(7) = "UseNET": strValues(7) = .UseNET
-        strKeys(8) = "UseMultiIDMaxNETDist": strValues(8) = .UseMultiIDMaxNETDist
-        strKeys(9) = "MultiIDMaxNETDist": strValues(9) = .MultiIDMaxNETDist
-        strKeys(10) = "EliminateBadNET": strValues(10) = .EliminateBadNET
-        strKeys(11) = "MaxIDToUse": strValues(11) = .MaxIDToUse
-        strKeys(12) = "IterationStopType": strValues(12) = .IterationStopType
-        strKeys(13) = "IterationStopValue": strValues(13) = .IterationStopValue
-        strKeys(14) = "IterationUseMWDec": strValues(14) = .IterationUseMWDec
-        strKeys(15) = "IterationMWDec": strValues(15) = .IterationMWDec
-        strKeys(16) = "IterationUseNETdec": strValues(16) = .IterationUseNETdec
-        strKeys(17) = "IterationNETDec": strValues(17) = .IterationNETDec
-        strKeys(18) = "IterationAcceptLast": strValues(18) = .IterationAcceptLast
-        strKeys(19) = "InitialSlope": strValues(19) = .InitialSlope
-        strKeys(20) = "InitialIntercept": strValues(20) = .InitialIntercept
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MWTolType", .MWTolType
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MWTol", .MWTol
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "NETorRT", .NETorRT
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseNET", .UseNET
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMultiIDMaxNETDist", .UseMultiIDMaxNETDist
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MultiIDMaxNETDist", .MultiIDMaxNETDist
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "EliminateBadNET", .EliminateBadNET
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MaxIDToUse", .MaxIDToUse
+        
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "IterationStopType", .IterationStopType
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "IterationStopValue", .IterationStopValue
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "IterationUseMWDec", .IterationUseMWDec
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "IterationMWDec", .IterationMWDec
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "IterationUseNETdec", .IterationUseNETdec
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "IterationNETDec", .IterationNETDec
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "IterationAcceptLast", .IterationAcceptLast
+        
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "InitialSlope", .InitialSlope
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "InitialIntercept", .InitialIntercept
         
         ' Use of NET Adj Lockers for NET adjustment is no longer supported (March 2006)
-''        strKeys(21) = "UseNetAdjLockers": strValues(21) = .UseNetAdjLockers
-''        strKeys(22) = "UseOldNetAdjIfFailure": strValues(22) = .UseOldNetAdjIfFailure
-''        strKeys(23) = "NetAdjLockerMinimumMatchCount": strValues(23) = .NetAdjLockerMinimumMatchCount
+''        AddKeyValueSetting sKeys, sVals, iKVCount, "UseNetAdjLockers", .UseNetAdjLockers
+''        AddKeyValueSetting sKeys, sVals, iKVCount, "UseOldNetAdjIfFailure", .UseOldNetAdjIfFailure
+''        AddKeyValueSetting sKeys, sVals, iKVCount, "NetAdjLockerMinimumMatchCount", .NetAdjLockerMinimumMatchCount
         
-        strKeys(21) = "UseRobustNETAdjustment": strValues(21) = .UseRobustNETAdjustment
-        strKeys(22) = "RobustNETAdjustmentMode": strValues(22) = .RobustNETAdjustmentMode
-        strKeys(23) = "RobustNETSlopeStart": strValues(23) = .RobustNETSlopeStart
-        strKeys(24) = "RobustNETSlopeEnd": strValues(24) = .RobustNETSlopeEnd
-        strKeys(25) = "RobustNETSlopeIncreaseMode": strValues(25) = .RobustNETSlopeIncreaseMode
-        strKeys(26) = "RobustNETSlopeIncrement": strValues(26) = .RobustNETSlopeIncrement
-        strKeys(27) = "RobustNETInterceptStart": strValues(27) = .RobustNETInterceptStart
-        strKeys(28) = "RobustNETInterceptEnd": strValues(28) = .RobustNETInterceptEnd
-        strKeys(29) = "RobustNETInterceptIncrement": strValues(29) = .RobustNETInterceptIncrement
-        strKeys(30) = "RobustNETMassShiftPPMStart": strValues(30) = .RobustNETMassShiftPPMStart
-        strKeys(31) = "RobustNETMassShiftPPMEnd": strValues(31) = .RobustNETMassShiftPPMEnd
-        strKeys(32) = "RobustNETMassShiftPPMIncrement": strValues(32) = .RobustNETMassShiftPPMIncrement
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseRobustNETAdjustment", .UseRobustNETAdjustment
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "RobustNETAdjustmentMode", .RobustNETAdjustmentMode
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RobustNETSlopeStart", .RobustNETSlopeStart
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RobustNETSlopeEnd", .RobustNETSlopeEnd
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "RobustNETSlopeIncreaseMode", .RobustNETSlopeIncreaseMode
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RobustNETSlopeIncrement", .RobustNETSlopeIncrement
+        
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RobustNETInterceptStart", .RobustNETInterceptStart
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RobustNETInterceptEnd", .RobustNETInterceptEnd
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RobustNETInterceptIncrement", .RobustNETInterceptIncrement
+        
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RobustNETMassShiftPPMStart", .RobustNETMassShiftPPMStart
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RobustNETMassShiftPPMEnd", .RobustNETMassShiftPPMEnd
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RobustNETMassShiftPPMIncrement", .RobustNETMassShiftPPMIncrement
     
     End With
     
     With udtPrefsExpanded
         With .AutoAnalysisOptions
-            strKeys(33) = "NETAdjustmentInitialNetTol": strValues(33) = .NETAdjustmentInitialNetTol
-            strKeys(34) = "NETAdjustmentMaxIterationCount": strValues(34) = .NETAdjustmentMaxIterationCount
-            strKeys(35) = "NETAdjustmentMinIDCount": strValues(35) = .NETAdjustmentMinIDCount
-            strKeys(36) = "NETAdjustmentMinIDCountAbsoluteMinimum": strValues(36) = .NETAdjustmentMinIDCountAbsoluteMinimum
-            strKeys(37) = "NETAdjustmentMinIterationCount": strValues(37) = .NETAdjustmentMinIterationCount
-            strKeys(38) = "NETAdjustmentChangeThresholdStopValue": strValues(38) = .NETAdjustmentChangeThresholdStopValue
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETAdjustmentInitialNetTol", .NETAdjustmentInitialNetTol
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "NETAdjustmentMaxIterationCount", .NETAdjustmentMaxIterationCount
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "NETAdjustmentMinIDCount", .NETAdjustmentMinIDCount
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "NETAdjustmentMinIDCountAbsoluteMinimum", .NETAdjustmentMinIDCountAbsoluteMinimum
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "NETAdjustmentMinIterationCount", .NETAdjustmentMinIterationCount
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETAdjustmentChangeThresholdStopValue", .NETAdjustmentChangeThresholdStopValue
             
-            strKeys(39) = "NETAdjustmentAutoIncrementUMCTopAbuPct": strValues(39) = .NETAdjustmentAutoIncrementUMCTopAbuPct
-            strKeys(40) = "NETAdjustmentUMCTopAbuPctInitial": strValues(40) = .NETAdjustmentUMCTopAbuPctInitial
-            strKeys(41) = "NETAdjustmentUMCTopAbuPctIncrement": strValues(41) = .NETAdjustmentUMCTopAbuPctIncrement
-            strKeys(42) = "NETAdjustmentUMCTopAbuPctMax": strValues(42) = .NETAdjustmentUMCTopAbuPctMax
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "NETAdjustmentAutoIncrementUMCTopAbuPct", .NETAdjustmentAutoIncrementUMCTopAbuPct
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "NETAdjustmentUMCTopAbuPctInitial", .NETAdjustmentUMCTopAbuPctInitial
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "NETAdjustmentUMCTopAbuPctIncrement", .NETAdjustmentUMCTopAbuPctIncrement
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "NETAdjustmentUMCTopAbuPctMax", .NETAdjustmentUMCTopAbuPctMax
             
-            strKeys(43) = "NETSlopeExpectedMinimum": strValues(43) = .NETSlopeExpectedMinimum
-            strKeys(44) = "NETSlopeExpectedMaximum": strValues(44) = .NETSlopeExpectedMaximum
-            strKeys(45) = "NETInterceptExpectedMinimum": strValues(45) = .NETInterceptExpectedMinimum
-            strKeys(46) = "NETInterceptExpectedMaximum": strValues(46) = .NETInterceptExpectedMaximum
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETSlopeExpectedMinimum", .NETSlopeExpectedMinimum
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETSlopeExpectedMaximum", .NETSlopeExpectedMaximum
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETInterceptExpectedMinimum", .NETInterceptExpectedMinimum
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETInterceptExpectedMaximum", .NETInterceptExpectedMaximum
         End With
     End With
-    IniStuff.WriteSection NET_ADJ_SECTION_NEWNAME, strKeys(), strValues()
+    IniStuff.WriteSection NET_ADJ_SECTION_NEWNAME, sKeys(), sVals(), iKVCount
 
     ' Write this after writing the udtUMCNETAdjDef section
     With udtUMCNetAdjDef
@@ -1849,44 +1704,41 @@ On Error GoTo SaveSettingsFileHandler
     End With
 
     If Not APP_BUILD_DISABLE_LCMSWARP Then
-        ReDim strKeys(0 To 15)
-        ReDim strValues(0 To 15)
         With udtUMCNetAdjDef.MSWarpOptions
-          
-            strKeys(0) = "MassCalibrationType": strValues(0) = .MassCalibrationType
-            strKeys(1) = "MinimumPMTTagObsCount": strValues(1) = .MinimumPMTTagObsCount
-            strKeys(2) = "MatchPromiscuity": strValues(2) = .MatchPromiscuity
+            iKVCount = 0
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassCalibrationType", .MassCalibrationType
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "MinimumPMTTagObsCount", .MinimumPMTTagObsCount
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MatchPromiscuity", .MatchPromiscuity
             
-            strKeys(3) = "NETTol": strValues(3) = .NETTol
-            strKeys(4) = "NumberOfSections": strValues(4) = .NumberOfSections
-            strKeys(5) = "MaxDistortion": strValues(5) = .MaxDistortion
-            strKeys(6) = "ContractionFactor": strValues(6) = .ContractionFactor
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "NETTol", .NETTol
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "NumberOfSections", .NumberOfSections
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MaxDistortion", .MaxDistortion
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "ContractionFactor", .ContractionFactor
             
-            strKeys(7) = "MassWindowPPM": strValues(7) = .MassWindowPPM
-            strKeys(8) = "MassSplineOrder": strValues(8) = .MassSplineOrder
-            strKeys(9) = "MassNumXSlices": strValues(9) = .MassNumXSlices
-            strKeys(10) = "MassNumMassDeltaBins": strValues(10) = .MassNumMassDeltaBins
-            strKeys(11) = "MassMaxJump": strValues(11) = .MassMaxJump
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "MassWindowPPM", .MassWindowPPM
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassSplineOrder", .MassSplineOrder
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassNumXSlices", .MassNumXSlices
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassNumMassDeltaBins", .MassNumMassDeltaBins
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassMaxJump", .MassMaxJump
             
-            strKeys(12) = "MassZScoreTolerance": strValues(12) = .MassZScoreTolerance
-            strKeys(13) = "MassUseLSQ": strValues(13) = .MassUseLSQ
-            strKeys(14) = "MassLSQOutlierZScore": strValues(14) = .MassLSQOutlierZScore
-            strKeys(15) = "MassLSQNumKnots": strValues(15) = .MassLSQNumKnots
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "MassZScoreTolerance", .MassZScoreTolerance
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "MassUseLSQ", .MassUseLSQ
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "MassLSQOutlierZScore", .MassLSQOutlierZScore
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassLSQNumKnots", .MassLSQNumKnots
         End With
-        IniStuff.WriteSection NET_ADJ_MS_WARP_SECTION, strKeys(), strValues()
+        IniStuff.WriteSection NET_ADJ_MS_WARP_SECTION, sKeys(), sVals(), iKVCount
     End If
         
         
 '' Note: Uncomment the following to enable writing of the internal standards to a .Ini file
 ''    Dim intInternalStandardIndex As Integer
-''    ReDim strKeys(0 To 0)
-''    ReDim strValues(0 To 0)
 ''
 ''    ' Write the Internal Standards
 ''    With udtInternalStandards
-''        strKeys(0) = "Count": strValues(0) = .Count
+''        iKVCount = 0
+''        AddKeyValueSetting sKeys, sVals, iKVCount, "Count", .Count
 ''    End With
-''    IniStuff.WriteSection "UMCInternalStandards", strKeys(), strValues()
+''    IniStuff.WriteSection "UMCInternalStandards", sKeys(), sVals(), iKVCount
 ''
 ''    ' Write the Internal Standards
 ''    ' Each locker is written to its own section in the .Ini file
@@ -1896,99 +1748,97 @@ On Error GoTo SaveSettingsFileHandler
 ''            With .InternalStandards(intInternalStandardIndex)
 ''
 ''                ' Write this Internal Standard
-''                ReDim strKeys(0 To 6)
-''                ReDim strValues(0 To 6)
 ''
-''                strKeys(0) = "SeqID": strValues(0) = .SeqID
-''                strKeys(1) = "PeptideSequence": strValues(1) = .PeptideSequence
-''                strKeys(2) = "MonoisotopicMass": strValues(2) = .MonoisotopicMass
-''                strKeys(3) = "NET": strValues(3) = .NET
-''                strKeys(4) = "ChargeMinimum": strValues(4) = .ChargeMinimum
-''                strKeys(5) = "ChargeMaximum": strValues(5) = .ChargeMaximum
-''                strKeys(6) = "ChargeMostAbundant": strValues(6) = .ChargeMostAbundant
+''                iKVCount = 0
+''                AddKeyValueSettingLng sKeys, sVals, iKVCount, "SeqID", .SeqID
+''                AddKeyValueSetting sKeys, sVals, iKVCount, "PeptideSequence", .PeptideSequence
+''                AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MonoisotopicMass", .MonoisotopicMass
+''                AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NET", .NET
+''                AddKeyValueSettingInt sKeys, sVals, iKVCount, "ChargeMinimum", .ChargeMinimum
+''                AddKeyValueSettingInt sKeys, sVals, iKVCount, "ChargeMaximum", .ChargeMaximum
+''                AddKeyValueSettingInt sKeys, sVals, iKVCount, "ChargeMostAbundant", .ChargeMostAbundant
 ''
-''                IniStuff.WriteSection "UMCInternalStandards" & Trim(intInternalStandardIndex + 1), strKeys(), strValues()
+''                IniStuff.WriteSection "UMCInternalStandards" & Trim(intInternalStandardIndex + 1), sKeys(), sVals(), iKVCount
 ''            End With
 ''
 ''        Next intInternalStandardIndex
 ''    End With
 
 
-    ReDim strKeys(0 To 9)
-    ReDim strValues(0 To 9)
     With udtAMTDef
-        strKeys(0) = "SearchFlag": strValues(0) = .SearchFlag
-        strKeys(1) = "MWField": strValues(1) = .MWField
-        strKeys(2) = "MWTol": strValues(2) = .MWTol
-        strKeys(3) = "NETorRT": strValues(3) = .NETorRT
-        strKeys(4) = "TolType": strValues(4) = .TolType
-        strKeys(5) = "NETTol": strValues(5) = .NETTol
-        strKeys(6) = "MassTag": strValues(6) = .MassTag
-        strKeys(7) = "MaxMassTags": strValues(7) = .MaxMassTags
-        strKeys(8) = "SkipReferenced": strValues(8) = .SkipReferenced
-        strKeys(9) = "SaveNCnt": strValues(9) = .SaveNCnt
+        iKVCount = 0
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "SearchFlag", .SearchFlag
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "MWField", .MWField
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MWTol", .MWTol
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "NETorRT", .NETorRT
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "TolType", .TolType
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETTol", .NETTol
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassTag", .MassTag
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MaxMassTags", .MaxMassTags
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SkipReferenced", .SkipReferenced
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveNCnt", .SaveNCnt
     End With
-    IniStuff.WriteSection "SearchAMTDef", strKeys(), strValues()
+    IniStuff.WriteSection "SearchAMTDef", sKeys(), sVals(), iKVCount
    
     If Not bnlAutoAnalysisFieldsOnly Then
-        ReDim strKeys(0 To 20)
-        ReDim strValues(0 To 20)
         With OlyOptions
-            strKeys(0) = "DefType": strValues(0) = .DefType
-            strKeys(1) = "DefShape": strValues(1) = .DefShape
-            strKeys(2) = "DefColor": strValues(2) = .DefColor
-            strKeys(3) = "DefVisible": strValues(3) = .DefVisible
-            strKeys(4) = "DefMinSize": strValues(4) = .DefMinSize
-            strKeys(5) = "DefMaxSize": strValues(5) = .DefMaxSize
-            strKeys(6) = "DefFontWidth": strValues(6) = .DefFontWidth
-            strKeys(7) = "DefFontHeight": strValues(7) = .DefFontHeight
-            strKeys(8) = "DefTextHeight": strValues(8) = .DefTextHeight
-            strKeys(9) = "DefStickWidth": strValues(9) = .DefStickWidth
-            strKeys(10) = "DefMinNET": strValues(10) = .DefMinNET
-            strKeys(11) = "DefMaxNET": strValues(11) = .DefMaxNET
-            strKeys(12) = "DefNETAdjustment": strValues(12) = .DefNETAdjustment
-            strKeys(13) = "DefNETTol": strValues(13) = .DefNETTol
-            strKeys(14) = "DefUniformSize": strValues(14) = .DefUniformSize
-            strKeys(15) = "DefBoxSizeAsSpotSize": strValues(15) = .DefBoxSizeAsSpotSize
-            strKeys(16) = "DefWithID": strValues(16) = .DefWithID
-            strKeys(17) = "DefCurrScopeVisible": strValues(17) = .DefCurrScopeVisible
-            strKeys(18) = "BackColor": strValues(18) = .BackColor
-            strKeys(19) = "ForeColor": strValues(19) = .ForeColor
-            strKeys(20) = "Orientation": strValues(20) = .Orientation
+            iKVCount = 0
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "DefType", CInt(.DefType)
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "DefShape", CInt(.DefShape)
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "DefColor", .DefColor
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "DefVisible", .DefVisible
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "DefMinSize", .DefMinSize
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "DefMaxSize", .DefMaxSize
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "DefFontWidth", .DefFontWidth
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "DefFontHeight", .DefFontHeight
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "DefTextHeight", .DefTextHeight
+            
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "DefStickWidth", .DefStickWidth
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "DefMinNET", .DefMinNET
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "DefMaxNET", .DefMaxNET
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "DefNETAdjustment", .DefNETAdjustment
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "DefNETTol", .DefNETTol
+            
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "DefUniformSize", .DefUniformSize
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "DefBoxSizeAsSpotSize", .DefBoxSizeAsSpotSize
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "DefWithID", .DefWithID
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "DefCurrScopeVisible", .DefCurrScopeVisible
+            
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "BackColor", .BackColor
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "ForeColor", .ForeColor
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "Orientation", .Orientation
         End With
-        IniStuff.WriteSection "OlyOptions", strKeys(), strValues()
+        IniStuff.WriteSection "OlyOptions", sKeys(), sVals(), iKVCount
         
-        ReDim strKeys(0 To 6)
-        ReDim strValues(0 To 6)
         With OlyOptions
             If Not .GRID Is Nothing Then
                 With .GRID
-                    strKeys(0) = "LineStyle": strValues(0) = .LineStyle
-                    strKeys(1) = "HorzAutoMode": strValues(1) = .HorzAutoMode
-                    strKeys(2) = "HorzBinsCount": strValues(2) = .HorzBinsCount
-                    strKeys(3) = "HorzGridVisible": strValues(3) = .HorzGridVisible
-                    strKeys(4) = "VertAutoMode": strValues(4) = .VertAutoMode
-                    strKeys(5) = "VertBinsCount": strValues(5) = .VertBinsCount
-                    strKeys(6) = "VertGridVisible": strValues(6) = .VertGridVisible
+                    iKVCount = 0
+                    AddKeyValueSettingInt sKeys, sVals, iKVCount, "LineStyle", CInt(.LineStyle)
+                    AddKeyValueSettingInt sKeys, sVals, iKVCount, "HorzAutoMode", CInt(.HorzAutoMode)
+                    AddKeyValueSettingLng sKeys, sVals, iKVCount, "HorzBinsCount", .HorzBinsCount
+                    AddKeyValueSettingBln sKeys, sVals, iKVCount, "HorzGridVisible", .HorzGridVisible
+                    AddKeyValueSettingInt sKeys, sVals, iKVCount, "VertAutoMode", CInt(.VertAutoMode)
+                    AddKeyValueSettingLng sKeys, sVals, iKVCount, "VertBinsCount", .VertBinsCount
+                    AddKeyValueSettingBln sKeys, sVals, iKVCount, "VertGridVisible", .VertGridVisible
                 End With
             End If
         End With
-        IniStuff.WriteSection "OlyGridOptions", strKeys(), strValues()
+        IniStuff.WriteSection "OlyGridOptions", sKeys(), sVals(), iKVCount
         
-        ReDim strKeys(0 To 8)
-        ReDim strValues(0 To 8)
         With OlyJiggyOptions
-            strKeys(0) = "UseMWConstraint": strValues(0) = .UseMWConstraint
-            strKeys(1) = "MWTol": strValues(1) = .MWTol
-            strKeys(2) = "UseNetConstraint": strValues(2) = .UseNetConstraint
-            strKeys(3) = "NETTol": strValues(3) = .NETTol
-            strKeys(4) = "UseAbuConstraint": strValues(4) = .UseAbuConstraint
-            strKeys(5) = "AbuTol": strValues(5) = .AbuTol
-            strKeys(6) = "JiggyScope": strValues(6) = .JiggyScope
-            strKeys(7) = "JiggyType": strValues(7) = .JiggyType
-            strKeys(8) = "BaseDisplayInd": strValues(8) = .BaseDisplayInd
+            iKVCount = 0
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMWConstraint", .UseMWConstraint
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MWTol", .MWTol
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseNetConstraint", .UseNetConstraint
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETTol", .NETTol
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseAbuConstraint", .UseAbuConstraint
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "AbuTol", .AbuTol
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "JiggyScope", .JiggyScope
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "JiggyType", .JiggyType
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "BaseDisplayInd", .BaseDisplayInd
         End With
-        IniStuff.WriteSection "OlyJiggyOptions", strKeys(), strValues()
+        IniStuff.WriteSection "OlyJiggyOptions", sKeys(), sVals(), iKVCount
     End If
     frmProgress.UpdateProgressBar 1
     
@@ -2006,474 +1856,457 @@ On Error GoTo SaveSettingsFileHandler
     ''sAMTPref = GetAMTPrefs()
     ''sFTICR_AMTPref = GetFTICR_AMTPrefs()
 
-    ReDim strKeys(0 To 7)
-    ReDim strValues(0 To 7)
-    strKeys(0) = "CoordinateSystem": strValues(0) = sCooSysPref
-    strKeys(1) = "DifferentialDisplay": strValues(1) = sDDClrPref
-    strKeys(2) = "Drawing": strValues(2) = sDrawingPref
-    strKeys(3) = "ICR2LS": strValues(3) = sICR2LSPref
-    strKeys(4) = "ChargeStateColors": strValues(4) = sBackForeCSIsoClrPref
-    strKeys(5) = "ChargeStateShapes": strValues(5) = sCSIsoShapePref
-    strKeys(6) = "Switches": strValues(6) = sSwitchPref
-    strKeys(7) = "Tolerances": strValues(7) = sTolerancesPref
+    iKVCount = 0
+    AddKeyValueSetting sKeys, sVals, iKVCount, "CoordinateSystem", sCooSysPref
+    AddKeyValueSetting sKeys, sVals, iKVCount, "DifferentialDisplay", sDDClrPref
+    AddKeyValueSetting sKeys, sVals, iKVCount, "Drawing", sDrawingPref
+    AddKeyValueSetting sKeys, sVals, iKVCount, "ICR2LS", sICR2LSPref
+    AddKeyValueSetting sKeys, sVals, iKVCount, "ChargeStateColors", sBackForeCSIsoClrPref
+    AddKeyValueSetting sKeys, sVals, iKVCount, "ChargeStateShapes", sCSIsoShapePref
+    AddKeyValueSetting sKeys, sVals, iKVCount, "Switches", sSwitchPref
+    AddKeyValueSetting sKeys, sVals, iKVCount, "Tolerances", sTolerancesPref
     
     ' No longer supported (March 2006)
-    ''strKeys(8) = "AMTs": strValues(8) = sAMTPref
-    ''strKeys(9) = "FTICRAmts": strValues(9) = sFTICR_AMTPref
+    ''AddKeyValueSetting sKeys, sVals, iKVCount, "AMTs", sAMTPref
+    ''AddKeyValueSetting sKeys, sVals, iKVCount, "FTICRAmts", sFTICR_AMTPref
             
-    IniStuff.WriteSection "Preferences", strKeys(), strValues()
+    IniStuff.WriteSection "Preferences", sKeys(), sVals(), iKVCount
 
     ' Write the expanded preferences
-    ReDim strKeys(0 To 17)
-    ReDim strValues(0 To 17)
     With udtPrefsExpanded
-        strKeys(0) = "MenuModeDefault": strValues(0) = .MenuModeDefault
-        strKeys(1) = "MenuModeIncludeObsolete": strValues(1) = .MenuModeIncludeObsolete
-        strKeys(2) = "ExtendedFileSaveModePreferred": strValues(2) = .ExtendedFileSaveModePreferred
-        strKeys(3) = "AutoAdjSize": strValues(3) = .AutoAdjSize
-        strKeys(4) = "AutoSizeMultiplier": strValues(4) = .AutoSizeMultiplier
-        strKeys(5) = "UMCDrawType": strValues(5) = .UMCDrawType
-        strKeys(6) = "UsePEKBasedERValues": strValues(6) = .UsePEKBasedERValues
-        strKeys(7) = "UseMassTagsWithNullMass": strValues(7) = .UseMassTagsWithNullMass
-        strKeys(8) = "UseMassTagsWithNullNET": strValues(8) = .UseMassTagsWithNullNET
-        strKeys(9) = "UseUMCConglomerateNET": strValues(9) = .UseUMCConglomerateNET
-        strKeys(10) = "NetAdjustmentUsesN15AMTMasses": strValues(10) = .NetAdjustmentUsesN15AMTMasses
-        strKeys(11) = "NetAdjustmentMinHighNormalizedScore": strValues(11) = .NetAdjustmentMinHighNormalizedScore
-        strKeys(12) = "NetAdjustmentMinHighDiscriminantScore": strValues(12) = .NetAdjustmentMinHighDiscriminantScore
-        strKeys(13) = "AMTSearchResultsBehavior": strValues(13) = .AMTSearchResultsBehavior
-        strKeys(14) = "ICR2LSSpectrumViewZoomWindowWidthMZ": strValues(14) = .ICR2LSSpectrumViewZoomWindowWidthMZ
-        strKeys(15) = "LastAutoAnalysisIniFilePath": strValues(15) = .LastAutoAnalysisIniFilePath
-        strKeys(16) = "LastInputFileMode": strValues(16) = .LastInputFileMode
-        strKeys(17) = "LegacyAMTDBPath": strValues(17) = .LegacyAMTDBPath
+        iKVCount = 0
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "MenuModeDefault", CInt(.MenuModeDefault)
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "MenuModeIncludeObsolete", .MenuModeIncludeObsolete
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExtendedFileSaveModePreferred", .ExtendedFileSaveModePreferred
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoAdjSize", .AutoAdjSize
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "AutoSizeMultiplier", .AutoSizeMultiplier
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "UMCDrawType", .UMCDrawType
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UsePEKBasedERValues", .UsePEKBasedERValues
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullMass", .UseMassTagsWithNullMass
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullNET", .UseMassTagsWithNullNET
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseUMCConglomerateNET", .UseUMCConglomerateNET
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "NetAdjustmentUsesN15AMTMasses", .NetAdjustmentUsesN15AMTMasses
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "NetAdjustmentMinHighNormalizedScore", .NetAdjustmentMinHighNormalizedScore
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "NetAdjustmentMinHighDiscriminantScore", .NetAdjustmentMinHighDiscriminantScore
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "AMTSearchResultsBehavior", CInt(.AMTSearchResultsBehavior)
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ICR2LSSpectrumViewZoomWindowWidthMZ", .ICR2LSSpectrumViewZoomWindowWidthMZ
+        AddKeyValueSetting sKeys, sVals, iKVCount, "LastAutoAnalysisIniFilePath", .LastAutoAnalysisIniFilePath
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "LastInputFileMode", CInt(.LastInputFileMode)
+        AddKeyValueSetting sKeys, sVals, iKVCount, "LegacyAMTDBPath", .LegacyAMTDBPath
     End With
-    IniStuff.WriteSection "ExpandedPreferences", strKeys(), strValues()
+    IniStuff.WriteSection "ExpandedPreferences", sKeys(), sVals(), iKVCount
     
     If Not bnlAutoAnalysisFieldsOnly And Not APP_BUILD_DISABLE_MTS Then
         ' Auto Query PRISM options
-        ReDim strKeys(0 To 10)
-        ReDim strValues(0 To 10)
         With udtPrefsExpanded.AutoQueryPRISMOptions
-            strKeys(0) = "ConnectionStringQueryDB": strValues(0) = .ConnectionStringQueryDB
-            strKeys(1) = "RequestTaskSPName": strValues(1) = .RequestTaskSPName
-            strKeys(2) = "SetTaskCompleteSPName": strValues(2) = .SetTaskCompleteSPName
-            strKeys(3) = "SetTaskToRestartSPName": strValues(3) = .SetTaskToRestartSPName
-            strKeys(4) = "PostLogEntrySPName": strValues(4) = .PostLogEntrySPName
-            strKeys(5) = "QueryIntervalSeconds": strValues(5) = .QueryIntervalSeconds
-            strKeys(6) = "MinimumPriorityToProcess": strValues(6) = .MinimumPriorityToProcess
-            strKeys(7) = "MaximumPriorityToProcess": strValues(7) = .MaximumPriorityToProcess
-            strKeys(8) = "PreferredDatabaseToProcess": strValues(8) = .PreferredDatabaseToProcess
-            strKeys(9) = "ServerForPreferredDatabase": strValues(9) = .ServerForPreferredDatabase
-            strKeys(10) = "ExclusivelyUseThisDatabase": strValues(10) = .ExclusivelyUseThisDatabase
+            iKVCount = 0
+            AddKeyValueSetting sKeys, sVals, iKVCount, "ConnectionStringQueryDB", .ConnectionStringQueryDB
+            AddKeyValueSetting sKeys, sVals, iKVCount, "RequestTaskSPName", .RequestTaskSPName
+            AddKeyValueSetting sKeys, sVals, iKVCount, "SetTaskCompleteSPName", .SetTaskCompleteSPName
+            AddKeyValueSetting sKeys, sVals, iKVCount, "SetTaskToRestartSPName", .SetTaskToRestartSPName
+            AddKeyValueSetting sKeys, sVals, iKVCount, "PostLogEntrySPName", .PostLogEntrySPName
+            
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "QueryIntervalSeconds", .QueryIntervalSeconds
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MinimumPriorityToProcess", .MinimumPriorityToProcess
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "MaximumPriorityToProcess", .MaximumPriorityToProcess
+            AddKeyValueSetting sKeys, sVals, iKVCount, "PreferredDatabaseToProcess", .PreferredDatabaseToProcess
+            AddKeyValueSetting sKeys, sVals, iKVCount, "ServerForPreferredDatabase", .ServerForPreferredDatabase
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExclusivelyUseThisDatabase", .ExclusivelyUseThisDatabase
         End With
-        IniStuff.WriteSection "AutoQueryPRISMOptions", strKeys(), strValues()
+        IniStuff.WriteSection "AutoQueryPRISMOptions", sKeys(), sVals(), iKVCount
     End If
     
     ' Write the NET Adjustment UMC Selection Options
-    ReDim strKeys(0 To 4)
-    ReDim strValues(0 To 4)
     With udtPrefsExpanded.NetAdjustmentUMCDistributionOptions
-        strKeys(0) = "RequireDispersedUMCSelection": strValues(0) = .RequireDispersedUMCSelection
-        strKeys(1) = "SegmentCount": strValues(1) = .SegmentCount
-        strKeys(2) = "MinimumUMCsPerSegmentPctTopAbuPct": strValues(2) = .MinimumUMCsPerSegmentPctTopAbuPct
-        strKeys(3) = "ScanPctStart": strValues(3) = .ScanPctStart
-        strKeys(4) = "ScanPctEnd": strValues(4) = .ScanPctEnd
+        iKVCount = 0
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RequireDispersedUMCSelection", .RequireDispersedUMCSelection
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "SegmentCount", .SegmentCount
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "MinimumUMCsPerSegmentPctTopAbuPct", .MinimumUMCsPerSegmentPctTopAbuPct
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "ScanPctStart", .ScanPctStart
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "ScanPctEnd", .ScanPctEnd
     End With
-    IniStuff.WriteSection "NetAdjustmentUMCDistributionOptions", strKeys(), strValues()
+    IniStuff.WriteSection "NetAdjustmentUMCDistributionOptions", sKeys(), sVals(), iKVCount
     
     ' Write the Error Plotting Options
-    ReDim strKeys(0 To 4)
-    ReDim strValues(0 To 4)
     With udtPrefsExpanded.ErrorPlottingOptions
-        strKeys(0) = "MassRangePPM": strValues(0) = .MassRangePPM
-        strKeys(1) = "MassBinSizePPM": strValues(1) = .MassBinSizePPM
-        strKeys(2) = "GANETRange": strValues(2) = .GANETRange
-        strKeys(3) = "GANETBinSize": strValues(3) = .GANETBinSize
-        strKeys(4) = "ButterWorthFrequency": strValues(4) = .ButterWorthFrequency
+        iKVCount = 0
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MassRangePPM", .MassRangePPM
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MassBinSizePPM", .MassBinSizePPM
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "GANETRange", .GANETRange
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "GANETBinSize", .GANETBinSize
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "ButterWorthFrequency", .ButterWorthFrequency
     End With
-    IniStuff.WriteSection "ErrorPlottingOptions", strKeys(), strValues()
+    IniStuff.WriteSection "ErrorPlottingOptions", sKeys(), sVals(), iKVCount
     
     ' Write the Error Plotting Options -- Graph2D
-    ReDim strKeys(0 To 8)
-    ReDim strValues(0 To 8)
     With udtPrefsExpanded.ErrorPlottingOptions.Graph2DOptions
-        strKeys(0) = "ShowPointSymbols": strValues(0) = .ShowPointSymbols
-        strKeys(1) = "DrawLinesBetweenPoints": strValues(1) = .DrawLinesBetweenPoints
-        strKeys(2) = "ShowGridlines": strValues(2) = .ShowGridLines
-        strKeys(3) = "AutoScaleXAxis": strValues(3) = .AutoScaleXAxis
-        strKeys(4) = "PointSizePixels": strValues(4) = .PointSizePixels
-        strKeys(5) = "LineWidthPixels": strValues(5) = .LineWidthPixels
-        strKeys(6) = "CenterYAxis": strValues(6) = .CenterYAxis
-        strKeys(7) = "ShowSmoothedData": strValues(7) = .ShowSmoothedData
-        strKeys(8) = "ShowPeakEdges": strValues(8) = .ShowPeakEdges
+        iKVCount = 0
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowPointSymbols", .ShowPointSymbols
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "DrawLinesBetweenPoints", .DrawLinesBetweenPoints
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowGridlines", .ShowGridLines
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoScaleXAxis", .AutoScaleXAxis
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "PointSizePixels", .PointSizePixels
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "LineWidthPixels", .LineWidthPixels
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "CenterYAxis", .CenterYAxis
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowSmoothedData", .ShowSmoothedData
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowPeakEdges", .ShowPeakEdges
     End With
-    IniStuff.WriteSection "ErrorPlottingOptionsGraph2D", strKeys(), strValues()
+    IniStuff.WriteSection "ErrorPlottingOptionsGraph2D", sKeys(), sVals(), iKVCount
     
     ' Write the Error Plotting Options -- Graph3D
-    ReDim strKeys(0 To 5)
-    ReDim strValues(0 To 5)
     With udtPrefsExpanded.ErrorPlottingOptions.Graph3DOptions
-        strKeys(0) = "ContourLevelsCount": strValues(0) = .ContourLevelsCount
-        strKeys(1) = "Perspective": strValues(1) = .Perspective
-        strKeys(2) = "Elevation": strValues(2) = .Elevation
-        strKeys(3) = "YRotation": strValues(3) = .YRotation
-        strKeys(4) = "ZRotation": strValues(4) = .ZRotation
-        strKeys(5) = "AnnotationFontSize": strValues(5) = .AnnotationFontSize
+        iKVCount = 0
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "ContourLevelsCount", .ContourLevelsCount
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "Perspective", .Perspective
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "Elevation", .Elevation
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "YRotation", .YRotation
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "ZRotation", .ZRotation
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "AnnotationFontSize", .AnnotationFontSize
     End With
-    IniStuff.WriteSection "ErrorPlottingOptionsGraph3D", strKeys(), strValues()
+    IniStuff.WriteSection "ErrorPlottingOptionsGraph3D", sKeys(), sVals(), iKVCount
     
     ' Write the noise removal options
-    ReDim strKeys(0 To 11)
-    ReDim strValues(0 To 11)
     With udtPrefsExpanded.NoiseRemovalOptions
-        strKeys(0) = "SearchTolerancePPMDefault": strValues(0) = .SearchTolerancePPMDefault
-        strKeys(1) = "SearchTolerancePPMAutoRemoval": strValues(1) = .SearchTolerancePPMAutoRemoval
-        strKeys(2) = "PercentageThresholdToExcludeSlice": strValues(2) = .PercentageThresholdToExcludeSlice
-        strKeys(3) = "PercentageThresholdToAddNeighborToSearchSlice": strValues(3) = .PercentageThresholdToAddNeighborToSearchSlice
-        strKeys(4) = "LimitMassRange": strValues(4) = .LimitMassRange
-        strKeys(5) = "MassStart": strValues(5) = .MassStart
-        strKeys(6) = "MassEnd": strValues(6) = .MassEnd
-        strKeys(7) = "LimitScanRange": strValues(7) = .LimitScanRange
-        strKeys(8) = "ScanStart": strValues(8) = .ScanStart
-        strKeys(9) = "ScanEnd": strValues(9) = .ScanEnd
-        strKeys(10) = "SearchScope": strValues(10) = .SearchScope
-        strKeys(11) = "RequireIdenticalCharge": strValues(11) = .RequireIdenticalCharge
+        iKVCount = 0
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "SearchTolerancePPMDefault", .SearchTolerancePPMDefault
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "SearchTolerancePPMAutoRemoval", .SearchTolerancePPMAutoRemoval
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "PercentageThresholdToExcludeSlice", .PercentageThresholdToExcludeSlice
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "PercentageThresholdToAddNeighborToSearchSlice", .PercentageThresholdToAddNeighborToSearchSlice
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "LimitMassRange", .LimitMassRange
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassStart", .MassStart
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassEnd", .MassEnd
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "LimitScanRange", .LimitScanRange
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "ScanStart", .ScanStart
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "ScanEnd", .ScanEnd
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "SearchScope", CInt(.SearchScope)
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RequireIdenticalCharge", .RequireIdenticalCharge
     End With
-    IniStuff.WriteSection "NoiseRemovalOptions", strKeys(), strValues()
+    IniStuff.WriteSection "NoiseRemovalOptions", sKeys(), sVals(), iKVCount
     frmProgress.UpdateProgressBar 2
     
     ' Write the Refine MS Data options
-    ReDim strKeys(0 To 22)
-    ReDim strValues(0 To 22)
     With udtPrefsExpanded.RefineMSDataOptions
-        strKeys(0) = "MinimumPeakHeight": strValues(0) = .MinimumPeakHeight
-        strKeys(1) = "MinimumSignalToNoiseRatioForLowAbundancePeaks": strValues(1) = .MinimumSignalToNoiseRatioForLowAbundancePeaks
-        strKeys(2) = "PercentageOfMaxForFindingWidth": strValues(2) = .PercentageOfMaxForFindingWidth
-        strKeys(3) = "MassCalibrationMaximumShift": strValues(3) = .MassCalibrationMaximumShift
-        strKeys(4) = "MassCalibrationTolType": strValues(4) = .MassCalibrationTolType
-        strKeys(5) = "ToleranceRefinementMethod": strValues(5) = .ToleranceRefinementMethod
-        strKeys(6) = "UseMinMaxIfOutOfRange": strValues(6) = .UseMinMaxIfOutOfRange
-        strKeys(7) = "MassToleranceMinimum": strValues(7) = .MassToleranceMinimum
-        strKeys(8) = "MassToleranceMaximum": strValues(8) = .MassToleranceMaximum
-        strKeys(9) = "MassToleranceAdjustmentMultiplier": strValues(9) = .MassToleranceAdjustmentMultiplier
-        strKeys(10) = "NETToleranceMinimum": strValues(10) = .NETToleranceMinimum
-        strKeys(11) = "NETToleranceMaximum": strValues(11) = .NETToleranceMaximum
-        strKeys(12) = "NETToleranceAdjustmentMultiplier": strValues(12) = .NETToleranceAdjustmentMultiplier
-        strKeys(13) = "IncludeInternalStdMatches": strValues(13) = .IncludeInternalStdMatches
-        strKeys(14) = "UseUMCClassStats": strValues(14) = .UseUMCClassStats
-        strKeys(15) = "MinimumSLiC": strValues(15) = .MinimumSLiC
-        strKeys(16) = "MaximumAbundance": strValues(16) = .MaximumAbundance
+        iKVCount = 0
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MinimumPeakHeight", .MinimumPeakHeight
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MinimumSignalToNoiseRatioForLowAbundancePeaks", .MinimumSignalToNoiseRatioForLowAbundancePeaks
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "PercentageOfMaxForFindingWidth", .PercentageOfMaxForFindingWidth
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassCalibrationMaximumShift", .MassCalibrationMaximumShift
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassCalibrationTolType", CInt(.MassCalibrationTolType)
+        
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "ToleranceRefinementMethod", CInt(.ToleranceRefinementMethod)
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMinMaxIfOutOfRange", .UseMinMaxIfOutOfRange
+        
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassToleranceMinimum", .MassToleranceMinimum
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassToleranceMaximum", .MassToleranceMaximum
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassToleranceAdjustmentMultiplier", .MassToleranceAdjustmentMultiplier
+        
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETToleranceMinimum", .NETToleranceMinimum
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETToleranceMaximum", .NETToleranceMaximum
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETToleranceAdjustmentMultiplier", .NETToleranceAdjustmentMultiplier
+        
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "IncludeInternalStdMatches", .IncludeInternalStdMatches
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseUMCClassStats", .UseUMCClassStats
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MinimumSLiC", .MinimumSLiC
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MaximumAbundance", .MaximumAbundance
     
-        strKeys(17) = "EMMassErrorPeakToleranceEstimatePPM": strValues(17) = .EMMassErrorPeakToleranceEstimatePPM
-        strKeys(18) = "EMNETErrorPeakToleranceEstimate": strValues(18) = .EMNETErrorPeakToleranceEstimate
-        strKeys(19) = "EMIterationCount": strValues(19) = .EMIterationCount
-        strKeys(20) = "EMPercentOfDataToExclude": strValues(20) = .EMPercentOfDataToExclude
-        strKeys(21) = "EMMassTolRefineForceUseSingleDataPointErrors": strValues(21) = .EMMassTolRefineForceUseSingleDataPointErrors
-        strKeys(22) = "EMNETTolRefineForceUseSingleDataPointErrors": strValues(22) = .EMNETTolRefineForceUseSingleDataPointErrors
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "EMMassErrorPeakToleranceEstimatePPM", .EMMassErrorPeakToleranceEstimatePPM
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "EMNETErrorPeakToleranceEstimate", .EMNETErrorPeakToleranceEstimate
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "EMIterationCount", .EMIterationCount
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "EMPercentOfDataToExclude", .EMPercentOfDataToExclude
+        
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "EMMassTolRefineForceUseSingleDataPointErrors", .EMMassTolRefineForceUseSingleDataPointErrors
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "EMNETTolRefineForceUseSingleDataPointErrors", .EMNETTolRefineForceUseSingleDataPointErrors
     End With
-    IniStuff.WriteSection "RefineMSDataOptions", strKeys(), strValues()
+    IniStuff.WriteSection "RefineMSDataOptions", sKeys(), sVals(), iKVCount
         
     ' Write the TIC Plotting Options
-    ReDim strKeys(0 To 17)
-    ReDim strValues(0 To 17)
     With udtPrefsExpanded.TICAndBPIPlottingOptions
-        strKeys(0) = "PlotNETOnXAxis": strValues(0) = .PlotNETOnXAxis
-        strKeys(1) = "NormalizeYAxis": strValues(1) = .NormalizeYAxis
-        strKeys(2) = "SmoothUsingMovingAverage": strValues(2) = .SmoothUsingMovingAverage
-        strKeys(3) = "MovingAverageWindowWidth": strValues(3) = .MovingAverageWindowWidth
-        strKeys(4) = "TimeDomainDataMaxValue": strValues(4) = .TimeDomainDataMaxValue
+        iKVCount = 0
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "PlotNETOnXAxis", .PlotNETOnXAxis
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "NormalizeYAxis", .NormalizeYAxis
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SmoothUsingMovingAverage", .SmoothUsingMovingAverage
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MovingAverageWindowWidth", .MovingAverageWindowWidth
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "TimeDomainDataMaxValue", .TimeDomainDataMaxValue
         With .Graph2DOptions
-            strKeys(5) = "ShowPointSymbols": strValues(5) = .ShowPointSymbols
-            strKeys(6) = "DrawLinesBetweenPoints": strValues(6) = .DrawLinesBetweenPoints
-            strKeys(7) = "ShowGridlines": strValues(7) = .ShowGridLines
-            strKeys(8) = "AutoScaleXAxis": strValues(8) = .AutoScaleXAxis
-            strKeys(9) = "PointSizePixels": strValues(9) = .PointSizePixels
-            strKeys(10) = "PointShape": strValues(10) = .PointShape
-            strKeys(11) = "PointAndLineColor": strValues(11) = .PointAndLineColor
-            strKeys(12) = "LineWidthPixels": strValues(12) = .LineWidthPixels
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowPointSymbols", .ShowPointSymbols
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "DrawLinesBetweenPoints", .DrawLinesBetweenPoints
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowGridlines", .ShowGridLines
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoScaleXAxis", .AutoScaleXAxis
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "PointSizePixels", .PointSizePixels
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "PointShape", .PointShape
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "PointAndLineColor", .PointAndLineColor
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "LineWidthPixels", .LineWidthPixels
         End With
-        strKeys(13) = "PointShapeSeries2": strValues(13) = .PointShapeSeries2
-        strKeys(14) = "PointAndLineColorSeries2": strValues(14) = .PointAndLineColorSeries2
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "PointShapeSeries2", .PointShapeSeries2
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "PointAndLineColorSeries2", .PointAndLineColorSeries2
         
-        strKeys(15) = "ClipOutliers": strValues(15) = .ClipOutliers
-        strKeys(16) = "ClipOutliersFactor": strValues(16) = .ClipOutliersFactor
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ClipOutliers", .ClipOutliers
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "ClipOutliersFactor", .ClipOutliersFactor
         
-        strKeys(17) = "KeepWindowOnTop": strValues(17) = .KeepWindowOnTop
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "KeepWindowOnTop", .KeepWindowOnTop
     End With
-    IniStuff.WriteSection "TICAndBPIPlottingOptions", strKeys(), strValues()
+    IniStuff.WriteSection "TICAndBPIPlottingOptions", sKeys(), sVals(), iKVCount
     
     ' Write the Pair Browser Options
-    ReDim strKeys(0 To 19)
-    ReDim strValues(0 To 19)
     With udtPrefsExpanded.PairBrowserPlottingOptions
-        strKeys(0) = "SortOrder": strValues(0) = .SortOrder
-        strKeys(1) = "SortDescending": strValues(1) = .SortDescending
-        strKeys(2) = "AutoZoom2DPlot": strValues(2) = .AutoZoom2DPlot
-        strKeys(3) = "HighlightMembers": strValues(3) = .HighlightMembers
-        strKeys(4) = "PlotAllChargeStates": strValues(4) = .PlotAllChargeStates
-        strKeys(5) = "FixedDimensionsForAutoZoom": strValues(5) = .FixedDimensionsForAutoZoom
+        iKVCount = 0
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "SortOrder", .SortOrder
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SortDescending", .SortDescending
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoZoom2DPlot", .AutoZoom2DPlot
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "HighlightMembers", .HighlightMembers
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "PlotAllChargeStates", .PlotAllChargeStates
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "FixedDimensionsForAutoZoom", .FixedDimensionsForAutoZoom
         
-        strKeys(6) = "MassRangeZoom": strValues(6) = .MassRangeZoom
-        strKeys(7) = "MassRangeUnits": strValues(7) = .MassRangeUnits
-        strKeys(8) = "ScanRangeZoom": strValues(8) = .ScanRangeZoom
-        strKeys(9) = "ScanRangeUnits": strValues(9) = .ScanRangeUnits
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassRangeZoom", .MassRangeZoom
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassRangeUnits", .MassRangeUnits
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ScanRangeZoom", .ScanRangeZoom
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "ScanRangeUnits", .ScanRangeUnits
         
         With .Graph2DOptions
-            strKeys(10) = "ShowPointSymbols": strValues(10) = .ShowPointSymbols
-            strKeys(11) = "DrawLinesBetweenPoints": strValues(11) = .DrawLinesBetweenPoints
-            strKeys(12) = "ShowGridlines": strValues(12) = .ShowGridLines
-            strKeys(13) = "PointSizePixels": strValues(13) = .PointSizePixels
-            strKeys(14) = "PointShape": strValues(14) = .PointShape
-            strKeys(15) = "PointAndLineColor": strValues(15) = .PointAndLineColor
-            strKeys(16) = "LineWidthPixels": strValues(16) = .LineWidthPixels
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowPointSymbols", .ShowPointSymbols
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "DrawLinesBetweenPoints", .DrawLinesBetweenPoints
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowGridlines", .ShowGridLines
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "PointSizePixels", .PointSizePixels
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "PointShape", .PointShape
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "PointAndLineColor", .PointAndLineColor
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "LineWidthPixels", .LineWidthPixels
         End With
     
-        strKeys(17) = "PointShapeHeavy": strValues(17) = .PointShapeHeavy
-        strKeys(18) = "PointAndLineColorHeavy": strValues(18) = .PointAndLineColorHeavy
-        strKeys(19) = "KeepWindowOnTop": strValues(19) = .KeepWindowOnTop
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "PointShapeHeavy", .PointShapeHeavy
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "PointAndLineColorHeavy", .PointAndLineColorHeavy
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "KeepWindowOnTop", .KeepWindowOnTop
     End With
-    IniStuff.WriteSection "PairBrowserOptions", strKeys(), strValues()
+    IniStuff.WriteSection "PairBrowserOptions", sKeys(), sVals(), iKVCount
     
     ' Write the UMC Browser Options
-    ReDim strKeys(0 To 17)
-    ReDim strValues(0 To 17)
     With udtPrefsExpanded.UMCBrowserPlottingOptions
-        strKeys(0) = "SortOrder": strValues(0) = .SortOrder
-        strKeys(1) = "SortDescending": strValues(1) = .SortDescending
-        strKeys(2) = "AutoZoom2DPlot": strValues(2) = .AutoZoom2DPlot
-        strKeys(3) = "HighlightMembers": strValues(3) = .HighlightMembers
-        strKeys(4) = "PlotAllChargeStates": strValues(4) = .PlotAllChargeStates
-        strKeys(5) = "FixedDimensionsForAutoZoom": strValues(5) = .FixedDimensionsForAutoZoom
+        iKVCount = 0
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "SortOrder", .SortOrder
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SortDescending", .SortDescending
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoZoom2DPlot", .AutoZoom2DPlot
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "HighlightMembers", .HighlightMembers
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "PlotAllChargeStates", .PlotAllChargeStates
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "FixedDimensionsForAutoZoom", .FixedDimensionsForAutoZoom
         
-        strKeys(6) = "MassRangeZoom": strValues(6) = .MassRangeZoom
-        strKeys(7) = "MassRangeUnits": strValues(7) = .MassRangeUnits
-        strKeys(8) = "ScanRangeZoom": strValues(8) = .ScanRangeZoom
-        strKeys(9) = "ScanRangeUnits": strValues(9) = .ScanRangeUnits
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassRangeZoom", .MassRangeZoom
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassRangeUnits", .MassRangeUnits
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ScanRangeZoom", .ScanRangeZoom
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "ScanRangeUnits", .ScanRangeUnits
         
         With .Graph2DOptions
-            strKeys(10) = "ShowPointSymbols": strValues(10) = .ShowPointSymbols
-            strKeys(11) = "DrawLinesBetweenPoints": strValues(11) = .DrawLinesBetweenPoints
-            strKeys(12) = "ShowGridlines": strValues(12) = .ShowGridLines
-            strKeys(13) = "PointSizePixels": strValues(13) = .PointSizePixels
-            strKeys(14) = "PointShape": strValues(14) = .PointShape
-            strKeys(15) = "PointAndLineColor": strValues(15) = .PointAndLineColor
-            strKeys(16) = "LineWidthPixels": strValues(16) = .LineWidthPixels
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowPointSymbols", .ShowPointSymbols
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "DrawLinesBetweenPoints", .DrawLinesBetweenPoints
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ShowGridlines", .ShowGridLines
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "PointSizePixels", .PointSizePixels
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "PointShape", .PointShape
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "PointAndLineColor", .PointAndLineColor
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "LineWidthPixels", .LineWidthPixels
         End With
     
-        strKeys(17) = "KeepWindowOnTop": strValues(17) = .KeepWindowOnTop
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "KeepWindowOnTop", .KeepWindowOnTop
     End With
-    IniStuff.WriteSection "UMCBrowserOptions", strKeys(), strValues()
+    IniStuff.WriteSection "UMCBrowserOptions", sKeys(), sVals(), iKVCount
     
     ' Write the Pair Search Options
-    ReDim strKeys(0 To 42)
-    ReDim strValues(0 To 42)
     With udtPrefsExpanded.PairSearchOptions
         With .SearchDef
-            strKeys(0) = "DeltaMass": strValues(0) = .DeltaMass
-            strKeys(1) = "DeltaMassTolerance": strValues(1) = .DeltaMassTolerance
-            strKeys(2) = "DeltaMassTolType": strValues(2) = .DeltaMassTolType
+            iKVCount = 0
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "DeltaMass", .DeltaMass
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "DeltaMassTolerance", .DeltaMassTolerance
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "DeltaMassTolType", .DeltaMassTolType
             
-            strKeys(3) = "AutoCalculateDeltaMinMaxCount": strValues(3) = .AutoCalculateDeltaMinMaxCount
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoCalculateDeltaMinMaxCount", .AutoCalculateDeltaMinMaxCount
             
-            strKeys(4) = "DeltaCountMin": strValues(4) = .DeltaCountMin
-            strKeys(5) = "DeltaCountMax": strValues(5) = .DeltaCountMax
-            strKeys(6) = "DeltaStepSize": strValues(6) = .DeltaStepSize
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "DeltaCountMin", .DeltaCountMin
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "DeltaCountMax", .DeltaCountMax
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "DeltaStepSize", .DeltaStepSize
             
-            strKeys(7) = "LightLabelMass": strValues(7) = .LightLabelMass
-            strKeys(8) = "HeavyLightMassDifference": strValues(8) = .HeavyLightMassDifference
-            strKeys(9) = "LabelCountMin": strValues(9) = .LabelCountMin
-            strKeys(10) = "LabelCountMax": strValues(10) = .LabelCountMax
-            strKeys(11) = "MaxDifferenceInNumberOfLightHeavyLabels": strValues(11) = .MaxDifferenceInNumberOfLightHeavyLabels
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "LightLabelMass", .LightLabelMass
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "HeavyLightMassDifference", .HeavyLightMassDifference
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "LabelCountMin", .LabelCountMin
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "LabelCountMax", .LabelCountMax
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "MaxDifferenceInNumberOfLightHeavyLabels", .MaxDifferenceInNumberOfLightHeavyLabels
             
-            strKeys(12) = "RequireUMCOverlap": strValues(12) = .RequireUMCOverlap
-            strKeys(13) = "RequireUMCOverlapAtApex": strValues(13) = .RequireUMCOverlapAtApex
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "RequireUMCOverlap", .RequireUMCOverlap
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "RequireUMCOverlapAtApex", .RequireUMCOverlapAtApex
             
-            strKeys(14) = "ScanTolerance": strValues(14) = .ScanTolerance
-            strKeys(15) = "ScanToleranceAtApex": strValues(15) = .ScanToleranceAtApex
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "ScanTolerance", .ScanTolerance
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "ScanToleranceAtApex", .ScanToleranceAtApex
             
-            strKeys(16) = "ERInclusionMin": strValues(16) = .ERInclusionMin
-            strKeys(17) = "ERInclusionMax": strValues(17) = .ERInclusionMax
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ERInclusionMin", .ERInclusionMin
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ERInclusionMax", .ERInclusionMax
             
-            strKeys(18) = "RequireMatchingChargeStatesForPairMembers": strValues(18) = .RequireMatchingChargeStatesForPairMembers
-            strKeys(19) = "UseIdenticalChargesForER": strValues(19) = .UseIdenticalChargesForER
-            strKeys(20) = "ComputeERScanByScan": strValues(20) = .ComputeERScanByScan
-            strKeys(21) = "ScanByScanAverageIsNotWeighted": strValues(21) = .ScanByScanAverageIsNotWeighted
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "RequireMatchingChargeStatesForPairMembers", .RequireMatchingChargeStatesForPairMembers
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseIdenticalChargesForER", .UseIdenticalChargesForER
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ComputeERScanByScan", .ComputeERScanByScan
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ScanByScanAverageIsNotWeighted", .ScanByScanAverageIsNotWeighted
             
-            strKeys(22) = "AverageERsAllChargeStates": strValues(22) = .AverageERsAllChargeStates
-            strKeys(23) = "AverageERsWeightingMode": strValues(23) = .AverageERsWeightingMode
-            strKeys(24) = "ERCalcType": strValues(24) = .ERCalcType
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "RequireMatchingIsotopeTagLabels", .RequireMatchingIsotopeTagLabels
+            
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "AverageERsAllChargeStates", .AverageERsAllChargeStates
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "AverageERsWeightingMode", .AverageERsWeightingMode
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "ERCalcType", .ERCalcType
         
-            strKeys(25) = "RemoveOutlierERs": strValues(25) = .RemoveOutlierERs
-            strKeys(26) = "RemoveOutlierERsIterate": strValues(26) = .RemoveOutlierERsIterate
-            strKeys(27) = "RemoveOutlierERsMinimumDataPointCount": strValues(27) = .RemoveOutlierERsMinimumDataPointCount
-            strKeys(28) = "RemoveOutlierERsConfidenceLevel": strValues(28) = .RemoveOutlierERsConfidenceLevel
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "RemoveOutlierERs", .RemoveOutlierERs
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "RemoveOutlierERsIterate", .RemoveOutlierERsIterate
+            AddKeyValueSettingLng sKeys, sVals, iKVCount, "RemoveOutlierERsMinimumDataPointCount", .RemoveOutlierERsMinimumDataPointCount
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "RemoveOutlierERsConfidenceLevel", .RemoveOutlierERsConfidenceLevel
         
-            strKeys(29) = .N15IncompleteIncorporationMode: strValues(29) = .N15IncompleteIncorporationMode
-            strKeys(30) = .N15PercentIncorporationMinimum: strValues(30) = .N15PercentIncorporationMinimum
-            strKeys(31) = .N15PercentIncorporationMaximum: strValues(31) = .N15PercentIncorporationMaximum
-            strKeys(32) = .N15PercentIncorporationStep: strValues(32) = .N15PercentIncorporationStep
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "N15IncompleteIncorporationMode", .N15IncompleteIncorporationMode
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "N15PercentIncorporationMinimum", .N15PercentIncorporationMinimum
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "N15PercentIncorporationMaximum", .N15PercentIncorporationMaximum
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "N15PercentIncorporationStep", .N15PercentIncorporationStep
         
         End With
         
-        strKeys(33) = "PairSearchMode": strValues(33) = .PairSearchMode
+        AddKeyValueSetting sKeys, sVals, iKVCount, "PairSearchMode", .PairSearchMode
         
-        strKeys(34) = "AutoExcludeOutOfERRange": strValues(34) = .AutoExcludeOutOfERRange
-        strKeys(35) = "AutoExcludeAmbiguous": strValues(35) = .AutoExcludeAmbiguous
-        strKeys(36) = "KeepMostConfidentAmbiguous": strValues(36) = .KeepMostConfidentAmbiguous
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoExcludeOutOfERRange", .AutoExcludeOutOfERRange
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoExcludeAmbiguous", .AutoExcludeAmbiguous
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "KeepMostConfidentAmbiguous", .KeepMostConfidentAmbiguous
         
-        strKeys(37) = "AutoAnalysisRemovePairMemberHitsAfterDBSearch": strValues(37) = .AutoAnalysisRemovePairMemberHitsAfterDBSearch
-        strKeys(38) = "AutoAnalysisRemovePairMemberHitsRemoveHeavy": strValues(38) = .AutoAnalysisRemovePairMemberHitsRemoveHeavy
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoAnalysisRemovePairMemberHitsAfterDBSearch", .AutoAnalysisRemovePairMemberHitsAfterDBSearch
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoAnalysisRemovePairMemberHitsRemoveHeavy", .AutoAnalysisRemovePairMemberHitsRemoveHeavy
         
-        strKeys(39) = "AutoAnalysisSavePairsToTextFile": strValues(39) = .AutoAnalysisSavePairsToTextFile
-        strKeys(40) = "AutoAnalysisSavePairsStatisticsToTextFile": strValues(40) = .AutoAnalysisSavePairsStatisticsToTextFile
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoAnalysisSavePairsToTextFile", .AutoAnalysisSavePairsToTextFile
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoAnalysisSavePairsStatisticsToTextFile", .AutoAnalysisSavePairsStatisticsToTextFile
         
-        strKeys(41) = "NETAdjustmentPairedSearchUMCSelection": strValues(41) = .NETAdjustmentPairedSearchUMCSelection
-        strKeys(42) = "AutoAnalysisDeltaMassAddnlCount": strValues(42) = .AutoAnalysisDeltaMassAddnlCount
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "NETAdjustmentPairedSearchUMCSelection", CInt(.NETAdjustmentPairedSearchUMCSelection)
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "AutoAnalysisDeltaMassAddnlCount", .AutoAnalysisDeltaMassAddnlCount
         
         If .AutoAnalysisDeltaMassAddnlCount > 0 Then
-            intTargetIndexBase = UBound(strKeys) + 1
-            ReDim Preserve strKeys(intTargetIndexBase + .AutoAnalysisDeltaMassAddnlCount - 1)
-            ReDim Preserve strValues(intTargetIndexBase + .AutoAnalysisDeltaMassAddnlCount - 1)
-            
             For intIndex = 0 To .AutoAnalysisDeltaMassAddnlCount - 1
-                strKeys(intTargetIndexBase + intIndex) = "AutoAnalysisDeltaMassAddnl" & Trim(intIndex + 1)
-                strValues(intTargetIndexBase + intIndex) = .AutoAnalysisDeltaMassAddnl(intIndex)
+                AddKeyValueSettingDbl sKeys, sVals, iKVCount, "AutoAnalysisDeltaMassAddnl" & Trim(intIndex + 1), .AutoAnalysisDeltaMassAddnl(intIndex)
             Next intIndex
         Else
-            intTargetIndexBase = UBound(strKeys) + 1
-            ReDim Preserve strKeys(intTargetIndexBase)
-            ReDim Preserve strValues(intTargetIndexBase)
-            
-            strKeys(intTargetIndexBase) = "AutoAnalysisDeltaMassAddnl1"
-            strValues(intTargetIndexBase) = "0"
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "AutoAnalysisDeltaMassAddnl1", "0"
         End If
         
     End With
-    IniStuff.WriteSection "PairSearchOptions", strKeys(), strValues()
+    IniStuff.WriteSection "PairSearchOptions", sKeys(), sVals(), iKVCount
         
         
     ' Write the IReport Pair options
-    ReDim strKeys(0 To 5)
-    ReDim strValues(0 To 5)
     With udtPrefsExpanded.PairSearchOptions.SearchDef.IReportEROptions
-        strKeys(0) = "Enabled": strValues(0) = .Enabled
-        strKeys(1) = "NaturalAbundanceRatio2CoeffExponent": strValues(1) = .NaturalAbundanceRatio2Coeff.Exponent
-        strKeys(2) = "NaturalAbundanceRatio2CoeffMultiplier": strValues(2) = .NaturalAbundanceRatio2Coeff.Multiplier
-        strKeys(3) = "NaturalAbundanceRatio4CoeffExponent": strValues(3) = .NaturalAbundanceRatio4Coeff.Exponent
-        strKeys(4) = "NaturalAbundanceRatio4CoeffMultiplier": strValues(4) = .NaturalAbundanceRatio4Coeff.Multiplier
-        strKeys(5) = "MinimumFractionScansWithValidER": strValues(5) = .MinimumFractionScansWithValidER
+        iKVCount = 0
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "Enabled", .Enabled
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NaturalAbundanceRatio2CoeffExponent", .NaturalAbundanceRatio2Coeff.Exponent
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NaturalAbundanceRatio2CoeffMultiplier", .NaturalAbundanceRatio2Coeff.Multiplier
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NaturalAbundanceRatio4CoeffExponent", .NaturalAbundanceRatio4Coeff.Exponent
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NaturalAbundanceRatio4CoeffMultiplier", .NaturalAbundanceRatio4Coeff.Multiplier
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MinimumFractionScansWithValidER", .MinimumFractionScansWithValidER
     End With
-    IniStuff.WriteSection "IReportEROptions", strKeys(), strValues()
+    IniStuff.WriteSection "IReportEROptions", sKeys(), sVals(), iKVCount
     
     
     ' Write the MT tag Staleness Options
-    ReDim strKeys(0 To 3)
-    ReDim strValues(0 To 3)
     With udtPrefsExpanded.MassTagStalenessOptions
-        strKeys(0) = "MaximumAgeLoadedMassTagsHours": strValues(0) = .MaximumAgeLoadedMassTagsHours
-        strKeys(1) = "MaximumFractionAMTsWithNulls": strValues(1) = .MaximumFractionAMTsWithNulls
-        strKeys(2) = "MaximumCountAMTsWithNulls": strValues(2) = .MaximumCountAMTsWithNulls
-        strKeys(3) = "MinimumTimeBetweenReloadMinutes": strValues(3) = .MinimumTimeBetweenReloadMinutes
+        iKVCount = 0
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MaximumAgeLoadedMassTagsHours", .MaximumAgeLoadedMassTagsHours
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MaximumFractionAMTsWithNulls", .MaximumFractionAMTsWithNulls
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MaximumCountAMTsWithNulls", .MaximumCountAMTsWithNulls
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MinimumTimeBetweenReloadMinutes", .MinimumTimeBetweenReloadMinutes
     End With
-    IniStuff.WriteSection "MassTagStalenessOptions", strKeys(), strValues()
+    IniStuff.WriteSection "MassTagStalenessOptions", sKeys(), sVals(), iKVCount
     
     
     ' Write the Match Score options
-    ReDim strKeys(0 To 4)
-    ReDim strValues(0 To 4)
     With udtPrefsExpanded.SLiCScoreOptions
-        strKeys(0) = "MassPPMStDev": strValues(0) = .MassPPMStDev
-        strKeys(1) = "NETStDev": strValues(1) = .NETStDev
-        strKeys(2) = "UseAMTNETStDev": strValues(2) = .UseAMTNETStDev
-        strKeys(3) = "MaxSearchDistanceMultiplier": strValues(3) = .MaxSearchDistanceMultiplier
-        strKeys(4) = "AutoDefineSLiCScoreThresholds": strValues(4) = .AutoDefineSLiCScoreThresholds
+        iKVCount = 0
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MassPPMStDev", .MassPPMStDev
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NETStDev", .NETStDev
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseAMTNETStDev", .UseAMTNETStDev
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "MaxSearchDistanceMultiplier", .MaxSearchDistanceMultiplier
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoDefineSLiCScoreThresholds", .AutoDefineSLiCScoreThresholds
     End With
-    IniStuff.WriteSection "SLiCScoreOptions", strKeys(), strValues()
+    IniStuff.WriteSection "SLiCScoreOptions", sKeys(), sVals(), iKVCount
     
     
     ' Write the GraphicExport options
-    ReDim strKeys(0 To 1)
-    ReDim strValues(0 To 1)
     With udtPrefsExpanded.GraphicExportOptions
-        strKeys(0) = "CopyEMFIncludeFilenameAndDate": strValues(0) = .CopyEMFIncludeFilenameAndDate
-        strKeys(1) = "CopyEMFIncludeTextLabels": strValues(1) = .CopyEMFIncludeTextLabels
+        iKVCount = 0
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "CopyEMFIncludeFilenameAndDate", .CopyEMFIncludeFilenameAndDate
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "CopyEMFIncludeTextLabels", .CopyEMFIncludeTextLabels
     End With
-    IniStuff.WriteSection "GraphicExportOptions", strKeys(), strValues()
+    IniStuff.WriteSection "GraphicExportOptions", sKeys(), sVals(), iKVCount
     
     ' Write the Auto Tolerance Refinement Options
-    ReDim strKeys(0 To 10)
-    ReDim strValues(0 To 10)
     With udtPrefsExpanded.AutoAnalysisOptions.AutoToleranceRefinement
-        strKeys(0) = "DBSearchMWTol": strValues(0) = .DBSearchMWTol
-        strKeys(1) = "DBSearchTolType": strValues(1) = .DBSearchTolType
-        strKeys(2) = "DBSearchNETTol": strValues(2) = .DBSearchNETTol
-        strKeys(3) = "DBSearchRegionShape": strValues(3) = .DBSearchRegionShape
-        strKeys(4) = "DBSearchMinimumHighNormalizedScore": strValues(4) = .DBSearchMinimumHighNormalizedScore
-        strKeys(5) = "DBSearchMinimumHighDiscriminantScore": strValues(5) = .DBSearchMinimumHighDiscriminantScore
-        strKeys(6) = "DBSearchMinimumPeptideProphetProbability": strValues(6) = .DBSearchMinimumPeptideProphetProbability
-        strKeys(7) = "RefineMassCalibration": strValues(7) = .RefineMassCalibration
-        strKeys(8) = "RefineMassCalibrationOverridePPM": strValues(8) = .RefineMassCalibrationOverridePPM
-        strKeys(9) = "RefineDBSearchMassTolerance": strValues(9) = .RefineDBSearchMassTolerance
-        strKeys(10) = "RefineDBSearchNETTolerance": strValues(10) = .RefineDBSearchNETTolerance
+        iKVCount = 0
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "DBSearchMWTol", .DBSearchMWTol
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "DBSearchTolType", CInt(.DBSearchTolType)
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "DBSearchNETTol", .DBSearchNETTol
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "DBSearchRegionShape", CInt(.DBSearchRegionShape)
+        
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "DBSearchMinimumHighNormalizedScore", .DBSearchMinimumHighNormalizedScore
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "DBSearchMinimumHighDiscriminantScore", .DBSearchMinimumHighDiscriminantScore
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "DBSearchMinimumPeptideProphetProbability", .DBSearchMinimumPeptideProphetProbability
+        
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RefineMassCalibration", .RefineMassCalibration
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RefineMassCalibrationOverridePPM", .RefineMassCalibrationOverridePPM
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RefineDBSearchMassTolerance", .RefineDBSearchMassTolerance
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RefineDBSearchNETTolerance", .RefineDBSearchNETTolerance
     End With
-    IniStuff.WriteSection "AutoToleranceRefinement", strKeys(), strValues()
+    IniStuff.WriteSection "AutoToleranceRefinement", sKeys(), sVals(), iKVCount
     
     
     ' Write the Auto Analysis Options
-    ReDim strKeys(0 To 43)
-    ReDim strValues(0 To 43)
     With udtPrefsExpanded.AutoAnalysisOptions
-        strKeys(0) = "MDType": strValues(0) = "1"
-        strKeys(1) = "AutoRemoveNoiseStreaks": strValues(1) = .AutoRemoveNoiseStreaks
-        strKeys(2) = "DoNotSaveOrExport": strValues(2) = .DoNotSaveOrExport
-        strKeys(3) = "SkipFindUMCs": strValues(3) = .SkipFindUMCs
-        strKeys(4) = "SkipGANETSlopeAndInterceptComputation": strValues(4) = .SkipGANETSlopeAndInterceptComputation
-        strKeys(5) = "DBConnectionRetryAttemptMax": strValues(5) = .DBConnectionRetryAttemptMax
-        strKeys(6) = "DBConnectionTimeoutSeconds": strValues(6) = .DBConnectionTimeoutSeconds
-        strKeys(7) = "ExportResultsFileUsesJobNumberInsteadOfDataSetName": strValues(7) = .ExportResultsFileUsesJobNumberInsteadOfDataSetName
-        strKeys(8) = "SaveGelFile": strValues(8) = .SaveGelFile
-        strKeys(9) = "SaveGelFileOnError": strValues(9) = .SaveGelFileOnError
-        strKeys(10) = "SavePictureGraphic": strValues(10) = .SavePictureGraphic
-        strKeys(11) = "SavePictureGraphicFileTypeList": strValues(11) = "; Options are " & GetPictureGraphicsTypeList()
-        strKeys(12) = "SavePictureGraphicFileType": strValues(12) = .SavePictureGraphicFileType
-        strKeys(13) = "SavePictureWidthPixels": strValues(13) = .SavePictureWidthPixels
-        strKeys(14) = "SavePictureHeightPixels": strValues(14) = .SavePictureHeightPixels
-        strKeys(15) = "SaveInternalStdHitsAndData": strValues(15) = .SaveInternalStdHitsAndData
+        iKVCount = 0
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "MDType", 1
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoRemoveNoiseStreaks", .AutoRemoveNoiseStreaks
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "DoNotSaveOrExport", .DoNotSaveOrExport
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SkipFindUMCs", .SkipFindUMCs
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SkipGANETSlopeAndInterceptComputation", .SkipGANETSlopeAndInterceptComputation
         
-        strKeys(16) = "SaveErrorGraphicMass": strValues(16) = .SaveErrorGraphicMass
-        strKeys(17) = "SaveErrorGraphicGANET": strValues(17) = .SaveErrorGraphicGANET
-        strKeys(18) = "SaveErrorGraphic3D": strValues(18) = .SaveErrorGraphic3D
-        strKeys(19) = "SaveErrorGraphicFileTypeList": strValues(19) = "; Options are " & GetErrorGraphicsTypeList()
-        strKeys(20) = "SaveErrorGraphicFileType": strValues(20) = .SaveErrorGraphicFileType
-        strKeys(21) = "SaveErrorGraphSizeWidthPixels": strValues(21) = .SaveErrorGraphSizeWidthPixels
-        strKeys(22) = "SaveErrorGraphSizeHeightPixels": strValues(22) = .SaveErrorGraphSizeHeightPixels
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "DBConnectionRetryAttemptMax", .DBConnectionRetryAttemptMax
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "DBConnectionTimeoutSeconds", .DBConnectionTimeoutSeconds
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExportResultsFileUsesJobNumberInsteadOfDataSetName", .ExportResultsFileUsesJobNumberInsteadOfDataSetName
         
-        strKeys(23) = "SavePlotTIC": strValues(23) = .SavePlotTIC
-        strKeys(24) = "SavePlotBPI": strValues(24) = .SavePlotBPI
-        strKeys(25) = "SavePlotTICTimeDomain": strValues(25) = .SavePlotTICTimeDomain
-        strKeys(26) = "SavePlotTICDataPointCounts": strValues(26) = .SavePlotTICDataPointCounts
-        strKeys(27) = "SavePlotTICDataPointCountsHitsOnly": strValues(27) = .SavePlotTICDataPointCountsHitsOnly
-        strKeys(28) = "SavePlotTICFromRawData": strValues(28) = .SavePlotTICFromRawData
-        strKeys(29) = "SavePlotBPIFromRawData": strValues(29) = .SavePlotBPIFromRawData
-        strKeys(30) = "SavePlotDeisotopingIntensityThresholds": strValues(30) = .SavePlotDeisotopingIntensityThresholds
-        strKeys(31) = "SavePlotDeisotopingPeakCounts": strValues(31) = .SavePlotDeisotopingPeakCounts
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveGelFile", .SaveGelFile
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveGelFileOnError", .SaveGelFileOnError
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePictureGraphic", .SavePictureGraphic
+        AddKeyValueSetting sKeys, sVals, iKVCount, "SavePictureGraphicFileTypeList", "; Options are " & GetPictureGraphicsTypeList()
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "SavePictureGraphicFileType", CInt(.SavePictureGraphicFileType)
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "SavePictureWidthPixels", .SavePictureWidthPixels
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "SavePictureHeightPixels", .SavePictureHeightPixels
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveInternalStdHitsAndData", .SaveInternalStdHitsAndData
         
-        strKeys(32) = "OutputFileSeparationCharacter": strValues(32) = .OutputFileSeparationCharacter
-        strKeys(33) = "PEKFileExtensionPreferenceOrder": strValues(33) = .PEKFileExtensionPreferenceOrder
-        strKeys(34) = "WriteIDResultsByIonToTextFileAfterAutoSearches": strValues(34) = .WriteIDResultsByIonToTextFileAfterAutoSearches
-        strKeys(35) = "SaveUMCStatisticsToTextFile": strValues(35) = .SaveUMCStatisticsToTextFile
-        strKeys(36) = "IncludeORFNameInTextFileOutput": strValues(36) = .IncludeORFNameInTextFileOutput
-        strKeys(37) = "SetIsConfirmedForDBSearchMatches": strValues(37) = .SetIsConfirmedForDBSearchMatches
-        strKeys(38) = "AddQuantitationDescriptionEntry": strValues(38) = .AddQuantitationDescriptionEntry
-        strKeys(39) = "ExportUMCsWithNoMatches": strValues(39) = .ExportUMCsWithNoMatches
-        strKeys(40) = "DBSearchRegionShape": strValues(40) = .DBSearchRegionShape
-        strKeys(41) = "UseLegacyDBForMTs": strValues(41) = .UseLegacyDBForMTs
-        strKeys(42) = "IgnoreNETAdjustmentFailure": strValues(42) = .IgnoreNETAdjustmentFailure
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveErrorGraphicMass", .SaveErrorGraphicMass
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveErrorGraphicGANET", .SaveErrorGraphicGANET
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveErrorGraphic3D", .SaveErrorGraphic3D
+        AddKeyValueSetting sKeys, sVals, iKVCount, "SaveErrorGraphicFileTypeList", "; Options are " & GetErrorGraphicsTypeList()
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "SaveErrorGraphicFileType", CInt(.SaveErrorGraphicFileType)
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "SaveErrorGraphSizeWidthPixels", .SaveErrorGraphSizeWidthPixels
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "SaveErrorGraphSizeHeightPixels", .SaveErrorGraphSizeHeightPixels
+        
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePlotTIC", .SavePlotTIC
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePlotBPI", .SavePlotBPI
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePlotTICTimeDomain", .SavePlotTICTimeDomain
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePlotTICDataPointCounts", .SavePlotTICDataPointCounts
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePlotTICDataPointCountsHitsOnly", .SavePlotTICDataPointCountsHitsOnly
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePlotTICFromRawData", .SavePlotTICFromRawData
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePlotBPIFromRawData", .SavePlotBPIFromRawData
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePlotDeisotopingIntensityThresholds", .SavePlotDeisotopingIntensityThresholds
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePlotDeisotopingPeakCounts", .SavePlotDeisotopingPeakCounts
+        
+        AddKeyValueSetting sKeys, sVals, iKVCount, "OutputFileSeparationCharacter", .OutputFileSeparationCharacter
+        AddKeyValueSetting sKeys, sVals, iKVCount, "PEKFileExtensionPreferenceOrder", .PEKFileExtensionPreferenceOrder
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "WriteIDResultsByIonToTextFileAfterAutoSearches", .WriteIDResultsByIonToTextFileAfterAutoSearches
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveUMCStatisticsToTextFile", .SaveUMCStatisticsToTextFile
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "IncludeORFNameInTextFileOutput", .IncludeORFNameInTextFileOutput
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SetIsConfirmedForDBSearchMatches", .SetIsConfirmedForDBSearchMatches
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AddQuantitationDescriptionEntry", .AddQuantitationDescriptionEntry
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExportUMCsWithNoMatches", .ExportUMCsWithNoMatches
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "DBSearchRegionShape", CInt(.DBSearchRegionShape)
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseLegacyDBForMTs", .UseLegacyDBForMTs
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "IgnoreNETAdjustmentFailure", .IgnoreNETAdjustmentFailure
         
         If .AutoAnalysisSearchModeCount < 0 Then .AutoAnalysisSearchModeCount = 0
         If .AutoAnalysisSearchModeCount > MAX_AUTO_SEARCH_MODE_COUNT Then .AutoAnalysisSearchModeCount = MAX_AUTO_SEARCH_MODE_COUNT
-        strKeys(43) = "AutoAnalysisSearchModeCount": strValues(43) = .AutoAnalysisSearchModeCount
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "AutoAnalysisSearchModeCount", .AutoAnalysisSearchModeCount
     End With
-    IniStuff.WriteSection "AutoAnalysisOptions", strKeys(), strValues()
+    IniStuff.WriteSection "AutoAnalysisOptions", sKeys(), sVals(), iKVCount
     
     ' Write the Auto Analysis Search Mode Settings
     ' Each search mode is written to its own section in the .Ini file
@@ -2482,34 +2315,32 @@ On Error GoTo SaveSettingsFileHandler
             With .AutoAnalysisSearchMode(intAutoSearchModeIndex)
                 
                 ' Write this Auto Analysis Search Mode's settings
-                ReDim strKeys(0 To 19)
-                ReDim strValues(0 To 19)
-                
-                strKeys(0) = "SearchModeList": strValues(0) = "; Options are " & GetAutoAnalysisOptionsList()
-                strKeys(1) = "SearchMode": strValues(1) = .SearchMode
-                strKeys(2) = "AlternateOutputFolderPath": strValues(2) = .AlternateOutputFolderPath
-                strKeys(3) = "WriteResultsToTextFile": strValues(3) = .WriteResultsToTextFile
-                strKeys(4) = "ExportResultsToDatabase": strValues(4) = .ExportResultsToDatabase
-                strKeys(5) = "ExportUMCMembers": strValues(5) = .ExportUMCMembers
-                strKeys(6) = "PairSearchAssumeMassTagsAreLabeled": strValues(6) = .PairSearchAssumeMassTagsAreLabeled
-                strKeys(7) = "InternalStdSearchMode": strValues(7) = .InternalStdSearchMode
-                strKeys(8) = "DBSearchMinimumHighNormalizedScore": strValues(8) = .DBSearchMinimumHighNormalizedScore
-                strKeys(9) = "DBSearchMinimumHighDiscriminantScore": strValues(9) = .DBSearchMinimumHighDiscriminantScore
-                strKeys(10) = "DBSearchMinimumPeptideProphetProbability": strValues(10) = .DBSearchMinimumPeptideProphetProbability
+                iKVCount = 0
+                AddKeyValueSetting sKeys, sVals, iKVCount, "SearchModeList", "; Options are " & GetAutoAnalysisOptionsList()
+                AddKeyValueSetting sKeys, sVals, iKVCount, "SearchMode", .SearchMode
+                AddKeyValueSetting sKeys, sVals, iKVCount, "AlternateOutputFolderPath", .AlternateOutputFolderPath
+                AddKeyValueSettingBln sKeys, sVals, iKVCount, "WriteResultsToTextFile", .WriteResultsToTextFile
+                AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExportResultsToDatabase", .ExportResultsToDatabase
+                AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExportUMCMembers", .ExportUMCMembers
+                AddKeyValueSettingBln sKeys, sVals, iKVCount, "PairSearchAssumeMassTagsAreLabeled", .PairSearchAssumeMassTagsAreLabeled
+                AddKeyValueSettingInt sKeys, sVals, iKVCount, "InternalStdSearchMode", CInt(.InternalStdSearchMode)
+                AddKeyValueSettingSng sKeys, sVals, iKVCount, "DBSearchMinimumHighNormalizedScore", .DBSearchMinimumHighNormalizedScore
+                AddKeyValueSettingSng sKeys, sVals, iKVCount, "DBSearchMinimumHighDiscriminantScore", .DBSearchMinimumHighDiscriminantScore
+                AddKeyValueSettingSng sKeys, sVals, iKVCount, "DBSearchMinimumPeptideProphetProbability", .DBSearchMinimumPeptideProphetProbability
                 
                 With .MassMods
-                    strKeys(11) = "DynamicMods": strValues(11) = .DynamicMods
-                    strKeys(12) = "N15InsteadOfN14": strValues(12) = .N15InsteadOfN14
-                    strKeys(13) = "PEO": strValues(13) = .PEO
-                    strKeys(14) = "ICATd0": strValues(14) = .ICATd0
-                    strKeys(15) = "ICATd8": strValues(15) = .ICATd8
-                    strKeys(16) = "Alkylation": strValues(16) = .Alkylation
-                    strKeys(17) = "AlkylationMass": strValues(17) = .AlkylationMass
-                    strKeys(18) = "ResidueToModify": strValues(18) = .ResidueToModify
-                    strKeys(19) = "ResidueMassModification": strValues(19) = .ResidueMassModification
+                    AddKeyValueSettingBln sKeys, sVals, iKVCount, "DynamicMods", .DynamicMods
+                    AddKeyValueSettingBln sKeys, sVals, iKVCount, "N15InsteadOfN14", .N15InsteadOfN14
+                    AddKeyValueSettingBln sKeys, sVals, iKVCount, "PEO", .PEO
+                    AddKeyValueSettingBln sKeys, sVals, iKVCount, "ICATd0", .ICATd0
+                    AddKeyValueSettingBln sKeys, sVals, iKVCount, "ICATd8", .ICATd8
+                    AddKeyValueSettingBln sKeys, sVals, iKVCount, "Alkylation", .Alkylation
+                    AddKeyValueSettingDbl sKeys, sVals, iKVCount, "AlkylationMass", .AlkylationMass
+                    AddKeyValueSetting sKeys, sVals, iKVCount, "ResidueToModify", .ResidueToModify
+                    AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ResidueMassModification", .ResidueMassModification
                 End With
                 
-                IniStuff.WriteSection "AutoAnalysisSearchMode" & Trim(intAutoSearchModeIndex + 1), strKeys(), strValues()
+                IniStuff.WriteSection "AutoAnalysisSearchMode" & Trim(intAutoSearchModeIndex + 1), sKeys(), sVals(), iKVCount
             End With
             
         Next intAutoSearchModeIndex
@@ -2517,61 +2348,60 @@ On Error GoTo SaveSettingsFileHandler
     
     
     ' Write the Auto Analysis Filter Preferences
-    ReDim strKeys(0 To 35)
-    ReDim strValues(0 To 35)
     With udtPrefsExpanded.AutoAnalysisFilterPrefs
-        strKeys(0) = "ExcludeDuplicates": strValues(0) = .ExcludeDuplicates
-        strKeys(1) = "ExcludeDuplicatesTolerance": strValues(1) = .ExcludeDuplicatesTolerance
+        iKVCount = 0
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExcludeDuplicates", .ExcludeDuplicates
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ExcludeDuplicatesTolerance", .ExcludeDuplicatesTolerance
         
-        strKeys(2) = "ExcludeIsoByFit": strValues(2) = .ExcludeIsoByFit
-        strKeys(3) = "ExcludeIsoByFitMaxVal": strValues(3) = .ExcludeIsoByFitMaxVal
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExcludeIsoByFit", .ExcludeIsoByFit
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ExcludeIsoByFitMaxVal", .ExcludeIsoByFitMaxVal
         
-        strKeys(4) = "ExcludeIsoSecondGuess": strValues(4) = .ExcludeIsoSecondGuess
-        strKeys(5) = "ExcludeIsoLessLikelyGuess": strValues(5) = .ExcludeIsoLessLikelyGuess
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExcludeIsoSecondGuess", .ExcludeIsoSecondGuess
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExcludeIsoLessLikelyGuess", .ExcludeIsoLessLikelyGuess
         
-        strKeys(6) = "ExcludeCSByStdDev": strValues(6) = .ExcludeCSByStdDev
-        strKeys(7) = "ExcludeCSByStdDevMaxVal": strValues(7) = .ExcludeCSByStdDevMaxVal
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExcludeCSByStdDev", .ExcludeCSByStdDev
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ExcludeCSByStdDevMaxVal", .ExcludeCSByStdDevMaxVal
         
-        strKeys(8) = "RestrictIsoByAbundance": strValues(8) = .RestrictIsoByAbundance
-        strKeys(9) = "RestrictIsoAbundanceMin": strValues(9) = .RestrictIsoAbundanceMin
-        strKeys(10) = "RestrictIsoAbundanceMax": strValues(10) = .RestrictIsoAbundanceMax
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictIsoByAbundance", .RestrictIsoByAbundance
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictIsoAbundanceMin", .RestrictIsoAbundanceMin
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictIsoAbundanceMax", .RestrictIsoAbundanceMax
         
-        strKeys(11) = "RestrictIsoByMass": strValues(11) = .RestrictIsoByMass
-        strKeys(12) = "RestrictIsoMassMin": strValues(12) = .RestrictIsoMassMin
-        strKeys(13) = "RestrictIsoMassMax": strValues(13) = .RestrictIsoMassMax
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictIsoByMass", .RestrictIsoByMass
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictIsoMassMin", .RestrictIsoMassMin
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictIsoMassMax", .RestrictIsoMassMax
         
-        strKeys(14) = "RestrictIsoByMZ": strValues(14) = .RestrictIsoByMZ
-        strKeys(15) = "RestrictIsoMZMin": strValues(15) = .RestrictIsoMZMin
-        strKeys(16) = "RestrictIsoMZMax": strValues(16) = .RestrictIsoMZMax
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictIsoByMZ", .RestrictIsoByMZ
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictIsoMZMin", .RestrictIsoMZMin
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictIsoMZMax", .RestrictIsoMZMax
         
-        strKeys(17) = "RestrictIsoByChargeState": strValues(17) = .RestrictIsoByChargeState
-        strKeys(18) = "RestrictIsoChargeStateMin": strValues(18) = .RestrictIsoChargeStateMin
-        strKeys(19) = "RestrictIsoChargeStateMax": strValues(19) = .RestrictIsoChargeStateMax
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictIsoByChargeState", .RestrictIsoByChargeState
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "RestrictIsoChargeStateMin", .RestrictIsoChargeStateMin
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "RestrictIsoChargeStateMax", .RestrictIsoChargeStateMax
         
-        strKeys(20) = "RestrictCSByAbundance": strValues(20) = .RestrictCSByAbundance
-        strKeys(21) = "RestrictCSAbundanceMin": strValues(21) = .RestrictCSAbundanceMin
-        strKeys(22) = "RestrictCSAbundanceMax": strValues(22) = .RestrictCSAbundanceMax
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictCSByAbundance", .RestrictCSByAbundance
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictCSAbundanceMin", .RestrictCSAbundanceMin
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictCSAbundanceMax", .RestrictCSAbundanceMax
         
-        strKeys(23) = "RestrictCSByMass": strValues(23) = .RestrictCSByMass
-        strKeys(24) = "RestrictCSMassMin": strValues(24) = .RestrictCSMassMin
-        strKeys(25) = "RestrictCSMassMax": strValues(25) = .RestrictCSMassMax
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictCSByMass", .RestrictCSByMass
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictCSMassMin", .RestrictCSMassMin
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictCSMassMax", .RestrictCSMassMax
         
-        strKeys(26) = "RestrictScanRange": strValues(26) = .RestrictScanRange
-        strKeys(27) = "RestrictScanRangeMin": strValues(27) = .RestrictScanRangeMin
-        strKeys(28) = "RestrictScanRangeMax": strValues(28) = .RestrictScanRangeMax
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictScanRange", .RestrictScanRange
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "RestrictScanRangeMin", .RestrictScanRangeMin
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "RestrictScanRangeMax", .RestrictScanRangeMax
         
-        strKeys(29) = "RestrictGANETRange": strValues(29) = .RestrictGANETRange
-        strKeys(30) = "RestrictGANETRangeMin": strValues(30) = .RestrictGANETRangeMin
-        strKeys(31) = "RestrictGANETRangeMax": strValues(31) = .RestrictGANETRangeMax
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictGANETRange", .RestrictGANETRange
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictGANETRangeMin", .RestrictGANETRangeMin
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RestrictGANETRangeMax", .RestrictGANETRangeMax
         
-        strKeys(32) = "RestrictToEvenScanNumbersOnly": strValues(32) = .RestrictToEvenScanNumbersOnly
-        strKeys(33) = "RestrictToOddScanNumbersOnly": strValues(33) = .RestrictToOddScanNumbersOnly
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictToEvenScanNumbersOnly", .RestrictToEvenScanNumbersOnly
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "RestrictToOddScanNumbersOnly", .RestrictToOddScanNumbersOnly
         
         ' Maximum data count filter
-        strKeys(34) = "MaximumDataCountEnabled": strValues(34) = .MaximumDataCountEnabled
-        strKeys(35) = "MaximumDataCountToLoad": strValues(35) = .MaximumDataCountToLoad
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "MaximumDataCountEnabled", .MaximumDataCountEnabled
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MaximumDataCountToLoad", .MaximumDataCountToLoad
     End With
-    IniStuff.WriteSection "AutoAnalysisFilterPrefs", strKeys(), strValues()
+    IniStuff.WriteSection "AutoAnalysisFilterPrefs", sKeys(), sVals(), iKVCount
     
     If udtPrefsExpanded.AutoAnalysisDBInfoIsValid Then
         With udtDBSettingsSingle
@@ -2633,42 +2463,40 @@ On Error GoTo SaveSettingsFileHandler
     
     If Not APP_BUILD_DISABLE_MTS Then
         ' Write the DMSConnectionInfo
-        ReDim strKeys(0 To 0)
-        ReDim strValues(0 To 0)
         With udtPrefsExpanded.DMSConnectionInfo
-            strKeys(0) = "ConnectionString": strValues(0) = .ConnectionString
+            iKVCount = 0
+            AddKeyValueSetting sKeys, sVals, iKVCount, "ConnectionString", .ConnectionString
         End With
-        IniStuff.WriteSection "DMSConnectionInfo", strKeys(), strValues()
+        IniStuff.WriteSection "DMSConnectionInfo", sKeys(), sVals(), iKVCount
     
     
         ' Write the MTSConnectionInfo
-        ReDim strKeys(0 To 20)
-        ReDim strValues(0 To 20)
         With udtPrefsExpanded.MTSConnectionInfo
-            strKeys(0) = "ConnectionString": strValues(0) = .ConnectionString
+            iKVCount = 0
+            AddKeyValueSetting sKeys, sVals, iKVCount, "ConnectionString", .ConnectionString
             
-            strKeys(1) = "spAddQuantitationDescription": strValues(1) = .spAddQuantitationDescription
-            strKeys(2) = "spGetLockers": strValues(2) = .spGetLockers
-            strKeys(3) = "spGetMassTagMatchCount": strValues(3) = .spGetMassTagMatchCount
-            strKeys(4) = "spGetMassTags": strValues(4) = .spGetMassTags
-            strKeys(5) = "spGetMassTagsSubset": strValues(5) = .spGetMassTagsSubset
-            strKeys(6) = "spGetPMResultStats": strValues(6) = .spGetPMResultStats
-            strKeys(7) = "spPutAnalysis": strValues(7) = .spPutAnalysis
-            strKeys(8) = "spPutUMC": strValues(8) = .spPutUMC
-            strKeys(9) = "spPutUMCMember": strValues(9) = .spPutUMCMember
-            strKeys(10) = "spPutUMCMatch": strValues(10) = .spPutUMCMatch
-            strKeys(11) = "spPutUMCInternalStdMatch": strValues(11) = .spPutUMCInternalStdMatch
-            strKeys(12) = "spEditGANET": strValues(12) = .spEditGANET
-            strKeys(13) = "spGetORFs": strValues(13) = .spGetORFs
-            strKeys(14) = "spGetORFSeq": strValues(14) = .spGetORFSeq
-            strKeys(15) = "spGetORFIDs": strValues(15) = .spGetORFIDs
-            strKeys(16) = "spGetORFRecord": strValues(16) = .spGetORFRecord
-            strKeys(17) = "spGetMassTagSeq": strValues(17) = .spGetMassTagSeq
-            strKeys(18) = "spGetMassTagNames": strValues(18) = .spGetMassTagNames
-            strKeys(19) = "spGetInternalStandards": strValues(19) = .spGetInternalStandards
-            strKeys(20) = "spGetDBSchemaVersion": strValues(20) = .spGetDBSchemaVersion
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spAddQuantitationDescription", .spAddQuantitationDescription
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetLockers", .spGetLockers
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTagMatchCount", .spGetMassTagMatchCount
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTags", .spGetMassTags
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTagsSubset", .spGetMassTagsSubset
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetPMResultStats", .spGetPMResultStats
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spPutAnalysis", .spPutAnalysis
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMC", .spPutUMC
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCMember", .spPutUMCMember
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCMatch", .spPutUMCMatch
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCInternalStdMatch", .spPutUMCInternalStdMatch
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spEditGANET", .spEditGANET
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetORFs", .spGetORFs
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetORFSeq", .spGetORFSeq
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetORFIDs", .spGetORFIDs
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetORFRecord", .spGetORFRecord
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTagSeq", .spGetMassTagSeq
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTagNames", .spGetMassTagNames
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetInternalStandards", .spGetInternalStandards
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetDBSchemaVersion", .spGetDBSchemaVersion
         End With
-        IniStuff.WriteSection "MTSConnectionInfo", strKeys(), strValues()
+        IniStuff.WriteSection "MTSConnectionInfo", sKeys(), sVals(), iKVCount
     End If
     
     
@@ -2940,102 +2768,102 @@ Private Sub IniFileWriteSingleDBConnection(objIniStuff As clsIniStuff, strSectio
     '                               Storage_Path, Total_Scans, Vol_Client, and Vol_Server
     
     Const MTDB_HEADER_ITEM_COUNT = 2
-    Dim strKeys() As String, strValues() As String
+    
+    Dim iKVCount As Integer
+    Dim sKeys() As String, sVals() As String
+    
     Dim intDBStuffArrayIndex As Integer, intDBStuffItemCount As Integer
 
+    Dim intDBStuffCountIndex As Integer
+
+    ReDim sKeys(99)
+    ReDim sVals(99)
+    
     ' Store the settings from udtRecentDBSettings(intIndex) in the ini file
     With udtDBSettingsSingle
-    
-        If blnIncludeDetailedAnalysisInfo Then
-            ReDim strKeys(0 To 52)
-            ReDim strValues(0 To 52)
-        Else
-            ReDim strKeys(0 To 21)
-            ReDim strValues(0 To 21)
-        End If
-            
+
         ' Write the version number
-        strKeys(0) = RECENT_DB_CONNECTION_INFOVERSION_NAME: strValues(0) = CStr(RECENT_DB_CONNECTION_INFOVERSION)
+        iKVCount = 0
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, RECENT_DB_CONNECTION_INFOVERSION_NAME, RECENT_DB_CONNECTION_INFOVERSION
         
         ' Write the header items (summary variables)
         Debug.Assert .ConnectionString = .AnalysisInfo.MTDB.ConnectionString
-        strKeys(1) = "ConnectionString": strValues(1) = .ConnectionString
-        strKeys(2) = "DBSchemaVersion": strValues(2) = CStr(.DBSchemaVersion)
-        strKeys(3) = "AmtsOnly": strValues(3) = CStr(.AMTsOnly)
-        strKeys(4) = "ConfirmedOnly": strValues(4) = CStr(.ConfirmedOnly)
-        strKeys(5) = "LockersOnly": strValues(5) = CStr(.LockersOnly)
-        strKeys(6) = "LimitToPMTsFromDataset": strValues(6) = CStr(.LimitToPMTsFromDataset)
+        AddKeyValueSetting sKeys, sVals, iKVCount, "ConnectionString", .ConnectionString
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "DBSchemaVersion", .DBSchemaVersion
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AmtsOnly", .AMTsOnly
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ConfirmedOnly", .ConfirmedOnly
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "LockersOnly", .LockersOnly
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "LimitToPMTsFromDataset", .LimitToPMTsFromDataset
         
-        strKeys(7) = "MinimumHighNormalizedScore": strValues(7) = CStr(.MinimumHighNormalizedScore)
-        strKeys(8) = "MinimumHighDiscriminantScore": strValues(8) = CStr(.MinimumHighDiscriminantScore)
-        strKeys(9) = "MinimumPeptideProphetProbability": strValues(9) = CStr(.MinimumPeptideProphetProbability)
-        strKeys(10) = "MinimumPMTQualityScore": strValues(10) = CStr(.MinimumPMTQualityScore)
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MinimumHighNormalizedScore", .MinimumHighNormalizedScore
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MinimumHighDiscriminantScore", .MinimumHighDiscriminantScore
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MinimumPeptideProphetProbability", .MinimumPeptideProphetProbability
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MinimumPMTQualityScore", .MinimumPMTQualityScore
         
-        strKeys(11) = "ExperimentInclusionFilter": strValues(11) = .ExperimentInclusionFilter
-        strKeys(12) = "ExperimentExclusionFilter": strValues(12) = .ExperimentExclusionFilter
-        strKeys(13) = "InternalStandardExplicit": strValues(13) = .InternalStandardExplicit
+        AddKeyValueSetting sKeys, sVals, iKVCount, "ExperimentInclusionFilter", .ExperimentInclusionFilter
+        AddKeyValueSetting sKeys, sVals, iKVCount, "ExperimentExclusionFilter", .ExperimentExclusionFilter
+        AddKeyValueSetting sKeys, sVals, iKVCount, "InternalStandardExplicit", .InternalStandardExplicit
         
-        strKeys(14) = "NETValueType": strValues(14) = CStr(.NETValueType)
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "NETValueType", .NETValueType
         
-        strKeys(15) = "MassTagSubsetID": strValues(15) = CStr(.MassTagSubsetID)
-        strKeys(16) = "ModificationList": strValues(16) = .ModificationList
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "MassTagSubsetID", .MassTagSubsetID
+        AddKeyValueSetting sKeys, sVals, iKVCount, "ModificationList", .ModificationList
         
-        strKeys(17) = "SelectedMassTagCount": strValues(17) = CStr(.SelectedMassTagCount)
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "SelectedMassTagCount", .SelectedMassTagCount
         
         ' Now write the values in .AnalysisInfo
         With .AnalysisInfo
             
-            strKeys(18) = "GANET_Fit": strValues(18) = CStr(.GANET_Fit)
-            strKeys(19) = "GANET_Intercept": strValues(19) = CStr(.GANET_Intercept)
-            strKeys(20) = "GANET_Slope": strValues(20) = CStr(.GANET_Slope)
-            strKeys(21) = "ValidAnalysisDataPresent": strValues(21) = CStr(.ValidAnalysisDataPresent)
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "GANET_Fit", .GANET_Fit
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "GANET_Intercept", .GANET_Intercept
+            AddKeyValueSettingDbl sKeys, sVals, iKVCount, "GANET_Slope", .GANET_Slope
+            AddKeyValueSettingBln sKeys, sVals, iKVCount, "ValidAnalysisDataPresent", .ValidAnalysisDataPresent
             
             If blnIncludeDetailedAnalysisInfo Then
-                strKeys(22) = "AnalysisTool": strValues(22) = .Analysis_Tool
-                strKeys(23) = "Created": strValues(23) = .Created
-                strKeys(24) = "Dataset": strValues(24) = .Dataset
-                strKeys(25) = "Dataset_Folder": strValues(25) = .Dataset_Folder
-                strKeys(26) = "Dataset_ID": strValues(26) = .Dataset_ID
-                strKeys(27) = "Desc_DataFolder": strValues(27) = .Desc_DataFolder
-                strKeys(28) = "Desc_Type": strValues(28) = .Desc_Type
-                strKeys(29) = "Duration": strValues(29) = .Duration
-                strKeys(30) = "Experiment": strValues(30) = .Experiment
-                strKeys(31) = "Instrument_Class": strValues(31) = .Instrument_Class
-                strKeys(32) = "Job": strValues(32) = .Job
-                strKeys(33) = "MD_Date": strValues(33) = .MD_Date
-                strKeys(34) = "MD_file": strValues(34) = .MD_file
-                strKeys(35) = "MD_Parameters": strValues(35) = .MD_Parameters
-                strKeys(36) = "MD_Reference_Job": strValues(36) = .MD_Reference_Job
-                strKeys(37) = "MD_State": strValues(37) = .MD_State
-                strKeys(38) = "MD_Type": strValues(38) = .MD_Type
-                strKeys(39) = "NET_Intercept": strValues(39) = .NET_Intercept
-                strKeys(40) = "NET_Slope": strValues(40) = .NET_Slope
-                strKeys(41) = "NET_TICFit": strValues(41) = .NET_TICFit
-                strKeys(42) = "Organism": strValues(42) = .Organism
-                strKeys(43) = "Organism_DB_Name": strValues(43) = .Organism_DB_Name
-                strKeys(44) = "Parameter_File_Name": strValues(44) = .Parameter_File_Name
-                strKeys(45) = "ProcessingType": strValues(45) = .ProcessingType
-                strKeys(46) = "Results_Folder": strValues(46) = .Results_Folder
-                strKeys(47) = "Settings_File_Name": strValues(47) = .Settings_File_Name
-                strKeys(48) = "State": strValues(48) = .STATE
-                strKeys(49) = "Storage_Path": strValues(49) = .Storage_Path
-                strKeys(50) = "Total_Scans": strValues(50) = .Total_Scans
-                strKeys(51) = "Vol_Client": strValues(51) = .Vol_Client
-                strKeys(52) = "Vol_Server": strValues(52) = .Vol_Server
+                AddKeyValueSetting sKeys, sVals, iKVCount, "AnalysisTool", .Analysis_Tool
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Created", .Created
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Dataset", .Dataset
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Dataset_Folder", .Dataset_Folder
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, "Dataset_ID", .Dataset_ID
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Desc_DataFolder", .Desc_DataFolder
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Desc_Type", .Desc_Type
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, "Duration", .Duration
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Experiment", .Experiment
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Instrument_Class", .Instrument_Class
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, "Job", .Job
+                AddKeyValueSetting sKeys, sVals, iKVCount, "MD_Date", .MD_Date
+                AddKeyValueSetting sKeys, sVals, iKVCount, "MD_file", .MD_file
+                AddKeyValueSetting sKeys, sVals, iKVCount, "MD_Parameters", .MD_Parameters
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, "MD_Reference_Job", .MD_Reference_Job
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, "MD_State", .MD_State
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, "MD_Type", .MD_Type
+                AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NET_Intercept", .NET_Intercept
+                AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NET_Slope", .NET_Slope
+                AddKeyValueSettingDbl sKeys, sVals, iKVCount, "NET_TICFit", .NET_TICFit
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Organism", .Organism
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Organism_DB_Name", .Organism_DB_Name
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Parameter_File_Name", .Parameter_File_Name
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, "ProcessingType", .ProcessingType
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Results_Folder", .Results_Folder
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Settings_File_Name", .Settings_File_Name
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, "State", .STATE
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Storage_Path", .Storage_Path
+                AddKeyValueSettingLng sKeys, sVals, iKVCount, "Total_Scans", .Total_Scans
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Vol_Client", .Vol_Client
+                AddKeyValueSetting sKeys, sVals, iKVCount, "Vol_Server", .Vol_Server
             End If
             
-            objIniStuff.WriteSection strSectionName, strKeys(), strValues()
+            objIniStuff.WriteSection strSectionName, sKeys(), sVals(), iKVCount
     
             If blnIncludeMtdbDBStuff Then
                 strSectionName = strSectionName & "_" & "MTDB"
                 With .MTDB
                     ' Write the MTDB items
                     
-                    ReDim strKeys(0 To MTDB_HEADER_ITEM_COUNT + .DBStuffArrayCount * 2 - 1)
-                    ReDim strValues(0 To MTDB_HEADER_ITEM_COUNT + .DBStuffArrayCount * 2 - 1)
-                    
-                    strKeys(0) = "DBStatus": strValues(0) = CStr(.DBStatus)
-                    strKeys(1) = "DBStuffCount": strValues(1) = CStr(0)         ' Note: This will be updated below
+                    iKVCount = 0
+                    AddKeyValueSettingLng sKeys, sVals, iKVCount, "DBStatus", .DBStatus
+                    AddKeyValueSettingInt sKeys, sVals, iKVCount, "DBStuffCount", 0        ' Note: This value will be updated below
+                    intDBStuffCountIndex = iKVCount - 1
                     
                     ' We must use a separate record of the # of items to write (intDBStuffItemCount) since
                     '  we aren't writing to disk all of the items in DBStuffArray
@@ -3058,25 +2886,25 @@ Private Sub IniFileWriteSingleDBConnection(objIniStuff As clsIniStuff, strSectio
                         Case NAME_INTERNAL_STANDARD_EXPLICIT        ' Do not write to disk; it is included in the summary variables above
                         Case NAME_NET_VALUE_TYPE                    ' Do not write to disk; it is included in the summary variables above
                         Case Else
-                            strKeys(MTDB_HEADER_ITEM_COUNT + intDBStuffItemCount * 2) = "DBStuffItem" & Trim(intDBStuffItemCount) & "Name"
-                            strValues(MTDB_HEADER_ITEM_COUNT + intDBStuffItemCount * 2) = .DBStuffArray(intDBStuffArrayIndex).Name
+                            AddKeyValueSetting sKeys, sVals, iKVCount, "DBStuffItem" & Trim(intDBStuffItemCount) & "Name", .DBStuffArray(intDBStuffArrayIndex).Name
                             
-                            strKeys(MTDB_HEADER_ITEM_COUNT + intDBStuffItemCount * 2 + 1) = "DBStuffItem" & Trim(intDBStuffItemCount) & "Value"
-                            strValues(MTDB_HEADER_ITEM_COUNT + intDBStuffItemCount * 2 + 1) = .DBStuffArray(intDBStuffArrayIndex).Value
+                            AddKeyValueSetting sKeys, sVals, iKVCount, "DBStuffItem" & Trim(intDBStuffItemCount) & "Value", .DBStuffArray(intDBStuffArrayIndex).Value
                             intDBStuffItemCount = intDBStuffItemCount + 1
                         End Select
                     Next intDBStuffArrayIndex
                     
                     If intDBStuffItemCount > 0 Then
+                        ' This assertion fails when the contents of the DBStuffArray are changed, which happens from time to time
+                        ' The assertion is only here to let the programmer know that the contents have changed; it's not necessarily a problem
                         Debug.Assert intDBStuffItemCount = 36
                     End If
                     
-                    ReDim Preserve strKeys(0 To MTDB_HEADER_ITEM_COUNT + intDBStuffItemCount * 2 - 1)
-                    ReDim Preserve strValues(0 To MTDB_HEADER_ITEM_COUNT + intDBStuffItemCount * 2 - 1)
+                    ' Check this
+                    Debug.Assert False
+                    Debug.Assert sKeys(intDBStuffCountIndex) = "DBStuffCount"
+                    sVals(intDBStuffCountIndex) = intDBStuffItemCount
                     
-                    strKeys(1) = "DBStuffCount": strValues(1) = (intDBStuffItemCount)
-                    
-                    objIniStuff.WriteSection strSectionName, strKeys(), strValues()
+                    objIniStuff.WriteSection strSectionName, sKeys(), sVals(), iKVCount
                 
                 End With
             End If
@@ -3216,6 +3044,171 @@ End Function
 ''Private Sub ResetAMTPreferences()
 ''glbPreferencesExpanded.LegacyAMTDBPath = ""
 ''End Sub
+
+
+Public Sub ResetOptions(gp As GelPrefs)
+'put options on default values
+    
+    ResetGelPrefs gp
+    ResetICR2LSPreferences
+    ResetOtherColorsPreferences
+    ResetCSIsoShapePreferences
+    ResetDDClrPreferences
+    
+    ' No longer supported (March 2006)
+    ''ResetAMTPreferences
+    ''ResetFTICR_AMTPreferences
+    
+    ResetExpandedPreferences glbPreferencesExpanded
+End Sub
+
+Public Sub ResetGelPrefs(gp As GelPrefs)
+    ResetSwitchPreferences gp
+    ResetTolerancesPreferences gp
+    ResetDrawingPreferences gp
+    ResetCooSysPreferences gp
+End Sub
+
+Private Sub ResetSwitchPreferences(gp As GelPrefs)
+    With gp
+        .IsoDataField = mftMWMono       ' 7
+        .Case2Results = 1
+        .DRDefinition = glNormal
+        .IsoICR2LSMOverZ = True
+    End With
+End Sub
+
+Private Sub ResetTolerancesPreferences(gp As GelPrefs)
+    With gp
+        .DBTolerance = -1
+        .DupTolerance = 2
+        .IsoDataFit = 0.15
+    End With
+End Sub
+
+Private Sub ResetDrawingPreferences(gp As GelPrefs)
+    With gp
+        .BorderClrSameAsInt = True
+        .MaxPointFactor = 2
+        .MinPointFactor = 0.5
+        .AbuAspectRatio = 1
+    End With
+End Sub
+
+Private Sub ResetAutoSearchModeEntry(udtAutoSearchModeEntry As udtAutoAnalysisSearchModeOptionsType)
+    With udtAutoSearchModeEntry
+        .SearchMode = AUTO_SEARCH_NONE
+        .AlternateOutputFolderPath = ""
+        .WriteResultsToTextFile = False
+        .ExportResultsToDatabase = False
+        .ExportUMCMembers = False
+        .PairSearchAssumeMassTagsAreLabeled = False
+        
+        If APP_BUILD_DISABLE_MTS Then
+            .InternalStdSearchMode = issmFindOnlyMassTags
+        Else
+            .InternalStdSearchMode = issmFindWithMassTags
+        End If
+        
+        .DBSearchMinimumHighNormalizedScore = 0
+        .DBSearchMinimumHighDiscriminantScore = 0
+        .DBSearchMinimumPeptideProphetProbability = 0
+        ResetDBSearchMassMods .MassMods
+    End With
+End Sub
+
+Public Sub ResetDBSearchMassMods(udtMassMods As udtDBSearchMassModificationOptionsType)
+    With udtMassMods
+        .DynamicMods = True
+        .N15InsteadOfN14 = False
+        .PEO = False
+        .ICATd0 = False
+        .ICATd8 = False
+        .Alkylation = False
+        .AlkylationMass = glALKYLATION
+        .ResidueToModify = ""
+        .ResidueMassModification = 0
+        .OtherInfo = ""
+    End With
+End Sub
+
+Private Sub ResetCooSysPreferences(gp As GelPrefs)
+    With gp
+        .CooType = glFNCooSys
+        .CooOrigin = glOriginBL
+        .CooHOrientation = glNormal
+        .CooVOrientation = glNormal
+        .CooVAxisScale = glVAxisLin
+    End With
+End Sub
+
+Private Sub ResetICR2LSPreferences()
+    sICR2LSCommand = "C:\Program Files\ICR-2LS\icr-2ls.exe "
+End Sub
+
+Public Sub ResetDataFilters(ByVal lngGelIndex As Long, ByRef udtPreferences As GelPrefs)
+    Dim i As Integer
+    
+On Error GoTo ResetDataFiltersErrorHandler
+
+    With udtPreferences
+        .DBTolerance = -1
+        .DupTolerance = 2
+        .IsoDataFit = 0.15
+    End With
+    
+    With GelData(lngGelIndex)
+       For i = 1 To MAX_FILTER_COUNT              'Do not use any filter initially
+         .DataFilter(i, 0) = False
+       Next i
+       .Preferences = udtPreferences
+       .DataFilter(fltDupTolerance, 1) = udtPreferences.DupTolerance
+       .DataFilter(fltDBTolerance, 1) = udtPreferences.DBTolerance
+       .DataFilter(fltIsoFit, 1) = udtPreferences.IsoDataFit
+       .DataFilter(fltCase2CloseResults, 1) = udtPreferences.Case2Results
+       .DataFilter(fltAR, 0) = 0
+       .DataFilter(fltAR, 1) = -1
+       .DataFilter(fltAR, 2) = -1
+       .DataFilter(fltID, 1) = 0
+       .DataFilter(fltCSAbu, 1) = 0             'min abundance
+       .DataFilter(fltIsoAbu, 1) = 0
+       .DataFilter(fltCSMW, 1) = 0              'min mass range
+       .DataFilter(fltIsoMW, 1) = 0
+       .DataFilter(fltIsoCS, 1) = 0
+       .DataFilter(fltCSStDev, 1) = 1
+       .DataFilter(fltIsoMZ, 1) = 0             'min m/z range
+       .DataFilter(fltEvenOddScanNumber, 1) = 0     ' Use all scans
+    End With
+    
+    Exit Sub
+
+ResetDataFiltersErrorHandler:
+    Debug.Print "Error in ResetDataFilters: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "ResetDataFilters"
+    Resume Next
+End Sub
+
+Private Sub ResetDDClrPreferences()
+    glUnderColor = glUnderColorDefault
+    glMidColor = glMidColorDefault
+    glOverColor = glOverColorDefault
+    glDDRatioMax = glHugeOverReal
+End Sub
+
+Private Sub ResetOtherColorsPreferences()
+    glBackColor = vbWhite
+    glForeColor = vbBlack
+    glCSColor = glCSColorDefault
+    glIsoColor = glIsoColorDefault
+    glSelColor = vbRed
+End Sub
+
+Private Sub ResetCSIsoShapePreferences()
+    glCSShape = 0       'oval
+    glIsoShape = 0
+End Sub
+
 
 Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpandedType, Optional strSingleSectionToReset As String = "", Optional blnApplyFilterOnIsotopicFit As Boolean = True)
     ' Use strSingleSectionToReset to reset a single section
@@ -3492,6 +3485,8 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .UseIdenticalChargesForER = True
                     .ComputeERScanByScan = True
                     .ScanByScanAverageIsNotWeighted = False
+                    
+                    .RequireMatchingIsotopeTagLabels = True
                     
                     .AverageERsAllChargeStates = True
                     .AverageERsWeightingMode = aewAbundance
@@ -3850,6 +3845,27 @@ End Sub
 ''Private Sub ResetFTICR_AMTPreferences()
 ''sFTICR_AMTPath = ""
 ''End Sub
+
+Public Sub SaveCurrentSettingsToIniFile(ByVal lngGelIndex As Long)
+    Dim strIniFilePath As String
+    
+    strIniFilePath = SelectFile(MDIForm1.hwnd, "Select existing Ini file or enter a new name", "", True, "*.ini", "Ini files (*.*)|*.*|All Files (*.*)|*.*")
+    
+    If Len(strIniFilePath) > 0 Then
+        ' Update glbPreferencesExpanded.AutoAnalysisDBInfo with the DB settings for the current gel
+        
+        strIniFilePath = FileExtensionForce(strIniFilePath, ".ini")
+        
+        If Not GelAnalysis(lngGelIndex) Is Nothing Then
+            With glbPreferencesExpanded
+                FillGelAnalysisInfo .AutoAnalysisDBInfo, GelAnalysis(lngGelIndex)
+                .AutoAnalysisDBInfoIsValid = .AutoAnalysisDBInfo.ValidAnalysisDataPresent
+            End With
+        End If
+        
+        IniFileSaveSettings glbPreferencesExpanded, UMCDef, UMCIonNetDef, UMCNetAdjDef, UMCInternalStandards, samtDef, glPreferences, strIniFilePath, True
+    End If
+End Sub
 
 Public Function SelectLegacyMTDB(objCallingForm As Form, strCurrentFilePath As String) As String
     Dim fso As New FileSystemObject

@@ -1426,7 +1426,7 @@ With udtUMCDef
 ''    .UMCMaxAbuPctBf = -10             'Ignored
 
     .OddEvenProcessingMode = oepUMCOddEvenProcessingMode.oepProcessAll
-    .AdditionalValue1 = 0
+    .RequireMatchingIsotopeTag = True
     .AdditionalValue2 = 0
     .AdditionalValue3 = 0
     .AdditionalValue4 = 0

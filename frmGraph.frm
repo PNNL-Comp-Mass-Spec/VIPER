@@ -3636,8 +3636,10 @@ Public Sub CopyAllPointsInView(Optional ByVal lngMaxPointsCountToCopy As Long = 
     Dim lngFN As Long, lngFNPrevious As Long
     Dim lngIonPointerArray() As Long           ' 1-based array
     Dim lngIonCount As Long
+    Dim strIsotopeLabelTag As String
     
     Dim blnCSPoints As Boolean
+    Dim blnContainsIsotopeTags As Boolean
     
     ' The following two arrays are used to look up the mass of each MT tag, given the MT tag ID
     ' If the user specified a mass modification (like alkylation, ICAT, or N15), then the standard mass
@@ -3772,11 +3774,23 @@ On Error GoTo CopyAllPointsInViewErrorHandler
             blnIReportData = False
         End If
         
-        If blnCSPoints Then
-            strExport(0) = strExport(0) & "Charge State" & strSepChar & "Fit" & strSepChar & "ExpressionRatio" & strSepChar & "M/Z of Most Abu" & strSepChar & "MW" & strSepChar & "UMC Indices"
+        If ((.DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) Then
+            blnContainsIsotopeTags = True
         Else
-            strExport(0) = strExport(0) & "Charge State" & strSepChar & "Fit" & strSepChar & "ExpressionRatio" & strSepChar & "M/Z of Most Abu" & strSepChar & GetIsoDescription(.Preferences.IsoDataField) & strSepChar & "UMC Indices"
+            blnContainsIsotopeTags = False
         End If
+        
+        If blnCSPoints Then
+            strExport(0) = strExport(0) & "Charge State" & strSepChar & "Fit" & strSepChar & "ExpressionRatio" & strSepChar & "M/Z of Most Abu" & strSepChar & "MW"
+        Else
+            strExport(0) = strExport(0) & "Charge State" & strSepChar & "Fit" & strSepChar & "ExpressionRatio" & strSepChar & "M/Z of Most Abu" & strSepChar & GetIsoDescription(.Preferences.IsoDataField)
+        End If
+        
+        If blnContainsIsotopeTags Then
+            strExport(0) = strExport(0) & strSepChar & "Isotope Label Tag"
+        End If
+        
+        strExport(0) = strExport(0) & strSepChar & "UMC Indices"
         
         If blnIncludeAMTMassDetails Then
             strExport(0) = strExport(0) & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "MassDiff (ppm)"
@@ -3819,6 +3833,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 dblMtoZ = 0
                 dblMW = .CSData(lngIonIndex).AverageMW
                 
+                strIsotopeLabelTag = ""
                 strUMCIndices = ""
                 strDBMatchList = .CSData(lngIonIndex).MTID
             
@@ -3837,6 +3852,8 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 ' Note: the m/z value stored in .IsoData() corresponds to the m/z of the most abundant peak in the isotope envelope, and therefore may not agree perfectly with dblMW
                 dblMtoZ = .IsoData(lngIonIndex).MZ
                 dblMW = GetIsoMass(.IsoData(lngIonIndex), .Preferences.IsoDataField)
+                
+                strIsotopeLabelTag = GetIsotopeLabelTagName(.IsoData(lngIonIndex).IsotopeLabel)
                 
                 strUMCIndices = ConstructUMCIndexList(nMyIndex, lngIonIndex, glIsoType)
                 strDBMatchList = .IsoData(lngIonIndex).MTID
@@ -3866,7 +3883,13 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                     strExport(lngExportCount) = strExport(lngExportCount) & Round(dblAbuIReportMWMono, 0) & strSepChar & Round(dblAbuIReport2Da, 0) & strSepChar
                 End If
                 
-                strExport(lngExportCount) = strExport(lngExportCount) & Trim(intCharge) & strSepChar & Format(dblFit, "0.000") & strSepChar & Format(dblExpressionRatio, "0.000000") & strSepChar & Format(dblMtoZ, "0.0000") & strSepChar & Format(dblMW, "0.0000") & strSepChar & strUMCIndices & strSepChar
+                strExport(lngExportCount) = strExport(lngExportCount) & Trim(intCharge) & strSepChar & Format(dblFit, "0.000") & strSepChar & Format(dblExpressionRatio, "0.000000") & strSepChar & Format(dblMtoZ, "0.0000") & strSepChar & Format(dblMW, "0.0000") & strSepChar
+                
+                If blnContainsIsotopeTags Then
+                    strExport(lngExportCount) = strExport(lngExportCount) & strIsotopeLabelTag & strSepChar
+                End If
+                
+                strExport(lngExportCount) = strExport(lngExportCount) & strUMCIndices & strSepChar
                 
                 If blnIncludeAMTMassDetails And Not blnOutputAllMatchesOnOneLine And Len(strDBMatchOrMatches) > 0 Then
                     ' Parse out the match details from strDBMatchOrMatches
@@ -4028,14 +4051,22 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim strSepChar As String
     Dim OutFileNum As Integer
     
+    Dim lngMemberIndex As Long
+    
     Dim lngPairIndex As Long
     Dim blnPairsPresent As Boolean
     Dim blnCorrectedIReportEREnabled As Boolean
+    Dim blnContainsIsotopeTags As Boolean
     
     Dim objP1IndFastSearch As FastSearchArrayLong
     Dim objP2IndFastSearch As FastSearchArrayLong
     Dim lngPairMatchCount As Long, lngPairMatchIndex As Long
     Dim udtPairMatchStats() As udtPairMatchStatsType
+
+    Dim intIsotopeLabelIndex As Integer
+    Dim eIsotopeLabelCurrent As iltIsotopeLabelTagConstants
+    Dim blnIsotopeLabelPresent(ISOTOPE_LABEL_TAG_CONSTANT_COUNT) As Boolean
+    Dim strIsotopes As String
     
 On Error GoTo CopyAllUMCsInViewErrorHandler
 
@@ -4072,6 +4103,13 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     ' Initialize the PairIndex lookup objects
     blnPairsPresent = PairIndexLookupInitialize(nMyIndex, objP1IndFastSearch, objP2IndFastSearch)
         
+    If ((GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) Then
+        blnContainsIsotopeTags = True
+    Else
+        blnContainsIsotopeTags = False
+    End If
+
+
     strSepChar = LookupDefaultSeparationCharacter()
     
     If AMTCnt = 0 Then
@@ -4206,14 +4244,21 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     
     ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; ExpressionRatioStDev; ExpressionRatioBasisCount; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagNET; MassTagNETStDev; SLiC Score; DelSLiC; MemberCountMatchingMassTag; IsInternalStdMatch; PeptideProphetProbability
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
-    strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar
-    strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
+    strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar
+    
+    If blnContainsIsotopeTags Then
+         strLineOut = strLineOut & "Isotope Tag Label" & strSepChar
+    End If
+
+    strLineOut = strLineOut & "PairIndex" & strSepChar & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability"
     
     With GelP_D_L(nMyIndex)
         If blnPairsPresent And .SearchDef.IReportEROptions.Enabled And .SearchDef.ComputeERScanByScan Then
             strLineOut = strLineOut & strSepChar & "Labelling Efficiency F" & strSepChar & "Log2(ER) Corrected for F" & strSepChar & "Log2(ER) Corrected Standard Error"
             blnCorrectedIReportEREnabled = True
+        Else
+            blnCorrectedIReportEREnabled = False
         End If
     End With
     
@@ -4273,10 +4318,45 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 strLineOut = strLineOut & .ClassCount & strSepChar
             End If
         
+            strLineOut = strLineOut & Round(ClsStat(lngUMCIndexOriginal, ustFitAverage), 3) & strSepChar
+            
+            If blnContainsIsotopeTags Then
+                For intIsotopeLabelIndex = 0 To UBound(blnIsotopeLabelPresent)
+                    blnIsotopeLabelPresent(intIsotopeLabelIndex) = False
+                Next intIsotopeLabelIndex
+                
+                ' Compile a list of the Isotope Type Tags for this UMC's members
+                For lngMemberIndex = 0 To .ClassCount - 1
+                    Select Case .ClassMType(lngMemberIndex)
+                    Case gldtCS
+                        ' Ignore it
+                    Case gldtIS
+                        eIsotopeLabelCurrent = GelData(nMyIndex).IsoData(.ClassMInd(lngMemberIndex)).IsotopeLabel
+                        If eIsotopeLabelCurrent >= 0 And eIsotopeLabelCurrent <= UBound(blnIsotopeLabelPresent) Then
+                            blnIsotopeLabelPresent(eIsotopeLabelCurrent) = True
+                        End If
+                    Case Else
+                        ' Ignore it
+                    End Select
+                Next lngMemberIndex
+                
+                strIsotopes = ""
+                For intIsotopeLabelIndex = 0 To UBound(blnIsotopeLabelPresent)
+                    If blnIsotopeLabelPresent(intIsotopeLabelIndex) Then
+                        If Len(strIsotopes) > 1 Then
+                            ' Trim the trailing comma
+                            strIsotopes = strIsotopes & ", "
+                        End If
+                        
+                        strIsotopes = strIsotopes & GetIsotopeLabelTagName(intIsotopeLabelIndex)
+                    End If
+                Next intIsotopeLabelIndex
+                
+                strLineOut = strLineOut & strIsotopes & strSepChar
+            End If
         End With
         
-        strLineOut = strLineOut & Round(ClsStat(lngUMCIndexOriginal, ustFitAverage), 3) & strSepChar
-        
+         
         ' Now start populating strLineOutEnd
         strLineOutEnd = ""
         strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).MultiAMTHitCount & strSepChar

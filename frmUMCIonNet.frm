@@ -50,18 +50,28 @@ Begin VB.Form frmUMCIonNet
       Tab(0).Control(5).Enabled=   0   'False
       Tab(0).Control(6)=   "cmdFindConnectionsThenUMCs"
       Tab(0).Control(6).Enabled=   0   'False
-      Tab(0).ControlCount=   7
+      Tab(0).Control(7)=   "chkRequireMatchingIsotopeTag"
+      Tab(0).Control(7).Enabled=   0   'False
+      Tab(0).ControlCount=   8
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "Frame1"
-      Tab(1).Control(1)=   "lblFilterConnections"
+      Tab(1).Control(0)=   "lblFilterConnections"
+      Tab(1).Control(1)=   "Frame1"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
       Tab(2).ControlEnabled=   0   'False
       Tab(2).Control(0)=   "fraNet(1)"
       Tab(2).ControlCount=   1
+      Begin VB.CheckBox chkRequireMatchingIsotopeTag 
+         Caption         =   "Require matching isotope label tag (e.g. N14 or N15)"
+         Height          =   255
+         Left            =   240
+         TabIndex        =   152
+         Top             =   3720
+         Width           =   4065
+      End
       Begin VB.CommandButton cmdFindConnectionsThenUMCs 
          Caption         =   "&Find Connections then LC-MS Features"
          Height          =   615
@@ -129,7 +139,7 @@ Begin VB.Form frmUMCIonNet
          Height          =   255
          Left            =   240
          TabIndex        =   147
-         Top             =   3840
+         Top             =   4200
          Value           =   1  'Checked
          Width           =   2985
       End
@@ -410,8 +420,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassAbundanceTopX"
-            Tab(2).Control(1)=   "fraClassMassTopX"
+            Tab(2).Control(0)=   "fraClassMassTopX"
+            Tab(2).Control(1)=   "fraClassAbundanceTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -1391,10 +1401,10 @@ Begin VB.Form frmUMCIonNet
       End
       Begin VB.Label lblLCMSFeatureFinderInfo 
          Caption         =   $"frmUMCIonNet.frx":00AC
-         Height          =   400
+         Height          =   405
          Left            =   240
          TabIndex        =   148
-         Top             =   4080
+         Top             =   4440
          Width           =   5415
       End
       Begin VB.Label lblFilterConnections 
@@ -1993,7 +2003,7 @@ LogErrors Err.Number, "frmUMCIonNet->EliminateLongConnections_NET"
 Resume Next
 End Function
 
-Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef strLCMSFeaturesFilePath As String, ByRef strIniFilePath As String, ByVal intOddEvenIteration As Integer) As Boolean
+Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef strLCMSFeaturesFilePath As String, ByRef strIniFilePath As String, ByVal intOddEvenIteration As Integer, ByVal intIsotopeTagIndex As Integer, ByRef eIsotopeTagList() As iltIsotopeLabelTagConstants) As Boolean
     Const COL_DELIMITER As String = vbTab
     
     Dim lngIndex As Long
@@ -2031,6 +2041,7 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
 
     If Not GetDataInScope(ISInd(), DataCnt) Then
         mAbortProcess = True
+        Status "Error constructing list of currently visible data points"
         ExportPeaksForUMCFinding = False
         Exit Function
     End If
@@ -2069,6 +2080,15 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                 blnExportPoint = True
             Else
                 blnExportPoint = CheckOddEvenIterationForScan(intOddEvenIteration, .IsoData(ISInd(lngIndex)).ScanNumber)
+            End If
+            
+            If blnExportPoint Then
+                If intIsotopeTagIndex >= 0 Then
+                    ' Only export the point if its isotope label matches the current one in eIsotopeTagList()
+                    If .IsoData(ISInd(lngIndex)).IsotopeLabel <> eIsotopeTagList(intIsotopeTagIndex) Then
+                        blnExportPoint = False
+                    End If
+                End If
             End If
             
             If blnExportPoint Then
@@ -2746,12 +2766,19 @@ Private Function FindUMCsUsingLCMSFeatureFinder(ByVal blnShowMessages As Boolean
     Dim lngIteration As Long
     Dim lngStatusUpdateIterationCount As Long
         
+    ' Note: If processing all scans, then intOddEvenIterationStart and intOddEvenIterationStart are 0
     Dim eOddEvenProcessingMode As oepUMCOddEvenProcessingMode
     Dim intOddEvenIteration As Integer
     Dim intOddEvenIterationStart As Integer
     Dim intOddEvenIterationEnd As Integer
     Dim intIterationSuccessCount As Integer
-        
+    
+    ' Note: If Isotope Tag Labels are not present, then intIsotopeTagIndexStart and intIsotopeTagIndexEnd will be -1
+    Dim intIsotopeTagIndex As Integer
+    Dim intIsotopeTagIndexStart As Integer
+    Dim intIsotopeTagIndexEnd As Integer
+    Dim eIsotopeTagList() As iltIsotopeLabelTagConstants
+    
     Dim blnAbortProcessing As Boolean
     Dim blnSuccess As Boolean
     Dim blnSuccessCurrentIteration As Boolean
@@ -2802,91 +2829,110 @@ On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
             intOddEvenIterationEnd = 0
         End Select
         
-        For intOddEvenIteration = intOddEvenIterationStart To intOddEvenIterationEnd
-        
-            ' Create two text files for LCMSFeatureFinder.exe to read
-            blnSuccessCurrentIteration = ExportPeaksForUMCFinding(strWorkingDirPath, strLCMSFeaturesFilePath, strIniFilePath, intOddEvenIteration)
-                    
-            If mAbortProcess Then
-                GoTo FindUMCsUsingLCMSFeatureFinderCleanup
-            End If
+        If UMCDef.RequireMatchingIsotopeTag And _
+           ((GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) Then
             
-            If blnSuccessCurrentIteration Then
-                strStatusBase = "Calling " & LCMS_FEATURE_FINDER_APP_NAME & " to find the LC-MS Features"
-                ChangeStatus strStatusBase
+            ' Construct a list of the Isotope Tag IDs present in the data
+            PopulateIsotopeTagList eIsotopeTagList, intIsotopeTagIndexStart, intIsotopeTagIndexEnd
+            
+            If mAbortProcess Then
+                ' Something went wrong in PopulateIsotopeTagList
+                FindUMCsUsingLCMSFeatureFinder = False
+                Exit Function
+            End If
+        Else
+            ReDim eIsotopeTagList(0)
+            intIsotopeTagIndexStart = -1
+            intIsotopeTagIndexEnd = -1
+        End If
+
+        For intOddEvenIteration = intOddEvenIterationStart To intOddEvenIterationEnd
+            For intIsotopeTagIndex = intIsotopeTagIndexStart To intIsotopeTagIndexEnd
+                
+                ' Create two text files for LCMSFeatureFinder.exe to read
+                blnSuccessCurrentIteration = ExportPeaksForUMCFinding(strWorkingDirPath, strLCMSFeaturesFilePath, strIniFilePath, intOddEvenIteration, intIsotopeTagIndex, eIsotopeTagList)
                         
-                strArguments = strLCMSFeaturesFilePath
-                If InStr(strArguments, " ") > 0 Then
-                    strArguments = """" & strArguments & """"
+                If mAbortProcess Then
+                    GoTo FindUMCsUsingLCMSFeatureFinderCleanup
                 End If
-                strArguments = "/I:" & strArguments
-        
-                Set objProgRunner = New clsProgRunner
-                dtProcessingStartTime = Now()
                 
-                If objProgRunner.StartProgram(strFeatureFinderAppPath, strArguments, vbNormalNoFocus) Then
-                
-                    lngStatusUpdateIterationCount = CInt(STATUS_UPDATE_INTERVAL_MSEC / CSng(APP_MONITOR_INTERVAL_MSEC))
-                    If lngStatusUpdateIterationCount < 1 Then lngStatusUpdateIterationCount = 1
+                If blnSuccessCurrentIteration Then
+                    strStatusBase = "Calling " & LCMS_FEATURE_FINDER_APP_NAME & " to find the LC-MS Features"
+                    ChangeStatus strStatusBase
+                            
+                    strArguments = strLCMSFeaturesFilePath
+                    If InStr(strArguments, " ") > 0 Then
+                        strArguments = """" & strArguments & """"
+                    End If
+                    strArguments = "/I:" & strArguments
+            
+                    Set objProgRunner = New clsProgRunner
+                    dtProcessingStartTime = Now()
                     
-                    Do While objProgRunner.AppRunning
-                        Sleep APP_MONITOR_INTERVAL_MSEC
+                    If objProgRunner.StartProgram(strFeatureFinderAppPath, strArguments, vbNormalNoFocus) Then
+                    
+                        lngStatusUpdateIterationCount = CInt(STATUS_UPDATE_INTERVAL_MSEC / CSng(APP_MONITOR_INTERVAL_MSEC))
+                        If lngStatusUpdateIterationCount < 1 Then lngStatusUpdateIterationCount = 1
                         
-                        sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
-                        If sngProcessingTimeSeconds / 60# >= sngMaxProcessingTimeMinutes Then
-                            blnAbortProcessing = True
-                            strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was aborted because over " & Trim(sngMaxProcessingTimeMinutes) & " minutes has elapsed."
-                        ElseIf mAbortProcess Then
-                            blnAbortProcessing = True
-                            strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was manually aborted by the user after " & Trim(sngProcessingTimeSeconds) & " seconds of processing."
-                        End If
-                        
-                        If blnAbortProcessing Then
-                            objProgRunner.AbortProcessing
+                        Do While objProgRunner.AppRunning
+                            Sleep APP_MONITOR_INTERVAL_MSEC
+                            
+                            sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
+                            If sngProcessingTimeSeconds / 60# >= sngMaxProcessingTimeMinutes Then
+                                blnAbortProcessing = True
+                                strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was aborted because over " & Trim(sngMaxProcessingTimeMinutes) & " minutes has elapsed."
+                            ElseIf mAbortProcess Then
+                                blnAbortProcessing = True
+                                strMessage = "LC-MS Feature Finding using the LCMS Feature Finder was manually aborted by the user after " & Trim(sngProcessingTimeSeconds) & " seconds of processing."
+                            End If
+                            
+                            If blnAbortProcessing Then
+                                objProgRunner.AbortProcessing
+                                DoEvents
+                                
+                                If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                                   MsgBox strMessage, vbOKOnly, glFGTU
+                                Else
+                                   Debug.Assert False
+                                   LogErrors Err.Number, "frmUMCIonNet->FindUMCsUsingLCMSFeatureFinder", strMessage
+                                   AddToAnalysisHistory CallerID, strMessage
+                                End If
+                                
+                                ChangeStatus strMessage
+                                Exit Do
+                            End If
+                            
+                            If lngIteration Mod lngStatusUpdateIterationCount = 0 Then
+                                If intOddEvenIteration = 1 Then
+                                    strStatusSpectrumType = "; odd-numbered spectra"
+                                ElseIf intOddEvenIteration = 2 Then
+                                    strStatusSpectrumType = "; even-numbered spectra"
+                                End If
+                                
+                                ChangeStatus strStatusBase & strStatusSpectrumType & ": " & Round(sngProcessingTimeSeconds, 1) & " seconds elapsed"
+                            End If
                             DoEvents
                             
-                            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-                               MsgBox strMessage, vbOKOnly, glFGTU
-                            Else
-                               Debug.Assert False
-                               LogErrors Err.Number, "frmUMCIonNet->FindUMCsUsingLCMSFeatureFinder", strMessage
-                               AddToAnalysisHistory CallerID, strMessage
-                            End If
+                            lngIteration = lngIteration + 1
+                        Loop
+            
+                        blnSuccess = Not blnAbortProcessing
+                        
+                        If blnSuccess Then
+                            ' Read the data from the _Features.txt & _PeakToFeatureMap.txt files
                             
-                            ChangeStatus strMessage
-                            Exit Do
-                        End If
-                        
-                        If lngIteration Mod lngStatusUpdateIterationCount = 0 Then
-                            If intOddEvenIteration = 1 Then
-                                strStatusSpectrumType = "; odd-numbered spectra"
-                            ElseIf intOddEvenIteration = 2 Then
-                                strStatusSpectrumType = "; even-numbered spectra"
+                            blnSuccessCurrentIteration = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages)
+                            If blnSuccessCurrentIteration Then
+                                intIterationSuccessCount = intIterationSuccessCount + 1
                             End If
-                            
-                            ChangeStatus strStatusBase & strStatusSpectrumType & ": " & Round(sngProcessingTimeSeconds, 1) & " seconds elapsed"
+                            If mAbortProcess Then blnSuccess = False
                         End If
-                        DoEvents
-                        
-                        lngIteration = lngIteration + 1
-                    Loop
-        
-                    blnSuccess = Not blnAbortProcessing
-                    
-                    If blnSuccess Then
-                        ' Read the data from the _Features.txt & _PeakToFeatureMap.txt files
-                        
-                        blnSuccessCurrentIteration = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages)
-                        If blnSuccessCurrentIteration Then
-                            intIterationSuccessCount = intIterationSuccessCount + 1
-                        End If
-                        If mAbortProcess Then blnSuccess = False
                     End If
                 End If
-            End If
+                
+                If Not blnSuccess Then Exit For
             
-            If Not blnSuccess Then Exit For
-        
+            Next intIsotopeTagIndex
         Next intOddEvenIteration
         
         If intIterationSuccessCount > 0 Then
@@ -2942,6 +2988,8 @@ Private Sub FindIonNetConnections()
     
     GelUMC(CallerID).def.OddEvenProcessingMode = UMCDef.OddEvenProcessingMode
     eOddEvenProcessingMode = UMCDef.OddEvenProcessingMode
+    
+    GelUMC(CallerID).def.RequireMatchingIsotopeTag = UMCDef.RequireMatchingIsotopeTag
     
     If PrepareDataArrays() Then
        If PrepareOptimization() Then
@@ -3335,6 +3383,10 @@ With GelUMCIon(Ind).ThisNetDef
     
     strDesc = strDesc & strLineSeparator & strAddnlText
     
+    If UMCDef.RequireMatchingIsotopeTag Then
+        strDesc = strDesc & strLineSeparator & "Require Matching Isotope Tag = True"
+    End If
+    
     strDesc = strDesc & vbCrLf
 End With
 GetUMCIsoDefinitionText = strDesc
@@ -3422,12 +3474,13 @@ Public Sub InitializeUMCSearch()
     
     ' MonroeMod: This code was in Form_Activate
     
+    Dim blnContainsIsotopeTags As Boolean
+    
 On Error GoTo InitializeUMCSearchErrorHandler
 
     Dim ScanRange As Long
     If bLoading Then
         CallerID = Me.Tag
-        lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
         
         ' Clear the cached LCMSResultsMapping data
         mLCMSResultsMappingCount = 0
@@ -3437,7 +3490,17 @@ On Error GoTo InitializeUMCSearchErrorHandler
         If CallerID >= 1 And CallerID <= UBound(GelBody) Then
             UMCDef = GelSearchDef(CallerID).UMCDef
             UMCIonNetDef = GelSearchDef(CallerID).UMCIonNetDef
+        
+            lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
+        
+            If ((GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) Then
+                blnContainsIsotopeTags = True
+            Else
+                blnContainsIsotopeTags = False
+            End If
         End If
+    
+        chkRequireMatchingIsotopeTag.Enabled = blnContainsIsotopeTags
         
         If GelUMCIon(CallerID).NetCount > 0 Then                     'accept settings from caller
            MyDef = GelUMCIon(CallerID).ThisNetDef
@@ -3859,6 +3922,86 @@ Private Sub PopulateComboBoxes()
     
 End Sub
 
+Private Sub PopulateIsotopeTagList(ByRef eIsotopeTagList() As iltIsotopeLabelTagConstants, ByRef intIsotopeTagIndexStart As Integer, ByRef intIsotopeTagIndexEnd As Integer)
+    ' Note: This Sub is duplicated in frmUMCSimple and frmUMCIonNet
+    
+    Dim strMessage As String
+    Dim lngIndex As Long
+    
+    Dim ISInd() As Long
+    Dim DataCnt As Long
+    
+    ' I need an Integer here so I can call ShellSortInt below
+    Dim intIsotopeTagList(ISOTOPE_LABEL_TAG_CONSTANT_COUNT - 1) As Integer
+    Dim intIsotopeTagCount As Integer
+    
+    ' Using a dictionary object as a hashtable
+    Dim htIsotopeTags As Dictionary
+    Set htIsotopeTags = New Dictionary
+    htIsotopeTags.RemoveAll
+        
+    ' Set these to -1 for now
+    intIsotopeTagIndexStart = -1
+    intIsotopeTagIndexEnd = -1
+    
+    intIsotopeTagCount = 0
+            
+    ' Construct a list of the Isotope Tag IDs present in the data
+
+    If Not GetDataInScope(ISInd(), DataCnt) Then
+        mAbortProcess = True
+        Status "Error constructing list of currently visible data points"
+        Exit Sub
+    End If
+    
+    With GelData(CallerID)
+        For lngIndex = 1 To DataCnt
+            If .IsoData(ISInd(lngIndex)).IsotopeLabel <> iltNone Then
+                ' Add .isotopeLabel to intIsotopeTagList() if not yet present
+                If Not htIsotopeTags.Exists(.IsoData(ISInd(lngIndex)).IsotopeLabel) Then
+                    If intIsotopeTagCount > UBound(intIsotopeTagList) Then
+                        ' Too many isotope tags; cannot add anymore
+                        strMessage = "More than " & CStr(ISOTOPE_LABEL_TAG_CONSTANT_COUNT) & " isotope tag labels were found; this is unexpected"
+                        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                           MsgBox strMessage, vbOKOnly, glFGTU
+                        Else
+                           Debug.Assert False
+                           LogErrors Err.Number, "frmUMCIonNet->PopulateIsotopeTagList, too many isotope tag labels"
+                           AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
+                        End If
+                        
+                        Exit For
+                    End If
+                    
+                    htIsotopeTags.add .IsoData(ISInd(lngIndex)).IsotopeLabel, intIsotopeTagCount
+                    
+                    intIsotopeTagList(intIsotopeTagCount) = .IsoData(ISInd(lngIndex)).IsotopeLabel
+                    intIsotopeTagCount = intIsotopeTagCount + 1
+                End If
+            End If
+        Next lngIndex
+    End With
+    
+    If intIsotopeTagCount > 0 Then
+        If intIsotopeTagCount > 1 Then
+            ' Sort intIsotopeTagList
+            ShellSortInt intIsotopeTagList, 0, intIsotopeTagCount - 1
+        End If
+        
+        ReDim eIsotopeTagList(intIsotopeTagCount - 1)
+        
+        For lngIndex = 0 To intIsotopeTagCount - 1
+            eIsotopeTagList(lngIndex) = intIsotopeTagList(lngIndex)
+        Next lngIndex
+        
+        intIsotopeTagIndexStart = 0
+        intIsotopeTagIndexEnd = intIsotopeTagCount - 1
+    Else
+        ReDim eIsotopeTagList(0)
+    End If
+    
+End Sub
+
 Private Function PPMToDaIfNeeded(dblConstraintValue As Double, DimInd As Long, lngDataIndex As Long) As Double
     
     ' If .DataType is a mass type, and if .ContraintUnits is ppm, then convert
@@ -3893,11 +4036,13 @@ On Error GoTo err_PrepareDataArrays
     ChangeStatus " Preparing arrays..."
 
     If Not GetDataInScope(ISInd(), DataCnt) Then
+        Status "Error constructing list of currently visible data points"
         PrepareDataArrays = False
         Exit Function
     End If
 
     If Not UpdateNetDimInfo() Then
+        Status "Unable to determine the network dimensions"
         PrepareDataArrays = False
         Exit Function
     End If
@@ -4192,6 +4337,8 @@ With UMCDef
     
     optDefScope(.DefScope).Value = True
     optEvenOddScanFilter(.OddEvenProcessingMode).Value = True
+    
+    SetCheckBox chkRequireMatchingIsotopeTag, .RequireMatchingIsotopeTag
     
     SetCheckBox chkInterpolateMissingIons, .InterpolateGaps
     txtInterpolateMaxGapSize = .InterpolateMaxGapSize
@@ -4496,6 +4643,14 @@ Private Sub cboMolecularMassField_Click()
         SetMolecularMassFieldDropdown CInt(UMCDef.MWField)
     Else
         UMCDef.MWField = GetMolecularMassFieldFromDropdown
+    End If
+End Sub
+
+Private Sub chkRequireMatchingIsotopeTag_Click()
+    If mCalculating Then
+        SetCheckBox chkRequireMatchingIsotopeTag, UMCDef.RequireMatchingIsotopeTag
+    Else
+        UMCDef.RequireMatchingIsotopeTag = cChkBox(chkRequireMatchingIsotopeTag)
     End If
 End Sub
 

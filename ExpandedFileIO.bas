@@ -1205,6 +1205,8 @@ Private Sub CopyDeltaLabelPairs2003ToCurrent(OldDeltaLabelPairs As IsoPairsDltLb
             .ComputeERScanByScan = False
             .ScanByScanAverageIsNotWeighted = False
             
+            .RequireMatchingIsotopeTagLabels = True
+            
             .AverageERsAllChargeStates = False
             .AverageERsWeightingMode = aewAbundance
         End With
@@ -1280,6 +1282,8 @@ Private Sub CopyDeltaLabelPairs2004aToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ComputeERScanByScan = OldDeltaLabelPairs.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
             
+            .RequireMatchingIsotopeTagLabels = True
+            
             .AverageERsAllChargeStates = OldDeltaLabelPairs.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.AverageERsWeightingMode
         End With
@@ -1354,6 +1358,8 @@ Private Sub CopyDeltaLabelPairs2004bToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ComputeERScanByScan = OldDeltaLabelPairs.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
             
+            .RequireMatchingIsotopeTagLabels = True
+            
             .AverageERsAllChargeStates = OldDeltaLabelPairs.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.AverageERsWeightingMode
         End With
@@ -1409,6 +1415,8 @@ Private Sub CopyDeltaLabelPairs2004cToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .UseIdenticalChargesForER = OldDeltaLabelPairs.SearchDef.UseIdenticalChargesForER
             .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
+            
+            .RequireMatchingIsotopeTagLabels = True
             
             .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode
@@ -1471,6 +1479,8 @@ Private Sub CopyDeltaLabelPairs2004dToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .UseIdenticalChargesForER = OldDeltaLabelPairs.SearchDef.UseIdenticalChargesForER
             .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
+            
+            .RequireMatchingIsotopeTagLabels = True
             
             .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode
@@ -1540,6 +1550,8 @@ Private Sub CopyDeltaLabelPairs2004eToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .UseIdenticalChargesForER = OldDeltaLabelPairs.SearchDef.UseIdenticalChargesForER
             .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
+            
+            .RequireMatchingIsotopeTagLabels = True
             
             .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode
@@ -2728,7 +2740,7 @@ End Sub
 Private Sub InitializeAdditionalUMCDefVariables(ByRef CurrentUMCDef As UMCDefinition)
     With CurrentUMCDef
         .OddEvenProcessingMode = oepUMCOddEvenProcessingMode.oepProcessAll
-        .AdditionalValue1 = 0
+        .RequireMatchingIsotopeTag = True
         .AdditionalValue2 = 0
         .AdditionalValue3 = 0
         .AdditionalValue4 = 0

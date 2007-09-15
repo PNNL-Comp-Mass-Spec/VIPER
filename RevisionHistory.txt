@@ -1,12 +1,13 @@
 VIPER Change Log
 
-Version 3.43 - Build 376; August 23, 2007
-	- Updated PEK file loader to read the column headers at the top of each Isos or CS section and use those to determine the data present in the 7th and 8th columns
-	- Now tracking the Isotope Tag reported by ICR-2LS (e.g. N14 or N15)
-		- Required update to the GelData structure by splitting AdditionalValue1 (a single) into two integers (IsotopeLabel and AdditionalIntValue)
-	- Removed legacy Public Enums 
-		- glDocDataCSFields, glDocDataCSVarFields, glDocDataISFields, & glDocDataISVarFields
-		- Created mftMassFieldTypeConstants to track the MW modes (e.g. mftMWMono replaces isfMWMono)
+Version 3.43 - Build 377; September 14, 2007
+	- Updated LCMS Feature Finding using "UMC Ion Networks" or using "UMC 2003" to consider the isotope label (e.g. N14 or N15) when finding UMCs
+	- Updated save/load Ini values to include UMC finding options OddEvenProcessingMode and RequireMatchingIsotopeTag
+	- Updated "Copy LC-MS Features (UMCs) in View" and "Copy Points in View" to include column "Isotope Label Tag" if the data contains isotope label information
+	- Updated Pair Finding to optionally find paired LC-MS features that have matching isotope tag labels
+		- Light member must be N14 and heavy member must be N15, or
+		- Light member must be C12 and heavy member must be C13, or
+		- Light member must be O16 and heavy member must be O18
 
 Version 3.43 - Build 376; August 16, 2007
 	- Switched from Ln(ER) to Log2(ER) where Log2() is the base-2 logarithm

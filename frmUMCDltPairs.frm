@@ -476,42 +476,51 @@ Begin VB.Form frmUMCDltPairs
       TabIndex        =   3
       Top             =   480
       Width           =   5175
+      Begin VB.CheckBox chkRequireMatchingIsotopeTagLabels 
+         BackColor       =   &H00C0FFC0&
+         Caption         =   "Require Matching Isotope Tag Labels (N14/15 or C12/C13)"
+         Height          =   735
+         Left            =   3360
+         TabIndex        =   72
+         Top             =   1920
+         Width           =   1725
+      End
       Begin VB.TextBox txtN15PercentIncorporationStep 
          Alignment       =   1  'Right Justify
          Height          =   285
-         Left            =   3120
+         Left            =   2160
          TabIndex        =   25
          Text            =   "1"
-         Top             =   3000
+         Top             =   3120
          Width           =   855
       End
       Begin VB.TextBox txtN15PercentIncorporationMaximum 
          Alignment       =   1  'Right Justify
          Height          =   285
-         Left            =   3120
+         Left            =   2160
          TabIndex        =   23
          Text            =   "95"
-         Top             =   2700
+         Top             =   2820
          Width           =   855
       End
       Begin VB.TextBox txtN15PercentIncorporationMinimum 
          Alignment       =   1  'Right Justify
          Height          =   285
-         Left            =   3120
+         Left            =   2160
          TabIndex        =   21
          Text            =   "95"
-         Top             =   2400
+         Top             =   2520
          Width           =   855
       End
       Begin VB.CheckBox chkN14N15IncompleteIncorporationMode 
          BackColor       =   &H00C0FFC0&
          Caption         =   "Enable N14/N15 Incomplete Incorporation Mode"
-         Height          =   615
-         Left            =   120
+         Height          =   495
+         Left            =   240
          TabIndex        =   18
-         Top             =   2400
+         Top             =   2040
          Value           =   1  'Checked
-         Width           =   1845
+         Width           =   2565
       End
       Begin VB.TextBox txtDeltaStepSize 
          Alignment       =   1  'Right Justify
@@ -602,21 +611,21 @@ Begin VB.Form frmUMCDltPairs
       Begin VB.Label Label4 
          BackStyle       =   0  'Transparent
          Caption         =   "Percent Incorporation Range"
-         Height          =   255
+         Height          =   615
          Index           =   4
-         Left            =   2280
+         Left            =   240
          TabIndex        =   19
-         Top             =   2160
-         Width           =   2415
+         Top             =   2520
+         Width           =   1095
       End
       Begin VB.Label Label4 
          BackStyle       =   0  'Transparent
          Caption         =   "Step"
          Height          =   255
          Index           =   3
-         Left            =   2280
+         Left            =   1320
          TabIndex        =   24
-         Top             =   3020
+         Top             =   3135
          Width           =   735
       End
       Begin VB.Label Label4 
@@ -624,9 +633,9 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Maximum"
          Height          =   255
          Index           =   2
-         Left            =   2280
+         Left            =   1320
          TabIndex        =   22
-         Top             =   2720
+         Top             =   2835
          Width           =   735
       End
       Begin VB.Label Label4 
@@ -634,9 +643,9 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Minimum"
          Height          =   255
          Index           =   1
-         Left            =   2280
+         Left            =   1320
          TabIndex        =   20
-         Top             =   2420
+         Top             =   2535
          Width           =   735
       End
       Begin VB.Label Label1 
@@ -848,6 +857,26 @@ Private Sub ClearAllPairs()
     DestroyDltLblPairs CallerID
 End Sub
 
+Private Sub EnableDisableDeltaMassButtons(ByVal blnEnable As Boolean, ByVal blnUpdateDeltaCountControls As Boolean)
+    txtDelta.Enabled = blnEnable
+    cmdSetToN15.Enabled = blnEnable
+    cmdSetToC13.Enabled = blnEnable
+    cmdSetToO18.Enabled = blnEnable
+    cmdSetDeuterium.Enabled = blnEnable
+    
+    If blnUpdateDeltaCountControls Then
+        txtMinDelta.Enabled = blnEnable
+        txtMaxDelta.Enabled = blnEnable
+        txtDeltaStepSize.Enabled = blnEnable
+        chkAutoMinMaxDelta.Enabled = blnEnable
+    End If
+End Sub
+
+Private Sub EnableDisableN14N15Controls()
+    EnableDisableN14N15IncompleteIncorporationMode
+    UpdateMatchingIsotopeTagLabelMode
+End Sub
+
 Private Sub EnableDisableN14N15IncompleteIncorporationMode()
     Dim blnIncompleteModeEnabled As Boolean
     
@@ -858,15 +887,11 @@ Private Sub EnableDisableN14N15IncompleteIncorporationMode()
         EnableDisableScanByScanAndIReport False
     End If
     
-    txtDelta.Enabled = Not blnIncompleteModeEnabled
     txtN15PercentIncorporationMinimum.Enabled = blnIncompleteModeEnabled
     txtN15PercentIncorporationMaximum.Enabled = blnIncompleteModeEnabled
     txtN15PercentIncorporationStep.Enabled = blnIncompleteModeEnabled
     
-    cmdSetToN15.Enabled = Not blnIncompleteModeEnabled
-    cmdSetToC13.Enabled = Not blnIncompleteModeEnabled
-    cmdSetToO18.Enabled = Not blnIncompleteModeEnabled
-    cmdSetDeuterium.Enabled = Not blnIncompleteModeEnabled
+    EnableDisableDeltaMassButtons Not blnIncompleteModeEnabled, False
     
 End Sub
 
@@ -971,7 +996,11 @@ Private Function FindPairs(ePairFormMode As pfmPairFormMode, Optional blnShowMes
     Dim ClsMidDelta As Long
     Dim LClsMW As Double            ' Light member MW
     Dim HClsMW As Double            ' Heavy member mw
-    Dim OverlapOK As Boolean
+    Dim blnOverlapOK As Boolean
+    
+    Dim LClsIsotopeTagLabel As iltIsotopeLabelTagConstants
+    Dim HClsIsotopeTagLabel As iltIsotopeLabelTagConstants
+    Dim blnCheckUMC As Boolean
     
     Dim strStatus As String
     Dim strSearchMode As String, strMessage As String
@@ -997,7 +1026,7 @@ On Error GoTo err_FindPairs
     
     ' Validate the N15 incorporation settings
     If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
-        ValidateN15IncorporationSettings
+        ValidateN15IncorporationSettings glbPreferencesExpanded.PairSearchOptions.SearchDef
         
         ' See if the UMC mass values are based on average masses; warn the user if they're not
         If GelUMC(CallerID).def.MWField <> mftMWAvg Then
@@ -1063,9 +1092,25 @@ On Error GoTo err_FindPairs
                ClsMaxDelta = GelP_D_L(CallerID).SearchDef.DeltaCountMax
             End If
             ClsStepDelta = GelP_D_L(CallerID).SearchDef.DeltaStepSize
+            
+            .RequireMatchingIsotopeTagLabelsEnabled = False
+            If .SearchDef.RequireMatchingIsotopeTagLabels Then
+                ' Only enable this if the file actually contains isotope label tags
+                If (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG Then
+                    .RequireMatchingIsotopeTagLabelsEnabled = True
+                    
+                    ' TODO: Possibly change this temp hack
+                    GelP_D_L(CallerID).SearchDef.N15IncompleteIncorporationMode = False
+                    ClsMinDelta = 0
+                    ClsMaxDelta = 0
+                    ClsStepDelta = 1
+                    blnAutoCalculateDeltaMinMax = False
+                    ePairFormMode = pfmDelta
+                End If
+            End If
         End With
        
-        With glbPreferencesExpanded.PairSearchOptions.SearchDef
+        With GelP_D_L(CallerID).SearchDef
             If .N15IncompleteIncorporationMode Then
                 ' Check that the values are <= 100 to avoid overflow errors
                 If .N15PercentIncorporationMinimum > 100 Then .N15PercentIncorporationMinimum = 100
@@ -1076,71 +1121,139 @@ On Error GoTo err_FindPairs
         
         ' Step through the LC-MS Features, treating each lngIndexHeavy'th UMC as the heavy member of the pair
         For lngIndexHeavy = 0 To GelUMC(CallerID).UMCCnt - 1
-            HClsMW = GelUMC(CallerID).UMCs(lngIndexHeavy).ClassMW
-           
-            ' The ClsMinDelta and ClsMaxDelta variables are not used for labeled pairs, but are calculated anyway
-            If blnAutoCalculateDeltaMinMax Then         'calculate for this specific mass
-               ClsMidDelta = CLng(0.012 * HClsMW)
-               ClsMinDelta = CLng(0.5 * ClsMidDelta)
-               ClsMaxDelta = CLng(1.5 * ClsMidDelta)
+            With GelUMC(CallerID).UMCs(lngIndexHeavy)
+                HClsMW = .ClassMW
+            
+                If GelP_D_L(CallerID).RequireMatchingIsotopeTagLabelsEnabled Then
+                    Select Case .ClassRepType
+                    Case gldtCS
+                        HClsIsotopeTagLabel = iltIsotopeLabelTagConstants.iltNone
+                    Case gldtIS
+                        HClsIsotopeTagLabel = GelData(CallerID).IsoData(.ClassRepInd).IsotopeLabel
+                    Case Else
+                        Debug.Assert False
+                        HClsIsotopeTagLabel = iltIsotopeLabelTagConstants.iltNone
+                    End Select
+                    
+                    Select Case HClsIsotopeTagLabel
+                    Case iltC13, iltN15, iltO18, iltNone
+                        ' Only check this UMC if it is tagged with a heavy isotope or it is untagged
+                        blnCheckUMC = True
+                    Case Else
+                        blnCheckUMC = False
+                    End Select
+                Else
+                    blnCheckUMC = True
+                End If
+            End With
+            
+            If lngIndexHeavy Mod 5 = 0 Then
+                strStatus = "Examining LC-MS Features: " & Trim(lngIndexHeavy) & " / " & Trim(GelUMC(CallerID).UMCCnt) & "; Pairs found: " & Trim(GelP_D_L(CallerID).PCnt)
+                UpdateStatus strStatus
+                If mAbortProcess Then Exit For
             End If
             
-            strStatus = "Examining LC-MS Features: " & Trim(lngIndexHeavy + 1) & " / " & Trim(GelUMC(CallerID).UMCCnt) & "; Pairs found: " & Trim(GelP_D_L(CallerID).PCnt)
-            UpdateStatus strStatus
-            If mAbortProcess Then Exit For
-           
-            ' Step through the LC-MS Features, treating each lngIndexLight'th UMC as the light member of the pair
-            For lngIndexLight = 0 To GelUMC(CallerID).UMCCnt - 1
-                If lngIndexHeavy <> lngIndexLight Then
-                    'check if 'overlap' condition is required and if yes do class lngIndexHeavy and lngIndexLight overlap at the edges?
-                    OverlapOK = True
-                    If GelP_D_L(CallerID).SearchDef.RequireUMCOverlap Then
-                        If ((GelUMC(CallerID).UMCs(lngIndexLight).MaxScan < GelUMC(CallerID).UMCs(lngIndexHeavy).MinScan) Or _
-                           (GelUMC(CallerID).UMCs(lngIndexHeavy).MaxScan < GelUMC(CallerID).UMCs(lngIndexLight).MinScan)) Then
-                                OverlapOK = False                       'no overlap
-                        End If
-                    End If
-                    
-                    If OverlapOK And GelP_D_L(CallerID).SearchDef.RequireUMCOverlapAtApex Then
-                        Select Case GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepType
-                        Case glCSType
-                            ScanMaxAbuLight = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngIndexLight).ClassRepInd).ScanNumber
-                            ScanMaxAbuHeavy = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepInd).ScanNumber
-                        Case glIsoType
-                            ScanMaxAbuLight = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngIndexLight).ClassRepInd).ScanNumber
-                            ScanMaxAbuHeavy = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepInd).ScanNumber
-                        Case Else
-                            ' This shouldn't happen
-                            Debug.Assert False
-                            ScanMaxAbuLight = 0
-                            ScanMaxAbuHeavy = GelP_D_L(CallerID).SearchDef.ScanToleranceAtApex + 1
-                        End Select
-                    
-                        ' Future: Make this more sophisticated by fitting a Gaussian curve to each of the LC-MS Features
-                        '         and comparing the alignment of the fitted curves
-                        ' For now, just check the scan distance between the apexes of the two LC-MS Features
-                        If Abs(ScanMaxAbuLight - ScanMaxAbuHeavy) > GelP_D_L(CallerID).SearchDef.ScanToleranceAtApex Then
-                            OverlapOK = False                       'no overlap
-                        End If
-                    
-                    End If
-                 
-                    If OverlapOK Then
-                        'check is it possible that this is a pair
-                        LClsMW = GelUMC(CallerID).UMCs(lngIndexLight).ClassMW
-                              
-                        Select Case ePairFormMode
-                        Case pfmDelta
-                            FindPairsWorkDelta blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy, ClsMinDelta, ClsMaxDelta, ClsStepDelta
-                        Case pfmLabel
-                            FindPairsWorkLabeled blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy
-                        Case pfmDeltaLabel
-                            FindPairsWorkDeltaLabeled blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy, ClsMinDelta, ClsMaxDelta, ClsStepDelta
-                        End Select
-                    
-                    End If
+            If blnCheckUMC Then
+                
+                ' The ClsMinDelta and ClsMaxDelta variables are not used for labeled pairs, but are calculated anyway
+                If blnAutoCalculateDeltaMinMax Then         'calculate for this specific mass
+                    ClsMidDelta = CLng(0.012 * HClsMW)
+                    ClsMinDelta = CLng(0.5 * ClsMidDelta)
+                    ClsMaxDelta = CLng(1.5 * ClsMidDelta)
                 End If
-            Next lngIndexLight
+                
+                ' Step through the LC-MS Features, treating each lngIndexLight'th UMC as the light member of the pair
+                For lngIndexLight = 0 To GelUMC(CallerID).UMCCnt - 1
+                    If lngIndexHeavy <> lngIndexLight Then
+                    
+                        blnOverlapOK = True
+                        If GelP_D_L(CallerID).RequireMatchingIsotopeTagLabelsEnabled Then
+                            With GelUMC(CallerID).UMCs(lngIndexLight)
+                                Select Case .ClassRepType
+                                Case gldtCS
+                                    LClsIsotopeTagLabel = iltIsotopeLabelTagConstants.iltNone
+                                Case gldtIS
+                                    LClsIsotopeTagLabel = GelData(CallerID).IsoData(.ClassRepInd).IsotopeLabel
+                                Case Else
+                                    Debug.Assert False
+                                    LClsIsotopeTagLabel = iltIsotopeLabelTagConstants.iltNone
+                                End Select
+                            End With
+                            
+                            Select Case LClsIsotopeTagLabel
+                            Case iltC12
+                                If HClsIsotopeTagLabel <> iltC13 Then
+                                    blnOverlapOK = False
+                                End If
+                            Case iltN14
+                                If HClsIsotopeTagLabel <> iltN15 Then
+                                    blnOverlapOK = False
+                                End If
+                            Case iltO16
+                                If HClsIsotopeTagLabel <> iltO18 Then
+                                    blnOverlapOK = False
+                                End If
+                            Case iltNone
+                                If HClsIsotopeTagLabel <> iltNone Then
+                                    blnOverlapOK = False
+                                End If
+                            Case Else
+                                ' Some other incompatible isotope tag label; skip it
+                                blnOverlapOK = False
+                            End Select
+                        End If
+                                                
+                        If blnOverlapOK Then
+                            'check if 'overlap' condition is required and if yes do class lngIndexHeavy and lngIndexLight overlap at the edges?
+                            If GelP_D_L(CallerID).SearchDef.RequireUMCOverlap Then
+                                If ((GelUMC(CallerID).UMCs(lngIndexLight).MaxScan < GelUMC(CallerID).UMCs(lngIndexHeavy).MinScan) Or _
+                                   (GelUMC(CallerID).UMCs(lngIndexHeavy).MaxScan < GelUMC(CallerID).UMCs(lngIndexLight).MinScan)) Then
+                                        blnOverlapOK = False                       'no overlap
+                                End If
+                            End If
+                        End If
+                        
+                        If blnOverlapOK And GelP_D_L(CallerID).SearchDef.RequireUMCOverlapAtApex Then
+                            Select Case GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepType
+                            Case glCSType
+                                ScanMaxAbuLight = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngIndexLight).ClassRepInd).ScanNumber
+                                ScanMaxAbuHeavy = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepInd).ScanNumber
+                            Case glIsoType
+                                ScanMaxAbuLight = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngIndexLight).ClassRepInd).ScanNumber
+                                ScanMaxAbuHeavy = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngIndexHeavy).ClassRepInd).ScanNumber
+                            Case Else
+                                ' This shouldn't happen
+                                Debug.Assert False
+                                ScanMaxAbuLight = 0
+                                ScanMaxAbuHeavy = GelP_D_L(CallerID).SearchDef.ScanToleranceAtApex + 1
+                            End Select
+                        
+                            ' Future: Make this more sophisticated by fitting a Gaussian curve to each of the LC-MS Features
+                            '         and comparing the alignment of the fitted curves
+                            ' For now, just check the scan distance between the apexes of the two LC-MS Features
+                            If Abs(ScanMaxAbuLight - ScanMaxAbuHeavy) > GelP_D_L(CallerID).SearchDef.ScanToleranceAtApex Then
+                                blnOverlapOK = False                       'no overlap
+                            End If
+                        
+                        End If
+                       
+                        If blnOverlapOK Then
+                            ' Compare the UMC masses to determine if this is potentially a valid pair
+                            LClsMW = GelUMC(CallerID).UMCs(lngIndexLight).ClassMW
+                                  
+                            Select Case ePairFormMode
+                            Case pfmDelta
+                                FindPairsWorkDelta blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy, ClsMinDelta, ClsMaxDelta, ClsStepDelta
+                            Case pfmLabel
+                                FindPairsWorkLabeled blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy
+                            Case pfmDeltaLabel
+                                FindPairsWorkDeltaLabeled blnShowMessages, LClsMW, HClsMW, lngIndexLight, lngIndexHeavy, ClsMinDelta, ClsMaxDelta, ClsStepDelta
+                            End Select
+                        
+                        End If
+                    End If
+                Next lngIndexLight
+            End If
         Next lngIndexHeavy
        
         Select Case ePairFormMode
@@ -1205,11 +1318,14 @@ On Error GoTo err_FindPairs
                 strMessage = strMessage & "; Use Identical Charges for ER = " & CStr(.UseIdenticalChargesForER)
                 strMessage = strMessage & "; Compute ER Scan by Scan = " & CStr(.ComputeERScanByScan)
                 strMessage = strMessage & "; Scan By Scan Average Uses Weighted Average = " & CStr(Not .ScanByScanAverageIsNotWeighted)
+                
                 strMessage = strMessage & "; Avg ER All Charge States = " & CStr(.AverageERsAllChargeStates)
                 strMessage = strMessage & "; Avg ERs Weighting Mode = " & CStr(.AverageERsWeightingMode)
             End With
             
-            With glbPreferencesExpanded.PairSearchOptions.SearchDef
+            strMessage = strMessage & "; Require Matching Isotope Tag Labels Enabled = " & CStr(.RequireMatchingIsotopeTagLabelsEnabled)
+            
+            With .SearchDef
                 If .N15IncompleteIncorporationMode Then
                     strMessage = strMessage & "; N15 Incomplete Incorporation Search Enabled"
                     strMessage = strMessage & "; Minimum Incorporation = " & Round(.N15PercentIncorporationMinimum, 1) & "%"
@@ -1304,7 +1420,7 @@ Private Sub FindPairsWorkDelta(ByVal blnShowMessages As Boolean, ByVal LClsMW As
 
     If LClsMW < HClsMW Then
         
-        With glbPreferencesExpanded.PairSearchOptions.SearchDef
+        With GelP_D_L(CallerID).SearchDef
             If .N15IncompleteIncorporationMode Then
                 ' Multiplying the values by 10 and then using Int() to round to one decimal place and allow for integer values in the For Loop
                 intN15IncorporationStart10x = Int(.N15PercentIncorporationMinimum * 10)
@@ -1345,7 +1461,7 @@ Private Sub FindPairsWorkDelta(ByVal blnShowMessages As Boolean, ByVal LClsMW As
             
             With GelP_D_L(CallerID)
                 For lngDeltaCnt = ClsMinDelta To ClsMaxDelta Step lngStepSize
-                    If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+                    If GelP_D_L(CallerID).SearchDef.N15IncompleteIncorporationMode Then
                         dblDeltaMassToCheck = (sngN15IncorporationFraction - N15_NATURAL_ABUNDANCE) * lngDeltaCnt * glN14N15_DELTA
                     Else
                         dblDeltaMassToCheck = lngDeltaCnt * .SearchDef.DeltaMass
@@ -1356,7 +1472,7 @@ Private Sub FindPairsWorkDelta(ByVal blnShowMessages As Boolean, ByVal LClsMW As
                     If Abs(MWDiff) <= dblMassTolerance Then
                         blnPairFound = FindPairsWorkValidatePair(lngIndexLight, lngIndexHeavy, lngDeltaCnt, 0, 0)
                         If blnPairFound Then
-                            If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+                            If GelP_D_L(CallerID).SearchDef.N15IncompleteIncorporationMode Then
                                 ' Cache this found pair
                                 If intCandidateCount > UBound(lngCandidateDeltaCounts) Then
                                     intArrayIndexMax = (UBound(lngCandidateDeltaCounts) + 1) * 2 - 1
@@ -1386,12 +1502,12 @@ Private Sub FindPairsWorkDelta(ByVal blnShowMessages As Boolean, ByVal LClsMW As
             End With
             
             If mAbortProcess Then Exit For
-            If Not glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+            If Not GelP_D_L(CallerID).SearchDef.N15IncompleteIncorporationMode Then
                 If blnPairFound Then Exit For
             End If
         Next intN15Incorporation10x
         
-        If glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode Then
+        If GelP_D_L(CallerID).SearchDef.N15IncompleteIncorporationMode Then
             If intCandidateCount > 0 Then
                 ' Need to find the best candidate (the one with the smallest value in sngCandidateMassDiff)
                 intCandidateIndexBest = 0
@@ -1685,7 +1801,7 @@ Public Sub InitializeForm()
         End If
        
         ' Validate the N15 incorporation settings
-        ValidateN15IncorporationSettings
+        ValidateN15IncorporationSettings glbPreferencesExpanded.PairSearchOptions.SearchDef
        
         With glbPreferencesExpanded.PairSearchOptions.SearchDef
             txtDelta.Text = .DeltaMass
@@ -1716,6 +1832,9 @@ Public Sub InitializeForm()
             txtN15PercentIncorporationMinimum.Text = Round(.N15PercentIncorporationMinimum, 1)
             txtN15PercentIncorporationMaximum.Text = Round(.N15PercentIncorporationMaximum, 1)
             txtN15PercentIncorporationStep.Text = Round(.N15PercentIncorporationStep, 1)
+            
+            SetCheckBox chkRequireMatchingIsotopeTagLabels, .RequireMatchingIsotopeTagLabels
+            EnableDisableN14N15Controls
             
             SetCheckBox chkPairsRequireOverlapAtEdge, .RequireUMCOverlap
             SetCheckBox chkPairsRequireOverlapAtApex, .RequireUMCOverlapAtApex
@@ -2161,6 +2280,24 @@ Private Sub UpdateDynamicControls()
     
 End Sub
 
+Private Sub UpdateMatchingIsotopeTagLabelMode()
+    ' Only enable this mode if hte current data has isotope tag information present
+    Dim blnRequireMatchingEnabled As Boolean
+    
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.RequireMatchingIsotopeTagLabels = cChkBox(chkRequireMatchingIsotopeTagLabels)
+    
+    If (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG Then
+        blnRequireMatchingEnabled = glbPreferencesExpanded.PairSearchOptions.SearchDef.RequireMatchingIsotopeTagLabels
+        chkRequireMatchingIsotopeTagLabels.Enabled = True
+    Else
+        blnRequireMatchingEnabled = False
+        chkRequireMatchingIsotopeTagLabels.Enabled = False
+    End If
+
+    EnableDisableDeltaMassButtons Not blnRequireMatchingEnabled, True
+    
+End Sub
+
 Private Sub UpdateStatus(ByVal Status As String)
 '-----------------------------------------------
 'set status label; entertain user so it doesn't
@@ -2170,9 +2307,9 @@ lblStatus.Caption = Status
 DoEvents
 End Sub
 
-Private Sub ValidateN15IncorporationSettings()
+Private Sub ValidateN15IncorporationSettings(ByRef udtSearchDef As udtIsoPairsSearchDefType)
     
-    With glbPreferencesExpanded.PairSearchOptions.SearchDef
+    With udtSearchDef
         If .N15PercentIncorporationMinimum < 0 Then
             .N15PercentIncorporationMinimum = 0
         End If
@@ -2227,15 +2364,15 @@ Private Sub cboAverageERsWeightingMode_Click()
 End Sub
 
 Private Sub chkAutoMinMaxDelta_Click()
-If chkAutoMinMaxDelta.Value = vbChecked Then
-   txtMinDelta.Enabled = False
-   txtMaxDelta.Enabled = False
-   glbPreferencesExpanded.PairSearchOptions.SearchDef.AutoCalculateDeltaMinMaxCount = True
-Else
-   txtMinDelta.Enabled = True
-   txtMaxDelta.Enabled = True
-   glbPreferencesExpanded.PairSearchOptions.SearchDef.AutoCalculateDeltaMinMaxCount = False
-End If
+    If chkAutoMinMaxDelta.Value = vbChecked Then
+       txtMinDelta.Enabled = False
+       txtMaxDelta.Enabled = False
+       glbPreferencesExpanded.PairSearchOptions.SearchDef.AutoCalculateDeltaMinMaxCount = True
+    Else
+       txtMinDelta.Enabled = True
+       txtMaxDelta.Enabled = True
+       glbPreferencesExpanded.PairSearchOptions.SearchDef.AutoCalculateDeltaMinMaxCount = False
+    End If
 End Sub
 
 Private Sub chkAverageERsAllChargeStates_Click()
@@ -2253,9 +2390,9 @@ Private Sub chkIReportEREnabled_Click()
 End Sub
 
 Private Sub chkN14N15IncompleteIncorporationMode_Click()
-    EnableDisableN14N15IncompleteIncorporationMode
+    EnableDisableN14N15Controls
     glbPreferencesExpanded.PairSearchOptions.SearchDef.N15IncompleteIncorporationMode = cChkBox(chkN14N15IncompleteIncorporationMode)
-    ValidateN15IncorporationSettings
+    ValidateN15IncorporationSettings glbPreferencesExpanded.PairSearchOptions.SearchDef
 End Sub
 
 Private Sub chkPairsExcludeAmbiguousKeepMostConfident_Click()
@@ -2282,6 +2419,10 @@ End Sub
 Private Sub chkRequireMatchingChargeStates_Click()
     glbPreferencesExpanded.PairSearchOptions.SearchDef.RequireMatchingChargeStatesForPairMembers = cChkBox(chkRequireMatchingChargeStates)
     UpdateDynamicControls
+End Sub
+
+Private Sub chkRequireMatchingIsotopeTagLabels_Click()
+    EnableDisableN14N15Controls
 End Sub
 
 Private Sub chkScanByScanAverageUsesWeightedAvg_Click()

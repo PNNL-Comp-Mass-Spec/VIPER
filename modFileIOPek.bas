@@ -179,6 +179,7 @@ Private mMaximumDataCountToLoad As Long
 Private mPrescannedData As clsFileIOPrescannedData
 
 Private mIReportFile As Boolean
+Private mIsotopeLabelTagsPresent As Boolean
 
 Private mValidDataPointCount As Long
 Private mSubtaskMessage As String
@@ -494,6 +495,8 @@ On Error GoTo LoadNewPEKErrorHandler
         End If
     End If
     
+    mIsotopeLabelTagsPresent = False
+    
     With GelData(mGelIndex)
         ' Reserve space in the arrays
         ReDim .ScanInfo(SCAN_INFO_DIM_CHUNK)
@@ -608,6 +611,13 @@ On Error GoTo LoadNewPEKErrorHandler
         Else
             .DataStatusBits = .DataStatusBits And Not GEL_DATA_STATUS_BIT_IREPORT
         End If
+        
+        If mIsotopeLabelTagsPresent Then
+            .DataStatusBits = .DataStatusBits Or GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG
+        Else
+            .DataStatusBits = .DataStatusBits And Not GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG
+        End If
+        
         
         If mMaxElutionTime = 0 Then
             ' Elution time wasn't defined
@@ -1087,6 +1097,12 @@ On Error GoTo ReadPEKFileErrorHandler
                                                     End If
                                                 End If
                                             End If
+                                            
+                                            If .IsotopeLabel <> iltIsotopeLabelTagConstants.iltNone Then
+                                                ' Isotope tag found; set mIsotopeLabelTagsPresent to true
+                                                mIsotopeLabelTagsPresent = True
+                                            End If
+
                                         End If
                                         
                                         
@@ -1626,20 +1642,6 @@ Private Function IsDataLine(ByVal strLineIn As String, ByRef varData As Variant,
     End If
 End Function
 
-Private Function GetIsotopeLabelTagCode(ByVal strIsotopeTag As String) As iltIsotopeLabelTagConstants
-    
-    Select Case LCase(Trim(strIsotopeTag))
-    Case "n14": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltN14
-    Case "n15": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltN15
-    Case "o16": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltO16
-    Case "o18": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltO18
-    Case "c12": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltC12
-    Case "c13": GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltC13
-    Case Else: GetIsotopeLabelTagCode = iltIsotopeLabelTagConstants.iltUnsupportedTag
-    End Select
-    
-End Function
-
 Private Function GetNumberEqual(ByVal sLine As String) As String
 'returns number as string after "=";
 'empty string if none or not numeric
@@ -1691,6 +1693,8 @@ Public Function GeneratePEKFileUsingDataPoints(ByVal lngGelIndex As Long, ByVal 
     Dim strSuggestedName As String
     Dim strSepChar As String
     Dim strScanHeaderFileName As String
+
+    Dim strLineOut As String
 
     Dim tsOutfile As TextStream
     Dim fso As FileSystemObject
@@ -1922,14 +1926,20 @@ On Error GoTo GeneratePEKFileUsingDataPointsErrorHandler
             Else
                 With GelData(lngGelIndex).IsoData(lngPointsInViewIndices(lngIndex))
                     ' CS,  Abundance,   m/z,   Fit,    Average MW, Monoisotopic MW,    Most abundant MW
-                    tsOutfile.WriteLine " " & Trim(.Charge) & strSepChar & _
+                    strLineOut = " " & Trim(.Charge) & strSepChar & _
                                     Trim(.Abundance) & strSepChar & _
                                     Round(.MZ, 6) & strSepChar & _
                                     Trim(.Fit) & strSepChar & _
                                     Round(.AverageMW, 6) & strSepChar & _
                                     Round(.MonoisotopicMW, 6) & strSepChar & _
                                     Round(.MostAbundantMW, 6)
-                
+
+                    If .IsotopeLabel <> iltNone Then
+                        strLineOut = strLineOut & strSepChar & GetIsotopeLabelTagName(.IsotopeLabel)
+                    End If
+
+                    tsOutfile.WriteLine strLineOut
+
                 End With
             End If
             
@@ -2388,7 +2398,7 @@ Private Sub GeneratePEKFileWriteIsoHeader(ByRef tsOutfile As TextStream, ByVal l
 
     tsOutfile.WriteLine "Isotopic mass transform results:"
     
-    strHeader = GetDefaultPEKFileIsoHeader(lngGelIndex)
+    strHeader = GetDefaultPEKFileIsoHeader(lngGelIndex, True)
     tsOutfile.WriteLine strHeader
 
 End Sub
@@ -2478,22 +2488,35 @@ GetColumnValueErrorHandler:
     
 End Function
 
-Private Function GetDefaultPEKFileIsoHeader(ByVal lngGelIndex As Long) As String
+Private Function GetDefaultPEKFileIsoHeader(ByVal lngGelIndex As Long, ByVal blnUseGelStatusBits As Boolean) As String
     ' If lngGelIndex is > 0, then will optionally add the "IsotopeLabel" header if .IsoData().IsotopeLabel is not blank
     
     Dim strHeader As String
+    Dim blnAddIsotopeHeaders As Boolean
     
     strHeader = "CS,  Abundance,   m/z,   Fit,    Average MW, Monoisotopic MW,    Most abundant MW"
     
 On Error GoTo GetDefaultPEKFileIsoHeaderErrorHandler
 
     If lngGelIndex > 0 Then
-        ' ToDo (August 2007): Uncomment this once .IsotopeLabel exists
-''        If GelData(lngGelIndex).IsoLines > 0 Then
-''            If Len(GelData(lngGelIndex).IsoData(1).IsotopeLabel) > 0 Then
-''                strHeader = strHeader & ",  IsotopeLabel,  IsotopeRatio"
-''            End If
-''        End If
+        With GelData(lngGelIndex)
+            blnAddIsotopeHeaders = False
+            If blnUseGelStatusBits Then
+                If ((.DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) Then
+                    blnAddIsotopeHeaders = True
+                End If
+            Else
+                If .IsoLines > 0 Then
+                    If .IsoData(1).IsotopeLabel <> iltIsotopeLabelTagConstants.iltNone Then
+                        blnAddIsotopeHeaders = True
+                    End If
+                End If
+            End If
+            
+            If blnAddIsotopeHeaders Then
+                strHeader = strHeader & ",  IsotopeLabel,  IsotopeRatio"
+            End If
+        End With
     End If
     
     GetDefaultPEKFileIsoHeader = strHeader
@@ -2652,7 +2675,7 @@ Private Sub ParseIsosColumnHeaders(ByVal strLineIn As String, ByRef intColumnMap
     Else
         ' Warn the user that the column headers weren't recognized
         If mReadMode = rmStoreData And Not mWarnedMissingRequiredIsosColumnHeaders Then
-            strMessage = CSV_COLUMN_HEADER_MISSING_WARNING & " not found in file " & strInputFilePath & "; default columns are: " & vbCrLf & GetDefaultPEKFileIsoHeader(mGelIndex)
+            strMessage = CSV_COLUMN_HEADER_MISSING_WARNING & " not found in file " & strInputFilePath & "; default columns are: " & vbCrLf & GetDefaultPEKFileIsoHeader(mGelIndex, False)
             If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                 MsgBox strMessage, vbExclamation + vbOKOnly, glFGTU
             End If
@@ -2664,7 +2687,7 @@ Private Sub ParseIsosColumnHeaders(ByVal strLineIn As String, ByRef intColumnMap
     If Len(strUnknownColumnList) > 0 Then
         If mReadMode = rmStoreData And Not mWarnedUnknownIsosColumnHeader Then
             ' Unknown column header; ignore it, but post an entry to the
-            AddToAnalysisHistory mGelIndex, CSV_COLUMN_HEADER_UNKNOWN_WARNING & " found in file " & strInputFilePath & ": " & strUnknownColumnList & "; default columns are: " & vbCrLf & GetDefaultPEKFileIsoHeader(mGelIndex)
+            AddToAnalysisHistory mGelIndex, CSV_COLUMN_HEADER_UNKNOWN_WARNING & " found in file " & strInputFilePath & ": " & strUnknownColumnList & "; default columns are: " & vbCrLf & GetDefaultPEKFileIsoHeader(mGelIndex, False)
             mWarnedUnknownIsosColumnHeader = True
         End If
     End If
@@ -2806,7 +2829,7 @@ Public Function WriteGELAsPEK(ByVal lngGelIndex As Long, ByVal hwndOwner As Long
              WriteCSDataToPEK TmpPEKNum, lngGelIndex, CurrFN
         Case LINE_DATA_ISO
              ' Get the default ISO header line
-             CurrLine = GetDefaultPEKFileIsoHeader(lngGelIndex)
+             CurrLine = GetDefaultPEKFileIsoHeader(lngGelIndex, True)
              Print #TmpPEKNum, CurrLine
              WriteIsoDataToPEK TmpPEKNum, lngGelIndex, CurrFN, lngIsoDataStartIndex
         Case LINE_WHATEVER
@@ -3039,12 +3062,11 @@ With GelData(Ind)
                         Format$(.IsoData(Indx(i)).Fit, "0.0000") & vbTab & _
                         Format$(.IsoData(Indx(i)).AverageMW, "0.0000") & vbTab & _
                         Format$(.IsoData(Indx(i)).MonoisotopicMW, "0.0000") & vbTab & _
-                        Format$(.IsoData(Indx(i)).MostAbundantMW, "0.0000") & vbTab
+                        Format$(.IsoData(Indx(i)).MostAbundantMW, "0.0000")
 
-              ' ToDo (August 2007): Implement this (will require a file format change by adding a new text field to udtIsotopicDataType
-''              If Len(.IsoData(Indx(i)).IsotopeLabel) > 0 Then
-''                sLine = sLine & vbTab & .IsoData(Indx(i)).IsotopeLabel
-''              End If
+              If .IsoData(Indx(i)).IsotopeLabel <> iltNone Then
+                sLine = sLine & vbTab & GetIsotopeLabelTagName(.IsoData(Indx(i)).IsotopeLabel)
+              End If
 
 ''              strAppendText = ""
 ''              If Len(strIsotopeLabel) > 0 Then

@@ -2227,6 +2227,50 @@ ShellSortLongErrorHandler:
     Debug.Assert False
 End Sub
 
+Public Sub ShellSortInt(ByRef intArray() As Integer, ByVal lngLowIndex As Long, ByVal lngHighIndex As Long)
+    Dim lngCount As Long
+    Dim lngIncrement As Long
+    Dim lngIndex As Long
+    Dim lngIndexCompare As Long
+    Dim intCompareVal As Integer
+
+On Error GoTo ShellSortIntErrorHandler
+
+' sort array[lngLowIndex..lngHighIndex]
+
+    ' compute largest increment
+    lngCount = lngHighIndex - lngLowIndex + 1
+    lngIncrement = 1
+    If (lngCount < 14) Then
+        lngIncrement = 1
+    Else
+        Do While lngIncrement < lngCount
+            lngIncrement = 3 * lngIncrement + 1
+        Loop
+        lngIncrement = lngIncrement \ 3
+        lngIncrement = lngIncrement \ 3
+    End If
+
+    Do While lngIncrement > 0
+        ' sort by insertion in increments of lngIncrement
+        For lngIndex = lngLowIndex + lngIncrement To lngHighIndex
+            intCompareVal = intArray(lngIndex)
+            For lngIndexCompare = lngIndex - lngIncrement To lngLowIndex Step -lngIncrement
+                ' Use <= to sort ascending; Use > to sort descending
+                If intArray(lngIndexCompare) <= intCompareVal Then Exit For
+                intArray(lngIndexCompare + lngIncrement) = intArray(lngIndexCompare)
+            Next lngIndexCompare
+            intArray(lngIndexCompare + lngIncrement) = intCompareVal
+        Next lngIndex
+        lngIncrement = lngIncrement \ 3
+    Loop
+    
+    Exit Sub
+
+ShellSortIntErrorHandler:
+    Debug.Assert False
+End Sub
+
 ' Shell Sort
 Public Sub ShellSortSingle(ByRef sngArray() As Single, ByVal lngLowIndex As Long, ByVal lngHighIndex As Long)
     Dim lngCount As Long

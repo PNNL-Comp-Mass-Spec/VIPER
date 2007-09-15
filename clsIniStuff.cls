@@ -125,16 +125,16 @@ Public Function ReadSection(psSection As String, psKeys() As String, psValues() 
     Else
         ReDim psKeys(0)
         ReDim psValues(0)
-        Dim iNull As Integer, iStart As Integer, i As Integer, s As String
+        Dim iNull As Integer, iStart As Integer, i As Integer, S As String
         i = 0: iStart = 1
         iNull = InStr(iStart, sReturned, vbNullChar)
         Do While iNull
-            s = Mid(sReturned, iStart, iNull - iStart)
-            If Left(s, 1) <> ";" Then   'Win98 includes comments in returned string, so ignore them
+            S = Mid(sReturned, iStart, iNull - iStart)
+            If Left(S, 1) <> ";" Then   'Win98 includes comments in returned string, so ignore them
               ReDim Preserve psKeys(i)
               ReDim Preserve psValues(i)
-              psKeys(i) = Left(s, InStr(1, s, "=") - 1)
-              psValues(i) = Right(s, Len(s) - InStr(1, s, "="))
+              psKeys(i) = Left(S, InStr(1, S, "=") - 1)
+              psValues(i) = Right(S, Len(S) - InStr(1, S, "="))
               i = i + 1
             End If
             iStart = iNull + 1
@@ -177,25 +177,52 @@ End Function
 ' Returns:
 '   true if success, false if fails (get LastErrorDescription for more info.....)
 '-----------------------------------------------------------------------------------
-Public Function WriteSection(psSection As String, psKeys() As String, psValues() As String) As Boolean
-    ' get out if we don't have a filename ....
-    If Not HaveFileName Then WriteSection = False: Exit Function
-    If UBound(psKeys) <> UBound(psValues) Then
+Public Function WriteSection(ByRef psSection As String, ByRef psKeys() As String, psValues() As String, ByVal intItemCount As Integer) As Boolean
+    ' If intItemcount is <= 0, then writes out the entire psKeys() and psValues() array
+    ' Otherwise, writes out the number of items specified by intItemCount
+    
+    Dim lngIndexStart As Long
+    Dim lngIndexEnd As Long
+    
+    ' Abort if we don't have a filename ....
+    If Not HaveFileName Then
         WriteSection = False
-        m_LastErrorDescription = "Key array and Value array must be of the same size"
         Exit Function
     End If
+    
+    If intItemCount <= 0 Then
+        If UBound(psKeys) <> UBound(psValues) Then
+            WriteSection = False
+            m_LastErrorDescription = "Key array and Value array must be of the same size"
+            Exit Function
+        End If
+        lngIndexStart = LBound(psKeys)
+        lngIndexEnd = UBound(psKeys)
+    Else
+        If UBound(psKeys) < intItemCount - 1 Or UBound(psValues) < intItemCount - 1 Then
+            WriteSection = False
+            m_LastErrorDescription = "Key array or Value array is not of length " & intItemCount
+            Exit Function
+        End If
+        lngIndexStart = 0
+        lngIndexEnd = intItemCount - 1
+    End If
+    
     ' return value
     Dim lRet As Long
+    
     ' tempstring which will contain the value to write on this format: key=value+vbNullChar+key=value etc...
-    Dim s As String, l As Long
+    Dim S As String, L As Long
+    
     ' format the string to write
-    For l = LBound(psKeys) To UBound(psKeys)
-        s = s & psKeys(l) & "=" & psValues(l) & vbNullChar
+    For L = lngIndexStart To lngIndexEnd
+        S = S & psKeys(L) & "=" & psValues(L) & vbNullChar
     Next
+    
     ' write section
-    lRet = WritePrivateProfileSection(psSection, s, m_FileName)
+    lRet = WritePrivateProfileSection(psSection, S, m_FileName)
     If lRet = 0 Then GetTheLastError
+    
 '    WriteSection = CBool(lRet)
     WriteSection = SetReturnValue(lRet)
     

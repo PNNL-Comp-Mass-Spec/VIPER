@@ -173,9 +173,10 @@ Public Type UMCDefinition
 '    UMCMaxAbuEtPctBf As Double              'max abundance elution percentage before        (Not used)
 '    UMCMaxAbuEtPctAf As Double              'max abundance elution percentage after         (Not used)
     
-    OddEvenProcessingMode As Integer    ' Actually type oepUMCOddEvenProcessingMode
-    AdditionalValue1 As Integer         ' 2 bytes; use for future expansion (name can be changed in the future)
-    AdditionalValue2 As Long            ' 4 bytes
+    OddEvenProcessingMode As Integer    ' Actually type oepUMCOddEvenProcessingMode; Added in August 2007
+    RequireMatchingIsotopeTag As Boolean    ' Added in September 2007
+    
+    AdditionalValue2 As Long            ' 4 bytes; use for future expansion (name can be changed in the future)
     AdditionalValue3 As Long            ' 4 bytes
     AdditionalValue4 As Long            ' 4 bytes
     AdditionalValue5 As Long            ' 4 bytes

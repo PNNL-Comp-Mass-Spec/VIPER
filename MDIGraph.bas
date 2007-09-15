@@ -56,6 +56,7 @@ Public Enum eosEvenOddScanFilterModeConstants
     eosLoadEvenScansOnly = 2
 End Enum
 
+Public Const ISOTOPE_LABEL_TAG_CONSTANT_COUNT As Integer = 8
 Public Enum iltIsotopeLabelTagConstants
     iltNone = 0
     iltUnsupportedTag = 1
@@ -1096,9 +1097,10 @@ Public Type udtIsoPairsSearchDefType
     N15PercentIncorporationMaximum As Single         ' 0 to 100, must be >= N14N15IncompleteIncorporationMinimum
     N15PercentIncorporationStep As Single            ' 1 to 100; will be rounded to 1 decimal place
     
-    ScanByScanAverageIsNotWeighted As Boolean       ' When False, then computes a weighted average across scans; when true, then does not weight
+    ScanByScanAverageIsNotWeighted As Boolean       ' When False, then computes a weighted average across scans; when true, then does not weight; added August 2007
+   
+    RequireMatchingIsotopeTagLabels As Boolean      ' Added September 2007
     
-    AdditionalValue1 As Boolean                     ' 2 bytes; New for this version
     AdditionalValue2 As Long                        ' 4 bytes; New for this version
     AdditionalValue3 As Long                        ' 4 bytes; New for this version
     AdditionalValue4 As Double                      ' 8 bytes; New for this version
@@ -1122,7 +1124,9 @@ Public Type IsoPairsDltLblType
     PCnt As Long                                ' Count of pairs
     Pairs() As udtIsoPairsDetailsType           ' 0-based array
     
-    AdditionalValue1 As Long                    ' New for this version
+    RequireMatchingIsotopeTagLabelsEnabled As Boolean   ' Added September 2007
+    AdditionalValue1 As Boolean                 ' New for this version
+    
     AdditionalValue2 As Long                    ' New for this version
     AdditionalValue3 As Long                    ' New for this version
     AdditionalValue4 As Double                  ' New for this version

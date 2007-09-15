@@ -218,19 +218,29 @@ Begin VB.Form frmUMCSimple
       Tab(0).Control(1).Enabled=   0   'False
       Tab(0).Control(2)=   "fraOptionFrame(1)"
       Tab(0).Control(2).Enabled=   0   'False
-      Tab(0).ControlCount=   3
+      Tab(0).Control(3)=   "chkRequireMatchingIsotopeTag"
+      Tab(0).Control(3).Enabled=   0   'False
+      Tab(0).ControlCount=   4
       TabCaption(1)   =   "Auto Refine Options"
       TabPicture(1)   =   "frmUMCSimple.frx":0059
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "fraOptionFrame(2)"
-      Tab(1).Control(1)=   "fraSplitUMCsOptions"
+      Tab(1).Control(0)=   "fraSplitUMCsOptions"
+      Tab(1).Control(1)=   "fraOptionFrame(2)"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "Adv Class Stats"
       TabPicture(2)   =   "frmUMCSimple.frx":0075
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraClassAbundanceTopX"
-      Tab(2).Control(1)=   "fraClassMassTopX"
+      Tab(2).Control(0)=   "fraClassMassTopX"
+      Tab(2).Control(1)=   "fraClassAbundanceTopX"
       Tab(2).ControlCount=   2
+      Begin VB.CheckBox chkRequireMatchingIsotopeTag 
+         Caption         =   "Require matching isotope label tag (e.g. N14 or N15)"
+         Height          =   615
+         Left            =   3720
+         TabIndex        =   98
+         Top             =   2400
+         Width           =   1665
+      End
       Begin VB.Frame fraOptionFrame 
          Height          =   1935
          Index           =   1
@@ -944,13 +954,15 @@ Dim CallerID As Long
 Dim CSCnt As Long               'count of CS data points included in count
 Dim ISCnt As Long               'count of IS data points included in count
 
+' The following are 0-based arrays
 Dim O_Cnt As Long               'total number of
 Dim O_Index() As Long           'index in CS/Iso arrays
 Dim O_Type() As Long            'type of data(CS/Iso)
 Dim O_MW() As Double            'mass array
 Dim O_Abu() As Double           'abundance (we need it anyway for class abundance calc)
 Dim O_Order() As Double         'Fit/StDev or Abundance
-Dim O_Scan() As Long            'just to have it
+Dim O_Scan() As Long            'Scan number
+Dim O_IsotopeLabel() As iltIsotopeLabelTagConstants
 
 Dim S_MW() As Double            'sorted mass array used for fast search
 
@@ -1041,10 +1053,23 @@ Public Sub InitializeUMCSearch()
     
     ' MonroeMod: This code was in Form_Activate
     
+    Dim blnContainsIsotopeTags As Boolean
+    
     On Error GoTo InitializeUMCSearchErrorHandler
     
     CallerID = Me.Tag
-    If CallerID >= 1 And CallerID <= UBound(GelBody) Then UMCDef = GelSearchDef(CallerID).UMCDef
+    If CallerID >= 1 And CallerID <= UBound(GelBody) Then
+        UMCDef = GelSearchDef(CallerID).UMCDef
+    
+        If ((GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) Then
+            blnContainsIsotopeTags = True
+        Else
+            blnContainsIsotopeTags = False
+        End If
+    End If
+    
+    chkRequireMatchingIsotopeTag.Enabled = blnContainsIsotopeTags
+    
     lblGelName.Caption = CompactPathString(GelBody(CallerID).Caption, 75)
     ' MonroeMod: copy value from .UMCDrawType to .DrawType
     GelUMCDraw(CallerID).DrawType = glbPreferencesExpanded.UMCDrawType
@@ -1062,6 +1087,8 @@ Public Sub InitializeUMCSearch()
         optDefScope(.DefScope).Value = True
         optMWField(.MWField - MW_FIELD_OFFSET).Value = True
         optEvenOddScanFilter(.OddEvenProcessingMode).Value = True
+        
+        SetCheckBox chkRequireMatchingIsotopeTag, .RequireMatchingIsotopeTag
         
         Select Case .TolType
         Case gltPPM
@@ -1186,6 +1213,14 @@ End Sub
 
 Private Sub chkRemoveLoCnt_Click()
     glbPreferencesExpanded.UMCAutoRefineOptions.UMCAutoRefineRemoveCountLow = cChkBox(chkRemoveLoCnt)
+End Sub
+
+Private Sub chkRequireMatchingIsotopeTag_Click()
+    If mCalculating Then
+        SetCheckBox chkRequireMatchingIsotopeTag, UMCDef.RequireMatchingIsotopeTag
+    Else
+        UMCDef.RequireMatchingIsotopeTag = cChkBox(chkRequireMatchingIsotopeTag)
+    End If
 End Sub
 
 Private Sub chkSplitUMCsByExaminingAbundance_Click()
@@ -1792,6 +1827,8 @@ Private Function UMCLoadArraysLocal() As Boolean
        ReDim O_Abu(MaxCnt - 1)
        ReDim O_Order(MaxCnt - 1)
        ReDim O_Scan(MaxCnt - 1)
+       ReDim O_IsotopeLabel(MaxCnt - 1)
+       
        O_Cnt = 0
        With GelData(CallerID)
          CSCnt = GetCSScope(CallerID, CSInd(), UMCDef.DefScope)
@@ -1803,6 +1840,8 @@ Private Function UMCLoadArraysLocal() As Boolean
                 O_MW(O_Cnt - 1) = .CSData(CSInd(i)).AverageMW
                 O_Abu(O_Cnt - 1) = .CSData(CSInd(i)).Abundance
                 O_Scan(O_Cnt - 1) = .CSData(CSInd(i)).ScanNumber
+                O_IsotopeLabel(O_Cnt - 1) = iltNone
+                
                 Select Case UMCDef.UMCType
                 Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX
                   O_Order(O_Cnt - 1) = .CSData(CSInd(i)).Abundance
@@ -1823,6 +1862,8 @@ Private Function UMCLoadArraysLocal() As Boolean
                 O_MW(O_Cnt - 1) = GetIsoMass(.IsoData(ISInd(i)), UMCDef.MWField)
                 O_Abu(O_Cnt - 1) = .IsoData(ISInd(i)).Abundance
                 O_Scan(O_Cnt - 1) = .IsoData(ISInd(i)).ScanNumber
+                O_IsotopeLabel(O_Cnt - 1) = .IsoData(ISInd(i)).IsotopeLabel
+                
                 Select Case UMCDef.UMCType
                 Case glUMC_TYPE_INTENSITY, glUMC_TYPE_ISHRINKINGBOX
                   O_Order(O_Cnt - 1) = .IsoData(ISInd(i)).Abundance
@@ -1845,6 +1886,8 @@ exit_UMCLoadArraysLocal:
        ReDim Preserve O_Abu(O_Cnt - 1)
        ReDim Preserve O_Order(O_Cnt - 1)
        ReDim Preserve O_Scan(O_Cnt - 1)
+       ReDim Preserve O_IsotopeLabel(O_Cnt - 1)
+       
        'initialize index arrays
        ReDim IndMW(O_Cnt - 1)
        ReDim IndOrder(O_Cnt - 1)
@@ -1864,6 +1907,7 @@ exit_UMCLoadArraysLocal:
        Erase O_Abu
        Erase O_Order
        Erase O_Scan
+       Erase O_IsotopeLabel
     End If
     Exit Function
     
@@ -1884,6 +1928,7 @@ Private Sub DestroyStructuresLocal()
     Erase O_Abu
     Erase O_Order
     Erase O_Scan
+    Erase O_IsotopeLabel
     Erase S_MW
     Erase IndMW
     Erase IndOrder
@@ -1971,7 +2016,7 @@ End Function
 Private Function ProcessScanPatternWrapper(ByRef MyPattern As ScanGapPattern, ByRef Scans() As Long, ByVal CurrScan As Long, ByRef ResInd() As Long, ByVal intOddEvenIteration As Integer) As Long
     
     Dim lngMaxIndex As Long
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     Dim CurrScanRelative As Long
     
@@ -1995,16 +2040,16 @@ Private Function ProcessScanPatternWrapper(ByRef MyPattern As ScanGapPattern, By
     ' However, if intOddEvenIteration is not 0, then we need to filter Scans() to only contain the odd or the even spectra
     
     If intOddEvenIteration = 0 Then
-        For lngindex = 0 To lngMaxIndex
-            RelativeScans(lngRelativeScanCount) = LookupScanNumberRelativeIndex(CallerID, Scans(lngindex))
-            RelativeScansPointerIndex(lngRelativeScanCount) = lngindex
+        For lngIndex = 0 To lngMaxIndex
+            RelativeScans(lngRelativeScanCount) = LookupScanNumberRelativeIndex(CallerID, Scans(lngIndex))
+            RelativeScansPointerIndex(lngRelativeScanCount) = lngIndex
             lngRelativeScanCount = lngRelativeScanCount + 1
-        Next lngindex
+        Next lngIndex
     Else
-        For lngindex = 0 To lngMaxIndex
-            If CheckOddEvenIterationForDataPoint(intOddEvenIteration, Scans(lngindex)) Then
-                RelativeScans(lngRelativeScanCount) = LookupScanNumberRelativeIndex(CallerID, Scans(lngindex))
-                RelativeScansPointerIndex(lngRelativeScanCount) = lngindex
+        For lngIndex = 0 To lngMaxIndex
+            If CheckOddEvenIterationForDataPoint(intOddEvenIteration, Scans(lngIndex)) Then
+                RelativeScans(lngRelativeScanCount) = LookupScanNumberRelativeIndex(CallerID, Scans(lngIndex))
+                RelativeScansPointerIndex(lngRelativeScanCount) = lngIndex
                 
                 ' When processing odd-only or even-only scans, we divide RelativeScans by 2 (and round down) since we're only keeping every other scan
                 ' This is required prior to calling MyPattern.ProcessScanPattern, otherwise it things every other scan has a gap
@@ -2012,7 +2057,7 @@ Private Function ProcessScanPatternWrapper(ByRef MyPattern As ScanGapPattern, By
                 RelativeScans(lngRelativeScanCount) = Int(RelativeScans(lngRelativeScanCount) / 2#)
                 lngRelativeScanCount = lngRelativeScanCount + 1
             End If
-        Next lngindex
+        Next lngIndex
     End If
     
     If lngRelativeScanCount > 0 Then
@@ -2031,13 +2076,13 @@ Private Function ProcessScanPatternWrapper(ByRef MyPattern As ScanGapPattern, By
         lngAcceptedCount = MyPattern.ProcessScanPattern(RelativeScans(), CurrScanRelative, ResInd())
         
         ' Need to update the values of ResInd() using RelativeScansPointerIndex()
-        For lngindex = 0 To lngAcceptedCount - 1
+        For lngIndex = 0 To lngAcceptedCount - 1
             If intOddEvenIteration = 0 Then
-                Debug.Assert ResInd(lngindex) = RelativeScansPointerIndex(ResInd(lngindex))
+                Debug.Assert ResInd(lngIndex) = RelativeScansPointerIndex(ResInd(lngIndex))
             End If
             
-            ResInd(lngindex) = RelativeScansPointerIndex(ResInd(lngindex))
-        Next lngindex
+            ResInd(lngIndex) = RelativeScansPointerIndex(ResInd(lngIndex))
+        Next lngIndex
     Else
         lngAcceptedCount = 0
     End If
@@ -2045,6 +2090,143 @@ Private Function ProcessScanPatternWrapper(ByRef MyPattern As ScanGapPattern, By
     ProcessScanPatternWrapper = lngAcceptedCount
 
 End Function
+
+Private Sub PopulateIsotopeTagList(ByRef eIsotopeTagList() As iltIsotopeLabelTagConstants, ByRef intIsotopeTagIndexStart As Integer, ByRef intIsotopeTagIndexEnd As Integer)
+    ' Note: This Sub is duplicated in frmUMCSimple and frmUMCIonNet
+    
+    Dim strMessage As String
+    Dim lngIndex As Long
+    
+    ' I need an Integer here so I can call ShellSortInt below
+    Dim intIsotopeTagList(ISOTOPE_LABEL_TAG_CONSTANT_COUNT - 1) As Integer
+    Dim intIsotopeTagCount As Integer
+    
+    ' Using a dictionary object as a hashtable
+    Dim htIsotopeTags As Dictionary
+    Set htIsotopeTags = New Dictionary
+    htIsotopeTags.RemoveAll
+        
+    ' Set these to -1 for now
+    intIsotopeTagIndexStart = -1
+    intIsotopeTagIndexEnd = -1
+    
+    intIsotopeTagCount = 0
+            
+    ' Construct a list of the Isotope Tag IDs present in the data
+    
+    For lngIndex = 0 To O_Cnt - 1
+        If O_IsotopeLabel(lngIndex) <> iltNone Then
+            ' Add O_IsotopeLabel() to intIsotopeTagList() if not yet present
+            If Not htIsotopeTags.Exists(O_IsotopeLabel(lngIndex)) Then
+                If intIsotopeTagCount > UBound(intIsotopeTagList) Then
+                    ' Too many isotope tags; cannot add anymore
+                    strMessage = "More than " & CStr(ISOTOPE_LABEL_TAG_CONSTANT_COUNT) & " isotope tag labels were found; this is unexpected"
+                    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                       MsgBox strMessage, vbOKOnly, glFGTU
+                    Else
+                       Debug.Assert False
+                       LogErrors Err.Number, "frmUMCSimple->PopulateIsotopeTagList, too many isotope tag labels"
+                       AddToAnalysisHistory CallerID, "Error in UMCIonNet Searching: " & strMessage
+                    End If
+                    
+                    Exit For
+                End If
+                
+                htIsotopeTags.add O_IsotopeLabel(lngIndex), intIsotopeTagCount
+                
+                intIsotopeTagList(intIsotopeTagCount) = O_IsotopeLabel(lngIndex)
+                intIsotopeTagCount = intIsotopeTagCount + 1
+            End If
+        End If
+    Next lngIndex
+    
+    
+    If intIsotopeTagCount > 0 Then
+        If intIsotopeTagCount > 1 Then
+            ' Sort intIsotopeTagList
+            ShellSortInt intIsotopeTagList, 0, intIsotopeTagCount - 1
+        End If
+        
+        ReDim eIsotopeTagList(intIsotopeTagCount - 1)
+        
+        For lngIndex = 0 To intIsotopeTagCount - 1
+            eIsotopeTagList(lngIndex) = intIsotopeTagList(lngIndex)
+        Next lngIndex
+        
+        intIsotopeTagIndexStart = 0
+        intIsotopeTagIndexEnd = intIsotopeTagCount - 1
+    Else
+        ReDim eIsotopeTagList(0)
+    End If
+    
+End Sub
+
+Private Function PreparePotentialMWRange(ByVal MWRangeMinInd As Long, ByVal MWRangeMaxInd As Long, ByVal intIsotopeTagIndex As Integer, ByRef eIsotopeTagList() As iltIsotopeLabelTagConstants) As Boolean
+    '----------------------------------------------------------------------------------------
+    'prepares arrays of potential class members; if sharing is disallowed eliminates already
+    'used data points; returns True if positive number of potential class members; False on
+    'on any error (no class members found is error since at least class rep. should be there)
+    '----------------------------------------------------------------------------------------
+    Dim i As Long
+    Dim IndRange As Long
+    Dim ThisMWInd As Long               'index in IndMW
+    Dim bUseThis As Boolean
+    
+    On Error GoTo err_PreparePotentialMWRange
+    
+    IndRange = MWRangeMaxInd - MWRangeMinInd + 1
+    CurrRepMWRangeInd = -1              'index of class representative in current range
+    If IndRange > 0 Then
+        ReDim CurrMWRangeInd_O(IndRange - 1)
+        CurrMWRangeCnt = 0
+        CurrRepInd_O = -1
+        For i = 0 To IndRange - 1
+            ThisMWInd = MWRangeMinInd + i
+            bUseThis = False
+            'always use class representative and remember its position in original array
+            If IndOrder(CurrOrderInd) = IndMW(ThisMWInd) Then
+                bUseThis = True
+                CurrRepInd_O = IndMW(ThisMWInd)
+            End If
+            
+            'and if sharing is disallowed use only not used data
+            If UMCDef.UMCSharing Then
+                bUseThis = True
+            Else
+                If Not IsUsed(IndMW(ThisMWInd)) Then bUseThis = True
+            End If
+            
+            If bUseThis And intIsotopeTagIndex >= 0 Then
+                ' Only use the point if its isotope label matches the current one in eIsotopeTagList()
+                If O_IsotopeLabel(IndMW(ThisMWInd)) <> eIsotopeTagList(intIsotopeTagIndex) Then
+                    bUseThis = False
+                End If
+            End If
+            
+            If bUseThis Then
+                CurrMWRangeCnt = CurrMWRangeCnt + 1
+                CurrMWRangeInd_O(CurrMWRangeCnt - 1) = IndMW(ThisMWInd)
+                If CurrMWRangeInd_O(CurrMWRangeCnt - 1) = CurrRepInd_O Then
+                    CurrRepMWRangeInd = CurrMWRangeCnt - 1     'remember where the class representative is
+                End If                                        'in the CurrMWRangeInd_O array
+            End If
+        Next i
+        
+        If CurrMWRangeCnt > 0 And CurrRepInd_O >= 0 Then
+            If CurrMWRangeCnt < IndRange Then
+                ReDim Preserve CurrMWRangeInd_O(CurrMWRangeCnt - 1)
+            End If
+            PreparePotentialMWRange = True
+            Exit Function
+        End If
+    End If
+
+err_PreparePotentialMWRange:
+    Erase CurrMWRangeInd_O
+    CurrMWRangeCnt = 0
+    CurrRepInd_O = -1
+End Function
+
 
 Private Function UMCLocalBreakStandard() As Boolean
     '------------------------------------------------------------------
@@ -2065,6 +2247,12 @@ Private Function UMCLocalBreakStandard() As Boolean
     Dim intOddEvenIteration As Integer
     Dim intOddEvenIterationStart As Integer
     Dim intOddEvenIterationEnd As Integer
+    
+    ' Note: If Isotope Tag Labels are not present, then intIsotopeTagIndexStart and intIsotopeTagIndexEnd will be -1
+    Dim intIsotopeTagIndex As Integer
+    Dim intIsotopeTagIndexStart As Integer
+    Dim intIsotopeTagIndexEnd As Integer
+    Dim eIsotopeTagList() As iltIsotopeLabelTagConstants
     
     Dim sngPercentComplete As Single
     
@@ -2096,102 +2284,131 @@ Private Function UMCLocalBreakStandard() As Boolean
         intOddEvenIterationEnd = 0
     End Select
     
+    If UMCDef.RequireMatchingIsotopeTag And _
+       ((GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) Then
+        
+        ' Construct a list of the Isotope Tag IDs present in the data
+        PopulateIsotopeTagList eIsotopeTagList, intIsotopeTagIndexStart, intIsotopeTagIndexEnd
+        
+    Else
+        ReDim eIsotopeTagList(0)
+        intIsotopeTagIndexStart = -1
+        intIsotopeTagIndexEnd = -1
+    End If
+    
     For intOddEvenIteration = intOddEvenIterationStart To intOddEvenIterationEnd
-        With GelUMC(CallerID)
-            bDone = False
-            CurrOrderInd = -1
-            Do Until bDone
-                bFoundNext = False
-                Do Until bFoundNext
-                    CurrOrderInd = CurrOrderInd + 1
-                    If CurrOrderInd > O_Cnt - 1 Then     'all data has been used
-                        bDone = True
-                        Exit Do
-                    Else
-                        'already used data can not be class representative
-                        If Not IsUsed(IndOrder(CurrOrderInd)) Then
-                            ' Only use data if intOddEvenIteration = 0 or if the scan number for the data point is the appropriate odd or even value
-                            If intOddEvenIteration = 0 Then
-                                bFoundNext = True
-                            Else
-                                bFoundNext = CheckOddEvenIterationForDataPoint(intOddEvenIteration, O_Scan(IndOrder(CurrOrderInd)))
-                            End If
-                        End If
-                    End If
-                Loop
+        For intIsotopeTagIndex = intIsotopeTagIndexStart To intIsotopeTagIndexEnd
+            With GelUMC(CallerID)
+                bDone = False
+                CurrOrderInd = -1
+                Do Until bDone
+                    DoEvents
                 
-                If bFoundNext Then      'new class representative = new class
-                   CurrMW = O_MW(IndOrder(CurrOrderInd))
-                   CurrScan = O_Scan(IndOrder(CurrOrderInd))
-                   'find all data points close enough in mass to be potential class members
-                   Select Case UMCDef.TolType
-                   Case gltPPM
-                        AbsTol = UMCDef.Tol * CurrMW * glPPM
-                   Case gltABS
-                        AbsTol = UMCDef.Tol
-                   Case Else
-                        Debug.Assert False
-                   End Select
-                   MWRangeMinInd = 0
-                   MWRangeMaxInd = O_Cnt - 1
-                   If MWRangeFinder.FindIndexRange(CurrMW, AbsTol, MWRangeMinInd, MWRangeMaxInd) Then
-                      If PreparePotentialMWRange(MWRangeMinInd, MWRangeMaxInd) Then
-                         If CurrMWRangeCnt > 1 Then    'at least one more potential member beside representative
-                            ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
-                            ReDim CurrMWRangeResInd(CurrMWRangeCnt - 1)     'and indexes that should be accepted
-                            For i = 0 To CurrMWRangeCnt - 1
-                                CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
-                            Next i
-                            AcceptedCnt = ProcessScanPatternWrapper(MyPattern, CurrMWRangeScan, CurrScan, CurrMWRangeResInd, intOddEvenIteration)
-                         ElseIf CurrMWRangeCnt = 1 Then
-                            AcceptedCnt = 1
-                            ReDim CurrMWRangeResInd(0)
-                            CurrMWRangeResInd(0) = 0
-                         Else
-                            AcceptedCnt = 0
-                            Erase CurrMWRangeResInd
-                         End If
-                         If AcceptedCnt > 0 Then
-                            'assemble class
-                            .UMCCnt = .UMCCnt + 1
-                            If .UMCCnt Mod 25 = 0 Then
-                                If intOddEvenIteration = 0 Or intOddEvenIterationStart = intOddEvenIterationEnd Then
-                                    sngPercentComplete = CurrOrderInd / O_Cnt * 100
+                    bFoundNext = False
+                    Do Until bFoundNext
+                        CurrOrderInd = CurrOrderInd + 1
+                        If CurrOrderInd > O_Cnt - 1 Then     'all data has been used
+                            bDone = True
+                            Exit Do
+                        Else
+                            'already used data can not be class representative
+                            If Not IsUsed(IndOrder(CurrOrderInd)) Then
+                                ' Only use data if intOddEvenIteration = 0 or if the scan number for the data point is the appropriate odd or even value
+                                If intOddEvenIteration = 0 Then
+                                    bFoundNext = True
                                 Else
-                                    If intOddEvenIteration = 1 Then
-                                        sngPercentComplete = CurrOrderInd / (O_Cnt * 2) * 100
-                                    Else
-                                        sngPercentComplete = (O_Cnt + CurrOrderInd) / (O_Cnt * 2) * 100
-                                    End If
+                                    bFoundNext = CheckOddEvenIterationForDataPoint(intOddEvenIteration, O_Scan(IndOrder(CurrOrderInd)))
                                 End If
                                 
-                                Status "Assembling features: " & .UMCCnt & " (" & Trim(Format(sngPercentComplete, "0.0")) & "% done)"
-                                If glAbortUMCProcessing Then Exit Do
+                                If bFoundNext And intIsotopeTagIndex >= 0 Then
+                                    ' Only use the point if its isotope label matches the current one in eIsotopeTagList()
+                                    If O_IsotopeLabel(IndOrder(CurrOrderInd)) <> eIsotopeTagList(intIsotopeTagIndex) Then
+                                        bFoundNext = False
+                                    End If
+                                End If
                             End If
-                            If UBound(.UMCs) + 1 < .UMCCnt Then     'increase size
-                               If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_UMCLocalBreakStandard
-                            End If
-                            With .UMCs(.UMCCnt - 1)
-                                .ClassCount = AcceptedCnt
-                                ReDim .ClassMInd(AcceptedCnt - 1)
-                                ReDim .ClassMType(AcceptedCnt - 1)
-                                For i = 0 To AcceptedCnt - 1
-                                    .ClassMInd(i) = O_Index(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
-                                    .ClassMType(i) = O_Type(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
-                                    IsUsed(CurrMWRangeInd_O(CurrMWRangeResInd(i))) = True
+                        End If
+                    Loop
+                    
+                    If bFoundNext Then      'new class representative = new class
+                       CurrMW = O_MW(IndOrder(CurrOrderInd))
+                       CurrScan = O_Scan(IndOrder(CurrOrderInd))
+                       
+                       'find all data points close enough in mass to be potential class members
+                       Select Case UMCDef.TolType
+                       Case gltPPM
+                            AbsTol = UMCDef.Tol * CurrMW * glPPM
+                       Case gltABS
+                            AbsTol = UMCDef.Tol
+                       Case Else
+                            Debug.Assert False
+                       End Select
+                       
+                       MWRangeMinInd = 0
+                       MWRangeMaxInd = O_Cnt - 1
+                       If MWRangeFinder.FindIndexRange(CurrMW, AbsTol, MWRangeMinInd, MWRangeMaxInd) Then
+                          If PreparePotentialMWRange(MWRangeMinInd, MWRangeMaxInd, intIsotopeTagIndex, eIsotopeTagList) Then
+                             If CurrMWRangeCnt > 1 Then    'at least one more potential member beside representative
+                                ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
+                                ReDim CurrMWRangeResInd(CurrMWRangeCnt - 1)     'and indexes that should be accepted
+                                For i = 0 To CurrMWRangeCnt - 1
+                                    CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
                                 Next i
-                                .ClassRepInd = O_Index(IndOrder(CurrOrderInd))
-                                .ClassRepType = O_Type(IndOrder(CurrOrderInd))
-                            End With
-                            'mark class representative and class members as being used
-                            IsRep(IndOrder(CurrOrderInd)) = True
-                            IsUsed(IndOrder(CurrOrderInd)) = True
-                         End If
-                      End If
-                   End If
-                End If
-            Loop
-        End With
+                                AcceptedCnt = ProcessScanPatternWrapper(MyPattern, CurrMWRangeScan, CurrScan, CurrMWRangeResInd, intOddEvenIteration)
+                             ElseIf CurrMWRangeCnt = 1 Then
+                                AcceptedCnt = 1
+                                ReDim CurrMWRangeResInd(0)
+                                CurrMWRangeResInd(0) = 0
+                             Else
+                                AcceptedCnt = 0
+                                Erase CurrMWRangeResInd
+                             End If
+                             
+                             If AcceptedCnt > 0 Then
+                                'assemble class
+                                .UMCCnt = .UMCCnt + 1
+                                If .UMCCnt Mod 25 = 0 Then
+                                    If intOddEvenIteration = 0 Or intOddEvenIterationStart = intOddEvenIterationEnd Then
+                                        sngPercentComplete = CurrOrderInd / O_Cnt * 100
+                                    Else
+                                        If intOddEvenIteration = 1 Then
+                                            sngPercentComplete = CurrOrderInd / (O_Cnt * 2) * 100
+                                        Else
+                                            sngPercentComplete = (O_Cnt + CurrOrderInd) / (O_Cnt * 2) * 100
+                                        End If
+                                    End If
+                                    
+                                    Status "Assembling features: " & .UMCCnt & " (" & Trim(Format(sngPercentComplete, "0.0")) & "% done)"
+                                    If glAbortUMCProcessing Then Exit Do
+                                End If
+                                
+                                If UBound(.UMCs) + 1 < .UMCCnt Then     'increase size
+                                   If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_UMCLocalBreakStandard
+                                End If
+                                
+                                With .UMCs(.UMCCnt - 1)
+                                    .ClassCount = AcceptedCnt
+                                    ReDim .ClassMInd(AcceptedCnt - 1)
+                                    ReDim .ClassMType(AcceptedCnt - 1)
+                                    For i = 0 To AcceptedCnt - 1
+                                        .ClassMInd(i) = O_Index(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
+                                        .ClassMType(i) = O_Type(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
+                                        IsUsed(CurrMWRangeInd_O(CurrMWRangeResInd(i))) = True
+                                    Next i
+                                    .ClassRepInd = O_Index(IndOrder(CurrOrderInd))
+                                    .ClassRepType = O_Type(IndOrder(CurrOrderInd))
+                                End With
+                                
+                                'mark class representative and class members as being used
+                                IsRep(IndOrder(CurrOrderInd)) = True
+                                IsUsed(IndOrder(CurrOrderInd)) = True
+                             End If
+                          End If
+                       End If
+                    End If
+                Loop
+            End With
+        Next intIsotopeTagIndex
     Next intOddEvenIteration
     
     Call ManageClasses(CallerID, UMCManageConstants.UMCMngTrim)
@@ -2242,6 +2459,12 @@ Private Function UMCLocalBreakShrinkingBox() As Boolean
     Dim intOddEvenIterationStart As Integer
     Dim intOddEvenIterationEnd As Integer
         
+    ' Note: If Isotope Tag Labels are not present, then intIsotopeTagIndexStart and intIsotopeTagIndexEnd will be -1
+    Dim intIsotopeTagIndex As Integer
+    Dim intIsotopeTagIndexStart As Integer
+    Dim intIsotopeTagIndexEnd As Integer
+    Dim eIsotopeTagList() As iltIsotopeLabelTagConstants
+        
     On Error GoTo err_UMCLocalBreakShrinkingBox
     CurrOrderInd = -1
     MyPattern.MaxGapCount = UMCDef.GapMaxCnt
@@ -2269,159 +2492,181 @@ Private Function UMCLocalBreakShrinkingBox() As Boolean
         intOddEvenIterationEnd = 0
     End Select
     
+    If UMCDef.RequireMatchingIsotopeTag And _
+       ((GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) Then
+        
+        ' Construct a list of the Isotope Tag IDs present in the data
+        PopulateIsotopeTagList eIsotopeTagList, intIsotopeTagIndexStart, intIsotopeTagIndexEnd
+        
+    Else
+        ReDim eIsotopeTagList(0)
+        intIsotopeTagIndexStart = -1
+        intIsotopeTagIndexEnd = -1
+    End If
+    
     For intOddEvenIteration = intOddEvenIterationStart To intOddEvenIterationEnd
-        With GelUMC(CallerID)
-            bDone = False
-            CurrOrderInd = -1
-            Do Until bDone
-                DoEvents
-                
-                bFoundNext = False
-                Do Until bFoundNext
-                    CurrOrderInd = CurrOrderInd + 1
-                    If CurrOrderInd > O_Cnt - 1 Then     'all data has been used
-                        bDone = True
-                        Exit Do
-                    Else
-                        'already used data can not be class representative
-                        If Not IsUsed(IndOrder(CurrOrderInd)) Then
-                            ' Only use data if intOddEvenIteration = 0 or if the scan number for the data point is the appropriate odd or even value
-                            If intOddEvenIteration = 0 Then
-                                bFoundNext = True
-                            Else
-                                bFoundNext = CheckOddEvenIterationForDataPoint(intOddEvenIteration, O_Scan(IndOrder(CurrOrderInd)))
+        For intIsotopeTagIndex = intIsotopeTagIndexStart To intIsotopeTagIndexEnd
+            With GelUMC(CallerID)
+                bDone = False
+                CurrOrderInd = -1
+                Do Until bDone
+                    DoEvents
+                    
+                    bFoundNext = False
+                    Do Until bFoundNext
+                        CurrOrderInd = CurrOrderInd + 1
+                        If CurrOrderInd > O_Cnt - 1 Then     'all data has been used
+                            bDone = True
+                            Exit Do
+                        Else
+                            'already used data can not be class representative
+                            If Not IsUsed(IndOrder(CurrOrderInd)) Then
+                                ' Only use data if intOddEvenIteration = 0 or if the scan number for the data point is the appropriate odd or even value
+                                If intOddEvenIteration = 0 Then
+                                    bFoundNext = True
+                                Else
+                                    bFoundNext = CheckOddEvenIterationForDataPoint(intOddEvenIteration, O_Scan(IndOrder(CurrOrderInd)))
+                                End If
+                                
+                                If bFoundNext And intIsotopeTagIndex >= 0 Then
+                                    ' Only use the point if its isotope label matches the current one in eIsotopeTagList()
+                                    If O_IsotopeLabel(IndOrder(CurrOrderInd)) <> eIsotopeTagList(intIsotopeTagIndex) Then
+                                        bFoundNext = False
+                                    End If
+                                End If
                             End If
                         End If
+                    Loop
+                    
+                    If bFoundNext Then      'new class representative = new class
+                       CurrMW = O_MW(IndOrder(CurrOrderInd))
+                       CurrScan = O_Scan(IndOrder(CurrOrderInd))
+                       'find all data points close enough in mass to be potential class members
+                       'note that max mw band width is double of the same parameter in Standard function
+                       Select Case UMCDef.TolType
+                       Case gltPPM
+                            AbsTol = 2 * UMCDef.Tol * CurrMW * glPPM
+                       Case gltABS
+                            AbsTol = 2 * UMCDef.Tol
+                       Case Else
+                            Debug.Assert False
+                       End Select
+                       
+                       MWRangeMinInd = 0
+                       MWRangeMaxInd = O_Cnt - 1
+                       If MWRangeFinder.FindIndexRange(CurrMW, AbsTol, MWRangeMinInd, MWRangeMaxInd) Then
+                          If PreparePotentialMWRange(MWRangeMinInd, MWRangeMaxInd, intIsotopeTagIndex, eIsotopeTagList) Then
+                             If CurrMWRangeCnt > 2 Then   'at least two more potential members beside representative
+                                If (CurrRepMWRangeInd = 0) Or (CurrRepMWRangeInd = CurrMWRangeCnt - 1) Then
+                                   'if representative is at the edge then everything could be included
+                                   ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
+                                   For i = 0 To CurrMWRangeCnt - 1
+                                       CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
+                                   Next i
+                                Else    'find all potential scores and note the best for this class
+                                   BSC = -1
+                                   For i = 0 To CurrRepMWRangeInd
+                                       'assume that class starts at position i and see how far it could go with 2*MWTol
+                                       EndFound = False
+                                       CurrEnd = CurrMWRangeCnt - 1
+                                       Do Until EndFound                                'find the end
+                                          If Abs(O_MW(CurrMWRangeInd_O(CurrEnd)) - O_MW(CurrMWRangeInd_O(i))) <= AbsTol Then
+                                             EndFound = True
+                                          Else
+                                             CurrEnd = CurrEnd - 1
+                                             If CurrEnd <= CurrRepMWRangeInd Then EndFound = True
+                                          End If
+                                       Loop
+                                       'fill temporary arrays
+                                       TmpCnt = CurrEnd - i + 1
+                                       ReDim TmpMWRangeScan(TmpCnt - 1)
+                                       ReDim TmpMWRangeResInd(TmpCnt - 1) As Long
+                                       For j = i To CurrEnd
+                                           TmpMWRangeScan(j - i) = O_Scan(CurrMWRangeInd_O(j))
+                                       Next j
+                                       'do patterns to obtain the score
+                                       TmpAcceptedCnt = ProcessScanPatternWrapper(MyPattern, TmpMWRangeScan, CurrScan, TmpMWRangeResInd, intOddEvenIteration)
+                                       If MyPattern.BestScore > BSC Then        'if more than one this way we will remember
+                                          BSC = MyPattern.BestScore             'the first one(additional criteria could be
+                                          BSCStart = i                          'easily added to improve the classes
+                                          BSCEnd = CurrEnd
+                                       End If
+                                   Next i
+                                   'now prepare the real stuff with best score
+                                   If BSC > 0 Then
+                                      CurrMWRangeCnt = BSCEnd - BSCStart + 1
+                                      If CurrMWRangeCnt > 0 Then
+                                         ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)
+                                         For i = 0 To CurrMWRangeCnt - 1            'shift current range left
+                                             CurrMWRangeInd_O(i) = CurrMWRangeInd_O(i + BSCStart)
+                                             CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
+                                         Next i
+                                         ReDim Preserve CurrMWRangeInd_O(CurrMWRangeCnt - 1)
+                                      Else
+                                         Erase CurrMWRangeScan
+                                         Erase CurrMWRangeInd_O
+                                      End If
+                                   End If
+                                End If
+                             Else                                               'two or less
+                                ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
+                                For i = 0 To CurrMWRangeCnt - 1
+                                    CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
+                                Next i
+                             End If
+                             'finally do the patterns if neccessary
+                             If CurrMWRangeCnt > 1 Then
+                                If CurrMWRangeCnt = 2 Then
+                                   DoEvents
+                                End If
+                                ReDim CurrMWRangeResInd(CurrMWRangeCnt - 1)     'indexes that should be accepted
+                                AcceptedCnt = ProcessScanPatternWrapper(MyPattern, CurrMWRangeScan, CurrScan, CurrMWRangeResInd, intOddEvenIteration)
+                    '             ElseIf CurrMWRangeCnt = 2 Then         'class representative and one more - has to be the same class
+                    '                AcceptedCnt = 2
+                    '                ReDim CurrMWRangeResInd(1)
+                    '                CurrMWRangeResInd(0) = 0
+                    '                CurrMWRangeResInd(1) = 1
+                             ElseIf CurrMWRangeCnt = 1 Then
+                                AcceptedCnt = 1
+                                ReDim CurrMWRangeResInd(0)
+                                CurrMWRangeResInd(0) = 0            'this is not neccessary but to make things clear
+                             Else
+                                AcceptedCnt = 0
+                                Erase CurrMWRangeResInd
+                             End If
+                                          
+                             If AcceptedCnt > 0 Then
+                                'assemble class
+                                .UMCCnt = .UMCCnt + 1
+                                If .UMCCnt Mod 2 = 0 Then
+                                    Status "Assembling feature: " & .UMCCnt & " (" & Trim(Format(CurrOrderInd / O_Cnt * 100, "0.0")) & "% done)"
+                                    If glAbortUMCProcessing Then Exit Do
+                                End If
+                                If UBound(.UMCs) + 1 < .UMCCnt Then     'increase size
+                                   If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_UMCLocalBreakShrinkingBox
+                                End If
+                                With .UMCs(.UMCCnt - 1)
+                                    .ClassCount = AcceptedCnt
+                                    ReDim .ClassMInd(AcceptedCnt - 1)
+                                    ReDim .ClassMType(AcceptedCnt - 1)
+                                    For i = 0 To AcceptedCnt - 1
+                                        .ClassMInd(i) = O_Index(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
+                                        .ClassMType(i) = O_Type(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
+                                        IsUsed(CurrMWRangeInd_O(CurrMWRangeResInd(i))) = True
+                                    Next i
+                                    .ClassRepInd = O_Index(IndOrder(CurrOrderInd))
+                                    .ClassRepType = O_Type(IndOrder(CurrOrderInd))
+                                End With
+                                'mark class representative and class members as being used
+                                IsRep(IndOrder(CurrOrderInd)) = True
+                                IsUsed(IndOrder(CurrOrderInd)) = True
+                             End If
+                          End If
+                       End If
                     End If
                 Loop
-                
-                If bFoundNext Then      'new class representative = new class
-                   CurrMW = O_MW(IndOrder(CurrOrderInd))
-                   CurrScan = O_Scan(IndOrder(CurrOrderInd))
-                   'find all data points close enough in mass to be potential class members
-                   'note that max mw band width is double of the same parameter in Standard function
-                   Select Case UMCDef.TolType
-                   Case gltPPM
-                        AbsTol = 2 * UMCDef.Tol * CurrMW * glPPM
-                   Case gltABS
-                        AbsTol = 2 * UMCDef.Tol
-                   Case Else
-                        Debug.Assert False
-                   End Select
-                   MWRangeMinInd = 0
-                   MWRangeMaxInd = O_Cnt - 1
-                   If MWRangeFinder.FindIndexRange(CurrMW, AbsTol, MWRangeMinInd, MWRangeMaxInd) Then
-                      If PreparePotentialMWRange(MWRangeMinInd, MWRangeMaxInd) Then
-                         If CurrMWRangeCnt > 2 Then   'at least two more potential members beside representative
-                            If (CurrRepMWRangeInd = 0) Or (CurrRepMWRangeInd = CurrMWRangeCnt - 1) Then
-                               'if representative is at the edge then everything could be included
-                               ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
-                               For i = 0 To CurrMWRangeCnt - 1
-                                   CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
-                               Next i
-                            Else    'find all potential scores and note the best for this class
-                               BSC = -1
-                               For i = 0 To CurrRepMWRangeInd
-                                   'assume that class starts at position i and see how far it could go with 2*MWTol
-                                   EndFound = False
-                                   CurrEnd = CurrMWRangeCnt - 1
-                                   Do Until EndFound                                'find the end
-                                      If Abs(O_MW(CurrMWRangeInd_O(CurrEnd)) - O_MW(CurrMWRangeInd_O(i))) <= AbsTol Then
-                                         EndFound = True
-                                      Else
-                                         CurrEnd = CurrEnd - 1
-                                         If CurrEnd <= CurrRepMWRangeInd Then EndFound = True
-                                      End If
-                                   Loop
-                                   'fill temporary arrays
-                                   TmpCnt = CurrEnd - i + 1
-                                   ReDim TmpMWRangeScan(TmpCnt - 1)
-                                   ReDim TmpMWRangeResInd(TmpCnt - 1) As Long
-                                   For j = i To CurrEnd
-                                       TmpMWRangeScan(j - i) = O_Scan(CurrMWRangeInd_O(j))
-                                   Next j
-                                   'do patterns to obtain the score
-                                   TmpAcceptedCnt = ProcessScanPatternWrapper(MyPattern, TmpMWRangeScan, CurrScan, TmpMWRangeResInd, intOddEvenIteration)
-                                   If MyPattern.BestScore > BSC Then        'if more than one this way we will remember
-                                      BSC = MyPattern.BestScore             'the first one(additional criteria could be
-                                      BSCStart = i                          'easily added to improve the classes
-                                      BSCEnd = CurrEnd
-                                   End If
-                               Next i
-                               'now prepare the real stuff with best score
-                               If BSC > 0 Then
-                                  CurrMWRangeCnt = BSCEnd - BSCStart + 1
-                                  If CurrMWRangeCnt > 0 Then
-                                     ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)
-                                     For i = 0 To CurrMWRangeCnt - 1            'shift current range left
-                                         CurrMWRangeInd_O(i) = CurrMWRangeInd_O(i + BSCStart)
-                                         CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
-                                     Next i
-                                     ReDim Preserve CurrMWRangeInd_O(CurrMWRangeCnt - 1)
-                                  Else
-                                     Erase CurrMWRangeScan
-                                     Erase CurrMWRangeInd_O
-                                  End If
-                               End If
-                            End If
-                         Else                                               'two or less
-                            ReDim CurrMWRangeScan(CurrMWRangeCnt - 1)       'scans
-                            For i = 0 To CurrMWRangeCnt - 1
-                                CurrMWRangeScan(i) = O_Scan(CurrMWRangeInd_O(i))
-                            Next i
-                         End If
-                         'finally do the patterns if neccessary
-                         If CurrMWRangeCnt > 1 Then
-                            If CurrMWRangeCnt = 2 Then
-                               DoEvents
-                            End If
-                            ReDim CurrMWRangeResInd(CurrMWRangeCnt - 1)     'indexes that should be accepted
-                            AcceptedCnt = ProcessScanPatternWrapper(MyPattern, CurrMWRangeScan, CurrScan, CurrMWRangeResInd, intOddEvenIteration)
-                '             ElseIf CurrMWRangeCnt = 2 Then         'class representative and one more - has to be the same class
-                '                AcceptedCnt = 2
-                '                ReDim CurrMWRangeResInd(1)
-                '                CurrMWRangeResInd(0) = 0
-                '                CurrMWRangeResInd(1) = 1
-                         ElseIf CurrMWRangeCnt = 1 Then
-                            AcceptedCnt = 1
-                            ReDim CurrMWRangeResInd(0)
-                            CurrMWRangeResInd(0) = 0            'this is not neccessary but to make things clear
-                         Else
-                            AcceptedCnt = 0
-                            Erase CurrMWRangeResInd
-                         End If
-                                      
-                         If AcceptedCnt > 0 Then
-                            'assemble class
-                            .UMCCnt = .UMCCnt + 1
-                            If .UMCCnt Mod 2 = 0 Then
-                                Status "Assembling feature: " & .UMCCnt & " (" & Trim(Format(CurrOrderInd / O_Cnt * 100, "0.0")) & "% done)"
-                                If glAbortUMCProcessing Then Exit Do
-                            End If
-                            If UBound(.UMCs) + 1 < .UMCCnt Then     'increase size
-                               If Not ManageClasses(CallerID, UMCManageConstants.UMCMngAdd) Then GoTo err_UMCLocalBreakShrinkingBox
-                            End If
-                            With .UMCs(.UMCCnt - 1)
-                                .ClassCount = AcceptedCnt
-                                ReDim .ClassMInd(AcceptedCnt - 1)
-                                ReDim .ClassMType(AcceptedCnt - 1)
-                                For i = 0 To AcceptedCnt - 1
-                                    .ClassMInd(i) = O_Index(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
-                                    .ClassMType(i) = O_Type(CurrMWRangeInd_O(CurrMWRangeResInd(i)))
-                                    IsUsed(CurrMWRangeInd_O(CurrMWRangeResInd(i))) = True
-                                Next i
-                                .ClassRepInd = O_Index(IndOrder(CurrOrderInd))
-                                .ClassRepType = O_Type(IndOrder(CurrOrderInd))
-                            End With
-                            'mark class representative and class members as being used
-                            IsRep(IndOrder(CurrOrderInd)) = True
-                            IsUsed(IndOrder(CurrOrderInd)) = True
-                         End If
-                      End If
-                   End If
-                End If
-            Loop
-        End With
+            End With
+        Next intIsotopeTagIndex
     Next intOddEvenIteration
     
     Call ManageClasses(CallerID, UMCManageConstants.UMCMngTrim)
@@ -2434,58 +2679,4 @@ err_UMCLocalBreakShrinkingBox:
     Status "Error creating Unique Mass Classes"
 End Function
 
-
-Private Function PreparePotentialMWRange(MWRangeMinInd As Long, MWRangeMaxInd As Long) As Boolean
-'----------------------------------------------------------------------------------------
-'prepares arrays of potential class members; if sharing is disallowed eliminates already
-'used data points; returns True if positive number of potential class members; False on
-'on any error (no class members found is error since at least class rep. should be there)
-'----------------------------------------------------------------------------------------
-Dim i As Long
-Dim IndRange As Long
-Dim ThisMWInd As Long               'index in IndMW
-Dim bUseThis As Boolean
-On Error GoTo err_PreparePotentialMWRange
-IndRange = MWRangeMaxInd - MWRangeMinInd + 1
-CurrRepMWRangeInd = -1              'index of class representative in current range
-If IndRange > 0 Then
-   ReDim CurrMWRangeInd_O(IndRange - 1)
-   CurrMWRangeCnt = 0
-   CurrRepInd_O = -1
-   For i = 0 To IndRange - 1
-       ThisMWInd = MWRangeMinInd + i
-       bUseThis = False
-       'always use class representative and remember its position in original array
-       If IndOrder(CurrOrderInd) = IndMW(ThisMWInd) Then
-          bUseThis = True
-          CurrRepInd_O = IndMW(ThisMWInd)
-       End If
-       'and if sharing is disallowed use only not used data
-       If UMCDef.UMCSharing Then
-          bUseThis = True
-       Else
-          If Not IsUsed(IndMW(ThisMWInd)) Then bUseThis = True
-       End If
-       If bUseThis Then
-          CurrMWRangeCnt = CurrMWRangeCnt + 1
-          CurrMWRangeInd_O(CurrMWRangeCnt - 1) = IndMW(ThisMWInd)
-          If CurrMWRangeInd_O(CurrMWRangeCnt - 1) = CurrRepInd_O Then
-             CurrRepMWRangeInd = CurrMWRangeCnt - 1     'remember where the class representative is
-          End If                                        'in the CurrMWRangeInd_O array
-       End If
-   Next i
-   If CurrMWRangeCnt > 0 And CurrRepInd_O >= 0 Then
-      If CurrMWRangeCnt < IndRange Then
-         ReDim Preserve CurrMWRangeInd_O(CurrMWRangeCnt - 1)
-      End If
-      PreparePotentialMWRange = True
-      Exit Function
-   End If
-End If
-
-err_PreparePotentialMWRange:
-Erase CurrMWRangeInd_O
-CurrMWRangeCnt = 0
-CurrRepInd_O = -1
-End Function
 
