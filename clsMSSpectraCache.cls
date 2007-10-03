@@ -443,7 +443,9 @@ On Error GoTo RemoveOldSpectraWorkErrorHandler
     Exit Function
     
 RemoveOldSpectraWorkErrorHandler:
-    MsgBox "Error examining folder for old spectra: " & strFolderPath & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error examining folder for old spectra: " & strFolderPath & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
     SetLocalErrorCode scErrorDeletingCachedSpectra
     
 End Function

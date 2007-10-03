@@ -444,7 +444,7 @@ Public Type DocumentData2005b            'file format for Certificate = glCERT20
 End Type
 
 
-' This is used with type DocumentData
+' This is used with type DocumentData (both CSData & IsoData)
 ' This structure was added in December 2005
 Public Type udtIsotopicDataType
     ScanNumber As Long

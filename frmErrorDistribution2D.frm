@@ -62,7 +62,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Options"
          Height          =   2295
          Left            =   -120
-         TabIndex        =   81
+         TabIndex        =   80
          Top             =   1200
          Width           =   6615
          Begin VB.CheckBox chkShowPeakEdges 
@@ -70,14 +70,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Peak Edges"
             Height          =   255
             Left            =   2520
-            TabIndex        =   88
+            TabIndex        =   87
             Top             =   960
             Width           =   2175
          End
          Begin VB.TextBox txtMassRangePPM 
             Height          =   285
             Left            =   2040
-            TabIndex        =   94
+            TabIndex        =   93
             Text            =   "100"
             Top             =   1200
             Width           =   735
@@ -85,7 +85,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtButterworthFrequency 
             Height          =   285
             Left            =   2760
-            TabIndex        =   104
+            TabIndex        =   103
             Text            =   "0.15"
             Top             =   1920
             Width           =   735
@@ -95,7 +95,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Smoothed Data"
             Height          =   255
             Left            =   240
-            TabIndex        =   85
+            TabIndex        =   84
             Top             =   960
             Width           =   2175
          End
@@ -104,7 +104,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Center Y Axis"
             Height          =   255
             Left            =   2520
-            TabIndex        =   87
+            TabIndex        =   86
             Top             =   480
             Value           =   1  'Checked
             Width           =   1335
@@ -114,7 +114,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Connect Points with Line"
             Height          =   255
             Left            =   240
-            TabIndex        =   84
+            TabIndex        =   83
             Top             =   720
             Value           =   1  'Checked
             Width           =   2175
@@ -124,7 +124,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Gridlines"
             Height          =   255
             Left            =   2520
-            TabIndex        =   86
+            TabIndex        =   85
             Top             =   240
             Value           =   1  'Checked
             Width           =   1455
@@ -132,7 +132,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGANETRange 
             Height          =   285
             Left            =   2040
-            TabIndex        =   100
+            TabIndex        =   99
             Text            =   "0.3"
             Top             =   1560
             Width           =   735
@@ -140,7 +140,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGANETBinSize 
             Height          =   285
             Left            =   5280
-            TabIndex        =   102
+            TabIndex        =   101
             Text            =   "0.005"
             Top             =   1560
             Width           =   735
@@ -148,7 +148,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtMassBinSizePPM 
             Height          =   285
             Left            =   5280
-            TabIndex        =   97
+            TabIndex        =   96
             Text            =   "0.5"
             Top             =   1200
             Width           =   735
@@ -156,7 +156,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGraphPointSize 
             Height          =   285
             Left            =   5280
-            TabIndex        =   90
+            TabIndex        =   89
             Text            =   "2"
             Top             =   240
             Width           =   735
@@ -164,7 +164,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGraphLineWidth 
             Height          =   285
             Left            =   5280
-            TabIndex        =   92
+            TabIndex        =   91
             Text            =   "3"
             Top             =   600
             Width           =   735
@@ -174,7 +174,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Auto Scale X Range"
             Height          =   255
             Left            =   240
-            TabIndex        =   82
+            TabIndex        =   81
             Top             =   240
             Value           =   1  'Checked
             Width           =   1815
@@ -184,7 +184,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Point Symbols"
             Height          =   255
             Left            =   240
-            TabIndex        =   83
+            TabIndex        =   82
             Top             =   480
             Value           =   1  'Checked
             Width           =   1815
@@ -194,7 +194,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Butterworth Sampling Frequency"
             Height          =   255
             Left            =   240
-            TabIndex        =   103
+            TabIndex        =   102
             Top             =   1950
             Width           =   2415
          End
@@ -203,7 +203,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Mass Range (± 0)"
             Height          =   255
             Left            =   240
-            TabIndex        =   93
+            TabIndex        =   92
             Top             =   1230
             Width           =   1575
          End
@@ -212,7 +212,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Left            =   2880
-            TabIndex        =   95
+            TabIndex        =   94
             Top             =   1230
             Width           =   495
          End
@@ -221,7 +221,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "NET Range (± 0)"
             Height          =   255
             Left            =   240
-            TabIndex        =   99
+            TabIndex        =   98
             Top             =   1590
             Width           =   1575
          End
@@ -230,7 +230,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "NET Bin Size"
             Height          =   255
             Left            =   3840
-            TabIndex        =   101
+            TabIndex        =   100
             Top             =   1590
             Width           =   1335
          End
@@ -239,7 +239,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Left            =   6120
-            TabIndex        =   98
+            TabIndex        =   97
             Top             =   1230
             Width           =   495
          End
@@ -248,7 +248,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Mass Bin Size"
             Height          =   255
             Left            =   3840
-            TabIndex        =   96
+            TabIndex        =   95
             Top             =   1230
             Width           =   1335
          End
@@ -257,7 +257,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Point Size"
             Height          =   255
             Left            =   4080
-            TabIndex        =   89
+            TabIndex        =   88
             Top             =   270
             Width           =   855
          End
@@ -266,7 +266,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Line Width"
             Height          =   255
             Left            =   4080
-            TabIndex        =   91
+            TabIndex        =   90
             Top             =   630
             Width           =   975
          End
@@ -292,7 +292,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
       Begin VIPER.ctlSpectraPlotter ctlPlotter 
          Height          =   4815
          Left            =   0
-         TabIndex        =   80
+         TabIndex        =   131
          Top             =   1320
          Width           =   6855
          _ExtentX        =   12091
@@ -360,7 +360,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Relative Risk Statistics"
          Height          =   735
          Left            =   120
-         TabIndex        =   107
+         TabIndex        =   106
          Top             =   6120
          Width           =   3015
          Begin VB.TextBox txtRelativeRiskStatistics 
@@ -369,7 +369,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   108
+            TabIndex        =   107
             Top             =   220
             Width           =   2835
          End
@@ -379,7 +379,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "UMC Mass Statistics"
          Height          =   1395
          Left            =   3240
-         TabIndex        =   105
+         TabIndex        =   104
          Top             =   4680
          Width           =   2550
          Begin VB.TextBox txtUMCMassStatistics 
@@ -388,7 +388,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   106
+            TabIndex        =   105
             Text            =   "frmErrorDistribution2D.frx":0000
             Top             =   280
             Width           =   2355
@@ -540,41 +540,26 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          _ExtentY        =   7911
          _Version        =   393216
          Style           =   1
-         Tabs            =   2
-         TabsPerRow      =   2
+         Tab             =   2
          TabHeight       =   520
          BackColor       =   16777215
          TabCaption(0)   =   "Mass Calibration Refinement"
          TabPicture(0)   =   "frmErrorDistribution2D.frx":017A
-         Tab(0).ControlEnabled=   -1  'True
+         Tab(0).ControlEnabled=   0   'False
          Tab(0).Control(0)=   "lblMassCalibrationRefinementDescription"
-         Tab(0).Control(0).Enabled=   0   'False
          Tab(0).Control(1)=   "lblMassCalibrationRefinementUnits(2)"
-         Tab(0).Control(1).Enabled=   0   'False
          Tab(0).Control(2)=   "lblMassCalibrationAdjustment"
-         Tab(0).Control(2).Enabled=   0   'False
          Tab(0).Control(3)=   "lblMassCalibrationRefinementUnits(1)"
-         Tab(0).Control(3).Enabled=   0   'False
          Tab(0).Control(4)=   "lblMassCalibrationOverallAdjustment"
-         Tab(0).Control(4).Enabled=   0   'False
          Tab(0).Control(5)=   "cmdMassCalibrationRefinementStart"
-         Tab(0).Control(5).Enabled=   0   'False
          Tab(0).Control(6)=   "fraMassCalibrationRefinement"
-         Tab(0).Control(6).Enabled=   0   'False
          Tab(0).Control(7)=   "cmdMassCalibrationManual"
-         Tab(0).Control(7).Enabled=   0   'False
          Tab(0).Control(8)=   "txtMassCalibrationNewIncrementalAdjustment"
-         Tab(0).Control(8).Enabled=   0   'False
          Tab(0).Control(9)=   "txtMassCalibrationOverallAdjustment"
-         Tab(0).Control(9).Enabled=   0   'False
          Tab(0).Control(10)=   "cmdMassCalibrationRevert"
-         Tab(0).Control(10).Enabled=   0   'False
-         Tab(0).Control(11)=   "cmdRecomputeHistograms"
-         Tab(0).Control(11).Enabled=   0   'False
+         Tab(0).Control(11)=   "cmdRecomputeHistograms(0)"
          Tab(0).Control(12)=   "cmdAbortProcessing(0)"
-         Tab(0).Control(12).Enabled=   0   'False
          Tab(0).Control(13)=   "cmdResetToDefaults"
-         Tab(0).Control(13).Enabled=   0   'False
          Tab(0).ControlCount=   14
          TabCaption(1)   =   "Tolerance Refinement"
          TabPicture(1)   =   "frmErrorDistribution2D.frx":0196
@@ -588,11 +573,202 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Tab(1).Control(6)=   "fraExpecationMaximizationOptions"
          Tab(1).Control(7)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
          Tab(1).ControlCount=   8
+         TabCaption(2)   =   "Pairwise Diffs"
+         TabPicture(2)   =   "frmErrorDistribution2D.frx":01B2
+         Tab(2).ControlEnabled=   -1  'True
+         Tab(2).Control(0)=   "lblPairwiseDifferencesOverview"
+         Tab(2).Control(0).Enabled=   0   'False
+         Tab(2).Control(1)=   "fraPairwiseDifferences"
+         Tab(2).Control(1).Enabled=   0   'False
+         Tab(2).Control(2)=   "cmdRecomputeHistograms(1)"
+         Tab(2).Control(2).Enabled=   0   'False
+         Tab(2).Control(3)=   "cmdAbortProcessing(2)"
+         Tab(2).Control(3).Enabled=   0   'False
+         Tab(2).ControlCount=   4
+         Begin VB.CommandButton cmdAbortProcessing 
+            Caption         =   "Abort Processing"
+            Height          =   375
+            Index           =   2
+            Left            =   480
+            TabIndex        =   128
+            Top             =   3960
+            Visible         =   0   'False
+            Width           =   2055
+         End
+         Begin VB.CommandButton cmdRecomputeHistograms 
+            Caption         =   "&Recompute Histograms"
+            Height          =   375
+            Index           =   1
+            Left            =   480
+            TabIndex        =   129
+            Top             =   3960
+            Width           =   2055
+         End
+         Begin VB.Frame fraPairwiseDifferences 
+            Caption         =   "Pairwise LC-MS Feature Diffs"
+            Height          =   2415
+            Left            =   120
+            TabIndex        =   110
+            Top             =   480
+            Width           =   4095
+            Begin VB.TextBox txtPairwiseMassDiffNETOffset 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Left            =   2040
+               TabIndex        =   125
+               Text            =   "0"
+               Top             =   2040
+               Width           =   615
+            End
+            Begin VB.TextBox txtPairwiseMassDiffNETTolerance 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Left            =   2040
+               TabIndex        =   122
+               Text            =   "0.1"
+               Top             =   1680
+               Width           =   615
+            End
+            Begin VB.CheckBox chkComputePairwiseMassDifferences 
+               Caption         =   "Compute pairwise differences"
+               Height          =   255
+               Left            =   120
+               TabIndex        =   111
+               Top             =   270
+               Width           =   3015
+            End
+            Begin VB.TextBox txtPairwiseMassDiffMinimum 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Left            =   2040
+               TabIndex        =   113
+               Text            =   "-100"
+               Top             =   600
+               Width           =   615
+            End
+            Begin VB.TextBox txtPairwiseMassDiffMaximum 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Left            =   2040
+               TabIndex        =   116
+               Text            =   "100"
+               Top             =   960
+               Width           =   615
+            End
+            Begin VB.TextBox txtPairwiseMassBinSize 
+               Alignment       =   1  'Right Justify
+               Height          =   285
+               Left            =   2040
+               TabIndex        =   119
+               Text            =   "0.25"
+               Top             =   1320
+               Width           =   615
+            End
+            Begin VB.Label lblUnits 
+               Caption         =   "NET"
+               Height          =   255
+               Index           =   11
+               Left            =   2760
+               TabIndex        =   126
+               Top             =   2070
+               Width           =   540
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "NET Offset"
+               Height          =   255
+               Index           =   15
+               Left            =   120
+               TabIndex        =   124
+               Top             =   2070
+               Width           =   1425
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "+/-"
+               Height          =   255
+               Index           =   13
+               Left            =   1680
+               TabIndex        =   130
+               Top             =   1710
+               Width           =   345
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "NET Tolerance"
+               Height          =   255
+               Index           =   12
+               Left            =   120
+               TabIndex        =   121
+               Top             =   1710
+               Width           =   1425
+            End
+            Begin VB.Label lblUnits 
+               Caption         =   "NET"
+               Height          =   255
+               Index           =   10
+               Left            =   2760
+               TabIndex        =   123
+               Top             =   1710
+               Width           =   540
+            End
+            Begin VB.Label lblUnits 
+               Caption         =   "Da"
+               Height          =   255
+               Index           =   9
+               Left            =   2760
+               TabIndex        =   120
+               Top             =   1350
+               Width           =   540
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "Minimum mass difference"
+               Height          =   255
+               Index           =   11
+               Left            =   120
+               TabIndex        =   112
+               Top             =   630
+               Width           =   1905
+            End
+            Begin VB.Label lblUnits 
+               Caption         =   "Da"
+               Height          =   255
+               Index           =   4
+               Left            =   2760
+               TabIndex        =   114
+               Top             =   630
+               Width           =   540
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "Maximum mass difference"
+               Height          =   255
+               Index           =   9
+               Left            =   120
+               TabIndex        =   115
+               Top             =   990
+               Width           =   1905
+            End
+            Begin VB.Label lblUnits 
+               Caption         =   "Da"
+               Height          =   255
+               Index           =   2
+               Left            =   2760
+               TabIndex        =   117
+               Top             =   990
+               Width           =   540
+            End
+            Begin VB.Label lblDescription 
+               Caption         =   "Bin Size"
+               Height          =   255
+               Index           =   7
+               Left            =   120
+               TabIndex        =   118
+               Top             =   1350
+               Width           =   1905
+            End
+         End
          Begin VB.CommandButton cmdResetToDefaults 
             Caption         =   "Set to Defaults"
             Height          =   375
-            Left            =   3840
-            TabIndex        =   110
+            Left            =   -71160
+            TabIndex        =   109
             Top             =   600
             Width           =   1455
          End
@@ -600,7 +776,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Use min or max tol if out of range"
             Height          =   375
             Left            =   -71280
-            TabIndex        =   109
+            TabIndex        =   108
             Top             =   1920
             Value           =   1  'Checked
             Width           =   1575
@@ -725,7 +901,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Abort Processing"
             Height          =   375
             Index           =   0
-            Left            =   1080
+            Left            =   -73920
             TabIndex        =   19
             Top             =   4080
             Visible         =   0   'False
@@ -734,7 +910,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.CommandButton cmdRecomputeHistograms 
             Caption         =   "&Recompute Histograms"
             Height          =   375
-            Left            =   1080
+            Index           =   0
+            Left            =   -73920
             TabIndex        =   20
             Top             =   4080
             Width           =   2055
@@ -742,7 +919,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.CommandButton cmdMassCalibrationRevert 
             Caption         =   "Revert to Original"
             Height          =   375
-            Left            =   1080
+            Left            =   -73920
             TabIndex        =   11
             Top             =   2160
             Width           =   1575
@@ -750,7 +927,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtMassCalibrationOverallAdjustment 
             Alignment       =   1  'Right Justify
             Height          =   285
-            Left            =   2040
+            Left            =   -72960
             Locked          =   -1  'True
             TabIndex        =   13
             Text            =   "0"
@@ -760,7 +937,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtMassCalibrationNewIncrementalAdjustment 
             Alignment       =   1  'Right Justify
             Height          =   285
-            Left            =   2040
+            Left            =   -72960
             TabIndex        =   16
             Text            =   "0"
             Top             =   2910
@@ -769,7 +946,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.CommandButton cmdMassCalibrationManual 
             Caption         =   "Manually recalibrate"
             Height          =   375
-            Left            =   1920
+            Left            =   -73080
             TabIndex        =   10
             Top             =   1740
             Width           =   1815
@@ -785,7 +962,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.Frame fraMassCalibrationRefinement 
             Caption         =   "Mass Calibration Refinement"
             Height          =   1215
-            Left            =   120
+            Left            =   -74880
             TabIndex        =   2
             Top             =   480
             Width           =   3500
@@ -1014,15 +1191,23 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.CommandButton cmdMassCalibrationRefinementStart 
             Caption         =   "Auto recalibrate"
             Height          =   375
-            Left            =   240
+            Left            =   -74760
             TabIndex        =   9
             Top             =   1740
             Width           =   1575
          End
+         Begin VB.Label lblPairwiseDifferencesOverview 
+            Caption         =   "Explanation goes here"
+            Height          =   975
+            Left            =   120
+            TabIndex        =   127
+            Top             =   3000
+            Width           =   5235
+         End
          Begin VB.Label lblMassCalibrationOverallAdjustment 
             Caption         =   "Overall Adjustment"
             Height          =   255
-            Left            =   240
+            Left            =   -74760
             TabIndex        =   12
             Top             =   2580
             Width           =   1695
@@ -1031,7 +1216,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Index           =   1
-            Left            =   3240
+            Left            =   -71760
             TabIndex        =   14
             Top             =   2580
             Width           =   600
@@ -1039,7 +1224,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.Label lblMassCalibrationAdjustment 
             Caption         =   "New Adjustment (relative to overall)"
             Height          =   375
-            Left            =   240
+            Left            =   -74760
             TabIndex        =   15
             Top             =   2835
             Width           =   1695
@@ -1048,7 +1233,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Index           =   2
-            Left            =   3240
+            Left            =   -71760
             TabIndex        =   17
             Top             =   2940
             Width           =   600
@@ -1056,7 +1241,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.Label lblMassCalibrationRefinementDescription 
             Caption         =   "Mass Calibration Refinement Description"
             Height          =   735
-            Left            =   120
+            Left            =   -74880
             TabIndex        =   18
             Top             =   3315
             Width           =   4605
@@ -1159,6 +1344,7 @@ Public Enum mdmMassErrorDisplayModeConstants
     mdmMassErrorPPM = 0
     mdmMassErrorDa = 1
     mdmGanetError = 2
+    mdmPairwiseMassDifferences = 3
 End Enum
 
 Private Type udtUMCStatsDetailsType
@@ -1172,6 +1358,11 @@ Private Type udtUMCStatsType
     Count As Long
     PPMStats As udtUMCStatsDetailsType
     DaStats As udtUMCStatsDetailsType
+End Type
+
+Private Type udtPairwiseMassDiffDataType
+    Mass As Single
+    NET As Single
 End Type
 
 Private Const MASS_PPM_ADJUSTMENT_PRECISION = 4
@@ -1201,6 +1392,7 @@ Private mRawNETErrorsIndividualPoints() As Single           ' 0-based array
 Private mMassPPMErrors As udtBinnedDataType
 Private mMassDaErrors As udtBinnedDataType
 Private mGanetErrors As udtBinnedDataType
+Private mPairwiseMassDifferences As udtBinnedDataType
 
 Private mUMCStats As udtUMCStatsType
 
@@ -1491,6 +1683,159 @@ CalcDistributionViaExpectationMaximationErrorHandler:
     
 End Function
 
+Private Sub CalcPairwiseMassDifferences(ByRef objHistogram As clsHistogram)
+    Dim lngIndex As Long
+    Dim lngIndexCompare As Long
+    Dim lngBinNumber As Long
+    
+    Dim blnIdentified As Long
+    Dim blnSuccess As Boolean
+    Dim sngClassNET As Single
+    
+    Dim lngIdentifiedUMCCount As Long
+    Dim lngUnIdentifiedUMCCount As Long
+    
+    Dim udtIdentifiedUMCs() As udtPairwiseMassDiffDataType
+    Dim udtUnIdentifiedUMCs() As udtPairwiseMassDiffDataType
+    
+    Dim sngMinMassDifference As Single
+    Dim sngMaxMassDifference As Single
+    Dim sngBinSize As Single
+    Dim sngNETTolerance As Single
+    Dim sngNETOffset As Single
+    
+    Dim sngMassDifference As Single
+    Dim sngNETDifference As Single
+    
+On Error GoTo CalcPairwiseMassDifferencesErrorHandler
+
+    If GelUMC(CallerID).UMCCnt < 1 Then
+        ' UMCs not in memory; unable to continue
+        Debug.Assert False
+        mPairwiseMassDifferences.BinnedCount = 0
+        Exit Sub
+    End If
+    
+    With GelUMC(CallerID)
+        lngIdentifiedUMCCount = 0
+        lngUnIdentifiedUMCCount = 0
+        ReDim udtIdentifiedUMCs(.UMCCnt - 1)
+        ReDim udtUnIdentifiedUMCs(.UMCCnt - 1)
+        
+        For lngIndex = 0 To .UMCCnt - 1
+            Select Case .UMCs(lngIndex).ClassRepType
+            Case gldtIS
+                If Len(GelData(CallerID).IsoData(.UMCs(lngIndex).ClassRepInd).MTID) > 0 Then
+                    blnIdentified = True
+                Else
+                    blnIdentified = False
+                End If
+                sngClassNET = ScanToGANET(CallerID, GelData(CallerID).IsoData(.UMCs(lngIndex).ClassRepInd).ScanNumber)
+            Case gldtCS
+                If Len(GelData(CallerID).CSData(.UMCs(lngIndex).ClassRepInd).MTID) > 0 Then
+                    blnIdentified = True
+                Else
+                    blnIdentified = False
+                End If
+                sngClassNET = ScanToGANET(CallerID, GelData(CallerID).CSData(.UMCs(lngIndex).ClassRepInd).ScanNumber)
+            Case Else
+                ' Unknown type; assume unidentified
+                Debug.Assert False
+                blnIdentified = False
+            End Select
+            
+            If blnIdentified Then
+                udtIdentifiedUMCs(lngIdentifiedUMCCount).Mass = .UMCs(lngIndex).ClassMW
+                udtIdentifiedUMCs(lngIdentifiedUMCCount).NET = sngClassNET
+                lngIdentifiedUMCCount = lngIdentifiedUMCCount + 1
+            Else
+                udtUnIdentifiedUMCs(lngUnIdentifiedUMCCount).Mass = .UMCs(lngIndex).ClassMW
+                udtUnIdentifiedUMCs(lngUnIdentifiedUMCCount).NET = sngClassNET
+                lngUnIdentifiedUMCCount = lngUnIdentifiedUMCCount + 1
+            End If
+            
+        Next lngIndex
+    End With
+    
+    If lngIdentifiedUMCCount = 0 Then
+        ' No LC-MS Features were found with AMT identifications; unable to continue
+        mPairwiseMassDifferences.BinnedCount = 0
+        Exit Sub
+    End If
+        
+    ' Shrink udtIdentifiedUMCs & udtUnIdentifiedUMCs
+    If lngIdentifiedUMCCount > 0 Then
+        ReDim Preserve udtIdentifiedUMCs(lngIdentifiedUMCCount - 1)
+    Else
+        ReDim Preserve udtIdentifiedUMCs(0)
+    End If
+    
+    If lngUnIdentifiedUMCCount > 0 Then
+        ReDim Preserve udtUnIdentifiedUMCs(lngUnIdentifiedUMCCount - 1)
+    Else
+        ReDim Preserve udtUnIdentifiedUMCs(0)
+    End If
+
+    With glbPreferencesExpanded.RefineMSDataOptions
+        sngMinMassDifference = .PairwiseMassDiffMinimum
+        sngMaxMassDifference = .PairwiseMassDiffMaximum
+        sngBinSize = .PairwiseMassBinSize
+        sngNETTolerance = .PairwiseMassDiffNETTolerance
+        sngNETOffset = .PairwiseMassDiffNETOffset
+    End With
+
+    With mPairwiseMassDifferences
+        blnSuccess = objHistogram.ComputeBinDetails(sngMinMassDifference, sngMaxMassDifference, sngBinSize, .BinnedCount, False, 1)
+    
+        If Not blnSuccess Or .BinnedCount <= 0 Then
+            .BinnedCount = 0
+            ReDim .Binned(0)
+        Else
+            .StartBin = sngMinMassDifference
+            .BinRangeMaximum = sngMaxMassDifference
+            .BinSize = sngBinSize
+            
+            ReDim .Binned(.BinnedCount)
+        
+            For lngIndex = 0 To lngIdentifiedUMCCount - 1
+                For lngIndexCompare = 0 To lngUnIdentifiedUMCCount - 1
+                    sngNETDifference = Abs(udtUnIdentifiedUMCs(lngIndexCompare).NET - (udtIdentifiedUMCs(lngIndex).NET + sngNETOffset))
+                    
+                    If sngNETDifference <= sngNETTolerance Then
+                        sngMassDifference = udtUnIdentifiedUMCs(lngIndexCompare).Mass - udtIdentifiedUMCs(lngIndex).Mass
+                        If sngMassDifference >= .StartBin And sngMassDifference <= .BinRangeMaximum Then
+                            lngBinNumber = objHistogram.DataPointToBinNumber(sngMassDifference, .StartBin, .BinSize)
+                            .Binned(lngBinNumber) = .Binned(lngBinNumber) + 1
+                        End If
+                    End If
+                Next lngIndexCompare
+                
+                If (lngIndex + 1) Mod 10 = 0 Then
+                    UpdateStatus "Computing pairwise differences: " & CStr(lngIndex + 1) & "/" & lngIdentifiedUMCCount
+                    DoEvents
+                End If
+                If mAbortProcessing Then Exit For
+            Next lngIndex
+        End If
+            
+        ReDim .SmoothedBins(UBound(.Binned))
+        For lngIndex = 0 To UBound(.Binned)
+            .SmoothedBins(lngIndex) = .Binned(lngIndex)
+        Next lngIndex
+        
+    End With
+    
+    Exit Sub
+
+CalcPairwiseMassDifferencesErrorHandler:
+    Debug.Assert False
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Unexpected error in CalcPairwiseMassDifferences" & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    LogErrors Err.Number, "CalcPairwiseMassDifferences"
+
+End Sub
+
 Private Sub ClearDataArrays()
     ClearRawDataArrays
     ClearRawDataIndividualPointsArrays
@@ -1518,14 +1863,18 @@ Private Sub ClearBinnedDataArrays()
     mMassPPMErrors.BinnedCount = 0
     mMassDaErrors.BinnedCount = 0
     mGanetErrors.BinnedCount = 0
+    mPairwiseMassDifferences.BinnedCount = 0
     
     ReDim mMassPPMErrors.Binned(0)
     ReDim mMassDaErrors.Binned(0)
     ReDim mGanetErrors.Binned(0)
+    ReDim mPairwiseMassDifferences.Binned(0)
     
     ReDim mMassPPMErrors.SmoothedBins(0)
     ReDim mMassDaErrors.SmoothedBins(0)
     ReDim mGanetErrors.SmoothedBins(0)
+    ReDim mPairwiseMassDifferences.SmoothedBins(0)
+    
 End Sub
 
 Private Sub ClearAmtIndexLookupArrays()
@@ -1732,11 +2081,19 @@ On Error GoTo ComputeMassErrorsErrorHandler
                 .SmoothedBins(lngIndex) = .Binned(lngIndex)
             Next lngIndex
         End With
-
     Else
         ' This will happen if there were no matches found when searching the database
         '  or if the user aborted processing
         ClearBinnedDataArrays
+    End If
+    
+    ' Also compute the pairwise UMC mass differences (identified vs. unidentified UMCs)
+    
+    If glbPreferencesExpanded.RefineMSDataOptions.ComputePairwiseMassDifferences Then
+        CalcPairwiseMassDifferences objHistogram
+    Else
+        mPairwiseMassDifferences.BinnedCount = 0
+        mPairwiseMassDifferences.BinnedCount = 0
     End If
     
     EnableDisableCalculating False
@@ -2060,6 +2417,11 @@ Private Sub DisplayCurrentUMCStats()
     
 On Error GoTo DisplayCurrentUMCStatsErrorHandler
 
+    If cboErrorDisplayMode.ListIndex = mdmPairwiseMassDifferences Then
+        ' Do not update txtUMCMassStatistics
+        Exit Sub
+    End If
+    
     strUMCStats = "Count: " & mUMCStats.Count & " Features"
     If cboErrorDisplayMode.ListIndex = mdmMassErrorDa Then
         udtUMCStatDetails = mUMCStats.DaStats
@@ -2119,6 +2481,11 @@ On Error GoTo DisplayErrorPlotPeakStatsErrorHandler
 
     If mUpdatingControls Then Exit Sub
     
+    If cboErrorDisplayMode.ListIndex = mdmPairwiseMassDifferences Then
+        ' Do not update txtUMCMassStatistics
+        Exit Sub
+    End If
+        
     ' Reset these to 0 for now
     With mMassCalErrorPeakCached
         .Center = 0
@@ -2305,6 +2672,7 @@ Private Sub EnableDisableCalculating(ByVal blnCalculating As Boolean, Optional B
     mCalculating = blnCalculating
     cmdAbortProcessing(0).Visible = blnCalculating And blnShowAbortButton
     cmdAbortProcessing(1).Visible = cmdAbortProcessing(0).Visible
+    cmdAbortProcessing(2).Visible = cmdAbortProcessing(0).Visible
     
     cmdMassToleranceRefinementStart.Visible = Not blnCalculating
     cmdNETToleranceRefinementStart.Visible = Not blnCalculating
@@ -2653,7 +3021,8 @@ End Function
 
 Public Sub InitializeForm()
     UpdateStatus "Initializing"
-    cmdRecomputeHistograms.Visible = False
+    cmdRecomputeHistograms(0).Visible = False
+    cmdRecomputeHistograms(1).Visible = cmdRecomputeHistograms(0).Visible
     
     ' We're calling EnableDisableCalculating to disable the controls while intitializing the form
     '  but we must set mCalculating to false, lest some of the initialization events are skipped
@@ -2701,11 +3070,14 @@ Public Sub InitializeForm()
        LoadMTDB False
     End If
     
+    lblPairwiseDifferencesOverview.Caption = "This option computes the pairwise difference between the mass of every identified LC-MS feature and the mass of every unidentified LC-MS feature, optionally filtering within a NET window.  A histogram of the differences is created.  Peaks in the plot might represent peptide modifications that are present for a number of LC-MS features in the sample, but are not present in the AMT tag database as AMTs with the given modification."
+    
     UpdateControlsWithSettings
     
     ComputeErrors True
     
-    cmdRecomputeHistograms.Visible = True
+    cmdRecomputeHistograms(0).Visible = True
+    cmdRecomputeHistograms(1).Visible = cmdRecomputeHistograms(0).Visible
     EnableDisableCalculating False
     
     mFormInitialized = True
@@ -2867,6 +3239,7 @@ Private Sub PopulateComboBoxes()
         .AddItem "Mass Error (PPM)"
         .AddItem "Mass Error (Da)"
         .AddItem "NET Error"
+        .AddItem "Pairwise Mass Differences (Da)"
         .ListIndex = mdmMassErrorDisplayModeConstants.mdmMassErrorPPM
     End With
     
@@ -3711,7 +4084,7 @@ Private Sub ResetToDefaults()
     
     ResetExpandedPreferences glbPreferencesExpanded, "RefineMSDataOptions"
     UpdateControlsWithSettings
-    
+     
     If glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats <> blnUseUMCStatsSaved Then
         ComputeErrors True
     End If
@@ -3933,6 +4306,12 @@ Private Sub UpdateControlsWithSettings()
         SetCheckBox chkEMRefineMassTolForceUseAllDataPointErrors, .EMMassTolRefineForceUseSingleDataPointErrors
         SetCheckBox chkEMRefineNETTolForceUseAllDataPointErrors, .EMNETTolRefineForceUseSingleDataPointErrors
         
+        SetCheckBox chkComputePairwiseMassDifferences, .ComputePairwiseMassDifferences
+        txtPairwiseMassDiffMinimum = .PairwiseMassDiffMinimum
+        txtPairwiseMassDiffMaximum = .PairwiseMassDiffMaximum
+        txtPairwiseMassBinSize = .PairwiseMassBinSize
+        txtPairwiseMassDiffNETTolerance = .PairwiseMassDiffNETTolerance
+        txtPairwiseMassDiffNETOffset = .PairwiseMassDiffNETOffset
         
         SetCheckBox chkIncludeInternalStandards, .IncludeInternalStdMatches
         SetCheckBox chkUseUMCClassStats, .UseUMCClassStats
@@ -4004,6 +4383,8 @@ On Error GoTo GraphMassErrorsErrorHandler
         With mNETTolErrorPeakCached
             strPlotTitle = strPlotTitle & vbCrLf & DisplayErrorPlotRelativeRisk("Relative Risk: ", .PeakStats.TruePositiveArea, .PeakStats.FalsePositiveArea) & vbCrLf
         End With
+    Case mdmPairwiseMassDifferences
+        ' Do not alter strPlotTitle
     Case Else
         ' Includes mdmMassErrorPPM & mdmMassErrorDa
         With mMassCalErrorPeakCached
@@ -4060,6 +4441,11 @@ On Error GoTo GraphMassErrorsErrorHandler
                 dblRange = PPMToMass(CDbl(glbPreferencesExpanded.ErrorPlottingOptions.MassRangePPM), 2000)
             Case mdmGanetError
                 dblRange = glbPreferencesExpanded.ErrorPlottingOptions.GANETRange
+            Case mdmPairwiseMassDifferences
+                dblRange = Abs(glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassDiffMaximum)
+                If Abs(glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassDiffMaximum) > dblRange Then
+                    dblRange = Abs(glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassDiffMaximum)
+                End If
             Case Else
                 Debug.Assert False
                 dblRange = 50
@@ -4144,6 +4530,9 @@ Private Sub UpdatePlotAddSeries(intSeriesNumber As Integer, lngSeriesColor As Lo
             Debug.Assert glbPreferencesExpanded.ErrorPlottingOptions.GANETBinSize = mGanetErrors.BinSize
             UpdatePlotAddData intSeriesNumber, blnUseSmoothedData, mGanetErrors
             strXAxisTitle = "NET Error"
+        Case mdmPairwiseMassDifferences
+            UpdatePlotAddData intSeriesNumber, blnUseSmoothedData, mPairwiseMassDifferences
+            strXAxisTitle = "Pairwise Mass Differences (Da)"
         Case Else
             ' This shouldn't happen
             Debug.Assert False
@@ -4222,6 +4611,8 @@ On Error GoTo UpdatePlotAddPeakEdgesErrorHandler
         UpdatePlotAddPeakEdgeData intSeriesNumber, lngSeriesColor, mMassDaErrors, mMassCalErrorPeakCached
     Case mdmGanetError
         UpdatePlotAddPeakEdgeData intSeriesNumber, lngSeriesColor, mGanetErrors, mNETTolErrorPeakCached
+    Case mdmPairwiseMassDifferences
+        ' Not supported for this mode
     Case Else
         ' This shouldn't happen
         Debug.Assert False
@@ -4315,6 +4706,10 @@ Private Sub chkCenterYAxis_Click()
     UpdatePlot
 End Sub
 
+Private Sub chkComputePairwiseMassDifferences_Click()
+    glbPreferencesExpanded.RefineMSDataOptions.ComputePairwiseMassDifferences = cChkBox(chkComputePairwiseMassDifferences)
+End Sub
+
 Private Sub chkDrawLinesBetweenPoints_Click()
     glbPreferencesExpanded.ErrorPlottingOptions.Graph2DOptions.DrawLinesBetweenPoints = cChkBox(chkDrawLinesBetweenPoints)
     UpdatePlot
@@ -4390,7 +4785,7 @@ Private Sub cmdNETToleranceRefinementStart_Click()
     If Not mCalculating Then RefineDBSearchNETToleranceStart
 End Sub
 
-Private Sub cmdRecomputeHistograms_Click()
+Private Sub cmdRecomputeHistograms_Click(Index As Integer)
     ComputeErrors False
 End Sub
 
@@ -4743,6 +5138,37 @@ Private Sub txtMinimumSLiC_Validate(Cancel As Boolean)
             .MinimumSLiC = CSngSafe(txtMinimumSLiC)
         End If
     End With
+End Sub
+
+Private Sub txtPairwiseMassBinSize_LostFocus()
+    ValidateTextboxValueDbl txtPairwiseMassBinSize, 0.01, 100, 0.25
+    glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassBinSize = CSngSafe(txtPairwiseMassBinSize)
+End Sub
+
+Private Sub txtPairwiseMassDiffMaximum_LostFocus()
+    ValidateTextboxValueDbl txtPairwiseMassDiffMaximum, -10000, 10000, -100
+    If Not ValidateDualTextBoxes(txtPairwiseMassDiffMinimum, txtPairwiseMassDiffMaximum, False, -10000, 10000, 100) Then
+        txtPairwiseMassDiffMaximum.SetFocus
+    End If
+    glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassDiffMaximum = CDblSafe(txtPairwiseMassDiffMaximum)
+End Sub
+
+Private Sub txtPairwiseMassDiffMinimum_LostFocus()
+    ValidateTextboxValueDbl txtPairwiseMassDiffMinimum, -10000, 10000, -100
+    If Not ValidateDualTextBoxes(txtPairwiseMassDiffMinimum, txtPairwiseMassDiffMaximum, True, -10000, 10000, 100) Then
+        txtPairwiseMassDiffMinimum.SetFocus
+    End If
+    glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassDiffMinimum = CDblSafe(txtPairwiseMassDiffMinimum)
+End Sub
+
+Private Sub txtPairwiseMassDiffNETOffset_LostFocus()
+    ValidateTextboxValueDbl txtPairwiseMassDiffNETOffset, -1, 1, 0
+    glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassDiffNETOffset = CSngSafe(txtPairwiseMassDiffNETOffset)
+End Sub
+
+Private Sub txtPairwiseMassDiffNETTolerance_LostFocus()
+    ValidateTextboxValueDbl txtPairwiseMassDiffNETTolerance, 0, 10, 0.3
+    glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassDiffNETTolerance = CSngSafe(txtPairwiseMassDiffNETTolerance)
 End Sub
 
 Private Sub txtRefineDBSearchMassToleranceAdjustmentMultiplier_LostFocus()

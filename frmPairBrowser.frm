@@ -451,7 +451,9 @@ On Error GoTo AutoZoom2DPlotErrorHandler
 AutoZoom2DPlotErrorHandler:
     Debug.Assert False
     Me.MousePointer = vbDefault
-    MsgBox "Error auto zooming: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error auto zooming: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
     LogErrors Err.Number, "frmPairBrowser->AutoZoom2DPlot", Err.Description, CallerIDLoaded
 
 End Sub
@@ -539,7 +541,10 @@ On Error GoTo DeleteMarkedPairsErrorHandler
     Exit Function
     
 DeleteMarkedPairsErrorHandler:
-    MsgBox "Error deleting marked pairs: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error deleting marked pairs: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    
     LogErrors Err.Number, "DeleteMarkedPairs", Err.Description, CallerIDLoaded
 
 End Function
@@ -1265,7 +1270,9 @@ On Error GoTo SortAndDisplayPairsErrorHandler
 
 SortAndDisplayPairsErrorHandler:
     Me.MousePointer = vbDefault
-    MsgBox "Error sorting pairs and populating list: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error sorting pairs and populating list: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
     LogErrors Err.Number, "SortAndDisplayPairs", Err.Description, CallerIDLoaded
 
 End Sub
@@ -1531,7 +1538,9 @@ On Error GoTo UpdatePlotForPairErrorHandler
 
 UpdatePlotForPairErrorHandler:
     Debug.Assert False
-    MsgBox "Error updating plot: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error updating plot: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
     LogErrors Err.Number, "frmPairBrowser->UpdatePlotForPair", Err.Description, CallerIDLoaded
         
 End Sub

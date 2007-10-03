@@ -968,6 +968,13 @@ On Error GoTo LoadSettingsFileHandler
         
         .EMMassTolRefineForceUseSingleDataPointErrors = GetIniFileSettingBln(IniStuff, "RefineMSDataOptions", "EMMassTolRefineForceUseSingleDataPointErrors", .EMMassTolRefineForceUseSingleDataPointErrors)
         .EMNETTolRefineForceUseSingleDataPointErrors = GetIniFileSettingBln(IniStuff, "RefineMSDataOptions", "EMNETTolRefineForceUseSingleDataPointErrors", .EMNETTolRefineForceUseSingleDataPointErrors)
+    
+        .ComputePairwiseMassDifferences = GetIniFileSettingBln(IniStuff, "RefineMSDataOptions", "ComputePairwiseMassDifferences", .ComputePairwiseMassDifferences)
+        .PairwiseMassDiffMinimum = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "PairwiseMassDiffMinimum", .PairwiseMassDiffMinimum)
+        .PairwiseMassDiffMaximum = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "PairwiseMassDiffMaximum", .PairwiseMassDiffMaximum)
+        .PairwiseMassBinSize = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "PairwiseMassBinSize", .PairwiseMassBinSize)
+        .PairwiseMassDiffNETTolerance = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "PairwiseMassDiffNETTolerance", .PairwiseMassDiffNETTolerance)
+        .PairwiseMassDiffNETOffset = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "PairwiseMassDiffNETOffset", .PairwiseMassDiffNETOffset)
     End With
     
     ' TIC and BPI Plotting Options
@@ -2016,6 +2023,13 @@ On Error GoTo SaveSettingsFileHandler
         
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "EMMassTolRefineForceUseSingleDataPointErrors", .EMMassTolRefineForceUseSingleDataPointErrors
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "EMNETTolRefineForceUseSingleDataPointErrors", .EMNETTolRefineForceUseSingleDataPointErrors
+    
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "ComputePairwiseMassDifferences", .ComputePairwiseMassDifferences
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "PairwiseMassDiffMinimum", .PairwiseMassDiffMinimum
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "PairwiseMassDiffMaximum", .PairwiseMassDiffMaximum
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "PairwiseMassBinSize", .PairwiseMassBinSize
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "PairwiseMassDiffNETTolerance", .PairwiseMassDiffNETTolerance
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "PairwiseMassDiffNETOffset", .PairwiseMassDiffNETOffset
     End With
     IniStuff.WriteSection "RefineMSDataOptions", sKeys(), sVals(), iKVCount
         
@@ -3365,6 +3379,13 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .EMNETErrorPeakToleranceEstimate = 0.05
                 .EMIterationCount = 32
                 .EMPercentOfDataToExclude = 10
+                
+                .ComputePairwiseMassDifferences = False
+                .PairwiseMassDiffMinimum = -100
+                .PairwiseMassDiffMaximum = 100
+                .PairwiseMassBinSize = 0.25
+                .PairwiseMassDiffNETTolerance = 0.1
+                .PairwiseMassDiffNETOffset = 0
             End With
         End If
         

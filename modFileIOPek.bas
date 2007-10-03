@@ -401,10 +401,10 @@ Set fso = Nothing
 Exit Function
 
 ExtractTimeDomainSignalFromPEKErrorHandler:
-Debug.Print "Error in ExtractTimeDomainSignalFromPEK: " & Err.Description
-Debug.Assert False
-LogErrors Err.Number, "ExtractTimeDomainSignalFromPEK"
-Set fso = Nothing
+    Debug.Print "Error in ExtractTimeDomainSignalFromPEK: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "ExtractTimeDomainSignalFromPEK"
+    Set fso = Nothing
 
 End Function
 

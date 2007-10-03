@@ -44,7 +44,7 @@ Public Property Get ErrorMessage() As String
     ErrorMessage = mErrorMessage
 End Property
 
-Private Function BetaCF(ByVal A As Double, ByVal b As Double, ByVal X As Double) As Double
+Private Function BetaCF(ByVal A As Double, ByVal B As Double, ByVal x As Double) As Double
 
     Const MAXIT As Long = 100
     Const EPS As Double = 0.0000003
@@ -54,24 +54,24 @@ Private Function BetaCF(ByVal A As Double, ByVal b As Double, ByVal X As Double)
     Dim aa As Double, c As Double, d As Double, del As Double
     Dim h As Double, qab As Double, qam As Double, qap As Double
 
-    qab = A + b
+    qab = A + B
     qap = A + 1#
     qam = A - 1#
     c = 1#
-    d = 1# - qab * X / qap
+    d = 1# - qab * x / qap
     If (Abs(d) < FPMIN) Then d = FPMIN
     d = 1# / d
     h = d
     For m = 1 To MAXIT
         m2 = 2 * m
-        aa = m * (b - m) * X / ((qam + m2) * (A + m2))
+        aa = m * (B - m) * x / ((qam + m2) * (A + m2))
         d = 1# + aa * d
         If (Abs(d) < FPMIN) Then d = FPMIN
         c = 1# + aa / c
         If (Abs(c) < FPMIN) Then c = FPMIN
         d = 1# / d
         h = h * d * c
-        aa = -(A + m) * (qab + m) * X / ((A + m2) * (qap + m2))
+        aa = -(A + m) * (qab + m) * x / ((A + m2) * (qap + m2))
         d = 1# + aa * d
         If (Abs(d) < FPMIN) Then d = FPMIN
         c = 1# + aa / c
@@ -92,24 +92,24 @@ Private Function BetaCF(ByVal A As Double, ByVal b As Double, ByVal X As Double)
 
 End Function
 
-Private Function BetaI(ByVal A As Double, ByVal b As Double, ByVal X As Double) As Double
+Private Function BetaI(ByVal A As Double, ByVal B As Double, ByVal x As Double) As Double
 
     Dim bt As Double
 
-    If (X < 0# Or X > 1#) Then
+    If (x < 0# Or x > 1#) Then
         mErrorMessage = "Bad x in routine clsCorrelation->BetaI; should be between 0 and 1"
     Else
 
-        If (X = 0# Or X = 1#) Then
+        If (x = 0# Or x = 1#) Then
             bt = 0#
         Else
-            bt = Exp(GammLn(A + b) - GammLn(A) - GammLn(b) + A * Log(X) + b * Log(1# - X))
+            bt = Exp(GammLn(A + B) - GammLn(A) - GammLn(B) + A * Log(x) + B * Log(1# - x))
         End If
 
-        If (X < (A + 1#) / (A + b + 2#)) Then
-            BetaI = bt * BetaCF(A, b, X) / A
+        If (x < (A + 1#) / (A + B + 2#)) Then
+            BetaI = bt * BetaCF(A, B, x) / A
         Else
-            BetaI = 1# - bt * BetaCF(b, A, 1# - X) / b
+            BetaI = 1# - bt * BetaCF(B, A, 1# - x) / B
         End If
     End If
 
@@ -188,8 +188,8 @@ mErrorMessage = ""
 Exit Function
 
 CorrelateErrorHandler:
-Debug.Assert False
-Correlate = -1
+    Debug.Assert False
+    Correlate = -1
 
 End Function
 
@@ -454,12 +454,12 @@ Private Sub CRank(ByVal n As Long, ByRef w() As Single, ByRef S As Single)
 
 End Sub
 
-Private Function ErfCC(ByVal X As Double) As Double
+Private Function ErfCC(ByVal x As Double) As Double
 
     Dim t As Double, z As Double, ans As Double
     Dim dblTemp As Double
     
-    z = Abs(X)
+    z = Abs(x)
     t = 1# / (1# + 0.5 * z)
 
     ' We need to perform the following in multiple steps since VB6 gripes that the full expression is too complex (more than 8 levels of computation)
@@ -471,7 +471,7 @@ Private Function ErfCC(ByVal X As Double) As Double
     ans = t * Exp(-z * z - 1.26551223 + t * (1.00002368 + dblTemp))
     
 
-    If X >= 0# Then
+    If x >= 0# Then
         ErfCC = ans
     Else
         ErfCC = 2# - ans
@@ -480,14 +480,14 @@ Private Function ErfCC(ByVal X As Double) As Double
 End Function
 
 Private Function GammLn(ByVal xx As Double) As Double
-    Dim X As Double, y As Double, tmp As Double, ser As Double
+    Dim x As Double, y As Double, tmp As Double, ser As Double
     Dim j As Long
 
-    X = xx
-    y = X
+    x = xx
+    y = x
 
-    tmp = X + 5.5
-    tmp = tmp - (X + 0.5) * Log(tmp)
+    tmp = x + 5.5
+    tmp = tmp - (x + 0.5) * Log(tmp)
     ser = 1.00000000019001
 
     For j = 0 To 5
@@ -495,7 +495,7 @@ Private Function GammLn(ByVal xx As Double) As Double
         ser = ser + mCoefficients(j) / y
     Next j
 
-    GammLn = -tmp + Log(2.50662827463101 * ser / X)
+    GammLn = -tmp + Log(2.50662827463101 * ser / x)
 
 End Function
 

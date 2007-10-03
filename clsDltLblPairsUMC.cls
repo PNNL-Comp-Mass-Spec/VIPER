@@ -264,7 +264,7 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
 
                     If eERCalcType = ectER_RAT Then
                         ' Convert udtERStats.ERAvg from Symmetric ER to Ratio ER
-                        dblERAvg = ConvertAltERtoRatioER(dblERAvg)
+                        udtERStats.ERAvg = ConvertAltERtoRatioER(udtERStats.ERAvg)
                     End If
                     
                     udtERStats.ERStDev = dblStDevProductSum / dblWeightingSum
@@ -1055,6 +1055,11 @@ End Function
 
 Private Function CalcDltLblPairsERViaIReport(ByVal lngGelIndex As Long, ByRef udtScanDetailsLt As udtScanByScanDetailsType, ByRef udtScanDetailsHv As udtScanByScanDetailsType, ByRef dblAbu2DaCorrected As Double, ByRef dblAbu4DaCorrected As Double, ByRef sngLabellingEfficiency As Single, ByRef sngLogERCorrectedForF As Single) As Double
 
+    ' The equations in this function are described in the paper:
+    '  W.J. Qian, et. al., "Quantitative proteome analysis of human plasma following in vivo
+    '   lipopolysaccharide administration using 16O/18O labeling and the accurate mass and time tag approach,"
+    '  Mol. Cell. Proteomics, 4 (5), 700-709 (2005).
+    
     ' Use udtScanDetailsLt.MemberIndexMostAbu and udtScanDetailsHv.MemberIndexMostAbu
     '  to compute corrected abundances for the MonoIsotopic peak, the M + 2Da peak, and the M + 4 Da peak
     
@@ -1129,6 +1134,14 @@ On Error GoTo CalcDltLblPairsERViaIReportErrorHandler
                 
                 ' B1 = I2-(M2/M0)*I0
                 dblAbu2DaCorrected = dblAbu2DaRaw - dblM2OverM0 * dblAbuMonoIso
+                
+                ' In certain cases, dblAbu2DaCorrected will be negative, which messes up all the subsequent math
+                ' For example, if dblAbuMonoIso is much greater than dblAbu2DaRaw, then dblAbu2DaCorrected is < 0
+                ' Additionally, if dblAbu2DaRaw is 0 to start with, then dblAbu2DaCorrected will definitely be < 0
+                ' Thus, assure dblAbu2DaCorrected is >= 0
+                If dblAbu2DaCorrected < 0 Then
+                    dblAbu2DaCorrected = 0
+                End If
                 
                 ' B2 = I4-(M2/M0)*B1-(M4/M0)*I0
                 ' Simplified form: = dblAbu4DaRaw -                                    dblM4OverM0 * dblAbuMonoIso

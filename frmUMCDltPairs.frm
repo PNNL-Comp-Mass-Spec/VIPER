@@ -1099,7 +1099,7 @@ On Error GoTo err_FindPairs
                 If (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG Then
                     .RequireMatchingIsotopeTagLabelsEnabled = True
                     
-                    ' TODO: Possibly change this temp hack
+                    ' TODO: Possibly change this temp hack (September 2007)
                     GelP_D_L(CallerID).SearchDef.N15IncompleteIncorporationMode = False
                     ClsMinDelta = 0
                     ClsMaxDelta = 0

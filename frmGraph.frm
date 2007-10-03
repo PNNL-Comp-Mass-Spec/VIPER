@@ -1099,8 +1099,8 @@ Private Sub ClearSelectedPoints(Optional ByVal blnRefreshPlot As Boolean = True)
 End Sub
 
 Private Sub csMyCooSys_CooSysChanged()
-picGraph.Refresh
-UpdateTICPlotAndFeatureBrowsersIfNeeded
+    picGraph.Refresh
+    UpdateTICPlotAndFeatureBrowsersIfNeeded
 End Sub
 
 Private Sub ExcludeVisiblePointsOneStep()
@@ -2396,7 +2396,7 @@ Private Sub mnuStepsUMCMode_Click(Index As Integer)
 End Sub
 
 Private Sub mnuViewNET_Click()
-SetXAxisLabelType True
+    SetXAxisLabelType True
 End Sub
 
 Private Sub mnuViewPairsBrowser_Click()

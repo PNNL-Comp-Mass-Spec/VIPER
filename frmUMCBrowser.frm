@@ -413,7 +413,9 @@ On Error GoTo AutoZoom2DPlotErrorHandler
 AutoZoom2DPlotErrorHandler:
     Debug.Assert False
     Me.MousePointer = vbDefault
-    MsgBox "Error auto zooming: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error auto zooming: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
     LogErrors Err.Number, "frmUMCBrowser->AutoZoom2DPlot", Err.Description, CallerIDLoaded
 
 End Sub
@@ -1133,7 +1135,9 @@ On Error GoTo SortAndDisplayUMCsErrorHandler
 
 SortAndDisplayUMCsErrorHandler:
     Me.MousePointer = vbDefault
-    MsgBox "Error sorting LC-MS Features and populating list: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error sorting LC-MS Features and populating list: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
     LogErrors Err.Number, "SortAndDisplayUMCs", Err.Description, CallerIDLoaded
 
 End Sub
@@ -1378,7 +1382,9 @@ On Error GoTo UpdatePlotForUMCErrorHandler
 
 UpdatePlotForUMCErrorHandler:
     Debug.Assert False
-    MsgBox "Error updating plot: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error updating plot: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
     LogErrors Err.Number, "frmUMCBrowser->UpdatePlotForUMC", Err.Description, CallerIDLoaded
         
 End Sub

@@ -244,7 +244,7 @@ Public Function BrowseFeaturesUndeleteSelected(lstFeatures As ListBox, ByRef Inf
     
     Dim lngItemIndex As Long
     Dim lngDereferencedIndex As Long
-    Dim lngindex As Long, lngTargetIndex As Long
+    Dim lngIndex As Long, lngTargetIndex As Long
     Dim blnUpdateListBox As Boolean
     
 On Error GoTo UnDeleteSelectedFeatureErrorHandler
@@ -262,12 +262,12 @@ On Error GoTo UnDeleteSelectedFeatureErrorHandler
                 If DeletedStackCount > 0 Then
                     ' Make sure lngDereferencedIndex is not in DeletedFeatureStack
                     lngTargetIndex = 0
-                    For lngindex = 0 To DeletedStackCount - 1
-                        If DeletedFeatureStack(lngindex) <> lngDereferencedIndex Then
-                            DeletedFeatureStack(lngTargetIndex) = DeletedFeatureStack(lngindex)
+                    For lngIndex = 0 To DeletedStackCount - 1
+                        If DeletedFeatureStack(lngIndex) <> lngDereferencedIndex Then
+                            DeletedFeatureStack(lngTargetIndex) = DeletedFeatureStack(lngIndex)
                             lngTargetIndex = lngTargetIndex + 1
                         End If
-                    Next lngindex
+                    Next lngIndex
                     If lngTargetIndex < DeletedStackCount Then
                         DeletedStackCount = lngTargetIndex
                         blnUpdateListBox = True
@@ -312,7 +312,7 @@ Public Sub BrowseFeaturesZoom2DPlot(ByRef udtOptions As udtFeatureBrowserOptions
     Dim dblScanHalfWidth As Double
     Dim lngScanHalfWidth As Long
 
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim lngIonCount As Long
     Dim lngIonPointerArray() As Long
 
@@ -392,15 +392,15 @@ On Error GoTo BrowseFeaturesZoom2DPlotErrorHandler
         ' Retrieve an array of the ion indices of the ions currently "In Scope" and part of the light LC-MS Feature
         ' Note that GetISScope will ReDim lngIonPointerArray() automatically
         lngIonCount = GetISScopeFilterByUMC(lngGelIndex, lngIonPointerArray(), glScope.glSc_Current, lngUMCIndex)
-        For lngindex = 1 To lngIonCount
-            GelBody(lngGelIndex).GelSel.AddToIsoSelection lngIonPointerArray(lngindex)
-        Next lngindex
+        For lngIndex = 1 To lngIonCount
+            GelBody(lngGelIndex).GelSel.AddToIsoSelection lngIonPointerArray(lngIndex)
+        Next lngIndex
         
         If lngUMCIndex2 >= 0 Then
             lngIonCount = GetISScopeFilterByUMC(lngGelIndex, lngIonPointerArray(), glScope.glSc_Current, lngUMCIndex2)
-            For lngindex = 1 To lngIonCount
-                GelBody(lngGelIndex).GelSel.AddToIsoSelection lngIonPointerArray(lngindex)
-            Next lngindex
+            For lngIndex = 1 To lngIonCount
+                GelBody(lngGelIndex).GelSel.AddToIsoSelection lngIonPointerArray(lngIndex)
+            Next lngIndex
         End If
         
         GelBody(lngGelIndex).RequestRefreshPlot
@@ -410,7 +410,9 @@ On Error GoTo BrowseFeaturesZoom2DPlotErrorHandler
     
 BrowseFeaturesZoom2DPlotErrorHandler:
     Debug.Assert False
-    MsgBox "Error auto zooming: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error auto zooming: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
     LogErrors Err.Number, "BrowseFeaturesZoom2DPlot", Err.Description, lngGelIndex
 
 End Sub

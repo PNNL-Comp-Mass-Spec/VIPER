@@ -89,13 +89,10 @@ Public Function BinData(ByRef sngDataToBin() As Single, ByRef lngDataCount As Lo
     ' sngDataToBin() should be a 0-based array
     ' Note that BinnedData ranges from index 0 to index BinnedDataCount
 
-    Dim sngDataRangeLastVal As Single
-    Dim intDecrementCount As Integer
-    
     Dim sngBinRangeMinimum As Single
     Dim sngBinRangeMaximum As Single
+    Dim blnSuccess As Boolean
     
-    Dim lngMultiplier As Long
     Dim lngIndex As Long, lngBinNumber As Long
 
 On Error GoTo BinErrorsErrorHandler
@@ -118,84 +115,15 @@ On Error GoTo BinErrorsErrorHandler
         If sngDataToBin(lngIndex) < sngBinRangeMinimum Then sngBinRangeMinimum = sngDataToBin(lngIndex)
     Next lngIndex
 
-    If IsInfinity(sngBinRangeMinimum) Or IsInfinity(sngBinRangeMaximum) Then
-        ' Minimum and/or maximum are infinity; cannot make a histogram
+    ' Call ComputeBinDetails to round the bin ranges to the appropriate values and update the bin size, if necessary
+    blnSuccess = ComputeBinDetails(sngBinRangeMinimum, sngBinRangeMaximum, mBinSize, BinnedDataCount, RequireNegativeStartBin, StartBinDigitsAfterDecimal)
+    
+    If Not blnSuccess Then
         BinnedDataCount = 0
         InitializeBinnedData BinnedDataCount, BinnedData, True
         BinData = False
         Exit Function
     End If
-    
-    ' sngBinRangeMinimum should be less than 0 if RequireNegativeStartBin is True
-    If sngBinRangeMinimum > 0 And RequireNegativeStartBin Then
-        sngBinRangeMinimum = 0
-    End If
-
-    ' Round sngBinRangeMinimum and sngBinRangeMaximum down/up, depending on StartBinDigitsAfterDecimal
-
-    If mStartBinDigitsAfterDecimal < 0 Then mStartBinDigitsAfterDecimal = 0
-    If mStartBinDigitsAfterDecimal > 7 Then mStartBinDigitsAfterDecimal = 7
-
-    lngMultiplier = 10 ^ mStartBinDigitsAfterDecimal
-
-    ' Use Int() to round down
-    If RequireNegativeStartBin Then
-        sngBinRangeMinimum = (-1 * (Int(Abs(sngBinRangeMinimum * lngMultiplier)) + 1)) / lngMultiplier
-    Else
-        sngBinRangeMinimum = (Int(sngBinRangeMinimum * lngMultiplier)) / lngMultiplier
-    End If
-    
-    sngBinRangeMaximum = (Int(sngBinRangeMaximum * lngMultiplier) + 1) / lngMultiplier
-
-    If IsInfinity(mBinSize) Then
-        ' mBinSize is Infinity; set to the default bin size
-        mBinSize = mDefaultBinSize
-    End If
-    
-    If mBinSize <= 0 Then mBinSize = mDefaultBinSize
-    If mBinSize > 1 Then
-        mBinSize = Round(mBinSize, 0)
-    Else
-        ' Round to 2 significant figures
-        mBinSize = CSng(Format(mBinSize, "0.0E+00"))
-        If mBinSize <= 0 Then mBinSize = mDefaultBinSize
-    End If
-
-    ' Make sure sngBinRangeMinimum and sngBinRangeMaximum are evenly divisible by mBinSize
-    ' We'll do this by decrementing/incrementing sngBinRangeMinimum in increments of mBinSize/10
-    '  until we pass or equal sngDataRangeLastVal
-
-    intDecrementCount = 0
-    sngDataRangeLastVal = sngBinRangeMinimum - mBinSize
-    Do While Round(sngBinRangeMinimum / mBinSize, 0) <> Round(sngBinRangeMinimum / mBinSize, mStartBinDigitsAfterDecimal + 1) And sngBinRangeMinimum > sngDataRangeLastVal And intDecrementCount <= 15
-        sngBinRangeMinimum = Round(sngBinRangeMinimum - mBinSize / 10#, mStartBinDigitsAfterDecimal + 2)
-        intDecrementCount = intDecrementCount + 1
-    Loop
-    If sngBinRangeMinimum < sngDataRangeLastVal Then
-        ' Acceptable answer not found
-        Debug.Assert False
-        sngBinRangeMinimum = sngDataRangeLastVal
-    End If
-
-    intDecrementCount = 0
-    sngDataRangeLastVal = sngBinRangeMaximum + mBinSize
-    Do While Round(sngBinRangeMaximum / mBinSize, 0) <> Round(sngBinRangeMaximum / mBinSize, mStartBinDigitsAfterDecimal + 1) And sngBinRangeMaximum < sngDataRangeLastVal And intDecrementCount <= 15
-        sngBinRangeMaximum = Round(sngBinRangeMaximum + mBinSize / 10#, mStartBinDigitsAfterDecimal + 2)
-        intDecrementCount = intDecrementCount + 1
-    Loop
-    If sngBinRangeMaximum > sngDataRangeLastVal Then
-        sngBinRangeMaximum = sngDataRangeLastVal
-    End If
-    
-
-    ' Initialize lngErrorsBinned; do not allow more than 1,000,000 bins
-    Do
-        On Error GoTo HandleBinCountOverload
-        BinnedDataCount = (sngBinRangeMaximum - sngBinRangeMinimum) / mBinSize
-        If BinnedDataCount > 1000000 Then
-            mBinSize = mBinSize * 10
-        End If
-    Loop While BinnedDataCount > 1000000
 
     On Error GoTo BinErrorsErrorHandler
 
@@ -225,21 +153,6 @@ On Error GoTo BinErrorsErrorHandler
     BinData = True
     Exit Function
 
-HandleBinCountOverload:
-    If Err.Number = 6 Then
-        ' Set .BinnedDataCount to a huge number (but still a valid Long) so that the BinSize gets incremented
-        BinnedDataCount = 1000000000#
-        Resume Next
-    Else
-        If mShowMessages Then
-            MsgBox "Error occurred while binning the mass errors.  Aborting.", vbInformation + vbOKOnly, "Error"
-        End If
-        BinnedDataCount = 0
-        InitializeBinnedData BinnedDataCount, BinnedData, True
-        BinData = False
-        Exit Function
-    End If
-
 BinErrorsErrorHandler:
     If mShowMessages Then
         MsgBox "Unexpected error in BinErrors()" & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
@@ -251,7 +164,115 @@ BinErrorsErrorHandler:
 
 End Function
 
-Private Function DataPointToBinNumber(ThisValue As Single, StartBin As Single, BinSize As Single) As Long
+Public Function ComputeBinDetails(ByRef sngBinRangeMinimum As Single, ByRef sngBinRangeMaximum As Single, ByRef sngBinSize As Single, _
+                                  ByRef lngBinCountComputed As Long, ByVal blnRequireNegativeStartBin As Boolean, ByVal intStartBinDigitsAfterDecimal As Integer) As Boolean
+
+    ' The user must provide sngBinRangeMinimum, sngBinRangeMaximum, and sngBinSize
+    ' This function will round the ranges and bin size to appropriate values, then compute
+    '  the number of bins to reserve given the values
+    
+    Dim lngMultiplier As Long
+    Dim intDecrementCount As Integer
+    Dim sngDataRangeLastVal As Single
+    
+    lngBinCountComputed = 0
+    
+    If IsInfinity(sngBinRangeMinimum) Or IsInfinity(sngBinRangeMaximum) Then
+        ' Minimum and/or maximum are infinity; cannot make a histogram
+        ComputeBinDetails = False
+        Exit Function
+    End If
+    
+    ' sngBinRangeMinimum should be less than or requal to 0 if blnRequireNegativeStartBin is True
+    If sngBinRangeMinimum > 0 And blnRequireNegativeStartBin Then
+        sngBinRangeMinimum = 0
+    End If
+
+    ' Round sngBinRangeMinimum and sngBinRangeMaximum down/up, depending on StartBinDigitsAfterDecimal
+
+    If intStartBinDigitsAfterDecimal < 0 Then intStartBinDigitsAfterDecimal = 0
+    If intStartBinDigitsAfterDecimal > 7 Then intStartBinDigitsAfterDecimal = 7
+
+    lngMultiplier = 10 ^ mStartBinDigitsAfterDecimal
+
+    ' Use Int() to round down
+    If blnRequireNegativeStartBin Then
+        sngBinRangeMinimum = (-1 * (Int(Abs(sngBinRangeMinimum * lngMultiplier)) + 1)) / lngMultiplier
+    Else
+        sngBinRangeMinimum = (Int(sngBinRangeMinimum * lngMultiplier)) / lngMultiplier
+    End If
+    
+    sngBinRangeMaximum = (Int(sngBinRangeMaximum * lngMultiplier) + 1) / lngMultiplier
+
+    If IsInfinity(sngBinSize) Then
+        ' sngBinSize is Infinity; set to the default bin size
+        sngBinSize = mDefaultBinSize
+    End If
+    
+    If sngBinSize <= 0 Then sngBinSize = mDefaultBinSize
+    If sngBinSize > 1 Then
+        sngBinSize = Round(sngBinSize, 0)
+    Else
+        ' Round to 2 significant figures
+        sngBinSize = CSng(Format(sngBinSize, "0.0E+00"))
+        If sngBinSize <= 0 Then sngBinSize = mDefaultBinSize
+    End If
+
+    ' Make sure sngBinRangeMinimum and sngBinRangeMaximum are evenly divisible by sngBinSize
+    ' We'll do this by decrementing/incrementing sngBinRangeMinimum in increments of sngBinSize/10
+    '  until we pass or equal sngDataRangeLastVal
+
+    intDecrementCount = 0
+    sngDataRangeLastVal = sngBinRangeMinimum - sngBinSize
+    Do While Round(sngBinRangeMinimum / sngBinSize, 0) <> Round(sngBinRangeMinimum / sngBinSize, mStartBinDigitsAfterDecimal + 1) And sngBinRangeMinimum > sngDataRangeLastVal And intDecrementCount <= 15
+        sngBinRangeMinimum = Round(sngBinRangeMinimum - sngBinSize / 10#, mStartBinDigitsAfterDecimal + 2)
+        intDecrementCount = intDecrementCount + 1
+    Loop
+    If sngBinRangeMinimum < sngDataRangeLastVal Then
+        ' Acceptable answer not found
+        Debug.Assert False
+        sngBinRangeMinimum = sngDataRangeLastVal
+    End If
+
+    intDecrementCount = 0
+    sngDataRangeLastVal = sngBinRangeMaximum + sngBinSize
+    Do While Round(sngBinRangeMaximum / sngBinSize, 0) <> Round(sngBinRangeMaximum / sngBinSize, mStartBinDigitsAfterDecimal + 1) And sngBinRangeMaximum < sngDataRangeLastVal And intDecrementCount <= 15
+        sngBinRangeMaximum = Round(sngBinRangeMaximum + sngBinSize / 10#, mStartBinDigitsAfterDecimal + 2)
+        intDecrementCount = intDecrementCount + 1
+    Loop
+    If sngBinRangeMaximum > sngDataRangeLastVal Then
+        sngBinRangeMaximum = sngDataRangeLastVal
+    End If
+    
+
+    ' Calculate lngErrorsBinned; do not allow more than 1,000,000 bins
+    Do
+        On Error GoTo HandleBinCountOverload
+        lngBinCountComputed = (sngBinRangeMaximum - sngBinRangeMinimum) / sngBinSize
+        If lngBinCountComputed > 1000000 Then
+            sngBinSize = sngBinSize * 10
+        End If
+    Loop While lngBinCountComputed > 1000000
+
+    ComputeBinDetails = True
+
+    Exit Function
+
+HandleBinCountOverload:
+    If Err.Number = 6 Then
+        ' Set .lngBinCountComputed to a huge number (but still a valid Long) so that the BinSize gets incremented
+        lngBinCountComputed = 1000000000#
+        Resume Next
+    Else
+        Debug.Assert False
+        lngBinCountComputed = 0
+        ComputeBinDetails = False
+        Exit Function
+    End If
+
+End Function
+
+Public Function DataPointToBinNumber(ThisValue As Single, StartBin As Single, BinSize As Single) As Long
     Dim WorkingValue As Single
 
     ' First subtract StartBin from ThisValue

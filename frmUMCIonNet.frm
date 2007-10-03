@@ -56,8 +56,8 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "lblFilterConnections"
-      Tab(1).Control(1)=   "Frame1"
+      Tab(1).Control(0)=   "Frame1"
+      Tab(1).Control(1)=   "lblFilterConnections"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
@@ -420,8 +420,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassMassTopX"
-            Tab(2).Control(1)=   "fraClassAbundanceTopX"
+            Tab(2).Control(0)=   "fraClassAbundanceTopX"
+            Tab(2).Control(1)=   "fraClassMassTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -2920,8 +2920,12 @@ On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
                         
                         If blnSuccess Then
                             ' Read the data from the _Features.txt & _PeakToFeatureMap.txt files
+                            If intIsotopeTagIndex >= 0 Then
+                                blnSuccessCurrentIteration = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages, intOddEvenIteration, eIsotopeTagList(intIsotopeTagIndex))
+                            Else
+                                blnSuccessCurrentIteration = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages, intOddEvenIteration, iltNone)
+                            End If
                             
-                            blnSuccessCurrentIteration = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages)
                             If blnSuccessCurrentIteration Then
                                 intIterationSuccessCount = intIterationSuccessCount + 1
                             End If
@@ -3282,7 +3286,7 @@ Private Function GetMetricDataMassUnits(lngMetricDataUnits As Long) As String
     End Select
 End Function
 
-Private Function GetUMCIsoDefinitionText(Ind As Long, Optional ByVal blnMultipleLines As Boolean = True) As String
+Private Function GetUMCIsoDefinitionText(Ind As Long, Optional ByVal blnMultipleLines As Boolean = True, Optional ByVal intOddEvenIteration As Integer = 0, Optional ByVal intIsotopeTagCode As Integer = -1) As String
 '-----------------------------------------------------------------------
 'returns formatted strDesc of the IonNet for 2D display with index Ind
 '-----------------------------------------------------------------------
@@ -3373,18 +3377,34 @@ With GelUMCIon(Ind).ThisNetDef
         strDesc = strDesc & "Metric strDesc not dimensioned"
      End If
      
+    If Right(strDesc, Len(strLineSeparator)) <> strLineSeparator Then
+        strDesc = strDesc & strLineSeparator
+    End If
+    
     Select Case UMCDef.OddEvenProcessingMode
-    Case oepUMCOddEvenProcessingMode.oepOddOnly: strAddnlText = "Process odd-numbered spectra only"
-    Case oepUMCOddEvenProcessingMode.oepEvenOnly: strAddnlText = "Process even-numbered  spectra only"
-    Case oepUMCOddEvenProcessingMode.oepOddEvenSequential: strAddnlText = "Process odd-numbered spectra then even-numbered spectra sequentially (and independently)"
-    Case oepUMCOddEvenProcessingMode.oepProcessAll: strAddnlText = "Process all spectra"
-    Case Else: strAddnlText = "Unknown type"
+    Case oepUMCOddEvenProcessingMode.oepOddOnly
+        strAddnlText = "Process odd-numbered spectra only"
+    Case oepUMCOddEvenProcessingMode.oepEvenOnly
+        strAddnlText = "Process even-numbered spectra only"
+    Case oepUMCOddEvenProcessingMode.oepOddEvenSequential
+        strAddnlText = "Process odd-numbered spectra then even-numbered spectra sequentially and independently"
+    Case oepUMCOddEvenProcessingMode.oepProcessAll
+        strAddnlText = "Process all spectra"
+    Case Else
+        strAddnlText = "Unknown type"
     End Select
     
-    strDesc = strDesc & strLineSeparator & strAddnlText
+    If intOddEvenIteration > 0 Then
+        strAddnlText = strAddnlText & " (iteration = " & Trim(intOddEvenIteration) & ")"
+    End If
     
-    If UMCDef.RequireMatchingIsotopeTag Then
-        strDesc = strDesc & strLineSeparator & "Require Matching Isotope Tag = True"
+    strDesc = strDesc & "DREAMS Odd/Even Mode = " & strAddnlText
+    
+    If ((GelData(Ind).DataStatusBits And GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) = GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG) Then
+        strDesc = strDesc & strLineSeparator & "Require Matching Isotope Tag = " & Trim(UMCDef.RequireMatchingIsotopeTag)
+        If intIsotopeTagCode >= 0 And UMCDef.RequireMatchingIsotopeTag Then
+            strDesc = strDesc & " (current tag " & GetIsotopeLabelTagName(intIsotopeTagCode) & ")"
+        End If
     End If
     
     strDesc = strDesc & vbCrLf
@@ -3532,7 +3552,7 @@ InitializeUMCSearchErrorHandler:
     
 End Sub
 
-Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, ByVal strWorkingDirPath As String, ByVal strLCMSFeaturesFilePath As String, blnShowMessages As Boolean) As Boolean
+Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, ByVal strWorkingDirPath As String, ByVal strLCMSFeaturesFilePath As String, ByVal blnShowMessages As Boolean, ByVal intOddEvenIteration As Integer, ByVal eIsotopeTag As iltIsotopeLabelTagConstants) As Boolean
 
     Dim strMessage As String
     Dim strResultsFilePath As String
@@ -3617,7 +3637,7 @@ Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, ByVal st
             GelUMCIon(CallerID).ThisNetDef = MyDef
             GelSearchDef(CallerID).UMCIonNetDef = MyDef
             
-            strUMCIsoDefinition = GetUMCIsoDefinitionText(CallerID, False)
+            strUMCIsoDefinition = GetUMCIsoDefinitionText(CallerID, False, intOddEvenIteration, eIsotopeTag)
             strUMCIsoDefinition = Replace(strUMCIsoDefinition, ": ", " = ")
             strUMCIsoDefinition = Trim(Replace(strUMCIsoDefinition, vbCrLf, ""))
             If Right(strUMCIsoDefinition, 1) = ";" Then

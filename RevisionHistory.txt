@@ -1,6 +1,15 @@
 VIPER Change Log
 
-Version 3.43 - Build 377; September 14, 2007
+Version 3.43 - Build 378; October 2, 2007
+	- Fixed two ER computation bugs related to adjustments made recently to the ER values computed when I-Report data is available.  
+		- The affected versions are: v3.43 builds 375, 376, and 377 (dated August 2007 and September 2007)
+		- Bug 1: Viper was reporting the zero-centered symmetric ER value in place of the Light/Heavy ER value (where 1 means unchanged).  
+		- Bug 2: Relates to the math involved with computing corrected abundances for the M+2 and M+4 peaks in the isotopic distribution of 16O/18O data.  
+			- Given equation "B1 = I2-(M2/M0)*I0", if I0 is much greater than I2, then B1 would become less than 0.  This is also the case if I2 is 0 to start with.  
+			- This leads to invalid values for this equation "B2 = I4-(M2/M0)*B1-(M4/M0)*I0" and ultimately leads to negative values for ER = Light/Heavy = LightAbundance / B2
+			- The fix is to set B1 to 0 if it is computed to be < 0
+
+Version 3.43 - Build 377; September 17, 2007
 	- Updated LCMS Feature Finding using "UMC Ion Networks" or using "UMC 2003" to consider the isotope label (e.g. N14 or N15) when finding UMCs
 	- Updated save/load Ini values to include UMC finding options OddEvenProcessingMode and RequireMatchingIsotopeTag
 	- Updated "Copy LC-MS Features (UMCs) in View" and "Copy Points in View" to include column "Isotope Label Tag" if the data contains isotope label information

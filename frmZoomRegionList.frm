@@ -173,6 +173,8 @@ Private Sub ZoomGelHandler()
     Dim sngScanWidth As Single
     Dim sngScanHalfWidth As Single
     
+On Error GoTo ZoomGelHandlerErrorHandler
+
     If Not IsNumeric(txtMassRange) Then
         txtMassRange = "0.01"
         cboMassRangeUnits.ListIndex = mruDa
@@ -208,6 +210,7 @@ Private Sub ZoomGelHandler()
     
     ' Extract the text from strZoomList that contains the line the cursor is located on
     ' Find the next vbCrLf after intCursorIndex
+    If intCursorIndex = 0 Then intCursorIndex = 1
     intMatchIndex = InStr(intCursorIndex, strZoomList, vbCrLf)
     If intMatchIndex > 0 Then
         strZoomList = Left(strZoomList, intMatchIndex - 1)
@@ -275,6 +278,13 @@ Private Sub ZoomGelHandler()
         
         ZoomGelToDimensionsScanOrNET dblMassMin, dblMassMax, sngScanOrNETMin, sngScanOrNETMax, blnUseNET, CallerID
     End If
+    
+    Exit Sub
+
+ZoomGelHandlerErrorHandler:
+    Debug.Assert False
+    
+    LogErrors Err.Number, "ZoomGelHandler", Err.Description
     
 End Sub
 
