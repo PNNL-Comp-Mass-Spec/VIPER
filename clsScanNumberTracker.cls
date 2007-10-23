@@ -56,7 +56,7 @@ On Error GoTo AddScanNumberAndUpdateAverageIncrementErrorHandler
  
     If mCurrentAutoScanNumber = 0 Then
         ' First call to AddScanNumberAndUpdateAverageIncrement since last Reset
-        ' Simply udpate mCurrentAutoScanNumber
+        ' Simply update mCurrentAutoScanNumber
         mCurrentAutoScanNumber = lngScanNumber
     ElseIf lngScanNumber > mCurrentAutoScanNumber Then
         ' Update the average since the new scan number is greater than the previous one

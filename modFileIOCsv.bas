@@ -605,6 +605,7 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, ByVal strIso
     Dim blnStoreDataPoint As Boolean
     
     Dim strData() As String
+    Dim strColumnHeader As String
     
     Dim sngFit As Single
     Dim sngAbundance As Single
@@ -679,7 +680,9 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                             Exit For
                         End If
                         
-                        Select Case LCase(Trim(strData(lngIndex)))
+                        strColumnHeader = StripQuotes(LCase(Trim(strData(lngIndex))))
+                        
+                        Select Case strColumnHeader
                         Case ISOS_COLUMN_SCAN_NUM: intColumnMapping(IsosFileColumnConstants.ScanNumber) = lngIndex
                         Case ISOS_COLUMN_CHARGE: intColumnMapping(IsosFileColumnConstants.Charge) = lngIndex
                         Case ISOS_COLUMN_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.Abundance) = lngIndex
@@ -861,6 +864,8 @@ Private Function ReadCSVScanFile(ByRef fso As FileSystemObject, ByVal strScansFi
     Dim blnDataLine As Boolean
     
     Dim strData() As String
+    Dim strColumnHeader As String
+    
     Dim intColumnMapping() As Integer
     Dim intScanType As Integer
     Dim sngMaxElutionTime As Single
@@ -936,7 +941,9 @@ On Error GoTo ReadCSVScanFileErrorHandler
                                 Exit For
                             End If
 
-                            Select Case LCase(Trim(strData(lngIndex)))
+                            strColumnHeader = StripQuotes(LCase(Trim(strData(lngIndex))))
+                            
+                            Select Case strColumnHeader
                             Case SCANS_COLUMN_SCAN_NUM: intColumnMapping(ScanFileColumnConstants.ScanNumber) = lngIndex
                             Case SCANS_COLUMN_TIME_A, SCANS_COLUMN_TIME_B: intColumnMapping(ScanFileColumnConstants.ScanTime) = lngIndex
                             Case SCANS_COLUMN_TYPE: intColumnMapping(ScanFileColumnConstants.ScanType) = lngIndex
@@ -1117,4 +1124,15 @@ Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScans
     
     ResolveCSVFilePaths = blnSuccess
     
+End Function
+
+Private Function StripQuotes(ByVal strText As String) As String
+
+    If Len(strText) > 2 Then
+        If Left(strText, 1) = """" And Right(strText, 1) = """" Then
+            strText = Mid(strText, 2, Len(strText) - 2)
+        End If
+    End If
+             
+    StripQuotes = strText
 End Function

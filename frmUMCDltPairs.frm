@@ -833,7 +833,7 @@ Private ERExcS As ERStatHelper
 Private mPairInfoChanged As Boolean
 Private mAbortProcess As Boolean
 
-Private mDltLblPairsUMC As clsDltLblPairsUMC
+Private WithEvents mDltLblPairsUMC As clsDltLblPairsUMC
 '
 
 Public Property Let FormMode(eNewFormMode As pfmPairFormMode)
@@ -2436,6 +2436,7 @@ End Sub
 
 Private Sub cmdAbortProcess_Click()
     mAbortProcess = True
+    mDltLblPairsUMC.AbortProcessingNow
 End Sub
 
 Private Sub cmdFindPairs_Click()
@@ -2507,6 +2508,10 @@ Private Sub Form_Unload(Cancel As Integer)
     End If
 End Sub
 
+Private Sub mDltLblPairsUMC_StatusChanged()
+    UpdateStatus mDltLblPairsUMC.Status
+End Sub
+
 Private Sub mnuFAutoClearPairsWhenFindingPairs_Click()
     Me.AutoClearPairsWhenFindingPairs = Not Me.AutoClearPairsWhenFindingPairs()
 End Sub
@@ -2544,14 +2549,31 @@ End Sub
 
 Private Sub mnuFERRecalculation_Click()
     Dim strMessage As String
+    Dim blnReHideAbortButton As Boolean
     
     GelP_D_L(CallerID).SearchDef = glbPreferencesExpanded.PairSearchOptions.SearchDef
     
     If mDltLblPairsUMC Is Nothing Then
         Set mDltLblPairsUMC = New clsDltLblPairsUMC
     End If
+    
+    Me.MousePointer = vbHourglass
+    
+    If Not cmdAbortProcess.Visible Then
+        ShowHideControls True
+        blnReHideAbortButton = True
+    End If
+    
+    DoEvents
+    
     mDltLblPairsUMC.CalcDltLblPairsER_UMC CallerID, strMessage
     
+    If blnReHideAbortButton Then
+        ShowHideControls False
+    End If
+   
+    Me.MousePointer = vbDefault
+
     UpdateStatus strMessage
     
     mPairInfoChanged = True
@@ -2578,11 +2600,11 @@ MarkBadERPairs
 End Sub
 
 Private Sub mnuFResetExclusionFlags_Click()
-UpdateStatus "Resetting pair exclusion flags..."
-Me.MousePointer = vbHourglass
-UpdateStatus PairsResetExclusionFlag(CallerID)
-mPairInfoChanged = True
-Me.MousePointer = vbDefault
+    UpdateStatus "Resetting pair exclusion flags..."
+    Me.MousePointer = vbHourglass
+    UpdateStatus PairsResetExclusionFlag(CallerID)
+    mPairInfoChanged = True
+    Me.MousePointer = vbDefault
 End Sub
 
 Private Sub mnuFunction_Click()

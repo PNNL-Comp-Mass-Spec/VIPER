@@ -92,12 +92,12 @@ Microsoft Access MT Database file formats:
 		- The Protein table must be named T_Proteins, containing the fields:
 			Ref_ID
 			Reference
-		- The MT to Protein Mapping table must be named T_Mass_Tags_to_Protein_Map, with fields:
+		- The MT to Protein Mapping table must be named T_Mass_Tag_to_Protein_Map, with fields:
 			Mass_Tag_ID
 			Ref_ID
 		- The advantage of using two tables to track protein information is
 		  that additional information for each protein can be defined in the 
-		  Proteins table while the T_Mass_Tags_to_Protein_Map simply associates 
+		  Proteins table while the T_Mass_Tag_to_Protein_Map simply associates 
 		  MT tags with proteins
 	- File QCStandards_ExpandedFormat.mdb demonstrates this database format
 		(installed by VIPER_Installer.msi at C:\Program Files\Viper\)

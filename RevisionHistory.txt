@@ -1,5 +1,13 @@
 VIPER Change Log
 
+Version 3.43 - Build 379; October 22, 2007
+	- Changed the default name for the mass tag to protein map table from T_Mass_Tags_to_Protein_Map to T_Mass_Tag_to_Protein_Map (VIPER supports either name)
+	- Now updating status bar when computing ER values on the "LC-MS Feature Delta Pairing" form
+	- Updated reading of Decon2LS .csv files to support column headers surrounded with double qutoes
+	- Updated the Merge PEK files dialog to support merging Decon2LS .CSV files
+		- Creates a merged _Isos.csv using the source _Isos.csv files
+		- Also creates a merged _Scans.csv file if the _Scans.csv files are available
+
 Version 3.43 - Build 378; October 2, 2007
 	- Fixed two ER computation bugs related to adjustments made recently to the ER values computed when I-Report data is available.  
 		- The affected versions are: v3.43 builds 375, 376, and 377 (dated August 2007 and September 2007)

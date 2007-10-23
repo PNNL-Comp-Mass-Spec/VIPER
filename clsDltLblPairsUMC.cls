@@ -13,6 +13,8 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
+Public Event StatusChanged()
+
 Private Type udtERStatsType
     ERAvg As Double                 ' Single ER or average ER
     ERStDev As Double               ' ER Standard Deviation if averaging
@@ -78,9 +80,22 @@ Private mCorrectedAbundanceStatsMaxIndex As Long
 Private mCorrectedAbundanceStats() As udtCorrectedAbundanceStatsType
 
 Private mGelIndex As Long
+Private mStatusMessage As String
+Private mAbortProcessing As Boolean
+
+
+Public Property Get Status()
+    Status = mStatusMessage
+End Property
+
+Public Sub AbortProcessingNow()
+    mAbortProcessing = True
+End Sub
 
 Private Sub Class_Initialize()
     mGelIndex = 0
+    mStatusMessage = ""
+    mAbortProcessing = False
     
     InitializeLocalVariables 10
 End Sub
@@ -104,6 +119,12 @@ Public Sub CalcDltLblPairsER_UMC(ByVal lngGelIndex As Long, ByRef strMessage As 
     
     For lngPairIndex = 0 To GelP_D_L(mGelIndex).PCnt - 1
         CalcDltLblPairsER_UMCSinglePair lngPairIndex, lngPairCountWithOutliers, dblOutlierFractionSum
+        
+        If lngPairIndex Mod 200 = 0 Then
+            UpdateStatus "Calculating Expression Ratios: " & Trim(lngPairIndex + 1) & " / " & Trim(GelP_D_L(mGelIndex).PCnt)
+        End If
+        
+        If mAbortProcessing Then Exit For
     Next lngPairIndex
   
     strMessage = "Calculated pair expression ratios; Pair count = " & GelP_D_L(mGelIndex).PCnt
@@ -111,6 +132,8 @@ Public Sub CalcDltLblPairsER_UMC(ByVal lngGelIndex As Long, ByRef strMessage As 
         strMessage = strMessage & "; Removed outlier ER values from " & lngPairCountWithOutliers & " pairs"
         strMessage = strMessage & "; Average % of ER values of pair that were removed as outliers = " & Round(dblOutlierFractionSum / CDbl(lngPairCountWithOutliers) * 100, 2) & "%"
     End If
+    
+    UpdateStatus strMessage
     
     AddToAnalysisHistory mGelIndex, strMessage
     
@@ -1478,6 +1501,7 @@ Private Sub InitializeLocalVariables(ByVal lngPairCount As Long)
     Dim lngIndex As Long
 
     mCorrectedAbundanceStatsMaxIndex = 0
+    mAbortProcessing = False
     
     If lngPairCount < 1 Then
         ReDim mCorrectedAbundanceStats(9)
@@ -1499,3 +1523,8 @@ End Sub
 Private Function Log2(ByVal dblValue As Double) As Double
     Log2 = Log(dblValue) / Log(2#)
 End Function
+
+Private Sub UpdateStatus(ByVal strStatus As String)
+    mStatusMessage = strStatus
+    RaiseEvent StatusChanged
+End Sub
