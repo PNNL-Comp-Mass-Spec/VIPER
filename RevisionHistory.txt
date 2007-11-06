@@ -1,5 +1,8 @@
 VIPER Change Log
 
+Version 3.43 - Build 380; November 5, 2007
+	- Fixed "Invalid use of Null" bug related to reading .PEK files with just 6 data fields in the Isotopic data section
+
 Version 3.43 - Build 379; October 22, 2007
 	- Changed the default name for the mass tag to protein map table from T_Mass_Tags_to_Protein_Map to T_Mass_Tag_to_Protein_Map (VIPER supports either name)
 	- Now updating status bar when computing ER values on the "LC-MS Feature Delta Pairing" form

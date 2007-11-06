@@ -2888,6 +2888,17 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                         ReDim UMCMembersCharge(UBound(UMCMembersMW))
                       Loop
                       Erase ChargeStatePresent()       ' Reset all to 0
+                      
+                      If GelUMC(lngGelIndex).def.RequireMatchingIsotopeTag Then
+                        ISMWField = GelUMC(lngGelIndex).def.MWField
+                        If .ClassMType(0) = glIsoType Then
+                            ' Change ISMWField to Average Masses if this is an N-15 based UMC
+                            If GelData(lngGelIndex).IsoData(.ClassMInd(0)).IsotopeLabel = iltIsotopeLabelTagConstants.iltN15 Then
+                                ISMWField = mftMWAvg
+                            End If
+                        End If
+                      End If
+                      
                       For j = 0 To lngMaxMemberIndex
                           Select Case .ClassMType(j)
                           Case glCSType

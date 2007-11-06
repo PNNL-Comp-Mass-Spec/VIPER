@@ -1085,12 +1085,12 @@ On Error GoTo ReadPEKFileErrorHandler
                                             Else
                                                 ' See if vardata(7) contains some text
                                             
-                                                If Not IsNumeric(varData(7)) Then
+                                                If Not IsNumeric(varData(7)) And Not IsNull(varData(7)) Then
                                                     ' Assume varData(7) contains an isotope label
                                                     .IsotopeLabel = GetIsotopeLabelTagCode(CStr(varData(7)))
 
                                                     If .IsotopeLabel <> iltNone Then
-                                                        If IsNumeric(varData(8)) Then
+                                                        If IsNumeric(varData(8)) And Not IsNull(varData(8)) Then
                                                             ' Assume varData(8) contains the ratio of N14 to N15
                                                             '.IsotopicFitRatio = CSng(varData(8))
                                                         End If
@@ -1195,6 +1195,12 @@ On Error GoTo ReadPEKFileErrorHandler
     Exit Function
 
 ReadPEKFileErrorHandler:
+    If Err.Number = 94 Then
+        ' Invalid use of Null; this shouldn't normally happen
+        Debug.Assert False
+        Resume Next
+    End If
+
     Debug.Assert False
     lngReturnValue = Err.Number
     LogErrors Err.Number, "ReadPEKFile"
