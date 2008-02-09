@@ -23,6 +23,7 @@ End Enum
 ' These fieldes apply to dbgGeneration1 through dbgGeneration1000
 Private Const DB_FIELD_AMT_OLD_ID = "ID"
 Private Const DB_FIELD_AMT_NEW_ID = "AMT_ID"
+Private Const DB_FIELD_AMT_PEPTIDE = "Peptide"
 Private Const DB_FIELD_AMT_MW = "AMTMonoisotopicMass"
 Private Const DB_FIELD_AMT_NET = "NET"
 Private Const DB_FIELD_AMT_RETENTION = "RetentionTime"            ' Stored in the AMTData().PNET; ignored if field PNET is present
@@ -41,6 +42,7 @@ Private Const DB_FIELD_PROTEIN_Protein_Name As String = "Protein_Name"
 
 ' These fields apply to dbgMTSOffline
 Private Const DB_FIELD_TMASSTAGS_MASS_TAG_ID = "Mass_Tag_ID"
+Private Const DB_FIELD_TMASSTAGS_PEPTIDE = "Peptide"
 Private Const DB_FIELD_TMASSTAGS_MW = "Monoisotopic_Mass"
 Private Const DB_FIELD_TMASSTAGS_MSMSObsCount = "Peptide_Obs_Count_Passing_Filter"
 Private Const DB_FIELD_TMASSTAGS_HighNormalizedScore = "High_Normalized_Score"
@@ -213,6 +215,7 @@ End Type
 
 Private Type udtAMTFieldPresentType
     MTID As Boolean
+    PeptideSequence As Boolean
     MW As Boolean
     NET As Boolean
     NETStDev As Boolean
@@ -807,7 +810,13 @@ On Error GoTo err_LegacyDBLoadAMTData
                                strMTTable & DB_FIELD_AMT_MW & ", " & _
                                strMTTable & DB_FIELD_AMT_NET
     
-        If udtFieldPresent.Status Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_Status
+        If udtFieldPresent.PeptideSequence Then
+            rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_PEPTIDE
+        End If
+    
+        If udtFieldPresent.Status Then
+            rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_Status
+        End If
         
         If udtFieldPresent.PNET Then
             rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_PNET
@@ -838,6 +847,10 @@ On Error GoTo err_LegacyDBLoadAMTData
                                strMTTable & DB_FIELD_TMASSTAGS_MW & ", " & _
                                strNETTable & DB_FIELD_TMTNET_NET
     
+        If udtFieldPresent.PeptideSequence Then
+            rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_PEPTIDE
+        End If
+        
         If udtFieldPresent.PNET Then
             rsAMTSQL = rsAMTSQL & ", " & strNETTable & DB_FIELD_TMTNET_PNET
         End If
@@ -972,6 +985,7 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             
             ' Set the defaults for the remaining fields
             ' We'll populate them with the real values if the field is present
+            AMTData(lngIndex).Sequence = ""
             AMTData(lngIndex).flag = 0
             AMTData(lngIndex).PNET = NET_VALUE_IF_NULL
             AMTData(lngIndex).NETStDev = 0
@@ -981,6 +995,12 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             AMTData(lngIndex).HighNormalizedScore = 0
             AMTData(lngIndex).HighDiscriminantScore = 0
             AMTData(lngIndex).PeptideProphetProbability = 0
+            
+            If udtFieldPresent.PeptideSequence Then
+                If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_PEPTIDE).Value) Then
+                    AMTData(lngIndex).Sequence = CStr(.Fields(DB_FIELD_TMASSTAGS_PEPTIDE).Value)
+                End If
+            End If
             
             If udtFieldPresent.PNET Then
                 If Not IsNull(.Fields(DB_FIELD_TMTNET_PNET).Value) Then
@@ -1051,6 +1071,7 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             
             ' Set the defaults for the remaining fields
             ' We'll populate them with the real values if the field is present
+            AMTData(lngIndex).Sequence = ""
             AMTData(lngIndex).flag = 0
             AMTData(lngIndex).PNET = NET_VALUE_IF_NULL
             AMTData(lngIndex).NETStDev = 0
@@ -1060,6 +1081,12 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             AMTData(lngIndex).HighNormalizedScore = 0
             AMTData(lngIndex).HighDiscriminantScore = 0
             AMTData(lngIndex).PeptideProphetProbability = 0
+            
+            If udtFieldPresent.PeptideSequence Then
+                If Not IsNull(.Fields(DB_FIELD_AMT_PEPTIDE).Value) Then
+                    AMTData(lngIndex).Sequence = .Fields(DB_FIELD_AMT_PEPTIDE).Value
+                End If
+            End If
             
             If udtFieldPresent.Status Then
                 AMTData(lngIndex).flag = CLng(.Fields(DB_FIELD_AMT_Status).Value)
@@ -1163,6 +1190,7 @@ Private Function EnumerateLegacyAMTFields(ByVal strLegacyDBFilePath As String, B
     
     With udtFieldPresent
         .MTID = False
+        .PeptideSequence = False
         .MW = False
         .NET = False
         .NETStDev = False
@@ -1210,6 +1238,7 @@ On Error GoTo err_EnumerateLegacyAMTFields:
             If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
                 Select Case LCase(fldAny.Name)
                 Case LCase(DB_FIELD_TMASSTAGS_MASS_TAG_ID):             udtFieldPresent.MTID = True
+                Case LCase(DB_FIELD_TMASSTAGS_PEPTIDE):                 udtFieldPresent.PeptideSequence = True
                 Case LCase(DB_FIELD_TMASSTAGS_MW):                      udtFieldPresent.MW = True
                 Case LCase(DB_FIELD_TMASSTAGS_MSMSObsCount):            udtFieldPresent.MSMSObsCount = True
                 Case LCase(DB_FIELD_TMASSTAGS_HighNormalizedScore):     udtFieldPresent.HighNormalizedScore = True
@@ -1227,6 +1256,7 @@ On Error GoTo err_EnumerateLegacyAMTFields:
                 Case LCase(DB_FIELD_AMT_NEW_ID)
                     udtFieldPresent.MTID = True
                     blnIsNewGeneration = True
+                Case LCase(DB_FIELD_AMT_PEPTIDE):           udtFieldPresent.PeptideSequence = True
                 Case LCase(DB_FIELD_AMT_MW):                udtFieldPresent.MW = True
                 Case LCase(DB_FIELD_AMT_NET):               udtFieldPresent.NET = True
                 Case LCase(DB_FIELD_AMT_Status):            udtFieldPresent.Status = True
@@ -2739,11 +2769,11 @@ Private Function GetLegacyDBRequiredMTTableFields(ByVal eDBGeneration As dbgData
     
     If eDBGeneration = dbgMTSOffline Then
         strMessage = "The [" & TABLE_NAME_T_MASS_TAGS & "] table should contain the fields: " & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " and " & DB_FIELD_TMASSTAGS_MW & ".  " & _
-                     "It can optionally contain the fields: " & DB_FIELD_TMASSTAGS_MSMSObsCount & ", " & DB_FIELD_TMASSTAGS_HighNormalizedScore & ", " & DB_FIELD_TMASSTAGS_HighDiscriminantScore & ", and " & DB_FIELD_TMASSTAGS_PeptideProphetProbability & "." & _
+                     "It can optionally contain the fields: " & DB_FIELD_TMASSTAGS_PEPTIDE & ", " & DB_FIELD_TMASSTAGS_MSMSObsCount & ", " & DB_FIELD_TMASSTAGS_HighNormalizedScore & ", " & DB_FIELD_TMASSTAGS_HighDiscriminantScore & ", and " & DB_FIELD_TMASSTAGS_PeptideProphetProbability & "." & _
                      "In addition, the [" & TABLE_NAME_T_MASS_TAGS_NET & "] table should contain the fields: " & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " and " & DB_FIELD_TMTNET_NET & ", plus optionally " & DB_FIELD_TMTNET_PNET & " and " & DB_FIELD_TMTNET_STDEV & ".  "
     Else
         strMessage = "The [" & TABLE_NAME_AMT & "] table should contain the fields: " & DB_FIELD_AMT_NEW_ID & ", " & DB_FIELD_AMT_MW & ", " & DB_FIELD_AMT_NET & ", " & DB_FIELD_AMT_Status & ", and " & DB_FIELD_AMT_RETENTION & " or " & DB_FIELD_AMT_PNET & ".  " & _
-                     "It can optionally contain the fields: " & DB_FIELD_AMT_MSMSObsCount & ", " & DB_FIELD_AMT_HighNormalizedScore & ", " & DB_FIELD_AMT_HighDiscriminantScore & ", " & DB_FIELD_AMT_PeptideProphetProbability & ", " & DB_FIELD_AMT_NitrogenAtom & ", and " & DB_FIELD_AMT_CysCount & "."
+                     "It can optionally contain the fields: " & DB_FIELD_AMT_PEPTIDE & ", " & DB_FIELD_AMT_MSMSObsCount & ", " & DB_FIELD_AMT_HighNormalizedScore & ", " & DB_FIELD_AMT_HighDiscriminantScore & ", " & DB_FIELD_AMT_PeptideProphetProbability & ", " & DB_FIELD_AMT_NitrogenAtom & ", and " & DB_FIELD_AMT_CysCount & "."
     End If
     
     GetLegacyDBRequiredMTTableFields = strMessage

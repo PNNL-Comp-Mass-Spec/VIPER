@@ -202,6 +202,8 @@ On Error GoTo ReadMZDataFileErrorHandler
         .DataLines = 0
         .CSLines = 0
         .IsoLines = 0
+        
+        .DataStatusBits = 0
     End With
     
     Set mMZDataReader = New MZDataFileReaderDLL.mzDataReader
@@ -295,7 +297,7 @@ On Error GoTo ReadMZDataFileErrorHandler
          ' New: data file folder path is the folder one folder up from .Filename's folder if .Filename's folder contains _Auto00000
          '      if .Filename's folder does not contain _Auto0000, then simply use .Filename's folder
         .PathtoDataFiles = DetermineParentFolderPath(.FileName)
-        
+                
         ' Note: CS Data is not loaded by this function
         ReDim .CSData(0)
         

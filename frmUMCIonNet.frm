@@ -56,8 +56,8 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "Frame1"
-      Tab(1).Control(1)=   "lblFilterConnections"
+      Tab(1).Control(0)=   "lblFilterConnections"
+      Tab(1).Control(1)=   "Frame1"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
@@ -420,8 +420,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassAbundanceTopX"
-            Tab(2).Control(1)=   "fraClassMassTopX"
+            Tab(2).Control(0)=   "fraClassMassTopX"
+            Tab(2).Control(1)=   "fraClassAbundanceTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -1579,7 +1579,7 @@ err_BuildCurrentClass:
 ChangeStatus " Error building LC-MS Feature."
 End Function
 
-Private Function BuildUMCsUsingmLCMSResultsMapping(ByVal blnShowMessages As Boolean) As Boolean
+Private Function BuildUMCsUsingLCMSResultsMapping(ByVal blnShowMessages As Boolean) As Boolean
     Dim lngIndex As Long
     Dim lngCurrentUMC As Long
     Dim intScopeUsedForConnections As Integer
@@ -1589,7 +1589,7 @@ Private Function BuildUMCsUsingmLCMSResultsMapping(ByVal blnShowMessages As Bool
     
     Dim blnSuccess As Boolean
     
-On Error GoTo BuildUMCsUsingmLCMSResultsMappingErrorHandler
+On Error GoTo BuildUMCsUsingLCMSResultsMappingErrorHandler
     blnSuccess = False
     
     If mLCMSResultsMappingCount = 0 Then
@@ -1688,15 +1688,15 @@ On Error GoTo BuildUMCsUsingmLCMSResultsMappingErrorHandler
         End If
     End If
     
-    BuildUMCsUsingmLCMSResultsMapping = blnSuccess
+    BuildUMCsUsingLCMSResultsMapping = blnSuccess
     Exit Function
     
-BuildUMCsUsingmLCMSResultsMappingErrorHandler:
-    Debug.Print "Error in BuildUMCsUsingmLCMSResultsMapping: " & Err.Description
+BuildUMCsUsingLCMSResultsMappingErrorHandler:
+    Debug.Print "Error in BuildUMCsUsingLCMSResultsMapping: " & Err.Description
     Debug.Assert False
-    LogErrors Err.Number, "frmUMCIonNet->BuildUMCsUsingmLCMSResultsMapping"
+    LogErrors Err.Number, "frmUMCIonNet->BuildUMCsUsingLCMSResultsMapping"
     
-    BuildUMCsUsingmLCMSResultsMapping = False
+    BuildUMCsUsingLCMSResultsMapping = False
 
 End Function
 
@@ -2940,7 +2940,7 @@ On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
         Next intOddEvenIteration
         
         If intIterationSuccessCount > 0 Then
-            blnSuccess = BuildUMCsUsingmLCMSResultsMapping(blnShowMessages)
+            blnSuccess = BuildUMCsUsingLCMSResultsMapping(blnShowMessages)
         Else
             blnSuccess = False
         End If
@@ -4390,7 +4390,7 @@ Private Sub ShowHideCommandButtons(ByVal blnCalculating As Boolean)
 
     fraDREAMS.Enabled = Not blnCalculating
     fraUMCScope.Enabled = Not blnCalculating
-    fraNET(0).Enabled = Not blnCalculating
+    fraNet(0).Enabled = Not blnCalculating
     fraLCMSFeatureStats.Enabled = Not blnCalculating
     fraOptionFrame(0).Enabled = Not blnCalculating
     fraOptionFrame(1).Enabled = Not blnCalculating
@@ -4975,7 +4975,7 @@ Private Sub cmdFindUMCsUsingNETConnections_Click()
     
     If cChkBox(chkUseLCMSFeatureFinder.Value) Then
         If mLCMSResultsMappingCount > 0 Then
-            BuildUMCsUsingmLCMSResultsMapping True
+            BuildUMCsUsingLCMSResultsMapping True
         Else
             FindUMCsUsingLCMSFeatureFinder True
         End If

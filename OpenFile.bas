@@ -2210,6 +2210,8 @@ End Sub
 
 Private Sub InitializeGelDataStructures(ByVal lngGelIndex As Long)
         
+    GelData(lngGelIndex).DataStatusBits = 0
+        
     With GelStatus(lngGelIndex)
         .Deleted = False
         .SourceDataRawFileType = rfcUnknown

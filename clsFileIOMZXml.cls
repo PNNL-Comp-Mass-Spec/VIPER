@@ -201,6 +201,8 @@ On Error GoTo ReadMZXMLFileErrorHandler
         .DataLines = 0
         .CSLines = 0
         .IsoLines = 0
+        
+        .DataStatusBits = 0
     End With
     
     Set mMZXmlReader = New MZXmlFileReaderDLL.mzXMLReader

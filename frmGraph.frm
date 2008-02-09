@@ -4020,6 +4020,7 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim lngScanClassRep As Long
     Dim dblGANETClassRep As Double, dblAMTMW As Double, dblAMTNet As Double, dblAMTNetStDev As Double
     Dim sngPeptideProphetProbability As Single
+    Dim strPeptideSequence As String
     
     ' The following two arrays are used to look up the mass of each MT tag, given the MT tag ID
     ' If the user specified a mass modification (like alkylation, ICAT, or N15), then the standard mass
@@ -4057,6 +4058,7 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim blnPairsPresent As Boolean
     Dim blnCorrectedIReportEREnabled As Boolean
     Dim blnContainsIsotopeTags As Boolean
+    Dim blnContainsMonoPlusMinus4Data As Boolean
     
     Dim objP1IndFastSearch As FastSearchArrayLong
     Dim objP2IndFastSearch As FastSearchArrayLong
@@ -4109,6 +4111,11 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
         blnContainsIsotopeTags = False
     End If
 
+    If (GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA) = GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA Then
+        blnContainsMonoPlusMinus4Data = True
+    Else
+        blnContainsMonoPlusMinus4Data = False
+    End If
 
     strSepChar = LookupDefaultSeparationCharacter()
     
@@ -4250,8 +4257,12 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
          strLineOut = strLineOut & "Isotope Tag Label" & strSepChar
     End If
 
+    If blnContainsMonoPlusMinus4Data Then
+         strLineOut = strLineOut & "PercentMembersNormal" & strSepChar & "PercentMembersMonoPlus4" & strSepChar & "PercentMembersMonoMinus4" & strSepChar
+    End If
+
     strLineOut = strLineOut & "PairIndex" & strSepChar & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
-    strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability"
+    strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar & "Peptide"
     
     With GelP_D_L(nMyIndex)
         If blnPairsPresent And .SearchDef.IReportEROptions.Enabled And .SearchDef.ComputeERScanByScan Then
@@ -4354,6 +4365,13 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 
                 strLineOut = strLineOut & strIsotopes & strSepChar
             End If
+        
+            If blnContainsMonoPlusMinus4Data Then
+                strLineOut = strLineOut & CStr(100 - .PercentMembersIReportMonoPlus4 - .PercentMembersIReportMonoMinus4) & strSepChar
+                strLineOut = strLineOut & CStr(.PercentMembersIReportMonoPlus4) & strSepChar
+                strLineOut = strLineOut & CStr(.PercentMembersIReportMonoMinus4) & strSepChar
+            End If
+        
         End With
         
          
@@ -4372,18 +4390,21 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 dblAMTNet = AMTData(lngMassTagIndexOriginal).NET
                 dblAMTNetStDev = AMTData(lngMassTagIndexOriginal).NETStDev
                 sngPeptideProphetProbability = AMTData(lngMassTagIndexOriginal).PeptideProphetProbability
+                strPeptideSequence = AMTData(lngMassTagIndexOriginal).Sequence
                 Debug.Assert AMTData(lngMassTagIndexOriginal).ID = udtUMCsInView(lngUMCIndex).IDIndex
             Else
                 dblAMTMW = 0
                 dblAMTNet = 0
                 dblAMTNetStDev = 0
                 sngPeptideProphetProbability = 0
+                strPeptideSequence = ""
             End If
         Else
             dblAMTMW = 0
             dblAMTNet = 0
             dblAMTNetStDev = 0
             sngPeptideProphetProbability = 0
+            strPeptideSequence = ""
         End If
         
         strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).IDIndex & strSepChar & Round(dblAMTMW, 6) & strSepChar & Round(dblAMTNet, 4) & strSepChar & Round(dblAMTNetStDev, 4)
@@ -4392,7 +4413,8 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
         strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).MemberHitCount
         strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).IDIsInternalStd
         strLineOutEnd = strLineOutEnd & strSepChar & Round(sngPeptideProphetProbability, 5)
-        
+        strLineOutEnd = strLineOutEnd & strSepChar & strPeptideSequence
+
         lngPairIndex = -1
         lngPairMatchCount = 0
         ReDim udtPairMatchStats(0)

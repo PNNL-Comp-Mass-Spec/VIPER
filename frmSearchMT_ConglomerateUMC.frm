@@ -956,7 +956,7 @@ Private Sub GenerateUniqueMatchStats(ByRef lngUniqueUMCCount As Long, ByRef lngU
                 ' Invalid MT tag index
                 Debug.Assert False
             End If
-    End If
+        End If
     Next lngIndex
     
     lngUniqueUMCCount = 0
@@ -3367,196 +3367,199 @@ Private Sub ShowHidePNNLMenus()
 End Sub
 
 Private Function ShowOrSaveResultsByIon(Optional strOutputFilePath As String = "", Optional blnDisplayResults As Boolean = True, Optional ByVal blnIncludeORFInfo As Boolean = True) As Long
-'---------------------------------------------------
-'report results, listing by data point (by ion)
-' If strOutputFilePath = "", then saves the results to a temporary file and shows them to the user using frmDataInfo
-' If strOutputFilePath is not blank, then saves the results to the file, but does not display them
-' If blnIncludeORFInfo = True, then attempts to connect to the database and retrieve the ORF information for each MT tag
-'
-' Returns 0 if no error, the error number if an error
-'---------------------------------------------------
-Dim fso As New FileSystemObject
-Dim ts As TextStream
-Dim strBaseMatchInfo As String
-Dim strLineOut As String
-Dim fname As String
-
-' Note: AMTRefs() is 1-based
-Dim AMTRefs() As String
-Dim AMTRefsCnt As Long
-Dim i As Long
-Dim lngExportCount As Long
-Dim strSepChar As String
-Dim dblIonMass As Double
-
-Dim lngAMTID() As Long      ' AMT ID's, copied from the globaly array AMTData()
-Dim lngIndex As Long
-
-' The following is used to lookup the mass of each MT tag, given the MT tag ID
-' It is initialized using AMTData()
-Dim objAMTIDFastSearch As New FastSearchArrayLong
-
-' Since AMT masses can be modified (e.g. alkylation), we must use the Pointer determined above
-'   to search mMTOrInd() to determine the correct match
-' We'll use objMTOrIndFastSearch, initializing using mMTOrInd()
-Dim objMTOrIndFastSearch As New FastSearchArrayLong
-
-' In order to add to the confusion, we must actually lookup the mMTOrInd() value in mMTInd()
-' This requires a 3rd FastSearch object, initialized using mMTInd()
-Dim objMTIndFastSearch As New FastSearchArrayLong
-
-' This last FastSearch object is used to lookup an ORF name
-Dim objORFNameFastSearch As New FastSearchArrayLong
-Dim blnSuccess As Boolean
-
-On Error GoTo err_ShowOrSaveResultsByIon
-
-If blnIncludeORFInfo Then
-    UpdateStatus "Sorting Protein lookup arrays"
-    If MTtoORFMapCount = 0 Then
-        blnIncludeORFInfo = InitializeORFInfo(False)
-    Else
-        ' We can use MTIDMap(), ORFIDMap(), and ORFRefNames() to get the ORF name
-        blnSuccess = objORFNameFastSearch.Fill(MTIDMap())
-        Debug.Assert blnSuccess
+    '---------------------------------------------------
+    'report results, listing by data point (by ion)
+    ' If strOutputFilePath = "", then saves the results to a temporary file and shows them to the user using frmDataInfo
+    ' If strOutputFilePath is not blank, then saves the results to the file, but does not display them
+    ' If blnIncludeORFInfo = True, then attempts to connect to the database and retrieve the ORF information for each MT tag
+    '
+    ' Returns 0 if no error, the error number if an error
+    '---------------------------------------------------
+    Dim fso As New FileSystemObject
+    Dim ts As TextStream
+    Dim strBaseMatchInfo As String
+    Dim strLineOut As String
+    Dim fname As String
+    
+    ' Note: AMTRefs() is 1-based
+    Dim AMTRefs() As String
+    Dim AMTRefsCnt As Long
+    Dim i As Long
+    Dim lngExportCount As Long
+    Dim strSepChar As String
+    Dim dblIonMass As Double
+    
+    Dim lngAMTID() As Long      ' AMT ID's, copied from the globaly array AMTData()
+    Dim lngIndex As Long
+    
+    ' The following is used to lookup the mass of each MT tag, given the MT tag ID
+    ' It is initialized using AMTData()
+    Dim objAMTIDFastSearch As New FastSearchArrayLong
+    
+    ' Since AMT masses can be modified (e.g. alkylation), we must use the Pointer determined above
+    '   to search mMTOrInd() to determine the correct match
+    ' We'll use objMTOrIndFastSearch, initializing using mMTOrInd()
+    Dim objMTOrIndFastSearch As New FastSearchArrayLong
+    
+    ' In order to add to the confusion, we must actually lookup the mMTOrInd() value in mMTInd()
+    ' This requires a 3rd FastSearch object, initialized using mMTInd()
+    Dim objMTIndFastSearch As New FastSearchArrayLong
+    
+    ' This last FastSearch object is used to lookup an ORF name
+    Dim objORFNameFastSearch As New FastSearchArrayLong
+    Dim blnSuccess As Boolean
+    
+    On Error GoTo err_ShowOrSaveResultsByIon
+    
+    If blnIncludeORFInfo Then
+        UpdateStatus "Sorting Protein lookup arrays"
+        If MTtoORFMapCount = 0 Then
+            blnIncludeORFInfo = InitializeORFInfo(False)
+        Else
+            ' We can use MTIDMap(), ORFIDMap(), and ORFRefNames() to get the ORF name
+            blnSuccess = objORFNameFastSearch.Fill(MTIDMap())
+            Debug.Assert blnSuccess
+        End If
     End If
-End If
-
-Select Case LastSearchTypeN14N15
-Case SEARCH_N14
-     NTypeStr = MOD_TKN_N14
-Case SEARCH_N15
-     NTypeStr = MOD_TKN_N15
-End Select
-
-UpdateStatus "Sorting MT lookup arrays"
-mKeyPressAbortProcess = 0
-
-' Construct the MT tag ID lookup arrays
-' We need to copy the AMT ID's from AMTData() to lngAMTID() since AMTData().ID is a String array that actually simply holds numbers
-If AMTCnt > 0 Then
-    ReDim lngAMTID(1 To AMTCnt)
-    For lngIndex = 1 To AMTCnt
-        lngAMTID(lngIndex) = CLngSafe(AMTData(lngIndex).ID)
-    Next lngIndex
-Else
-    ReDim lngAMTID(1 To 1)
-End If
-
-blnSuccess = objAMTIDFastSearch.Fill(lngAMTID())
-Debug.Assert blnSuccess
-
-blnSuccess = objMTOrIndFastSearch.Fill(mMTOrInd())
-Debug.Assert blnSuccess
-
-blnSuccess = objMTIndFastSearch.Fill(mMTInd())
-Debug.Assert blnSuccess
-
-Me.MousePointer = vbHourglass
-
-'temporary file for results output
-fname = GetTempFolder() & RawDataTmpFile
-If Len(strOutputFilePath) > 0 Then fname = strOutputFilePath
-Set ts = fso.OpenTextFile(fname, ForWriting, True)
-
-strSepChar = LookupDefaultSeparationCharacter()
-
-strLineOut = "Index" & strSepChar & "Scan" & strSepChar & "ChargeState" & strSepChar & "MonoMW" & strSepChar & "Abundance" & strSepChar
-strLineOut = strLineOut & "Fit" & strSepChar & "ER" & strSepChar & "LockerID" & strSepChar & "FreqShift" & strSepChar & "MassCorrection" & strSepChar & "MultiMassTagHitCount" & strSepChar
-strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods"
-
-If blnIncludeORFInfo Then strLineOut = strLineOut & strSepChar & "MultiORFCount" & strSepChar & "ORFName"
-ts.WriteLine strLineOut
-
-With GelData(CallerID)
-  If .CSLines > 0 Then ts.WriteLine "Charge State Data Block"
-  For i = 1 To .CSLines
-      If i Mod 500 = 0 Then
-        UpdateStatus "Preparing results: " & Trim(i) & " / " & Trim(.CSLines)
-        If mKeyPressAbortProcess > 1 Then Exit For
-      End If
-      If Not IsNull(.CSData(i).MTID) Then
-         If IsAMTReferenced(.CSData(i).MTID) Then
-            AMTRefsCnt = GetAMTRefFromString2(.CSData(i).MTID, AMTRefs())
-            If AMTRefsCnt > 0 Then
-            'for Charge State standard deviation is used on place of Fit
-                dblIonMass = .CSData(i).AverageMW
-                strBaseMatchInfo = i & strSepChar & .CSData(i).ScanNumber & strSepChar _
-                   & .CSData(i).Charge & strSepChar & .CSData(i).AverageMW & strSepChar _
-                   & .CSData(i).Abundance & strSepChar & .CSData(i).MassStDev & strSepChar
-                strBaseMatchInfo = strBaseMatchInfo & LookupExpressionRatioValue(CallerID, i, False)
-                If GelLM(CallerID).CSCnt > 0 Then   'we have mass correction
-                   strBaseMatchInfo = strBaseMatchInfo & strSepChar & GelLM(CallerID).CSLckID(i) & strSepChar _
-                        & GelLM(CallerID).CSFreqShift(i) & strSepChar _
-                        & GelLM(CallerID).CSMassCorrection(i)
-                Else
-                   strBaseMatchInfo = strBaseMatchInfo & strSepChar & strSepChar & strSepChar
-                End If
-            
-                WriteAMTMatchesForIon ts, strBaseMatchInfo, dblIonMass, AMTRefs(), AMTRefsCnt, objAMTIDFastSearch, objMTOrIndFastSearch, objMTIndFastSearch, lngExportCount, blnIncludeORFInfo, objORFNameFastSearch, strSepChar
-            End If
-         End If
-      End If
-  Next i
-  If .IsoLines > 0 Then ts.WriteLine "Isotopic Data Block"
-  For i = 1 To .IsoLines
-      If i Mod 500 = 0 Then
-        UpdateStatus "Preparing results: " & Trim(i) & " / " & Trim(.IsoLines)
-        If mKeyPressAbortProcess > 1 Then Exit For
-      End If
-      If Not IsNull(.IsoData(i).MTID) Then
-         If IsAMTReferenced(.IsoData(i).MTID) Then
-            AMTRefsCnt = GetAMTRefFromString2(.IsoData(i).MTID, AMTRefs())
-            If AMTRefsCnt > 0 Then
-                dblIonMass = .IsoData(i).MonoisotopicMW
-                strBaseMatchInfo = i & strSepChar & .IsoData(i).ScanNumber & strSepChar _
-                   & .IsoData(i).Charge & strSepChar & .IsoData(i).MonoisotopicMW & strSepChar _
-                   & .IsoData(i).Abundance & strSepChar & .IsoData(i).Fit & strSepChar
-                strBaseMatchInfo = strBaseMatchInfo & LookupExpressionRatioValue(CallerID, i, True)
-                If GelLM(CallerID).IsoCnt > 0 Then
-                   strBaseMatchInfo = strBaseMatchInfo & strSepChar & GelLM(CallerID).IsoLckID(i) & strSepChar _
-                         & GelLM(CallerID).IsoFreqShift(i) & strSepChar _
-                         & GelLM(CallerID).IsoMassCorrection(i)
-                Else
-                   strBaseMatchInfo = strBaseMatchInfo & strSepChar & strSepChar & strSepChar
-                End If
+    
+    Select Case LastSearchTypeN14N15
+    Case SEARCH_N14
+         NTypeStr = MOD_TKN_N14
+    Case SEARCH_N15
+         NTypeStr = MOD_TKN_N15
+    End Select
+    
+    UpdateStatus "Sorting MT lookup arrays"
+    mKeyPressAbortProcess = 0
+    
+    ' Construct the MT tag ID lookup arrays
+    ' We need to copy the AMT ID's from AMTData() to lngAMTID() since AMTData().ID is a String array that actually simply holds numbers
+    If AMTCnt > 0 Then
+        ReDim lngAMTID(1 To AMTCnt)
+        For lngIndex = 1 To AMTCnt
+            lngAMTID(lngIndex) = CLngSafe(AMTData(lngIndex).ID)
+        Next lngIndex
+    Else
+        ReDim lngAMTID(1 To 1)
+    End If
+    
+    blnSuccess = objAMTIDFastSearch.Fill(lngAMTID())
+    Debug.Assert blnSuccess
+    
+    blnSuccess = objMTOrIndFastSearch.Fill(mMTOrInd())
+    Debug.Assert blnSuccess
+    
+    blnSuccess = objMTIndFastSearch.Fill(mMTInd())
+    Debug.Assert blnSuccess
+    
+    Me.MousePointer = vbHourglass
+    
+    'temporary file for results output
+    fname = GetTempFolder() & RawDataTmpFile
+    If Len(strOutputFilePath) > 0 Then fname = strOutputFilePath
+    Set ts = fso.OpenTextFile(fname, ForWriting, True)
+    
+    strSepChar = LookupDefaultSeparationCharacter()
+    
+    strLineOut = "Index" & strSepChar & "Scan" & strSepChar & "ChargeState" & strSepChar & "MonoMW" & strSepChar & "Abundance" & strSepChar
+    strLineOut = strLineOut & "Fit" & strSepChar & "ER" & strSepChar & "LockerID" & strSepChar & "FreqShift" & strSepChar & "MassCorrection" & strSepChar & "MultiMassTagHitCount" & strSepChar
+    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "Peptide_Warning_PossiblyIncorrect"
+    
+    If blnIncludeORFInfo Then
+        strLineOut = strLineOut & strSepChar & "MultiORFCount" & strSepChar & "ORFName"
+    End If
+    
+    ts.WriteLine strLineOut
+    
+    With GelData(CallerID)
+      If .CSLines > 0 Then ts.WriteLine "Charge State Data Block"
+      For i = 1 To .CSLines
+          If i Mod 500 = 0 Then
+            UpdateStatus "Preparing results: " & Trim(i) & " / " & Trim(.CSLines)
+            If mKeyPressAbortProcess > 1 Then Exit For
+          End If
+          If Not IsNull(.CSData(i).MTID) Then
+             If IsAMTReferenced(.CSData(i).MTID) Then
+                AMTRefsCnt = GetAMTRefFromString2(.CSData(i).MTID, AMTRefs())
+                If AMTRefsCnt > 0 Then
+                'for Charge State standard deviation is used on place of Fit
+                    dblIonMass = .CSData(i).AverageMW
+                    strBaseMatchInfo = i & strSepChar & .CSData(i).ScanNumber & strSepChar _
+                       & .CSData(i).Charge & strSepChar & .CSData(i).AverageMW & strSepChar _
+                       & .CSData(i).Abundance & strSepChar & .CSData(i).MassStDev & strSepChar
+                    strBaseMatchInfo = strBaseMatchInfo & LookupExpressionRatioValue(CallerID, i, False)
+                    If GelLM(CallerID).CSCnt > 0 Then   'we have mass correction
+                       strBaseMatchInfo = strBaseMatchInfo & strSepChar & GelLM(CallerID).CSLckID(i) & strSepChar _
+                            & GelLM(CallerID).CSFreqShift(i) & strSepChar _
+                            & GelLM(CallerID).CSMassCorrection(i)
+                    Else
+                       strBaseMatchInfo = strBaseMatchInfo & strSepChar & strSepChar & strSepChar
+                    End If
                 
-                WriteAMTMatchesForIon ts, strBaseMatchInfo, dblIonMass, AMTRefs(), AMTRefsCnt, objAMTIDFastSearch, objMTOrIndFastSearch, objMTIndFastSearch, lngExportCount, blnIncludeORFInfo, objORFNameFastSearch, strSepChar
-            End If
-         End If
-      End If
-  Next i
-End With
-ts.Close
-
-UpdateStatus ""
-
-If blnDisplayResults Then
-   frmDataInfo.Tag = "EXP"
-   frmDataInfo.Show vbModal
-Else
-    ' MonroeMod
-    AddToAnalysisHistory CallerID, "Exported " & lngExportCount & " search results to text file: " & fname
-End If
-ShowOrSaveResultsByIon = 0
-
+                    WriteAMTMatchesForIon ts, strBaseMatchInfo, dblIonMass, AMTRefs(), AMTRefsCnt, objAMTIDFastSearch, objMTOrIndFastSearch, objMTIndFastSearch, lngExportCount, blnIncludeORFInfo, objORFNameFastSearch, strSepChar
+                End If
+             End If
+          End If
+      Next i
+      If .IsoLines > 0 Then ts.WriteLine "Isotopic Data Block"
+      For i = 1 To .IsoLines
+          If i Mod 500 = 0 Then
+            UpdateStatus "Preparing results: " & Trim(i) & " / " & Trim(.IsoLines)
+            If mKeyPressAbortProcess > 1 Then Exit For
+          End If
+          If Not IsNull(.IsoData(i).MTID) Then
+             If IsAMTReferenced(.IsoData(i).MTID) Then
+                AMTRefsCnt = GetAMTRefFromString2(.IsoData(i).MTID, AMTRefs())
+                If AMTRefsCnt > 0 Then
+                    dblIonMass = .IsoData(i).MonoisotopicMW
+                    strBaseMatchInfo = i & strSepChar & .IsoData(i).ScanNumber & strSepChar _
+                       & .IsoData(i).Charge & strSepChar & .IsoData(i).MonoisotopicMW & strSepChar _
+                       & .IsoData(i).Abundance & strSepChar & .IsoData(i).Fit & strSepChar
+                    strBaseMatchInfo = strBaseMatchInfo & LookupExpressionRatioValue(CallerID, i, True)
+                    If GelLM(CallerID).IsoCnt > 0 Then
+                       strBaseMatchInfo = strBaseMatchInfo & strSepChar & GelLM(CallerID).IsoLckID(i) & strSepChar _
+                             & GelLM(CallerID).IsoFreqShift(i) & strSepChar _
+                             & GelLM(CallerID).IsoMassCorrection(i)
+                    Else
+                       strBaseMatchInfo = strBaseMatchInfo & strSepChar & strSepChar & strSepChar
+                    End If
+                    
+                    WriteAMTMatchesForIon ts, strBaseMatchInfo, dblIonMass, AMTRefs(), AMTRefsCnt, objAMTIDFastSearch, objMTOrIndFastSearch, objMTIndFastSearch, lngExportCount, blnIncludeORFInfo, objORFNameFastSearch, strSepChar
+                End If
+             End If
+          End If
+      Next i
+    End With
+    ts.Close
+    
+    UpdateStatus ""
+    
+    If blnDisplayResults Then
+       frmDataInfo.Tag = "EXP"
+       frmDataInfo.Show vbModal
+    Else
+        ' MonroeMod
+        AddToAnalysisHistory CallerID, "Exported " & lngExportCount & " search results to text file: " & fname
+    End If
+    ShowOrSaveResultsByIon = 0
+    
 ShowOrSaveResultsCleanup:
-
-Set ts = Nothing
-Set fso = Nothing
-
-Set objAMTIDFastSearch = Nothing
-Set objMTOrIndFastSearch = Nothing
-Set objMTIndFastSearch = Nothing
-Set objORFNameFastSearch = Nothing
-
-Exit Function
-
+    
+    Set ts = Nothing
+    Set fso = Nothing
+    
+    Set objAMTIDFastSearch = Nothing
+    Set objMTOrIndFastSearch = Nothing
+    Set objMTIndFastSearch = Nothing
+    Set objORFNameFastSearch = Nothing
+    
+    Exit Function
+    
 err_ShowOrSaveResultsByIon:
-Debug.Assert False
-ShowOrSaveResultsByIon = Err.Number
-LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.ShowOrSaveResultsByIon"
-Resume ShowOrSaveResultsCleanup
+    Debug.Assert False
+    ShowOrSaveResultsByIon = Err.Number
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.ShowOrSaveResultsByIon"
+    Resume ShowOrSaveResultsCleanup
 
 End Function
 
@@ -3590,6 +3593,7 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     Dim dblMatchNET As Double
     Dim strMatchID As String
     Dim strInternalStdDescription As String
+    Dim strPeptideSequence As String
     Dim sngPeptideProphetProbability As Single
     
     Dim dblMassErrorPPM As Double
@@ -3649,7 +3653,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar
-    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar
+    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar & "Peptide" & strSepChar
     strLineOut = strLineOut & "TIC_from_Raw_Data" & strSepChar & "Deisotoping_Peak_Count"
     
     With GelP_D_L(CallerID)
@@ -3673,6 +3677,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
                 dblMatchNET = .NET
                 strMatchID = .SeqID
                 strInternalStdDescription = .Description
+                strPeptideSequence = .PeptideSequence
             End With
             sngPeptideProphetProbability = 0
         Else
@@ -3692,6 +3697,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             strMatchID = AMTData(lngMassTagIndexOriginal).ID
             
             sngPeptideProphetProbability = AMTData(lngMassTagIndexOriginal).PeptideProphetProbability
+            strPeptideSequence = AMTData(lngMassTagIndexOriginal).Sequence
         End If
     
         With GelUMC(CallerID).UMCs(lngUMCIndexOriginal)
@@ -3764,6 +3770,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
         strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).DelSLiC, 4)
         strLineOutEnd = strLineOutEnd & strSepChar & mUMCMatchStats(mgInd).IDIsInternalStd
         strLineOutEnd = strLineOutEnd & strSepChar & Round(sngPeptideProphetProbability, 5)
+        strLineOutEnd = strLineOutEnd & strSepChar & strPeptideSequence
         
         lngScanIndex = LookupScanNumberRelativeIndex(CallerID, lngScanClassRep)
         If lngScanIndex = 0 Then
@@ -4221,6 +4228,7 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
     
     Dim lngOriginalAMTIndex As Long             ' Index of the AMT in AMTData().MW, etc.
     Dim lngMTOrIndIndexOriginal As Long         ' Index of the AMT in mMTOrInd()
+    Dim lngMassTagIndexOriginal As Long         ' Index of teh AMT in AMTData()
     
     Dim lngMatchingIndices() As Long            ' Used with both objAMTIDFastSearch and objMTOrIndFastSearch
     Dim lngMatchCount As Long
@@ -4231,7 +4239,8 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
     Dim lngPointerIndex As Long
     
     Dim dblAMTMass As Double
-    Dim dblBestAMTMass As Double, dblBestAMTMassDiff As Double, strBestAMTMods As String
+    Dim dblBestAMTMass As Double, dblBestAMTMassDiff As Double
+    Dim strBestAMTMods As String, strBestSequence As String
     
     ' AMTRefsCnt is the number of AMTs that this ion matched (aka MultiMassTagHitCount)
     strBaseMatchInfo = strLineOutPrefix & strSepChar & AMTRefsCnt
@@ -4260,6 +4269,8 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
                     If objMTIndFastSearch.FindMatchingIndices(lngMTOrIndIndexOriginal, lngMTIndMatchingIndices(), lngMTIndMatchCount) Then
                         ' Match found
                         
+                        lngMassTagIndexOriginal = mMTOrInd(lngMTIndMatchingIndices(0))
+            
                         If LastSearchTypeN14N15 = SEARCH_N14 Then
                             ' N14
                             dblAMTMass = mMTMWN14(lngMTIndMatchingIndices(0))
@@ -4272,11 +4283,26 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
                             dblBestAMTMass = dblAMTMass
                             dblBestAMTMassDiff = Abs(dblAMTMass - dblIonMass)
                             strBestAMTMods = mMTMods(lngMTOrIndIndexOriginal)
+                            
+                            If lngMassTagIndexOriginal <= AMTCnt Then
+                                strBestSequence = AMTData(lngMassTagIndexOriginal).Sequence
+                            Else
+                                ' Invalid MT tag index
+                                Debug.Assert False
+                            End If
+                           
                         Else
                             If Abs(dblAMTMass - dblIonMass) < dblBestAMTMassDiff Then
                                 dblBestAMTMass = dblAMTMass
                                 dblBestAMTMassDiff = Abs(dblAMTMass - dblIonMass)
                                 strBestAMTMods = mMTMods(lngMTOrIndIndexOriginal)
+                                
+                                If lngMassTagIndexOriginal <= AMTCnt Then
+                                    strBestSequence = AMTData(lngMassTagIndexOriginal).Sequence
+                                Else
+                                    ' Invalid MT tag index
+                                    Debug.Assert False
+                                End If
                             End If
                         End If
                     End If
@@ -4298,7 +4324,7 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
         If Len(strBestAMTMods) > 0 Then
             strLineOut = strLineOut & " " & strBestAMTMods
         End If
-        strLineOut = strLineOut & strSepChar
+        strLineOut = strLineOut & strSepChar & strBestSequence & strSepChar
         
         If Not blnIncludeORFInfo Then
             ts.WriteLine strLineOut

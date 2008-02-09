@@ -2482,7 +2482,7 @@ Public Sub CopyLegacyCSToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, B
          
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
          
-        .AdditionalIntValue = 0
+        .IReportTagType = irtIReportTagTypeConstants.irtNone
         .AdditionalValue2 = 0
         
         On Error Resume Next
@@ -2525,7 +2525,7 @@ Public Sub CopyLegacyIso2005ToCurrentIso(ByRef udtIsotopicData As udtIsotopicDat
       
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
          
-        .AdditionalIntValue = 0
+        .IReportTagType = irtIReportTagTypeConstants.irtNone
         .AdditionalValue2 = 0
         
         .MTID = udtIsotopicDataOld.MTID
@@ -2570,7 +2570,7 @@ Public Sub CopyLegacyIsoToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, 
                  
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
          
-        .AdditionalIntValue = 0
+        .IReportTagType = irtIReportTagTypeConstants.irtNone
         .AdditionalValue2 = 0
         
         On Error Resume Next

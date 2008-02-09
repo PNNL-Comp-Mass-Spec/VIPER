@@ -2795,6 +2795,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
     
     Dim i As Long, j As Long
     Dim lngMaxMemberIndex As Long
+    Dim intTagIndex As Integer
     
     Dim UMCMembersMaxIndex As Long
     Dim UMCMembersMW() As Double                   ' 0-based array; MW values for each of the LC-MS Features members
@@ -2833,6 +2834,10 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
     Dim strCaptionSaved As String
     Dim blnShowProgressUsingFormCaption As Boolean
     
+    Dim blnComputeIsoStats As Boolean
+    Dim UMCMemberIsoStats(IREPORT_TAG_TYPE_CONSTANT_COUNT - 1) As Long
+    Dim eIReportTagType As irtIReportTagTypeConstants
+        
     On Error GoTo err_CalculateClasses
     
     If blnUseProgressForm Then
@@ -2864,6 +2869,13 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
     ReDim ChargeStateBasedFit(INITIAL_RESERVE_COUNT)
     ReDim ChargeStateBasedOrgIndex(INITIAL_RESERVE_COUNT)
     
+    
+    If (GelData(lngGelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA) = GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA Then
+        blnComputeIsoStats = True
+    Else
+        blnComputeIsoStats = False
+    End If
+    
     With GelUMC(lngGelIndex)
         ISMWField = .def.MWField
         If .UMCCnt > 0 Then
@@ -2874,18 +2886,26 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                    ' and populate the UMCMembersMW, UMCMembersScan, etc. arrays
                    '
                    ' Also determine which charge states are present
+                   ' In addition, keep track of stats related to IReportTagType
                    '
                    .MinScan = glHugeLong:               .MaxScan = -glHugeLong
                    .MinMW = glHugeDouble:               .MaxMW = -glHugeDouble
+
+                   If blnComputeIsoStats Then
+                        For intTagIndex = 0 To IREPORT_TAG_TYPE_CONSTANT_COUNT - 1
+                            UMCMemberIsoStats(intTagIndex) = 0
+                        Next intTagIndex
+                   End If
+
                    If .ClassCount > 0 Then
                       lngMaxMemberIndex = .ClassCount - 1
                       UMCMembersMaxIndex = lngMaxMemberIndex
                       Do While UMCMembersMaxIndex > UBound(UMCMembersMW)
-                        ReDim UMCMembersMW(UBound(UMCMembersMW) * 2)
-                        ReDim UMCMembersAbu(UBound(UMCMembersMW))
-                        ReDim UMCMembersScan(UBound(UMCMembersMW))
-                        ReDim UMCMembersFit(UBound(UMCMembersMW))
-                        ReDim UMCMembersCharge(UBound(UMCMembersMW))
+                          ReDim UMCMembersMW(UBound(UMCMembersMW) * 2)
+                          ReDim UMCMembersAbu(UBound(UMCMembersMW))
+                          ReDim UMCMembersScan(UBound(UMCMembersMW))
+                          ReDim UMCMembersFit(UBound(UMCMembersMW))
+                          ReDim UMCMembersCharge(UBound(UMCMembersMW))
                       Loop
                       Erase ChargeStatePresent()       ' Reset all to 0
                       
@@ -2907,13 +2927,16 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                                UMCMembersScan(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).ScanNumber
                                UMCMembersFit(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).MassStDev        ' Isotopic fit is not defined for charge state data; use standard deviation instead
                                UMCMembersCharge(j) = GelData(lngGelIndex).CSData(.ClassMInd(j)).Charge
+                               eIReportTagType = irtNone
                           Case glIsoType
                                UMCMembersMW(j) = GetIsoMass(GelData(lngGelIndex).IsoData(.ClassMInd(j)), ISMWField)
                                UMCMembersAbu(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Abundance
                                UMCMembersScan(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).ScanNumber
                                UMCMembersFit(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Fit
                                UMCMembersCharge(j) = GelData(lngGelIndex).IsoData(.ClassMInd(j)).Charge
+                               eIReportTagType = GelData(lngGelIndex).IsoData(.ClassMInd(j)).IReportTagType
                           End Select
+                          
                           If UMCMembersMW(j) < .MinMW Then .MinMW = UMCMembersMW(j)
                           If UMCMembersMW(j) > .MaxMW Then .MaxMW = UMCMembersMW(j)
                           If UMCMembersScan(j) < .MinScan Then .MinScan = UMCMembersScan(j)
@@ -2922,6 +2945,14 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                              ChargeStatePresent(UMCMembersCharge(j)) = ChargeStatePresent(UMCMembersCharge(j)) + 1
                           Else
                              ChargeStatePresent(MAX_CHARGE_STATE) = ChargeStatePresent(MAX_CHARGE_STATE) + 1
+                          End If
+                          
+                          If blnComputeIsoStats Then
+                             If eIReportTagType > 0 And eIReportTagType < IREPORT_TAG_TYPE_CONSTANT_COUNT Then
+                                UMCMemberIsoStats(eIReportTagType) = UMCMemberIsoStats(eIReportTagType) + 1
+                             Else
+                                UMCMemberIsoStats(irtIReportTagTypeConstants.irtNone) = UMCMemberIsoStats(irtIReportTagTypeConstants.irtNone) + 1
+                             End If
                           End If
                       Next j
                    End If
@@ -3120,7 +3151,16 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                         End With
                     End If
                     
-               Else                             'something is wrong
+                    If blnComputeIsoStats Then
+                        ' Populate the .PercentMembersIReport values; these are used when finding pairs to force certain UMCs to only be heavy or only be light members of pairs
+                        .UMCs(i).PercentMembersIReportMonoPlus4 = CByte(UMCMemberIsoStats(irtIReportTagTypeConstants.irtMonoPlus4) * 100# / .UMCs(i).ClassCount)
+                        .UMCs(i).PercentMembersIReportMonoMinus4 = CByte(UMCMemberIsoStats(irtIReportTagTypeConstants.irtMonoMinus4) * 100# / .UMCs(i).ClassCount)
+                    Else
+                        .UMCs(i).PercentMembersIReportMonoPlus4 = 0
+                        .UMCs(i).PercentMembersIReportMonoMinus4 = 0
+                    End If
+                    
+               Else     ' ClassCount is 0; something is wrong
                     ' This code shouldn't be reached
                     Debug.Assert False
                     With .UMCs(i)
@@ -3131,6 +3171,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                         .MaxScan = -1
                     End With
                End If
+               
                If i Mod 500 = 0 Then
                   If blnShowProgressUsingFormCaption Then
                       frmCallingForm.Caption = "Updating LC-MS Feature Stats: " & Trim(i) & " / " & (.UMCCnt)

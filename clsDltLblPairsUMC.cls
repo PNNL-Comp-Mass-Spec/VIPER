@@ -116,7 +116,7 @@ Public Sub CalcDltLblPairsER_UMC(ByVal lngGelIndex As Long, ByRef strMessage As 
     
     lngPairCountWithOutliers = 0
     dblOutlierFractionSum = 0
-    
+   
     For lngPairIndex = 0 To GelP_D_L(mGelIndex).PCnt - 1
         CalcDltLblPairsER_UMCSinglePair lngPairIndex, lngPairCountWithOutliers, dblOutlierFractionSum
         
@@ -913,7 +913,7 @@ On Error GoTo CalcDltLblPairsERScanByScanErrorHandler
                     If dblERList(lngIndex) > 0 Then
                         dblERListSymmetricERs(lngIndex) = ConvertRatioERtoAltER(dblERList(lngIndex))
                     Else
-                        Debug.Assert False
+                        ' Ratio ER is <= 0; simply store a value of 0 in dblERListSymmetricERs()
                         dblERListSymmetricERs(lngIndex) = 0
                     End If
                 Next lngIndex
@@ -1146,67 +1146,97 @@ On Error GoTo CalcDltLblPairsERViaIReportErrorHandler
             ' Uncomment for debugging
             'Debug.Print dblMonoIsoMass & vbTab & dblAbuMonoIso & vbTab & dblAbu2DaRaw & vbTab & dblAbu4DaRaw
             
-            With glbPreferencesExpanded.PairSearchOptions.SearchDef.IReportEROptions
-                With .NaturalAbundanceRatio2Coeff
+            With glbPreferencesExpanded.PairSearchOptions.SearchDef
+                                
+                If .IgnoreMonoPlus2AbundanceInIReportERCalc <> 0 Then
+                    ' Ignore I2
+                    dblAbu2DaRaw = 0
+                End If
+                
+                With .IReportEROptions.NaturalAbundanceRatio2Coeff
                     dblM2OverM0 = .Multiplier * dblMonoIsoMass ^ .Exponent
                 End With
                 
-                With .NaturalAbundanceRatio4Coeff
+                With .IReportEROptions.NaturalAbundanceRatio4Coeff
                     dblM4OverM0 = .Multiplier * dblMonoIsoMass ^ .Exponent
                 End With
-                
-                ' B1 = I2-(M2/M0)*I0
-                dblAbu2DaCorrected = dblAbu2DaRaw - dblM2OverM0 * dblAbuMonoIso
-                
-                ' In certain cases, dblAbu2DaCorrected will be negative, which messes up all the subsequent math
-                ' For example, if dblAbuMonoIso is much greater than dblAbu2DaRaw, then dblAbu2DaCorrected is < 0
-                ' Additionally, if dblAbu2DaRaw is 0 to start with, then dblAbu2DaCorrected will definitely be < 0
-                ' Thus, assure dblAbu2DaCorrected is >= 0
-                If dblAbu2DaCorrected < 0 Then
-                    dblAbu2DaCorrected = 0
-                End If
-                
-                ' B2 = I4-(M2/M0)*B1-(M4/M0)*I0
-                ' Simplified form: = dblAbu4DaRaw -                                    dblM4OverM0 * dblAbuMonoIso
-                dblAbu4DaCorrected = dblAbu4DaRaw - dblM2OverM0 * dblAbu2DaCorrected - dblM4OverM0 * dblAbuMonoIso
-                
-                ' f = 2*B2/(B1+2B2)
-                sngLabellingEfficiency = 2 * dblAbu4DaCorrected / (dblAbu2DaCorrected + 2 * dblAbu4DaCorrected)
-                
+            End With
+            
+            ' B1 = I2-(M2/M0)*I0
+            dblAbu2DaCorrected = dblAbu2DaRaw - dblM2OverM0 * dblAbuMonoIso
+            
+            ' In certain cases, dblAbu2DaCorrected will be negative, which messes up all the subsequent math
+            ' For example, if dblAbuMonoIso is much greater than dblAbu2DaRaw, then dblAbu2DaCorrected is < 0
+            ' Additionally, if dblAbu2DaRaw is 0 to start with, then dblAbu2DaCorrected will definitely be < 0
+            ' Thus, assure dblAbu2DaCorrected is >= 0
+            If dblAbu2DaCorrected < 0 Then
+                dblAbu2DaCorrected = 0
+            End If
+            
+            ' B2 = I4-(M2/M0)*B1-(M4/M0)*I0
+            ' Simplified form: = dblAbu4DaRaw -                                    dblM4OverM0 * dblAbuMonoIso
+            dblAbu4DaCorrected = dblAbu4DaRaw - dblM2OverM0 * dblAbu2DaCorrected - dblM4OverM0 * dblAbuMonoIso
+            
+            
+            ' Check for B2 being negative
+            ' If so, and if B1 > 0, then recompute using B2 = I4-(M4/M0)*I0
+            If dblAbu4DaCorrected <= 0 And dblAbu2DaCorrected > 0 Then
+                dblAbu4DaCorrected = dblAbu4DaRaw - dblM4OverM0 * dblAbuMonoIso
+                 
                 If dblAbu4DaCorrected <= 0 Then
-                    ' Condition 1
-                    ' False pair
-                    dblER = ER_CALC_ERR
+                    ' Assign the raw I+4 abundance to B2
+                    dblAbu4DaCorrected = dblAbu4DaRaw
+                End If
+            End If
+            
+            ' f = (2*B2) / (B1 + 2*B2)
+            sngLabellingEfficiency = 2 * dblAbu4DaCorrected / (dblAbu2DaCorrected + 2 * dblAbu4DaCorrected)
+            
+            If dblAbu4DaCorrected <= 0 Then
+                ' Condition 1
+                ' False pair since B2 is <= 0
+                dblER = ER_CALC_ERR
+                sngLogERCorrectedForF = CDblToSng(ER_CALC_ERR)
+                sngLabellingEfficiency = 0
+                
+            ElseIf dblAbu2DaCorrected < 0.15 * dblAbu4DaCorrected Then
+                ' Condition 2
+                ' B1 is less than 15% of B2; don't use it
+                
+                udtScanDetailsHv.Abundance = Round(1.15 * dblAbu4DaCorrected, 0)
+                
+                ' ER = I0 / (1.15 * B2)
+                dblER = dblAbuMonoIso / udtScanDetailsHv.Abundance
+                
+                If dblER > 0 Then
+                    sngLogERCorrectedForF = CDblToSng(Log2(dblER))
+                Else
                     sngLogERCorrectedForF = CDblToSng(ER_CALC_ERR)
-                    sngLabellingEfficiency = 0
-                ElseIf dblAbu2DaCorrected < 0.15 * dblAbu4DaCorrected Then
-                    ' Condition 2
-                    udtScanDetailsHv.Abundance = Round(1.15 * dblAbu4DaCorrected, 0)
+                End If
+                sngLabellingEfficiency = 1
+            Else
+                ' Condition 3
+                ' B1 is greater than 15% of B2
+                ' Continue if B1 + B2 is > 0
+                
+                If dblAbu2DaCorrected + dblAbu4DaCorrected > 0 Then
+                    udtScanDetailsHv.Abundance = Round(dblAbu2DaCorrected + dblAbu4DaCorrected, 0)
+                    
+                    ' ER = I0 / (I2+I4)
                     dblER = dblAbuMonoIso / udtScanDetailsHv.Abundance
-                    If dblER > 0 Then
-                        sngLogERCorrectedForF = CDblToSng(Log2(dblER))
+                    
+                    ' ER_Corr = ER * (2*F - F^2) - (1-F)^2
+                    dblERCorrectedForF = dblER * (2 * sngLabellingEfficiency - sngLabellingEfficiency ^ 2) - (1 - sngLabellingEfficiency) ^ 2
+                    If dblERCorrectedForF > 0 Then
+                        sngLogERCorrectedForF = CDblToSng(Log2(dblERCorrectedForF))
                     Else
                         sngLogERCorrectedForF = CDblToSng(ER_CALC_ERR)
                     End If
-                    sngLabellingEfficiency = 1
                 Else
-                    ' Condition 3
-                    If dblAbu2DaCorrected + dblAbu4DaCorrected > 0 Then
-                        udtScanDetailsHv.Abundance = Round(dblAbu2DaCorrected + dblAbu4DaCorrected, 0)
-                        dblER = dblAbuMonoIso / udtScanDetailsHv.Abundance
-                        
-                        dblERCorrectedForF = dblER * (2 * sngLabellingEfficiency - sngLabellingEfficiency ^ 2) - (1 - sngLabellingEfficiency) ^ 2
-                        If dblERCorrectedForF > 0 Then
-                            sngLogERCorrectedForF = CDblToSng(Log2(dblERCorrectedForF))
-                        Else
-                            sngLogERCorrectedForF = CDblToSng(ER_CALC_ERR)
-                        End If
-                    Else
-                        ' Error; leave dblER as ER_CALC_ERR
-                    End If
+                    ' Error; leave dblER as ER_CALC_ERR
                 End If
-                
-            End With
+            End If
+
         End If
     End If
     

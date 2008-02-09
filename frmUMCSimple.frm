@@ -224,14 +224,14 @@ Begin VB.Form frmUMCSimple
       TabCaption(1)   =   "Auto Refine Options"
       TabPicture(1)   =   "frmUMCSimple.frx":0059
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "fraSplitUMCsOptions"
-      Tab(1).Control(1)=   "fraOptionFrame(2)"
+      Tab(1).Control(0)=   "fraOptionFrame(2)"
+      Tab(1).Control(1)=   "fraSplitUMCsOptions"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "Adv Class Stats"
       TabPicture(2)   =   "frmUMCSimple.frx":0075
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraClassMassTopX"
-      Tab(2).Control(1)=   "fraClassAbundanceTopX"
+      Tab(2).Control(0)=   "fraClassAbundanceTopX"
+      Tab(2).Control(1)=   "fraClassMassTopX"
       Tab(2).ControlCount=   2
       Begin VB.CheckBox chkRequireMatchingIsotopeTag 
          Caption         =   "Require matching isotope label tag (e.g. N14 or N15)"

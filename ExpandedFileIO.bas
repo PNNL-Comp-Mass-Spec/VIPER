@@ -1207,6 +1207,9 @@ Private Sub CopyDeltaLabelPairs2003ToCurrent(OldDeltaLabelPairs As IsoPairsDltLb
             
             .RequireMatchingIsotopeTagLabels = True
             
+            .MonoPlusMinusThresholdForceHeavyOrLight = 66
+            .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
+            
             .AverageERsAllChargeStates = False
             .AverageERsWeightingMode = aewAbundance
         End With
@@ -1284,6 +1287,9 @@ Private Sub CopyDeltaLabelPairs2004aToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             
             .RequireMatchingIsotopeTagLabels = True
             
+            .MonoPlusMinusThresholdForceHeavyOrLight = 66
+            .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
+            
             .AverageERsAllChargeStates = OldDeltaLabelPairs.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.AverageERsWeightingMode
         End With
@@ -1360,6 +1366,9 @@ Private Sub CopyDeltaLabelPairs2004bToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             
             .RequireMatchingIsotopeTagLabels = True
             
+            .MonoPlusMinusThresholdForceHeavyOrLight = 66
+            .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
+            
             .AverageERsAllChargeStates = OldDeltaLabelPairs.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.AverageERsWeightingMode
         End With
@@ -1417,6 +1426,9 @@ Private Sub CopyDeltaLabelPairs2004cToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ScanByScanAverageIsNotWeighted = False
             
             .RequireMatchingIsotopeTagLabels = True
+            
+            .MonoPlusMinusThresholdForceHeavyOrLight = 66
+            .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
             
             .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode
@@ -1481,6 +1493,9 @@ Private Sub CopyDeltaLabelPairs2004dToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ScanByScanAverageIsNotWeighted = False
             
             .RequireMatchingIsotopeTagLabels = True
+            
+            .MonoPlusMinusThresholdForceHeavyOrLight = 66
+            .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
             
             .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode
@@ -1552,6 +1567,9 @@ Private Sub CopyDeltaLabelPairs2004eToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ScanByScanAverageIsNotWeighted = False
             
             .RequireMatchingIsotopeTagLabels = True
+            
+            .MonoPlusMinusThresholdForceHeavyOrLight = 66
+            .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
             
             .AverageERsAllChargeStates = OldDeltaLabelPairs.SearchDef.AverageERsAllChargeStates
             .AverageERsWeightingMode = OldDeltaLabelPairs.SearchDef.AverageERsWeightingMode

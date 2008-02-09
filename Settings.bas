@@ -63,6 +63,10 @@ Private Sub AddKeyValueSettingBln(ByRef strKeys() As String, ByRef strValues() A
     AddKeyValueSetting strKeys, strValues, intKeyValueCount, strKey, Trim(Str(blnValue)), blnResetList
 End Sub
 
+Private Sub AddKeyValueSettingByt(ByRef strKeys() As String, ByRef strValues() As String, ByRef intKeyValueCount As Integer, ByRef strKey As String, ByRef bytValue As Byte, Optional ByVal blnResetList As Boolean)
+    AddKeyValueSetting strKeys, strValues, intKeyValueCount, strKey, Trim(Str(bytValue)), blnResetList
+End Sub
+
 Private Sub AddKeyValueSettingSng(ByRef strKeys() As String, ByRef strValues() As String, ByRef intKeyValueCount As Integer, ByRef strKey As String, ByRef sngValue As Single, Optional ByVal blnResetList As Boolean)
     AddKeyValueSetting strKeys, strValues, intKeyValueCount, strKey, Trim(Str(sngValue)), blnResetList
 End Sub
@@ -365,6 +369,28 @@ Private Function GetIniFileSettingBln(objIniStuff As clsIniStuff, strSection As 
         GetIniFileSettingBln = CBoolSafe(Trim(strSetting))
     Else
         GetIniFileSettingBln = blnDefault
+    End If
+
+End Function
+
+Private Function GetIniFileSettingByt(objIniStuff As clsIniStuff, strSection As String, strKey As String, Optional bytDefault As Byte = 0) As Byte
+    Dim strSetting As String
+    Dim strDefault As String
+    Dim intValue As Integer
+    
+    strDefault = Str(bytDefault)
+
+    If objIniStuff.ReadValue(strSection, strKey, strDefault, strSetting) Then
+        intValue = CIntSafe(Trim(strSetting))
+        If intValue <= 0 Then
+            GetIniFileSettingByt = 0
+        ElseIf intValue >= 255 Then
+            GetIniFileSettingByt = 255
+        Else
+            GetIniFileSettingByt = CByte(intValue)
+        End If
+    Else
+        GetIniFileSettingByt = bytDefault
     End If
 
 End Function
@@ -842,6 +868,9 @@ On Error GoTo LoadSettingsFileHandler
         .UsePEKBasedERValues = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UsePEKBasedERValues", .UsePEKBasedERValues)
         .UseMassTagsWithNullMass = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseMassTagsWithNullMass", .UseMassTagsWithNullMass)
         .UseMassTagsWithNullNET = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseMassTagsWithNullNET", .UseMassTagsWithNullNET)
+        
+        .IReportAutoAddMonoPlus4AndMinus4Data = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data)
+        
         .UseUMCConglomerateNET = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseUMCConglomerateNET", .UseUMCConglomerateNET)
         .NetAdjustmentUsesN15AMTMasses = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "NetAdjustmentUsesN15AMTMasses", .NetAdjustmentUsesN15AMTMasses)
         .NetAdjustmentMinHighNormalizedScore = GetIniFileSettingSng(IniStuff, "ExpandedPreferences", "NetAdjustmentMinHighNormalizedScore", .NetAdjustmentMinHighNormalizedScore)
@@ -1092,6 +1121,9 @@ On Error GoTo LoadSettingsFileHandler
             .ScanByScanAverageIsNotWeighted = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "ScanByScanAverageIsNotWeighted", .ScanByScanAverageIsNotWeighted)
             
             .RequireMatchingIsotopeTagLabels = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "RequireMatchingIsotopeTagLabels", .RequireMatchingIsotopeTagLabels)
+            
+            .MonoPlusMinusThresholdForceHeavyOrLight = GetIniFileSettingByt(IniStuff, "PairSearchOptions", "MonoPlusMinusThresholdForceHeavyOrLight", .MonoPlusMinusThresholdForceHeavyOrLight)
+            .IgnoreMonoPlus2AbundanceInIReportERCalc = GetIniFileSettingByt(IniStuff, "PairSearchOptions", "IgnoreMonoPlus2AbundanceInIReportERCalc", .IgnoreMonoPlus2AbundanceInIReportERCalc)
             
             .AverageERsAllChargeStates = GetIniFileSettingBln(IniStuff, "PairSearchOptions", "AverageERsAllChargeStates", .AverageERsAllChargeStates)
             .AverageERsWeightingMode = GetIniFileSettingInt(IniStuff, "PairSearchOptions", "AverageERsWeightingMode", CInt(.AverageERsWeightingMode))
@@ -1891,6 +1923,7 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UsePEKBasedERValues", .UsePEKBasedERValues
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullMass", .UseMassTagsWithNullMass
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullNET", .UseMassTagsWithNullNET
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseUMCConglomerateNET", .UseUMCConglomerateNET
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "NetAdjustmentUsesN15AMTMasses", .NetAdjustmentUsesN15AMTMasses
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "NetAdjustmentMinHighNormalizedScore", .NetAdjustmentMinHighNormalizedScore
@@ -2156,6 +2189,9 @@ On Error GoTo SaveSettingsFileHandler
             AddKeyValueSettingBln sKeys, sVals, iKVCount, "ScanByScanAverageIsNotWeighted", .ScanByScanAverageIsNotWeighted
             
             AddKeyValueSettingBln sKeys, sVals, iKVCount, "RequireMatchingIsotopeTagLabels", .RequireMatchingIsotopeTagLabels
+            
+            AddKeyValueSettingByt sKeys, sVals, iKVCount, "MonoPlusMinusThresholdForceHeavyOrLight", .MonoPlusMinusThresholdForceHeavyOrLight
+            AddKeyValueSettingByt sKeys, sVals, iKVCount, "IgnoreMonoPlus2AbundanceInIReportERCalc", .IgnoreMonoPlus2AbundanceInIReportERCalc
             
             AddKeyValueSettingBln sKeys, sVals, iKVCount, "AverageERsAllChargeStates", .AverageERsAllChargeStates
             AddKeyValueSettingInt sKeys, sVals, iKVCount, "AverageERsWeightingMode", .AverageERsWeightingMode
@@ -3245,6 +3281,8 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
             .UseMassTagsWithNullMass = False
             .UseMassTagsWithNullNET = False
             
+            .IReportAutoAddMonoPlus4AndMinus4Data = True
+            
             .UseUMCConglomerateNET = True
             .NetAdjustmentUsesN15AMTMasses = False
             .NetAdjustmentMinHighNormalizedScore = 2.5
@@ -3507,7 +3545,10 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .ComputeERScanByScan = True
                     .ScanByScanAverageIsNotWeighted = False
                     
-                    .RequireMatchingIsotopeTagLabels = True
+                    .RequireMatchingIsotopeTagLabels = False
+                    
+                    .MonoPlusMinusThresholdForceHeavyOrLight = 66
+                    .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
                     
                     .AverageERsAllChargeStates = True
                     .AverageERsWeightingMode = aewAbundance
@@ -3532,7 +3573,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .N15PercentIncorporationMinimum = 95
                     .N15PercentIncorporationMaximum = 95
                     .N15PercentIncorporationStep = 1
-                
+                    
                 End With
                 
                 .AutoExcludeOutOfERRange = False

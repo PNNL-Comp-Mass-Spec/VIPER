@@ -68,6 +68,13 @@ Public Enum iltIsotopeLabelTagConstants
     iltC13 = 7
 End Enum
 
+Public Const IREPORT_TAG_TYPE_CONSTANT_COUNT As Integer = 3
+Public Enum irtIReportTagTypeConstants
+    irtNone = 0
+    irtMonoPlus4 = 1                    ' Species should be the heavy member of a pair
+    irtMonoMinus4 = 2                   ' Species should be the light member of a pair
+End Enum
+
 'global data types (this information is not saved with the .Gel file)
 Public Type GelState
     Deleted As Integer
@@ -471,9 +478,11 @@ Public Type udtIsotopicDataType
 
     ExpressionRatio As Single
     
-    IsotopeLabel As Integer         ' 2 bytes Actually type iltIsotopeLabelTagConstants (was previously part of AdditionalValue1, which was a single)
+    IsotopeLabel As Integer         ' 2 bytes; Actually type iltIsotopeLabelTagConstants (was previously part of AdditionalValue1, which was a single)
 
-    AdditionalIntValue As Integer   ' New for this version; was previously part of AdditionalValue1, which was a single)
+    IReportTagType As Byte          ' 1 byte; Actually type irtIReportTagTypeConstants (was previously AdditionalIntValue, which itself was previously part of AdditionalValue1, which was a single)
+    
+    AdditionalValue1 As Byte        ' 1 byte; use for future expanasion
     AdditionalValue2 As Single      ' 4 bytes; New for this version; use for future expansion (name can be changed in the future)
     
     MTID As String                      ' List of MT tags and/or Internal Standards that match this data point
@@ -512,8 +521,8 @@ Public Type DocumentData           'file format for Certificate = glCERT2004_Mod
   CustomNETsDefined As Boolean          ' True when a custom NET is defined
   ScanInfo() As udtScanInfoType         ' Updated for this version; lists all MS scan numbers and times, in increasing order; 1-based array for historical reasons
 
-  CSData() As udtIsotopicDataType       ' Updated for this version
-  IsoData() As udtIsotopicDataType      ' Updated for this version
+  CSData() As udtIsotopicDataType       ' Updated for this version; 1-based array
+  IsoData() As udtIsotopicDataType      ' Updated for this version; 1-based array
   
   AdditionalValue1 As Long          ' Use for future expansion (name can be changed in the future)
   AdditionalValue2 As Long          ' Use for future expansion (name can be changed in the future)
@@ -694,7 +703,11 @@ Public Type udtUMCType
   ChargeStateCount As Integer                                       ' Number of unique charge states that the members of this UMC have
   ChargeStateBasedStats() As UMClassChargeStateBasedStatsType       ' Stats on the members, grouped by charge state  (0-based array)
   
-  AdditionalValue1 As Long          ' New for this version; use for future expansion (name can be changed in the future)
+  PercentMembersIReportMonoPlus4 As Byte       ' % of the data in the UMC that was added due to MonoPlus4 data (was previously part of AdditionalValue1, a long)
+  PercentMembersIReportMonoMinus4 As Byte      ' % of the data in the UMC that was added due to MonoMinus4 data (was previously part of AdditionalValue1, a long)
+  
+  AdditionalValue1 As Integer
+  
   AdditionalValue2 As Long          ' New for this version; use for future expansion (name can be changed in the future)
   AdditionalValue3 As Single        ' New for this version; use for future expansion (name can be changed in the future)
   AdditionalValue4 As Single        ' New for this version; use for future expansion (name can be changed in the future)
@@ -1098,10 +1111,13 @@ Public Type udtIsoPairsSearchDefType
     N15PercentIncorporationStep As Single            ' 1 to 100; will be rounded to 1 decimal place
     
     ScanByScanAverageIsNotWeighted As Boolean       ' When False, then computes a weighted average across scans; when true, then does not weight; added August 2007
-   
     RequireMatchingIsotopeTagLabels As Boolean      ' Added September 2007
     
-    AdditionalValue2 As Long                        ' 4 bytes; New for this version
+    MonoPlusMinusThresholdForceHeavyOrLight As Byte ' Added January 2008  (was part of AdditionalValue2, a long)
+    
+    IgnoreMonoPlus2AbundanceInIReportERCalc As Byte ' Added January 2008  (was part of AdditionalValue2, a long); 0 = False, 1 = True
+    
+    AdditionalValue2 As Integer                     ' 2 bytes; New for this version (was a long, now an integer)
     AdditionalValue3 As Long                        ' 4 bytes; New for this version
     AdditionalValue4 As Double                      ' 8 bytes; New for this version
     AdditionalValue5 As Double                      ' 8 bytes; New for this version
@@ -1768,6 +1784,9 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                     AddToAnalysisHistory lngGelIndex, "File Loaded; Only isotopic data with abundance between " & Trim(objLoadOptionsForm.AbuFilterMin) & " and " & Trim(objLoadOptionsForm.AbuFilterMax) & " counts loaded (at user request)."
                 End With
             End If
+            
+            AddToAnalysisHistory lngGelIndex, "File Loaded; data point count = " & CStr(GelData(lngGelIndex).IsoLines)
+            
         End If
         
     End If

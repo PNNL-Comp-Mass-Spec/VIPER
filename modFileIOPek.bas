@@ -506,6 +506,8 @@ On Error GoTo LoadNewPEKErrorHandler
         .CSLines = 0
         .IsoLines = 0
         
+        .DataStatusBits = 0
+        
         ReDim .CSData(ISO_DATA_DIM_CHUNK)
         ReDim .IsoData(ISO_DATA_DIM_CHUNK)
     End With
@@ -618,7 +620,9 @@ On Error GoTo LoadNewPEKErrorHandler
             .DataStatusBits = .DataStatusBits And Not GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG
         End If
         
-        
+        ' .Pek files cannot have MonoPlusMinus4 data, so clear the bit
+        .DataStatusBits = .DataStatusBits And Not GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA
+
         If mMaxElutionTime = 0 Then
             ' Elution time wasn't defined
             ' Define the default elution time to range from 0 to 1

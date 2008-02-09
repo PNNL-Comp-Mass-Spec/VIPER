@@ -61,6 +61,7 @@ Microsoft Access MT Database file formats:
 		NitrogenAtom
 		AA_Cystine_Count
 		Status
+		Peptide
 	- The Access database file can optionally contain two tables containing Protein
 	  information and MT to Protein Mapping information.  If these tables are
 	  present, then Viper can optionally display the protein names along with

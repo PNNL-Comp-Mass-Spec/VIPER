@@ -1,5 +1,36 @@
 VIPER Change Log
 
+Version 3.43 - Build 385; February 8, 2008
+	- Added option "Ignore MonoPlus2 abundance in I-Report Computation" on the LC-MS Feature Delta Pairing Analysis window
+		- When enabled, then the I+2 values are set to 0 when computing the expression ratios, which has the effect of changing the B2 calculation from B2 = I4-(M2/M0)*B1-(M4/M0)*I0 to instead be B2 = I4-(M4/M0)*I0
+	- Updated the I-report ER calculation to check for situations where B2 is <= 0
+		- If B2 is less than zero but B1 is greater than zero, then B2 is computed using B2 = I4-(M4/M0)*I0 ; if, at this point, B2 is still negative, then it is set to the raw MonoPlus4Da abundance, aka I4
+
+Version 3.43 - Build 384, February 7, 2008
+	- When finding LC-MS features, if data points loaded from _pairs_isos.csv files are used, then new stats are computed:
+		- Percent of the data in the UMC that was added due to MonoPlus4 data  (PercentMembersIReportMonoPlus4)
+		- Percent of the data in the UMC that was added due to MonoMinus4 data (PercentMembersIReportMonoMinus4)
+		- These values are reported if you use Edit->Copy LC-MS Features in View
+	- Pair searching was updated to optionally force LC-MS features to only be heavy or only be light members of pairs depending on PercentMembersIReportMonoPlus4 and PercentMembersIReportMonoMinus4
+		- By default, if PercentMembersIReportMonoPlus4  >= 66%, then the LC-MS Feature must be the heavy member of a pair
+		- By default, if PercentMembersIReportMonoMinus4 >= 66%, then the LC-MS Feature must be the light member of a pair
+
+Version 3.43 - Build 383, January 26, 2008
+	- Added the ability to read _pairs_isos.csv files, which contain additional columns mono_plus4_abundance and mono_minus4_abundance
+		- When this data is found, new data points are added that are similar to the original data point from Decon2LS, but have a monoisotopic mass of +4.0085 or -4.0085 Da away from the original point's monoisotopic mass 
+		- The abundance of the new data points is that specified by mono_plus4_abundance or mono_minus4_abundance
+		- The average mass and mono abundant MW values assigned to the new data points are set equal to the new monoisotopic mass value
+		- The m/z value of the new data points is computed given the new monoisotopic mass and the charge state determined by Decon2LS (and thus specified in the _pairs_isos.csv file)
+		- The new data points have I+2 abundance values (used with I-report) set to 0
+		- The new data points are treated like normal data points when finding LC-MS Features
+	- Now tracking the peptide sequence associated with each MTID
+		- Peptide sequence is now included in a new column in the main window if you use Edit->Copy LC-MS Features in View in the main window
+		- Peptide sequence is now included in a new column in the Database Search window (step 6) if you choose Function->Report Results by UMCs
+	- When reading legacy MTDBs (in Microsoft Access files) looks for field Peptide in table AMT or table T_Mass_Tags to read the peptide sequence
+
+Version 3.43 - Build 381; January 21, 2008
+	- Updated "Set to Defaults" option on the pair searching form to have "Require Matching Isotope Tag Labels" unchecked
+
 Version 3.43 - Build 380; November 5, 2007
 	- Fixed "Invalid use of Null" bug related to reading .PEK files with just 6 data fields in the Isotopic data section
 
@@ -97,7 +128,7 @@ Version 3.42 - Build 366; March 2, 2007
 	- Finalized updates to handle Microsoft Access files with T_Mass_Tags and T_Mass_Tags_NET tables
 		- Legacy Access DBs can now be of two distinct formats:
 			a) with table AMT, plus optionally tables AMT_Proteins and AMT_to_Protein_Map
-			b) with tables T_Mass_Tags and T_Mass_Tags_NET, plus optionall tables T_Proteins and T_Mass_Tags_to_Protein_Map
+			b) with tables T_Mass_Tags and T_Mass_Tags_NET, plus optional tables T_Proteins and T_Mass_Tags_to_Protein_Map
 		- See the Readme.txt file for more information
 
 Version 3.42 - Build 365; February 28, 2007

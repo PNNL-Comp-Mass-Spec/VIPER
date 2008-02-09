@@ -3,6 +3,7 @@ Option Explicit
 
 Public Const CSV_ISOS_IC_FILE_SUFFIX As String = "isos_ic.csv"
 Public Const CSV_ISOS_FILE_SUFFIX As String = "isos.csv"
+Public Const CSV_ISOS_PAIRS_SUFFIX As String = "pairs_isos.csv"
 Public Const CSV_SCANS_FILE_SUFFIX As String = "scans.csv"
 Public Const CSV_COLUMN_HEADER_UNKNOWN_WARNING As String = "Warning: unknown column headers"
 Public Const CSV_COLUMN_HEADER_MISSING_WARNING As String = "Warning: expected important column headers"
@@ -20,6 +21,8 @@ Private Const ISOS_COLUMN_FWHM As String = "fwhm"
 Private Const ISOS_COLUMN_SIGNAL_NOISE As String = "signal_noise"
 Private Const ISOS_COLUMN_MONO_ABUNDANCE As String = "mono_abundance"
 Private Const ISOS_COLUMN_MONO_PLUS2_ABUNDANCE As String = "mono_plus2_abundance"
+Private Const ISOS_COLUMN_MONO_PLUS4_ABUNDANCE As String = "mono_plus4_abundance"
+Private Const ISOS_COLUMN_MONO_MINUS4_ABUNDANCE As String = "mono_minus4_abundance"
 
 ' Note: These should all be lowercase string values
 Private Const SCANS_COLUMN_SCAN_NUM As String = "scan_num"
@@ -54,7 +57,7 @@ Private Enum ScanFileColumnConstants
     PeptideIntensityThreshold = 10
 End Enum
 
-Private Const ISOS_FILE_COLUMN_COUNT As Integer = 12
+Private Const ISOS_FILE_COLUMN_COUNT As Integer = 14
 Private Enum IsosFileColumnConstants
     ScanNumber = 0
     Charge = 1
@@ -68,6 +71,8 @@ Private Enum IsosFileColumnConstants
     SignalToNoise = 9
     MonoAbundance = 10
     MonoPlus2Abundance = 11
+    MonoPlus4Abundance = 12
+    MonoMinus4Abundance = 13
 End Enum
 
 Private Enum rmReadModeConstants
@@ -97,6 +102,45 @@ Private mSubtaskMessage As String
 
 Private mReadMode As rmReadModeConstants
 Private mCurrentProgressStep As Integer
+
+Private Sub DuplicateIsoLineDataPoint(ByRef udtSrcIsoData As udtIsotopicDataType, ByRef udtTargetIsoData() As udtIsotopicDataType, ByVal lngTargetIndex As Long, ByVal dblTargetMassDelta As Double, ByVal sngTargetIntensity As Single, ByVal eIReportTagType As irtIReportTagTypeConstants)
+
+    Static intErrorLogCount As Integer
+    
+    On Error GoTo DuplicateIsoLineDataPointErrorHandler
+    
+    If lngTargetIndex > UBound(udtTargetIsoData) Then
+        ' Increase the amount of space reserved for udtTargetIsoData by 50%
+        ' Note that udtTargetIsoData() is a 1-based array
+        ReDim Preserve udtTargetIsoData((UBound(udtTargetIsoData)) * 1.5)
+    End If
+    
+    udtTargetIsoData(lngTargetIndex) = udtSrcIsoData
+    
+    With udtTargetIsoData(lngTargetIndex)
+        .MonoisotopicMW = udtSrcIsoData.MonoisotopicMW + dblTargetMassDelta
+        .AverageMW = .MonoisotopicMW
+        .MostAbundantMW = .MonoisotopicMW
+        
+        .IntensityMono = sngTargetIntensity
+        .Abundance = .IntensityMono
+        
+        .MZ = ConvoluteMass(.MonoisotopicMW, 0, .Charge)
+        .IntensityMonoPlus2 = 0
+        .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
+        .IReportTagType = eIReportTagType
+    End With
+    
+    Exit Sub
+
+DuplicateIsoLineDataPointErrorHandler:
+    Debug.Assert False
+    If intErrorLogCount < 10 Then
+        LogErrors Err.Number, "DuplicateIsoLineDataPoint"
+        intErrorLogCount = intErrorLogCount + 1
+    End If
+
+End Sub
 
 Private Function GetColumnValueDbl(ByRef strData() As String, ByVal intColumnIndex As Integer, Optional ByVal dblDefaultValue As Double = 0) As Double
     On Error GoTo GetColumnValueErrorHandler
@@ -180,6 +224,8 @@ Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean) 
         strHeaders = strHeaders & ", " & ISOS_COLUMN_SIGNAL_NOISE
         strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_ABUNDANCE
         strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_PLUS2_ABUNDANCE
+        strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_PLUS4_ABUNDANCE
+        strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_MINUS4_ABUNDANCE
     End If
 
     GetDefaultIsosColumnHeaders = strHeaders
@@ -327,6 +373,9 @@ On Error GoTo LoadNewCSVErrorHandler
     
     mScanInfoCount = 0
     ReDim GelData(mGelIndex).ScanInfo(0)
+    
+    GelData(mGelIndex).DataStatusBits = 0
+    
     If blnValidScanFile Then
         ' Read the scans file and populate .ScanInfo
         lngReturnValue = ReadCSVScanFile(fso, strScansFilePath, strBaseName, lngTotalBytesRead)
@@ -360,14 +409,21 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
     ' Returns 0 if no error, the error number if an error
 
     Dim lngIndex As Long
+    Dim lngNewIsoDataCount As Long
+    Dim lngDataCountUpdated As Long
+    Dim lngDataPointsAdded As Long
     Dim lngReturnValue As Long
     
     Dim objFile As File
     Dim objFolder As Folder
     
     Dim blnMonoPlus2DataPresent As Boolean
+    Dim blnMonoPlus4DataPresent As Boolean
     Dim MaxMZ As Double
     Dim intColumnMapping() As Integer
+    
+    Dim sngMonoPlus4Intensities() As Single
+    Dim sngMonoMinus4Intensities() As Single
     
 On Error GoTo ReadCSVIsosFileErrorHandler
 
@@ -427,11 +483,11 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         frmProgress.InitializeSubtask mSubtaskMessage, 0, lngByteCountTotal
         frmProgress.UpdateSubtaskProgressBar lngScansFileByteCount
         
-            ' Reset the tracking variables
+        ' Reset the tracking variables
         mValidDataPointCount = 0
         lngTotalBytesRead = 0
     
-        lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, lngTotalBytesRead, intColumnMapping, blnValidScanFile)
+        lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, lngTotalBytesRead, intColumnMapping, blnValidScanFile, sngMonoPlus4Intensities, sngMonoMinus4Intensities)
         If lngReturnValue <> 0 Then
             ' Error occurred
             Debug.Assert False
@@ -472,7 +528,73 @@ On Error GoTo ReadCSVIsosFileErrorHandler
     mCurrentProgressStep = mCurrentProgressStep + 1
     frmProgress.UpdateProgressBar mCurrentProgressStep
     frmProgress.InitializeSubtask "Initializing data structures", 0, 1
+
+    ' Look for the presence of MonoPlus2 data
+    blnMonoPlus2DataPresent = False
+    If intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) >= 0 Then
+        For lngIndex = 1 To GelData(mGelIndex).IsoLines
+            If GelData(mGelIndex).IsoData(lngIndex).IntensityMonoPlus2 > 0 Then
+                blnMonoPlus2DataPresent = True
+                Exit For
+            End If
+        Next lngIndex
+    End If
+
+    ' Look for the presence of MonoPlus4 and MonoMinus4 data
+    blnMonoPlus4DataPresent = False
+    If intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance) >= 0 Then
+        For lngIndex = 1 To GelData(mGelIndex).IsoLines
+            If sngMonoPlus4Intensities(lngIndex) > 0 Then
+                blnMonoPlus4DataPresent = True
+                Exit For
+            End If
+        Next lngIndex
+    End If
+  
+    If blnMonoPlus4DataPresent Then
+        If glbPreferencesExpanded.IReportAutoAddMonoPlus4AndMinus4Data Then
+            Dim udtNewIsoData() As udtIsotopicDataType
+            ReDim udtNewIsoData(GelData(mGelIndex).IsoLines * 1.5)
             
+            lngNewIsoDataCount = 0
+            For lngIndex = 1 To GelData(mGelIndex).IsoLines
+                lngNewIsoDataCount = lngNewIsoDataCount + 1
+                If lngNewIsoDataCount > UBound(udtNewIsoData) Then
+                    ReDim Preserve udtNewIsoData((UBound(udtNewIsoData)) * 1.5)
+                End If
+                
+                udtNewIsoData(lngNewIsoDataCount) = GelData(mGelIndex).IsoData(lngIndex)
+                                
+                If sngMonoPlus4Intensities(lngIndex) > 0 Then
+                    lngNewIsoDataCount = lngNewIsoDataCount + 1
+                    DuplicateIsoLineDataPoint GelData(mGelIndex).IsoData(lngIndex), udtNewIsoData, lngNewIsoDataCount, glO16O18_DELTA, sngMonoPlus4Intensities(lngIndex), irtIReportTagTypeConstants.irtMonoPlus4
+                End If
+            
+                If sngMonoMinus4Intensities(lngIndex) > 0 Then
+                    lngNewIsoDataCount = lngNewIsoDataCount + 1
+                    DuplicateIsoLineDataPoint GelData(mGelIndex).IsoData(lngIndex), udtNewIsoData, lngNewIsoDataCount, -glO16O18_DELTA, sngMonoMinus4Intensities(lngIndex), irtIReportTagTypeConstants.irtMonoMinus4
+                End If
+            Next lngIndex
+            
+            If lngNewIsoDataCount > GelData(mGelIndex).IsoLines Then
+                ' Copy the data from udtNewIsoData() back into GelData(mGelIndex).IsoData
+                ReDim GelData(mGelIndex).IsoData(lngNewIsoDataCount)
+                For lngIndex = 1 To lngNewIsoDataCount
+                    GelData(mGelIndex).IsoData(lngIndex) = udtNewIsoData(lngIndex)
+                Next lngIndex
+                
+                lngDataPointsAdded = lngNewIsoDataCount - GelData(mGelIndex).IsoLines
+                GelData(mGelIndex).IsoLines = lngNewIsoDataCount
+                
+                AddToAnalysisHistory mGelIndex, "Added " & CStr(lngDataPointsAdded) & " new data points using the '" & ISOS_COLUMN_MONO_PLUS4_ABUNDANCE & "' and '" & ISOS_COLUMN_MONO_MINUS4_ABUNDANCE & "' columns in the " & CSV_ISOS_PAIRS_SUFFIX & " file; total data point count = " & CStr(lngNewIsoDataCount)
+            
+                GelData(mGelIndex).DataStatusBits = GelData(mGelIndex).DataStatusBits Or GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA
+            
+            End If
+        End If
+    End If
+    
+    
     With GelData(mGelIndex)
          ' Old: .PathtoDataFiles = GetPathWOFileName(CurrDataFName)
          ' New: data file folder path is the folder one folder up from .Filename's folder if .Filename's folder contains _Auto00000
@@ -484,7 +606,6 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         
         ' Find the minimum and maximum MW, Abundance, and MZ values, and set the filters
         MaxMZ = 0
-        blnMonoPlus2DataPresent = False
         If .IsoLines > 0 Then
             ReDim Preserve .IsoData(.IsoLines)
             
@@ -496,10 +617,6 @@ On Error GoTo ReadCSVIsosFileErrorHandler
             For lngIndex = 1 To .IsoLines
             If .IsoData(lngIndex).Abundance < .MinAbu Then .MinAbu = .IsoData(lngIndex).Abundance
                 If .IsoData(lngIndex).Abundance > .MaxAbu Then .MaxAbu = .IsoData(lngIndex).Abundance
-                
-                If intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) >= 0 And Not blnMonoPlus2DataPresent Then
-                    If .IsoData(lngIndex).IntensityMonoPlus2 > 0 Then blnMonoPlus2DataPresent = True
-                End If
                 
                 FindMWExtremes .IsoData(lngIndex), .MinMW, .MaxMW, MaxMZ
             Next lngIndex
@@ -590,7 +707,7 @@ ReadCSVIsosFileErrorHandler:
 
 End Function
 
-Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, ByVal strIsosFilePath As String, ByRef lngTotalBytesRead As Long, ByRef intColumnMapping() As Integer, ByVal blnValidScanFile As Boolean) As Long
+Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, ByVal strIsosFilePath As String, ByRef lngTotalBytesRead As Long, ByRef intColumnMapping() As Integer, ByVal blnValidScanFile As Boolean, ByRef sngMonoPlus4Intensities() As Single, ByRef sngMonoMinus4Intensities() As Single) As Long
     
     Dim tsInFile As TextStream
     Dim strLineIn As String
@@ -615,6 +732,12 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, ByVal strIso
     Dim lngReturnValue As Long
     
 On Error GoTo ReadCSVIsosFileWorkErrorHandler
+    
+    ' Reserve space in these arrays, but only if we're not pre-scanning the data
+    If mReadMode <> rmReadModeConstants.rmPrescanData Then
+        ReDim sngMonoPlus4Intensities(UBound(GelData(mGelIndex).IsoData))
+        ReDim sngMonoMinus4Intensities(UBound(GelData(mGelIndex).IsoData))
+    End If
     
     lngLinesRead = 0
     
@@ -663,6 +786,8 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     intColumnMapping(IsosFileColumnConstants.SignalToNoise) = IsosFileColumnConstants.SignalToNoise
                     intColumnMapping(IsosFileColumnConstants.MonoAbundance) = IsosFileColumnConstants.MonoAbundance
                     intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) = IsosFileColumnConstants.MonoPlus2Abundance
+                    intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance) = IsosFileColumnConstants.MonoPlus4Abundance
+                    intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance) = IsosFileColumnConstants.MonoMinus4Abundance
 
                     ' Column headers were not present
                      AddToAnalysisHistory mGelIndex, "Isos file " & fso.GetFileName(strIsosFilePath) & " did not contain column headers; using the default headers (" & GetDefaultIsosColumnHeaders(False) & ")"
@@ -695,6 +820,8 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         Case ISOS_COLUMN_SIGNAL_NOISE: intColumnMapping(IsosFileColumnConstants.SignalToNoise) = lngIndex
                         Case ISOS_COLUMN_MONO_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoAbundance) = lngIndex
                         Case ISOS_COLUMN_MONO_PLUS2_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) = lngIndex
+                        Case ISOS_COLUMN_MONO_PLUS4_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance) = lngIndex
+                        Case ISOS_COLUMN_MONO_MINUS4_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance) = lngIndex
                         Case Else
                             ' Unknown column header; ignore it, but post an entry to the analysis history
                             If Len(strUnknownColumnList) > 0 Then
@@ -708,7 +835,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     Next lngIndex
                     
                     If Len(strUnknownColumnList) > 0 Then
-                        ' Unknown column header; ignore it, but post an entry to the
+                        ' Unknown column header; ignore it, but post an entry to the analysis history
                         AddToAnalysisHistory mGelIndex, CSV_COLUMN_HEADER_UNKNOWN_WARNING & " found in file " & fso.GetFileName(strIsosFilePath) & ": " & strUnknownColumnList & "; Known columns are: " & vbCrLf & GetDefaultIsosColumnHeaders(False)
                     End If
                     
@@ -808,6 +935,11 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                 
                                 If .IsoLines > UBound(.IsoData) Then
                                     ReDim Preserve .IsoData(UBound(.IsoData) + ISO_DATA_DIM_CHUNK)
+                                    
+                                    If mReadMode <> rmReadModeConstants.rmPrescanData Then
+                                        ReDim Preserve sngMonoPlus4Intensities(UBound(.IsoData))
+                                        ReDim Preserve sngMonoMinus4Intensities(UBound(.IsoData))
+                                    End If
                                 End If
                                
                                 With .IsoData(.IsoLines)
@@ -824,6 +956,11 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                     .IntensityMono = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoAbundance), 0)
                                     .IntensityMonoPlus2 = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance), 0)
                                 End With
+                            
+                                If mReadMode <> rmReadModeConstants.rmPrescanData Then
+                                    sngMonoPlus4Intensities(.IsoLines) = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance), 0)
+                                    sngMonoMinus4Intensities(.IsoLines) = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance), 0)
+                                End If
                             End With
                         End If
                     End If
@@ -1091,8 +1228,13 @@ Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScans
         strIsosFilePath = strBaseName & CSV_ISOS_IC_FILE_SUFFIX
         
         If Not FileExists(strIsosFilePath) Then
+            strIsosFilePath = strBaseName & CSV_ISOS_PAIRS_SUFFIX
+        End If
+        
+        If Not FileExists(strIsosFilePath) Then
             strIsosFilePath = strBaseName & CSV_ISOS_FILE_SUFFIX
         End If
+        
         blnSuccess = True
         
     Else
@@ -1100,21 +1242,26 @@ Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScans
         ' Look for the Scans.csv file
         
         ' Define the base name
-        ' First look for isos_ic.csv
-        lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_IC_FILE_SUFFIX))
+        ' First look for pairs_isos.csv
+        lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_PAIRS_SUFFIX))
         If lngCharLoc < 1 Then
             ' No match, look for isos.csv
-            lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_FILE_SUFFIX))
+            lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_IC_FILE_SUFFIX))
             If lngCharLoc < 1 Then
-                ' No match
+                ' No match, look for isos.csv
+                lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_FILE_SUFFIX))
+                If lngCharLoc < 1 Then
+                    ' No match
+                End If
             End If
         End If
-        
+                
         If lngCharLoc >= 1 Then
             strIsosFilePath = strFilePath
             
             strBaseName = Left(strFilePath, lngCharLoc - 1)
             strScansFilePath = strBaseName & CSV_SCANS_FILE_SUFFIX
+            
             blnSuccess = True
         Else
             blnSuccess = False

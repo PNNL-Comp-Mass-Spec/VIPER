@@ -706,6 +706,8 @@ AutoAnalysisDefineFilePathsErrorHandler:
         ' The error was probably permission denied (70)
         Debug.Assert Err.Number = 70
         
+        ' Note that error 76 will result from "path too long", which results if the path length, including the .Ini file name, is over 255 characters
+        
         blnErrorOccurred = True
         Err.Clear
         Resume Next

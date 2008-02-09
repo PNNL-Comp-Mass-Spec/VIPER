@@ -2,13 +2,13 @@ VERSION 5.00
 Begin VB.Form frmUMCDltPairs 
    BackColor       =   &H00C0FFC0&
    Caption         =   "LC-MS Feature Delta Pairing Analysis"
-   ClientHeight    =   7365
+   ClientHeight    =   8085
    ClientLeft      =   60
    ClientTop       =   630
    ClientWidth     =   10725
    Icon            =   "frmUMCDltPairs.frx":0000
    LinkTopic       =   "Form1"
-   ScaleHeight     =   7365
+   ScaleHeight     =   8085
    ScaleWidth      =   10725
    StartUpPosition =   1  'CenterOwner
    Begin VB.Frame fraERCalc 
@@ -16,7 +16,7 @@ Begin VB.Form frmUMCDltPairs
       Caption         =   "ER Calculation Mode"
       Height          =   615
       Left            =   5400
-      TabIndex        =   68
+      TabIndex        =   71
       Top             =   5880
       Width           =   5175
       Begin VB.OptionButton optERCalc 
@@ -25,7 +25,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   195
          Index           =   0
          Left            =   120
-         TabIndex        =   71
+         TabIndex        =   74
          ToolTipText     =   "Ratio (Abundance of Light member/ Abundance of Heavy Member)"
          Top             =   240
          Value           =   -1  'True
@@ -37,7 +37,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   195
          Index           =   1
          Left            =   1440
-         TabIndex        =   70
+         TabIndex        =   73
          ToolTipText     =   "Logarithmic Ratio; Ln(AbuLight/AbuHeavy)"
          Top             =   240
          Width           =   1575
@@ -48,7 +48,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   195
          Index           =   2
          Left            =   3240
-         TabIndex        =   69
+         TabIndex        =   72
          ToolTipText     =   "0-Shifted Symmetric Ratio; (AbuL/AbuH)-1 for AbuL>=AbuH; 1-(AbuH/AbuL) for AbuL<AbuH"
          Top             =   240
          Width           =   1575
@@ -57,7 +57,6 @@ Begin VB.Form frmUMCDltPairs
    Begin VB.CommandButton cmdResetToDefaults 
       Caption         =   "Set to Defaults"
       Height          =   300
-      Index           =   1
       Left            =   3720
       TabIndex        =   1
       Top             =   120
@@ -248,17 +247,36 @@ Begin VB.Form frmUMCDltPairs
    Begin VB.Frame fraGeneralOptions 
       BackColor       =   &H00C0FFC0&
       Caption         =   "Pair Search and ER Calculation Options"
-      Height          =   2535
+      Height          =   3495
       Left            =   120
       TabIndex        =   55
       Top             =   3960
       Width           =   5175
+      Begin VB.CheckBox chkIgnoreMonoPlus2AbundanceInIReportERCalc 
+         BackColor       =   &H00C0FFC0&
+         Caption         =   "Ignore MonoPlus2 Abundance in I-Report ER computation"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   76
+         Top             =   3120
+         Value           =   1  'Checked
+         Width           =   4695
+      End
+      Begin VB.TextBox txtMonoPlusMinusThresholdForceHeavyOrLight 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   3720
+         TabIndex        =   68
+         Text            =   "65"
+         Top             =   2520
+         Width           =   615
+      End
       Begin VB.CheckBox chkScanByScanAverageUsesWeightedAvg 
          BackColor       =   &H00C0FFC0&
          Caption         =   "Scan-by-scan average uses weighted avg"
          Height          =   375
          Left            =   3000
-         TabIndex        =   67
+         TabIndex        =   61
          Top             =   1080
          Value           =   1  'Checked
          Width           =   1935
@@ -267,7 +285,7 @@ Begin VB.Form frmUMCDltPairs
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   4320
-         TabIndex        =   65
+         TabIndex        =   66
          Text            =   "3"
          Top             =   2000
          Width           =   615
@@ -277,7 +295,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Repeatedly remove outliers"
          Height          =   300
          Left            =   360
-         TabIndex        =   63
+         TabIndex        =   64
          Top             =   1920
          Value           =   1  'Checked
          Width           =   2415
@@ -287,7 +305,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Remove outlier ER values using Grubb's test (95% conf.)"
          Height          =   255
          Left            =   120
-         TabIndex        =   62
+         TabIndex        =   63
          Top             =   1680
          Value           =   1  'Checked
          Width           =   4695
@@ -297,7 +315,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Enable I-Report ER computation"
          Height          =   255
          Left            =   120
-         TabIndex        =   61
+         TabIndex        =   62
          Top             =   1360
          Value           =   1  'Checked
          Width           =   3375
@@ -350,12 +368,30 @@ Begin VB.Form frmUMCDltPairs
          Value           =   1  'Checked
          Width           =   4095
       End
+      Begin VB.Label lblMonoPlusMinusThresholdForceHeavyOrLightUnits 
+         BackStyle       =   0  'Transparent
+         Caption         =   "%"
+         Height          =   195
+         Left            =   4440
+         TabIndex        =   69
+         Top             =   2520
+         Width           =   375
+      End
+      Begin VB.Label lblMonoPlusMinusThresholdForceHeavyOrLight 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Percentage threshold to force features with mostly MonoPlus4 points to be Heavy or mostly MonoMinus4 points to be Light"
+         Height          =   645
+         Left            =   120
+         TabIndex        =   67
+         Top             =   2400
+         Width           =   3495
+      End
       Begin VB.Label lblRemoveOutlierERsMinimumDataPointCount 
          BackStyle       =   0  'Transparent
          Caption         =   "Minimum final data point count"
          Height          =   400
          Left            =   2880
-         TabIndex        =   64
+         TabIndex        =   65
          Top             =   1940
          Width           =   1455
       End
@@ -481,7 +517,7 @@ Begin VB.Form frmUMCDltPairs
          Caption         =   "Require Matching Isotope Tag Labels (N14/15 or C12/C13)"
          Height          =   735
          Left            =   3360
-         TabIndex        =   72
+         TabIndex        =   75
          Top             =   1920
          Width           =   1725
       End
@@ -699,10 +735,10 @@ Begin VB.Form frmUMCDltPairs
    End
    Begin VB.Label lblStatus 
       BackStyle       =   0  'Transparent
-      Height          =   600
+      Height          =   480
       Left            =   120
-      TabIndex        =   66
-      Top             =   6720
+      TabIndex        =   70
+      Top             =   7560
       Width           =   10455
    End
    Begin VB.Menu mnuFunction 
@@ -807,6 +843,8 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Const MAXPAIRS As Long = 10000000
+            Const DEFAULT_MONO_PLUSMINUS_THRESHOLD As Byte = 66
+            Const MINIMUM_MONO_PLUSMINUS_THRESHOLD As Byte = 25
 
 Public Enum pfmPairFormMode
     pfmDelta = 0
@@ -834,6 +872,7 @@ Private mPairInfoChanged As Boolean
 Private mAbortProcess As Boolean
 
 Private WithEvents mDltLblPairsUMC As clsDltLblPairsUMC
+Attribute mDltLblPairsUMC.VB_VarHelpID = -1
 '
 
 Public Property Let FormMode(eNewFormMode As pfmPairFormMode)
@@ -855,6 +894,13 @@ End Property
 Private Sub ClearAllPairs()
     mPairInfoChanged = True
     DestroyDltLblPairs CallerID
+End Sub
+
+Private Sub EnableDisableControls(ByVal blnEnable As Boolean)
+    Dim blnSearchingForPairs As Boolean
+
+    blnSearchingForPairs = Not blnEnable
+    ShowHideControls blnSearchingForPairs
 End Sub
 
 Private Sub EnableDisableDeltaMassButtons(ByVal blnEnable As Boolean, ByVal blnUpdateDeltaCountControls As Boolean)
@@ -1009,6 +1055,7 @@ Private Function FindPairs(ePairFormMode As pfmPairFormMode, Optional blnShowMes
     
     Dim blnSuccess As Boolean
     Dim blnAutoCalculateDeltaMinMax As Boolean
+    Dim blnCheckMonoPlusMinus4Thresholds As Boolean
     
     Dim ScanMaxAbuLight As Double
     Dim ScanMaxAbuHeavy As Double
@@ -1117,9 +1164,24 @@ On Error GoTo err_FindPairs
                 If .N15PercentIncorporationMaximum > 100 Then .N15PercentIncorporationMaximum = 100
                 If .N15PercentIncorporationStep > 100 Then .N15PercentIncorporationStep = 100
             End If
+        
+            If (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA) = GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA Then
+                blnCheckMonoPlusMinus4Thresholds = True
+                If .MonoPlusMinusThresholdForceHeavyOrLight = 0 Then
+                    .MonoPlusMinusThresholdForceHeavyOrLight = DEFAULT_MONO_PLUSMINUS_THRESHOLD
+                ElseIf .MonoPlusMinusThresholdForceHeavyOrLight < MINIMUM_MONO_PLUSMINUS_THRESHOLD Then
+                    .MonoPlusMinusThresholdForceHeavyOrLight = MINIMUM_MONO_PLUSMINUS_THRESHOLD
+                End If
+            Else
+                blnCheckMonoPlusMinus4Thresholds = False
+            End If
+        
         End With
         
         ' Step through the LC-MS Features, treating each lngIndexHeavy'th UMC as the heavy member of the pair
+        ' However, if .PercentMembersIReportMonoMinus4 >= .MonoPlusMinusThresholdForceHeavyOrLight then force light
+        ' Also, if .PercentMembersIReportMonoPlus4 >= .MonoPlusMinusThresholdForceHeavyOrLight then force heavy
+        
         For lngIndexHeavy = 0 To GelUMC(CallerID).UMCCnt - 1
             With GelUMC(CallerID).UMCs(lngIndexHeavy)
                 HClsMW = .ClassMW
@@ -1147,7 +1209,15 @@ On Error GoTo err_FindPairs
                 End If
             End With
             
-            If lngIndexHeavy Mod 5 = 0 Then
+            If blnCheckUMC And blnCheckMonoPlusMinus4Thresholds Then
+                If GelUMC(CallerID).UMCs(lngIndexHeavy).PercentMembersIReportMonoMinus4 >= _
+                   GelP_D_L(CallerID).SearchDef.MonoPlusMinusThresholdForceHeavyOrLight Then
+                    ' Force this UMC to be light
+                    blnCheckUMC = False
+                End If
+            End If
+            
+            If lngIndexHeavy Mod 10 = 0 Then
                 strStatus = "Examining LC-MS Features: " & Trim(lngIndexHeavy) & " / " & Trim(GelUMC(CallerID).UMCCnt) & "; Pairs found: " & Trim(GelP_D_L(CallerID).PCnt)
                 UpdateStatus strStatus
                 If mAbortProcess Then Exit For
@@ -1203,6 +1273,14 @@ On Error GoTo err_FindPairs
                             End Select
                         End If
                                                 
+                        If blnOverlapOK And blnCheckMonoPlusMinus4Thresholds Then
+                            If GelUMC(CallerID).UMCs(lngIndexLight).PercentMembersIReportMonoPlus4 >= _
+                               GelP_D_L(CallerID).SearchDef.MonoPlusMinusThresholdForceHeavyOrLight Then
+                                ' Force this UMC to be heavy
+                                blnOverlapOK = False
+                            End If
+                        End If
+                        
                         If blnOverlapOK Then
                             'check if 'overlap' condition is required and if yes do class lngIndexHeavy and lngIndexLight overlap at the edges?
                             If GelP_D_L(CallerID).SearchDef.RequireUMCOverlap Then
@@ -1333,6 +1411,14 @@ On Error GoTo err_FindPairs
                     strMessage = strMessage & "; Step size = " & Round(.N15PercentIncorporationStep, 1) & "%"
                 End If
             End With
+            
+            If blnCheckMonoPlusMinus4Thresholds Then
+                strMessage = strMessage & "; Used MonoPlus4 and MonoMinus4 percentages in LC-MS features to force features with >= " & CStr(GelP_D_L(CallerID).SearchDef.MonoPlusMinusThresholdForceHeavyOrLight) & "% of the points MonoPlus4 to be heavy or >= " & CStr(GelP_D_L(CallerID).SearchDef.MonoPlusMinusThresholdForceHeavyOrLight) & "% of the points MonoMinus4 to be light"
+            End If
+            
+            If .SearchDef.IgnoreMonoPlus2AbundanceInIReportERCalc <> 0 Then
+                strMessage = strMessage & "; Note that MonoPlus2Da Intensity values were ignored for the ER calculation"
+            End If
             
             AddToAnalysisHistory CallerID, strMessage
         End With
@@ -1862,6 +1948,16 @@ Public Sub InitializeForm()
             If .RemoveOutlierERsMinimumDataPointCount < 2 Then .RemoveOutlierERsMinimumDataPointCount = 2
             txtRemoveOutlierERsMinimumDataPointCount.Text = .RemoveOutlierERsMinimumDataPointCount
             
+            If .MonoPlusMinusThresholdForceHeavyOrLight = 0 Then
+                .MonoPlusMinusThresholdForceHeavyOrLight = DEFAULT_MONO_PLUSMINUS_THRESHOLD
+            ElseIf .MonoPlusMinusThresholdForceHeavyOrLight < MINIMUM_MONO_PLUSMINUS_THRESHOLD Then
+                .MonoPlusMinusThresholdForceHeavyOrLight = MINIMUM_MONO_PLUSMINUS_THRESHOLD
+            End If
+            
+            SetCheckBox chkIgnoreMonoPlus2AbundanceInIReportERCalc, CBool(.IgnoreMonoPlus2AbundanceInIReportERCalc)
+            
+            txtMonoPlusMinusThresholdForceHeavyOrLight.Text = .MonoPlusMinusThresholdForceHeavyOrLight
+            
             optERCalc(glbPreferencesExpanded.PairSearchOptions.SearchDef.ERCalcType).Value = True
             
             UpdateDynamicControls
@@ -1916,6 +2012,7 @@ Private Sub PickParameters()
     Call txtERMax_LostFocus
     
     Call txtRemoveOutlierERsMinimumDataPointCount_LostFocus
+    Call txtMonoPlusMinusThresholdForceHeavyOrLight_LostFocus
 End Sub
 
 Public Sub ReportPairs(PState As Integer, Optional strFilePath As String = "")
@@ -2133,6 +2230,8 @@ Private Sub ResetToDefaults()
     
     bLoading = True
     InitializeForm
+    
+    cmdSetToO18_Click
 End Sub
 
 Public Sub SetDeltaMass(dblDeltaMass As Double)
@@ -2248,9 +2347,18 @@ End Sub
 
 Private Sub ShowHideControls(blnSearchingForPairs As Boolean)
     cmdAbortProcess.Visible = blnSearchingForPairs
+    
     cmdFindPairs.Visible = Not blnSearchingForPairs
+    cmdResetToDefaults.Visible = Not blnSearchingForPairs
+    
     fraControls.Visible = Not blnSearchingForPairs
     cmdSetToICAT.Visible = Not blnSearchingForPairs
+    
+    fraGeneralOptions.Enabled = Not blnSearchingForPairs
+    fraToleranceOptions.Enabled = Not blnSearchingForPairs
+    fraInclusionOptions.Enabled = Not blnSearchingForPairs
+    fraDeltaOptions.Enabled = Not blnSearchingForPairs
+    fraERCalc.Enabled = Not blnSearchingForPairs
 End Sub
 
 Private Sub UpdateDynamicControls()
@@ -2385,6 +2493,14 @@ Private Sub chkComputeERScanByScan_Click()
     UpdateDynamicControls
 End Sub
 
+Private Sub chkIgnoreMonoPlus2AbundanceInIReportERCalc_Click()
+    If cChkBox(chkIgnoreMonoPlus2AbundanceInIReportERCalc) Then
+        glbPreferencesExpanded.PairSearchOptions.SearchDef.IgnoreMonoPlus2AbundanceInIReportERCalc = 1
+    Else
+        glbPreferencesExpanded.PairSearchOptions.SearchDef.IgnoreMonoPlus2AbundanceInIReportERCalc = 0
+    End If
+End Sub
+
 Private Sub chkIReportEREnabled_Click()
     glbPreferencesExpanded.PairSearchOptions.SearchDef.IReportEROptions.Enabled = cChkBox(chkIReportEREnabled)
 End Sub
@@ -2436,14 +2552,16 @@ End Sub
 
 Private Sub cmdAbortProcess_Click()
     mAbortProcess = True
-    mDltLblPairsUMC.AbortProcessingNow
+    If Not mDltLblPairsUMC Is Nothing Then
+        mDltLblPairsUMC.AbortProcessingNow
+    End If
 End Sub
 
 Private Sub cmdFindPairs_Click()
     FindPairsWrapper
 End Sub
 
-Private Sub cmdResetToDefaults_Click(Index As Integer)
+Private Sub cmdResetToDefaults_Click()
     ResetToDefaults
 End Sub
 
@@ -2676,6 +2794,22 @@ Private Sub txtHeavyLightDelta_LostFocus()
 err_Delta:
     MsgBox "Delta should be positive number.", vbOKOnly, glFGTU
     txtHeavyLightDelta.SetFocus
+End Sub
+
+Private Sub txtMonoPlusMinusThresholdForceHeavyOrLight_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtMonoPlusMinusThresholdForceHeavyOrLight, KeyAscii, True, False
+End Sub
+
+Private Sub txtMonoPlusMinusThresholdForceHeavyOrLight_LostFocus()
+   On Error GoTo err_MonoPlusMinus
+    glbPreferencesExpanded.PairSearchOptions.SearchDef.MonoPlusMinusThresholdForceHeavyOrLight = CByte(txtMonoPlusMinusThresholdForceHeavyOrLight.Text)
+    If glbPreferencesExpanded.PairSearchOptions.SearchDef.MonoPlusMinusThresholdForceHeavyOrLight >= MINIMUM_MONO_PLUSMINUS_THRESHOLD And _
+       glbPreferencesExpanded.PairSearchOptions.SearchDef.MonoPlusMinusThresholdForceHeavyOrLight <= 101 Then
+        Exit Sub
+    End If
+err_MonoPlusMinus:
+    MsgBox "Threshold should be between " & CStr(MINIMUM_MONO_PLUSMINUS_THRESHOLD) & " and 100.", vbOKOnly, glFGTU
+    txtMonoPlusMinusThresholdForceHeavyOrLight.SetFocus
 End Sub
 
 Private Sub txtLabel_LostFocus()

@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "November 5, 2007"
+Public Const APP_BUILD_DATE As String = "February 8, 2008"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -52,8 +52,9 @@ Public Const UMC_INDICATOR_BIT_LOWSEGMENTCOUNT_ADDITION = 64            ' LC-MS 
 Public Const UMC_INDICATOR_BIT_NET_ADJ_DB_HIT = 128                     ' LC-MS Features used for NET adjustment that matched one or more MT tags in the database
 Public Const UMC_INDICATOR_BIT_NET_ADJ_LOCKER_HIT = 256                 ' LC-MS Features used for Net adjustment that matched one of the Internal Standards (aka NET adjustment lockers)
 
-Public Const GEL_DATA_STATUS_BIT_IREPORT = 2                ' When the gel data contains IReport data, this this bit is turned on
-Public Const GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG = 4      ' When the gel data contains Isotope LabelTag info (field .IsotopeLabel), this this bit is turned on
+Public Const GEL_DATA_STATUS_BIT_IREPORT = 2                        ' When the gel data contains IReport data, this this bit is turned on
+Public Const GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG = 4              ' When the gel data contains Isotope LabelTag info (field .IsotopeLabel), this this bit is turned on
+Public Const GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA = 8      ' When the gel data contains data loaded from _Pairs_isos.csv files and MonoPlus4 or MonoMinus4 data was added, then this this bit is turned on
 
 Public Enum natNETTypeConstants
     natGeneric = 0
@@ -818,6 +819,7 @@ Public Type udtPairSearchOptionsType
     
     AutoAnalysisDeltaMassAddnlCount As Integer
     AutoAnalysisDeltaMassAddnl() As Double
+
 End Type
 
 Public Type udtPairMatchStatsType
@@ -1213,6 +1215,8 @@ Public Type udtPreferencesExpandedType
     UseMassTagsWithNullMass As Boolean      ' Can only be set in the .Ini file
     UseMassTagsWithNullNET As Boolean
     
+    IReportAutoAddMonoPlus4AndMinus4Data As Boolean
+
     UseUMCConglomerateNET As Boolean        ' When true, then uses the NET of the LC-MS Features class rep, rather than using the NET of each member of the LC-MS Feature
     NetAdjustmentUsesN15AMTMasses As Boolean
     NetAdjustmentMinHighNormalizedScore As Single
@@ -1263,6 +1267,7 @@ Public Type udtPreferencesExpandedType
     
     DMSConnectionInfo As udtDMSConnectionInfoType
     MTSConnectionInfo As udtMTSConnectionInfoType
+  
 End Type
 
 Public Type udtAutoAnalysisMTDBOverrideType
