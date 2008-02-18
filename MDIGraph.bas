@@ -1388,7 +1388,7 @@ Dim sFileName As String
 Dim OpenResult As Integer
 Dim blnInteractiveMode As Boolean
 
-Dim fso As FileSystemObject
+Dim fso As New FileSystemObject
 Dim objFile As File
 
 On Error Resume Next
@@ -1398,19 +1398,10 @@ strErrorMessage = ""
 If Len(strInputFilePath) = 0 Then
     blnInteractiveMode = True
     
-    sFileName = SelectFile(hwndOwner, _
-                      "Select source .Pek, .CSV, .mzXML, or .mzData file", "", False, "", _
-                      "All Files (*.*)|*.*|" & _
-                      "PEK Files (*.pek)|*.pek|" & _
-                      "CSV Files (*.csv)|*.csv|" & _
-                      "mzXML Files (*.mzXML)|*.mzXml|" & _
-                      "mzXML Files (*mzXML.xml)|*mzXML.xml|" & _
-                      "mzData Files (*.mzData)|*.mzData|" & _
-                      "mzData Files (*mzData.xml)|*mzData.xml", _
-                      glbPreferencesExpanded.LastInputFileMode + 2)
+    sFileName = FileNewSelectFile(hwndOwner)
     
     If Len(sFileName) > 0 Then
-        If Not FileExists(sFileName) Then
+        If Not fso.FileExists(sFileName) Then
             strErrorMessage = "File not found: " & sFileName
             sFileName = ""
             MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
@@ -1418,7 +1409,7 @@ If Len(strInputFilePath) = 0 Then
     End If
 Else
     blnInteractiveMode = False
-    If FileExists(strInputFilePath) Then
+    If fso.FileExists(strInputFilePath) Then
         sFileName = strInputFilePath
     Else
         sFileName = ""
@@ -1465,7 +1456,6 @@ If Len(sFileName) > 0 Then ' User selected a file.
    
    With GelData(fIndex)  'save parameters for this doc
         ' Make sure sFileName contains the full path to the file
-        Set fso = New FileSystemObject
         Set objFile = fso.GetFile(sFileName)
         sFileName = objFile.Path
         
@@ -1558,6 +1548,24 @@ Else
 End If
 frmProgress.HideForm
 Screen.MousePointer = vbDefault
+End Function
+
+Public Function FileNewSelectFile(hwndOwner As Long) As String
+    Dim sFileName As String
+    
+    sFileName = SelectFile(hwndOwner, _
+                      "Select source .Pek, .CSV, .mzXML, or .mzData file", "", False, "", _
+                      "All Files (*.*)|*.*|" & _
+                      "PEK Files (*.pek)|*.pek|" & _
+                      "CSV Files (*.csv)|*.csv|" & _
+                      "mzXML Files (*.mzXML)|*.mzXml|" & _
+                      "mzXML Files (*mzXML.xml)|*mzXML.xml|" & _
+                      "mzData Files (*.mzData)|*.mzData|" & _
+                      "mzData Files (*mzData.xml)|*mzData.xml", _
+                      glbPreferencesExpanded.LastInputFileMode + 2)
+
+    FileNewSelectFile = sFileName
+    
 End Function
 
 Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex As Long, ByVal blnInteractiveMode As Boolean) As Integer

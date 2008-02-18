@@ -1,5 +1,10 @@
 VIPER Change Log
 
+Version 3.43 - Build 386; February 17, 2008
+	- Updated to optionally call IsoLabelingIDMain.exe to create the _pairs_isos.csv file using the Decon2LS _isos.csv and _peaks.dat files for a given dataset
+		- Use parameter file setting GenerateMonoPlus4IsoLabelingFile in the AutoAnalysisOptions section to initiate this behavior
+		- You must also set IReportAutoAddMonoPlus4AndMinus4Data to True in the ExpandedPreferences section to force the MonoPlus4 and MonoMinus4 data to be loaded
+
 Version 3.43 - Build 385; February 8, 2008
 	- Added option "Ignore MonoPlus2 abundance in I-Report Computation" on the LC-MS Feature Delta Pairing Analysis window
 		- When enabled, then the I+2 values are set to 0 when computing the expression ratios, which has the effect of changing the B2 calculation from B2 = I4-(M2/M0)*B1-(M4/M0)*I0 to instead be B2 = I4-(M4/M0)*I0

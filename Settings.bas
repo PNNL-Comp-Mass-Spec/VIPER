@@ -1258,6 +1258,8 @@ On Error GoTo LoadSettingsFileHandler
             .DBConnectionTimeoutSeconds = GetIniFileSettingInt(IniStuff, "AutoAnalysisOptions", "DBConnectionTimeoutSeconds", .DBConnectionTimeoutSeconds)
             .ExportResultsFileUsesJobNumberInsteadOfDataSetName = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "ExportResultsFileUsesJobNumberInsteadOfDataSetName", .ExportResultsFileUsesJobNumberInsteadOfDataSetName)
             
+            .GenerateMonoPlus4IsoLabelingFile = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "GenerateMonoPlus4IsoLabelingFile", .GenerateMonoPlus4IsoLabelingFile)
+            
             .SaveGelFile = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SaveGelFile", .SaveGelFile)
             .SaveGelFileOnError = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SaveGelFileOnError", .SaveGelFileOnError)
             .SavePictureGraphic = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SavePictureGraphic", .SavePictureGraphic)
@@ -2313,6 +2315,9 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingInt sKeys, sVals, iKVCount, "DBConnectionTimeoutSeconds", .DBConnectionTimeoutSeconds
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "ExportResultsFileUsesJobNumberInsteadOfDataSetName", .ExportResultsFileUsesJobNumberInsteadOfDataSetName
         
+        ' Note: We're always storing False for .GenerateMonoPlus4IsoLabelingFile
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "GenerateMonoPlus4IsoLabelingFile", False
+
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveGelFile", .SaveGelFile
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveGelFileOnError", .SaveGelFileOnError
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SavePictureGraphic", .SavePictureGraphic
@@ -3695,6 +3700,8 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .DBConnectionRetryAttemptMax = 5
                 .DBConnectionTimeoutSeconds = 300
                 .ExportResultsFileUsesJobNumberInsteadOfDataSetName = True
+                
+                .GenerateMonoPlus4IsoLabelingFile = False
                 
                 .SaveGelFile = False
                 .SaveGelFileOnError = True

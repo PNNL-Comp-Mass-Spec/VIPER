@@ -45,6 +45,10 @@ Private Const RESIDUALS_PLOT_POINT_SIZE As Integer = 2
 
 Private Const CTL2DHEATMAP_ERROR_MESSAGE As String = "Failed to load control 'ctl2DHeatMap'"
 
+Private Const ISO_LABELING_ID_CREATION_TOOL = "IsoLabelingIDMain.exe"
+Private Const CSV_PAIRS_ISOS_FILE_SUFFIX As String = "_pairs_isos.csv"
+Private Const DECON2LS_DAT_FILE_SUFFIX As String = "_peaks.dat"
+
 Private Type udtAutoAnalysisOutputFileInfoType
     FileName As String
     Description As String
@@ -1298,8 +1302,13 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
         End If
         tsOutput.WriteLine "        " & HTML_INDEX_FILE_DATA_FILE_LINE_START & " " & fso.GetFileName(udtAutoParams.FilePaths.InputFilePath) & "<BR>"
         
-        strTempPath = udtAutoParams.FilePaths.InputFilePath
-        intIndex = InStr(strTempPath, fso.GetFileName(udtAutoParams.FilePaths.InputFilePath))
+        If Len(udtAutoParams.FilePaths.InputFilePathOriginal) > 0 Then
+            strTempPath = udtAutoParams.FilePaths.InputFilePathOriginal
+        Else
+            strTempPath = udtAutoParams.FilePaths.InputFilePath
+        End If
+        
+        intIndex = InStr(strTempPath, fso.GetFileName(strTempPath))
         If intIndex > 1 Then
             strTempPath = Left(strTempPath, intIndex - 1)
         End If
@@ -1546,6 +1555,287 @@ GenerateHTMLBrowsingFileErrorHandler:
     End If
     
 End Sub
+
+Private Function AutoAnalysisGenerateMonoPlus4IsoLabelingFile(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject, strInputFilePath As String, ByRef strInputFilePathNew As String, ByRef blnDeleteInputFileNewAfterLoad As Boolean) As Boolean
+    ' strInputFilePath should end in CSV_ISOS_FILE_SUFFIX or CSV_ISOS_IC_FILE_SUFFIX
+    ' If the input file is already located in the working folder, then blnDeleteInputFileNewAfterLoad will be set to false
+    ' Otherwise, blnDeleteInputFileNewAfterLoad will be set to true
+    
+    Const DEFAULT_MAXIMUM_PROCESSING_TIME_MINUTES As Single = 60
+    
+    Const APP_MONITOR_INTERVAL_MSEC As Integer = 250
+    Const STATUS_UPDATE_INTERVAL_SEC As Integer = 30
+    
+    Dim blnSuccess As Boolean
+    Dim blnAbortProcessing As Boolean
+    
+    Dim strInputFolderPath As String
+    Dim strInputFileName As String
+    Dim strDatasetName As String
+    
+    Dim strScansFilePath As String
+    Dim strScansFileName As String
+    
+    Dim strPeaksDataFileName As String
+    Dim strPeaksDataFilePath As String
+    
+    Dim strIsoLabelingIDToolFolderPath As String
+    Dim strIsosFilePathLocal As String
+    Dim strScansFilePathLocal As String
+    Dim strPeaksDataFilePathLocal As String
+    Dim strIsoLabelingProgramPath As String
+        
+    Dim strErrorMessage As String
+    Dim strMessage As String
+    
+    Dim objProgRunner As clsProgRunner
+    Dim strArguments As String
+    Dim strWorkingDirSaved As String
+    
+    Dim sngProcessingTimeSeconds As Single
+    Dim sngMaxProcessingTimeMinutes As Single
+    Dim dtProcessingStartTime As Date
+
+    Dim lngStatusUpdateIterationCount As Long
+    Dim lngIteration As Long
+    
+On Error GoTo AutoAnalysisGenerateMonoPlus4IsoLabelingFileErrorHandler
+    
+    strInputFilePathNew = ""
+    blnDeleteInputFileNewAfterLoad = False
+    strErrorMessage = ""
+    
+    ' Determine the parent folder path
+    strInputFolderPath = fso.GetParentFolderName(strInputFilePath)
+    
+    ' Extract out the dataset name from strInputFilePath
+    strInputFileName = fso.GetFileName(strInputFilePath)
+    strDatasetName = ""
+    
+    ' Look for _isos.csv at the end of strDatasetName
+    If Len(strInputFileName) > Len(CSV_ISOS_FILE_SUFFIX) Then
+        If LCase(Right(strInputFileName, Len(CSV_ISOS_FILE_SUFFIX))) = LCase(CSV_ISOS_FILE_SUFFIX) Then
+            strDatasetName = Left(strInputFileName, Len(strInputFileName) - Len(CSV_ISOS_FILE_SUFFIX))
+        End If
+    End If
+    
+    If Len(strDatasetName) = 0 Then
+        If Len(strInputFileName) > Len(CSV_ISOS_IC_FILE_SUFFIX) Then
+            If LCase(Right(strInputFileName, Len(CSV_ISOS_IC_FILE_SUFFIX))) = LCase(CSV_ISOS_IC_FILE_SUFFIX) Then
+                strDatasetName = Left(strInputFileName, Len(strInputFileName) - Len(CSV_ISOS_IC_FILE_SUFFIX))
+            End If
+        End If
+    End If
+    
+    If Len(strDatasetName) = 0 Then
+        If Len(strInputFileName) > Len(CSV_SCANS_FILE_SUFFIX) Then
+            If LCase(Right(strInputFileName, Len(CSV_SCANS_FILE_SUFFIX))) = LCase(CSV_SCANS_FILE_SUFFIX) Then
+                ' strInputFileName actually points to the _scans.csv file
+                ' Extract out the dataset name, then look for the _isos.csv file
+                
+                strDatasetName = Left(strInputFileName, Len(strInputFileName) - Len(CSV_SCANS_FILE_SUFFIX))
+                
+                ' Now look for the _isos.csv file
+                strInputFilePath = fso.BuildPath(strInputFolderPath, strDatasetName & CSV_ISOS_IC_FILE_SUFFIX)
+                If Not fso.FileExists(strInputFilePath) Then
+                    strInputFilePath = fso.BuildPath(strInputFolderPath, strDatasetName & CSV_ISOS_FILE_SUFFIX)
+                End If
+                
+                If Not fso.FileExists(strInputFilePath) Then
+                    strErrorMessage = "Could not find the " & CSV_ISOS_FILE_SUFFIX & " file corresponding to " & strInputFilePath
+                    strDatasetName = ""
+                Else
+                    strInputFileName = fso.GetFileName(strInputFilePath)
+                End If
+            End If
+        End If
+    End If
+    
+    blnSuccess = False
+    If Len(strDatasetName) = 0 Then
+        ' Could not determine the dataset name
+        
+        If Len(strErrorMessage) = 0 Then
+            strErrorMessage = "Error - Could not determine the dataset name for file " & strInputFilePath
+        End If
+        strErrorMessage = strErrorMessage & "; unable to create the " & CSV_PAIRS_ISOS_FILE_SUFFIX & " file"
+
+        If udtWorkingParams.ts Is Nothing And udtAutoParams.ShowMessages Then
+            MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+        Else
+            AutoAnalysisLog udtAutoParams, udtWorkingParams, strErrorMessage
+        End If
+        
+    Else
+        ' Note that CSV_ISOS_FILE_SUFFIX, CSV_ISOS_IC_FILE_SUFFIX, and CSV_SCANS_FILE_SUFFIX do not have a leading underscore
+        ' Thus, strDatasetName likely currently ends in an underscore
+        
+        ' First define the Scans file name
+        strScansFileName = strDatasetName & CSV_SCANS_FILE_SUFFIX
+        strScansFilePath = fso.BuildPath(strInputFolderPath, strScansFileName)
+        
+        ' Now remove the underscore from the end of strDatasetName
+        If Right(strDatasetName, 1) = "_" Then
+            strDatasetName = Left(strDatasetName, Len(strDatasetName) - 1)
+        End If
+        
+        ' Look for the peaks.dat file in strInputFolderPath
+        
+        strPeaksDataFileName = strDatasetName & DECON2LS_DAT_FILE_SUFFIX
+        strPeaksDataFilePath = fso.BuildPath(strInputFolderPath, strPeaksDataFileName)
+        
+        If Not fso.FileExists(strPeaksDataFilePath) Then
+            strErrorMessage = "Error - Decon2LS " & DECON2LS_DAT_FILE_SUFFIX & " not found at " & strPeaksDataFilePath & "; unable to create the " & CSV_PAIRS_ISOS_FILE_SUFFIX & " file"
+            If udtWorkingParams.ts Is Nothing And udtAutoParams.ShowMessages Then
+                MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+            Else
+                AutoAnalysisLog udtAutoParams, udtWorkingParams, strErrorMessage
+            End If
+        Else
+            strIsoLabelingIDToolFolderPath = App.Path
+            strIsoLabelingProgramPath = fso.BuildPath(strIsoLabelingIDToolFolderPath, ISO_LABELING_ID_CREATION_TOOL)
+            
+            ' Make sure IsoLabelingIDMain.exe exists
+            If Not fso.FileExists(strIsoLabelingProgramPath) Then
+                strErrorMessage = "Error - " & ISO_LABELING_ID_CREATION_TOOL & " not found in " & strIsoLabelingIDToolFolderPath & "; unable to create the " & CSV_PAIRS_ISOS_FILE_SUFFIX & " file"
+                If udtWorkingParams.ts Is Nothing And udtAutoParams.ShowMessages Then
+                    MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+                Else
+                    AutoAnalysisLog udtAutoParams, udtWorkingParams, strErrorMessage
+                End If
+            Else
+                blnSuccess = True
+            End If
+        End If
+    End If
+    
+    If blnSuccess Then
+        ' Input files were found; proceed with creating the _pairs_isos.csv file
+        
+        strIsosFilePathLocal = fso.BuildPath(strIsoLabelingIDToolFolderPath, strInputFileName)
+        strScansFilePathLocal = fso.BuildPath(strIsoLabelingIDToolFolderPath, strScansFileName)
+        strPeaksDataFilePathLocal = fso.BuildPath(strIsoLabelingIDToolFolderPath, strPeaksDataFileName)
+       
+        If LCase(strIsoLabelingIDToolFolderPath) = LCase(fso.GetParentFolderName(strInputFilePath)) Then
+            ' The input file is already located in the working folder
+            blnDeleteInputFileNewAfterLoad = False
+        Else
+            ' Copy the input files to the local folder
+            
+            fso.CopyFile strInputFilePath, strIsosFilePathLocal, True
+            fso.CopyFile strScansFilePath, strScansFilePathLocal, True
+            fso.CopyFile strPeaksDataFilePath, strPeaksDataFilePathLocal, True
+            
+            blnDeleteInputFileNewAfterLoad = True
+        End If
+        
+        
+        ' Now call IsoLabelingIDMain.exe
+       
+        sngMaxProcessingTimeMinutes = DEFAULT_MAXIMUM_PROCESSING_TIME_MINUTES
+        
+        strArguments = strDatasetName
+        
+        ' Change the working directory to strIsoLabelingIDToolFolderPath if needed
+        If CurDir <> strIsoLabelingIDToolFolderPath Then
+            strWorkingDirSaved = CurDir
+            ChDir strIsoLabelingIDToolFolderPath
+        Else
+            strWorkingDirSaved = ""
+        End If
+                
+        Set objProgRunner = New clsProgRunner
+        dtProcessingStartTime = Now()
+        blnAbortProcessing = False
+        
+        If objProgRunner.StartProgram(strIsoLabelingProgramPath, strArguments, vbNormalNoFocus) Then
+            lngStatusUpdateIterationCount = CLng(STATUS_UPDATE_INTERVAL_SEC / CSng(APP_MONITOR_INTERVAL_MSEC / 1000#))
+            If lngStatusUpdateIterationCount < 1 Then lngStatusUpdateIterationCount = 1
+            
+            Do While objProgRunner.AppRunning
+                Sleep APP_MONITOR_INTERVAL_MSEC
+                
+                sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
+                If sngProcessingTimeSeconds / 60# >= sngMaxProcessingTimeMinutes Then
+                    blnAbortProcessing = True
+                    strErrorMessage = CSV_PAIRS_ISOS_FILE_SUFFIX & " file generation using " & ISO_LABELING_ID_CREATION_TOOL & " was aborted because over " & Trim(sngMaxProcessingTimeMinutes) & " minutes has elapsed."
+                End If
+                
+                If blnAbortProcessing Then
+                    objProgRunner.AbortProcessing
+                    DoEvents
+                     
+                    Debug.Assert False
+                    LogErrors Err.Number, "AutoAnalysisProcedures->AutoAnalysisGenerateMonoPlus4IsoLabelingFile", strErrorMessage
+                    AutoAnalysisLog udtAutoParams, udtWorkingParams, strErrorMessage
+                     
+                    Exit Do
+                End If
+                
+                If lngIteration Mod lngStatusUpdateIterationCount = 0 Then
+                    strMessage = "Generating _pairs_isos.csv file: " & Round(sngProcessingTimeSeconds, 1) & " seconds elapsed"
+                    AutoAnalysisLog udtAutoParams, udtWorkingParams, strMessage
+                End If
+                DoEvents
+                
+                lngIteration = lngIteration + 1
+            Loop
+        
+            blnSuccess = Not blnAbortProcessing
+            
+            If blnSuccess Then
+                strInputFilePathNew = fso.BuildPath(strIsoLabelingIDToolFolderPath, strDatasetName & CSV_PAIRS_ISOS_FILE_SUFFIX)
+                
+                If Not fso.FileExists(strInputFilePathNew) Then
+                    strErrorMessage = "Error - " & ISO_LABELING_ID_CREATION_TOOL & " did not create the " & CSV_PAIRS_ISOS_FILE_SUFFIX & " file at " & strInputFilePathNew
+                    If udtWorkingParams.ts Is Nothing And udtAutoParams.ShowMessages Then
+                        MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+                    Else
+                        AutoAnalysisLog udtAutoParams, udtWorkingParams, strErrorMessage
+                    End If
+                Else
+                    blnSuccess = True
+                End If
+            End If
+        
+        End If
+        
+        If blnDeleteInputFileNewAfterLoad Then
+            ' Delete the local copy of the _peaks.dat file
+            ' Also delete the local copy of the _isos.csv file
+            If fso.FileExists(strPeaksDataFilePathLocal) Then
+                On Error Resume Next
+                fso.DeleteFile strPeaksDataFilePathLocal, True
+            End If
+            
+            If fso.FileExists(strIsosFilePathLocal) Then
+                On Error Resume Next
+                fso.DeleteFile strIsosFilePathLocal, True
+            End If
+            
+        End If
+        
+        If Len(strWorkingDirSaved) > 0 Then
+            ChDir strWorkingDirSaved
+        End If
+    End If
+    
+    AutoAnalysisGenerateMonoPlus4IsoLabelingFile = blnSuccess
+    Exit Function
+    
+AutoAnalysisGenerateMonoPlus4IsoLabelingFileErrorHandler:
+    Debug.Assert False
+    strErrorMessage = "Error - An error has occurred while creating the IsoLabelingFile during auto analysis: " & Err.Description
+    If udtWorkingParams.ts Is Nothing And udtAutoParams.ShowMessages Then
+        MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+    Else
+        AutoAnalysisLog udtAutoParams, udtWorkingParams, strErrorMessage
+    End If
+    udtWorkingParams.ErrorBits = udtWorkingParams.ErrorBits Or DATAFILE_LOAD_ERROR_BIT
+    AutoAnalysisGenerateMonoPlus4IsoLabelingFile = False
+
+End Function
+
 
 ' September 2004: Unused function
 ''Private Sub AutoAnalysisUpdateParentHTMLBrowsingFile(byref udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, byref fso As FileSystemObject)
@@ -2134,8 +2424,13 @@ On Error GoTo LoadOptionsErrorHandler
             If .MD_Reference_Job < 0 Then
                 ' Try to determine the job number from udtAutoParams.InputFilePath
                 ' This will only work if udtAutoParams.InputFilePath is on one of the main servers (like Gigasax or Proto-1)
-                strParentFolderName = fso.GetParentFolderName(udtAutoParams.FilePaths.InputFilePath)
                 
+                If Len(udtAutoParams.FilePaths.InputFilePathOriginal) > 0 Then
+                    strParentFolderName = fso.GetParentFolderName(udtAutoParams.FilePaths.InputFilePathOriginal)
+                Else
+                    strParentFolderName = fso.GetParentFolderName(udtAutoParams.FilePaths.InputFilePath)
+                End If
+                                
                 ' The above returned the full path to the parent folder
                 ' We just want the name
                 strParentFolderName = fso.GetFileName(strParentFolderName)
@@ -2200,7 +2495,15 @@ Private Function AutoAnalysisLoadInputFile(ByRef udtWorkingParams As udtAutoAnal
     
     Dim eFileType As ifmInputFileModeConstants
     
-    Dim blnSuccess As Boolean, blnInvalidFolder As Boolean
+    Dim blnFileExists As Boolean
+    Dim blnInvalidFolder As Boolean
+    Dim blnSuccess As Boolean
+    
+    Dim strInputFilePathNew As String
+    Dim blnDeleteInputFileNewAfterLoad As Boolean
+    Dim blnGeneratedMonoPlus4IsoLabelingFile As Boolean
+    Dim strMonoPlus4IsoLabelingMessage As String
+    Dim strScansFilePathLocal As String
     
     Dim strHistoryMatch As String
     Dim lngHistoryIndexLastMatch As Long
@@ -2263,14 +2566,15 @@ On Error GoTo LoadInputFileErrorHandler
     End If
 
     ' See if udtAutoParams.FilePaths.InputFilePath exists
+    blnFileExists = False
     If Len(udtAutoParams.FilePaths.InputFilePath) > 0 Then
-        blnSuccess = fso.FileExists(udtAutoParams.FilePaths.InputFilePath)
-        If Not blnSuccess And InStr(udtAutoParams.FilePaths.InputFilePath, "*") Then
+        blnFileExists = fso.FileExists(udtAutoParams.FilePaths.InputFilePath)
+        If Not blnFileExists And InStr(udtAutoParams.FilePaths.InputFilePath, "*") Then
             ' File not found, however a wildcard is present in udtAutoParams.FilePaths.InputFilePath
             ' Find all files that match the wildcard
             ' If more than one match, choose the best one based on .PEKFileExtensionPreferenceOrder
             
-            ' Need to pre-read the .Ini file to look up the PEKFileExtensionPreferenceOrder setting
+            ' Need to pre-read the .Ini file to look up the PEKFileExtensionPreferenceOrder setting, plus several other settings necessary prior to reading the input ifle
             ' See below for additional comments about pre-reading the .Ini file
             If Len(udtAutoParams.FilePaths.IniFilePath) > 0 Then
                 ' IniFileReadSingleSetting requires a full path
@@ -2380,8 +2684,8 @@ On Error GoTo LoadInputFileErrorHandler
                 
                 If Len(strWildcardFileMatch) > 0 Then
                     strWildcardFileMatch = fso.BuildPath(fso.GetParentFolderName(udtAutoParams.FilePaths.InputFilePath), strWildcardFileMatch)
-                    blnSuccess = fso.FileExists(strWildcardFileMatch)
-                    If blnSuccess Then
+                    blnFileExists = fso.FileExists(strWildcardFileMatch)
+                    If blnFileExists Then
                         Set fsInputFile = fso.GetFile(strWildcardFileMatch)
                         udtAutoParams.FilePaths.InputFilePath = fsInputFile.Path
                     Else
@@ -2393,7 +2697,8 @@ On Error GoTo LoadInputFileErrorHandler
         End If
     End If
         
-    ' Need to pre-read the .Ini file to look up the ExcludeIsoByFit, ExcludeIsoByFitMaxVal,
+    ' Need to pre-read the .Ini file to look up number values, including:
+    '  GenerateMonoPlus4IsoLabeling, ExcludeIsoByFit, ExcludeIsoByFitMaxVal,
     '  RestrictIsoByAbundance, RestrictIsoAbundanceMin, RestrictIsoAbundanceMax,
     '  UsePEKBasedERValues, RestrictToEvenScanNumbersOnly, RestrictToOddScanNumbersOnly,
     '  MaximumDataCountEnabled, and database export settings
@@ -2411,8 +2716,9 @@ On Error GoTo LoadInputFileErrorHandler
     
         With glbPreferencesExpanded
             If FileExists(udtAutoParams.FilePaths.IniFilePath) Then
+                
                 With .AutoAnalysisFilterPrefs
-                    
+
                     strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "ExcludeIsoByFit", "False", udtAutoParams.FilePaths.IniFilePath)
                     .ExcludeIsoByFit = CBoolSafe(strKeyValue)
                     .ExcludeIsoByFitMaxVal = 0.15
@@ -2466,6 +2772,9 @@ On Error GoTo LoadInputFileErrorHandler
                 With .AutoAnalysisOptions
                     strKeyValue = IniFileReadSingleSetting("AutoAnalysisOptions", "PEKFileExtensionPreferenceOrder", .PEKFileExtensionPreferenceOrder, udtAutoParams.FilePaths.IniFilePath)
                     .PEKFileExtensionPreferenceOrder = strKeyValue
+                
+                    strKeyValue = IniFileReadSingleSetting("AutoAnalysisOptions", "GenerateMonoPlus4IsoLabelingFile", "False", udtAutoParams.FilePaths.IniFilePath)
+                    .GenerateMonoPlus4IsoLabelingFile = CBoolSafe(strKeyValue)
                 End With
                 
                 strKeyValue = IniFileReadSingleSetting("ExpandedPreferences", "UsePEKBasedERValues", "False", udtAutoParams.FilePaths.IniFilePath)
@@ -2526,6 +2835,8 @@ On Error GoTo LoadInputFileErrorHandler
                     End If
                 End With
                 
+                .AutoAnalysisOptions.GenerateMonoPlus4IsoLabelingFile = False
+                
                 .UsePEKBasedERValues = False
                 
                 udtAutoParams.InvalidExportPassword = True
@@ -2534,50 +2845,77 @@ On Error GoTo LoadInputFileErrorHandler
         
     End If
     
-    
-    If Not blnSuccess Then
+    If Not blnFileExists Then
         ' udtAutoParams.FilePaths.InputFilePath is empty or doesn't exist
+        ' Prompt user, though only if .ShowMessages is True
+        
         If udtAutoParams.ShowMessages Then
-            ' Prompt user for file and try to load
+            ' Prompt user for file to load
             If Len(udtAutoParams.FilePaths.InputFilePath) > 0 Then
                 MsgBox "Input file path does not point to a valid " & KNOWN_FILE_EXTENSIONS & " file: " & vbCrLf & udtAutoParams.FilePaths.InputFilePath & vbCrLf & "Please choose a valid file (extension " & KNOWN_FILE_EXTENSIONS_WITH_GEL & ")", vbExclamation + vbOKOnly, "File not found"
             End If
-            
-            udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, "", 0, strErrorMessage)
-            If udtWorkingParams.GelIndex > 0 Then
-                ' File loaded successfully
-                udtAutoParams.FilePaths.InputFilePath = GelData(udtWorkingParams.GelIndex).FileName
-                AutoAnalysisLog udtAutoParams, udtWorkingParams, "Loading File; " & GetFileInfo(GelData(udtWorkingParams.GelIndex).FileName)
-                blnSuccess = True
-            Else
-                ' Load failed
-                AutoAnalysisLog udtAutoParams, udtWorkingParams, "Error - " & strErrorMessage
-                udtWorkingParams.ErrorBits = udtWorkingParams.ErrorBits Or DATAFILE_LOAD_ERROR_BIT
-                blnSuccess = False
+        
+            strInputFilePathNew = FileNewSelectFile(MDIForm1.hwnd)
+            blnFileExists = fso.FileExists(strInputFilePathNew)
+                        
+            If blnFileExists Then
+                udtAutoParams.FilePaths.InputFilePath = strInputFilePathNew
             End If
-        Else
-            ' Load failed
+        End If
+    
+        If Not blnFileExists Then
+            ' File not found, and not showing messages, so load failed
             If Not blnInvalidFolder Then
                 AutoAnalysisLog udtAutoParams, udtWorkingParams, "Error - File not found: " & udtAutoParams.FilePaths.InputFilePath
                 udtWorkingParams.ErrorBits = udtWorkingParams.ErrorBits Or DATAFILE_LOAD_ERROR_BIT
             End If
         End If
-    Else
+    End If
+      
+    If blnFileExists Then
         ' udtAutoParams.FilePaths.InputFilePath was found; try to load
+        udtAutoParams.FilePaths.InputFilePathOriginal = ""
         
+        blnSuccess = False
         If DetermineFileType(udtAutoParams.FilePaths.InputFilePath, eFileType) Then
-            If eFileType = ifmGelFile Then
-                ' Loading a .Gel file; use ReadGelFile
-                udtWorkingParams.GelIndex = ReadGelFile(udtAutoParams.FilePaths.InputFilePath, udtAutoParams.GelIndexToForce)
-                udtWorkingParams.LoadedGelFile = True
-            Else
-                ' Loading a .Pek, .CSV, .mzXML, or .mzData file; use FileNew
-                If udtAutoParams.GelIndexToForce > 0 And udtAutoParams.GelIndexToForce <= UBound(GelBody()) Then
-                    udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, udtAutoParams.GelIndexToForce, strErrorMessage)
+                
+            If eFileType = ifmCSVFile And glbPreferencesExpanded.AutoAnalysisOptions.GenerateMonoPlus4IsoLabelingFile Then
+                ' Need to call IsoLabelingIDMain.exe to create the _pairs_isos.csv file
+                '  using the .Dat file and the _isos.csv file
+                blnSuccess = AutoAnalysisGenerateMonoPlus4IsoLabelingFile(udtWorkingParams, udtAutoParams, fso, udtAutoParams.FilePaths.InputFilePath, strInputFilePathNew, blnDeleteInputFileNewAfterLoad)
+                
+                If blnSuccess Then
+                    blnGeneratedMonoPlus4IsoLabelingFile = True
+                    strMonoPlus4IsoLabelingMessage = "Note: Used " & ISO_LABELING_ID_CREATION_TOOL & " to generate " & fso.GetFileName(strInputFilePathNew) & " from " & udtAutoParams.FilePaths.InputFilePath
+                    
+                    ' Update .InputFilePath with the new file path
+                    udtAutoParams.FilePaths.InputFilePathOriginal = udtAutoParams.FilePaths.InputFilePath
+                    udtAutoParams.FilePaths.InputFilePath = strInputFilePathNew
                 Else
-                    udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, 0, strErrorMessage)
+                    strErrorMessage = "Error calling " & ISO_LABELING_ID_CREATION_TOOL & " with  " & udtAutoParams.FilePaths.InputFilePath
+                    udtWorkingParams.ErrorBits = udtWorkingParams.ErrorBits Or DATAFILE_LOAD_ERROR_BIT
                 End If
+            Else
+                blnSuccess = True
+            End If
+
+            If blnSuccess Then
+                If eFileType = ifmGelFile Then
+                    ' Loading a .Gel file; use ReadGelFile
+                    udtWorkingParams.GelIndex = ReadGelFile(udtAutoParams.FilePaths.InputFilePath, udtAutoParams.GelIndexToForce)
+                    udtWorkingParams.LoadedGelFile = True
+                Else
+                    ' Loading a .Pek, .CSV, .mzXML, or .mzData file; use FileNew
+                    If udtAutoParams.GelIndexToForce > 0 And udtAutoParams.GelIndexToForce <= UBound(GelBody()) Then
+                        udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, udtAutoParams.GelIndexToForce, strErrorMessage)
+                    Else
+                        udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, 0, strErrorMessage)
+                    End If
+                    udtWorkingParams.LoadedGelFile = False
+                End If
+            Else
                 udtWorkingParams.LoadedGelFile = False
+                udtWorkingParams.GelIndex = 0
             End If
         Else
             ' Invalid file type
@@ -2611,6 +2949,22 @@ On Error GoTo LoadInputFileErrorHandler
             blnSuccess = False
         End If
         
+        If blnGeneratedMonoPlus4IsoLabelingFile Then
+            If blnDeleteInputFileNewAfterLoad Then
+                If fso.FileExists(udtAutoParams.FilePaths.InputFilePath) Then
+                    On Error Resume Next
+                    fso.DeleteFile udtAutoParams.FilePaths.InputFilePath, True
+                    
+                    strScansFilePathLocal = Left(udtAutoParams.FilePaths.InputFilePath, Len(udtAutoParams.FilePaths.InputFilePath) - Len(CSV_PAIRS_ISOS_FILE_SUFFIX))
+                    strScansFilePathLocal = strScansFilePathLocal & "_" & CSV_SCANS_FILE_SUFFIX
+                    
+                    If fso.FileExists(strScansFilePathLocal) Then
+                        fso.DeleteFile strScansFilePathLocal, True
+                    End If
+                    On Error GoTo LoadInputFileErrorHandler
+                End If
+            End If
+        End If
     End If
     
     If blnSuccess Then
@@ -2623,6 +2977,11 @@ On Error GoTo LoadInputFileErrorHandler
         strHistoryMatch = FindSettingInAnalysisHistory(udtWorkingParams.GelIndex, CSV_COLUMN_HEADER_MISSING_WARNING, lngHistoryIndexLastMatch, False, ":", ";")
         If lngHistoryIndexLastMatch >= 0 Then
             udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or MISCELLANEOUS_MESSAGE_WARNING_BIT
+        End If
+        
+        If blnGeneratedMonoPlus4IsoLabelingFile Then
+            ' Append strMonoPlus4IsoLabelingMessage to the analysis status history
+            AddToAnalysisHistory udtWorkingParams.GelIndex, strMonoPlus4IsoLabelingMessage
         End If
     End If
     
@@ -5588,6 +5947,7 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
     ' Initialize udtAutoParams and udtWorkingParams
     With udtAutoParams
         .FilePaths.InputFilePath = strBaseFileName & ".pek"
+        .FilePaths.InputFilePathOriginal = ""
         .MTDBOverride.Enabled = False
     End With
     
@@ -6077,6 +6437,7 @@ On Error GoTo GenerateAutoAnalysisHtmlFileErrorHandler
                 .ShowMessages = blnShowMessages
                 .FilePaths.OutputFolderPath = objFolder.Path            ' This probably doesn't need to be populated here
                 .FilePaths.InputFilePath = strInputFilePath
+                .FilePaths.InputFilePathOriginal = ""
                 
                 If lngPeakMatchingTaskID > 0 And Len(strMTDBName) > 0 Then
                     .MTDBOverride.Enabled = True
@@ -6287,6 +6648,7 @@ Public Sub InitializeAutoAnalysisParameters(ByRef udtAutoParams As udtAutoAnalys
             .DatasetFolder = ""
             .ResultsFolder = ""
             .InputFilePath = ""
+            .InputFilePathOriginal = ""
             .OutputFolderPath = ""
             .IniFilePath = ""
             .LogFilePath = ""

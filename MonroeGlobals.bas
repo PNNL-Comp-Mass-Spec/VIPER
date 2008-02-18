@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "February 8, 2008"
+Public Const APP_BUILD_DATE As String = "February 17, 2008"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -1007,6 +1007,8 @@ Public Type udtAutoAnalysisOptionsType
     DBConnectionTimeoutSeconds As Integer
     ExportResultsFileUsesJobNumberInsteadOfDataSetName As Boolean
     
+    GenerateMonoPlus4IsoLabelingFile As Boolean         ' If true, then calls IsoLabelingIDMain.exe to create the _pairs_isos.csv file using the .Dat file and the _isos.csv file
+    
     SaveGelFile As Boolean
     SaveGelFileOnError As Boolean
     SavePictureGraphic As Boolean
@@ -1312,6 +1314,7 @@ Public Type udtAutoAnalysisFilePathsType
     ResultsFolder As String     ' Folder name only
 
     InputFilePath As String
+    InputFilePathOriginal As String     ' This holds the original input file path specified; useful if the IsoLabelingIDMain.exe software was used to create a _pairs_isos.csv file from an _isos.csv file
     
     OutputFolderPath As String
     IniFilePath As String
