@@ -1087,7 +1087,7 @@ End Sub
 Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
     Dim blnAMTsWereLoaded As Boolean, blnDBConnectionError As Boolean
 
-    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, blnForceReload, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
         lblMTStatus.Caption = ConstructMTStatusText(True)
     
         If Not CreateNewMTSearchObject() Then
@@ -1212,7 +1212,7 @@ ElseIf PIDCnt(PairInd) = 0 Then     'no id for this pair
    ts.WriteLine SP & glARG_SEP & "Unidentified"
 Else                                'identified
    For i = PIDInd1(PairInd) To PIDInd2(PairInd)
-       sID = glARG_SEP & AMTData(mgIDInd(i)).ID & glARG_SEP _
+       sID = glARG_SEP & Trim(AMTData(mgIDInd(i)).ID) & glARG_SEP _
             & AMTData(mgIDInd(i)).MW & glARG_SEP & mgScore(i)
        ts.WriteLine SP & sID
    Next i

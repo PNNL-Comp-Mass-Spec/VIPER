@@ -406,9 +406,12 @@ Private Function ComputeScanNumber(ByVal dblNET As Double, ByVal dblNETSlope As 
     ComputeScanNumber = CLngSafe((dblNET - dblNETIntercept) / dblNETSlope)
 End Function
 
-Public Function ConfirmMassTagsAndInternalStdsLoaded(frmCallingForm As VB.Form, lngGelIndex As Long, blnShowMessages As Boolean, Optional ByRef intConnectAttemptCountReturn As Integer, Optional ByVal blnForceReload As Boolean = False, Optional ByVal blnLoadMTtoORFMapInfo As Boolean = True, Optional ByRef blnAMTsWereLoaded As Boolean = False, Optional ByRef blnDBConnectionError As Boolean = False) As Boolean
+' Old: Function ConfirmMassTagsAndInternalStdsLoaded(frmCallingForm As VB.Form, lngGelIndex As Long, blnShowMessages As Boolean, Optional ByRef intConnectAttemptCountReturn As Integer, Optional ByVal blnForceReload As Boolean = False, Optional ByVal blnLoadMTtoORFMapInfo As Boolean = True, Optional ByRef blnAMTsWereLoaded As Boolean = False, Optional ByRef blnDBConnectionError As Boolean = False) As Boolean
+
+Public Function ConfirmMassTagsAndInternalStdsLoaded(frmCallingForm As VB.Form, lngGelIndex As Long, blnShowMessages As Boolean, ByVal blnLoadMTtoORFMapInfo As Boolean, ByVal blnLoadMTStats As Boolean, Optional ByVal blnForceReload As Boolean = False, Optional ByRef intConnectAttemptCountReturn As Integer = 0, Optional ByRef blnAMTsWereLoaded As Boolean = False, Optional ByRef blnDBConnectionError As Boolean = False) As Boolean
     ' Returns True if the Correct MassTags and Internal Standards are loaded
     ' Returns False if not, or if an error
+    ' Optionally calls ConfirmMTStatsLoaded if blnLoadMTStats=True
     '
     ' If over MassTagStalenessOptions.MaximumAgeLoadedMassTagsHours has elapsed since the last load, then
     '  changes blnForceReload to True
@@ -640,7 +643,12 @@ Public Function ConfirmMassTagsAndInternalStdsLoaded(frmCallingForm As VB.Form, 
           End If
         End If
     End If
-        
+    
+    If MassTagsLoaded And blnLoadMTStats Then
+        ' Also confirm that the MT Stats are loaded
+        ConfirmMTStatsLoaded frmCallingForm, lngGelIndex, blnShowMessages, 0, blnForceReload
+    End If
+    
     ConfirmMassTagsAndInternalStdsLoaded = MassTagsLoaded
     Exit Function
     
@@ -659,6 +667,155 @@ err_LoadMTDB:
     End Select
     ConfirmMassTagsAndInternalStdsLoaded = False
     
+End Function
+
+Private Function ConfirmMTStatsLoaded(frmCallingForm As VB.Form, lngGelIndex As Long, blnShowMessages As Boolean, Optional ByRef intConnectAttemptCountReturn As Integer, Optional ByVal blnForceReload As Boolean = False, Optional ByRef blnMTStatsWereLoaded As Boolean = False, Optional ByRef blnDBConnectionError As Boolean = False) As Boolean
+    ' Returns True if the Correct MT Stats are loaded
+    ' Returns False if not, or if an error
+    '
+    ' If over MassTagStalenessOptions.MaximumAgeLoadedMassTagsHours has elapsed since the last load, then
+    '  changes blnForceReload to True
+    '
+    ' If the DB connection string is empty but CurrLegacyMTDatabase is defined, then assumes we're using AMTs from a legacy DB (aka an Access DB)
+    
+    '-----------------------------------------------
+    'Load MT Stats from database if necessary;
+    '-----------------------------------------------
+    
+    Dim MTStatsLoaded As Boolean
+    Dim blnValuesAgree As Boolean
+    Dim tmpConnStr As String
+    Dim udtFilteringOptions As udtMTFilteringOptionsType
+    
+    Dim strMissingDBErrorMessage As String
+    Dim lngDBConnectionTimoutLength As Long
+    Dim fso As FileSystemObject
+    
+    strMissingDBErrorMessage = "MT tag database search not possible at this moment. " & vbCrLf & "Please define the database using menu option 'Steps->3. Select MT tags' in the main window."
+    
+    ' Lookup the current MT tags filter options
+    LookupMTFilteringOptions lngGelIndex, udtFilteringOptions
+    
+    On Error GoTo err_LoadMTDB
+       
+    TraceLog 5, "ConfirmMTStatsLoaded", "Check if MT Stats are loaded"
+       
+    ' Set the connection string
+    If APP_BUILD_DISABLE_MTS Then
+        tmpConnStr = ""
+    Else
+        tmpConnStr = GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString
+    End If
+
+    ' Possibly load data from database if neccessary
+    ' First see if new MT Stats need to be loaded
+    MTStatsLoaded = False
+    If AMTScoreStatsCnt > 0 Then
+        ' MT Stats are in memory
+        If Len(CurrMTStatsDatabase) > 0 And CurrMTStatsDatabase = CurrMTDatabase Then
+            ' We are connected to an MTS DB (not a legacy database)
+            ' If the desired MT Stats are already loaded, then do not re-load
+            With udtFilteringOptions
+                If (UCase(CurrMTStatsDatabase) = UCase(tmpConnStr)) And _
+                   (CurrMTStatsFilteringOptions.MinimumHighNormalizedScore = .MinimumHighNormalizedScore) And _
+                   (CurrMTStatsFilteringOptions.MinimumPMTQualityScore = .MinimumPMTQualityScore) Then
+                   
+                    blnValuesAgree = True
+                    
+                    If CurrMTSchemaVersion < 1 Or CurrMTSchemaVersion >= 2 Then
+                        ' Schema version 2; examine MinimumHighDiscriminantScore AND MinimumPeptideProphetProbability
+                        If (CurrMTStatsFilteringOptions.MinimumHighDiscriminantScore = .MinimumHighDiscriminantScore) And _
+                           (CurrMTStatsFilteringOptions.MinimumPeptideProphetProbability = .MinimumPeptideProphetProbability) Then
+                            blnValuesAgree = True
+                        Else
+                            blnValuesAgree = False
+                        End If
+                    End If
+                    
+                    MTStatsLoaded = blnValuesAgree
+                End If
+            End With
+        ElseIf Len(CurrLegacyMTDatabase) > 0 Then
+            If GelData(lngGelIndex).PathtoDatabase = CurrLegacyMTDatabase Then
+                MTStatsLoaded = True
+            End If
+        End If
+       
+        With glbPreferencesExpanded.MassTagStalenessOptions
+            If .MaximumAgeLoadedMassTagsHours = 0 Then .MaximumAgeLoadedMassTagsHours = 8
+            
+            If Now() - .AMTStatsLoadTime >= .MaximumAgeLoadedMassTagsHours / 24# Then blnForceReload = True
+        End With
+    End If
+
+    blnMTStatsWereLoaded = False
+    If Not MTStatsLoaded Or blnForceReload Then
+       If blnForceReload Then
+            TraceLog 5, "ConfirmMTStatsLoaded", "Need to re-load MT Stats (force reload)"
+       Else
+            TraceLog 5, "ConfirmMTStatsLoaded", "Need to re-load MT Stats (difference found)"
+       End If
+       
+       If Not GelAnalysis(lngGelIndex) Is Nothing Then
+            If Len(GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString) > 0 And Not APP_BUILD_DISABLE_MTS Then
+                With glbPreferencesExpanded.AutoAnalysisOptions
+                   intConnectAttemptCountReturn = 0
+                   Do
+                      If intConnectAttemptCountReturn = 0 Then
+                          lngDBConnectionTimoutLength = .DBConnectionTimeoutSeconds
+                      Else
+                          ' On the second attempt (or higher), use of a longer timeout length may be beneficial
+                          ' Take times 1.5 on the 2nd try, 2 on the third, 2.5 on the fourth, etc.
+                          lngDBConnectionTimoutLength = .DBConnectionTimeoutSeconds * ((intConnectAttemptCountReturn + 2) / 2#)
+                          ' Allow a maximum timeout length of 30 minutes
+                          If lngDBConnectionTimoutLength > 1800 Then lngDBConnectionTimoutLength = 1800
+                      End If
+                      
+                      MTStatsLoaded = LoadMTStats(lngGelIndex, frmCallingForm, CInt(lngDBConnectionTimoutLength), blnDBConnectionError)
+                      
+                      intConnectAttemptCountReturn = intConnectAttemptCountReturn + 1
+                   Loop While Not MTStatsLoaded And Not blnDBConnectionError And intConnectAttemptCountReturn < .DBConnectionRetryAttemptMax
+                   blnMTStatsWereLoaded = MTStatsLoaded
+                   
+                End With
+            
+            ElseIf Len(GelData(lngGelIndex).PathtoDatabase) > 0 Then
+                ' At present, cannot load MT Stats from a Legacy DB
+                MTStatsLoaded = False
+                '' MTStatsLoaded = ConnectToLegacyAMTDB(frmCallingForm, lngGelIndex, False, True, False)
+                blnMTStatsWereLoaded = MTStatsLoaded
+            Else
+                If blnShowMessages Then
+                    MsgBox strMissingDBErrorMessage, vbExclamation + vbOKOnly, "Error"
+                End If
+                MTStatsLoaded = False
+            End If
+       Else
+            If blnShowMessages Then
+                MsgBox strMissingDBErrorMessage, vbExclamation + vbOKOnly, "Error"
+            End If
+            MTStatsLoaded = False
+       End If
+    End If
+
+    ConfirmMTStatsLoaded = MTStatsLoaded
+    Exit Function
+    
+err_LoadMTDB:
+    Debug.Assert False
+    Select Case Err.Number
+    Case 91         'object variable not set
+        If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox strMissingDBErrorMessage, vbExclamation + vbOKOnly, "Error"
+        End If
+    Case Else
+        If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox "An error occurred while loading the MT Stats", vbExclamation + vbOKOnly, "Error"
+        End If
+        LogErrors Err.Number, "MonroeLaVRoutines->ConfirmMTStatsLoaded"
+    End Select
+    ConfirmMTStatsLoaded = False
+
 End Function
 
 Public Function ConstructUMCIndexList(ByVal lngGelIndex As Long, ByVal lngIonIndex As Long, ByVal intIonType As Integer) As String

@@ -92,6 +92,17 @@ Public Function FixNull(vPossiblyNullValue As Variant) As String
 
 End Function
 
+Public Function FixNullInt(vPossiblyNullValue As Variant, Optional intValueToReturnIfNull As Integer = 0) As Integer
+    
+    On Error Resume Next
+    If VarType(vPossiblyNullValue) = 1 Then
+        FixNullInt = intValueToReturnIfNull
+    Else
+        FixNullInt = vPossiblyNullValue
+    End If
+
+End Function
+
 Public Function FixNullLng(vPossiblyNullValue As Variant, Optional lngValueToReturnIfNull As Long = 0) As Long
     
     On Error Resume Next

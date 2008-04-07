@@ -801,7 +801,7 @@ End Sub
 Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
     Dim blnAMTsWereLoaded As Boolean, blnDBConnectionError As Boolean
 
-    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, blnForceReload, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
         lblMTCount.Caption = ConstructMTStatusText(True)
         cmdSearch.Enabled = True
     Else

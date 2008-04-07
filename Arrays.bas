@@ -923,7 +923,7 @@ End If
 If AMTCnt > 0 Then
     ReDim lngAMTID(1 To AMTCnt)
     For lngIndex = 1 To AMTCnt
-        lngAMTID(lngIndex) = CLngSafe(AMTData(lngIndex).ID)
+        lngAMTID(lngIndex) = AMTData(lngIndex).ID
     Next lngIndex
 Else
     ReDim lngAMTID(1 To 1)

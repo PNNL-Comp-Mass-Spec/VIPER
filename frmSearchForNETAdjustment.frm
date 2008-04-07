@@ -1073,7 +1073,7 @@ ts.WriteLine "Average Deviation: " & AdjAvD
 ts.WriteLine
 ts.WriteLine "ID" & glARG_SEP & "ID_NET" & glARG_SEP & "Scan"
 For i = 0 To IDCnt - 1
-    ts.WriteLine AMTData(ID(i)).ID & glARG_SEP & AMTData(ID(i)).NET & glARG_SEP & IDScan(i)
+    ts.WriteLine Trim(AMTData(ID(i)).ID) & glARG_SEP & AMTData(ID(i)).NET & glARG_SEP & IDScan(i)
 Next i
 ts.Close
 Set fso = Nothing
@@ -1215,7 +1215,7 @@ End Sub
 Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
     Dim blnAMTsWereLoaded As Boolean, blnDBConnectionError As Boolean
     
-    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, blnForceReload, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
         lblMTStatus.Caption = ConstructMTStatusText(False)
     
         If Not CreateNewMTSearchObject() Then

@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
 Begin VB.Form frmProtoViewPRISM 
    Caption         =   "Protein Based Analysis - PRISM"
    ClientHeight    =   8670
@@ -146,6 +146,7 @@ Begin VB.Form frmProtoViewPRISM
       _ExtentX        =   9975
       _ExtentY        =   6588
       _Version        =   393217
+      Enabled         =   -1  'True
       TextRTF         =   $"frmProtoViewPRISM.frx":030A
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "Courier New"
@@ -646,6 +647,82 @@ Private Sub GetPeptidesDigestion()
 
 End Sub
 
+Private Function LoadORFs(ByVal Ind As Long) As Boolean
+    '--------------------------------------------------------------
+    'executes command that retrieves list of Proteins (ORFs) from Organism
+    'MT tag database; returns True if at least one ORF loaded.
+    '--------------------------------------------------------------
+    Dim cnNew As New ADODB.Connection
+    Dim sCommand As String
+    Dim rsORFs As New ADODB.Recordset
+    Dim cmdGetORFs As New ADODB.Command     'no arguments with ORF list
+    
+    'reserve space for 50000 ORFs; increase in chunks of 2000 after that
+    ReDim ORFID(1 To 50000)
+    
+    On Error Resume Next
+    sCommand = glbPreferencesExpanded.MTSConnectionInfo.spGetORFIDs
+    If Len(sCommand) <= 0 Then Exit Function
+    
+    On Error GoTo err_LoadORFs
+    Screen.MousePointer = vbHourglass
+    ORFCnt = 0
+    
+    If Not EstablishConnection(cnNew, GelAnalysis(Ind).MTDB.cn.ConnectionString, False) Then
+        Debug.Assert False
+        LoadORFs = False
+        Exit Function
+    End If
+    
+    'create and tune command object to retrieve MT tags
+    ' Initialize the SP
+    InitializeSPCommand cmdGetORFs, cnNew, sCommand
+    
+    'procedure returns error number or 0 if OK
+    Set rsORFs = cmdGetORFs.Execute
+    With rsORFs
+        Do Until .EOF
+           ORFCnt = ORFCnt + 1
+           ORFID(ORFCnt) = .Fields(0).Value
+           .MoveNext
+        Loop
+    End With
+    rsORFs.Close
+    
+    'clean things and exit
+exit_LoadORFs:
+    On Error Resume Next
+    Set cmdGetORFs.ActiveConnection = Nothing
+    cnNew.Close
+    If ORFCnt > 0 Then
+       If ORFCnt < UBound(ORFID) Then ReDim Preserve ORFID(1 To ORFCnt)
+    Else
+       Erase ORFID
+    End If
+    Screen.MousePointer = vbDefault
+    LoadORFs = (ORFCnt > 0)
+    Exit Function
+
+err_LoadORFs:
+    Select Case Err.Number
+    Case 9                       'need more room for MT tags
+        ReDim Preserve ORFID(1 To ORFCnt + 2000)
+        Resume
+    Case 13, 94                  'Type Mismatch or Invalid Use of Null
+        Resume Next              'just ignore it
+    Case 3265, 3704              'two errors I have encountered
+        '2nd attempt will probably work so let user know it should try again
+        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox "Error loading Proteins from the database. Error could " _
+                 & "have been caused by network/server issues(timeout) so you " _
+                 & "might try loading again with Refresh function.", vbOKOnly, glFGTU
+        End If
+    Case Else
+        LogErrors Err.Number, "LoadORFs"
+    End Select
+    ORFCnt = -1
+    GoTo exit_LoadORFs
+End Function
 
 Private Sub Timer1_Timer()
 CurrORFInd = CLng(Rnd() * ORFCnt)

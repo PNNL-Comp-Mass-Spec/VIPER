@@ -569,6 +569,9 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Begin VB.Menu mnuFSearchNonPaired 
          Caption         =   "Search &Non-paired LC-MS Features"
       End
+      Begin VB.Menu mnuFSearchN14LabeledFeatures 
+         Caption         =   "Search N14-labeled Features"
+      End
       Begin VB.Menu mnuFSep1 
          Caption         =   "-"
       End
@@ -2069,7 +2072,7 @@ Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
     
     cmdSearchAllUMCs.Enabled = False
     
-    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, blnForceReload, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
         lblMTStatus.Caption = ConstructMTStatusText(True)
     
         If Not CreateNewMTSearchObject() Then
@@ -3437,7 +3440,7 @@ Private Function ShowOrSaveResultsByIon(Optional strOutputFilePath As String = "
     If AMTCnt > 0 Then
         ReDim lngAMTID(1 To AMTCnt)
         For lngIndex = 1 To AMTCnt
-            lngAMTID(lngIndex) = CLngSafe(AMTData(lngIndex).ID)
+            lngAMTID(lngIndex) = AMTData(lngIndex).ID
         Next lngIndex
     Else
         ReDim lngAMTID(1 To 1)
@@ -3694,7 +3697,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
         
             dblMatchNET = AMTData(lngMassTagIndexOriginal).NET
             ' Future: dblMatchNETStDev = AMTData(lngMassTagIndexOriginal).NETStDev
-            strMatchID = AMTData(lngMassTagIndexOriginal).ID
+            strMatchID = Trim(AMTData(lngMassTagIndexOriginal).ID)
             
             sngPeptideProphetProbability = AMTData(lngMassTagIndexOriginal).PeptideProphetProbability
             strPeptideSequence = AMTData(lngMassTagIndexOriginal).Sequence
@@ -3807,7 +3810,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
                         If mUMCMatchStats(mgInd).IDIsInternalStd Then
                             ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl & strSepChar & "1" & strSepChar & strInternalStdDescription
                         Else
-                            WriteORFResults ts, strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl, CLngSafe(AMTData(lngMassTagIndexOriginal).ID), objORFNameFastSearch, strSepChar
+                            WriteORFResults ts, strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl, AMTData(lngMassTagIndexOriginal).ID, objORFNameFastSearch, strSepChar
                         End If
                     End If
                     
@@ -3827,7 +3830,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
                 If mUMCMatchStats(mgInd).IDIsInternalStd Then
                     ts.WriteLine strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl & strSepChar & "1" & strSepChar & strInternalStdDescription
                 Else
-                    WriteORFResults ts, strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl, CLngSafe(AMTData(lngMassTagIndexOriginal).ID), objORFNameFastSearch, strSepChar
+                    WriteORFResults ts, strLineOut & strLineOutMiddle & strLineOutEnd & strLineOutEndAddnl, AMTData(lngMassTagIndexOriginal).ID, objORFNameFastSearch, strSepChar
                 End If
             End If
             
@@ -4615,6 +4618,24 @@ End Sub
 
 Private Sub mnuFSearchAll_Click()
 StartSearchAll
+End Sub
+
+Private Sub mnuFSearchN14LabeledFeatures_Click()
+    '''''''''''''''''''''''''''''''''''''
+    '''''''''''''''''''''''''''''''''''''
+    '''    ToDo: Implement this search
+    '''''''''''''''''''''''''''''''''''''
+    '''''''''''''''''''''''''''''''''''''
+    Debug.Assert False
+    
+    ' Step 0: Clear any existing pairs
+    ' Step 1: Match UMCs to the DB, though only use N14 UMCs
+    ' Step 2: For each match, compute the average peptide mass, then compare to the average mass value of the N15 UMCs
+    '         However, if the N15 UMCs have monoisotopic mass values, then compute the mono peptide mass
+    '         For matching UMCs, check their scan boundaries using the same code as is on the PairSearch form
+    '         If a match, then create a new pair, compute the ER (not scan-by-scan, but use charge-state rules from the Pair Search form), and store the peptide hit
+    '
+    
 End Sub
 
 Private Sub mnuFSearchNonPaired_Click()

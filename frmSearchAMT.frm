@@ -591,9 +591,9 @@ If AMTCnt > 0 Then  'global AMT count
    For i = 1 To AMTCnt
        Select Case samtDef.NETorRT
        Case glAMT_NET
-         sLine = AMTData(i).ID & glARG_SEP & AMTData(i).MW & glARG_SEP & AMTData(i).NET & glARG_SEP & AMTHits(i)
+         sLine = Trim(AMTData(i).ID) & glARG_SEP & AMTData(i).MW & glARG_SEP & AMTData(i).NET & glARG_SEP & AMTHits(i)
        Case glAMT_RT_or_PNET
-         sLine = AMTData(i).ID & glARG_SEP & AMTData(i).MW & glARG_SEP & AMTData(i).PNET & glARG_SEP & AMTHits(i)
+         sLine = Trim(AMTData(i).ID) & glARG_SEP & AMTData(i).MW & glARG_SEP & AMTData(i).PNET & glARG_SEP & AMTHits(i)
        End Select
        If AMTHits(i) > 0 Then
           AvgErrDa = Str(AMTMWErr(i) / AMTHits(i))

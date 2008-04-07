@@ -1291,7 +1291,7 @@ With GelData(0)
                 .Abundance = 1000000
                 .AverageMW = AMTData(i).MW
                 .ExpressionRatio = 0                ' Legacy: stored AMTData(i).NET here
-                .MTID = "MT: " & AMTData(i).ID
+                .MTID = "MT: " & Trim(AMTData(i).ID)
             End With
             If AMTData(i).MW < .MinMW Then .MinMW = AMTData(i).MW
             If AMTData(i).MW > .MaxMW Then .MaxMW = AMTData(i).MW
@@ -1320,7 +1320,7 @@ With GelData(0)
                 .AverageMW = AMTData(i).MW
                 .MostAbundantMW = AMTData(i).MW
                 .ExpressionRatio = 0                       ' Legacy: stored AMTData(i).NET here
-                .MTID = "MT: " & AMTData(i).ID
+                .MTID = "MT: " & Trim(AMTData(i).ID)
             End With
             
             If AMTData(i).MW < .MinMW Then .MinMW = AMTData(i).MW

@@ -1205,7 +1205,7 @@ Private Sub CopyDeltaLabelPairs2003ToCurrent(OldDeltaLabelPairs As IsoPairsDltLb
             .ComputeERScanByScan = False
             .ScanByScanAverageIsNotWeighted = False
             
-            .RequireMatchingIsotopeTagLabels = True
+            .RequireMatchingIsotopeTagLabels = False
             
             .MonoPlusMinusThresholdForceHeavyOrLight = 66
             .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
@@ -1285,7 +1285,7 @@ Private Sub CopyDeltaLabelPairs2004aToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ComputeERScanByScan = OldDeltaLabelPairs.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
             
-            .RequireMatchingIsotopeTagLabels = True
+            .RequireMatchingIsotopeTagLabels = False
             
             .MonoPlusMinusThresholdForceHeavyOrLight = 66
             .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
@@ -1364,7 +1364,7 @@ Private Sub CopyDeltaLabelPairs2004bToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ComputeERScanByScan = OldDeltaLabelPairs.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
             
-            .RequireMatchingIsotopeTagLabels = True
+            .RequireMatchingIsotopeTagLabels = False
             
             .MonoPlusMinusThresholdForceHeavyOrLight = 66
             .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
@@ -1425,7 +1425,7 @@ Private Sub CopyDeltaLabelPairs2004cToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
             
-            .RequireMatchingIsotopeTagLabels = True
+            .RequireMatchingIsotopeTagLabels = False
             
             .MonoPlusMinusThresholdForceHeavyOrLight = 66
             .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
@@ -1492,7 +1492,7 @@ Private Sub CopyDeltaLabelPairs2004dToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
             
-            .RequireMatchingIsotopeTagLabels = True
+            .RequireMatchingIsotopeTagLabels = False
             
             .MonoPlusMinusThresholdForceHeavyOrLight = 66
             .IgnoreMonoPlus2AbundanceInIReportERCalc = 0
@@ -1566,7 +1566,7 @@ Private Sub CopyDeltaLabelPairs2004eToCurrent(OldDeltaLabelPairs As IsoPairsDltL
             .ComputeERScanByScan = OldDeltaLabelPairs.SearchDef.ComputeERScanByScan
             .ScanByScanAverageIsNotWeighted = False
             
-            .RequireMatchingIsotopeTagLabels = True
+            .RequireMatchingIsotopeTagLabels = False
             
             .MonoPlusMinusThresholdForceHeavyOrLight = 66
             .IgnoreMonoPlus2AbundanceInIReportERCalc = 0

@@ -731,7 +731,7 @@ lblStatus.Caption = ""
 Me.MousePointer = vbDefault
 End Function
 
-Public Function GetAMTMWByID(ByVal ID As String) As Double
+Public Function GetAMTMWByID(ByVal ID As Long) As Double
 'returns AMT MW for AMT; not optimized to tell the truth
 Dim i As Long
 GetAMTMWByID = -1

@@ -114,8 +114,8 @@ Begin VB.Form frmMSAlign
       TabCaption(2)   =   "Tolerances"
       TabPicture(2)   =   "frmMSAlign.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraBinningOptions"
-      Tab(2).Control(1)=   "fraNETTolerances"
+      Tab(2).Control(0)=   "fraNETTolerances"
+      Tab(2).Control(1)=   "fraBinningOptions"
       Tab(2).ControlCount=   2
       TabCaption(3)   =   "Calibration Type"
       TabPicture(3)   =   "frmMSAlign.frx":0054
@@ -125,10 +125,10 @@ Begin VB.Form frmMSAlign
       TabCaption(4)   =   "Advanced"
       TabPicture(4)   =   "frmMSAlign.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "txtWarpMassZScoreTolerance"
-      Tab(4).Control(1)=   "Frame1"
-      Tab(4).Control(2)=   "chkWarpMassUseLSQ"
-      Tab(4).Control(3)=   "Label21"
+      Tab(4).Control(0)=   "Label21"
+      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(2)=   "Frame1"
+      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
       Tab(4).ControlCount=   4
       TabCaption(5)   =   "Plots"
       TabPicture(5)   =   "frmMSAlign.frx":008C
@@ -2103,7 +2103,7 @@ Begin VB.Form frmMSAlign
          Top             =   960
          Visible         =   0   'False
          Width           =   5535
-         _Version        =   393217
+         _Version        =   393218
          _ExtentX        =   9763
          _ExtentY        =   8070
          _StockProps     =   68
@@ -2117,7 +2117,7 @@ Begin VB.Form frmMSAlign
             Strikethrough   =   0   'False
          EndProperty
          Reset_0         =   0   'False
-         CompatibleVers_0=   393217
+         CompatibleVers_0=   393218
          Graph3D_0       =   1
          ClassName_1     =   "CCWGraph3DFrame"
          opts_1          =   62
@@ -2200,8 +2200,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   5.47080630525871E-295
-         DataMax_5       =   5.47080630525871E-295
+         DataMin_5       =   1.15737829893346E-294
+         DataMax_5       =   1.15737829893346E-294
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2267,8 +2267,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   5.4868435072828E-295
-         DataMax_14      =   5.4868435072828E-295
+         DataMin_14      =   1.14536084996792E-294
+         DataMax_14      =   1.14536084996792E-294
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2336,8 +2336,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   5.50828617218652E-295
-         DataMax_23      =   5.50828617218652E-295
+         DataMin_23      =   1.14117982895605E-294
+         DataMax_23      =   1.14117982895605E-294
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -2985,6 +2985,12 @@ Begin VB.Form frmMSAlign
          Caption         =   "Load MT Tags from &Legacy DB"
       End
       Begin VB.Menu mnuPMTTagsSep1 
+         Caption         =   "-"
+      End
+      Begin VB.Menu mnuPMTTagsLoadMTStats 
+         Caption         =   "Load MT &FScore Stats"
+      End
+      Begin VB.Menu mnuPMTTagsSep2 
          Caption         =   "-"
       End
       Begin VB.Menu mnuPMTTagsStatus 
@@ -4542,7 +4548,7 @@ On Error GoTo InitializeSearchErrorHandler
         End If
     Else
         ' Force loading of MT tags
-        Call LoadPMTsFromDB
+        Call LoadPMTsFromDB(False, False)
         
         ' Display the slope and intercept
         With GelAnalysis(CallerID)
@@ -4564,14 +4570,15 @@ InitializeSearchErrorHandler:
 
 End Sub
 
-Private Sub LoadPMTsFromDB(Optional blnForceReload As Boolean = False)
+Private Sub LoadPMTsFromDB(blnForceReload As Boolean, blnLoadMTStats As Boolean)
     Dim blnAMTsWereLoaded As Boolean, blnDBConnectionError As Boolean
     Dim strMessage As String
     
     EnableDisableControls False
     
     UpdateStatus "Confirming that MT tags are present in memory"
-    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, blnForceReload, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+    
+    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, blnLoadMTStats, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
         PopulateLocalPMTsArray
         
         If blnAMTsWereLoaded Then
@@ -7175,7 +7182,7 @@ Private Sub mnuPMTTagsLoadFromDB_Click()
     'load/reload MT tags
     '------------------------------------------------------------
     If Not GelAnalysis(CallerID) Is Nothing Then
-        Call LoadPMTsFromDB(True)
+        Call LoadPMTsFromDB(True, False)
     Else
         WarnUserNotConnectedToDB CallerID, True
     End If
@@ -7183,6 +7190,17 @@ End Sub
 
 Private Sub mnuPMTTagsLoadFromLegacyDB_Click()
     LoadPMTsFromLegacyDB
+End Sub
+
+Private Sub mnuPMTTagsLoadMTStats_Click()
+    '------------------------------------------------------------
+    'load/reload MT tags
+    '------------------------------------------------------------
+    If Not GelAnalysis(CallerID) Is Nothing Then
+        Call LoadPMTsFromDB(True, True)
+    Else
+        WarnUserNotConnectedToDB CallerID, True
+    End If
 End Sub
 
 Private Sub mnuPMTTagsStatus_Click()

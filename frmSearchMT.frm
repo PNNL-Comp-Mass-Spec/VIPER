@@ -383,7 +383,7 @@ Public Sub InitializeDBSearch(Optional blnForceReload As Boolean = False)
     Dim blnAMTsWereLoaded As Boolean, blnDBConnectionError As Boolean
 
     If bLoading Then
-        If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, blnForceReload, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+        If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
             lblAMTStatus.Caption = ConstructMTStatusText(True)
             cmdSearch.Enabled = True
         Else
@@ -478,9 +478,9 @@ If AMTCnt > 0 Then  'global AMT count
         
        Select Case samtDef.NETorRT
        Case glAMT_NET
-         sLine = AMTData(i).ID & strSepChar & AMTData(i).MW & strSepChar & AMTData(i).NET & strSepChar & AMTHits(i)
+         sLine = Trim(AMTData(i).ID) & strSepChar & AMTData(i).MW & strSepChar & AMTData(i).NET & strSepChar & AMTHits(i)
        Case glAMT_RT_or_PNET
-         sLine = AMTData(i).ID & strSepChar & AMTData(i).MW & strSepChar & AMTData(i).PNET & strSepChar & AMTHits(i)
+         sLine = Trim(AMTData(i).ID) & strSepChar & AMTData(i).MW & strSepChar & AMTData(i).PNET & strSepChar & AMTHits(i)
        End Select
        If AMTHits(i) > 0 Then
           AvgErrDa = Str(AMTMWErr(i) / AMTHits(i))
@@ -613,8 +613,10 @@ End Sub
 
 Private Sub cmdRefresh_Click()
     Dim blnAMTsWereLoaded As Boolean, blnDBConnectionError As Boolean
-
-    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, True, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+    Dim blnForceReload As Boolean
+    blnForceReload = True
+    
+    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
         lblAMTStatus.Caption = "Loaded; MT tag count: " & LongToStringWithCommas(AMTCnt)
         cmdSearch.Enabled = True
     Else

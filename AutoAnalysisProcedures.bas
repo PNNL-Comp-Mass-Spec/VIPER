@@ -1556,7 +1556,7 @@ GenerateHTMLBrowsingFileErrorHandler:
     
 End Sub
 
-Private Function AutoAnalysisGenerateMonoPlus4IsoLabelingFile(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject, strInputFilePath As String, ByRef strInputFilePathNew As String, ByRef blnDeleteInputFileNewAfterLoad As Boolean) As Boolean
+Private Function AutoAnalysisGenerateMonoPlus4IsoLabelingFile(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject, strInputFilePath As String, ByRef strInputFilePathNew As String, ByRef blnDeleteInputFileNewAfterLoad As Boolean, ByRef strScansFilePathLocal As String) As Boolean
     ' strInputFilePath should end in CSV_ISOS_FILE_SUFFIX or CSV_ISOS_IC_FILE_SUFFIX
     ' If the input file is already located in the working folder, then blnDeleteInputFileNewAfterLoad will be set to false
     ' Otherwise, blnDeleteInputFileNewAfterLoad will be set to true
@@ -1581,7 +1581,6 @@ Private Function AutoAnalysisGenerateMonoPlus4IsoLabelingFile(ByRef udtWorkingPa
     
     Dim strIsoLabelingIDToolFolderPath As String
     Dim strIsosFilePathLocal As String
-    Dim strScansFilePathLocal As String
     Dim strPeaksDataFilePathLocal As String
     Dim strIsoLabelingProgramPath As String
         
@@ -1602,8 +1601,10 @@ Private Function AutoAnalysisGenerateMonoPlus4IsoLabelingFile(ByRef udtWorkingPa
 On Error GoTo AutoAnalysisGenerateMonoPlus4IsoLabelingFileErrorHandler
     
     strInputFilePathNew = ""
-    blnDeleteInputFileNewAfterLoad = False
     strErrorMessage = ""
+    
+    blnDeleteInputFileNewAfterLoad = False
+    strScansFilePathLocal = ""
     
     ' Determine the parent folder path
     strInputFolderPath = fso.GetParentFolderName(strInputFilePath)
@@ -1793,6 +1794,7 @@ On Error GoTo AutoAnalysisGenerateMonoPlus4IsoLabelingFileErrorHandler
                     Else
                         AutoAnalysisLog udtAutoParams, udtWorkingParams, strErrorMessage
                     End If
+                    blnSuccess = False
                 Else
                     blnSuccess = True
                 End If
@@ -1803,16 +1805,26 @@ On Error GoTo AutoAnalysisGenerateMonoPlus4IsoLabelingFileErrorHandler
         If blnDeleteInputFileNewAfterLoad Then
             ' Delete the local copy of the _peaks.dat file
             ' Also delete the local copy of the _isos.csv file
+            
+            On Error Resume Next
             If fso.FileExists(strPeaksDataFilePathLocal) Then
-                On Error Resume Next
                 fso.DeleteFile strPeaksDataFilePathLocal, True
             End If
             
+            On Error Resume Next
             If fso.FileExists(strIsosFilePathLocal) Then
-                On Error Resume Next
                 fso.DeleteFile strIsosFilePathLocal, True
             End If
             
+            If Not blnSuccess Then
+                ' Processing failed; also need to delete the _scans.csv file
+                On Error Resume Next
+                If fso.FileExists(strScansFilePathLocal) Then
+                    fso.DeleteFile strScansFilePathLocal, True
+                End If
+            End If
+            
+            On Error GoTo AutoAnalysisGenerateMonoPlus4IsoLabelingFileErrorHandler
         End If
         
         If Len(strWorkingDirSaved) > 0 Then
@@ -2102,6 +2114,7 @@ End Sub
 Private Function AutoAnalysisLoadDB(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject) As Boolean
     ' Returns True if the database is loaded, False otherwise
     
+    Dim blnForceReload As Boolean
     Dim blnDBLoaded As Boolean
     Dim intConnectAttemptCount As Integer
     Dim strDBName As String
@@ -2115,7 +2128,9 @@ On Error GoTo LoadDBErrorHandler
         AutoAnalysisLog udtAutoParams, udtWorkingParams, "Error - Could not connect to the database -- the connection string is not defined"
     Else
         ' Note that intConnectAttemptCount is sent ByRef so that we can record the number of connection attempts required
-        blnDBLoaded = ConfirmMassTagsAndInternalStdsLoaded(MDIForm1, udtWorkingParams.GelIndex, udtAutoParams.ShowMessages, intConnectAttemptCount, False, True, blnAMTsWereLoaded, blnDBConnectionError)
+        blnForceReload = False
+        
+        blnDBLoaded = ConfirmMassTagsAndInternalStdsLoaded(MDIForm1, udtWorkingParams.GelIndex, udtAutoParams.ShowMessages, True, False, blnForceReload, intConnectAttemptCount, blnAMTsWereLoaded, blnDBConnectionError)
         If AMTCnt <= 0 Then blnDBLoaded = False
         strDBName = ExtractDBNameFromConnectionString(GelAnalysis(udtWorkingParams.GelIndex).MTDB.cn.ConnectionString)
         If blnDBLoaded Then
@@ -2500,10 +2515,12 @@ Private Function AutoAnalysisLoadInputFile(ByRef udtWorkingParams As udtAutoAnal
     Dim blnSuccess As Boolean
     
     Dim strInputFilePathNew As String
+    Dim strScansFilePathLocal As String
+    
     Dim blnDeleteInputFileNewAfterLoad As Boolean
     Dim blnGeneratedMonoPlus4IsoLabelingFile As Boolean
+    
     Dim strMonoPlus4IsoLabelingMessage As String
-    Dim strScansFilePathLocal As String
     
     Dim strHistoryMatch As String
     Dim lngHistoryIndexLastMatch As Long
@@ -2882,7 +2899,7 @@ On Error GoTo LoadInputFileErrorHandler
             If eFileType = ifmCSVFile And glbPreferencesExpanded.AutoAnalysisOptions.GenerateMonoPlus4IsoLabelingFile Then
                 ' Need to call IsoLabelingIDMain.exe to create the _pairs_isos.csv file
                 '  using the .Dat file and the _isos.csv file
-                blnSuccess = AutoAnalysisGenerateMonoPlus4IsoLabelingFile(udtWorkingParams, udtAutoParams, fso, udtAutoParams.FilePaths.InputFilePath, strInputFilePathNew, blnDeleteInputFileNewAfterLoad)
+                blnSuccess = AutoAnalysisGenerateMonoPlus4IsoLabelingFile(udtWorkingParams, udtAutoParams, fso, udtAutoParams.FilePaths.InputFilePath, strInputFilePathNew, blnDeleteInputFileNewAfterLoad, strScansFilePathLocal)
                 
                 If blnSuccess Then
                     blnGeneratedMonoPlus4IsoLabelingFile = True
@@ -2952,12 +2969,13 @@ On Error GoTo LoadInputFileErrorHandler
         If blnGeneratedMonoPlus4IsoLabelingFile Then
             If blnDeleteInputFileNewAfterLoad Then
                 If fso.FileExists(udtAutoParams.FilePaths.InputFilePath) Then
+                    ' Delete the _pairs_isos.csv file
+                    
                     On Error Resume Next
                     fso.DeleteFile udtAutoParams.FilePaths.InputFilePath, True
                     
-                    strScansFilePathLocal = Left(udtAutoParams.FilePaths.InputFilePath, Len(udtAutoParams.FilePaths.InputFilePath) - Len(CSV_PAIRS_ISOS_FILE_SUFFIX))
-                    strScansFilePathLocal = strScansFilePathLocal & "_" & CSV_SCANS_FILE_SUFFIX
-                    
+                    ' Delete the _scans.csv file
+                    On Error Resume Next
                     If fso.FileExists(strScansFilePathLocal) Then
                         fso.DeleteFile strScansFilePathLocal, True
                     End If
@@ -5868,6 +5886,7 @@ Public Sub AutoGenerateQCPlots(objCallingForm As Form, lngGelIndex As Long, Opti
     Dim eMassUnitsSaved As glMassToleranceConstants
     
     Dim blnGenerateRobustNETPlots As Boolean
+    Dim blnForceReload As Boolean
     Dim blnAMTsWereLoaded As Boolean
     Dim blnDBConnectionError As Boolean
     
@@ -5973,7 +5992,8 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
     End If
     
     If eResponse = vbYes Then
-        If ConfirmMassTagsAndInternalStdsLoaded(objCallingForm, udtWorkingParams.GelIndex, udtAutoParams.ShowMessages, 0, False, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+        blnForceReload = False
+        If ConfirmMassTagsAndInternalStdsLoaded(objCallingForm, udtWorkingParams.GelIndex, udtAutoParams.ShowMessages, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
             ' ConstructMTStatusText(True)
         Else
             If blnDBConnectionError Then

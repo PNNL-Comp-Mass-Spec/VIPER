@@ -2870,7 +2870,19 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
     ReDim ChargeStateBasedOrgIndex(INITIAL_RESERVE_COUNT)
     
     
+    
+'''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''
+'''    ToDo: If Require matching N14/N15 tag mode is enabled, then
+'''          store monoisotopic mass values for the N14-type UMCs and
+'''          average mass values for the N15-type UMCs
+'''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''
+
+    
     If (GelData(lngGelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA) = GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA Then
+Debug.Assert False
+        
         blnComputeIsoStats = True
     Else
         blnComputeIsoStats = False

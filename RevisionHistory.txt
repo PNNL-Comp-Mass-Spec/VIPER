@@ -1,5 +1,17 @@
 VIPER Change Log
 
+Version 3.44 - Build 388; April 7, 2008
+	- Now optionally obtains MT FScore Stats values from MTS databases using procedure GetMTStatsAndPepProphetStats
+		- These values will be used with the SMART algorithm
+	- Changed internal storage of MTID values to be in an array of 32 bit integers rather than in a string array
+	- Work in progress: 
+		- Menu option SearchN14LabeledFeatures when matching Features to PMTs; see frmSearchMT_ConglomerateUMC.frm
+		- Correct reported abundance when column "pct most abundant" is present; see modFileIOPek.bas
+		- If RequireMatchingIsotopeTag is enabled when finding LC-MS features, then store monoisotopic mass values for the N14-type UMCs and average mass values for the N15-type UMCs; see UC.Bas
+
+Version 3.43 - Build 387; February 18, 2008
+	- Updated to delete the _scans.csv file if IsoLabelingIDMain.exe does not create the _pairs_isos.csv file
+
 Version 3.43 - Build 386; February 17, 2008
 	- Updated to optionally call IsoLabelingIDMain.exe to create the _pairs_isos.csv file using the Decon2LS _isos.csv and _peaks.dat files for a given dataset
 		- Use parameter file setting GenerateMonoPlus4IsoLabelingFile in the AutoAnalysisOptions section to initiate this behavior

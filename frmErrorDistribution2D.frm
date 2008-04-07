@@ -1515,7 +1515,7 @@ On Error GoTo AddNewErrValuesErrorHandler
                     If lngIndexPointer >= 0 Then
                         lngMTIndex = mAMTIDSortedInd(lngIndexPointer)
                     
-                        Debug.Assert InStr(Refs(lngMatchIndex), AMTData(lngMTIndex).ID) > 0
+                        Debug.Assert InStr(Refs(lngMatchIndex), Trim(AMTData(lngMTIndex).ID)) > 0
                         dblRefMW = AMTData(lngMTIndex).MW
                         dblRefNET = AMTData(lngMTIndex).NET
                     
@@ -2325,7 +2325,6 @@ On Error GoTo ConstructAMTIndexLookupArrayErrorHandler
         ReDim mAMTIDSortedInd(0 To AMTCnt - 1)
     
         For lngIndex = 1 To AMTCnt
-            Debug.Assert IsNumeric(AMTData(lngIndex).ID)
             mAMTIDSorted(lngIndex - 1) = AMTData(lngIndex).ID        ' Note that AMTData() is a 1-based array
             mAMTIDSortedInd(lngIndex - 1) = lngIndex
         Next lngIndex
@@ -3096,7 +3095,7 @@ Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
     End If
     
     If eResponse = vbYes Then
-        If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, blnForceReload, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+        If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
             lblMTStatus.Caption = ConstructMTStatusText(False)
         Else
             If blnDBConnectionError Then

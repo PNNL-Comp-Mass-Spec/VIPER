@@ -96,7 +96,7 @@ Private Const ISOS_COLUMN_IREP_MW_MONO_ABU As String = "imono"
 Private Const ISOS_COLUMN_IREP_2DA As String = "i+2"
 Private Const ISOS_COLUMN_PCT_MOST_ABUNDANT As String = "pct most abundant"
 Private Const ISOS_COLUMN_ELEMENT_LABEL_N14N15 As String = "n14/n15"
-Private Const ISOS_COLUMN_ELEMENT_LABEL_N14N15_RATIO As String = "n14/n15 ratio"
+Private Const ISOS_COLUMN_ELEMENT_LABEL_N14N15_RATIO As String = "n14/n15 ratio"        ' Confidence value related to ICR-2LS decision to label a peak as N14 or N15.  If 1, then both are equally likely.  If 10 and labeled N14, then the theoretical N14 distribution fit 10 times better than the theoretical N15 distribution
 
 
 ' Note: These should all be lowercase string values
@@ -1073,6 +1073,25 @@ On Error GoTo ReadPEKFileErrorHandler
                                         .FWHM = 0
                                         .SignalToNoise = 0
                                         
+                                        If intIsosColumnMapping(irdIsoRawDataIndex.irdPctMostAbundant) >= 0 Then
+                                            
+                                            '''''''''''''''''''''''''''''''''''''
+                                            '''''''''''''''''''''''''''''''''''''
+                                            '''    ToDo: Implement this optional abundance correction step
+                                            '''''''''''''''''''''''''''''''''''''
+                                            '''''''''''''''''''''''''''''''''''''
+                                            Debug.Assert False
+
+''                                            If glbPreferencesExpanded.CorrectIntensityUsingPctMostAbundant Then
+''                                                sngPctMostAbundant = GetColumnValueSng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdPctMostAbundant), 0)
+''                                                If sngPctMostAbundant > 0 Then
+''                                                    .Abundance = .Abundance / (sngPctMostAbundant / 100#)
+''                                                End If
+''                                            End If
+                                            
+                                        End If
+                                        
+                                        
                                         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
                                         
                                         If intIsosColumnMapping(irdIsoRawDataIndex.irdIsotopeTag) >= 0 Or _
@@ -1086,6 +1105,10 @@ On Error GoTo ReadPEKFileErrorHandler
                                             
                                             If intIsosColumnMapping(irdIsoRawDataIndex.irdIsotopeTag) > 0 Then
                                                 .IsotopeLabel = GetIsotopeLabelTagCode(GetColumnValueString(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdIsotopeTag), ""))
+                                                
+                                                If intIsosColumnMapping(irdIsoRawDataIndex.irdIsotopeTagRatio) > 0 Then
+                                                    '.IsotopeFitRatio = GetColumnValueSng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdIsotopeTagRatio), 0)
+                                                End If
                                             Else
                                                 ' See if vardata(7) contains some text
                                             

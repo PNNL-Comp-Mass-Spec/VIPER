@@ -2818,7 +2818,7 @@ End Sub
 Private Sub mnuEditClearIDBadDeltaMTICAT_Click()
 Me.MousePointer = vbHourglass
 If AMTCnt = 0 Then
-    ConfirmMassTagsAndInternalStdsLoaded Me, nMyIndex, True
+    ConfirmMassTagsAndInternalStdsLoaded Me, nMyIndex, True, True, False
 End If
 RemoveBadMTs_DeltaMT nMyIndex, PAIR_ICAT
 Me.MousePointer = vbDefault
@@ -2827,7 +2827,7 @@ End Sub
 Private Sub mnuEditClearIDBadDeltaMTN14N15_Click()
 Me.MousePointer = vbHourglass
 If AMTCnt = 0 Then
-    ConfirmMassTagsAndInternalStdsLoaded Me, nMyIndex, True
+    ConfirmMassTagsAndInternalStdsLoaded Me, nMyIndex, True, True, False
 End If
 RemoveBadMTs_DeltaMT nMyIndex, PAIR_N14N15
 Me.MousePointer = vbDefault
@@ -3730,7 +3730,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 If Len(strDBMatchList) > 0 Then
                     eResponse = MsgBox("One or more points contains database matches.  However, the appropriate ORF information is not currently loaded.  Load it now (if No, then re-enable this option using Edit->Copy Points in View->Include DB Search Matches)?", vbQuestion + vbYesNoCancel + vbDefaultButton1, "Load MT tags")
                     If eResponse = vbYes Then
-                        ConfirmMassTagsAndInternalStdsLoaded Me, nMyIndex, True
+                        ConfirmMassTagsAndInternalStdsLoaded Me, nMyIndex, True, True, False
                     Else
                         mnuSCopyPointsInViewIncludeSearchResults.Checked = False
                     End If
@@ -4147,7 +4147,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             If blnMatchFound Then
                 eResponse = MsgBox("One or more LC-MS Features contains database matches.  However, the appropriate Protein (ORF) information is not currently loaded.  Load it now (if No, then re-enable this option using Edit->Copy LC-MS Features in View->Include DB Search Matches)?", vbQuestion + vbYesNoCancel + vbDefaultButton1, "Load MT tags")
                 If eResponse = vbYes Then
-                    ConfirmMassTagsAndInternalStdsLoaded Me, nMyIndex, True
+                    ConfirmMassTagsAndInternalStdsLoaded Me, nMyIndex, True, True, False
                 Else
                     mnuSCopyPointsInViewByUMCIncludeSearchResults.Checked = False
                 End If

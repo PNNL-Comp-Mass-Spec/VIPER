@@ -1185,7 +1185,7 @@ End Function
 Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
     Dim blnAMTsWereLoaded As Boolean, blnDBConnectionError As Boolean
 
-    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, blnForceReload, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
         lblMTStatus.Caption = ConstructMTStatusText(True)
     
         If Not CreateNewMTSearchObject() Then
@@ -1641,7 +1641,7 @@ For lngPairInd = 0 To PCount - 1
                     lngMassTagIndexPointer = mMTInd(mUMCMatchStats(lngMatchIndex).IDIndex)
                     lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
                     
-                    strIDInfo = strSepChar & AMTData(lngMassTagIndexOriginal).ID & strSepChar
+                    strIDInfo = strSepChar & Trim(AMTData(lngMassTagIndexOriginal).ID) & strSepChar
                     strIDInfo = strIDInfo & mMTMWN14(mUMCMatchStats(lngMatchIndex).IDIndex) & strSepChar
                 
                     strIDInfo = strIDInfo & MOD_TKN_PAIR_LIGHT
@@ -1659,7 +1659,7 @@ For lngPairInd = 0 To PCount - 1
                     If Not blnIncludeORFInfo Then
                         ts.WriteLine strPairInfo & strIDInfo
                     Else
-                        WriteORFResults ts, strPairInfo & strIDInfo, CLngSafe(AMTData(lngMassTagIndexOriginal).ID), objORFNameFastSearch, strSepChar
+                        WriteORFResults ts, strPairInfo & strIDInfo, AMTData(lngMassTagIndexOriginal).ID, objORFNameFastSearch, strSepChar
                     End If
                Next lngMatchIndex
             End If

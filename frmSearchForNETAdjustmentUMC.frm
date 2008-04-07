@@ -1,6 +1,6 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl.ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
 Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmSearchForNETAdjustmentUMC 
    Caption         =   "Search MT Tag Database For NET Adjustment"
@@ -4416,7 +4416,7 @@ End Sub
 Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
     Dim blnAMTsWereLoaded As Boolean, blnDBConnectionError As Boolean
     
-    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, 0, blnForceReload, True, blnAMTsWereLoaded, blnDBConnectionError) Then
+    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
         lblMTStatus.Caption = ConstructMTStatusText(True)
     
         If Not CreateNewMTSearchObject() Then
@@ -4771,7 +4771,7 @@ Private Sub ReportAdjustments()
         End With
     Else
         For i = 0 To IDCnt - 1
-            ts.WriteLine AMTData(ID(i)).ID & glARG_SEP & AMTData(ID(i)).NET & glARG_SEP & IDScan(i)
+            ts.WriteLine Trim(AMTData(ID(i)).ID) & glARG_SEP & AMTData(ID(i)).NET & glARG_SEP & IDScan(i)
         Next i
     End If
     

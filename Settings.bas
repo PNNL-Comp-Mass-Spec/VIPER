@@ -2550,6 +2550,8 @@ On Error GoTo SaveSettingsFileHandler
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTagNames", .spGetMassTagNames
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetInternalStandards", .spGetInternalStandards
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetDBSchemaVersion", .spGetDBSchemaVersion
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTagToProteinNameMap", .spGetMassTagToProteinNameMap
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMTStats", .spGetMTStats
         End With
         IniStuff.WriteSection "MTSConnectionInfo", sKeys(), sVals(), iKVCount
     End If
@@ -3834,6 +3836,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .spGetInternalStandards = "GetInternalStandards"
                     .spGetDBSchemaVersion = "GetDBSchemaVersion"
                     .spGetMassTagToProteinNameMap = "GetMassTagToProteinNameMap"
+                    .spGetMTStats = "GetMTStatsAndPepProphetStats"
                     
                     .sqlGetMTNames = "SELECT * FROM V_IFC_Mass_Tag_To_Protein_Map ORDER BY 1"               ' We really only want the first 3 columns, but they have different names in the old and new schema, and we thus will simply access the view
                     ' Obsolete: .sqlGetORFMassTagMap = "SELECT * FROM V_IFC_Mass_Tag_To_Protein_Name_Map ORDER BY 1"

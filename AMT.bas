@@ -183,20 +183,42 @@ Public Type udtUMCMassTagRawMatches
 End Type
 
 Public Type udtAMTDataType
-    ID As String                  'AMT ID
-    flag As Integer               'Status field
-    MW As Double                  'Theoretical molecular weight
-    NET As Double                 'elution time
-    MSMSObsCount As Long          'number of observations by MS/MS
-    NETStDev As Double            'elution time standard deviation
-    PNET As Double                'Theoretical NET (from DB)  (previously, held retention time, in seconds)
-    CNT_N As Long                 'count of N atoms
-    CNT_Cys As Long               'count of Cysteines
-    Sequence As String            'peptide sequences
+    ID As Long                          'AMT ID
+    flag As Integer                     'Status field
+    MW As Double                        'Theoretical molecular weight
+    NET As Double                       'elution time
+    MSMSObsCount As Long                'number of observations by MS/MS
+    NETStDev As Double                  'elution time standard deviation
+    PNET As Single                      'Theoretical NET (from DB)  (previously, held retention time, in seconds)
+    CNT_N As Integer                    'count of N atoms
+    CNT_Cys As Integer                  'count of Cysteines
     HighNormalizedScore As Single       'High normalized score (typically XCorr)
     HighDiscriminantScore As Single     'High discriminant score
-    PeptideProphetProbability As Single ' High Peptide Prophet Probability
+    PeptideProphetProbability As Single 'High Peptide Prophet Probability
+    Sequence As String                  'peptide sequences;
 End Type
+
+Public Type udtAMTScoreStatsType
+    MTID As Long                          'AMT ID
+    MW As Double                        'Theoretical molecular weight
+    NET As Double                       'elution time
+    NETStDev As Double                  'elution time standard deviation
+    NETCount As Integer
+    MSMSObsCount As Long                'number of observations by MS/MS
+    HighNormalizedScore As Single       'High normalized score (typically XCorr)
+    HighDiscriminantScore As Single     'High discriminant score
+    PeptideProphetProbability As Single 'High Peptide Prophet Probability
+    ModCount As Integer
+    TrypticState As Byte
+    PepProphetObsCountCS1 As Integer
+    PepProphetObsCountCS2 As Integer
+    PepProphetObsCountCS3 As Integer
+    PepProphetFScoreCS1 As Single
+    PepProphetFScoreCS2 As Single
+    PepProphetFScoreCS3 As Single
+    PassesFilters As Byte
+End Type
+
 
 Private Type udtAMTFieldPresentProteinTblType
     ID As Boolean
@@ -251,32 +273,22 @@ Public sorfDef As SearchORFDefinition
 'search flag as an array (for more efficient searching)
 Private aSearchFlag() As Boolean
 
-'Global array of data loaded from AMT database to make things faster
+'Global array of data loaded from AMT database
 'Array is sorted on MW (since the Stored Procedure returns the data that way)
 'This is a 1-based array, ranging from 1 to AMTCnt
 Public AMTData() As udtAMTDataType
 
-'''Public AMTID() As String        'AMT ID
-'''Public AMTFlag() As Integer     'Status field
-'''Public AMTMW() As Double        'Theoretical molecular weight
-'''Public AMTNET() As Double       'elution time
-'''Public AMTObsCount() As Integer
-'''Public AMTNETStDev() As Double  'elution time standard deviation
-'''Public AMTPNET() As Double      'Theoretical NET (from DB)  (previously, held retention time, in seconds)
-'''Public AMTCNT_N() As Long       'count of N atoms
-'''Public AMTCNT_Cys() As Long     'count of Cysteines
-'''Public AMTSequence() As String  'peptide sequences
-'''Public AMTHiNormalizedScore() As Single     ' High normalized score (typically XCorr)
-'''Public AMTHiDiscriminantScore() As Single   ' High discriminant score
-
-'''Public AMTCNT_Lys() As Long     'count of Lysine
-'''Public AMTCNT_Ser() As Long     'count of Serine
-'''Public AMTCNT_Tyr() As Long     'count of whatever
+'Global array of data loaded from AMT database
+'Array is sorted on MTID (since the Stored Procedure returns the data that way)
+'This is a 0-based array, ranging from 0 to AMTScoreStatsCnt-1
+Public AMTScoreStatsCnt As Long
+Public AMTScoreStats() As udtAMTScoreStatsType
 
 'arrays down are used to compare AMT database with
 'current gel and eventually recalculate NET for gels
 Public AMTHits() As Long
 Public AMTMWErr() As Double     'sum of absolute values of absolute errors
+
 'following arrays are used for both NET and RT calculation
 Public AMTNETErr() As Double    'sum of absolute NET/RT errors (direction could help)
 Public AMTNETMin() As Double    'min of NET/RT range
@@ -290,7 +302,7 @@ Public ORFID() As Long              'ORF ids
 Public MTtoORFMapCount As Long      'number of MT tags - ORF mappings
 Public MTIDMap() As Long            'parallel arrays that establish MT tags to Proteins mapping; 1-based array
 Public ORFIDMap() As Long           'parallel arrays that establish MT tags to Proteins mapping; 1-based array
-Public ORFRefNames() As String      'ORF ref names; 1-based array
+Public ORFRefNames() As String      'Protein (ORF) names; 1-based array
 
 ' Unused variables (July 2003)
 ''''names from the T_Mass_Tags_to_ORF_Map are not loaded by default but could be
@@ -506,12 +518,12 @@ Public Function ConstructAMTReference(ByVal MW As Double, _
     End If
     
     ' The following assertion will fail if we used a huge search tolerance
-    Debug.Assert Abs(MWTolRef) < 1
+    'Debug.Assert Abs(MWTolRef) < 1
     
     sMWTolRef = MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd
     'put AMT ID and actual errors
     AMTRef = ""
-    AMTRef = AMTRef & AMTMark & AMTData(AMTMatchIndex).ID & sMWTolRef
+    AMTRef = AMTRef & AMTMark & Trim(AMTData(AMTMatchIndex).ID) & sMWTolRef
     AMTRef = AMTRef & MTSLiCMark & Round(dblSLiCScore, 4) & MTSLiCEnd
     AMTRef = AMTRef & MTDelSLiCMark & Round(dblDelSLiCScore, 4) & MTDelSLiCEnd
     
@@ -881,9 +893,13 @@ On Error GoTo err_LegacyDBLoadAMTData
     ' Initially reserve space for 1000 entries
     AMTCnt = 0
     ReDim AMTData(1 To 1000)
-    
+
     ' Clear MTtoORFMapCount
     MTtoORFMapCount = 0
+        
+    ' Clear the Score Stats array; this data cannot be loaded from Legacy DBs
+    AMTScoreStatsCnt = 0
+    ReDim AMTScoreStats(0)
     
     Do Until rsAMT.EOF
         If AMTCnt >= UBound(AMTData) Then
@@ -959,7 +975,7 @@ err_LegacyDBLoadAMTData:
 End Function
 
 Private Function LegacyDBLoadAMTDataWork(ByRef rsAMT As Recordset, ByVal lngIndex As Long, ByRef lngMassTagCountWithNullValues As Long, ByRef udtFieldPresent As udtAMTFieldPresentType, ByVal eDBGeneration As dbgDatabaseGenerationConstants) As Boolean
-    Const NET_VALUE_IF_NULL = -100000
+    Const NET_VALUE_IF_NULL As Single = -100000
 
     Dim blnSuccess As Boolean
     
@@ -973,7 +989,10 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
         Select Case eDBGeneration
         Case dbgMTSOffline
             
-            AMTData(lngIndex).ID = .Fields(DB_FIELD_TMASSTAGS_MASS_TAG_ID).Value
+            ' Initialize this entry
+            InitializeAMTDataEntry AMTData(lngIndex), NET_VALUE_IF_NULL
+                        
+            AMTData(lngIndex).ID = CLng(.Fields(DB_FIELD_TMASSTAGS_MASS_TAG_ID).Value)
             AMTData(lngIndex).MW = CDbl(.Fields(DB_FIELD_TMASSTAGS_MW).Value)
             
             If IsNull(.Fields(DB_FIELD_TMTNET_NET).Value) Then
@@ -983,19 +1002,6 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             End If
             
             
-            ' Set the defaults for the remaining fields
-            ' We'll populate them with the real values if the field is present
-            AMTData(lngIndex).Sequence = ""
-            AMTData(lngIndex).flag = 0
-            AMTData(lngIndex).PNET = NET_VALUE_IF_NULL
-            AMTData(lngIndex).NETStDev = 0
-            AMTData(lngIndex).CNT_N = -1
-            AMTData(lngIndex).CNT_Cys = -1
-            AMTData(lngIndex).MSMSObsCount = 1
-            AMTData(lngIndex).HighNormalizedScore = 0
-            AMTData(lngIndex).HighDiscriminantScore = 0
-            AMTData(lngIndex).PeptideProphetProbability = 0
-            
             If udtFieldPresent.PeptideSequence Then
                 If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_PEPTIDE).Value) Then
                     AMTData(lngIndex).Sequence = CStr(.Fields(DB_FIELD_TMASSTAGS_PEPTIDE).Value)
@@ -1004,13 +1010,13 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             
             If udtFieldPresent.PNET Then
                 If Not IsNull(.Fields(DB_FIELD_TMTNET_PNET).Value) Then
-                    AMTData(lngIndex).PNET = CDbl(.Fields(DB_FIELD_TMTNET_PNET).Value)
+                    AMTData(lngIndex).PNET = CSng(.Fields(DB_FIELD_TMTNET_PNET).Value)
                 End If
             End If
             
             If udtFieldPresent.NETStDev Then
                 If Not IsNull(.Fields(DB_FIELD_TMTNET_STDEV).Value) Then
-                    AMTData(lngIndex).NETStDev = CDbl(.Fields(DB_FIELD_TMTNET_STDEV).Value)
+                    AMTData(lngIndex).NETStDev = CSng(.Fields(DB_FIELD_TMTNET_STDEV).Value)
                 End If
             End If
             
@@ -1054,10 +1060,14 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             
             blnSuccess = True
         Case dbgGeneration1000, dbgGeneration1, dbgGeneration0800, dbgGeneration0900
+            
+             ' Initialize this entry
+            InitializeAMTDataEntry AMTData(lngIndex), NET_VALUE_IF_NULL
+            
             If eDBGeneration < dbgGeneration1000 Then
-                AMTData(lngIndex).ID = .Fields(DB_FIELD_AMT_OLD_ID).Value
+                AMTData(lngIndex).ID = CLng(.Fields(DB_FIELD_AMT_OLD_ID).Value)
             Else
-                AMTData(lngIndex).ID = .Fields(DB_FIELD_AMT_NEW_ID).Value
+                AMTData(lngIndex).ID = CLng(.Fields(DB_FIELD_AMT_NEW_ID).Value)
             End If
             
             AMTData(lngIndex).MW = CDbl(.Fields(DB_FIELD_AMT_MW).Value)
@@ -1068,20 +1078,6 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                 AMTData(lngIndex).NET = CDbl(.Fields(DB_FIELD_AMT_NET).Value)
             End If
             
-            
-            ' Set the defaults for the remaining fields
-            ' We'll populate them with the real values if the field is present
-            AMTData(lngIndex).Sequence = ""
-            AMTData(lngIndex).flag = 0
-            AMTData(lngIndex).PNET = NET_VALUE_IF_NULL
-            AMTData(lngIndex).NETStDev = 0
-            AMTData(lngIndex).CNT_N = -1
-            AMTData(lngIndex).CNT_Cys = -1
-            AMTData(lngIndex).MSMSObsCount = 1
-            AMTData(lngIndex).HighNormalizedScore = 0
-            AMTData(lngIndex).HighDiscriminantScore = 0
-            AMTData(lngIndex).PeptideProphetProbability = 0
-            
             If udtFieldPresent.PeptideSequence Then
                 If Not IsNull(.Fields(DB_FIELD_AMT_PEPTIDE).Value) Then
                     AMTData(lngIndex).Sequence = .Fields(DB_FIELD_AMT_PEPTIDE).Value
@@ -1089,18 +1085,18 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             End If
             
             If udtFieldPresent.Status Then
-                AMTData(lngIndex).flag = CLng(.Fields(DB_FIELD_AMT_Status).Value)
+                AMTData(lngIndex).flag = CInt(.Fields(DB_FIELD_AMT_Status).Value)
             End If
             
             If udtFieldPresent.PNET Then
                 If Not IsNull(.Fields(DB_FIELD_AMT_PNET).Value) Then
-                    AMTData(lngIndex).PNET = CDbl(.Fields(DB_FIELD_AMT_PNET).Value)
+                    AMTData(lngIndex).PNET = CSng(.Fields(DB_FIELD_AMT_PNET).Value)
                 End If
             End If
             
             If udtFieldPresent.RetentionTime Then
                 If Not IsNull(.Fields(DB_FIELD_AMT_RETENTION).Value) Then
-                    AMTData(lngIndex).PNET = CDbl(.Fields(DB_FIELD_AMT_RETENTION).Value)
+                    AMTData(lngIndex).PNET = CSng(.Fields(DB_FIELD_AMT_RETENTION).Value)
                 End If
             End If
             
@@ -1484,7 +1480,7 @@ On Error GoTo err_LegacyDBLoadProteinData
         If AMTCnt > 0 Then
             ReDim AMTIDsSorted(1 To AMTCnt)
             For lngAMTIndex = 1 To AMTCnt
-                AMTIDsSorted(lngAMTIndex) = CLngSafe(AMTData(lngAMTIndex).ID)
+                AMTIDsSorted(lngAMTIndex) = AMTData(lngAMTIndex).ID
             Next lngAMTIndex
             Set objQSLong = New QSLong
             objQSLong.QSAsc AMTIDsSorted(), EmptyArray()
@@ -2128,7 +2124,7 @@ If mwutSearch.FindIndexRange(MW, AbsTol, FirstInd, LastInd) Then
         End If
         sMWTolRef = MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd
         'put AMT ID and actual errors
-        AMTRef = AMTRef & AMTMark & AMTData(i).ID & sMWTolRef
+        AMTRef = AMTRef & AMTMark & Trim(AMTData(i).ID) & sMWTolRef
         If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(i).CNT_N & MTEndMark
         If Delta > 0 Then AMTRef = AMTRef & MTDltMark & Delta
         AMTRef = AMTRef & glARG_SEP & Chr$(32)
@@ -2193,7 +2189,7 @@ If mwutSearch.FindIndexRange(MW, AbsTol, FirstInd, LastInd) Then
         NETTolRef = (NET - AMTData(i).NET)
         sNETTolRef = NETErrMark & Format$(NETTolRef, "0.000") & NETErrEnd
         'put AMT ID and actual errors
-        AMTRef = AMTRef & AMTMark & AMTData(i).ID & sMWTolRef & sNETTolRef
+        AMTRef = AMTRef & AMTMark & Trim(AMTData(i).ID) & sMWTolRef & sNETTolRef
         If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(i).CNT_N & MTEndMark
         If Delta > 0 Then AMTRef = AMTRef & MTDltMark & Delta
         AMTRef = AMTRef & glARG_SEP & Chr$(32)
@@ -2250,7 +2246,7 @@ If mwutSearch.FindIndexRange(MW, AbsTol, FirstInd, LastInd) Then
         RTolRef = (AMTData(i).PNET - RT)
         sRTolRef = RTErrMark & Format$(RTolRef, "0.000") & RTErrEnd
         'put AMT ID and actual errors
-        AMTRef = AMTRef & AMTMark & AMTData(i).ID & sMWTolRef & sRTolRef
+        AMTRef = AMTRef & AMTMark & Trim(AMTData(i).ID) & sMWTolRef & sRTolRef
         If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(i).CNT_N & MTEndMark
         If Delta > 0 Then AMTRef = AMTRef & MTDltMark & Delta
         AMTRef = AMTRef & glARG_SEP & Chr$(32)
@@ -2283,7 +2279,7 @@ If AMTPos > 0 Then
    If AMTEnd > 0 Then
       GetAMTRefFromString = Mid$(S, AMTPos, AMTEnd - AMTPos)
    Else
-      GetAMTRefFromString = Right$(S, Len(S) - AMTPos)
+      GetAMTRefFromString = Mid$(S, AMTPos)
    End If
    AMTMatchStart = AMTPos
 Else
@@ -2307,7 +2303,7 @@ If ISTDPos > 0 Then
    If ISTDEnd > 0 Then
       GetInternalStdRefFromString = Mid$(S, ISTDPos, ISTDEnd - ISTDPos)
    Else
-      GetInternalStdRefFromString = Right$(S, Len(S) - ISTDPos)
+      GetInternalStdRefFromString = Mid$(S, ISTDPos)
    End If
    MatchStart = ISTDPos
 Else
@@ -2410,6 +2406,23 @@ Public Function IsAMTReferencedByUMC(udtUMC As udtUMCType, lngGelIndex As Long) 
     IsAMTReferencedByUMC = blnAMTMatchPresent
 End Function
 
+Public Sub InitializeAMTDataEntry(ByRef udtAMTDataPoint As udtAMTDataType, Optional NET_VALUE_IF_NULL As Single = -100000)
+    udtAMTDataPoint.ID = 0
+    udtAMTDataPoint.flag = 0
+    udtAMTDataPoint.MW = 0
+    udtAMTDataPoint.NET = 0
+    udtAMTDataPoint.MSMSObsCount = 1
+    udtAMTDataPoint.NETStDev = 0
+    udtAMTDataPoint.PNET = NET_VALUE_IF_NULL
+    udtAMTDataPoint.CNT_N = -1
+    udtAMTDataPoint.CNT_Cys = -1
+    udtAMTDataPoint.HighNormalizedScore = 0
+    udtAMTDataPoint.HighDiscriminantScore = 0
+    udtAMTDataPoint.PeptideProphetProbability = 0
+    udtAMTDataPoint.Sequence = ""
+End Sub
+
+
 Public Function IsAMTMatchInherited(S As String) As Boolean
 'returns True if string s contains AMTMatchInheritedMark
     
@@ -2476,23 +2489,37 @@ End Sub
 Public Function GetAMTRefFromString1(ByVal S As String, _
                                      ByRef aAMT() As String) As Long
 'fills array aAMT with AMT IDs and returns number of it
-Dim Cnt  As Long
+'Note that array aAMT is 1-based
+'Note that S contains both AMT IDs and mass error information
+'In contrast, aAMT() will just contain the AMT ID values
+Dim Cnt As Long
 Dim AMTRef As String
 Dim StartPos As Integer
 Dim AMTMatchStart As Integer
 Dim Done As Boolean
+Dim RefStringLength As Integer
+Dim PosAdjust As Integer
 
-If Len(S) > 0 Then
-   ReDim aAMT(1 To Len(S))
+RefStringLength = Len(S)
+PosAdjust = Len(AMTMark) - 1
+
+If RefStringLength > 0 Then
+   ReDim aAMT(1 To 2)
    Cnt = 0
    StartPos = 1
    Do Until Done
       AMTRef = GetAMTRefFromString(S, StartPos, AMTMatchStart)
       If Len(AMTRef) > 0 Then
          Cnt = Cnt + 1
+         If Cnt > UBound(aAMT) Then
+            ReDim Preserve aAMT(1 To UBound(aAMT) * 2)
+         End If
+        
          aAMT(Cnt) = GetIDFromString(AMTRef, AMTMark, AMTIDEnd)
          StartPos = AMTMatchStart + Len(AMTRef)
-         If StartPos > Len(S) Then Done = True
+         If StartPos >= RefStringLength - PosAdjust Then
+            Done = True
+         End If
       Else
          Done = True
       End If
@@ -2625,7 +2652,7 @@ End Function
 Public Function GetAMTRefFromString2(ByVal S As String, _
                                      ByRef aAMT() As String) As Long
 'Fills array aAMT with AMT references and returns number of it
-'Note that array is 1-based
+'Note that array aAMT is 1-based
 'Difference with GetAMTRefFromString1 is that here is returned
 'the whole reference with errors; and Not founds are not counted
 Dim Cnt  As Long
@@ -2634,9 +2661,15 @@ Dim StartPos As Integer
 Dim AMTMatchStart As Integer
 Dim Done As Boolean
 
+Dim RefStringLength As Integer
+Dim PosAdjust As Integer
+
+RefStringLength = Len(S)
+PosAdjust = Len(AMTMark) - 1
+
 Cnt = 0
-If Len(S) > 0 Then
-   ReDim aAMT(1 To Len(S))
+If RefStringLength > 0 Then
+   ReDim aAMT(1 To 4)
    StartPos = 1
    Do Until Done
       AMTRef = GetAMTRefFromString(S, StartPos, AMTMatchStart)
@@ -2644,10 +2677,13 @@ If Len(S) > 0 Then
          'do not take empty(Not found) reference
          If InStr(1, AMTRef, NoHarvest) <= 0 Then
             Cnt = Cnt + 1
+            If Cnt > UBound(aAMT) Then
+               ReDim Preserve aAMT(1 To UBound(aAMT) * 2)
+            End If
             aAMT(Cnt) = AMTRef
          End If
          StartPos = AMTMatchStart + Len(AMTRef)
-         If StartPos > Len(S) Then
+         If StartPos > RefStringLength - PosAdjust Then
             Done = True
          End If
       Else
@@ -2854,20 +2890,20 @@ End Function
 '''End Function
 
 Public Sub InitAMTStat()
-'redimensions and initialize statistic arrays
-Dim i As Long
-If AMTCnt > 0 Then
-   ReDim AMTHits(1 To AMTCnt)
-   ReDim AMTMWErr(1 To AMTCnt)
-   ReDim AMTNETErr(1 To AMTCnt)
-   ReDim AMTNETMin(1 To AMTCnt)
-   ReDim AMTNETMax(1 To AMTCnt)
-   'only last 2 arrays need special initialization
-   For i = 1 To AMTCnt
-       AMTNETMin(i) = glHugeOverExp
-       AMTNETMax(i) = -1
-   Next i
-End If
+    'redimensions and initialize statistic arrays
+    Dim i As Long
+    If AMTCnt > 0 Then
+       ReDim AMTHits(1 To AMTCnt)
+       ReDim AMTMWErr(1 To AMTCnt)
+       ReDim AMTNETErr(1 To AMTCnt)
+       ReDim AMTNETMin(1 To AMTCnt)
+       ReDim AMTNETMax(1 To AMTCnt)
+       'only last 2 arrays need special initialization
+       For i = 1 To AMTCnt
+           AMTNETMin(i) = glHugeOverExp
+           AMTNETMax(i) = -1
+       Next i
+    End If
 End Sub
 
 Public Sub DestroyAMTStat()
@@ -2903,20 +2939,20 @@ End Sub
 '''GetLockerAMTInd = -1
 '''End Function
 
-
-Public Function GetAMTRefInd(ByVal AMTRef As String) As Long
-'returns index in AMT array of AMTRef; -1 if not found or error
-Dim i As Long
-On Error GoTo err_GetAMTRefInd
-For i = 1 To AMTCnt
-    If AMTRef = AMTData(i).ID Then
-       GetAMTRefInd = i
-       Exit Function
-    End If
-Next i
-err_GetAMTRefInd:
-GetAMTRefInd = -1
-End Function
+' Unused Function (April 2008)
+''Public Function GetAMTRefInd(ByVal AMTRef As Long) As Long
+'''returns index in AMT array of AMTRef; -1 if not found or error
+''Dim i As Long
+''On Error GoTo err_GetAMTRefInd
+''For i = 1 To AMTCnt
+''    If AMTRef = AMTData(i).ID Then
+''       GetAMTRefInd = i
+''       Exit Function
+''    End If
+''Next i
+''err_GetAMTRefInd:
+''GetAMTRefInd = -1
+''End Function
 
 ' Unused Function (March 2003)
 '''Public Function GetBestAMTMatchInd(ByVal s As String) As Long
@@ -3318,29 +3354,34 @@ Else                                    'must be legacy database
    End If
 End If
 
-sTmp = sTmp & vbCrLf & "MT tags: " & AMTCnt & vbCrLf
-sTmp = sTmp & "OK MT tag ID: " & IDOKs & vbCrLf
-sTmp = sTmp & "Null MT tag ID: " & IDNulls & vbCrLf
+sTmp = sTmp & vbCrLf & "MT tags: " & Format$(AMTCnt, "###,###,##0") & vbCrLf
+sTmp = sTmp & "OK MT tag ID: " & Format$(IDOKs, "###,###,##0") & vbCrLf
+sTmp = sTmp & "Null MT tag ID: " & Format$(IDNulls, "###,###,##0") & vbCrLf
 
-sTmp = sTmp & "OK Masses: " & MWOKs & vbCrLf
-sTmp = sTmp & "Null Masses: " & MWNulls & vbCrLf
-sTmp = sTmp & "Bad Masses: " & MWOthers & vbCrLf
+sTmp = sTmp & "OK Masses: " & Format$(MWOKs, "###,###,##0") & vbCrLf
+sTmp = sTmp & "Null Masses: " & Format$(MWNulls, "###,###,##0") & vbCrLf
+sTmp = sTmp & "Bad Masses: " & Format$(MWOthers, "###,###,##0") & vbCrLf
 If MWOKs > 0 Then
     sTmp = sTmp & "Mass Range: " & Format$(MWMin, "0.000000") & " - " & Format$(MWMax, "0.000000") & vbCrLf
 End If
 
-sTmp = sTmp & "OK ET (NET/all results): " & ETAllOKs & vbCrLf
-sTmp = sTmp & "Null ET (NET/all results): " & ETAllNulls & vbCrLf
-sTmp = sTmp & "Bad ET (NET/all results): " & ETAllOthers & vbCrLf
+sTmp = sTmp & vbCrLf & "OK ET (NET/all results): " & Format$(ETAllOKs, "###,###,##0") & vbCrLf
+sTmp = sTmp & "Null ET (NET/all results): " & Format$(ETAllNulls, "###,###,##0") & vbCrLf
+sTmp = sTmp & "Bad ET (NET/all results): " & Format$(ETAllOthers, "###,###,##0") & vbCrLf
 If ETAllOKs > 0 Then
     sTmp = sTmp & "ET Range: " & Format$(ETAllMin, "0.000000") & " - " & Format$(ETAllMax, "0.000000") & vbCrLf
 End If
 
-sTmp = sTmp & "OK ET (RT/best results): " & ET1stOKs & vbCrLf
-sTmp = sTmp & "Null ET (RT/best results): " & ET1stNulls & vbCrLf
-sTmp = sTmp & "Bad ET (RT/best results): " & ET1stOthers & vbCrLf
+sTmp = sTmp & vbCrLf & "OK ET (RT/best results): " & Format$(ET1stOKs, "###,###,##0") & vbCrLf
+sTmp = sTmp & "Null ET (RT/best results): " & Format$(ET1stNulls, "###,###,##0") & vbCrLf
+sTmp = sTmp & "Bad ET (RT/best results): " & Format$(ET1stOthers, "###,###,##0") & vbCrLf
 If ET1stOKs > 0 Then
     sTmp = sTmp & "ET Range: " & Format$(ET1stMin, "0.000000") & " - " & Format$(ET1stMax, "0.000000") & vbCrLf
+End If
+
+If AMTScoreStatsCnt > 0 Then
+    sTmp = sTmp & vbCrLf
+    sTmp = sTmp & "MT Stats: " & Format$(AMTScoreStatsCnt, "###,###,##0")
 End If
 
 CheckMassTags = sTmp

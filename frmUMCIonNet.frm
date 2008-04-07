@@ -32,26 +32,19 @@ Begin VB.Form frmUMCIonNet
       _ExtentY        =   8916
       _Version        =   393216
       Style           =   1
+      Tab             =   2
       TabHeight       =   520
       TabCaption(0)   =   "1. Find Connections"
       TabPicture(0)   =   "frmUMCIonNet.frx":0000
-      Tab(0).ControlEnabled=   -1  'True
-      Tab(0).Control(0)=   "lblLCMSFeatureFinderInfo"
-      Tab(0).Control(0).Enabled=   0   'False
-      Tab(0).Control(1)=   "fraNet(0)"
-      Tab(0).Control(1).Enabled=   0   'False
-      Tab(0).Control(2)=   "fraUMCScope"
-      Tab(0).Control(2).Enabled=   0   'False
-      Tab(0).Control(3)=   "chkUseLCMSFeatureFinder"
-      Tab(0).Control(3).Enabled=   0   'False
-      Tab(0).Control(4)=   "fraDREAMS"
-      Tab(0).Control(4).Enabled=   0   'False
-      Tab(0).Control(5)=   "cmdAbortFindConnections"
-      Tab(0).Control(5).Enabled=   0   'False
-      Tab(0).Control(6)=   "cmdFindConnectionsThenUMCs"
-      Tab(0).Control(6).Enabled=   0   'False
-      Tab(0).Control(7)=   "chkRequireMatchingIsotopeTag"
-      Tab(0).Control(7).Enabled=   0   'False
+      Tab(0).ControlEnabled=   0   'False
+      Tab(0).Control(0)=   "chkRequireMatchingIsotopeTag"
+      Tab(0).Control(1)=   "cmdFindConnectionsThenUMCs"
+      Tab(0).Control(2)=   "cmdAbortFindConnections"
+      Tab(0).Control(3)=   "fraDREAMS"
+      Tab(0).Control(4)=   "chkUseLCMSFeatureFinder"
+      Tab(0).Control(5)=   "fraUMCScope"
+      Tab(0).Control(6)=   "fraNet(0)"
+      Tab(0).Control(7)=   "lblLCMSFeatureFinderInfo"
       Tab(0).ControlCount=   8
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
@@ -61,21 +54,22 @@ Begin VB.Form frmUMCIonNet
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
-      Tab(2).ControlEnabled=   0   'False
+      Tab(2).ControlEnabled=   -1  'True
       Tab(2).Control(0)=   "fraNet(1)"
+      Tab(2).Control(0).Enabled=   0   'False
       Tab(2).ControlCount=   1
       Begin VB.CheckBox chkRequireMatchingIsotopeTag 
-         Caption         =   "Require matching isotope label tag (e.g. N14 or N15)"
-         Height          =   255
-         Left            =   240
+         Caption         =   "Require matching isotope label tag (e.g. N14 or N15); if enabled, stores mono mass for N14 and average mass for N15"
+         Height          =   375
+         Left            =   -74760
          TabIndex        =   152
          Top             =   3720
-         Width           =   4065
+         Width           =   5385
       End
       Begin VB.CommandButton cmdFindConnectionsThenUMCs 
          Caption         =   "&Find Connections then LC-MS Features"
          Height          =   615
-         Left            =   8280
+         Left            =   -66720
          TabIndex        =   58
          ToolTipText     =   "Create Net based on current settings, then Find LC-MS Features"
          Top             =   3840
@@ -84,7 +78,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.CommandButton cmdAbortFindConnections 
          Caption         =   "Abort!"
          Height          =   375
-         Left            =   8880
+         Left            =   -66120
          TabIndex        =   151
          Top             =   3960
          Width           =   975
@@ -92,7 +86,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraDREAMS 
          Caption         =   "DREAMS Options"
          Height          =   1935
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   4
          Top             =   1560
          Width           =   1815
@@ -137,7 +131,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.CheckBox chkUseLCMSFeatureFinder 
          Caption         =   "Use LCMSFeatureFinder external app"
          Height          =   255
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   147
          Top             =   4200
          Value           =   1  'Checked
@@ -146,7 +140,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraUMCScope 
          Caption         =   "Definition Scope"
          Height          =   975
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   1
          Top             =   420
          Width           =   1815
@@ -220,7 +214,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   4455
          Index           =   1
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   65
          Top             =   360
          Width           =   10695
@@ -944,7 +938,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   3255
          Index           =   0
-         Left            =   2040
+         Left            =   -72960
          TabIndex        =   9
          Top             =   420
          Width           =   8535
@@ -1402,7 +1396,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Label lblLCMSFeatureFinderInfo 
          Caption         =   $"frmUMCIonNet.frx":00AC
          Height          =   405
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   148
          Top             =   4440
          Width           =   5415
@@ -4390,7 +4384,7 @@ Private Sub ShowHideCommandButtons(ByVal blnCalculating As Boolean)
 
     fraDREAMS.Enabled = Not blnCalculating
     fraUMCScope.Enabled = Not blnCalculating
-    fraNet(0).Enabled = Not blnCalculating
+    fraNET(0).Enabled = Not blnCalculating
     fraLCMSFeatureStats.Enabled = Not blnCalculating
     fraOptionFrame(0).Enabled = Not blnCalculating
     fraOptionFrame(1).Enabled = Not blnCalculating
