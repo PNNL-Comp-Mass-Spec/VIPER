@@ -1,8 +1,8 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmParameters 
    Caption         =   "Edit Gel Parameters"
-   ClientHeight    =   5520
+   ClientHeight    =   5715
    ClientLeft      =   2580
    ClientTop       =   1515
    ClientWidth     =   7755
@@ -10,16 +10,16 @@ Begin VB.Form frmParameters
    KeyPreview      =   -1  'True
    LinkTopic       =   "Form1"
    MinButton       =   0   'False
-   ScaleHeight     =   5520
+   ScaleHeight     =   5715
    ScaleWidth      =   7755
    Begin TabDlg.SSTab tbsParameters 
-      Height          =   4575
+      Height          =   4935
       Left            =   120
       TabIndex        =   0
       Top             =   120
       Width           =   7485
       _ExtentX        =   13203
-      _ExtentY        =   8070
+      _ExtentY        =   8705
       _Version        =   393216
       Style           =   1
       Tab             =   2
@@ -52,44 +52,65 @@ Begin VB.Form frmParameters
       Tab(2).Control(5).Enabled=   0   'False
       Tab(2).Control(6)=   "Label2(6)"
       Tab(2).Control(6).Enabled=   0   'False
-      Tab(2).Control(7)=   "cmdSelectMassTags"
+      Tab(2).Control(7)=   "Label2(1)"
       Tab(2).Control(7).Enabled=   0   'False
-      Tab(2).Control(8)=   "cmdBreakMTLink"
+      Tab(2).Control(8)=   "cmdSelectMassTags"
       Tab(2).Control(8).Enabled=   0   'False
-      Tab(2).Control(9)=   "cmdDummyMTLink"
+      Tab(2).Control(9)=   "cmdBreakMTLink"
       Tab(2).Control(9).Enabled=   0   'False
-      Tab(2).Control(10)=   "txtMediaType"
+      Tab(2).Control(10)=   "cmdDummyMTLink"
       Tab(2).Control(10).Enabled=   0   'False
-      Tab(2).Control(11)=   "txtCertificate"
+      Tab(2).Control(11)=   "txtMediaType"
       Tab(2).Control(11).Enabled=   0   'False
-      Tab(2).Control(12)=   "txtDFilesPath"
+      Tab(2).Control(12)=   "txtCertificate"
       Tab(2).Control(12).Enabled=   0   'False
-      Tab(2).Control(13)=   "txtLegacyDBPath"
+      Tab(2).Control(13)=   "txtDFilesPath"
       Tab(2).Control(13).Enabled=   0   'False
-      Tab(2).Control(14)=   "cmdBrowseForLegacyDB"
+      Tab(2).Control(14)=   "txtLegacyDBPath"
       Tab(2).Control(14).Enabled=   0   'False
-      Tab(2).Control(15)=   "cmdBrowseForDataFileFolder"
+      Tab(2).Control(15)=   "cmdBrowseForLegacyDB"
       Tab(2).Control(15).Enabled=   0   'False
-      Tab(2).Control(16)=   "cboRawDataFileFormat"
+      Tab(2).Control(16)=   "cmdBrowseForDataFileFolder"
       Tab(2).Control(16).Enabled=   0   'False
-      Tab(2).Control(17)=   "cmdBrowseForInputFile"
+      Tab(2).Control(17)=   "cboRawDataFileFormat"
       Tab(2).Control(17).Enabled=   0   'False
-      Tab(2).Control(18)=   "txtInputFilePath"
+      Tab(2).Control(18)=   "cmdBrowseForInputFile"
       Tab(2).Control(18).Enabled=   0   'False
-      Tab(2).ControlCount=   19
-      Begin VB.TextBox txtInputFilePath 
+      Tab(2).Control(19)=   "txtInputFilePath"
+      Tab(2).Control(19).Enabled=   0   'False
+      Tab(2).Control(20)=   "cmdBrowseForFinniganRawFilePath"
+      Tab(2).Control(20).Enabled=   0   'False
+      Tab(2).Control(21)=   "txtFinniganRawFilePath"
+      Tab(2).Control(21).Enabled=   0   'False
+      Tab(2).ControlCount=   22
+      Begin VB.TextBox txtFinniganRawFilePath 
          Height          =   285
          Left            =   1680
          TabIndex        =   22
-         Top             =   1680
+         Top             =   1560
+         Width           =   4695
+      End
+      Begin VB.CommandButton cmdBrowseForFinniganRawFilePath 
+         Caption         =   "B&rowse"
+         Height          =   375
+         Left            =   6480
+         TabIndex        =   23
+         Top             =   1560
+         Width           =   855
+      End
+      Begin VB.TextBox txtInputFilePath 
+         Height          =   285
+         Left            =   1680
+         TabIndex        =   25
+         Top             =   2160
          Width           =   4695
       End
       Begin VB.CommandButton cmdBrowseForInputFile 
          Caption         =   "B&rowse"
          Height          =   375
          Left            =   6480
-         TabIndex        =   23
-         Top             =   1680
+         TabIndex        =   26
+         Top             =   2160
          Width           =   855
       End
       Begin VB.ComboBox cboRawDataFileFormat 
@@ -112,15 +133,15 @@ Begin VB.Form frmParameters
          Caption         =   "B&rowse"
          Height          =   375
          Left            =   6480
-         TabIndex        =   26
-         Top             =   2130
+         TabIndex        =   29
+         Top             =   2610
          Width           =   855
       End
       Begin VB.TextBox txtLegacyDBPath 
          Height          =   285
          Left            =   1680
-         TabIndex        =   25
-         Top             =   2160
+         TabIndex        =   28
+         Top             =   2640
          Width           =   4695
       End
       Begin VB.Frame fraCalibration 
@@ -242,34 +263,34 @@ Begin VB.Form frmParameters
       Begin VB.TextBox txtMediaType 
          Height          =   285
          Left            =   1680
-         TabIndex        =   28
-         Top             =   2640
+         TabIndex        =   31
+         Top             =   3120
          Width           =   2295
       End
       Begin VB.CommandButton cmdDummyMTLink 
          Caption         =   "&Link With MT Database"
          Height          =   375
          Left            =   5280
-         TabIndex        =   30
+         TabIndex        =   33
          ToolTipText     =   "Link with MT Tag database"
-         Top             =   3060
+         Top             =   3420
          Width           =   1935
       End
       Begin VB.CommandButton cmdBreakMTLink 
          Caption         =   "&Break Link With MT DB"
          Height          =   375
          Left            =   5280
-         TabIndex        =   31
-         Top             =   3540
+         TabIndex        =   34
+         Top             =   3900
          Width           =   1935
       End
       Begin VB.CommandButton cmdSelectMassTags 
          Caption         =   "&Select MT Tags"
          Height          =   375
          Left            =   5280
-         TabIndex        =   32
+         TabIndex        =   35
          ToolTipText     =   "Select MT Tags to load for search"
-         Top             =   4020
+         Top             =   4380
          Width           =   1935
       End
       Begin VB.TextBox txtComment 
@@ -282,12 +303,22 @@ Begin VB.Form frmParameters
       End
       Begin VB.Label Label2 
          BackStyle       =   0  'Transparent
+         Caption         =   "Path To Finnigan .Raw file"
+         Height          =   375
+         Index           =   1
+         Left            =   240
+         TabIndex        =   21
+         Top             =   1605
+         Width           =   1455
+      End
+      Begin VB.Label Label2 
+         BackStyle       =   0  'Transparent
          Caption         =   "Path To Input File:"
          Height          =   255
          Index           =   6
          Left            =   240
-         TabIndex        =   21
-         Top             =   1720
+         TabIndex        =   24
+         Top             =   2205
          Width           =   1455
       End
       Begin VB.Label Label2 
@@ -306,8 +337,8 @@ Begin VB.Form frmParameters
          Height          =   255
          Index           =   4
          Left            =   240
-         TabIndex        =   24
-         Top             =   2205
+         TabIndex        =   27
+         Top             =   2685
          Width           =   1455
       End
       Begin VB.Label lblRecalibration 
@@ -326,8 +357,8 @@ Begin VB.Form frmParameters
          Height          =   255
          Index           =   0
          Left            =   240
-         TabIndex        =   27
-         Top             =   2685
+         TabIndex        =   30
+         Top             =   3165
          Width           =   1455
       End
       Begin VB.Label Label2 
@@ -354,8 +385,8 @@ Begin VB.Form frmParameters
          BackStyle       =   0  'Transparent
          Height          =   1095
          Left            =   240
-         TabIndex        =   29
-         Top             =   3180
+         TabIndex        =   32
+         Top             =   3600
          Width           =   4575
          WordWrap        =   -1  'True
       End
@@ -365,16 +396,16 @@ Begin VB.Form frmParameters
       Caption         =   "Cancel"
       Height          =   375
       Left            =   4680
-      TabIndex        =   35
-      Top             =   4815
+      TabIndex        =   38
+      Top             =   5175
       Width           =   1095
    End
    Begin VB.CommandButton cmdOK 
       Caption         =   "OK"
       Height          =   375
       Left            =   3480
-      TabIndex        =   34
-      Top             =   4815
+      TabIndex        =   37
+      Top             =   5175
       Width           =   1095
    End
    Begin VB.Label Label3 
@@ -382,8 +413,8 @@ Begin VB.Form frmParameters
       Caption         =   "WARNING: Editing information on this dialog might change data or access to data files."
       Height          =   495
       Left            =   120
-      TabIndex        =   33
-      Top             =   4800
+      TabIndex        =   36
+      Top             =   5160
       Width           =   3255
    End
 End
@@ -422,15 +453,32 @@ Dim WithEvents MyDummyInit As DummyAnalysisInitiator
 Attribute MyDummyInit.VB_VarHelpID = -1
 
 Private Sub cboRawDataFileFormat_Click()
-GelStatus(CallerID).SourceDataRawFileType = cboRawDataFileFormat.ListIndex
+    GelStatus(CallerID).SourceDataRawFileType = cboRawDataFileFormat.ListIndex
 End Sub
 
 Private Sub cmbCalEq_Click()
-GelData(CallerID).CalEquation = cmbCalEq.Text
+    GelData(CallerID).CalEquation = cmbCalEq.Text
 End Sub
 
 Private Sub cmdBreakMTLink_Click()
     BreakMTSLink
+End Sub
+
+Private Sub cmdBrowseForFinniganRawFilePath_Click()
+    Dim PathToInputFile As String
+    
+    On Error Resume Next
+    PathToInputFile = SelectFile(Me.hwnd, _
+                          "Select Finnigan data file", "", False, "", _
+                          "RAW Files (*.raw)|*.raw|" & _
+                          "All Files (*.*)|*.*", _
+                          1)
+                          
+    If Len(PathToInputFile) > 0 Then
+        txtFinniganRawFilePath.Text = PathToInputFile
+        txtFinniganRawFilePath_LostFocus
+    End If
+
 End Sub
 
 Private Sub cmdBrowseForLegacyDB_Click()
@@ -453,25 +501,25 @@ Private Sub cmdBrowseForDataFileFolder_Click()
 End Sub
 
 Private Sub cmdBrowseForInputFile_Click()
-Dim PathToInputFile As String
-
-On Error Resume Next
-PathToInputFile = SelectFile(Me.hwnd, _
-                      "Select source .Pek, .CSV, .mzXML, or .mzData file", "", False, "", _
-                      "All Files (*.*)|*.*|" & _
-                      "PEK Files (*.pek)|*.pek|" & _
-                      "CSV Files (*.csv)|*.csv|" & _
-                      "mzXML Files (*.mzXML)|*.mzXml|" & _
-                      "mzXML Files (*mzXML.xml)|*mzXML.xml|" & _
-                      "mzData Files (*.mzData)|*.mzData|" & _
-                      "mzData Files (*mzData.xml)|*mzData.xml", _
-                      glbPreferencesExpanded.LastInputFileMode + 2)
-                      
-If Len(PathToInputFile) > 0 Then
-    txtInputFilePath.Text = PathToInputFile
-    txtInputFilePath_LostFocus
-    UpdatePreferredFileExtension PathToInputFile
-End If
+    Dim PathToInputFile As String
+    
+    On Error Resume Next
+    PathToInputFile = SelectFile(Me.hwnd, _
+                          "Select source .Pek, .CSV, .mzXML, or .mzData file", "", False, "", _
+                          "All Files (*.*)|*.*|" & _
+                          "PEK Files (*.pek)|*.pek|" & _
+                          "CSV Files (*.csv)|*.csv|" & _
+                          "mzXML Files (*.mzXML)|*.mzXml|" & _
+                          "mzXML Files (*mzXML.xml)|*mzXML.xml|" & _
+                          "mzData Files (*.mzData)|*.mzData|" & _
+                          "mzData Files (*mzData.xml)|*mzData.xml", _
+                          glbPreferencesExpanded.LastInputFileMode + 2)
+                          
+    If Len(PathToInputFile) > 0 Then
+        txtInputFilePath.Text = PathToInputFile
+        txtInputFilePath_LostFocus
+        UpdatePreferredFileExtension PathToInputFile
+    End If
 
 End Sub
 
@@ -566,12 +614,13 @@ FormActivateErrorHandler:
 End Sub
 
 Private Sub Form_Load()
-PopulateComboBoxes
-tbsParameters.Tab = 0
+    PopulateComboBoxes
 
-ShowHidePNNLMenus
+    tbsParameters.Tab = 0
 
-PositionControls
+    ShowHidePNNLMenus
+
+    PositionControls
 End Sub
 
 Private Sub Form_Resize()
@@ -617,19 +666,19 @@ Private Sub BreakMTSLink()
 End Sub
 
 Private Sub SaveOldSettings()
-Dim ArrSize As Long
-With GelData(CallerID)
-    OldCalEq = .CalEquation
-    ArrSize = 10 * Len(.CalArg(1))
-    CopyMemory OldCalArg(1), .CalArg(1), ArrSize
-    OldComment = .Comment
-    OldPathToDataF = .PathtoDataFiles
-    OldRawDataFileFormat = GelStatus(CallerID).SourceDataRawFileType
-    OldInputFilePath = .FileName
-    OldCertificate = .Certificate
-    OldMediaType = .MediaType
-    OldPathToDB = .PathtoDatabase
-End With
+    Dim ArrSize As Long
+    With GelData(CallerID)
+        OldCalEq = .CalEquation
+        ArrSize = 10 * Len(.CalArg(1))
+        CopyMemory OldCalArg(1), .CalArg(1), ArrSize
+        OldComment = .Comment
+        OldPathToDataF = .PathtoDataFiles
+        OldRawDataFileFormat = GelStatus(CallerID).SourceDataRawFileType
+        OldInputFilePath = .FileName
+        OldCertificate = .Certificate
+        OldMediaType = .MediaType
+        OldPathToDB = .PathtoDatabase
+    End With
 End Sub
 
 Private Sub RestoreOldSettings()
@@ -656,41 +705,43 @@ End Sub
 
 Private Sub Settings()
 Dim i As Long
-With GelData(CallerID)
-   Select Case UCase(.CalEquation)
-   Case UCase(CAL_EQUATION_1)
-        cmbCalEq.Text = CAL_EQUATION_1
-   Case UCase(CAL_EQUATION_2)
-        cmbCalEq.Text = CAL_EQUATION_2
-   Case UCase(CAL_EQUATION_3)
-        cmbCalEq.Text = CAL_EQUATION_3
-   Case UCase(CAL_EQUATION_4)
-        cmbCalEq.Text = CAL_EQUATION_4
-   Case UCase(CAL_EQUATION_5)
-        cmbCalEq.Text = CAL_EQUATION_5
-   End Select
-   For i = 1 To 4
-     txtCalEqPar(i - 1).Text = .CalArg(i)
-   Next i
-   txtComment = .Comment
-   txtDFilesPath = .PathtoDataFiles
-   
-   Select Case GelStatus(CallerID).SourceDataRawFileType
-   Case rfcZippedSFolders
-       cboRawDataFileFormat.ListIndex = rfcZippedSFolders
-   Case rfcFinniganRaw
-       cboRawDataFileFormat.ListIndex = rfcFinniganRaw
-   Case Else
-      ' Includes rfcUnknown
-       cboRawDataFileFormat.ListIndex = rfcUnknown
-   End Select
-   
-   txtInputFilePath = .FileName
-   txtLegacyDBPath = .PathtoDatabase
-   
-   txtCertificate = .Certificate
-   txtMediaType = .MediaType
-End With
+    With GelData(CallerID)
+        Select Case UCase(.CalEquation)
+        Case UCase(CAL_EQUATION_1)
+             cmbCalEq.Text = CAL_EQUATION_1
+        Case UCase(CAL_EQUATION_2)
+             cmbCalEq.Text = CAL_EQUATION_2
+        Case UCase(CAL_EQUATION_3)
+             cmbCalEq.Text = CAL_EQUATION_3
+        Case UCase(CAL_EQUATION_4)
+             cmbCalEq.Text = CAL_EQUATION_4
+        Case UCase(CAL_EQUATION_5)
+             cmbCalEq.Text = CAL_EQUATION_5
+        End Select
+        For i = 1 To 4
+          txtCalEqPar(i - 1).Text = .CalArg(i)
+        Next i
+        txtComment = .Comment
+        txtDFilesPath = .PathtoDataFiles
+        
+        Select Case GelStatus(CallerID).SourceDataRawFileType
+        Case rfcZippedSFolders
+            cboRawDataFileFormat.ListIndex = rfcZippedSFolders
+        Case rfcFinniganRaw
+            cboRawDataFileFormat.ListIndex = rfcFinniganRaw
+        Case Else
+           ' Includes rfcUnknown
+            cboRawDataFileFormat.ListIndex = rfcUnknown
+        End Select
+        
+        txtInputFilePath = .FileName
+        txtFinniganRawFilePath.Text = GelStatus(CallerID).FinniganRawFilePath
+    
+        txtLegacyDBPath = .PathtoDatabase
+        
+        txtCertificate = .Certificate
+        txtMediaType = .MediaType
+    End With
 End Sub
 
 Private Sub ShowHidePNNLMenus()
@@ -726,6 +777,10 @@ End Sub
 
 Private Sub tbsParameters_Click(PreviousTab As Integer)
     PositionControls
+End Sub
+
+Private Sub txtFinniganRawFilePath_LostFocus()
+    GelStatus(CallerID).FinniganRawFilePath = Trim$(txtFinniganRawFilePath.Text)
 End Sub
 
 Private Sub txtLegacyDBPath_LostFocus()
@@ -787,10 +842,12 @@ Private Sub PositionControls()
         If txtDFilesPath.Left > 0 Then
             cmdBrowseForDataFileFolder.Left = tbsParameters.width - cmdBrowseForDataFileFolder.width - 120
             cmdBrowseForInputFile.Left = cmdBrowseForDataFileFolder.Left
+            cmdBrowseForFinniganRawFilePath.Left = cmdBrowseForDataFileFolder.Left
             cmdBrowseForLegacyDB.Left = cmdBrowseForDataFileFolder.Left
             
             txtDFilesPath.width = cmdBrowseForDataFileFolder.Left - txtDFilesPath.Left - 120
             txtInputFilePath.width = txtDFilesPath.width
+            txtFinniganRawFilePath.width = txtDFilesPath.width
             txtLegacyDBPath.width = txtDFilesPath.width
         End If
     End If

@@ -160,7 +160,13 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
     Dim dblStDevProductSum As Double                ' Sum of ER StDev times value used for weighting
     Dim dblMemberCountProductSum As Double          ' Sum of ER member count value times value used for weighting
     Dim dblOutlierCountRemovedProductSum As Double  ' Sum of ER outlier count removed times value used for weighting
+    Dim dblLabellingEfficiencyProductSum As Double  ' Sum of Labelleing Efficiency times value used for weighting
+    Dim dblLogERCorrectedForFProductSum As Double   ' Sum of Log ER Corrected for F times value used for weighting
+    Dim dblERStandardErrorProductSum As Double      ' Sum of ER Standard Error times value used for weighting
     Dim dblWeightingSum As Double                   ' Sum of values used for weighting
+    
+    Dim dblTotalAbundanceAllCS As Double            ' Sum of total abundance across all charge states
+    Dim lngTotalMemberCountAllCS As Long            ' Sum of total member count across all charge states
     
     Dim eWeightingMode As aewAverageERsWeightingModeConstants
     Dim eERCalcType As ectERCalcTypeConstants
@@ -239,9 +245,15 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                 
                 dblERProductSum = 0
                 dblStDevProductSum = 0
-                dblWeightingSum = 0
                 dblMemberCountProductSum = 0
                 dblOutlierCountRemovedProductSum = 0
+                dblLabellingEfficiencyProductSum = 0
+                dblLogERCorrectedForFProductSum = 0
+                dblERStandardErrorProductSum = 0
+                dblWeightingSum = 0
+                
+                dblTotalAbundanceAllCS = 0
+                lngTotalMemberCountAllCS = 0
                 
                 For intIndex = 0 To intChargeStateStatsCount - 1
                     If udtPairsERChargeStateStats(intIndex).ERStats.ERAvg = ER_CALC_ERR Then
@@ -250,6 +262,9 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                     Else
                         dblERAvg = udtPairsERChargeStateStats(intIndex).ERStats.ERAvg
                         
+                        dblTotalAbundanceAllCS = dblTotalAbundanceAllCS + udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
+                        lngTotalMemberCountAllCS = lngTotalMemberCountAllCS + udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
+
                         If eERCalcType = ectER_RAT Then
                             ' Convert dblERAvg from Ratio ER to Symmetric ER
                             dblERAvg = ConvertRatioERtoAltER(dblERAvg)
@@ -261,6 +276,10 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                             dblMemberCountProductSum = dblMemberCountProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERCount * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
                             dblOutlierCountRemovedProductSum = dblOutlierCountRemovedProductSum + udtPairsERChargeStateStats(intIndex).ERStats.EROutlierCountRemoved * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
                             
+                            dblLabellingEfficiencyProductSum = dblLabellingEfficiencyProductSum + udtPairsERChargeStateStats(intIndex).ERStats.LabellingEfficiencyF * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
+                            dblLogERCorrectedForFProductSum = dblLogERCorrectedForFProductSum + udtPairsERChargeStateStats(intIndex).ERStats.LogERCorrectedForF * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
+                            dblERStandardErrorProductSum = dblERStandardErrorProductSum + udtPairsERChargeStateStats(intIndex).ERStats.LogERStandardError * udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
+                            
                             dblWeightingSum = dblWeightingSum + udtPairsERChargeStateStats(intIndex).ERStats.TotalAbundance
                             
                         ElseIf eWeightingMode = aewMemberCounts Then
@@ -269,6 +288,10 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                             dblMemberCountProductSum = dblMemberCountProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERCount * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
                             dblOutlierCountRemovedProductSum = dblOutlierCountRemovedProductSum + udtPairsERChargeStateStats(intIndex).ERStats.EROutlierCountRemoved * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
                             
+                            dblLabellingEfficiencyProductSum = dblLabellingEfficiencyProductSum + udtPairsERChargeStateStats(intIndex).ERStats.LabellingEfficiencyF * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
+                            dblLogERCorrectedForFProductSum = dblLogERCorrectedForFProductSum + udtPairsERChargeStateStats(intIndex).ERStats.LogERCorrectedForF * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
+                            dblERStandardErrorProductSum = dblERStandardErrorProductSum + udtPairsERChargeStateStats(intIndex).ERStats.LogERStandardError * udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
+                            
                             dblWeightingSum = dblWeightingSum + udtPairsERChargeStateStats(intIndex).ERStats.TotalMemberCount
                         Else
                             ' aewNoWeighting
@@ -276,6 +299,10 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                             dblStDevProductSum = dblStDevProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERStDev
                             dblMemberCountProductSum = dblMemberCountProductSum + udtPairsERChargeStateStats(intIndex).ERStats.ERCount
                             dblOutlierCountRemovedProductSum = dblOutlierCountRemovedProductSum + udtPairsERChargeStateStats(intIndex).ERStats.EROutlierCountRemoved
+                            
+                            dblLabellingEfficiencyProductSum = dblLabellingEfficiencyProductSum + udtPairsERChargeStateStats(intIndex).ERStats.LabellingEfficiencyF
+                            dblLogERCorrectedForFProductSum = dblLogERCorrectedForFProductSum + udtPairsERChargeStateStats(intIndex).ERStats.LogERCorrectedForF
+                            dblERStandardErrorProductSum = dblERStandardErrorProductSum + udtPairsERChargeStateStats(intIndex).ERStats.LogERStandardError
                             
                             dblWeightingSum = dblWeightingSum + 1#
                         End If
@@ -298,8 +325,16 @@ Private Sub CalcDltLblPairsER_UMCSinglePair(ByVal lngPairIndex As Long, ByRef ln
                             udtERStats.EROutlierCountRemoved = 1
                         End If
                     Else
-                        udtERStats.EROutlierCountRemoved = 1
+                        udtERStats.EROutlierCountRemoved = 0
                     End If
+                    
+                    udtERStats.LabellingEfficiencyF = dblLabellingEfficiencyProductSum / dblWeightingSum
+                    udtERStats.LogERCorrectedForF = dblLogERCorrectedForFProductSum / dblWeightingSum
+                    udtERStats.LogERStandardError = dblERStandardErrorProductSum / dblWeightingSum
+
+                    udtERStats.TotalAbundance = dblTotalAbundanceAllCS
+                    udtERStats.TotalMemberCount = lngTotalMemberCountAllCS
+                    
                 Else
                     ' The Weighting Sum is 0
                     ' This shouldn't happen

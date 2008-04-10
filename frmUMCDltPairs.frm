@@ -439,7 +439,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   285
          Left            =   3960
          TabIndex        =   48
-         Text            =   "15"
+         Text            =   "25"
          Top             =   1800
          Width           =   495
       End
@@ -448,7 +448,7 @@ Begin VB.Form frmUMCDltPairs
          Height          =   285
          Left            =   3960
          TabIndex        =   45
-         Text            =   "15"
+         Text            =   "25"
          Top             =   840
          Width           =   495
       End

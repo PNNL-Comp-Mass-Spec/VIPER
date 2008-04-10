@@ -3541,8 +3541,8 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .RequireUMCOverlap = True
                     .RequireUMCOverlapAtApex = True
                     
-                    .ScanTolerance = 15
-                    .ScanToleranceAtApex = 15
+                    .ScanTolerance = 25
+                    .ScanToleranceAtApex = 25
                     
                     .ERInclusionMin = -5
                     .ERInclusionMax = 5

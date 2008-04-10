@@ -202,6 +202,64 @@ GetColumnValueErrorHandler:
     
 End Function
 
+Public Function GetDatasetNameFromDecon2LSFilename(ByVal strFilePath As String) As String
+    Dim fso As New FileSystemObject
+    Dim strFileName As String
+    Dim strBase As String
+    
+    strBase = ""
+
+    strFileName = fso.GetFileName(strFilePath)
+    
+    If StringEndsWith(strFileName, "_" & CSV_ISOS_IC_FILE_SUFFIX) Then
+        strBase = StringTrimEnd(strFileName, "_" & CSV_ISOS_IC_FILE_SUFFIX)
+    ElseIf StringEndsWith(strFileName, "_" & CSV_ISOS_FILE_SUFFIX) Then
+        strBase = StringTrimEnd(strFileName, "_" & CSV_ISOS_FILE_SUFFIX)
+    ElseIf StringEndsWith(strFileName, "_" & CSV_ISOS_PAIRS_SUFFIX) Then
+        strBase = StringTrimEnd(strFileName, "_" & CSV_ISOS_PAIRS_SUFFIX)
+    ElseIf StringEndsWith(strFileName, "_" & CSV_SCANS_FILE_SUFFIX) Then
+        strBase = StringTrimEnd(strFileName, "_" & CSV_SCANS_FILE_SUFFIX)
+    Else
+        strBase = fso.GetBaseName(strFileName)
+    End If
+    
+    Set fso = Nothing
+    
+    GetDatasetNameFromDecon2LSFilename = strBase
+    
+End Function
+
+Private Function StringEndsWith(ByVal strText As String, ByVal strComparisonText As String) As Boolean
+  
+    Dim blnMatchFound As Boolean
+  
+    blnMatchFound = False
+    If Len(strText) >= Len(strComparisonText) Then
+        If LCase(Right(strText, Len(strComparisonText))) = LCase(strComparisonText) Then
+            blnMatchFound = True
+        End If
+    End If
+    
+    StringEndsWith = blnMatchFound
+    
+End Function
+
+Private Function StringTrimEnd(ByVal strText As String, ByVal strTextToTrim As String) As String
+    Dim intTrimLength As Integer
+    Dim strTrimmedText As String
+    
+    intTrimLength = Len(strTextToTrim)
+    
+    strTrimmedText = strText
+    If Len(strTrimmedText) >= intTrimLength Then
+        If LCase(Right(strTrimmedText, intTrimLength)) = LCase(strTextToTrim) Then
+            strTrimmedText = Left(strTrimmedText, Len(strTrimmedText) - intTrimLength)
+        End If
+    End If
+    
+    StringTrimEnd = strTrimmedText
+End Function
+
 Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean) As String
     Dim strHeaders As String
     

@@ -2902,7 +2902,8 @@ On Error GoTo DetermineSourceDataRawFileTypeErrorHandler
     Else
         If fso.FolderExists(GelData(lngGelIndex).PathtoDataFiles) Then
             ' Look for a .Raw file in the source data folder, having the same name as the .Pek, .CSV, .mzXML, or .mzData file
-            strTargetFilePath = fso.GetBaseName(GelData(lngGelIndex).FileName)
+            strTargetFilePath = GetDatasetNameFromDecon2LSFilename(GelData(lngGelIndex).FileName)
+                      
             strTargetFilePath = strTargetFilePath & ".Raw"
             
             strTargetFilePath = fso.BuildPath(GelData(lngGelIndex).PathtoDataFiles, strTargetFilePath)

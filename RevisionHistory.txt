@@ -1,9 +1,18 @@
 VIPER Change Log
 
+Version 3.44 - Build 389; April 10, 2008
+	- Fixed bug that failed to properly determine the .Raw file path when using the Show Mass Spectrum for Point Nearest the Cursor feature (Ctrl+D)
+	- Added option to edit the path to the .Raw file 
+		- Use Edit->Display Parameters and Paths, then go to the General tab
+	- Now computing weighted average values for the extended expression ratio stats when using ER values from multiple charge states to compute averaged ER values for a given pair
+		- Extended stats are "Labelling Efficiency F", "Log2(ER) Corrected for F", and "Log2(ER) Corrected Standard Error"
+	- Increased default scan tolerance for pair-class overlapping at the edges and/or center to 25 scans (was 15)
+
 Version 3.44 - Build 388; April 7, 2008
 	- Now optionally obtains MT FScore Stats values from MTS databases using procedure GetMTStatsAndPepProphetStats
 		- These values will be used with the SMART algorithm
 	- Changed internal storage of MTID values to be in an array of 32 bit integers rather than in a string array
+	- Updated to a new version of MassMatchCOM.dll
 	- Work in progress: 
 		- Menu option SearchN14LabeledFeatures when matching Features to PMTs; see frmSearchMT_ConglomerateUMC.frm
 		- Correct reported abundance when column "pct most abundant" is present; see modFileIOPek.bas
