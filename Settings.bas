@@ -1386,6 +1386,9 @@ On Error GoTo LoadSettingsFileHandler
             
             .ExcludeIsoByFit = GetIniFileSettingBln(IniStuff, "AutoAnalysisFilterPrefs", "ExcludeIsoByFit", .ExcludeIsoByFit)
             .ExcludeIsoByFitMaxVal = GetIniFileSettingDbl(IniStuff, "AutoAnalysisFilterPrefs", "ExcludeIsoByFitMaxVal", .ExcludeIsoByFitMaxVal)
+            If .ExcludeIsoByFitMaxVal > 100 Then
+                .ExcludeIsoByFitMaxVal = 100
+            End If
             
             .ExcludeIsoSecondGuess = GetIniFileSettingBln(IniStuff, "AutoAnalysisFilterPrefs", "ExcludeIsoSecondGuess", .ExcludeIsoSecondGuess)
             .ExcludeIsoLessLikelyGuess = GetIniFileSettingBln(IniStuff, "AutoAnalysisFilterPrefs", "ExcludeIsoLessLikelyGuess", .ExcludeIsoLessLikelyGuess)

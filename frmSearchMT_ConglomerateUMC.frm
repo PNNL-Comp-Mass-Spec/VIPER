@@ -3568,7 +3568,7 @@ End Function
 
 Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = "", Optional blnDisplayResults As Boolean = True, Optional ByVal blnIncludeORFInfo As Boolean = True) As Long
     '-------------------------------------
-    'report identified unique mass classes
+    ' Report identified unique mass classes
     ' If strOutputFilePath = "", then saves the results to a temporary file and shows them to the user using frmDataInfo
     ' If strOutputFilePath is not blank, then saves the results to the file, but does not display them
     ' If blnIncludeORFInfo = True, then attempts to connect to the database and retrieve the ORF information for each MT tag
@@ -3703,19 +3703,9 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             strPeptideSequence = AMTData(lngMassTagIndexOriginal).Sequence
         End If
     
+        GetUMCClassRepScanAndNET CallerID, lngUMCIndexOriginal, lngScanClassRep, dblGANETClassRep
+        
         With GelUMC(CallerID).UMCs(lngUMCIndexOriginal)
-            Select Case .ClassRepType
-            Case gldtCS
-                lngScanClassRep = GelData(CallerID).CSData(.ClassRepInd).ScanNumber
-            Case gldtIS
-                lngScanClassRep = GelData(CallerID).IsoData(.ClassRepInd).ScanNumber
-            Case Else
-                Debug.Assert False
-                lngScanClassRep = (.MinScan + .MaxScan) / 2
-            End Select
-            
-            dblGANETClassRep = ScanToGANET(CallerID, lngScanClassRep)
-            
             strLineOut = lngUMCIndexOriginal & strSepChar & .MinScan & strSepChar & .MaxScan & strSepChar & lngScanClassRep & strSepChar & Format(dblGANETClassRep, "0.0000") & strSepChar & Round(.ClassMW, 6) & strSepChar
             strLineOut = strLineOut & Round(.ClassMWStD, 6) & strSepChar & .MinMW & strSepChar & .MaxMW & strSepChar & .ClassAbundance & strSepChar
             

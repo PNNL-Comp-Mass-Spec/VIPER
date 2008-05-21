@@ -1,5 +1,22 @@
 VIPER Change Log
 
+Version 3.44 - Build 392; May 20, 2008
+	- Updated the report shown when matching N14/N15 paired UMCs to the database (and requiring that the number of nitrogens match) to include the peptide sequence and the N-count of the peptide
+	- Decreased the threshold for allowing an ambiguity between the number of nitrogen atoms in a peptide vs. the mass spacing of a N14/N15 pair
+		- Old thresholds were 2000 Da and 4000 Da, allowing for +/-1 or +/-2 difference, respectively
+		- New thresholds are 1500 Da and 3000 Da, again, allowing for +/- or +/-2 difference between the number of nitrogen atoms in a peptide vs. the delta mass spacing of a pair
+			- In addition, peptides between 1000 Da and 1500 Da are allowed to have Peptide_N_Count - Pair_Delta_Count equal to 0 or -1
+
+Version 3.44 - Build 391; May 19, 2008
+	- Updated the algorithm that auto-determines the minimum and maximum N-count values to use when finding N14/N15 pairs
+		- New algorithm uses custom slope and intercept values to compute the values
+		- Delta_N_Count_Min = 0.008 * HeavyPairMemberMass - 5  (if less than 1, then set to 1)
+		- Delta_N_Count_Max = 0.017 * HeavyPairMemberMass + 3
+
+Version 3.44 - Build 390; April 11, 2008
+	- Fixed bug that caused data loaded from .PEK files to have a charge state of 0 if the user chose to disable filtering by isotopic fit when loading data
+		- Oddly, this bug only occurred in the compiled application and not when running through the IDE
+
 Version 3.44 - Build 389; April 10, 2008
 	- Fixed bug that failed to properly determine the .Raw file path when using the Show Mass Spectrum for Point Nearest the Cursor feature (Ctrl+D)
 	- Added option to edit the path to the .Raw file 

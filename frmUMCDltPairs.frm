@@ -1227,9 +1227,22 @@ On Error GoTo err_FindPairs
                 
                 ' The ClsMinDelta and ClsMaxDelta variables are not used for labeled pairs, but are calculated anyway
                 If blnAutoCalculateDeltaMinMax Then         'calculate for this specific mass
-                    ClsMidDelta = CLng(0.012 * HClsMW)
-                    ClsMinDelta = CLng(0.5 * ClsMidDelta)
-                    ClsMaxDelta = CLng(1.5 * ClsMidDelta)
+                
+                    ' Old Algorithm (from ~2002)
+                    ' This algorithm uses slopes of 0.006 and 0.0225 to determine the min and max delta values, given the mass of the heavy UMC
+                    'ClsMidDelta = CLng(0.012 * HClsMW)
+                    'ClsMinDelta = CLng(0.5 * ClsMidDelta)
+                    'ClsMaxDelta = CLng(1.5 * ClsMidDelta)
+                    
+                    ' New Algorithm (May 2008)
+                    ' This algorithm uses a custom slope and intercept to determine ClsMinDelta and ClsMaxDelta from the mass of the heavy UMC
+                    ClsMidDelta = CLng(0.0107 * HClsMW)
+                    
+                    ClsMinDelta = CLng(0.008 * HClsMW - 5)
+                    If ClsMinDelta < 1 Then ClsMinDelta = 1
+                    
+                    ClsMaxDelta = CLng(0.017 * HClsMW + 3)
+
                 End If
                 
                 ' Step through the LC-MS Features, treating each lngIndexLight'th UMC as the light member of the pair

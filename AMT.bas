@@ -148,7 +148,7 @@ Private Const TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP_ALT = "T_Mass_Tags_to_Protein
 'This corresponds to FileInfoVersions(fioSearchDefinitions) version 2 through version 8
 Public Type SearchAMTDefinition
     SearchScope As Integer       'current scope or all points (actually type glScope) ; Not used on frmSearchMT_ConglomerateUMC
-    SearchFlag As Integer        'defines which AMTs are included in search; corresponds to constants glAMT_CONFIRM_  ; Not used on frmSearchMT_ConglomerateUMC
+    SearchFlag As Integer        'defines which AMTs are included in search; corresponds to constants glAMT_CONFIRM_ ; if 0, then all data is searched ; Not used on frmSearchMT_ConglomerateUMC
     MWField As Integer           'MWField for Isotopic data
     TolType As Integer           'ppm or Dalton; represented by 0 = ppm = gltPPM or 2 = Da = gltABS (actually type glMassToleranceConstants)
     NETorRT As Integer           'Use NET or use RT (on some forms, use NET or use PNET)

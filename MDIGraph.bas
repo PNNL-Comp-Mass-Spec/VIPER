@@ -735,7 +735,7 @@ End Type
 Public Type UMCIonNet
     Visible As Boolean
     ThisNetDef As UMCIonNetDefinition
-    NetCount As Long
+    NETCount As Long
     NetInd1() As Long
     NetInd2() As Long
     NetDist() As Double         'distance between nodes
@@ -1377,177 +1377,177 @@ End If
 End Sub
 
 Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath As String = "", Optional lngGelIndexToForce As Long = 0, Optional ByRef strErrorMessage As String = "") As Long
-'---------------------------------------------------------------------------------------
-'Opens the file given by strInputFilePath, or prompts the user to choose a .Pek, .CSV, .mzXML, or .mzData file
-'Returns the index of the file in memory if success, 0 otherwise
-'If lngGelIndexToForce is > 0 then the data will be loaded into the gel with the given index
-'---------------------------------------------------------------------------------------
-
-Dim fIndex As Long
-Dim sFileName As String
-Dim OpenResult As Integer
-Dim blnInteractiveMode As Boolean
-
-Dim fso As New FileSystemObject
-Dim objFile As File
-
-On Error Resume Next
-
-strErrorMessage = ""
-
-If Len(strInputFilePath) = 0 Then
-    blnInteractiveMode = True
+    '---------------------------------------------------------------------------------------
+    'Opens the file given by strInputFilePath, or prompts the user to choose a .Pek, .CSV, .mzXML, or .mzData file
+    'Returns the index of the file in memory if success, 0 otherwise
+    'If lngGelIndexToForce is > 0 then the data will be loaded into the gel with the given index
+    '---------------------------------------------------------------------------------------
     
-    sFileName = FileNewSelectFile(hwndOwner)
+    Dim fIndex As Long
+    Dim sFileName As String
+    Dim OpenResult As Integer
+    Dim blnInteractiveMode As Boolean
     
-    If Len(sFileName) > 0 Then
-        If Not fso.FileExists(sFileName) Then
-            strErrorMessage = "File not found: " & sFileName
+    Dim fso As New FileSystemObject
+    Dim objFile As File
+    
+    On Error Resume Next
+    
+    strErrorMessage = ""
+    
+    If Len(strInputFilePath) = 0 Then
+        blnInteractiveMode = True
+        
+        sFileName = FileNewSelectFile(hwndOwner)
+        
+        If Len(sFileName) > 0 Then
+            If Not fso.FileExists(sFileName) Then
+                strErrorMessage = "File not found: " & sFileName
+                sFileName = ""
+                MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+            End If
+        End If
+    Else
+        blnInteractiveMode = False
+        If fso.FileExists(strInputFilePath) Then
+            sFileName = strInputFilePath
+        Else
             sFileName = ""
-            MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+            strErrorMessage = "File not found: " & strInputFilePath
         End If
     End If
-Else
-    blnInteractiveMode = False
-    If fso.FileExists(strInputFilePath) Then
-        sFileName = strInputFilePath
-    Else
-        sFileName = ""
-        strErrorMessage = "File not found: " & strInputFilePath
-    End If
-End If
-
-If Len(sFileName) > 0 Then ' User selected a file.
-    UpdatePreferredFileExtension sFileName
-   
-   'Find the next available index
-   If lngGelIndexToForce > 0 And lngGelIndexToForce <= UBound(GelBody()) Then
-      fIndex = lngGelIndexToForce
-   Else
-      fIndex = FindFreeIndex()
-   End If
-   GelData(fIndex).Comment = glCOMMENT_CREATED & Now & vbCrLf & glCOMMENT_USER & UserName
-   
-   ' MonroeMod
-   AddToAnalysisHistory fIndex, "New gel created (user " & UserName & ")"
-   
-' No longer supported (March 2006)
-''   IsDBFile = (LCase(GetFileExtension(sFileName)) = ".mdb")
-''   If IsDBFile Then
-''      GelData(fIndex).Certificate = glCERT2000_DB
-''      GelData(fIndex).PathtoDatabase = sFileName
-''      frmGelFromDB.Tag = fIndex
-''      frmGelFromDB.Show vbModal
-''      If GelStatus(fIndex).DBGel = 0 Then   'user canceled
-''         SetGelStateToDeleted fIndex
-''         MDIStatus False, ""
-''         Exit Function
-''      End If
-''   Else
     
-   GelData(fIndex).Certificate = glCERT2003
-   GelData(fIndex).pICooSysEnabled = False
-   GelData(fIndex).PathtoDatabase = ""
-
-   If fIndex > glMaxGels Then
-      MsgBox "Command aborted. Too many open files.", vbOKOnly, glFGTU
-      Exit Function
-   End If
-   
-   With GelData(fIndex)  'save parameters for this doc
-        ' Make sure sFileName contains the full path to the file
-        Set objFile = fso.GetFile(sFileName)
-        sFileName = objFile.Path
+    If Len(sFileName) > 0 Then ' User selected a file.
+        UpdatePreferredFileExtension sFileName
+       
+       'Find the next available index
+       If lngGelIndexToForce > 0 And lngGelIndexToForce <= UBound(GelBody()) Then
+          fIndex = lngGelIndexToForce
+       Else
+          fIndex = FindFreeIndex()
+       End If
+       GelData(fIndex).Comment = glCOMMENT_CREATED & Now & vbCrLf & glCOMMENT_USER & UserName
+       
+       ' MonroeMod
+       AddToAnalysisHistory fIndex, "New gel created (user " & UserName & ")"
+       
+    ' No longer supported (March 2006)
+    ''   IsDBFile = (LCase(GetFileExtension(sFileName)) = ".mdb")
+    ''   If IsDBFile Then
+    ''      GelData(fIndex).Certificate = glCERT2000_DB
+    ''      GelData(fIndex).PathtoDatabase = sFileName
+    ''      frmGelFromDB.Tag = fIndex
+    ''      frmGelFromDB.Show vbModal
+    ''      If GelStatus(fIndex).DBGel = 0 Then   'user canceled
+    ''         SetGelStateToDeleted fIndex
+    ''         MDIStatus False, ""
+    ''         Exit Function
+    ''      End If
+    ''   Else
         
-        ' The full path to the .Pek, .CSV, .mzXML, or .mzData file
-        .FileName = sFileName
-        .Fileinfo = GetFileInfo(sFileName)
-        ResetDataFilters fIndex, glPreferences
-        ' MonroeMod
-        AddToAnalysisHistory fIndex, "Loading File; " & .Fileinfo
-   End With
-   
-' No longer supported (March 2006)
-''   If IsDBFile Then
-''     Screen.MousePointer = vbHourglass
-''     OpenResult = LoadNewDBGel(sFileName, fIndex)
-''   Else
-   
-   OpenResult = LoadNewData(sFileName, fIndex, blnInteractiveMode)
-   Select Case OpenResult
-   Case 0      'success
-      Debug.Assert Not GelStatus(fIndex).Deleted
-      GelStatus(fIndex).Dirty = True
-      GelBody(fIndex).Tag = fIndex
-      GelBody(fIndex).Caption = "Untitled:" & fIndex
-      GelData(fIndex).PathtoDatabase = glbPreferencesExpanded.LegacyAMTDBPath
-      GelStatus(fIndex).GelFilePathFull = GetFilePathFull(sFileName)
-      ' MonroeMod: Need to add recent files to file menu
-      GetRecentFiles
-      GelBody(fIndex).Show
-      FileNew = fIndex
-   Case -1     'user canceled load of large data set
-      MDIStatus False, "Done"
-      GelStatus(fIndex).Deleted = True
-      FileNew = 0
-   Case -2     'data sets too large
-      MDIStatus False, "Done"
-      strErrorMessage = "Dataset too large"
-      If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-          MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
-      End If
-      GelStatus(fIndex).Deleted = True
-      FileNew = 0
-   Case -3     'data structure problem
-      MDIStatus False, "Done"
-      strErrorMessage = "Scan numbers in the input file must be in ascending order."
-      If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-          MsgBox strErrorMessage & vbCrLf & "Open the " & GetFileExtension(sFileName) & " file with any text editor and make changes.", vbOKOnly, glFGTU
-      End If
-      GelStatus(fIndex).Deleted = True
-      FileNew = 0
-   Case -4     'no valid data
-      MDIStatus False, "Done"
-      strErrorMessage = "No valid data found in file"
-      If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-          MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
-      End If
-      GelStatus(fIndex).Deleted = True
-      FileNew = 0
-   Case -5     ' User Cancelled load in the middle of loading (or post-load processing)
-      MDIStatus False, "Done"
-      strErrorMessage = "Load cancelled"
-      If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-          MsgBox strErrorMessage, vbOKOnly, glFGTU
-      End If
-      GelStatus(fIndex).Deleted = True
-      FileNew = 0
-   Case -6, -7
-      MDIStatus False, "Done"
-      strErrorMessage = "File not found"
-      If OpenResult = -6 And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-          MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
-      End If
-      GelStatus(fIndex).Deleted = True
-      FileNew = 0
-   Case Else   'some other error
-      MDIStatus False, "Done"
-      strErrorMessage = "Error loading data from file; file maybe contains no data or structure does not match expected format"
-      If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-          MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
-      End If
-      GelStatus(fIndex).Deleted = True
-      FileNew = 0
-   End Select
-   If GelStatus(fIndex).Deleted Then
-       SetGelStateToDeleted fIndex
-   End If
-Else
-   MDIStatus False, "Done"
-   FileNew = 0
-End If
-frmProgress.HideForm
-Screen.MousePointer = vbDefault
+       GelData(fIndex).Certificate = glCERT2003
+       GelData(fIndex).pICooSysEnabled = False
+       GelData(fIndex).PathtoDatabase = ""
+    
+       If fIndex > glMaxGels Then
+          MsgBox "Command aborted. Too many open files.", vbOKOnly, glFGTU
+          Exit Function
+       End If
+       
+       With GelData(fIndex)  'save parameters for this doc
+            ' Make sure sFileName contains the full path to the file
+            Set objFile = fso.GetFile(sFileName)
+            sFileName = objFile.Path
+            
+            ' The full path to the .Pek, .CSV, .mzXML, or .mzData file
+            .FileName = sFileName
+            .Fileinfo = GetFileInfo(sFileName)
+            ResetDataFilters fIndex, glPreferences
+            ' MonroeMod
+            AddToAnalysisHistory fIndex, "Loading File; " & .Fileinfo
+       End With
+       
+    ' No longer supported (March 2006)
+    ''   If IsDBFile Then
+    ''     Screen.MousePointer = vbHourglass
+    ''     OpenResult = LoadNewDBGel(sFileName, fIndex)
+    ''   Else
+       
+       OpenResult = LoadNewData(sFileName, fIndex, blnInteractiveMode)
+       Select Case OpenResult
+       Case 0      'success
+          Debug.Assert Not GelStatus(fIndex).Deleted
+          GelStatus(fIndex).Dirty = True
+          GelBody(fIndex).Tag = fIndex
+          GelBody(fIndex).Caption = "Untitled:" & fIndex
+          GelData(fIndex).PathtoDatabase = glbPreferencesExpanded.LegacyAMTDBPath
+          GelStatus(fIndex).GelFilePathFull = GetFilePathFull(sFileName)
+          ' MonroeMod: Need to add recent files to file menu
+          GetRecentFiles
+          GelBody(fIndex).Show
+          FileNew = fIndex
+       Case -1     'user canceled load of large data set
+          MDIStatus False, "Done"
+          GelStatus(fIndex).Deleted = True
+          FileNew = 0
+       Case -2     'data sets too large
+          MDIStatus False, "Done"
+          strErrorMessage = "Dataset too large"
+          If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+              MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
+          End If
+          GelStatus(fIndex).Deleted = True
+          FileNew = 0
+       Case -3     'data structure problem
+          MDIStatus False, "Done"
+          strErrorMessage = "Scan numbers in the input file must be in ascending order."
+          If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+              MsgBox strErrorMessage & vbCrLf & "Open the " & GetFileExtension(sFileName) & " file with any text editor and make changes.", vbOKOnly, glFGTU
+          End If
+          GelStatus(fIndex).Deleted = True
+          FileNew = 0
+       Case -4     'no valid data
+          MDIStatus False, "Done"
+          strErrorMessage = "No valid data found in file"
+          If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+              MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
+          End If
+          GelStatus(fIndex).Deleted = True
+          FileNew = 0
+       Case -5     ' User Cancelled load in the middle of loading (or post-load processing)
+          MDIStatus False, "Done"
+          strErrorMessage = "Load cancelled"
+          If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+              MsgBox strErrorMessage, vbOKOnly, glFGTU
+          End If
+          GelStatus(fIndex).Deleted = True
+          FileNew = 0
+       Case -6, -7
+          MDIStatus False, "Done"
+          strErrorMessage = "File not found"
+          If OpenResult = -6 And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+              MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
+          End If
+          GelStatus(fIndex).Deleted = True
+          FileNew = 0
+       Case Else   'some other error
+          MDIStatus False, "Done"
+          strErrorMessage = "Error loading data from file; file maybe contains no data or structure does not match expected format"
+          If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+              MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
+          End If
+          GelStatus(fIndex).Deleted = True
+          FileNew = 0
+       End Select
+       If GelStatus(fIndex).Deleted Then
+           SetGelStateToDeleted fIndex
+       End If
+    Else
+       MDIStatus False, "Done"
+       FileNew = 0
+    End If
+    frmProgress.HideForm
+    Screen.MousePointer = vbDefault
 End Function
 
 Public Function FileNewSelectFile(hwndOwner As Long) As String
@@ -1674,7 +1674,7 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 If .ExcludeIsoByFit Then
                     .ExcludeIsoByFitMaxVal = objLoadOptionsForm.IsoFitMax
                 Else
-                    .ExcludeIsoByFitMaxVal = glHugeDouble
+                    .ExcludeIsoByFitMaxVal = 100
                 End If
 
                 .RestrictIsoByAbundance = objLoadOptionsForm.FilterOnAbundance

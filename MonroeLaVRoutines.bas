@@ -1347,6 +1347,35 @@ End Function
 ''
 ''End Function
 
+Public Function GetUMCClassRepScanAndNET(ByVal CallerID As Long, ByVal lngUMCIndex As Long, ByRef lngScanClassRep As Long, ByRef dblNETClassRep As Double) As Boolean
+
+On Error GoTo GetUMCClassRepScanAndNETErrorHandler
+
+    lngScanClassRep = 0
+    dblNETClassRep = 0
+
+    Select Case GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepType
+    Case gldtCS
+        lngScanClassRep = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).ScanNumber
+    Case gldtIS
+        lngScanClassRep = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).ScanNumber
+    Case Else
+        Debug.Assert False
+        lngScanClassRep = (GelUMC(CallerID).UMCs(lngUMCIndex).MinScan + GelUMC(CallerID).UMCs(lngUMCIndex).MaxScan) / 2
+    End Select
+    
+    dblNETClassRep = ScanToGANET(CallerID, lngScanClassRep)
+    
+    GetUMCClassRepScanAndNET = True
+    Exit Function
+
+GetUMCClassRepScanAndNETErrorHandler:
+    Debug.Print Err.Message
+    Debug.Assert False
+    GetUMCClassRepScanAndNET = False
+    
+End Function
+            
 Public Function GetSearchToleranceUnitText(eTolType As glMassToleranceConstants) As String
     Select Case eTolType
     Case gltPPM
@@ -4310,7 +4339,7 @@ Public Sub SmoothViaMovingAverage(dblArray() As Double, lngLowIndex As Long, lng
     ' If intSmoothsToPerform is > 1, then repeats the smooth multiple times
     
     Dim intIteration As Integer
-    Dim x As Long, y As Long
+    Dim X As Long, Y As Long
     Dim lngDataCount As Long
     
     Dim lngWindowHalfWidth As Long
@@ -4342,21 +4371,21 @@ On Error GoTo SmoothViaMovingAverageErrorHandler
         SmoothUsingMovingAverageEdgeMath dblArray, True, lngLowIndex, lngHighIndex, dblSmoothedData(), lngWindowSize
         
         ' Perform the smooth on the vast majority of points
-        For x = lngLowIndex + lngWindowHalfWidth To lngHighIndex - lngWindowHalfWidth
+        For X = lngLowIndex + lngWindowHalfWidth To lngHighIndex - lngWindowHalfWidth
             dblSum = 0
-            For y = 0 To lngWindowSize - 1
-                dblSum = dblSum + dblArray(x - lngWindowHalfWidth + y)
-            Next y
-            dblSmoothedData(x) = dblSum / lngWindowSize
-        Next x
+            For Y = 0 To lngWindowSize - 1
+                dblSum = dblSum + dblArray(X - lngWindowHalfWidth + Y)
+            Next Y
+            dblSmoothedData(X) = dblSum / lngWindowSize
+        Next X
         
         ' Smooth the last few points after a full window of points is available
         SmoothUsingMovingAverageEdgeMath dblArray, False, lngLowIndex, lngHighIndex, dblSmoothedData(), lngWindowSize
         
-        For x = lngLowIndex To lngHighIndex
+        For X = lngLowIndex To lngHighIndex
             ' Copy smoothed array to actual dblArray
-            dblArray(x) = dblSmoothedData(x)
-        Next x
+            dblArray(X) = dblSmoothedData(X)
+        Next X
     Next intIteration
     
     Exit Sub
@@ -4373,7 +4402,7 @@ Private Sub SmoothUsingMovingAverageEdgeMath(dblArray() As Double, blnSmoothBegi
     Dim StartIndex As Long, FinishIndex As Long
     Dim lngWindowHalfWidth As Long
     
-    Dim x As Long, y As Long, lngPointToUse As Long
+    Dim X As Long, Y As Long, lngPointToUse As Long
     Dim dblSum As Double, PointsUsed As Integer
     
     lngWindowHalfWidth = (lngWindowSize - 1) / 2
@@ -4388,11 +4417,11 @@ Private Sub SmoothUsingMovingAverageEdgeMath(dblArray() As Double, blnSmoothBegi
     
     
     ' Performs a shortened smooth at the beginning and end of a set of points
-    For x = StartIndex To FinishIndex
+    For X = StartIndex To FinishIndex
         dblSum = 0
         PointsUsed = 0
-        For y = 0 To lngWindowSize - 1
-            lngPointToUse = x - lngWindowHalfWidth + y
+        For Y = 0 To lngWindowSize - 1
+            lngPointToUse = X - lngWindowHalfWidth + Y
             If lngPointToUse >= lngLowIndex And lngPointToUse <= lngHighIndex Then
                 dblSum = dblSum + dblArray(lngPointToUse)
             Else
@@ -4403,11 +4432,11 @@ Private Sub SmoothUsingMovingAverageEdgeMath(dblArray() As Double, blnSmoothBegi
                 End If
             End If
             PointsUsed = PointsUsed + 1
-        Next y
+        Next Y
         If PointsUsed > 0 Then
-            dblSmoothedData(x) = dblSum / PointsUsed
+            dblSmoothedData(X) = dblSum / PointsUsed
         End If
-    Next x
+    Next X
 
 End Sub
 

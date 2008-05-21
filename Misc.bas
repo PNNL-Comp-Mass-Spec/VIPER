@@ -1027,7 +1027,7 @@ End If
 End Function
 
 
-Public Function FactorN(ByVal x As Long, ByVal n As Long) As Long
+Public Function FactorN(ByVal X As Long, ByVal n As Long) As Long
 '----------------------------------------------------------------
 'returns factor of the x closest to the N
 '----------------------------------------------------------------
@@ -1035,8 +1035,8 @@ Dim i As Long
 Dim CurrFacN As Long
 
 CurrFacN = 1
-For i = 1 To CLng(x / 2)
-    If x Mod i = 0 Then
+For i = 1 To CLng(X / 2)
+    If X Mod i = 0 Then
        If Abs(i - n) <= Abs(CurrFacN - n) Then
           CurrFacN = i
        End If

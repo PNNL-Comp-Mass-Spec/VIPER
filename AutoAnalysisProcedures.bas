@@ -2761,6 +2761,9 @@ On Error GoTo LoadInputFileErrorHandler
                         strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "ExcludeIsoByFitMaxVal", Trim(.ExcludeIsoByFitMaxVal), udtAutoParams.FilePaths.IniFilePath)
                         If IsNumeric(strKeyValue) Then
                             .ExcludeIsoByFitMaxVal = val(strKeyValue)
+                            If .ExcludeIsoByFitMaxVal > 100 Then
+                                .ExcludeIsoByFitMaxVal = 100
+                            End If
                         End If
                     End If
                     

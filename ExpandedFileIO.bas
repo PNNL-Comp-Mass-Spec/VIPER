@@ -104,6 +104,8 @@ Public Function BinaryLoadData(ByVal strFilePath As String, ByVal lngGelIndex As
     Dim lngOffsetsInFile(FILEIO_SECTION_COUNT) As Long
     Dim lngRecordSizes(FILEIO_SECTION_COUNT) As Long
     
+    Dim strCurrentTask As String
+    
 On Error GoTo BinaryLoadDataErrorHandler
     
     Call InitFileIOOffsetsAndVersions
@@ -125,17 +127,23 @@ On Error GoTo BinaryLoadDataErrorHandler
     Get #InFileNum, FileIO_Offset_IncludesExtendedLoc, eFileSaveMode
     
 ' 1. Read the info of the byte offsets of each of the sections
+    strCurrentTask = "Read the byte offset and version info for the file sections"
     For intSectionID = 0 To FILEIO_SECTION_COUNT - 1
         BinaryLoadDataGetOffsetInfo FileInfoHeaderOffsets(intSectionID), lngOffsetsInFile(intSectionID), lngRecordSizes(intSectionID), lngDataCount, sngVersionsInFile(intSectionID), InFileNum
     Next intSectionID
 
+    strCurrentTask = "Reading Gel data"
     frmProgress.UpdateProgressBar Loc(InFileNum)
-    frmProgress.InitializeSubtask "Reading Gel data", 0, 1
+    frmProgress.InitializeSubtask strCurrentTask, 0, 1
     
 ' 2. Read the Gel Data
      ' Note that versions prior to sngVersionsInFile(fioGelData) = 7# stored the mass calibration info in GelSearchDef().MassCalibrationInfo
      ' This information is now stored in .CSData().MassShiftCount and .IsoData().MassShiftOverallPPM
     If sngVersionsInFile(fioGelData) <> FileInfoVersions(fioGelData) Then
+        If lngOffsetsInFile(fioGelData) <= 0 Then
+            MsgBox "The file offset for loading the Gel Data is invalid; unable to load data (header information may be corrupted).  Aborting load."
+            GoTo BinaryLoadDataCleanup
+        End If
     
         If sngVersionsInFile(fioGelData) = 1# Then
             Seek #InFileNum, lngOffsetsInFile(fioGelData)
@@ -192,52 +200,59 @@ On Error GoTo BinaryLoadDataErrorHandler
     
     If eFileSaveMode <> fsNoExtended Then
     ' 3. Read the UMC Data
+        strCurrentTask = "Reading UMC data"
         frmProgress.UpdateProgressBar Loc(InFileNum)
-        frmProgress.InitializeSubtask "Reading UMC data", 0, 1
+        frmProgress.InitializeSubtask strCurrentTask, 0, 1
         
-        If sngVersionsInFile(fioGelUMC) <> FileInfoVersions(fioGelUMC) Then
-            If sngVersionsInFile(fioGelUMC) = 1# Then
-                ' Update from version 1 to current version
-                Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
-                Get #InFileNum, , GelUMC2002
-                blnUMCDataLoaded = True
-                
-                frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
-                CopyGelUMC2002ToCurrent GelUMC2002, GelUMC(lngGelIndex)
-            ElseIf sngVersionsInFile(fioGelUMC) = 2# Then
-                ' Update from version 2 to current version
-                Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
-                Get #InFileNum, , GelUMC2003a
-                blnUMCDataLoaded = True
-                
-                frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
-                CopyGelUMC2003aToCurrent GelUMC2003a, GelUMC(lngGelIndex)
+        If lngOffsetsInFile(fioGelUMC) <= 0 Then
+            MsgBox "The file offset for loading UMC data is invalid; unable to load UMCs (header information may be corrupted)"
+        Else
+        
+            If sngVersionsInFile(fioGelUMC) <> FileInfoVersions(fioGelUMC) Then
             
-            ElseIf sngVersionsInFile(fioGelUMC) = 3# Then
-                ' Update from version 3 to current version
-                Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
-                Get #InFileNum, , GelUMC2004
-                blnUMCDataLoaded = True
+                If sngVersionsInFile(fioGelUMC) = 1# Then
+                    ' Update from version 1 to current version
+                    Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
+                    Get #InFileNum, , GelUMC2002
+                    blnUMCDataLoaded = True
+                    
+                    frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
+                    CopyGelUMC2002ToCurrent GelUMC2002, GelUMC(lngGelIndex)
+                ElseIf sngVersionsInFile(fioGelUMC) = 2# Then
+                    ' Update from version 2 to current version
+                    Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
+                    Get #InFileNum, , GelUMC2003a
+                    blnUMCDataLoaded = True
+                    
+                    frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
+                    CopyGelUMC2003aToCurrent GelUMC2003a, GelUMC(lngGelIndex)
                 
-                frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
-                CopyGelUMC2004ToCurrent GelUMC2004, GelUMC(lngGelIndex)
-            
-            ElseIf sngVersionsInFile(fioGelUMC) = 4# Then
-                ' Update from version 4 to current version
+                ElseIf sngVersionsInFile(fioGelUMC) = 3# Then
+                    ' Update from version 3 to current version
+                    Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
+                    Get #InFileNum, , GelUMC2004
+                    blnUMCDataLoaded = True
+                    
+                    frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
+                    CopyGelUMC2004ToCurrent GelUMC2004, GelUMC(lngGelIndex)
+                
+                ElseIf sngVersionsInFile(fioGelUMC) = 4# Then
+                    ' Update from version 4 to current version
+                    Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
+                    Get #InFileNum, , GelUMC(lngGelIndex)
+                    blnUMCDataLoaded = True
+                    
+                    frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
+                    InitializeAdditionalUMCDefVariables GelUMC(lngGelIndex).def
+                    
+                Else
+                    MsgBox "The LC-MS Feature data " & FILE_FORMAT_ERROR_MESSAGE
+                End If
+            Else
                 Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
                 Get #InFileNum, , GelUMC(lngGelIndex)
                 blnUMCDataLoaded = True
-                
-                frmProgress.UpdateCurrentSubTask "Updating LC-MS Feature data format to current version"
-                InitializeAdditionalUMCDefVariables GelUMC(lngGelIndex).def
-                
-            Else
-                MsgBox "The LC-MS Feature data " & FILE_FORMAT_ERROR_MESSAGE
             End If
-        Else
-            Seek #InFileNum, lngOffsetsInFile(fioGelUMC)
-            Get #InFileNum, , GelUMC(lngGelIndex)
-            blnUMCDataLoaded = True
         End If
         
         If blnUMCDataLoaded Then
@@ -248,134 +263,140 @@ On Error GoTo BinaryLoadDataErrorHandler
     End If
     
 ' 4. Read the Analysis Info Data
+    strCurrentTask = "Reading Analysis Info"
     frmProgress.UpdateProgressBar Loc(InFileNum)
-    frmProgress.InitializeSubtask "Reading Analysis Info", 0, 1
+    frmProgress.InitializeSubtask strCurrentTask, 0, 1
     
-    If sngVersionsInFile(fioGelAnalysis) <> FileInfoVersions(fioGelAnalysis) Then
-        MsgBox "The Analsyis Info " & FILE_FORMAT_ERROR_MESSAGE
-    Else
+    If lngOffsetsInFile(fioGelAnalysis) > 0 Then
         Seek #InFileNum, lngOffsetsInFile(fioGelAnalysis)
         GelAnalysisInfoRead InFileNum, lngGelIndex
     End If
     
 ' 5. Read the UMC Net Adjustment Definition values
+    strCurrentTask = "Reading UMC Net parameters"
     frmProgress.UpdateProgressBar Loc(InFileNum)
-    frmProgress.InitializeSubtask "Reading UMC Net parameters", 0, 1
-    
-    If sngVersionsInFile(fioUMCNetAdjDef) <> FileInfoVersions(fioUMCNetAdjDef) Then
-        If sngVersionsInFile(fioUMCNetAdjDef) = 1# Then
-            ' Update from version 1 to version 3
-            Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
-            Get #InFileNum, , GelUMCNETAdjDef2003
-            CopyGelNetAdjDef2003ToCurrent GelUMCNETAdjDef2003, GelUMCNETAdjDef(lngGelIndex)
-        ElseIf sngVersionsInFile(fioUMCNetAdjDef) = 2# Then
-            MsgBox "The UMC Net Adjustment definition in the input file was saved using a December 2003 beta-version file format and therefore cannot be loaded.  Defaults will be used instead."
-            SetDefaultUMCNETAdjDef GelUMCNETAdjDef(lngGelIndex)
-        ElseIf sngVersionsInFile(fioUMCNetAdjDef) = 3# Then
-            Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
-            Get #InFileNum, , GelUMCNETAdjDef2004
-            CopyGelNetAdjDef2004ToCurrent GelUMCNETAdjDef2004, GelUMCNETAdjDef(lngGelIndex)
-        ElseIf sngVersionsInFile(fioUMCNetAdjDef) = 4# Then
-            Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
-            Get #InFileNum, , GelUMCNetAdjDef2005a
-            CopyGelNetAdjDef2005aToCurrent GelUMCNetAdjDef2005a, GelUMCNETAdjDef(lngGelIndex)
-        ElseIf sngVersionsInFile(fioUMCNetAdjDef) = 5# Then
-            Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
-            Get #InFileNum, , GelUMCNetAdjDef2005b
-            CopyGelNetAdjDef2005bToCurrent GelUMCNetAdjDef2005b, GelUMCNETAdjDef(lngGelIndex)
+    frmProgress.InitializeSubtask strCurrentTask, 0, 1
+
+    If lngOffsetsInFile(fioUMCNetAdjDef) > 0 Then
+        If sngVersionsInFile(fioUMCNetAdjDef) <> FileInfoVersions(fioUMCNetAdjDef) Then
+            If sngVersionsInFile(fioUMCNetAdjDef) = 1# Then
+                ' Update from version 1 to version 3
+                Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
+                Get #InFileNum, , GelUMCNETAdjDef2003
+                CopyGelNetAdjDef2003ToCurrent GelUMCNETAdjDef2003, GelUMCNETAdjDef(lngGelIndex)
+            ElseIf sngVersionsInFile(fioUMCNetAdjDef) = 2# Then
+                MsgBox "The UMC Net Adjustment definition in the input file was saved using a December 2003 beta-version file format and therefore cannot be loaded.  Defaults will be used instead."
+                SetDefaultUMCNETAdjDef GelUMCNETAdjDef(lngGelIndex)
+            ElseIf sngVersionsInFile(fioUMCNetAdjDef) = 3# Then
+                Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
+                Get #InFileNum, , GelUMCNETAdjDef2004
+                CopyGelNetAdjDef2004ToCurrent GelUMCNETAdjDef2004, GelUMCNETAdjDef(lngGelIndex)
+            ElseIf sngVersionsInFile(fioUMCNetAdjDef) = 4# Then
+                Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
+                Get #InFileNum, , GelUMCNetAdjDef2005a
+                CopyGelNetAdjDef2005aToCurrent GelUMCNetAdjDef2005a, GelUMCNETAdjDef(lngGelIndex)
+            ElseIf sngVersionsInFile(fioUMCNetAdjDef) = 5# Then
+                Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
+                Get #InFileNum, , GelUMCNetAdjDef2005b
+                CopyGelNetAdjDef2005bToCurrent GelUMCNetAdjDef2005b, GelUMCNETAdjDef(lngGelIndex)
+            Else
+                MsgBox "The UMC Net Adjustment definition " & FILE_FORMAT_ERROR_MESSAGE
+                SetDefaultUMCNETAdjDef GelUMCNETAdjDef(lngGelIndex)
+            End If
+            
+            If sngVersionsInFile(fioUMCNetAdjDef) <= 5# And Not APP_BUILD_DISABLE_LCMSWARP Then
+                ' Force RobustNetAdjustment with warping to be enabled if the version is <= 5#
+                With GelUMCNETAdjDef(lngGelIndex)
+                    .UseRobustNETAdjustment = True
+                    .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass
+                End With
+            End If
         Else
-            MsgBox "The UMC Net Adjustment definition " & FILE_FORMAT_ERROR_MESSAGE
-            SetDefaultUMCNETAdjDef GelUMCNETAdjDef(lngGelIndex)
+            Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
+            Get #InFileNum, , GelUMCNETAdjDef(lngGelIndex)
+            
+            UMCNetAdjDef = GelUMCNETAdjDef(lngGelIndex)
         End If
-        
-        If sngVersionsInFile(fioUMCNetAdjDef) <= 5# And Not APP_BUILD_DISABLE_LCMSWARP Then
-            ' Force RobustNetAdjustment with warping to be enabled if the version is <= 5#
-            With GelUMCNETAdjDef(lngGelIndex)
-                .UseRobustNETAdjustment = True
-                .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass
-            End With
-        End If
-    Else
-        Seek #InFileNum, lngOffsetsInFile(fioUMCNetAdjDef)
-        Get #InFileNum, , GelUMCNETAdjDef(lngGelIndex)
-        
-        UMCNetAdjDef = GelUMCNETAdjDef(lngGelIndex)
     End If
     
 ' 6. Read the Search Definition values
+    strCurrentTask = "Reading Search Definitions"
     frmProgress.UpdateProgressBar Loc(InFileNum)
-    frmProgress.InitializeSubtask "Reading Search Definitions", 0, 1
+    frmProgress.InitializeSubtask strCurrentTask, 0, 1
     
-    If sngVersionsInFile(fioSearchDefinitions) <> FileInfoVersions(fioSearchDefinitions) Then
-        If sngVersionsInFile(fioSearchDefinitions) = 2# Then
-            ' Update from version 2 to the current version
-            Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
-            Get #InFileNum, , GelSearchDef2002
-            
-            CopyGelSearchDef2002ToCurrent GelSearchDef2002, GelSearchDef(lngGelIndex)
-            blnSearchDefLoaded = True
-        ElseIf sngVersionsInFile(fioSearchDefinitions) = 3# Then
-            ' Update from Version 3 to the current version
-            Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
-            Get #InFileNum, , GelSearchDef2003
-            
-            CopyGelSearchDef2003ToCurrent GelSearchDef2003, GelSearchDef(lngGelIndex)
-            blnSearchDefLoaded = True
-        ElseIf sngVersionsInFile(fioSearchDefinitions) = 4# Then
-            ' Update from Version 4 to the current version
-            Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
-            Get #InFileNum, , GelSearchDef2003b
-            
-            CopyGelSearchDef2003bToCurrent GelSearchDef2003b, GelSearchDef(lngGelIndex)
-            blnSearchDefLoaded = True
-        ElseIf sngVersionsInFile(fioSearchDefinitions) = 5# Then
-            ' Update from Version 5 to the current version
-            Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
-            Get #InFileNum, , GelSearchDef2003c
-            
-            CopyGelSearchDef2003cToCurrent GelSearchDef2003c, GelSearchDef(lngGelIndex)
-            blnSearchDefLoaded = True
-        ElseIf sngVersionsInFile(fioSearchDefinitions) = 6# Then
-            ' Update from Version 6 to the current version
-            Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
-            Get #InFileNum, , GelSearchDef2003d
-            
-            CopyGelSearchDef2003dToCurrent GelSearchDef2003d, GelSearchDef(lngGelIndex)
-            blnSearchDefLoaded = True
-        ElseIf sngVersionsInFile(fioSearchDefinitions) = 7# Then
-            ' Update from Version 7 to the current version
-            Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
-            Get #InFileNum, , GelSearchDef2003e
-            
-            CopyGelSearchDef2003eToCurrent GelSearchDef2003e, GelSearchDef(lngGelIndex)
-            blnSearchDefLoaded = True
-        Else
-            MsgBox "The Search Definitions " & FILE_FORMAT_ERROR_MESSAGE
-        End If
-    Else
-        Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
-        Get #InFileNum, , GelSearchDef(lngGelIndex)
-        blnSearchDefLoaded = True
-    End If
-
-    If blnSearchDefLoaded Then
-        ' Copy values from GelUMC(lngGelIndex).Def to UMCDef (part of Module12, UC.Bas)
-        With GelSearchDef(lngGelIndex).UMCDef
-            If .Tol > 0 Or .MWField > 0 Then
-                ' Data exists; copy
-                UMCDef = GelSearchDef(lngGelIndex).UMCDef
+    If lngOffsetsInFile(fioSearchDefinitions) > 0 Then
+        If sngVersionsInFile(fioSearchDefinitions) <> FileInfoVersions(fioSearchDefinitions) Then
+            If sngVersionsInFile(fioSearchDefinitions) = 2# Then
+                ' Update from version 2 to the current version
+                Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
+                Get #InFileNum, , GelSearchDef2002
+                
+                CopyGelSearchDef2002ToCurrent GelSearchDef2002, GelSearchDef(lngGelIndex)
+                blnSearchDefLoaded = True
+            ElseIf sngVersionsInFile(fioSearchDefinitions) = 3# Then
+                ' Update from Version 3 to the current version
+                Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
+                Get #InFileNum, , GelSearchDef2003
+                
+                CopyGelSearchDef2003ToCurrent GelSearchDef2003, GelSearchDef(lngGelIndex)
+                blnSearchDefLoaded = True
+            ElseIf sngVersionsInFile(fioSearchDefinitions) = 4# Then
+                ' Update from Version 4 to the current version
+                Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
+                Get #InFileNum, , GelSearchDef2003b
+                
+                CopyGelSearchDef2003bToCurrent GelSearchDef2003b, GelSearchDef(lngGelIndex)
+                blnSearchDefLoaded = True
+            ElseIf sngVersionsInFile(fioSearchDefinitions) = 5# Then
+                ' Update from Version 5 to the current version
+                Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
+                Get #InFileNum, , GelSearchDef2003c
+                
+                CopyGelSearchDef2003cToCurrent GelSearchDef2003c, GelSearchDef(lngGelIndex)
+                blnSearchDefLoaded = True
+            ElseIf sngVersionsInFile(fioSearchDefinitions) = 6# Then
+                ' Update from Version 6 to the current version
+                Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
+                Get #InFileNum, , GelSearchDef2003d
+                
+                CopyGelSearchDef2003dToCurrent GelSearchDef2003d, GelSearchDef(lngGelIndex)
+                blnSearchDefLoaded = True
+            ElseIf sngVersionsInFile(fioSearchDefinitions) = 7# Then
+                ' Update from Version 7 to the current version
+                Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
+                Get #InFileNum, , GelSearchDef2003e
+                
+                CopyGelSearchDef2003eToCurrent GelSearchDef2003e, GelSearchDef(lngGelIndex)
+                blnSearchDefLoaded = True
+            Else
+                MsgBox "The Search Definitions " & FILE_FORMAT_ERROR_MESSAGE
             End If
-        End With
-        
-        If sngVersionsInFile(fioGelData) < 7# Then
-            CopyLegacyMassCalibrationInfoToData GelData(lngGelIndex), GelSearchDef(lngGelIndex).MassCalibrationInfo
+        Else
+            Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
+            Get #InFileNum, , GelSearchDef(lngGelIndex)
+            blnSearchDefLoaded = True
+        End If
+    
+        If blnSearchDefLoaded Then
+            ' Copy values from GelUMC(lngGelIndex).Def to UMCDef (part of Module12, UC.Bas)
+            With GelSearchDef(lngGelIndex).UMCDef
+                If .Tol > 0 Or .MWField > 0 Then
+                    ' Data exists; copy
+                    UMCDef = GelSearchDef(lngGelIndex).UMCDef
+                End If
+            End With
+            
+            If sngVersionsInFile(fioGelData) < 7# Then
+                CopyLegacyMassCalibrationInfoToData GelData(lngGelIndex), GelSearchDef(lngGelIndex).MassCalibrationInfo
+            End If
         End If
     End If
-
+    
     If eFileSaveMode <> fsNoExtended Then
     ' 7. Read the ORF Data
+        strCurrentTask = "Reading Protein information"
         frmProgress.UpdateProgressBar Loc(InFileNum)
-        frmProgress.InitializeSubtask "Reading Protein information", 0, 1
+        frmProgress.InitializeSubtask strCurrentTask, 0, 1
       
 ''        If sngVersionsInFile(fioORFData) <> FileInfoVersions(fioORFData) Then
 ''            MsgBox "The Protein information " & FILE_FORMAT_ERROR_MESSAGE
@@ -386,8 +407,9 @@ On Error GoTo BinaryLoadDataErrorHandler
 ''        End If
 ''
     ' 8. Read the ORF MT tags
+        strCurrentTask = "Reading the MT tags for the Proteins"
         frmProgress.UpdateProgressBar Loc(InFileNum)
-        frmProgress.InitializeSubtask "Reading the MT tags for the Proteins", 0, 1
+        frmProgress.InitializeSubtask strCurrentTask, 0, 1
       
       ' No longer supported (March 2006)
 ''        If sngVersionsInFile(fioORFMassTags) <> FileInfoVersions(fioORFMassTags) Then
@@ -399,8 +421,9 @@ On Error GoTo BinaryLoadDataErrorHandler
 ''        End If
 
     ' 9. Read the Pairs Data
+        strCurrentTask = "Reading pairs"
         frmProgress.UpdateProgressBar Loc(InFileNum)
-        frmProgress.InitializeSubtask "Reading pairs", 0, 1
+        frmProgress.InitializeSubtask strCurrentTask, 0, 1
         
 ''        If sngVersionsInFile(fioGelPairs) <> FileInfoVersions(fioGelPairs) Then
 ''            MsgBox "The pairs data " & FILE_FORMAT_ERROR_MESSAGE
@@ -411,68 +434,73 @@ On Error GoTo BinaryLoadDataErrorHandler
 ''        End If
     
     ' 10. Read the Delta Labeled Pairs Data
+        strCurrentTask = "Reading delta labeled pairs"
         frmProgress.UpdateProgressBar Loc(InFileNum)
-        frmProgress.InitializeSubtask "Reading delta labeled pairs", 0, 1
+        frmProgress.InitializeSubtask strCurrentTask, 0, 1
         
-        If sngVersionsInFile(fioGelDeltaLabeledPairs) <> FileInfoVersions(fioGelDeltaLabeledPairs) Then
-            If sngVersionsInFile(fioGelDeltaLabeledPairs) = 2# Then
-                ' Update from version 2 to current version
-                Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
-                Get #InFileNum, , GelP_D_L2003
-                
-                CopyDeltaLabelPairs2003ToCurrent GelP_D_L2003, GelP_D_L(lngGelIndex)
-                blnPairsDataLoaded = True
-                
-            ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 3# Then
-                ' Update from version 3 to current version
-                Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
-                Get #InFileNum, , GelP_D_L2004a
-                
-                CopyDeltaLabelPairs2004aToCurrent GelP_D_L2004a, GelP_D_L(lngGelIndex)
-                blnPairsDataLoaded = True
-                
-            ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 4# Then
-                Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
-                Get #InFileNum, , GelP_D_L2004b
-                
-                CopyDeltaLabelPairs2004bToCurrent GelP_D_L2004b, GelP_D_L(lngGelIndex)
-                blnPairsDataLoaded = True
-                
-            ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 5# Then
-                Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
-                Get #InFileNum, , GelP_D_L2004c
-                
-                CopyDeltaLabelPairs2004cToCurrent GelP_D_L2004c, GelP_D_L(lngGelIndex)
-                blnPairsDataLoaded = True
-                
-            ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 6# Then
-                Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
-                Get #InFileNum, , GelP_D_L2004d
-                
-                CopyDeltaLabelPairs2004dToCurrent GelP_D_L2004d, GelP_D_L(lngGelIndex)
-                blnPairsDataLoaded = True
-            ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 7# Then
-                Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
-                Get #InFileNum, , GelP_D_L2004e
-                
-                CopyDeltaLabelPairs2004eToCurrent GelP_D_L2004e, GelP_D_L(lngGelIndex)
-                blnPairsDataLoaded = True
+        If lngOffsetsInFile(fioGelDeltaLabeledPairs) > 0 Then
+            
+            If sngVersionsInFile(fioGelDeltaLabeledPairs) <> FileInfoVersions(fioGelDeltaLabeledPairs) Then
+                If sngVersionsInFile(fioGelDeltaLabeledPairs) = 2# Then
+                    ' Update from version 2 to current version
+                    Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
+                    Get #InFileNum, , GelP_D_L2003
+                    
+                    CopyDeltaLabelPairs2003ToCurrent GelP_D_L2003, GelP_D_L(lngGelIndex)
+                    blnPairsDataLoaded = True
+                    
+                ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 3# Then
+                    ' Update from version 3 to current version
+                    Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
+                    Get #InFileNum, , GelP_D_L2004a
+                    
+                    CopyDeltaLabelPairs2004aToCurrent GelP_D_L2004a, GelP_D_L(lngGelIndex)
+                    blnPairsDataLoaded = True
+                    
+                ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 4# Then
+                    Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
+                    Get #InFileNum, , GelP_D_L2004b
+                    
+                    CopyDeltaLabelPairs2004bToCurrent GelP_D_L2004b, GelP_D_L(lngGelIndex)
+                    blnPairsDataLoaded = True
+                    
+                ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 5# Then
+                    Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
+                    Get #InFileNum, , GelP_D_L2004c
+                    
+                    CopyDeltaLabelPairs2004cToCurrent GelP_D_L2004c, GelP_D_L(lngGelIndex)
+                    blnPairsDataLoaded = True
+                    
+                ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 6# Then
+                    Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
+                    Get #InFileNum, , GelP_D_L2004d
+                    
+                    CopyDeltaLabelPairs2004dToCurrent GelP_D_L2004d, GelP_D_L(lngGelIndex)
+                    blnPairsDataLoaded = True
+                ElseIf sngVersionsInFile(fioGelDeltaLabeledPairs) = 7# Then
+                    Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
+                    Get #InFileNum, , GelP_D_L2004e
+                    
+                    CopyDeltaLabelPairs2004eToCurrent GelP_D_L2004e, GelP_D_L(lngGelIndex)
+                    blnPairsDataLoaded = True
+                Else
+                    MsgBox "The pairs data " & FILE_FORMAT_ERROR_MESSAGE
+                End If
             Else
-                MsgBox "The pairs data " & FILE_FORMAT_ERROR_MESSAGE
+                Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
+                Get #InFileNum, , GelP_D_L(lngGelIndex)
+                blnPairsDataLoaded = True
             End If
-        Else
-            Seek #InFileNum, lngOffsetsInFile(fioGelDeltaLabeledPairs)
-            Get #InFileNum, , GelP_D_L(lngGelIndex)
-            blnPairsDataLoaded = True
-        End If
-    
-        If blnPairsDataLoaded Then
-            glbPreferencesExpanded.PairSearchOptions.SearchDef = GelP_D_L(lngGelIndex).SearchDef
+        
+            If blnPairsDataLoaded Then
+                glbPreferencesExpanded.PairSearchOptions.SearchDef = GelP_D_L(lngGelIndex).SearchDef
+            End If
         End If
         
     ' 11. Read the Identified Pairs (IDP) Data
+        strCurrentTask = "Reading IDP data"
         frmProgress.UpdateProgressBar Loc(InFileNum)
-        frmProgress.InitializeSubtask "Reading IDP data", 0, 1
+        frmProgress.InitializeSubtask strCurrentTask, 0, 1
         
 ''        If sngVersionsInFile(fioGelIDP) <> FileInfoVersions(fioGelIDP) Then
 ''            MsgBox "The IDP data " & FILE_FORMAT_ERROR_MESSAGE
@@ -483,14 +511,17 @@ On Error GoTo BinaryLoadDataErrorHandler
 ''        End If
     
     ' 12. Read the Gel Lock Mass (LM) Data
+        strCurrentTask = "Reading LM pairs"
         frmProgress.UpdateProgressBar Loc(InFileNum)
-        frmProgress.InitializeSubtask "Reading LM pairs", 0, 1
+        frmProgress.InitializeSubtask strCurrentTask, 0, 1
         
         If sngVersionsInFile(fioGelLM) <> FileInfoVersions(fioGelLM) Then
             MsgBox "The Gel Lock Mass data " & FILE_FORMAT_ERROR_MESSAGE
         Else
-            Seek #InFileNum, lngOffsetsInFile(fioGelLM)
-            Get #InFileNum, , GelLM(lngGelIndex)
+            If lngOffsetsInFile(fioGelLM) > 0 Then
+                Seek #InFileNum, lngOffsetsInFile(fioGelLM)
+                Get #InFileNum, , GelLM(lngGelIndex)
+            End If
         End If
 
     ' 13. Read the ORF Viewer Saved Gel List And Options
@@ -518,14 +549,14 @@ BinaryLoadDataCleanup:
     Exit Function
     
 BinaryLoadDataErrorHandler:
-    MsgBox "Error reading input file " & strFilePath & vbCrLf & Err.Description & vbCrLf & "Aborting.", vbExclamation + vbOKOnly, "Error"
+    MsgBox "Error reading input file " & strFilePath & " (" & strCurrentTask & ")" & vbCrLf & Err.Description & vbCrLf & "Aborting.", vbExclamation + vbOKOnly, "Error"
     LogErrors Err.Number, "BinaryLoadData", Err.Description, lngGelIndex
     BinaryLoadData = False
     Resume BinaryLoadDataCleanup
 
 End Function
 
-Private Sub BinaryLoadDataGetOffsetInfo(lngInfoOffset As Long, ByRef lngActualOffsetOfData As Long, ByRef lngRecordSize As Long, ByRef lngDataCount As Long, ByRef sngDataFormatVersion As Single, InFileNum As Integer)
+Private Sub BinaryLoadDataGetOffsetInfo(ByVal lngInfoOffset As Long, ByRef lngActualOffsetOfData As Long, ByRef lngRecordSize As Long, ByRef lngDataCount As Long, ByRef sngDataFormatVersion As Single, ByVal InFileNum As Integer)
     
     Seek #InFileNum, lngInfoOffset
     Get #InFileNum, , lngActualOffsetOfData

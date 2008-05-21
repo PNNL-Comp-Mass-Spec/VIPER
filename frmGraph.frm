@@ -2895,12 +2895,12 @@ Private Sub mnuEditNETFormula_Click()
 End Sub
 
 Private Sub mnuEditParameters_Click()
-frmParameters.Tag = nMyIndex
-frmParameters.Show vbModeless, MDIForm1
+    frmParameters.Tag = nMyIndex
+    frmParameters.Show vbModeless, MDIForm1
 End Sub
 
 Private Sub mnuEditResidualDisplay_Click()
-Call FillDisplay0ResidualCounts(nMyIndex)
+    Call FillDisplay0ResidualCounts(nMyIndex)
 End Sub
 
 Private Sub mnuEditUMC_Click()
@@ -2914,16 +2914,16 @@ End If
 End Sub
 
 Private Sub mnuExit_Click()
-Unload MDIForm1
+    Unload MDIForm1
 End Sub
 
 Private Sub mnuNew_Click()
-LoadNewDataFile
+    LoadNewDataFile
 End Sub
 
 Private Sub mnuOpen_Click()
-MDIStatus True, "Loading ... please be patient"
-FileOpenProc (Me.hwnd)
+    MDIStatus True, "Loading ... please be patient"
+    FileOpenProc (Me.hwnd)
 End Sub
 
 ''' MonroeMod: New subroutine
@@ -2933,11 +2933,11 @@ End Sub
 ''End Sub
 
 Private Sub mnuPrint_Click()
-If GoPrint(Me.Tag) < 0 Then MsgBox "Error printing.", vbOKOnly
+    If GoPrint(Me.Tag) < 0 Then MsgBox "Error printing.", vbOKOnly
 End Sub
 
 Private Sub mnuPrintSetup_Click()
-PrinterSetupAPIDlg (Me.hwnd)
+    PrinterSetupAPIDlg (Me.hwnd)
 End Sub
 
 Private Sub mnuRecentFiles_Click(Index As Integer)
