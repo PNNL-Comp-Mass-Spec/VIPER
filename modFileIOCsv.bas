@@ -9,7 +9,8 @@ Public Const CSV_COLUMN_HEADER_UNKNOWN_WARNING As String = "Warning: unknown col
 Public Const CSV_COLUMN_HEADER_MISSING_WARNING As String = "Warning: expected important column headers"
 
 ' Note: These should all be lowercase string values
-Private Const ISOS_COLUMN_SCAN_NUM As String = "scan_num"
+Private Const ISOS_COLUMN_SCAN_NUM_A As String = "scan_num"
+Private Const ISOS_COLUMN_SCAN_NUM_B As String = "lc_scan_num"
 Private Const ISOS_COLUMN_CHARGE As String = "charge"
 Private Const ISOS_COLUMN_ABUNDANCE As String = "abundance"
 Private Const ISOS_COLUMN_MZ As String = "mz"
@@ -23,6 +24,8 @@ Private Const ISOS_COLUMN_MONO_ABUNDANCE As String = "mono_abundance"
 Private Const ISOS_COLUMN_MONO_PLUS2_ABUNDANCE As String = "mono_plus2_abundance"
 Private Const ISOS_COLUMN_MONO_PLUS4_ABUNDANCE As String = "mono_plus4_abundance"
 Private Const ISOS_COLUMN_MONO_MINUS4_ABUNDANCE As String = "mono_minus4_abundance"
+Private Const ISOS_COLUMN_IMS_DRIFT_TIME As String = "drift_time"
+Private Const ISOS_COLUMN_IMS_SCAN_NUM As String = "ims_scan_num"
 
 ' Note: These should all be lowercase string values
 Private Const SCANS_COLUMN_SCAN_NUM As String = "scan_num"
@@ -37,12 +40,12 @@ Private Const SCANS_COLUMN_BPI As String = "bpi"
 Private Const SCANS_COLUMN_TIME_DOMAIN_SIGNAL As String = "time_domain_signal"
 Private Const SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD As String = "peak_intensity_threshold"
 Private Const SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD As String = "peptide_intensity_threshold"
-
+Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE As String = "frame_pressure"
 
 Private Const SCAN_INFO_DIM_CHUNK As Long = 10000
 Private Const ISO_DATA_DIM_CHUNK As Long = 25000
 
-Private Const SCAN_FILE_COLUMN_COUNT As Integer = 11
+Private Const SCAN_FILE_COLUMN_COUNT As Integer = 12
 Private Enum ScanFileColumnConstants
     ScanNumber = 0
     ScanTime = 1
@@ -55,9 +58,10 @@ Private Enum ScanFileColumnConstants
     TimeDomainSignal = 8
     PeakIntensityThreshold = 9
     PeptideIntensityThreshold = 10
+    IMSFramePressure = 11               ' Only present in IMS datafiles
 End Enum
 
-Private Const ISOS_FILE_COLUMN_COUNT As Integer = 14
+Private Const ISOS_FILE_COLUMN_COUNT As Integer = 15
 Private Enum IsosFileColumnConstants
     ScanNumber = 0
     Charge = 1
@@ -73,6 +77,7 @@ Private Enum IsosFileColumnConstants
     MonoPlus2Abundance = 11
     MonoPlus4Abundance = 12
     MonoMinus4Abundance = 13
+    IMSDriftTime = 14               ' Only present in IMS datafiles
 End Enum
 
 Private Enum rmReadModeConstants
@@ -129,6 +134,7 @@ Private Sub DuplicateIsoLineDataPoint(ByRef udtSrcIsoData As udtIsotopicDataType
         .IntensityMonoPlus2 = 0
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
         .IReportTagType = eIReportTagType
+        .IMSDriftTime = udtSrcIsoData.IMSDriftTime
     End With
     
     Exit Sub
@@ -260,10 +266,10 @@ Private Function StringTrimEnd(ByVal strText As String, ByVal strTextToTrim As S
     StringTrimEnd = strTrimmedText
 End Function
 
-Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean) As String
+Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean, blnIncludeIMSFileHeaders As Boolean) As String
     Dim strHeaders As String
     
-    strHeaders = ISOS_COLUMN_SCAN_NUM
+    strHeaders = ISOS_COLUMN_SCAN_NUM_A
     If Not blnRequiredColumnsOnly Then
         strHeaders = strHeaders & ", " & ISOS_COLUMN_CHARGE
     End If
@@ -284,12 +290,16 @@ Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean) 
         strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_PLUS2_ABUNDANCE
         strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_PLUS4_ABUNDANCE
         strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_MINUS4_ABUNDANCE
+        
+        If blnIncludeIMSFileHeaders Then
+            strHeaders = strHeaders & ", " & ISOS_COLUMN_IMS_DRIFT_TIME
+        End If
     End If
 
     GetDefaultIsosColumnHeaders = strHeaders
 End Function
 
-Private Function GetDefaultScansColumnHeaders(blnRequiredColumnsOnly As Boolean) As String
+Private Function GetDefaultScansColumnHeaders(blnRequiredColumnsOnly As Boolean, blnIncludeIMSFileHeaders As Boolean) As String
     Dim strHeaders As String
 
     strHeaders = SCANS_COLUMN_SCAN_NUM
@@ -305,6 +315,10 @@ Private Function GetDefaultScansColumnHeaders(blnRequiredColumnsOnly As Boolean)
         strHeaders = strHeaders & ", " & SCANS_COLUMN_TIME_DOMAIN_SIGNAL
         strHeaders = strHeaders & ", " & SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD
         strHeaders = strHeaders & ", " & SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD
+        
+        If blnIncludeIMSFileHeaders Then
+            strHeaders = strHeaders & ", " & SCANS_COLUMN_IMS_FRAME_PRESSURE
+        End If
     End If
     
     GetDefaultScansColumnHeaders = strHeaders
@@ -587,6 +601,11 @@ On Error GoTo ReadCSVIsosFileErrorHandler
     frmProgress.UpdateProgressBar mCurrentProgressStep
     frmProgress.InitializeSubtask "Initializing data structures", 0, 1
 
+    ' If IMS data is present, then update .DataStatusBits
+    If intColumnMapping(IsosFileColumnConstants.IMSDriftTime) >= 0 Then
+        GelData(mGelIndex).DataStatusBits = GelData(mGelIndex).DataStatusBits Or GEL_DATA_STATUS_BIT_IMS_DATA
+    End If
+
     ' Look for the presence of MonoPlus2 data
     blnMonoPlus2DataPresent = False
     If intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) >= 0 Then
@@ -846,9 +865,10 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) = IsosFileColumnConstants.MonoPlus2Abundance
                     intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance) = IsosFileColumnConstants.MonoPlus4Abundance
                     intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance) = IsosFileColumnConstants.MonoMinus4Abundance
+                    intColumnMapping(IsosFileColumnConstants.IMSDriftTime) = IsosFileColumnConstants.IMSDriftTime
 
                     ' Column headers were not present
-                     AddToAnalysisHistory mGelIndex, "Isos file " & fso.GetFileName(strIsosFilePath) & " did not contain column headers; using the default headers (" & GetDefaultIsosColumnHeaders(False) & ")"
+                     AddToAnalysisHistory mGelIndex, "Isos file " & fso.GetFileName(strIsosFilePath) & " did not contain column headers; using the default headers (" & GetDefaultIsosColumnHeaders(False, False) & ")"
 
                     blnDataLine = True
                 Else
@@ -866,7 +886,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         strColumnHeader = StripQuotes(LCase(Trim(strData(lngIndex))))
                         
                         Select Case strColumnHeader
-                        Case ISOS_COLUMN_SCAN_NUM: intColumnMapping(IsosFileColumnConstants.ScanNumber) = lngIndex
+                        Case ISOS_COLUMN_SCAN_NUM_A, ISOS_COLUMN_SCAN_NUM_B: intColumnMapping(IsosFileColumnConstants.ScanNumber) = lngIndex
                         Case ISOS_COLUMN_CHARGE: intColumnMapping(IsosFileColumnConstants.Charge) = lngIndex
                         Case ISOS_COLUMN_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.Abundance) = lngIndex
                         Case ISOS_COLUMN_MZ: intColumnMapping(IsosFileColumnConstants.MZ) = lngIndex
@@ -880,6 +900,9 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         Case ISOS_COLUMN_MONO_PLUS2_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) = lngIndex
                         Case ISOS_COLUMN_MONO_PLUS4_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance) = lngIndex
                         Case ISOS_COLUMN_MONO_MINUS4_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance) = lngIndex
+                        Case ISOS_COLUMN_IMS_DRIFT_TIME: intColumnMapping(IsosFileColumnConstants.IMSDriftTime) = lngIndex
+                        Case ISOS_COLUMN_IMS_SCAN_NUM
+                            ' Ignore this column
                         Case Else
                             ' Unknown column header; ignore it, but post an entry to the analysis history
                             If Len(strUnknownColumnList) > 0 Then
@@ -894,7 +917,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     
                     If Len(strUnknownColumnList) > 0 Then
                         ' Unknown column header; ignore it, but post an entry to the analysis history
-                        AddToAnalysisHistory mGelIndex, CSV_COLUMN_HEADER_UNKNOWN_WARNING & " found in file " & fso.GetFileName(strIsosFilePath) & ": " & strUnknownColumnList & "; Known columns are: " & vbCrLf & GetDefaultIsosColumnHeaders(False)
+                        AddToAnalysisHistory mGelIndex, CSV_COLUMN_HEADER_UNKNOWN_WARNING & " found in file " & fso.GetFileName(strIsosFilePath) & ": " & strUnknownColumnList & "; Known columns are: " & vbCrLf & GetDefaultIsosColumnHeaders(False, False)
                     End If
                     
                     blnDataLine = False
@@ -907,7 +930,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                    intColumnMapping(IsosFileColumnConstants.MonoisotopicMW) < 0 Then
                    
                     If mReadMode = rmStoreData Then
-                        strMessage = CSV_COLUMN_HEADER_MISSING_WARNING & " not found in file " & fso.GetFileName(strIsosFilePath) & "; the expected columns are: " & vbCrLf & GetDefaultIsosColumnHeaders(True)
+                        strMessage = CSV_COLUMN_HEADER_MISSING_WARNING & " not found in file " & fso.GetFileName(strIsosFilePath) & "; the expected columns are: " & vbCrLf & GetDefaultIsosColumnHeaders(True, False)
                         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                             MsgBox strMessage, vbExclamation + vbOKOnly, glFGTU
                         End If
@@ -1013,6 +1036,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                     .SignalToNoise = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.SignalToNoise), 0)
                                     .IntensityMono = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoAbundance), 0)
                                     .IntensityMonoPlus2 = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance), 0)
+                                    .IMSDriftTime = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.IMSDriftTime), 0)
                                 End With
                             
                                 If mReadMode <> rmReadModeConstants.rmPrescanData Then
@@ -1119,9 +1143,10 @@ On Error GoTo ReadCSVScanFileErrorHandler
                         intColumnMapping(ScanFileColumnConstants.TimeDomainSignal) = ScanFileColumnConstants.TimeDomainSignal
                         intColumnMapping(ScanFileColumnConstants.PeakIntensityThreshold) = ScanFileColumnConstants.PeakIntensityThreshold
                         intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold) = ScanFileColumnConstants.PeptideIntensityThreshold
+                        intColumnMapping(ScanFileColumnConstants.IMSFramePressure) = ScanFileColumnConstants.IMSFramePressure
 
                         ' Column headers were not present
-                         AddToAnalysisHistory mGelIndex, "Scans file " & fso.GetFileName(strScansFilePath) & " did not contain column headers; using the default headers (" & GetDefaultScansColumnHeaders(False) & ")"
+                         AddToAnalysisHistory mGelIndex, "Scans file " & fso.GetFileName(strScansFilePath) & " did not contain column headers; using the default headers (" & GetDefaultScansColumnHeaders(False, False) & ")"
 
                         blnDataLine = True
                     Else
@@ -1150,6 +1175,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
                             Case SCANS_COLUMN_TIME_DOMAIN_SIGNAL: intColumnMapping(ScanFileColumnConstants.TimeDomainSignal) = lngIndex
                             Case SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD: intColumnMapping(ScanFileColumnConstants.PeakIntensityThreshold) = lngIndex
                             Case SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD: intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold) = lngIndex
+                            Case SCANS_COLUMN_IMS_FRAME_PRESSURE: intColumnMapping(ScanFileColumnConstants.IMSFramePressure) = lngIndex
                             Case Else
                                 ' Unknown column header; ignore it, but post an entry to the analysis history
                                 If Len(strUnknownColumnList) > 0 Then
@@ -1164,7 +1190,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
                         
                         If Len(strUnknownColumnList) > 0 Then
                             ' Unknown column header; ignore it, but post an entry to the
-                            AddToAnalysisHistory mGelIndex, CSV_COLUMN_HEADER_UNKNOWN_WARNING & " found in file " & fso.GetFileName(strScansFilePath) & ": " & strUnknownColumnList & "; Known columns are: " & vbCrLf & GetDefaultScansColumnHeaders(False)
+                            AddToAnalysisHistory mGelIndex, CSV_COLUMN_HEADER_UNKNOWN_WARNING & " found in file " & fso.GetFileName(strScansFilePath) & ": " & strUnknownColumnList & "; Known columns are: " & vbCrLf & GetDefaultScansColumnHeaders(False, False)
                         End If
                         
                         blnDataLine = False
@@ -1176,7 +1202,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
                        intColumnMapping(ScanFileColumnConstants.ScanTime) < 0 Or _
                        intColumnMapping(ScanFileColumnConstants.ScanType) < 0 Then
                        
-                        strMessage = CSV_COLUMN_HEADER_MISSING_WARNING & " not found in file " & fso.GetFileName(strScansFilePath) & "; the expected columns are: " & vbCrLf & GetDefaultScansColumnHeaders(True)
+                        strMessage = CSV_COLUMN_HEADER_MISSING_WARNING & " not found in file " & fso.GetFileName(strScansFilePath) & "; the expected columns are: " & vbCrLf & GetDefaultScansColumnHeaders(True, False)
                         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                             MsgBox strMessage, vbExclamation + vbOKOnly, glFGTU
                         End If
@@ -1223,6 +1249,8 @@ On Error GoTo ReadCSVScanFileErrorHandler
                         .PeptideIntensityThreshold = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold), 0)
     
                         .FrequencyShift = 0
+                    
+                        .IMSFramePressure = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.IMSFramePressure), 0)
                     
                     End With
                 End If

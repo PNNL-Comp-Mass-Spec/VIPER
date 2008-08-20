@@ -1858,7 +1858,7 @@ Case -6
     If blnShowMessages Then MsgBox strStatusMessage, vbOKOnly, glFGTU
 Case Else
     ' Success (no error)
-    strStatusMessage = "MT tag hits: " & HitsCnt & "(non-unique)"
+    strStatusMessage = "MT tag hits: " & HitsCnt & " (non-unique)"
     If blnShowMessages Then MsgBox strStatusMessage, vbOKOnly, glFGTU
 
     If Not GelAnalysis(CallerID) Is Nothing Then

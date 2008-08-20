@@ -1,6 +1,6 @@
 Type=OleDll
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\WINDOWS\system32\stdole2.tlb#OLE Automation
-Reference=*\G{2206CEB0-19C1-11D1-89E0-00C04FD7A829}#1.0#0#C:\Program Files\Common Files\System\OLE DB\OLEDB32.DLL#Microsoft OLE DB Service Component 1.0 Type Library
+Reference=*\G{2206CEB0-19C1-11D1-89E0-00C04FD7A829}#1.0#0#C:\Program Files\Common Files\system\ole db\oledb32.dll#Microsoft OLE DB Service Component 1.0 Type Library
 Reference=*\G{EF53050B-882E-4776-B643-EDA472E8E3F2}#2.7#0#C:\Program Files\Common Files\system\ado\msado27.tlb#Microsoft ActiveX Data Objects 2.7 Library
 Reference=*\G{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}#1.0#0#C:\WINDOWS\system32\wshom.ocx#Windows Script Host Object Model
 Class=NameValue; NameValue.cls
@@ -30,7 +30,7 @@ CompatibleMode="0"
 CompatibleEXE32="MassTagsAccess.exe"
 MajorVer=2
 MinorVer=4
-RevisionVer=52
+RevisionVer=53
 AutoIncrementVer=1
 ServerSupportFiles=0
 VersionCompanyName="Battelle/PNNL"

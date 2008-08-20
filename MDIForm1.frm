@@ -852,7 +852,7 @@ If Not MyAnalysisInit.NewAnalysis Is Nothing Then
         Case 0      'success
            GelStatus(Ind).Dirty = True
            GelBody(Ind).Tag = Ind
-           GelBody(Ind).Caption = "Untitled:" & Ind
+           GelBody(Ind).Caption = "Untitled:" & Ind & " (" & fso.GetBaseName(sFileName) & ")"
            GelStatus(Ind).GelFilePathFull = App.Path
            GelBody(Ind).Show
         Case 1      'auto analysis success

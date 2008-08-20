@@ -1002,7 +1002,7 @@ Case -4
 Case -5
    MsgBox "Pairs need to be recalculated. Close dialog and recalculate pairs, then return to this dialog.", vbOKOnly, glFGTU
 Case Else
-   MsgBox "MT tag hits: " & HitsCnt & "(non-unique)", vbOKOnly, glFGTU
+   MsgBox "MT tag hits: " & HitsCnt & " (non-unique)", vbOKOnly, glFGTU
     
     If Not GelAnalysis(CallerID) Is Nothing Then
         If GelAnalysis(CallerID).MD_Type = stNotDefined Or GelAnalysis(CallerID).MD_Type = stStandardIndividual Then

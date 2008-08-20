@@ -552,7 +552,7 @@ Case -2
    MsgBox "Error in NET/RT calculation formula.", vbOKOnly
    txtNETFormula.SetFocus
 Case Else
-   MsgBox "MT records hits: " & HitsCnt & "(non-unique)", vbOKOnly
+   MsgBox "MT records hits: " & HitsCnt & "( non-unique)", vbOKOnly
 End Select
 End Sub
 

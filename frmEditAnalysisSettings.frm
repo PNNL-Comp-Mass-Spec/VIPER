@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
 Begin VB.Form frmEditAnalysisSettings 
    Caption         =   "Edit Analysis Settings"
    ClientHeight    =   9870
@@ -6707,6 +6707,13 @@ Private Sub LookupDefaultUMCIonNetValues(ByVal intControlIndex As Integer, ByRef
             dblDefault = 1
             dblMaximum = 100000
         End If
+    Case uindUMCIonNetDimConstants.uindIMSDriftTime
+        If blnReturnDefaultWeightFactor Then
+            dblDefault = 0.1
+            ' Drift time doesn't normally have a constraint
+            dblMinimum = 0
+            dblMaximum = 100000
+        End If
     Case Else
         Debug.Assert False
         If blnReturnDefaultWeightFactor Then
@@ -8646,11 +8653,11 @@ Private Sub Form_Load()
     ShowHidePNNLMenus
 End Sub
 
-Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
 GetOLEData Data
 End Sub
 
-Private Sub fraOptionFrame_OLEDragDrop(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub fraOptionFrame_OLEDragDrop(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
     GetOLEData Data
 End Sub
 
@@ -8775,7 +8782,7 @@ Private Sub optUMCSearchTolType_Click(Index As Integer)
     End If
 End Sub
 
-Private Sub tbsTabStrip_OLEDragDrop(Data As TabDlg.DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub tbsTabStrip_OLEDragDrop(Data As TabDlg.DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
     GetOLEData Data
 End Sub
 

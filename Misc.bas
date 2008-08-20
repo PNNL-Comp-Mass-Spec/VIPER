@@ -1446,7 +1446,7 @@ With udtUMCDef
 End With
 End Sub
 
-Public Sub SetDefaultUMCIonNetDef(ByRef udtUMCIonNetDef As UMCIonNetDefinition)
+Public Sub SetDefaultUMCIonNetDef(ByRef udtUMCIonNetDef As UMCIonNetDefinition, Optional blnIMSData As Boolean = False)
     Dim intIndex As Integer
     
     ' These defaults were set in November 2006
@@ -1457,8 +1457,20 @@ Public Sub SetDefaultUMCIonNetDef(ByRef udtUMCIonNetDef As UMCIonNetDefinition)
         .NetDim = 5
         .TooDistant = 0.1
         ReDim .MetricData(.NetDim - 1)
-        .MetricData(0).Use = True:  .MetricData(0).DataType = uindUMCIonNetDimConstants.uindMonoMW:   .MetricData(0).WeightFactor = 0.01:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 10: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_PPM
-        .MetricData(1).Use = False:  .MetricData(1).DataType = uindUMCIonNetDimConstants.uindAvgMW:    .MetricData(1).WeightFactor = 0.01:   .MetricData(1).ConstraintType = Net_CT_LT:       .MetricData(1).ConstraintValue = 10: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_PPM
+        
+        If blnIMSData Then
+            ' Monoisotopic mass constraint is 50 ppm since IMS data collected on a TOF
+            .MetricData(0).Use = True:  .MetricData(0).DataType = uindUMCIonNetDimConstants.uindMonoMW:   .MetricData(0).WeightFactor = 0.01:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 50: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_PPM
+            
+            ' Second dimension is set to IMS Drift Time, with a weigh factor of 0.1
+            .MetricData(1).Use = True: .MetricData(1).DataType = uindUMCIonNetDimConstants.uindIMSDriftTime:    .MetricData(1).WeightFactor = 0.1:   .MetricData(1).ConstraintType = Net_CT_None:       .MetricData(1).ConstraintValue = 5: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_DA
+        Else
+            ' Monoisotopic mass constraint is 10 ppm
+            .MetricData(0).Use = True:  .MetricData(0).DataType = uindUMCIonNetDimConstants.uindMonoMW:   .MetricData(0).WeightFactor = 0.01:   .MetricData(0).ConstraintType = Net_CT_LT:       .MetricData(0).ConstraintValue = 10: .MetricData(0).ConstraintUnits = DATA_UNITS_MASS_PPM
+            
+            ' Second dimension is set to Average mass, but is not used
+            .MetricData(1).Use = False: .MetricData(1).DataType = uindUMCIonNetDimConstants.uindAvgMW:    .MetricData(1).WeightFactor = 0.01:   .MetricData(1).ConstraintType = Net_CT_LT:       .MetricData(1).ConstraintValue = 10: .MetricData(1).ConstraintUnits = DATA_UNITS_MASS_PPM
+        End If
         .MetricData(2).Use = True:  .MetricData(2).DataType = uindUMCIonNetDimConstants.uindLogAbundance:   .MetricData(2).WeightFactor = 0.1:   .MetricData(2).ConstraintType = Net_CT_None:     .MetricData(2).ConstraintValue = 0.1:   .MetricData(2).ConstraintUnits = DATA_UNITS_MASS_DA
         .MetricData(3).Use = True:  .MetricData(3).DataType = uindUMCIonNetDimConstants.uindGenericNET:      .MetricData(3).WeightFactor = 15:   .MetricData(3).ConstraintType = Net_CT_None:    .MetricData(3).ConstraintValue = 0.01:  .MetricData(3).ConstraintUnits = DATA_UNITS_MASS_DA
         .MetricData(4).Use = True:  .MetricData(4).DataType = uindUMCIonNetDimConstants.uindFit:       .MetricData(4).WeightFactor = 0.1:    .MetricData(4).ConstraintType = Net_CT_None:    .MetricData(4).ConstraintValue = 0.01:  .MetricData(4).ConstraintUnits = DATA_UNITS_MASS_DA

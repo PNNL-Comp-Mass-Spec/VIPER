@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
 Begin VB.Form frmUMCIonNet 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "LC-MS Feature (UMC) Ion Networks"
@@ -1759,7 +1759,7 @@ If ResCnt > 0 Then
       ChangeStatus "Sorting connections..."
       Call Sort2LongArrays(Ind1(), Ind2(), SortInd())   'sort results on Ind1, Ind2
       With GelUMCIon(CallerID)
-         .NetCount = TmpCnt
+         .NETCount = TmpCnt
          ReDim .NetInd1(TmpCnt - 1):   ReDim .NetInd2(TmpCnt - 1):   ReDim .NetDist(TmpCnt - 1)
          .MinDist = glHugeDouble:      .MaxDist = -glHugeDouble
          For i = 0 To TmpCnt - 1
@@ -1778,12 +1778,12 @@ End If
 
 If blnEraseUMCIonNetworks Then
     With GelUMCIon(CallerID)
-        .NetCount = 0
+        .NETCount = 0
          ReDim .NetInd1(0):   ReDim .NetInd2(0):   ReDim .NetDist(0)
     End With
 End If
 
-ChangeStatus " Number of connections: " & GelUMCIon(CallerID).NetCount
+ChangeStatus " Number of connections: " & GelUMCIon(CallerID).NETCount
 lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
 Exit Sub
 
@@ -1959,10 +1959,10 @@ On Error GoTo EliminateLongConnectionsNetErrorHandler
 
 ChangeStatus " Eliminating long connections..."
 With GelUMCIon(CallerID)
-    lngOriginalConnectionCount = .NetCount
-    If .NetCount > 0 Then
+    lngOriginalConnectionCount = .NETCount
+    If .NETCount > 0 Then
        .MinDist = glHugeDouble:     .MaxDist = -glHugeDouble
-       For i = 0 To .NetCount - 1
+       For i = 0 To .NETCount - 1
            If .NetDist(i) <= TooLongConnection Then
               TmpCnt = TmpCnt + 1
               .NetInd1(TmpCnt - 1) = .NetInd1(i)
@@ -1979,14 +1979,14 @@ With GelUMCIon(CallerID)
        Else
           Erase .NetDist:   Erase .NetInd1:   Erase .NetInd2
        End If
-       .NetCount = TmpCnt
+       .NETCount = TmpCnt
        .ThisNetDef.TooDistant = TooLongConnection
     End If
 End With
 GelSearchDef(CallerID).UMCIonNetDef = GelUMCIon(CallerID).ThisNetDef
-ChangeStatus " Number of connections: " & GelUMCIon(CallerID).NetCount
+ChangeStatus " Number of connections: " & GelUMCIon(CallerID).NETCount
 lblNetInfo.Caption = GetUMCIonNetInfo(CallerID)
-EliminateLongConnections_Net = lngOriginalConnectionCount - GelUMCIon(CallerID).NetCount
+EliminateLongConnections_Net = lngOriginalConnectionCount - GelUMCIon(CallerID).NETCount
 
 Exit Function
 
@@ -2017,22 +2017,29 @@ Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef
     Dim lngGelScanNumberMin As Long
     Dim lngGelScanNumberMax As Long
     Dim intMinLength As Integer
-        
+   
     Dim blnMonoMassDefined As Boolean
     Dim blnAvgMassDefined As Boolean
     Dim blnLogAbundanceDefined As Boolean
     Dim blnScanDefined As Boolean
     Dim blnNETDefined As Boolean
     Dim blnFitDefined As Boolean
+    Dim blnIMSDriftTimeDefined As Boolean
+    
     
     Dim blnUseGenericNET As Boolean
     Dim blnExportPoint As Boolean
+    Dim blnIMSData As Boolean
     
 On Error GoTo ExportPeaksForUMCFindingErrorHandler
 
     strBaseStatus = "Exporting loaded peaks to find LC-MS features with external application"
     ChangeStatus strBaseStatus
 
+    If ((GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA) Then
+        blnIMSData = True
+    End If
+    
     If Not GetDataInScope(ISInd(), DataCnt) Then
         mAbortProcess = True
         Status "Error constructing list of currently visible data points"
@@ -2065,6 +2072,10 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                  "mono_abundance" & COL_DELIMITER & _
                  "mono_plus2_abundance" & COL_DELIMITER & _
                  "index"
+    
+    If blnIMSData Then
+        strLineOut = strLineOut & COL_DELIMITER & "ims_drift_time"
+    End If
                  
     tsOutfile.WriteLine strLineOut
     
@@ -2106,6 +2117,10 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                                  Trim(.IntensityMono) & COL_DELIMITER & _
                                  Trim(.IntensityMonoPlus2) & COL_DELIMITER & _
                                  Trim(ISInd(lngIndex))
+
+                    If blnIMSData Then
+                        strLineOut = strLineOut & COL_DELIMITER & Trim(.IMSDriftTime)
+                    End If
     
                     tsOutfile.WriteLine strLineOut
                 End With
@@ -2141,6 +2156,7 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     blnScanDefined = False
     blnNETDefined = False
     blnFitDefined = False
+    blnIMSDriftTimeDefined = False
     
     blnUseGenericNET = False
     
@@ -2188,6 +2204,10 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                Case uindUMCIonNetDimConstants.uindLogAbundance
                     strDimensionName = "LogAbundance"
                     blnLogAbundanceDefined = True
+                
+               Case uindUMCIonNetDimConstants.uindIMSDriftTime
+                    strDimensionName = "IMSDriftTime"
+                    blnIMSDriftTimeDefined = True
                     
             End Select
         
@@ -2225,6 +2245,8 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     If Not blnScanDefined Then tsOutfile.WriteLine "ScanWeight=0"
     If Not blnNETDefined Then tsOutfile.WriteLine "NETWeight=0"
     If Not blnFitDefined Then tsOutfile.WriteLine "FitWeight=0"
+    If Not blnIMSDriftTimeDefined Then tsOutfile.WriteLine "IMSDriftTimeWeight=0"
+    
 
     ' Write out some additional settings
     tsOutfile.WriteLine "MaxDistance=" & Trim(MyDef.TooDistant)
@@ -2974,7 +2996,7 @@ Private Sub FindIonNetConnections()
            txtNETType.SetFocus
            Exit Sub
         End If
-        If GelUMCIon(CallerID).NetCount > 0 Then
+        If GelUMCIon(CallerID).NETCount > 0 Then
            eResponse = MsgBox("Isotopic NET already established. Overwrite?", vbYesNo, glFGTU)
            If eResponse = vbNo Then Exit Sub
         End If
@@ -3013,7 +3035,7 @@ Private Sub FindIonNetConnections()
                 strUMCIsoDefinition = Left(strUMCIsoDefinition, Len(strUMCIsoDefinition) - 1)
              End If
              
-             AddToAnalysisHistory CallerID, "Found data-point connections (" & AUTO_ANALYSIS_UMCIonNet & "); Connection count = " & Trim(GelUMCIon(CallerID).NetCount) & "; " & strUMCIsoDefinition & "; Connections eliminated by max distance filter = " & Trim(lngConnectionsEliminated)
+             AddToAnalysisHistory CallerID, "Found data-point connections (" & AUTO_ANALYSIS_UMCIonNet & "); Connection count = " & Trim(GelUMCIon(CallerID).NETCount) & "; " & strUMCIsoDefinition & "; Connections eliminated by max distance filter = " & Trim(lngConnectionsEliminated)
           Else
              ChangeStatus " Error initializing Net structures."
           End If
@@ -3048,7 +3070,7 @@ Private Function FormClassesFromNETsWrapper(Optional ByVal blnShowMessages As Bo
     
     If mCalculating Then Exit Function
     
-    If GelUMCIon(CallerID).NetCount > 0 Then
+    If GelUMCIon(CallerID).NETCount > 0 Then
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled And blnShowMessages Then
             If GelUMC(CallerID).UMCCnt > 0 Then
                 eResponse = MsgBox("Unique Mass Classes structure already exists. Overwrite?", vbYesNo, glFGTU)
@@ -3319,49 +3341,52 @@ With GelUMCIon(Ind).ThisNetDef
             End If
             
             If .MetricData(i).Use Then
-               Select Case .MetricData(i).DataType
-               Case uindUMCIonNetDimConstants.uindMonoMW
-                    strAddnlText = "Monoisotopic mass; "
-               Case uindUMCIonNetDimConstants.uindAvgMW
-                    strAddnlText = "Average mass; "
-               Case uindUMCIonNetDimConstants.uindTmaMW
-                    strAddnlText = "The most abundant mass; "
-               Case uindUMCIonNetDimConstants.uindScan
-                    strAddnlText = "Scan; "
-               Case uindUMCIonNetDimConstants.uindFit
-                    strAddnlText = "Isotopic fit; "
-               Case uindUMCIonNetDimConstants.uindMZ
-                    strAddnlText = "m/z; "
-               Case uindUMCIonNetDimConstants.uindGenericNET
-                    strAddnlText = "Generic NET; "
-               Case uindUMCIonNetDimConstants.uindChargeState
-                    strAddnlText = "Charge state; "
-               Case uindUMCIonNetDimConstants.uindLogAbundance
-                    strAddnlText = "Log(Abundance); "
-               End Select
-               strDesc = strDesc & strAddnlText
-               strDesc = strDesc & "Weight factor: " & .MetricData(i).WeightFactor & "; "
-               strDesc = strDesc & "Constraint: "
-               Select Case .MetricData(i).ConstraintType
-               Case Net_CT_None
-                    strAddnlText = "none"
-               Case Net_CT_LT
-                    strAddnlText = "Distance < " & .MetricData(i).ConstraintValue
-               Case Net_CT_GT
-                    strAddnlText = "Distance > " & .MetricData(i).ConstraintValue
-               Case Net_CT_EQ
-                    strAddnlText = "Distance equal to " & .MetricData(i).ConstraintValue
-               End Select
-               
-               strDesc = strDesc & strAddnlText
-               If .MetricData(i).ConstraintType <> Net_CT_None Then
-                    Select Case .MetricData(i).DataType
-                    Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
-                        strDesc = strDesc & " " & GetMetricDataMassUnits(.MetricData(i).ConstraintUnits)
-                    Case Else
-                        ' Do not append the units
-                    End Select
-               End If
+                Select Case .MetricData(i).DataType
+                Case uindUMCIonNetDimConstants.uindMonoMW
+                     strAddnlText = "Monoisotopic mass; "
+                Case uindUMCIonNetDimConstants.uindAvgMW
+                     strAddnlText = "Average mass; "
+                Case uindUMCIonNetDimConstants.uindTmaMW
+                     strAddnlText = "The most abundant mass; "
+                Case uindUMCIonNetDimConstants.uindScan
+                     strAddnlText = "Scan; "
+                Case uindUMCIonNetDimConstants.uindFit
+                     strAddnlText = "Isotopic fit; "
+                Case uindUMCIonNetDimConstants.uindMZ
+                     strAddnlText = "m/z; "
+                Case uindUMCIonNetDimConstants.uindGenericNET
+                     strAddnlText = "Generic NET; "
+                Case uindUMCIonNetDimConstants.uindChargeState
+                     strAddnlText = "Charge state; "
+                Case uindUMCIonNetDimConstants.uindLogAbundance
+                     strAddnlText = "Log(Abundance); "
+                Case uindUMCIonNetDimConstants.uindIMSDriftTime
+                     strAddnlText = "IMS Drift Time; "
+                End Select
+                
+                strDesc = strDesc & strAddnlText
+                strDesc = strDesc & "Weight factor: " & .MetricData(i).WeightFactor & "; "
+                strDesc = strDesc & "Constraint: "
+                Select Case .MetricData(i).ConstraintType
+                Case Net_CT_None
+                     strAddnlText = "none"
+                Case Net_CT_LT
+                     strAddnlText = "Distance < " & .MetricData(i).ConstraintValue
+                Case Net_CT_GT
+                     strAddnlText = "Distance > " & .MetricData(i).ConstraintValue
+                Case Net_CT_EQ
+                     strAddnlText = "Distance equal to " & .MetricData(i).ConstraintValue
+                End Select
+                
+                strDesc = strDesc & strAddnlText
+                If .MetricData(i).ConstraintType <> Net_CT_None Then
+                     Select Case .MetricData(i).DataType
+                     Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
+                         strDesc = strDesc & " " & GetMetricDataMassUnits(.MetricData(i).ConstraintUnits)
+                     Case Else
+                         ' Do not append the units
+                     End Select
+                End If
             Else
                 strDesc = strDesc & "Unused"
             End If
@@ -3516,9 +3541,9 @@ On Error GoTo InitializeUMCSearchErrorHandler
     
         chkRequireMatchingIsotopeTag.Enabled = blnContainsIsotopeTags
         
-        If GelUMCIon(CallerID).NetCount > 0 Then                     'accept settings from caller
+        If GelUMCIon(CallerID).NETCount > 0 Then                     'accept settings from caller
            MyDef = GelUMCIon(CallerID).ThisNetDef
-           ChangeStatus " Number of lines: " & GelUMCIon(CallerID).NetCount
+           ChangeStatus " Number of lines: " & GelUMCIon(CallerID).NETCount
         Else                                                         'accept setting from UMCIonNetDef (default Def, or last Def used when form was Unloaded)
            MyDef = UMCIonNetDef
            ChangeStatus " No net structure found."
@@ -3860,6 +3885,7 @@ Private Sub PopulateComboBoxes()
             .AddItem "Generic NET"
             .AddItem "Charge STATE"
             .AddItem "Log (Abundance)"
+            .AddItem "IMS Drift Time"
         End With
     
         With cmbConstraint(intIndex)
@@ -4067,65 +4093,70 @@ On Error GoTo err_PrepareDataArrays
     Select Case MyDef.MetricType
     Case METRIC_EUCLIDEAN, METRIC_HONDURAS, METRIC_INFINITY
         With GelData(CallerID)
-           For j = 0 To MyDef.NetDim - 1
-               If MyDef.MetricData(j).Use Then
-                  Select Case MyDef.MetricData(j).DataType
-                  Case uindUMCIonNetDimConstants.uindMonoMW
-                      For i = 1 To DataCnt
-                          DataOInd(i - 1) = ISInd(i)
-                          DataVal(i - 1, j) = .IsoData(ISInd(i)).MonoisotopicMW * MyDef.MetricData(j).WeightFactor
-                      Next i
-                  Case uindUMCIonNetDimConstants.uindAvgMW
-                      For i = 1 To DataCnt
-                          DataOInd(i - 1) = ISInd(i)
-                          DataVal(i - 1, j) = .IsoData(ISInd(i)).AverageMW * MyDef.MetricData(j).WeightFactor
-                      Next i
-                  Case uindUMCIonNetDimConstants.uindTmaMW
-                      For i = 1 To DataCnt
-                          DataOInd(i - 1) = ISInd(i)
-                          DataVal(i - 1, j) = .IsoData(ISInd(i)).MostAbundantMW * MyDef.MetricData(j).WeightFactor
-                      Next i
-                  Case uindUMCIonNetDimConstants.uindScan
-                      For i = 1 To DataCnt
-                          DataOInd(i - 1) = ISInd(i)
-                          ' When processing odd-only or even-only scans in frmUMCSimple, we divide lngScanNumberRelativeIndex by 2 since we're only keeping every other scan
-                          ' However, we will not do that in this function, since a scan gap of 1 is allowed for, and since that can mess up the minimum Scan Width filters applied by the LCMSFeatureFinder
-                          lngScanNumberRelativeIndex = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(i)).ScanNumber)
-                          DataVal(i - 1, j) = lngScanNumberRelativeIndex * MyDef.MetricData(j).WeightFactor
-                      Next i
-                  Case uindUMCIonNetDimConstants.uindFit
-                      For i = 1 To DataCnt
-                          DataOInd(i - 1) = ISInd(i)
-                          DataVal(i - 1, j) = .IsoData(ISInd(i)).Fit * MyDef.MetricData(j).WeightFactor
-                      Next i
-                  Case uindUMCIonNetDimConstants.uindMZ
-                      For i = 1 To DataCnt
-                          DataOInd(i - 1) = ISInd(i)
-                          DataVal(i - 1, j) = .IsoData(ISInd(i)).MZ * MyDef.MetricData(j).WeightFactor
-                      Next i
-                  Case uindUMCIonNetDimConstants.uindGenericNET
-                      For i = 1 To DataCnt
-                          DataOInd(i - 1) = ISInd(i)
-                          DataVal(i - 1, j) = ((.IsoData(ISInd(i)).ScanNumber - MinScan) / (MaxScan - MinScan)) * MyDef.MetricData(j).WeightFactor
-                      Next i
-                  Case uindUMCIonNetDimConstants.uindChargeState
-                      For i = 1 To DataCnt
-                          DataOInd(i - 1) = ISInd(i)
-                          DataVal(i - 1, j) = .IsoData(ISInd(i)).Charge * MyDef.MetricData(j).WeightFactor
-                      Next i
-                  Case uindUMCIonNetDimConstants.uindLogAbundance
-                      For i = 1 To DataCnt
-                          DataOInd(i - 1) = ISInd(i)
-                          If .IsoData(ISInd(i)).Abundance > 0 Then
-                            DataVal(i - 1, j) = Log(.IsoData(ISInd(i)).Abundance) / Log(10#) * MyDef.MetricData(j).WeightFactor
-                          Else
-                            ' Cannot perform Log(0)
-                            DataVal(i - 1, j) = 0
-                          End If
-                      Next i
-                  End Select
-               End If
-           Next j
+            For j = 0 To MyDef.NetDim - 1
+                If MyDef.MetricData(j).Use Then
+                    Select Case MyDef.MetricData(j).DataType
+                    Case uindUMCIonNetDimConstants.uindMonoMW
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            DataVal(i - 1, j) = .IsoData(ISInd(i)).MonoisotopicMW * MyDef.MetricData(j).WeightFactor
+                        Next i
+                    Case uindUMCIonNetDimConstants.uindAvgMW
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            DataVal(i - 1, j) = .IsoData(ISInd(i)).AverageMW * MyDef.MetricData(j).WeightFactor
+                        Next i
+                    Case uindUMCIonNetDimConstants.uindTmaMW
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            DataVal(i - 1, j) = .IsoData(ISInd(i)).MostAbundantMW * MyDef.MetricData(j).WeightFactor
+                        Next i
+                    Case uindUMCIonNetDimConstants.uindScan
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            ' When processing odd-only or even-only scans in frmUMCSimple, we divide lngScanNumberRelativeIndex by 2 since we're only keeping every other scan
+                            ' However, we will not do that in this function, since a scan gap of 1 is allowed for, and since that can mess up the minimum Scan Width filters applied by the LCMSFeatureFinder
+                            lngScanNumberRelativeIndex = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(i)).ScanNumber)
+                            DataVal(i - 1, j) = lngScanNumberRelativeIndex * MyDef.MetricData(j).WeightFactor
+                        Next i
+                    Case uindUMCIonNetDimConstants.uindFit
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            DataVal(i - 1, j) = .IsoData(ISInd(i)).Fit * MyDef.MetricData(j).WeightFactor
+                        Next i
+                    Case uindUMCIonNetDimConstants.uindMZ
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            DataVal(i - 1, j) = .IsoData(ISInd(i)).MZ * MyDef.MetricData(j).WeightFactor
+                        Next i
+                    Case uindUMCIonNetDimConstants.uindGenericNET
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            DataVal(i - 1, j) = ((.IsoData(ISInd(i)).ScanNumber - MinScan) / (MaxScan - MinScan)) * MyDef.MetricData(j).WeightFactor
+                        Next i
+                    Case uindUMCIonNetDimConstants.uindChargeState
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            DataVal(i - 1, j) = .IsoData(ISInd(i)).Charge * MyDef.MetricData(j).WeightFactor
+                        Next i
+                    Case uindUMCIonNetDimConstants.uindLogAbundance
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            If .IsoData(ISInd(i)).Abundance > 0 Then
+                              DataVal(i - 1, j) = Log(.IsoData(ISInd(i)).Abundance) / Log(10#) * MyDef.MetricData(j).WeightFactor
+                            Else
+                              ' Cannot perform Log(0)
+                              DataVal(i - 1, j) = 0
+                            End If
+                        Next i
+                    Case uindUMCIonNetDimConstants.uindIMSDriftTime
+                        For i = 1 To DataCnt
+                            DataOInd(i - 1) = ISInd(i)
+                            DataVal(i - 1, j) = .IsoData(ISInd(i)).IMSDriftTime * MyDef.MetricData(j).WeightFactor
+                        Next i
+                    End Select
+                End If
+            Next j
         End With
     Case Else
         ' This shouldn't get reached
@@ -4151,7 +4182,7 @@ HUMCIsoCnt = GelData(CallerID).IsoLines
 'use arrays with same indexing as in IsoData arrays(element 0 will not be used)
 ReDim HUMCIsoUsed(HUMCIsoCnt)
 ReDim HUMCEquClsWk(HUMCIsoCnt - 1)               'here we will use 0th element
-HUMCNetCnt = GelUMCIon(CallerID).NetCount
+HUMCNetCnt = GelUMCIon(CallerID).NETCount
 ReDim HUMCNetUsed(HUMCNetCnt - 1)
 PrepareHUMCArrays = True
 err_PrepareHUMCArrays:
@@ -4195,10 +4226,14 @@ Private Sub ResetToDefaults()
         ResetUMCAutoRefineOptions .UMCAutoRefineOptions
         
         .UMCDrawType = umcdt_ActualUMC
+        
+        If (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA Then
+            .UMCAutoRefineOptions.UMCAutoRefineRemoveCountLow = False
+        End If
     End With
     
     SetDefaultUMCDef UMCDef
-    SetDefaultUMCIonNetDef MyDef
+    SetDefaultUMCIonNetDef MyDef, (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
         
     DisplayCurrentOptions
     
@@ -4252,7 +4287,7 @@ Case NET_EDIT_REJECT_LONG
        TooLongConnection = CDbl(txtNetEditTooDistant.Text)
        lngConnectionsEliminated = EliminateLongConnections_Net(TooLongConnection)
        
-       AddToAnalysisHistory CallerID, "Removed long connections (" & AUTO_ANALYSIS_UMCIonNet & "); New connection count = " & Trim(GelUMCIon(CallerID).NetCount) & "; Connections removed = " & Trim(lngConnectionsEliminated)
+       AddToAnalysisHistory CallerID, "Removed long connections (" & AUTO_ANALYSIS_UMCIonNet & "); New connection count = " & Trim(GelUMCIon(CallerID).NETCount) & "; Connections removed = " & Trim(lngConnectionsEliminated)
        
        txtRejectLongConnections = CDbl(GelUMCIon(CallerID).ThisNetDef.TooDistant)
     Else

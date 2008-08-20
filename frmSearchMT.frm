@@ -546,7 +546,7 @@ Case -2
    If blnShowMessages Then MsgBox "Error in NET calculation formula.", vbOKOnly
    txtNETFormula.SetFocus
 Case Else
-   If blnShowMessages Then MsgBox "MT tag hits: " & HitsCnt & "(non-unique)", vbOKOnly
+   If blnShowMessages Then MsgBox "MT tag hits: " & HitsCnt & " (non-unique)", vbOKOnly
 End Select
 StartSearch = HitsCnt
 End Function

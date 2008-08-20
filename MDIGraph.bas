@@ -342,7 +342,7 @@ Public Type udtScanInfoType
     FrequencyShift As Single                ' New for this version (used to be in .DFFS())
     
     CustomNET As Single             ' New for this version; custom NET value for each scan (initially 0 for all scans); was AdditionalValue1
-    AdditionalValue2 As Single      ' New for this version; use for future expansion (name can be changed in the future)
+    IMSFramePressure As Single      ' New for this version; IMS Frame Pressure; was AdditionalValue2
     
 End Type
 
@@ -483,7 +483,7 @@ Public Type udtIsotopicDataType
     IReportTagType As Byte          ' 1 byte; Actually type irtIReportTagTypeConstants (was previously AdditionalIntValue, which itself was previously part of AdditionalValue1, which was a single)
     
     AdditionalValue1 As Byte        ' 1 byte; use for future expanasion
-    AdditionalValue2 As Single      ' 4 bytes; New for this version; use for future expansion (name can be changed in the future)
+    IMSDriftTime As Single          ' 4 bytes (was previously AdditionalValue2, a single)
     
     MTID As String                      ' List of MT tags and/or Internal Standards that match this data point
 
@@ -1479,7 +1479,7 @@ Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath
           Debug.Assert Not GelStatus(fIndex).Deleted
           GelStatus(fIndex).Dirty = True
           GelBody(fIndex).Tag = fIndex
-          GelBody(fIndex).Caption = "Untitled:" & fIndex
+          GelBody(fIndex).Caption = "Untitled:" & fIndex & " (" & fso.GetBaseName(sFileName) & ")"
           GelData(fIndex).PathtoDatabase = glbPreferencesExpanded.LegacyAMTDBPath
           GelStatus(fIndex).GelFilePathFull = GetFilePathFull(sFileName)
           ' MonroeMod: Need to add recent files to file menu

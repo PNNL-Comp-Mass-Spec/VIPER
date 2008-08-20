@@ -978,6 +978,7 @@ Private Function LegacyDBLoadAMTDataWork(ByRef rsAMT As Recordset, ByVal lngInde
     Const NET_VALUE_IF_NULL As Single = -100000
 
     Dim blnSuccess As Boolean
+    Dim blnComputeNitrogenCount As Boolean
     
 On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
     
@@ -1114,9 +1115,17 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                 lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
             End If
             
+            blnComputeNitrogenCount = True
             If udtFieldPresent.NitrogenAtom Then
                 If Not IsNull(.Fields(DB_FIELD_AMT_NitrogenAtom).Value) Then
                     AMTData(lngIndex).CNT_N = CLng(.Fields(DB_FIELD_AMT_NitrogenAtom).Value)
+                    blnComputeNitrogenCount = False
+                End If
+            End If
+            
+            If blnComputeNitrogenCount And udtFieldPresent.PeptideSequence Then
+                If Len(AMTData(lngIndex).Sequence) > 0 Then
+                    AMTData(lngIndex).CNT_N = NitrogenCount(AMTData(lngIndex).Sequence)
                 End If
             End If
             

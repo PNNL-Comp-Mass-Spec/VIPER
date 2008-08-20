@@ -365,19 +365,31 @@ Private Type udtChromatogramType
 End Type
 
 Private Type udtTICandBPIChromType
-    Chromatograms(TIC_AND_BPI_TYPE_COUNT - 1) As udtChromatogramType
+    Chromatograms(LC_TIME_BASED_CHROM_COUNT - 1) As udtChromatogramType
     
     BPIInfo() As udtBPIInfoType             ' 1-based array
     GANETVals() As Double                   ' 1-based array
     
     ScanCount As Long               ' The above arrays range from 1 to ScanCount
     ScanNumberStart As Long
-    ScanNumberEnd  As Long
+    ScanNumberEnd As Long
+End Type
+
+Private Type udtIMSTICandBPIChromType
+    Chromatograms(IMS_TIME_BASED_CHROM_COUNT - 1) As udtChromatogramType
+
+    BPIInfo() As udtBPIInfoType             ' 1-based array
+
+    BinCount As Long
+    ScaledDriftTimeStart As Long            ' This value is drift time multiplied by 100
+    ScaledDriftTimeEnd As Long              ' This value is drift time multiplied by 100
 End Type
 
 Public CallerID As Long
 
-Private mChromData As udtTICandBPIChromType
+Private mLCChromData As udtTICandBPIChromType
+Private mIMSChromData As udtIMSTICandBPIChromType
+
 Private mCurrentPlotType As tbcTICAndBPIConstants
 
 Private mUpdatingControls As Boolean
@@ -464,7 +476,7 @@ Private Sub ComputeAndDisplayChromatogram()
     Dim lngCountDimmed As Long
     Dim eChromType As tbcTICAndBPIConstants
     
-    Dim dblMaximum As Double
+    Dim lngScaledDriftTime As Long
     
     If mUpdatingControls Then Exit Sub
     mNeedToRecomputeChromatogram = False
@@ -476,7 +488,7 @@ On Error GoTo ComputeAndDisplayChromatogramErrorHandler
     
     UpdateStatus "Preparing chromatogram"
     
-    With mChromData
+    With mLCChromData
         ' Determine the number of scans for the current gel and initialize the arrays
         GetScanRange CallerID, .ScanNumberStart, .ScanNumberEnd, .ScanCount
         
@@ -484,7 +496,7 @@ On Error GoTo ComputeAndDisplayChromatogramErrorHandler
         If lngCountDimmed = 0 Then lngCountDimmed = 1
         
         ' Initialize the chromatogram arrays
-        For eChromType = 0 To TIC_AND_BPI_TYPE_COUNT - 1
+        For eChromType = 0 To LC_TIME_BASED_CHROM_COUNT - 1
             With .Chromatograms(eChromType)
                 ReDim .RawIntensity(1 To lngCountDimmed)
                 ReDim .NormalizedIntensity(1 To lngCountDimmed)
@@ -498,10 +510,29 @@ On Error GoTo ComputeAndDisplayChromatogramErrorHandler
         ' Two of the chromatograms are actually dual series chromatograms, rather than raw and normalized data
         .Chromatograms(tbcDeisotopingIntensityThresholds).DualSeriesData = True
         .Chromatograms(tbcDeisotopingPeakCounts).DualSeriesData = True
-
+    
     End With
     
-    ' Retrieve an array of the ion indices of the ions currently "In Scope"
+    With mIMSChromData
+        ' Initially reserve space for 5000 items
+        lngCountDimmed = 5000
+        
+        For eChromType = 0 To IMS_TIME_BASED_CHROM_COUNT - 1
+            With .Chromatograms(eChromType)
+                ReDim .RawIntensity(1 To lngCountDimmed)
+                ReDim .NormalizedIntensity(1 To lngCountDimmed)
+                .MaximumValue = 0
+                .DualSeriesData = False
+            End With
+        Next eChromType
+        ReDim .BPIInfo(1 To lngCountDimmed)
+        
+        .BinCount = 0
+        .ScaledDriftTimeStart = 0
+        .ScaledDriftTimeEnd = 0
+    End With
+    
+    ' Retrieve an array of the ion indices of the ions currently "In Scope" (aka ions "In View")
     ' Note that GetISScope will ReDim each PointerArray() automatically
     lngCSCount = GetCSScope(CallerID, lngCSPointerArray(), glScope.glSc_Current)
     lngIsoCount = GetISScope(CallerID, lngIsoPointerArray(), glScope.glSc_Current)
@@ -513,113 +544,186 @@ On Error GoTo ComputeAndDisplayChromatogramErrorHandler
             dblTimeDomainDataMaxValue = glHugeDouble
         End If
     End With
-
     
     ' Construct the chromatograms
-    With mChromData
-        ' Charge state data
-        For lngPointerIndex = 1 To lngCSCount
-            lngOriginalIndex = lngCSPointerArray(lngPointerIndex)
-            
-            lngScanNumber = GelData(CallerID).CSData(lngOriginalIndex).ScanNumber
-            dblAbundance = GelData(CallerID).CSData(lngOriginalIndex).Abundance
-            
-            lngChromIndex = lngScanNumber - .ScanNumberStart + 1
-            
-            With .Chromatograms(tbcTICFromCurrentDataIntensities)
-                .RawIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) + dblAbundance
-            End With
-            
-            With .Chromatograms(tbcTICFromCurrentDataPointCounts)
-                .RawIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) + 1
-            End With
-            
-            If dblAbundance > .Chromatograms(tbcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) Then
-                .Chromatograms(tbcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) = dblAbundance
-                With .BPIInfo(lngChromIndex)
-                    .Mass = GelData(CallerID).CSData(lngOriginalIndex).AverageMW
-                    .OriginalIndex = lngOriginalIndex
-                    .CSData = True
-                End With
-            End If
-            
-            If lngPointerIndex Mod 250 = 0 Then UpdateStatus "Preparing chromatograms: " & Trim(lngPointerIndex) & " / " & Trim(lngCSCount)
-        Next lngPointerIndex
+      
+    ' Charge state data
+    For lngPointerIndex = 1 To lngCSCount
+        lngOriginalIndex = lngCSPointerArray(lngPointerIndex)
         
-        ' Isotopic data
+        lngScanNumber = GelData(CallerID).CSData(lngOriginalIndex).ScanNumber
+        dblAbundance = GelData(CallerID).CSData(lngOriginalIndex).Abundance
+        
+        lngChromIndex = lngScanNumber - mLCChromData.ScanNumberStart + 1
+        
+        With mLCChromData.Chromatograms(tbcTICFromCurrentDataIntensities)
+            .RawIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) + dblAbundance
+        End With
+        
+        With mLCChromData.Chromatograms(tbcTICFromCurrentDataPointCounts)
+            .RawIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) + 1
+        End With
+        
+        If dblAbundance > mLCChromData.Chromatograms(tbcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) Then
+            mLCChromData.Chromatograms(tbcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) = dblAbundance
+            With mLCChromData.BPIInfo(lngChromIndex)
+                .Mass = GelData(CallerID).CSData(lngOriginalIndex).AverageMW
+                .OriginalIndex = lngOriginalIndex
+                .CSData = True
+            End With
+        End If
+        
+        If lngPointerIndex Mod 250 = 0 Then UpdateStatus "Preparing chromatograms: " & Trim(lngPointerIndex) & " / " & Trim(lngCSCount)
+    Next lngPointerIndex
+    
+    ' Isotopic data
+    For lngPointerIndex = 1 To lngIsoCount
+        lngOriginalIndex = lngIsoPointerArray(lngPointerIndex)
+        
+        lngScanNumber = GelData(CallerID).IsoData(lngOriginalIndex).ScanNumber
+        dblAbundance = GelData(CallerID).IsoData(lngOriginalIndex).Abundance
+        
+        lngChromIndex = lngScanNumber - mLCChromData.ScanNumberStart + 1
+        
+        With mLCChromData.Chromatograms(tbcTICFromCurrentDataIntensities)
+            .RawIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) + dblAbundance
+        End With
+        
+        With mLCChromData.Chromatograms(tbcTICFromCurrentDataPointCounts)
+            .RawIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) + 1
+        End With
+        
+        If dblAbundance > mLCChromData.Chromatograms(tbcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) Then
+            mLCChromData.Chromatograms(tbcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) = dblAbundance
+            With mLCChromData.BPIInfo(lngChromIndex)
+                .Mass = GelData(CallerID).IsoData(lngOriginalIndex).MonoisotopicMW
+                .OriginalIndex = lngOriginalIndex
+                .CSData = False
+            End With
+        End If
+        
+        If lngPointerIndex Mod 250 = 0 Then UpdateStatus "Preparing chromatograms: " & Trim(lngPointerIndex) & " / " & Trim(lngIsoCount)
+    Next lngPointerIndex
+    
+    If (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA And lngIsoCount > 0 Then
+        ' Populate the IMS chromatograms
+        ' First, pre-scan the data to determine the range of IMS Drift Times present
+        
+        ' Initialize sngDriftTimeMin and sngDriftTimeMax
+        lngOriginalIndex = lngIsoPointerArray(1)
+        mIMSChromData.ScaledDriftTimeStart = Int(GelData(CallerID).IsoData(lngOriginalIndex).IMSDriftTime * 10)
+        mIMSChromData.ScaledDriftTimeEnd = mIMSChromData.ScaledDriftTimeStart
+        
+        ' Now step through the data to find the IMS Drift Time limits
+        For lngPointerIndex = 2 To lngIsoCount
+            lngOriginalIndex = lngIsoPointerArray(lngPointerIndex)
+            lngScaledDriftTime = Int(GelData(CallerID).IsoData(lngOriginalIndex).IMSDriftTime * 10)
+            
+            If lngScaledDriftTime < mIMSChromData.ScaledDriftTimeStart Then
+                mIMSChromData.ScaledDriftTimeStart = lngScaledDriftTime
+            End If
+        
+            If lngScaledDriftTime > mIMSChromData.ScaledDriftTimeEnd Then
+                 mIMSChromData.ScaledDriftTimeEnd = lngScaledDriftTime
+            End If
+        Next lngPointerIndex
+            
+        ' Compute the number of bins required
+        mIMSChromData.BinCount = (mIMSChromData.ScaledDriftTimeEnd - mIMSChromData.ScaledDriftTimeStart)
+        If mIMSChromData.BinCount < 2 Then mIMSChromData.BinCount = 2
+        
+        If UBound(mIMSChromData.Chromatograms(0).RawIntensity) < mIMSChromData.BinCount Then
+            ' How often does this happen?
+            ' Probably should change the default amount of space reserved to 10000 instead of 1000
+            Debug.Assert False
+            
+            ' Need to reserve more space
+            For eChromType = 0 To IMS_TIME_BASED_CHROM_COUNT - 1
+                With mIMSChromData.Chromatograms(eChromType)
+                    ReDim .RawIntensity(1 To mIMSChromData.BinCount)
+                    ReDim .NormalizedIntensity(1 To mIMSChromData.BinCount)
+                End With
+            Next eChromType
+            
+            ReDim mIMSChromData.BPIInfo(1 To mIMSChromData.BinCount)
+        End If
+        
+        ' Now generate the IMS Drift Time chromatograms
         For lngPointerIndex = 1 To lngIsoCount
             lngOriginalIndex = lngIsoPointerArray(lngPointerIndex)
+            lngScaledDriftTime = Int(GelData(CallerID).IsoData(lngOriginalIndex).IMSDriftTime * 10)
+            lngChromIndex = lngScaledDriftTime - mIMSChromData.ScaledDriftTimeStart + 1
             
-            lngScanNumber = GelData(CallerID).IsoData(lngOriginalIndex).ScanNumber
+            If lngChromIndex < 1 Then lngChromIndex = 1
+            If lngChromIndex > mIMSChromData.BinCount Then lngChromIndex = mIMSChromData.BinCount
+            
             dblAbundance = GelData(CallerID).IsoData(lngOriginalIndex).Abundance
             
-            lngChromIndex = lngScanNumber - .ScanNumberStart + 1
-            
-            With .Chromatograms(tbcTICFromCurrentDataIntensities)
+            With mIMSChromData.Chromatograms(itcTICFromCurrentDataIntensities)
                 .RawIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) + dblAbundance
             End With
             
-            With .Chromatograms(tbcTICFromCurrentDataPointCounts)
-                .RawIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) + 1
-            End With
-            
-            If dblAbundance > .Chromatograms(tbcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) Then
-                .Chromatograms(tbcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) = dblAbundance
-                With .BPIInfo(lngChromIndex)
+            If dblAbundance > mIMSChromData.Chromatograms(itcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) Then
+                mIMSChromData.Chromatograms(itcBPIFromCurrentDataIntensities).RawIntensity(lngChromIndex) = dblAbundance
+                With mIMSChromData.BPIInfo(lngChromIndex)
                     .Mass = GelData(CallerID).IsoData(lngOriginalIndex).MonoisotopicMW
                     .OriginalIndex = lngOriginalIndex
                     .CSData = False
                 End With
             End If
-            
-            If lngPointerIndex Mod 250 = 0 Then UpdateStatus "Preparing chromatograms: " & Trim(lngPointerIndex) & " / " & Trim(lngIsoCount)
         Next lngPointerIndex
-    
-        ' Data from .ScanInfo()
-        ' Must lookup the scan number in ScanInfo()
-        For lngPointerIndex = 1 To UBound(GelData(CallerID).ScanInfo())
-            lngScanNumber = GelData(CallerID).ScanInfo(lngPointerIndex).ScanNumber
-            lngChromIndex = lngScanNumber - .ScanNumberStart + 1
             
-            With .Chromatograms(tbcTICFromTimeDomain)
-                .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).TimeDomainSignal
-                
-                If .RawIntensity(lngChromIndex) > dblTimeDomainDataMaxValue Then
-                    .RawIntensity(lngChromIndex) = dblTimeDomainDataMaxValue
-                End If
-            End With
+    End If
     
-            With .Chromatograms(tbcTICFromRawData)
-                .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).TIC
-            End With
-            With .Chromatograms(tbcBPIFromRawData)
-                .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).BPI
-            End With
+    ' Data from .ScanInfo()
+    ' Must lookup the scan number in ScanInfo()
+    For lngPointerIndex = 1 To UBound(GelData(CallerID).ScanInfo())
+        lngScanNumber = GelData(CallerID).ScanInfo(lngPointerIndex).ScanNumber
+        lngChromIndex = lngScanNumber - mLCChromData.ScanNumberStart + 1
+        
+        With mLCChromData.Chromatograms(tbcTICFromTimeDomain)
+            .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).TimeDomainSignal
             
-            With .Chromatograms(tbcDeisotopingIntensityThresholds)
-                .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).PeakIntensityThreshold
-                .NormalizedIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).PeptideIntensityThreshold
-            End With
-            With .Chromatograms(tbcDeisotopingPeakCounts)
-                .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).NumDeisotoped
-                .NormalizedIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).NumPeaks
-            End With
+            If .RawIntensity(lngChromIndex) > dblTimeDomainDataMaxValue Then
+                .RawIntensity(lngChromIndex) = dblTimeDomainDataMaxValue
+            End If
+        End With
 
-        Next lngPointerIndex
-  
+        With mLCChromData.Chromatograms(tbcTICFromRawData)
+            .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).TIC
+        End With
+        With mLCChromData.Chromatograms(tbcBPIFromRawData)
+            .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).BPI
+        End With
+        
+        With mLCChromData.Chromatograms(tbcDeisotopingIntensityThresholds)
+            .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).PeakIntensityThreshold
+            .NormalizedIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).PeptideIntensityThreshold
+        End With
+        With mLCChromData.Chromatograms(tbcDeisotopingPeakCounts)
+            .RawIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).NumDeisotoped
+            .NormalizedIntensity(lngChromIndex) = GelData(CallerID).ScanInfo(lngPointerIndex).NumPeaks
+        End With
+
+    Next lngPointerIndex
+
+    With mLCChromData
+        ' Populate .GANETVals
         For lngChromIndex = 1 To .ScanCount
             .GANETVals(lngChromIndex) = ScanToGANET(CallerID, lngChromIndex + .ScanNumberStart - 1)
         Next lngChromIndex
     
-        ' Step through each of the chromatograms and interpolate the abundances between non-zero data points
+        ' Step through each of the LC chromatograms and interpolate the abundances between non-zero data points
         '  that have scan gaps > 1 but, according to .ScanInfo(), are actually adjacent scans
-        For eChromType = 0 To TIC_AND_BPI_TYPE_COUNT - 1
+        For eChromType = 0 To LC_TIME_BASED_CHROM_COUNT - 1
             InterpolateChromatogramGaps CallerID, .Chromatograms(eChromType).RawIntensity(), 1, .ScanCount, .ScanNumberStart
         Next eChromType
-        
-        If glbPreferencesExpanded.TICAndBPIPlottingOptions.SmoothUsingMovingAverage Then
+    End With
+    
+    If glbPreferencesExpanded.TICAndBPIPlottingOptions.SmoothUsingMovingAverage Then
+        With mLCChromData
             ' Smooth each of the chromatograms using a moving average filter
-            For eChromType = 0 To TIC_AND_BPI_TYPE_COUNT - 1
+            For eChromType = 0 To LC_TIME_BASED_CHROM_COUNT - 1
                 .Chromatograms(eChromType).SmoothWindowWidth = glbPreferencesExpanded.TICAndBPIPlottingOptions.MovingAverageWindowWidth
                 SmoothViaMovingAverage .Chromatograms(eChromType).RawIntensity(), 1, .ScanCount, .Chromatograms(eChromType).SmoothWindowWidth, 1
             Next eChromType
@@ -629,46 +733,37 @@ On Error GoTo ComputeAndDisplayChromatogramErrorHandler
                 .Chromatograms(eChromType).SmoothWindowWidth = glbPreferencesExpanded.TICAndBPIPlottingOptions.MovingAverageWindowWidth
                 SmoothViaMovingAverage .Chromatograms(eChromType).NormalizedIntensity(), 1, .ScanCount, .Chromatograms(eChromType).SmoothWindowWidth, 1
             Next eChromType
+        End With
         
-        Else
-            For eChromType = 0 To TIC_AND_BPI_TYPE_COUNT - 1
-                .Chromatograms(eChromType).SmoothWindowWidth = 0
+        With mIMSChromData
+            ' Smooth each of the chromatograms using a moving average filter
+            For eChromType = 0 To IMS_TIME_BASED_CHROM_COUNT - 1
+                .Chromatograms(eChromType).SmoothWindowWidth = glbPreferencesExpanded.TICAndBPIPlottingOptions.MovingAverageWindowWidth
+                SmoothViaMovingAverage .Chromatograms(eChromType).RawIntensity(), 1, .BinCount, .Chromatograms(eChromType).SmoothWindowWidth, 1
             Next eChromType
-        End If
-        
-        ' Optionally clip the data relative to the median
-        ' Normalize each of the chromatograms and store in .NormalizedIntensity
-        For eChromType = 0 To TIC_AND_BPI_TYPE_COUNT - 1
-            With .Chromatograms(eChromType)
-                
-                If glbPreferencesExpanded.TICAndBPIPlottingOptions.ClipOutliers Then
-                    ' Clip the data relative to the median
-                    ClipDataVsMedian .RawIntensity, glbPreferencesExpanded.TICAndBPIPlottingOptions.ClipOutliersFactor
-                    If .DualSeriesData Then
-                        ClipDataVsMedian .NormalizedIntensity, glbPreferencesExpanded.TICAndBPIPlottingOptions.ClipOutliersFactor
-                    End If
-                End If
-                          
-                dblMaximum = 0
-                For lngChromIndex = 1 To mChromData.ScanCount
-                    If .RawIntensity(lngChromIndex) > dblMaximum Then
-                        dblMaximum = .RawIntensity(lngChromIndex)
-                    End If
-                Next lngChromIndex
-                
-                If Not .DualSeriesData Then
-                    If dblMaximum > 0 Then
-                        For lngChromIndex = 1 To mChromData.ScanCount
-                            .NormalizedIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) / dblMaximum * 100
-                        Next lngChromIndex
-                    End If
-                End If
-                .MaximumValue = dblMaximum
-            End With
+        End With
+    Else
+        For eChromType = 0 To LC_TIME_BASED_CHROM_COUNT - 1
+            mLCChromData.Chromatograms(eChromType).SmoothWindowWidth = 0
         Next eChromType
-        
-    End With
     
+        For eChromType = 0 To IMS_TIME_BASED_CHROM_COUNT - 1
+            mIMSChromData.Chromatograms(eChromType).SmoothWindowWidth = 0
+        Next eChromType
+    
+    End If
+    
+    ' Optionally clip the data relative to the median
+    ' Normalize each of the chromatograms and store in .NormalizedIntensity
+    For eChromType = 0 To LC_TIME_BASED_CHROM_COUNT - 1
+        PostProcessChromatogram mLCChromData.Chromatograms(eChromType), mLCChromData.ScanCount
+    Next eChromType
+
+    For eChromType = 0 To IMS_TIME_BASED_CHROM_COUNT - 1
+        PostProcessChromatogram mIMSChromData.Chromatograms(eChromType), mIMSChromData.BinCount
+    Next eChromType
+
+    ' Update the plot
     UpdatePlot
     
     Exit Sub
@@ -683,7 +778,7 @@ ComputeAndDisplayChromatogramErrorHandler:
     
 End Sub
 
-Private Function ExportChromatogramCheckInclusion(eChromType, blnIncludeAllChromatograms, blnExportCurrentViewChromatogramsOnly) As Boolean
+Private Function ExportChromatogramCheckInclusion(eChromType As tbcTICAndBPIConstants, blnIncludeAllChromatograms As Boolean, blnExportCurrentViewChromatogramsOnly As Boolean) As Boolean
 
     Dim blnInclude As Boolean
 
@@ -692,6 +787,8 @@ Private Function ExportChromatogramCheckInclusion(eChromType, blnIncludeAllChrom
     ElseIf blnExportCurrentViewChromatogramsOnly Then
         Select Case eChromType
         Case tbcTICFromCurrentDataIntensities, tbcBPIFromCurrentDataIntensities, tbcTICFromCurrentDataPointCounts
+            blnInclude = True
+        Case tbcIMSTICFromCurrentDataIntensities, tbcIMSBPIFromCurrentDataIntensities
             blnInclude = True
         Case Else
             blnInclude = False
@@ -718,7 +815,12 @@ Public Function ExportChromatogramDataToClipboardOrFile(Optional strFilePath As 
     Dim eChromType As tbcTICAndBPIConstants
     Dim blnUseNormalized As Boolean
     
-    If mChromData.ScanCount = 0 Then
+    Dim blnIMSData As Boolean
+    Dim dblValue As Double
+    
+    blnIMSData = PlotTypeIsIMS(mCurrentPlotType)
+    
+    If Not blnIMSData And mLCChromData.ScanCount = 0 Or blnIMSData And mIMSChromData.BinCount = 0 Then
         If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             MsgBox "No data found to copy", vbInformation + vbOKOnly, "No data"
         End If
@@ -733,36 +835,80 @@ On Error GoTo ExportChromatogramDataToClipboardOrFileErrorHandler
     
     blnUseNormalized = glbPreferencesExpanded.TICAndBPIPlottingOptions.NormalizeYAxis
     
-    ' Header row is strData(0)
-    ' Data is from strData(1) to strData(mChromData.ScanCount)
-    ReDim strData(0 To mChromData.ScanCount + 2)
-    
-    ' Fill strData()
-    ' Define the header row
-    strData(0) = "ScanNumber" & vbTab & "NET"
-    For eChromType = 0 To TIC_AND_BPI_TYPE_COUNT - 1
-        If ExportChromatogramCheckInclusion(eChromType, blnIncludeAllChromatograms, blnExportCurrentViewChromatogramsOnly) Then
-            strData(0) = strData(0) & vbTab & GetChromDescription(eChromType, False)
-        End If
-    Next eChromType
-    
-    With mChromData
-        For lngIndex = 1 To mChromData.ScanCount
-            lngScanNumber = lngIndex + mChromData.ScanNumberStart - 1
-            strData(lngIndex) = Trim(lngScanNumber) & vbTab & Round(.GANETVals(lngIndex), 5)
-            
-            For eChromType = 0 To TIC_AND_BPI_TYPE_COUNT - 1
-                If ExportChromatogramCheckInclusion(eChromType, blnIncludeAllChromatograms, blnExportCurrentViewChromatogramsOnly) Then
-                    If blnUseNormalized Then
-                        strData(lngIndex) = strData(lngIndex) & vbTab & Trim(.Chromatograms(eChromType).NormalizedIntensity(lngIndex))
-                    Else
-                        strData(lngIndex) = strData(lngIndex) & vbTab & Trim(.Chromatograms(eChromType).RawIntensity(lngIndex))
+    If blnIMSData Then
+        ' Header row is strData(0)
+        ' Data is from strData(1) to strData(mIMSChromData.BinCount)
+        ReDim strData(0 To mIMSChromData.BinCount + 2)
+        
+        ' Fill strData()
+        ' Define the header row
+        strData(0) = "IMS_Drift_Time"
+        For eChromType = 0 To IMS_TIME_BASED_CHROM_COUNT - 1
+            If ExportChromatogramCheckInclusion(eChromType + LC_TIME_BASED_CHROM_COUNT, blnIncludeAllChromatograms, blnExportCurrentViewChromatogramsOnly) Then
+                strData(0) = strData(0) & vbTab & GetChromDescription(eChromType + LC_TIME_BASED_CHROM_COUNT, False)
+            End If
+        Next eChromType
+        
+        With mIMSChromData
+            For lngIndex = 1 To .BinCount
+                strData(lngIndex) = Trim((lngIndex + .ScaledDriftTimeStart - 1) / 10)
+                
+                For eChromType = 0 To IMS_TIME_BASED_CHROM_COUNT - 1
+                    If ExportChromatogramCheckInclusion(eChromType + LC_TIME_BASED_CHROM_COUNT, blnIncludeAllChromatograms, blnExportCurrentViewChromatogramsOnly) Then
+                        If blnUseNormalized Then
+                            If .Chromatograms(eChromType).NormalizedIntensity(lngIndex) = 0 Then
+                                strData(lngIndex) = strData(lngIndex) & vbTab & "0"
+                            Else
+                                strData(lngIndex) = strData(lngIndex) & vbTab & Format(.Chromatograms(eChromType).NormalizedIntensity(lngIndex), "0.0##")
+                            End If
+                        Else
+                            strData(lngIndex) = strData(lngIndex) & vbTab & Trim(.Chromatograms(eChromType).RawIntensity(lngIndex))
+                        End If
                     End If
-                End If
-            Next eChromType
-        Next lngIndex
-        lngOutputArrayCount = .ScanCount + 1
-    End With
+                Next eChromType
+            Next lngIndex
+            lngOutputArrayCount = .BinCount + 1
+        End With
+        
+    Else
+        ' Header row is strData(0)
+        ' Data is from strData(1) to strData(mLCChromData.ScanCount)
+        ReDim strData(0 To mLCChromData.ScanCount + 2)
+        
+        ' Fill strData()
+        ' Define the header row
+        strData(0) = "ScanNumber" & vbTab & "NET"
+        For eChromType = 0 To LC_TIME_BASED_CHROM_COUNT - 1
+            If ExportChromatogramCheckInclusion(eChromType, blnIncludeAllChromatograms, blnExportCurrentViewChromatogramsOnly) Then
+                strData(0) = strData(0) & vbTab & GetChromDescription(eChromType, False)
+            End If
+        Next eChromType
+        
+        With mLCChromData
+            For lngIndex = 1 To .ScanCount
+                lngScanNumber = lngIndex + .ScanNumberStart - 1
+                strData(lngIndex) = Trim(lngScanNumber) & vbTab & Round(.GANETVals(lngIndex), 5)
+                
+                For eChromType = 0 To LC_TIME_BASED_CHROM_COUNT - 1
+                    If ExportChromatogramCheckInclusion(eChromType, blnIncludeAllChromatograms, blnExportCurrentViewChromatogramsOnly) Then
+                        If blnUseNormalized Then
+                            dblValue = .Chromatograms(eChromType).NormalizedIntensity(lngIndex)
+                        Else
+                            dblValue = .Chromatograms(eChromType).RawIntensity(lngIndex)
+                        End If
+                    
+                        If dblValue = 0 Then
+                            strData(lngIndex) = strData(lngIndex) & vbTab & "0"
+                        Else
+                            strData(lngIndex) = strData(lngIndex) & vbTab & Format(dblValue, "0.0##")
+                        End If
+                    
+                    End If
+                Next eChromType
+            Next lngIndex
+            lngOutputArrayCount = .ScanCount + 1
+        End With
+    End If
     
     If Len(strFilePath) > 0 Then
         OutFileNum = FreeFile()
@@ -826,6 +972,10 @@ Public Function GetChromDescription(ePlotType As tbcTICAndBPIConstants, blnInclu
             strDescription = "Deisotoping Intensity Thresholds"
         Case tbcDeisotopingPeakCounts
             strDescription = "Deisotoping Peak Counts"
+        Case tbcIMSBPIFromCurrentDataIntensities
+            strDescription = "Base Peak Intensity (BPI) vs. IMS Drift Time"
+        Case tbcIMSTICFromCurrentDataIntensities
+            strDescription = "TIC vs. IMS Drift Time"
         Case Else
             Debug.Assert False
             strDescription = "Unknown Chromatogram"
@@ -848,12 +998,29 @@ Public Function GetChromDescription(ePlotType As tbcTICAndBPIConstants, blnInclu
             strDescription = "DeisotopingIntensityThresholds"
         Case tbcDeisotopingPeakCounts
             strDescription = "DeisotopingPeakCounts"
+        Case tbcIMSBPIFromCurrentDataIntensities
+            strDescription = "BPIvsIMSDriftTime"
+        Case tbcIMSTICFromCurrentDataIntensities
+            strDescription = "TICvsIMSDriftTime"
         Case Else
             strDescription = "UnknownChromatogram"
         End Select
     End If
     
     GetChromDescription = strDescription
+    
+End Function
+
+Private Function GetIMSPlotType(ByVal ePlotType As tbcTICAndBPIConstants) As itcIMSTICConstants
+    If ePlotType = tbcIMSTICFromCurrentDataIntensities Then
+        GetIMSPlotType = itcTICFromCurrentDataIntensities
+    ElseIf ePlotType = tbcIMSBPIFromCurrentDataIntensities Then
+        GetIMSPlotType = itcBPIFromCurrentDataIntensities
+    Else
+        ' Unknown type; assume itcTICFromCurrentDataIntensities
+        Debug.Assert False
+        GetIMSPlotType = itcTICFromCurrentDataIntensities
+    End If
     
 End Function
 
@@ -937,6 +1104,16 @@ Private Sub InitializePlot()
 
 End Sub
 
+Private Function PlotTypeIsIMS(ByVal ePlotType As tbcTICAndBPIConstants) As Boolean
+
+    If ePlotType = tbcIMSTICFromCurrentDataIntensities Or ePlotType = tbcIMSBPIFromCurrentDataIntensities Then
+        PlotTypeIsIMS = True
+    Else
+        PlotTypeIsIMS = False
+    End If
+
+End Function
+
 Private Sub PopulateComboBoxes()
     
     mUpdatingControls = True
@@ -950,6 +1127,8 @@ Private Sub PopulateComboBoxes()
         .AddItem "BPI from raw data"
         .AddItem "Deisotoping Intensity Thresholds"
         .AddItem "Deisotoping Peak Counts"
+        .AddItem "IMS TIC (current data in view)"
+        .AddItem "IMS BPI (current data in view)"
         
         .ListIndex = tbcTICFromCurrentDataIntensities
     End With
@@ -997,6 +1176,40 @@ Private Sub PositionControls()
     blnResizing = False
     
 End Sub
+
+Private Sub PostProcessChromatogram(ByRef udtChromatogram As udtChromatogramType, ByVal lngDataCount As Long)
+    Dim dblMaximum As Double
+    Dim lngChromIndex As Long
+
+    With udtChromatogram
+        
+        If glbPreferencesExpanded.TICAndBPIPlottingOptions.ClipOutliers Then
+            ' Clip the data relative to the median
+            ClipDataVsMedian .RawIntensity, glbPreferencesExpanded.TICAndBPIPlottingOptions.ClipOutliersFactor
+            If .DualSeriesData Then
+                ClipDataVsMedian .NormalizedIntensity, glbPreferencesExpanded.TICAndBPIPlottingOptions.ClipOutliersFactor
+            End If
+        End If
+                  
+        dblMaximum = 0
+        For lngChromIndex = 1 To lngDataCount
+            If .RawIntensity(lngChromIndex) > dblMaximum Then
+                dblMaximum = .RawIntensity(lngChromIndex)
+            End If
+        Next lngChromIndex
+        
+        If Not .DualSeriesData Then
+            If dblMaximum > 0 Then
+                For lngChromIndex = 1 To lngDataCount
+                    .NormalizedIntensity(lngChromIndex) = .RawIntensity(lngChromIndex) / dblMaximum * 100
+                Next lngChromIndex
+            End If
+        End If
+        .MaximumValue = dblMaximum
+    End With
+    
+End Sub
+
 
 Public Function SaveChartPictureToFile(blnSaveAsPNG As Boolean, Optional strFilePath As String = "", Optional blnShowMessages As Boolean = True) As Long
     ' If blnSaveAsPNG = True, then saves a PNG file
@@ -1067,7 +1280,9 @@ End Sub
 
 Public Sub SetPlotMode(eChromType As tbcTICAndBPIConstants)
     On Error Resume Next
-    If eChromType >= 0 And eChromType < TIC_AND_BPI_TYPE_COUNT And eChromType < cboTICToDisplay.ListCount Then
+    If eChromType >= 0 And _
+       eChromType < LC_TIME_BASED_CHROM_COUNT + IMS_TIME_BASED_CHROM_COUNT And _
+       eChromType < cboTICToDisplay.ListCount Then
         ' Note: This will automatically call UpdatePlot, unless the timer
         '  has been disabled using TogglePlotUpdateTimerEnabled
         cboTICToDisplay.ListIndex = eChromType
@@ -1148,6 +1363,11 @@ Private Sub UpdatePlot()
     
     Dim udtGraphOptions As udtGraph2DOptionsType
     
+    Dim dblMaxValue As Double
+    Dim lngSmoothWindowWidth As Long
+
+    Dim eIMSPlotType As itcIMSTICConstants
+    
     If mUpdatingControls Then Exit Sub
     mNeedToUpdatePlot = False
     
@@ -1169,7 +1389,8 @@ On Error GoTo GraphChromatogramErrorHandler
     strPlotTitle = strPlotTitle & StripFullPath(ExtractInputFilePath(CallerID))
     
     ' Determine the plot type and thus the series count
-    If cboTICToDisplay.ListIndex >= 0 And cboTICToDisplay.ListIndex < TIC_AND_BPI_TYPE_COUNT Then
+    If cboTICToDisplay.ListIndex >= 0 And _
+       cboTICToDisplay.ListIndex < LC_TIME_BASED_CHROM_COUNT + IMS_TIME_BASED_CHROM_COUNT Then
         mCurrentPlotType = cboTICToDisplay.ListIndex
     Else
         ' This shouldn't happen
@@ -1177,11 +1398,16 @@ On Error GoTo GraphChromatogramErrorHandler
         mCurrentPlotType = tbcBPIFromCurrentDataIntensities
     End If
     
-    If mChromData.Chromatograms(mCurrentPlotType).DualSeriesData Then
-        intSeriesCount = 2
-    Else
+    If PlotTypeIsIMS(mCurrentPlotType) Then
         intSeriesCount = 1
+    Else
+        If mLCChromData.Chromatograms(mCurrentPlotType).DualSeriesData Then
+            intSeriesCount = 2
+        Else
+            intSeriesCount = 1
+        End If
     End If
+    
     
     With ctlChromatogramPlot
         ' Delay updating the chart
@@ -1224,55 +1450,74 @@ On Error GoTo GraphChromatogramErrorHandler
         
         .SetCurrentSeries 1
 
-        ' Plot the data
-        If intSeriesCount = 2 Then
-            UpdatePlotAddData mChromData.Chromatograms(mCurrentPlotType).NormalizedIntensity(), mChromData.ScanCount, 1, 2
-            UpdatePlotAddData mChromData.Chromatograms(mCurrentPlotType).RawIntensity(), mChromData.ScanCount, 2, 2
-        Else
-            If glbPreferencesExpanded.TICAndBPIPlottingOptions.NormalizeYAxis Then
-                UpdatePlotAddData mChromData.Chromatograms(mCurrentPlotType).NormalizedIntensity(), mChromData.ScanCount, 1, 1
-            Else
-                UpdatePlotAddData mChromData.Chromatograms(mCurrentPlotType).RawIntensity(), mChromData.ScanCount, 1, 1
-            End If
-        End If
-        
-        strYAxisTitle = GetChromDescription(mCurrentPlotType, True)
-        If glbPreferencesExpanded.TICAndBPIPlottingOptions.NormalizeYAxis Then
-            
-            If mChromData.Chromatograms(mCurrentPlotType).MaximumValue >= 100000 Then
-                strFormatString = "0.000E+00"
-            ElseIf mChromData.Chromatograms(mCurrentPlotType).MaximumValue >= 100 Then
-                strFormatString = "#0.0"
-            Else
-                strFormatString = "#0.000"
-            End If
-            strYAxisTitle = strYAxisTitle & " (Maximum = " & Format(mChromData.Chromatograms(mCurrentPlotType).MaximumValue, strFormatString)
-            blnNoteAdded = True
-        End If
-        
-        If mChromData.Chromatograms(mCurrentPlotType).SmoothWindowWidth > 0 Then
-            If blnNoteAdded Then
-                strYAxisTitle = strYAxisTitle & ", "
-            Else
-                strYAxisTitle = strYAxisTitle & " ("
-            End If
-            strYAxisTitle = strYAxisTitle & "Smooth window width = " & Trim(mChromData.Chromatograms(mCurrentPlotType).SmoothWindowWidth)
-            blnNoteAdded = True
-        End If
-        
-        If blnNoteAdded Then strYAxisTitle = strYAxisTitle & ")"
-
+        ' Define the X-axis title now; it will get updated later if we're plotting IMS data
         If glbPreferencesExpanded.TICAndBPIPlottingOptions.PlotNETOnXAxis Then
             strXAxisTitle = "Normalized Elution Time (NET)"
         Else
             strXAxisTitle = "Scan Number"
         End If
 
+        ' Plot the data
+        If PlotTypeIsIMS(mCurrentPlotType) Then
+            eIMSPlotType = GetIMSPlotType(mCurrentPlotType)
+            
+            If glbPreferencesExpanded.TICAndBPIPlottingOptions.NormalizeYAxis Then
+                UpdatePlotAddIMSData mIMSChromData.Chromatograms(eIMSPlotType).NormalizedIntensity(), mIMSChromData.BinCount, 1, 1
+            Else
+                UpdatePlotAddIMSData mIMSChromData.Chromatograms(eIMSPlotType).RawIntensity(), mIMSChromData.BinCount, 1, 1
+            End If
+            
+            dblMaxValue = mIMSChromData.Chromatograms(eIMSPlotType).MaximumValue
+            lngSmoothWindowWidth = mIMSChromData.Chromatograms(eIMSPlotType).SmoothWindowWidth
+            
+            strXAxisTitle = "IMS Drift Time"
+        Else
+            If intSeriesCount = 2 Then
+                UpdatePlotAddLCData mLCChromData.Chromatograms(mCurrentPlotType).NormalizedIntensity(), mLCChromData.ScanCount, 1, 2
+                UpdatePlotAddLCData mLCChromData.Chromatograms(mCurrentPlotType).RawIntensity(), mLCChromData.ScanCount, 2, 2
+            Else
+                If glbPreferencesExpanded.TICAndBPIPlottingOptions.NormalizeYAxis Then
+                    UpdatePlotAddLCData mLCChromData.Chromatograms(mCurrentPlotType).NormalizedIntensity(), mLCChromData.ScanCount, 1, 1
+                Else
+                    UpdatePlotAddLCData mLCChromData.Chromatograms(mCurrentPlotType).RawIntensity(), mLCChromData.ScanCount, 1, 1
+                End If
+            End If
+        
+            dblMaxValue = mLCChromData.Chromatograms(mCurrentPlotType).MaximumValue
+            lngSmoothWindowWidth = mLCChromData.Chromatograms(mCurrentPlotType).SmoothWindowWidth
+        End If
+        
+        strYAxisTitle = GetChromDescription(mCurrentPlotType, True)
+        If glbPreferencesExpanded.TICAndBPIPlottingOptions.NormalizeYAxis Then
+            
+            If dblMaxValue >= 100000 Then
+                strFormatString = "0.000E+00"
+            ElseIf dblMaxValue >= 100 Then
+                strFormatString = "#0.0"
+            Else
+                strFormatString = "#0.000"
+            End If
+            strYAxisTitle = strYAxisTitle & " (Maximum = " & Format(dblMaxValue, strFormatString)
+            blnNoteAdded = True
+        End If
+        
+        If lngSmoothWindowWidth > 0 Then
+            If blnNoteAdded Then
+                strYAxisTitle = strYAxisTitle & ", "
+            Else
+                strYAxisTitle = strYAxisTitle & " ("
+            End If
+            strYAxisTitle = strYAxisTitle & "Smooth window width = " & Trim(lngSmoothWindowWidth)
+            blnNoteAdded = True
+        End If
+        
+        If blnNoteAdded Then strYAxisTitle = strYAxisTitle & ")"
+
         .SetLabelXAxis strXAxisTitle
         .SetLabelYAxis strYAxisTitle
 
         If udtGraphOptions.AutoScaleXAxis Then
-            If mAutoUpdatePlot Then
+            If mAutoUpdatePlot And Not PlotTypeIsIMS(mCurrentPlotType) Then
                 ' Determine the actual scan range the user has zoomed in on
                 GelBody(CallerID).GetCurrentZoomArea lngXMin, lngXMax, 0, 0
                 
@@ -1320,7 +1565,35 @@ GraphChromatogramErrorHandler:
     
 End Sub
 
-Private Sub UpdatePlotAddData(dblChromatogramDataOneBased() As Double, lngDataCount As Long, intSeries As Integer, intSeriesCount As Integer)
+Private Sub UpdatePlotAddIMSData(dblChromatogramDataOneBased() As Double, lngDataCount As Long, intSeries As Integer, intSeriesCount As Integer)
+    Dim lngIndex As Long
+    Dim dblXData() As Double
+    Dim dblYData() As Double
+    
+    With ctlChromatogramPlot
+        .SetSeriesDataPointCount intSeries, lngDataCount
+        
+        If lngDataCount > 0 Then
+    
+            ReDim dblXData(1 To lngDataCount)
+            ReDim dblYData(1 To lngDataCount)
+            
+            For lngIndex = 1 To lngDataCount
+                dblXData(lngIndex) = (mIMSChromData.ScaledDriftTimeStart + lngIndex - 1) / 10#
+                dblYData(lngIndex) = dblChromatogramDataOneBased(lngIndex)
+            Next lngIndex
+            
+            .SetDataX intSeries, dblXData()
+            
+            '.SetDataY intSeries, dblChromatogramDataOneBased()
+            .SetDataY intSeries, dblYData()
+        End If
+        
+    End With
+    
+End Sub
+
+Private Sub UpdatePlotAddLCData(dblChromatogramDataOneBased() As Double, lngDataCount As Long, intSeries As Integer, intSeriesCount As Integer)
     Dim lngIndex As Long
     Dim dblXData() As Double
     
@@ -1330,12 +1603,12 @@ Private Sub UpdatePlotAddData(dblChromatogramDataOneBased() As Double, lngDataCo
         If lngDataCount > 0 Then
     
             If glbPreferencesExpanded.TICAndBPIPlottingOptions.PlotNETOnXAxis Then
-                .SetDataX intSeries, mChromData.GANETVals()
+                .SetDataX intSeries, mLCChromData.GANETVals()
             Else
                 ReDim dblXData(1 To lngDataCount)
                 
                 For lngIndex = 1 To lngDataCount
-                    dblXData(lngIndex) = mChromData.ScanNumberStart + lngIndex - 1
+                    dblXData(lngIndex) = mLCChromData.ScanNumberStart + lngIndex - 1
                 Next lngIndex
                 
                 .SetDataX intSeries, dblXData()

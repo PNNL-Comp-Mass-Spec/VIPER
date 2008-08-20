@@ -170,7 +170,7 @@ Begin VB.Form frmUMCBrowser
          Height          =   255
          Left            =   120
          TabIndex        =   25
-         Top             =   960
+         Top             =   940
          Width           =   3015
       End
       Begin VB.ComboBox cboUMCSortOrder 
@@ -194,7 +194,7 @@ Begin VB.Form frmUMCBrowser
          Left            =   2160
          Style           =   2  'Dropdown List
          TabIndex        =   8
-         Top             =   1305
+         Top             =   1320
          Width           =   975
       End
       Begin VB.TextBox txtScanRange 
@@ -210,7 +210,7 @@ Begin VB.Form frmUMCBrowser
          Left            =   2160
          Style           =   2  'Dropdown List
          TabIndex        =   6
-         Top             =   1665
+         Top             =   1680
          Width           =   975
       End
       Begin VB.Label lblMassRange 
@@ -218,7 +218,7 @@ Begin VB.Form frmUMCBrowser
          Height          =   255
          Left            =   120
          TabIndex        =   11
-         Top             =   1320
+         Top             =   1340
          Width           =   1095
       End
       Begin VB.Label lblScanRange 
@@ -226,7 +226,7 @@ Begin VB.Form frmUMCBrowser
          Height          =   255
          Left            =   120
          TabIndex        =   10
-         Top             =   1680
+         Top             =   1700
          Width           =   1095
       End
    End
@@ -407,7 +407,7 @@ On Error GoTo AutoZoom2DPlotErrorHandler
         Exit Sub
     End If
 
-    BrowseFeaturesZoom2DPlot glbPreferencesExpanded.UMCBrowserPlottingOptions, CallerIDLoaded, lngUMCIndexOriginal
+    BrowseFeaturesZoomAndHighlight2DPlot glbPreferencesExpanded.UMCBrowserPlottingOptions, CallerIDLoaded, lngUMCIndexOriginal
     Exit Sub
     
 AutoZoom2DPlotErrorHandler:
@@ -517,7 +517,7 @@ Private Sub DisplayUMCInfoSelectedItem(Optional blnSkipAutoZoom As Boolean = Fal
         
         UpdatePlotForUMC lngUMCIndexOriginal
         
-        If glbPreferencesExpanded.UMCBrowserPlottingOptions.AutoZoom2DPlot And Not blnSkipAutoZoom Then
+        If (glbPreferencesExpanded.UMCBrowserPlottingOptions.AutoZoom2DPlot Or glbPreferencesExpanded.UMCBrowserPlottingOptions.HighlightMembers) And Not blnSkipAutoZoom Then
             AutoZoom2DPlot lngUMCIndexOriginal
         End If
     End If

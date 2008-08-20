@@ -293,7 +293,7 @@ UnDeleteSelectedFeatureErrorHandler:
     
 End Function
 
-Public Sub BrowseFeaturesZoom2DPlot(ByRef udtOptions As udtFeatureBrowserOptionsType, lngGelIndex As Long, lngUMCIndex As Long, Optional lngUMCIndex2 As Long = -1)
+Public Sub BrowseFeaturesZoomAndHighlight2DPlot(ByRef udtOptions As udtFeatureBrowserOptionsType, lngGelIndex As Long, lngUMCIndex As Long, Optional lngUMCIndex2 As Long = -1)
     ' If lngUMCIndex2 is >=0 then examines it, in addition to lngUMCIndex
     
     Dim lngScanMin As Long, lngScanMax As Long
@@ -316,73 +316,75 @@ Public Sub BrowseFeaturesZoom2DPlot(ByRef udtOptions As udtFeatureBrowserOptions
     Dim lngIonCount As Long
     Dim lngIonPointerArray() As Long
 
-On Error GoTo BrowseFeaturesZoom2DPlotErrorHandler
+On Error GoTo BrowseFeaturesZoomAndHighlight2DPlotErrorHandler
 
-    dblMassHalfWidthUser = udtOptions.MassRangeZoom
-
-    sngScanWidth = udtOptions.ScanRangeZoom
-
-    If udtOptions.MassRangeUnits = mruPpm Then
-        blnUsePpm = True
-    Else
-        blnUsePpm = False
-    End If
-
-    If udtOptions.ScanRangeUnits = sruNet Then
-        blnUseNET = True
-    Else
-        blnUseNET = False
-    End If
-
-    With GelUMC(lngGelIndex)
-        If lngUMCIndex2 >= 0 Then
-            BrowseFeaturesLookupScanAndMassLimits .UMCs(lngUMCIndex), .UMCs(lngUMCIndex2), lngScanMin, lngScanMax, dblMassMin, dblMassMax
-            dblCentralMass = (.UMCs(lngUMCIndex).ClassMW + .UMCs(lngUMCIndex2).ClassMW) / 2
+    If udtOptions.AutoZoom2DPlot Then
+        dblMassHalfWidthUser = udtOptions.MassRangeZoom
+    
+        sngScanWidth = udtOptions.ScanRangeZoom
+    
+        If udtOptions.MassRangeUnits = mruPpm Then
+            blnUsePpm = True
         Else
-            ' Only consider the first UMC; sending it twice to BrowseFeaturesLookupScanAndMassLimits won't hurt anything
-            BrowseFeaturesLookupScanAndMassLimits .UMCs(lngUMCIndex), .UMCs(lngUMCIndex), lngScanMin, lngScanMax, dblMassMin, dblMassMax
-            dblCentralMass = .UMCs(lngUMCIndex).ClassMW
+            blnUsePpm = False
         End If
-    End With
     
-    ' Determine the central scan
-    lngCentralScan = Round((lngScanMin + lngScanMax) / 2, 0)
-
-    If blnUsePpm Then
-        dblMassHalfWidthUser = PPMToMass(dblMassHalfWidthUser, dblCentralMass)
-    End If
-    dblMassHalfWidthDa = Abs(dblMassHalfWidthUser / 2)
-
-    If dblMassHalfWidthDa < 0.00001 Then dblMassHalfWidthDa = 0.00001
+        If udtOptions.ScanRangeUnits = sruNet Then
+            blnUseNET = True
+        Else
+            blnUseNET = False
+        End If
     
-    dblScanHalfWidth = Abs(sngScanWidth / 2)
-    If blnUseNET Then
-        ' Convert from NET to scan
-        lngScanHalfWidth = GANETToScan(lngGelIndex, dblScanHalfWidth)
-    Else
-        lngScanHalfWidth = Round(dblScanHalfWidth, 0)
-    End If
-    
-    If lngScanHalfWidth < 2 Then lngScanHalfWidth = 2
-    
-    If udtOptions.FixedDimensionsForAutoZoom Then
+        With GelUMC(lngGelIndex)
+            If lngUMCIndex2 >= 0 Then
+                BrowseFeaturesLookupScanAndMassLimits .UMCs(lngUMCIndex), .UMCs(lngUMCIndex2), lngScanMin, lngScanMax, dblMassMin, dblMassMax
+                dblCentralMass = (.UMCs(lngUMCIndex).ClassMW + .UMCs(lngUMCIndex2).ClassMW) / 2
+            Else
+                ' Only consider the first UMC; sending it twice to BrowseFeaturesLookupScanAndMassLimits won't hurt anything
+                BrowseFeaturesLookupScanAndMassLimits .UMCs(lngUMCIndex), .UMCs(lngUMCIndex), lngScanMin, lngScanMax, dblMassMin, dblMassMax
+                dblCentralMass = .UMCs(lngUMCIndex).ClassMW
+            End If
+        End With
         
-        dblMassMin = dblCentralMass - dblMassHalfWidthDa
-        dblMassMax = dblCentralMass + dblMassHalfWidthDa
-        
-        lngScanMin = lngCentralScan - lngScanHalfWidth
-        lngScanMax = lngCentralScan + lngScanHalfWidth
-    Else
-        ' The dimensions define the edge width around the feature
-        dblMassMin = dblMassMin - dblMassHalfWidthDa
-        dblMassMax = dblMassMax + dblMassHalfWidthDa
-        
-        lngScanMin = lngScanMin - lngScanHalfWidth
-        lngScanMax = lngScanMax + lngScanHalfWidth
-    End If
+        ' Determine the central scan
+        lngCentralScan = Round((lngScanMin + lngScanMax) / 2, 0)
     
-    ' Zoom the 2D plot
-    ZoomGelToDimensions lngGelIndex, CSng(lngScanMin), dblMassMin, CSng(lngScanMax), dblMassMax
+        If blnUsePpm Then
+            dblMassHalfWidthUser = PPMToMass(dblMassHalfWidthUser, dblCentralMass)
+        End If
+        dblMassHalfWidthDa = Abs(dblMassHalfWidthUser / 2)
+    
+        If dblMassHalfWidthDa < 0.00001 Then dblMassHalfWidthDa = 0.00001
+        
+        dblScanHalfWidth = Abs(sngScanWidth / 2)
+        If blnUseNET Then
+            ' Convert from NET to scan
+            lngScanHalfWidth = GANETToScan(lngGelIndex, dblScanHalfWidth)
+        Else
+            lngScanHalfWidth = Round(dblScanHalfWidth, 0)
+        End If
+        
+        If lngScanHalfWidth < 2 Then lngScanHalfWidth = 2
+        
+        If udtOptions.FixedDimensionsForAutoZoom Then
+            
+            dblMassMin = dblCentralMass - dblMassHalfWidthDa
+            dblMassMax = dblCentralMass + dblMassHalfWidthDa
+            
+            lngScanMin = lngCentralScan - lngScanHalfWidth
+            lngScanMax = lngCentralScan + lngScanHalfWidth
+        Else
+            ' The dimensions define the edge width around the feature
+            dblMassMin = dblMassMin - dblMassHalfWidthDa
+            dblMassMax = dblMassMax + dblMassHalfWidthDa
+            
+            lngScanMin = lngScanMin - lngScanHalfWidth
+            lngScanMax = lngScanMax + lngScanHalfWidth
+        End If
+        
+        ' Zoom the 2D plot
+        ZoomGelToDimensions lngGelIndex, CSng(lngScanMin), dblMassMin, CSng(lngScanMax), dblMassMax
+    End If
     
     If udtOptions.HighlightMembers Then
         ' Highlight the points that are members of this Feature
@@ -408,12 +410,12 @@ On Error GoTo BrowseFeaturesZoom2DPlotErrorHandler
     
     Exit Sub
     
-BrowseFeaturesZoom2DPlotErrorHandler:
+BrowseFeaturesZoomAndHighlight2DPlotErrorHandler:
     Debug.Assert False
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox "Error auto zooming: " & Err.Description, vbExclamation + vbOKOnly, "Error"
     End If
-    LogErrors Err.Number, "BrowseFeaturesZoom2DPlot", Err.Description, lngGelIndex
+    LogErrors Err.Number, "BrowseFeaturesZoomAndHighlight2DPlot", Err.Description, lngGelIndex
 
 End Sub
 

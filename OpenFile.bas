@@ -730,7 +730,7 @@ End With
 
 ' MonroeMod Begin
 With GelUMCIon(Ind)
-    .NetCount = 0
+    .NETCount = 0
     ReDim .NetInd1(0)
     ReDim .NetInd2(0)
     ReDim .NetDist(0)
@@ -1757,8 +1757,9 @@ End Select
 
 Debug.Assert Not GelStatus(fIndex).Deleted
 GelBody(fIndex).Tag = fIndex
-GelBody(fIndex).Caption = strFileName              ' MonroeMod: Removed UCase()
 GelStatus(fIndex).GelFilePathFull = GetFilePathFull(strFileName)
+GelBody(fIndex).Caption = CompactPathString(GelStatus(fIndex).GelFilePathFull, 80)
+
 
 GelBody(fIndex).Show
 If GelData(fIndex).Preferences.CooType = glNETCooSys Then

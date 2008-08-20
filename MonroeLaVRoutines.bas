@@ -2669,7 +2669,8 @@ Public Sub CopyLegacyCSToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, B
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
          
         .IReportTagType = irtIReportTagTypeConstants.irtNone
-        .AdditionalValue2 = 0
+        .AdditionalValue1 = 0
+        .IMSDriftTime = 0
         
         On Error Resume Next
         If IsNull(CSVar(lngCSIndex, csvfMTID)) Then
@@ -2712,7 +2713,8 @@ Public Sub CopyLegacyIso2005ToCurrentIso(ByRef udtIsotopicData As udtIsotopicDat
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
          
         .IReportTagType = irtIReportTagTypeConstants.irtNone
-        .AdditionalValue2 = 0
+        .AdditionalValue1 = 0
+        .IMSDriftTime = 0
         
         .MTID = udtIsotopicDataOld.MTID
     End With
@@ -2757,7 +2759,8 @@ Public Sub CopyLegacyIsoToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, 
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
          
         .IReportTagType = irtIReportTagTypeConstants.irtNone
-        .AdditionalValue2 = 0
+        .AdditionalValue1 = 0
+        .IMSDriftTime = 0
         
         On Error Resume Next
         If IsNull(IsoVar(lngIsoIndex, isvfMTID)) Then
@@ -4349,6 +4352,8 @@ Public Sub SmoothViaMovingAverage(dblArray() As Double, lngLowIndex As Long, lng
     
 On Error GoTo SmoothViaMovingAverageErrorHandler
 
+    If lngHighIndex < lngLowIndex Then Exit Sub
+    
     lngDataCount = UBound(dblArray) - LBound(dblArray) + 1
     ReDim SmoothedBPI(LBound(dblArray) To UBound(dblArray))
 

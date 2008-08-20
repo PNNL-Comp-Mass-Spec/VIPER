@@ -2202,7 +2202,7 @@ Private Sub mnuResetAllOptionsToDefaults_Click()
         ResetExpandedPreferences glbPreferencesExpanded, "", True
         
         SetDefaultUMCDef GelSearchDef(nMyIndex).UMCDef
-        SetDefaultUMCIonNetDef GelSearchDef(nMyIndex).UMCIonNetDef
+        SetDefaultUMCIonNetDef GelSearchDef(nMyIndex).UMCIonNetDef, (GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
         SetDefaultUMCNETAdjDef GelUMCNETAdjDef(nMyIndex)
         
         SetDefaultSearchAMTDef samtDef, GelUMCNETAdjDef(nMyIndex)
@@ -3637,9 +3637,11 @@ Public Sub CopyAllPointsInView(Optional ByVal lngMaxPointsCountToCopy As Long = 
     Dim lngIonPointerArray() As Long           ' 1-based array
     Dim lngIonCount As Long
     Dim strIsotopeLabelTag As String
+    Dim sngIMSDriftTime As Single
     
     Dim blnCSPoints As Boolean
     Dim blnContainsIsotopeTags As Boolean
+    Dim blnIMSData As Boolean
     
     ' The following two arrays are used to look up the mass of each MT tag, given the MT tag ID
     ' If the user specified a mass modification (like alkylation, ICAT, or N15), then the standard mass
@@ -3766,7 +3768,15 @@ On Error GoTo CopyAllPointsInViewErrorHandler
     End If
     
     With GelData(nMyIndex)
-        strExport(0) = "Scan" & strSepChar & "NET" & strSepChar & "Index" & strSepChar & "Abundance" & strSepChar
+        strExport(0) = "Scan" & strSepChar & "NET" & strSepChar & "Index" & strSepChar
+        
+        If ((.DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA) Then
+            blnIMSData = True
+             strExport(0) = strExport(0) & "IMS_Drift_Time" & strSepChar
+        End If
+        
+        strExport(0) = strExport(0) & "Abundance" & strSepChar
+        
         If Not blnCSPoints And ((.DataStatusBits And GEL_DATA_STATUS_BIT_IREPORT) = GEL_DATA_STATUS_BIT_IREPORT) Then
             blnIReportData = True
             strExport(0) = strExport(0) & "Monoiso Mass Abu" & strSepChar & "Monoiso Mass +2 Da Abu" & strSepChar
@@ -3834,6 +3844,8 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 dblMW = .CSData(lngIonIndex).AverageMW
                 
                 strIsotopeLabelTag = ""
+                sngIMSDriftTime = 0
+                
                 strUMCIndices = ""
                 strDBMatchList = .CSData(lngIonIndex).MTID
             
@@ -3854,6 +3866,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 dblMW = GetIsoMass(.IsoData(lngIonIndex), .Preferences.IsoDataField)
                 
                 strIsotopeLabelTag = GetIsotopeLabelTagName(.IsoData(lngIonIndex).IsotopeLabel)
+                sngIMSDriftTime = .IsoData(lngIonIndex).IMSDriftTime
                 
                 strUMCIndices = ConstructUMCIndexList(nMyIndex, lngIonIndex, glIsoType)
                 strDBMatchList = .IsoData(lngIonIndex).MTID
@@ -3877,7 +3890,13 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                     End If
                 End If
                 
-                strExport(lngExportCount) = lngFN & strSepChar & Format$(dblNET, "0.0000") & strSepChar & lngIonIndex & strSepChar & Round(dblAbu, 0) & strSepChar
+                strExport(lngExportCount) = lngFN & strSepChar & Format$(dblNET, "0.0000") & strSepChar & lngIonIndex & strSepChar
+                
+                If blnIMSData Then
+                    strExport(lngExportCount) = strExport(lngExportCount) & sngIMSDriftTime & strSepChar
+                End If
+                
+                 strExport(lngExportCount) = strExport(lngExportCount) & Round(dblAbu, 0) & strSepChar
                 
                 If blnIReportData Then
                     strExport(lngExportCount) = strExport(lngExportCount) & Round(dblAbuIReportMWMono, 0) & strSepChar & Round(dblAbuIReport2Da, 0) & strSepChar

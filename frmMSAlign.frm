@@ -114,8 +114,8 @@ Begin VB.Form frmMSAlign
       TabCaption(2)   =   "Tolerances"
       TabPicture(2)   =   "frmMSAlign.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraBinningOptions"
-      Tab(2).Control(1)=   "fraNETTolerances"
+      Tab(2).Control(0)=   "fraNETTolerances"
+      Tab(2).Control(1)=   "fraBinningOptions"
       Tab(2).ControlCount=   2
       TabCaption(3)   =   "Calibration Type"
       TabPicture(3)   =   "frmMSAlign.frx":0054
@@ -125,10 +125,10 @@ Begin VB.Form frmMSAlign
       TabCaption(4)   =   "Advanced"
       TabPicture(4)   =   "frmMSAlign.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "txtWarpMassZScoreTolerance"
-      Tab(4).Control(1)=   "Frame1"
-      Tab(4).Control(2)=   "chkWarpMassUseLSQ"
-      Tab(4).Control(3)=   "Label21"
+      Tab(4).Control(0)=   "Label21"
+      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(2)=   "Frame1"
+      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
       Tab(4).ControlCount=   4
       TabCaption(5)   =   "Plots"
       TabPicture(5)   =   "frmMSAlign.frx":008C
@@ -2201,8 +2201,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   1.21995026481964E-294
-         DataMax_5       =   1.21995026481964E-294
+         DataMin_5       =   9.71908206847002E-295
+         DataMax_5       =   9.71908206847002E-295
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2268,8 +2268,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   1.16149959107373E-294
-         DataMax_14      =   1.16149959107373E-294
+         DataMin_14      =   9.76322170458103E-295
+         DataMax_14      =   9.76322170458103E-295
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2337,8 +2337,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   1.17658710403942E-294
-         DataMax_23      =   1.17658710403942E-294
+         DataMin_23      =   9.80413598162574E-295
+         DataMax_23      =   9.80413598162574E-295
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -4508,6 +4508,8 @@ On Error GoTo InitializeSearchErrorHandler
     
         UMCNetAdjDef = GelUMCNETAdjDef(CallerID)
     
+        Me.Caption = "LCMSWarp (" & CompactPathString(GelStatus(CallerID).GelFilePathFull, 80) & ")"
+        
     Else
         lblUMCMassMode = "CallerID is not defined; LC-MS Feature Mass mode is unknown"
         ClearLocalFeaturesArray
@@ -6278,7 +6280,7 @@ Private Sub ShowAboutBox()
                  "Analytical Chemistry, 78 (21), 7397-7409 (2006).  " & vbCrLf & vbCrLf & _
                  "Implementation by Navdeep Jaitly and Matthew Monroe"
     
-    MsgBox strMessage, vbInformation Or vbOKOnly, "About LCMSWARP"
+    MsgBox strMessage, vbInformation Or vbOKOnly, "About LCMSWarp"
 End Sub
 
 Public Sub StartAlignment()

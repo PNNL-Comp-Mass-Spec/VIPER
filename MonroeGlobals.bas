@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "May 19, 2008"
+Public Const APP_BUILD_DATE As String = "August 15, 2008"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -55,6 +55,7 @@ Public Const UMC_INDICATOR_BIT_NET_ADJ_LOCKER_HIT = 256                 ' LC-MS 
 Public Const GEL_DATA_STATUS_BIT_IREPORT = 2                        ' When the gel data contains IReport data, this this bit is turned on
 Public Const GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG = 4              ' When the gel data contains Isotope LabelTag info (field .IsotopeLabel), this this bit is turned on
 Public Const GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA = 8      ' When the gel data contains data loaded from _Pairs_isos.csv files and MonoPlus4 or MonoMinus4 data was added, then this this bit is turned on
+Public Const GEL_DATA_STATUS_BIT_IMS_DATA = 16                      ' When the gel data contains IMS data, then this bit is turned on
 
 Public Enum natNETTypeConstants
     natGeneric = 0
@@ -88,7 +89,8 @@ Public Enum fsFileSaveModeConstants
     fsLegacy = 3
 End Enum
 
-Public Const TIC_AND_BPI_TYPE_COUNT = 8
+Public Const LC_TIME_BASED_CHROM_COUNT = 8
+Public Const IMS_TIME_BASED_CHROM_COUNT = 2
 Public Enum tbcTICAndBPIConstants
     tbcTICFromCurrentDataIntensities = 0
     tbcBPIFromCurrentDataIntensities = 1
@@ -98,6 +100,13 @@ Public Enum tbcTICAndBPIConstants
     tbcBPIFromRawData = 5
     tbcDeisotopingIntensityThresholds = 6
     tbcDeisotopingPeakCounts = 7
+    tbcIMSTICFromCurrentDataIntensities = 8
+    tbcIMSBPIFromCurrentDataIntensities = 9
+End Enum
+
+Public Enum itcIMSTICConstants
+    itcTICFromCurrentDataIntensities = 0
+    itcBPIFromCurrentDataIntensities = 1
 End Enum
 
 Public Const MASS_TOLERANCE_REFINEMENT_METHOD_COUNT = 5

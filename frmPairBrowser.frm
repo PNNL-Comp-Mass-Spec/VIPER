@@ -444,7 +444,7 @@ On Error GoTo AutoZoom2DPlotErrorHandler
         lngUMCIndexHeavy = .P2
     End With
     
-    BrowseFeaturesZoom2DPlot glbPreferencesExpanded.PairBrowserPlottingOptions, CallerIDLoaded, lngUMCIndexLight, lngUMCIndexHeavy
+    BrowseFeaturesZoomAndHighlight2DPlot glbPreferencesExpanded.PairBrowserPlottingOptions, CallerIDLoaded, lngUMCIndexLight, lngUMCIndexHeavy
     
     Exit Sub
     
@@ -583,7 +583,7 @@ Private Sub DisplayPairInfoSelectedItem(Optional blnSkipAutoZoom As Boolean = Fa
         
         UpdatePlotForPair lngPairIndexOriginal
         
-        If glbPreferencesExpanded.PairBrowserPlottingOptions.AutoZoom2DPlot And Not blnSkipAutoZoom Then
+        If (glbPreferencesExpanded.PairBrowserPlottingOptions.AutoZoom2DPlot Or glbPreferencesExpanded.PairBrowserPlottingOptions.HighlightMembers) And Not blnSkipAutoZoom Then
             AutoZoom2DPlot lngPairIndexOriginal
         End If
     End If

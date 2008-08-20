@@ -1,5 +1,20 @@
 VIPER Change Log
 
+Version 3.45 - Build 395; August 8, 2008
+	- Updated to track IMS drift time when column drift_time is present in the _isos.csv file
+	- Updated the internal LC-MS feature finding algorithm (UMCIonNet) to allow for an IMS Drift Time dimension
+	- Updated to write out IMS drift time data (and drift time weighting options) when finding LC-MS features using the LCMSFeatureFinder
+
+Version 3.44 - Build 394; June 11, 2008
+	- Updated to compute the number of nitrogens in each peptide when loading data from legacy MTDBs (Microsoft Access files) 
+		- Column Peptide in table AMT must be present in the Access DB, since VIPER will read the AMT peptide sequences from that column
+		- However, if column NitrogenCount is also present in the AMT table, then that value will be used for the nitrogen count, in lieu of computing a nitrogen count based on the peptide sequence
+		- The number of nitrogens in a peptide is used when you choose Steps->Database Search using Pairs->UMC N14/N15 Pairs
+
+Version 3.44 - Build 393; May 21, 2008
+	- Now showing the filename of new data files in the main window, e.g. Untitled:1 (DatasetName)
+	- Now showing the filename of the data file in the LCMSWarp window, e.g. LCMSWarp (DatasetName)
+
 Version 3.44 - Build 392; May 20, 2008
 	- Updated the report shown when matching N14/N15 paired UMCs to the database (and requiring that the number of nitrogens match) to include the peptide sequence and the N-count of the peptide
 	- Decreased the threshold for allowing an ambiguity between the number of nitrogen atoms in a peptide vs. the mass spacing of a N14/N15 pair

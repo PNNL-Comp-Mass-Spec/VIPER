@@ -3942,7 +3942,7 @@ On Error GoTo SaveChromatogramsErrorHandler
             frmTICAndBPIPlots.Height = lngHeightTwips
             DoEvents
             
-            For eChromType = 0 To TIC_AND_BPI_TYPE_COUNT - 1
+            For eChromType = 0 To LC_TIME_BASED_CHROM_COUNT + IMS_TIME_BASED_CHROM_COUNT - 1
                 If lngError <> 0 Then Exit For
 
                 blnProceed = False
@@ -3963,6 +3963,10 @@ On Error GoTo SaveChromatogramsErrorHandler
                     If .SavePlotDeisotopingIntensityThresholds Then blnProceed = True
                 Case tbcDeisotopingPeakCounts
                     If .SavePlotDeisotopingPeakCounts Then blnProceed = True
+                Case tbcIMSBPIFromCurrentDataIntensities
+                    ' Skip this type
+                Case tbcIMSTICFromCurrentDataIntensities
+                    ' Skip this type
                 Case Else
                     ' This shouldn't happen
                     Debug.Assert False

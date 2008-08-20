@@ -27,6 +27,7 @@ Public Enum uindUMCIonNetDimConstants
     uindGenericNET = 6
     uindChargeState = 7
     uindLogAbundance = 8
+    uindIMSDriftTime = 9
 End Enum
 
 Public Const DATA_UNITS_MASS_DA = 0
@@ -212,8 +213,8 @@ Public Function GetUMCIonNetInfo(Ind As Long) As String
 '----------------------------------------------------------
 On Error Resume Next
 Dim Info As String
-Info = "Number of connections: " & GelUMCIon(Ind).NetCount & vbCrLf
-If GelUMCIon(Ind).NetCount > 0 Then
+Info = "Number of connections: " & GelUMCIon(Ind).NETCount & vbCrLf
+If GelUMCIon(Ind).NETCount > 0 Then
    Info = Info & "Shortest connection: " & Format$(GelUMCIon(Ind).MinDist, "0.00E-00") & " = " & Format$(GelUMCIon(Ind).MinDist, "0.000") & vbCrLf
    Info = Info & "Longest connection: " & Format$(GelUMCIon(Ind).MaxDist, "0.00E-00") & " = " & Format$(GelUMCIon(Ind).MaxDist, "0.000")
 End If
