@@ -1052,7 +1052,9 @@ Public Function ConstructMassTagModMassDescription(udtMassMods As udtDBSearchMas
         End If
         
         If Len(strAnalysisHistoryInfo) > 0 Then
-            If .DynamicMods Then
+            If .ModMode = 2 Then
+                strAnalysisHistoryInfo = strAnalysisHistoryInfo & "; Mod Type = Decoy"
+            ElseIf .ModMode = 1 Then
                 strAnalysisHistoryInfo = strAnalysisHistoryInfo & "; Mod Type = Dynamic"
             Else
                 strAnalysisHistoryInfo = strAnalysisHistoryInfo & "; Mod Type = Fixed"

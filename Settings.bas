@@ -476,6 +476,8 @@ Public Sub IniFileLoadSettings(ByRef udtPrefsExpanded As udtPreferencesExpandedT
     
     Dim blnLegacySectionName As Boolean
     
+    Dim strModValue As String
+    
 On Error GoTo LoadSettingsFileHandler
 
     ' Set the Ini filename
@@ -1322,7 +1324,10 @@ On Error GoTo LoadSettingsFileHandler
                 .DBSearchMinimumPeptideProphetProbability = GetIniFileSettingSng(IniStuff, strSectionName, "DBSearchMinimumPeptideProphetProbability", .DBSearchMinimumPeptideProphetProbability)
 
                 With .MassMods
-                    .DynamicMods = GetIniFileSettingBln(IniStuff, strSectionName, "DynamicMods", .DynamicMods)
+                    ' "DynamicMods" was replaced with "ModMode" in August 2008
+                    ' Preferentially use ModMode, if present
+                    .ModMode = IniFileLoadSettingsGetModMode(IniStuff, strSectionName, .ModMode)
+                                     
                     .N15InsteadOfN14 = GetIniFileSettingBln(IniStuff, strSectionName, "N15InsteadOfN14", .N15InsteadOfN14)
                     .PEO = GetIniFileSettingBln(IniStuff, strSectionName, "PEO", .PEO)
                     .ICATd0 = GetIniFileSettingBln(IniStuff, strSectionName, "ICATd0", .ICATd0)
@@ -1359,7 +1364,9 @@ On Error GoTo LoadSettingsFileHandler
                         .DBSearchMinimumPeptideProphetProbability = GetIniFileSettingSng(IniStuff, strSectionName, "DBSearchMinimumPeptideProphetProbability", 0)
                                         
                         With .MassMods
-                            .DynamicMods = GetIniFileSettingBln(IniStuff, strSectionName, "DynamicMods", True)
+                            ' "DynamicMods" was replaced with "ModMode" in August 2008
+                            ' Preferentially use ModMode, if present
+                            .ModMode = IniFileLoadSettingsGetModMode(IniStuff, strSectionName, .ModMode)
                             .N15InsteadOfN14 = GetIniFileSettingBln(IniStuff, strSectionName, "N15InsteadOfN14", False)
                             .PEO = GetIniFileSettingBln(IniStuff, strSectionName, "PEO", False)
                             .ICATd0 = GetIniFileSettingBln(IniStuff, strSectionName, "ICATd0", False)
@@ -1519,6 +1526,38 @@ LoadSettingsFileHandler:
     Set IniStuff = Nothing
 
 End Sub
+
+Private Function IniFileLoadSettingsGetModMode(ByRef IniStuff As clsIniStuff, ByVal strSectionName As String, bytDefaultIfMissing As Byte) As Byte
+                    
+    Dim strModValue As String
+    Dim bytNewModMode As Byte
+    
+    bytNewModMode = bytDefaultIfMissing
+ 
+    strModValue = GetIniFileSetting(IniStuff, strSectionName, "ModMode", "")
+    If Len(strModValue) > 0 Then
+        ' ModMode value is defined; use it
+        If IsNumeric(strModValue) Then
+            bytNewModMode = CByte(strModValue)
+        End If
+    Else
+        
+        strModValue = GetIniFileSetting(IniStuff, strSectionName, "DynamicMods", "")
+        If Len(strModValue) > 0 Then
+            ' Legacy DynamicMods value was present; use it
+            If CBoolSafe(strModValue) Then
+                bytNewModMode = 1
+            Else
+                bytNewModMode = 0
+            End If
+        Else
+            ' Could not find "DynamicMods" or "ModMode" in this section
+            ' Leave .ModMode unchanged
+        End If
+    End If
+    
+    IniFileLoadSettingsGetModMode = bytNewModMode
+End Function
 
 Public Sub IniFileSaveSettings(udtPrefsExpanded As udtPreferencesExpandedType, udtUMCDef As UMCDefinition, udtUMCIonNetDef As UMCIonNetDefinition, udtUMCNetAdjDef As NetAdjDefinition, udtInternalStandards As udtInternalStandardsType, udtAMTDef As SearchAMTDefinition, udtPrefs As GelPrefs, Optional strIniFilePath As String = "", Optional bnlAutoAnalysisFieldsOnly As Boolean = False)
     ' Saves settings to an .ini file
@@ -2387,7 +2426,7 @@ On Error GoTo SaveSettingsFileHandler
                 AddKeyValueSettingSng sKeys, sVals, iKVCount, "DBSearchMinimumPeptideProphetProbability", .DBSearchMinimumPeptideProphetProbability
                 
                 With .MassMods
-                    AddKeyValueSettingBln sKeys, sVals, iKVCount, "DynamicMods", .DynamicMods
+                    AddKeyValueSettingByt sKeys, sVals, iKVCount, "ModMode", .ModMode
                     AddKeyValueSettingBln sKeys, sVals, iKVCount, "N15InsteadOfN14", .N15InsteadOfN14
                     AddKeyValueSettingBln sKeys, sVals, iKVCount, "PEO", .PEO
                     AddKeyValueSettingBln sKeys, sVals, iKVCount, "ICATd0", .ICATd0
@@ -3179,7 +3218,7 @@ End Sub
 
 Public Sub ResetDBSearchMassMods(udtMassMods As udtDBSearchMassModificationOptionsType)
     With udtMassMods
-        .DynamicMods = True
+        .ModMode = 1                    ' Was previously: .DynamicMods = True
         .N15InsteadOfN14 = False
         .PEO = False
         .ICATd0 = False

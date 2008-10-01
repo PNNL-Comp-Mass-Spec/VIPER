@@ -27,70 +27,70 @@ Begin VB.Form frmEditAnalysisSettings
       _Version        =   393216
       Style           =   1
       Tabs            =   8
-      Tab             =   4
+      Tab             =   6
       TabsPerRow      =   8
       TabHeight       =   520
       OLEDropMode     =   1
       TabCaption(0)   =   "1. Load and Filter"
       TabPicture(0)   =   "frmEditAnalysisSettings.frx":0000
       Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "lblDescription(50)"
-      Tab(0).Control(1)=   "fraOptionFrame(4)"
-      Tab(0).Control(2)=   "fraOptionFrame(5)"
-      Tab(0).Control(3)=   "fraOptionFrame(6)"
+      Tab(0).Control(0)=   "fraOptionFrame(22)"
+      Tab(0).Control(1)=   "fraOptionFrame(8)"
+      Tab(0).Control(2)=   "fraOptionFrame(9)"
+      Tab(0).Control(3)=   "txtPEKFileExtensionPreferenceOrder"
       Tab(0).Control(4)=   "fraOptionFrame(7)"
-      Tab(0).Control(5)=   "txtPEKFileExtensionPreferenceOrder"
-      Tab(0).Control(6)=   "fraOptionFrame(9)"
-      Tab(0).Control(7)=   "fraOptionFrame(8)"
-      Tab(0).Control(8)=   "fraOptionFrame(22)"
+      Tab(0).Control(5)=   "fraOptionFrame(6)"
+      Tab(0).Control(6)=   "fraOptionFrame(5)"
+      Tab(0).Control(7)=   "fraOptionFrame(4)"
+      Tab(0).Control(8)=   "lblDescription(50)"
       Tab(0).ControlCount=   9
       TabCaption(1)   =   "2. LC-MS Features"
       TabPicture(1)   =   "frmEditAnalysisSettings.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "lblDescription(115)"
-      Tab(1).Control(1)=   "lblDescription(63)"
-      Tab(1).Control(2)=   "lblDescription(64)"
-      Tab(1).Control(3)=   "lblDescription(58)"
-      Tab(1).Control(4)=   "lblDescription(61)"
-      Tab(1).Control(5)=   "cboUMCSearchMode"
-      Tab(1).Control(6)=   "fraUMCSearch200x"
-      Tab(1).Control(7)=   "cmbUMCMW"
-      Tab(1).Control(8)=   "cmbUMCAbu"
-      Tab(1).Control(9)=   "txtInterpolateMaxGapSize"
-      Tab(1).Control(10)=   "chkInterpolateMissingIons"
-      Tab(1).Control(11)=   "fraUMCIonNetOptions"
-      Tab(1).Control(12)=   "tbsUMCRefinementOptions"
-      Tab(1).Control(13)=   "chkUseMostAbuChargeStateStatsForClassStats"
-      Tab(1).Control(14)=   "cboChargeStateAbuType"
-      Tab(1).Control(15)=   "chkSkipFindUMCs"
+      Tab(1).Control(0)=   "chkSkipFindUMCs"
+      Tab(1).Control(1)=   "cboChargeStateAbuType"
+      Tab(1).Control(2)=   "chkUseMostAbuChargeStateStatsForClassStats"
+      Tab(1).Control(3)=   "tbsUMCRefinementOptions"
+      Tab(1).Control(4)=   "fraUMCIonNetOptions"
+      Tab(1).Control(5)=   "chkInterpolateMissingIons"
+      Tab(1).Control(6)=   "txtInterpolateMaxGapSize"
+      Tab(1).Control(7)=   "cmbUMCAbu"
+      Tab(1).Control(8)=   "cmbUMCMW"
+      Tab(1).Control(9)=   "fraUMCSearch200x"
+      Tab(1).Control(10)=   "cboUMCSearchMode"
+      Tab(1).Control(11)=   "lblDescription(61)"
+      Tab(1).Control(12)=   "lblDescription(58)"
+      Tab(1).Control(13)=   "lblDescription(64)"
+      Tab(1).Control(14)=   "lblDescription(63)"
+      Tab(1).Control(15)=   "lblDescription(115)"
       Tab(1).ControlCount=   16
       TabCaption(2)   =   "3. MT Tags"
       TabPicture(2)   =   "frmEditAnalysisSettings.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraOptionFrame(19)"
-      Tab(2).Control(1)=   "fraOptionFrame(44)"
-      Tab(2).Control(2)=   "cmdSelectOtherDB"
-      Tab(2).Control(3)=   "fraSelectingMassTags"
-      Tab(2).Control(4)=   "fraOptionFrame(16)"
-      Tab(2).Control(5)=   "lblDescription(121)"
+      Tab(2).Control(0)=   "lblDescription(121)"
+      Tab(2).Control(1)=   "fraOptionFrame(16)"
+      Tab(2).Control(2)=   "fraSelectingMassTags"
+      Tab(2).Control(3)=   "cmdSelectOtherDB"
+      Tab(2).Control(4)=   "fraOptionFrame(44)"
+      Tab(2).Control(5)=   "fraOptionFrame(19)"
       Tab(2).ControlCount=   6
       TabCaption(3)   =   "4. Pairs"
       TabPicture(3)   =   "frmEditAnalysisSettings.frx":0054
       Tab(3).ControlEnabled=   0   'False
-      Tab(3).Control(0)=   "lblDescription(16)"
-      Tab(3).Control(1)=   "cboPairsIdentificationMode"
-      Tab(3).Control(2)=   "fraOptionFrame(37)"
-      Tab(3).Control(3)=   "fraOptionFrame(38)"
-      Tab(3).Control(4)=   "fraOptionFrame(40)"
-      Tab(3).Control(5)=   "fraOptionFrame(41)"
-      Tab(3).Control(6)=   "fraOptionFrame(48)"
-      Tab(3).Control(7)=   "fraOptionFrame(52)"
-      Tab(3).Control(8)=   "fraOptionFrame(53)"
-      Tab(3).Control(9)=   "fraOptionFrame(56)"
+      Tab(3).Control(0)=   "fraOptionFrame(56)"
+      Tab(3).Control(1)=   "fraOptionFrame(53)"
+      Tab(3).Control(2)=   "fraOptionFrame(52)"
+      Tab(3).Control(3)=   "fraOptionFrame(48)"
+      Tab(3).Control(4)=   "fraOptionFrame(41)"
+      Tab(3).Control(5)=   "fraOptionFrame(40)"
+      Tab(3).Control(6)=   "fraOptionFrame(38)"
+      Tab(3).Control(7)=   "fraOptionFrame(37)"
+      Tab(3).Control(8)=   "cboPairsIdentificationMode"
+      Tab(3).Control(9)=   "lblDescription(16)"
       Tab(3).ControlCount=   10
       TabCaption(4)   =   "5. NET Adjustment"
       TabPicture(4)   =   "frmEditAnalysisSettings.frx":0070
-      Tab(4).ControlEnabled=   -1  'True
+      Tab(4).ControlEnabled=   0   'False
       Tab(4).Control(0)=   "lblDescription(156)"
       Tab(4).Control(0).Enabled=   0   'False
       Tab(4).Control(1)=   "chkSkipGANETSlopeAndInterceptComputation"
@@ -111,48 +111,59 @@ Begin VB.Form frmEditAnalysisSettings
       TabCaption(5)   =   "6. Refinement"
       TabPicture(5)   =   "frmEditAnalysisSettings.frx":008C
       Tab(5).ControlEnabled=   0   'False
-      Tab(5).Control(0)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
-      Tab(5).Control(1)=   "fraExpecationMaximizationOptions"
-      Tab(5).Control(2)=   "cboToleranceRefinementMethod"
-      Tab(5).Control(3)=   "chkRefineDBSearchNETTolerance"
-      Tab(5).Control(4)=   "chkRefineDBSearchMassTolerance"
-      Tab(5).Control(5)=   "fraToleranceRefinementPeakCriteria"
-      Tab(5).Control(6)=   "fraOptionFrame(2)"
-      Tab(5).Control(7)=   "fraOptionFrame(3)"
-      Tab(5).Control(8)=   "fraOptionFrame(0)"
-      Tab(5).Control(9)=   "fraOptionFrame(1)"
-      Tab(5).Control(10)=   "lblMassCalibrationRefinementDescription"
-      Tab(5).Control(11)=   "lblToleranceRefinementExplanation"
+      Tab(5).Control(0)=   "lblToleranceRefinementExplanation"
+      Tab(5).Control(1)=   "lblMassCalibrationRefinementDescription"
+      Tab(5).Control(2)=   "fraOptionFrame(1)"
+      Tab(5).Control(3)=   "fraOptionFrame(0)"
+      Tab(5).Control(4)=   "fraOptionFrame(3)"
+      Tab(5).Control(5)=   "fraOptionFrame(2)"
+      Tab(5).Control(6)=   "fraToleranceRefinementPeakCriteria"
+      Tab(5).Control(7)=   "chkRefineDBSearchMassTolerance"
+      Tab(5).Control(8)=   "chkRefineDBSearchNETTolerance"
+      Tab(5).Control(9)=   "cboToleranceRefinementMethod"
+      Tab(5).Control(10)=   "fraExpecationMaximizationOptions"
+      Tab(5).Control(11)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
       Tab(5).ControlCount=   12
       TabCaption(6)   =   "7. DB Search"
       TabPicture(6)   =   "frmEditAnalysisSettings.frx":00A8
-      Tab(6).ControlEnabled=   0   'False
-      Tab(6).Control(0)=   "fraOptionFrame(31)"
-      Tab(6).Control(1)=   "fraOptionFrame(45)"
-      Tab(6).Control(2)=   "cboDBSearchMode"
-      Tab(6).Control(3)=   "lstDBSearchModes"
-      Tab(6).Control(4)=   "chkDoNotSaveOrExport"
+      Tab(6).ControlEnabled=   -1  'True
+      Tab(6).Control(0)=   "lblToleranceRefinementWarning"
+      Tab(6).Control(0).Enabled=   0   'False
+      Tab(6).Control(1)=   "lblDescription(70)"
+      Tab(6).Control(1).Enabled=   0   'False
+      Tab(6).Control(2)=   "fraOptionFrame(30)"
+      Tab(6).Control(2).Enabled=   0   'False
+      Tab(6).Control(3)=   "fraOptionFrame(26)"
+      Tab(6).Control(3).Enabled=   0   'False
+      Tab(6).Control(4)=   "cmdAddRemove(2)"
+      Tab(6).Control(4).Enabled=   0   'False
       Tab(6).Control(5)=   "fraOptionFrame(29)"
-      Tab(6).Control(6)=   "cmdAddRemove(2)"
-      Tab(6).Control(7)=   "fraOptionFrame(26)"
-      Tab(6).Control(8)=   "fraOptionFrame(30)"
-      Tab(6).Control(9)=   "lblDescription(70)"
-      Tab(6).Control(10)=   "lblToleranceRefinementWarning"
+      Tab(6).Control(5).Enabled=   0   'False
+      Tab(6).Control(6)=   "chkDoNotSaveOrExport"
+      Tab(6).Control(6).Enabled=   0   'False
+      Tab(6).Control(7)=   "lstDBSearchModes"
+      Tab(6).Control(7).Enabled=   0   'False
+      Tab(6).Control(8)=   "cboDBSearchMode"
+      Tab(6).Control(8).Enabled=   0   'False
+      Tab(6).Control(9)=   "fraOptionFrame(45)"
+      Tab(6).Control(9).Enabled=   0   'False
+      Tab(6).Control(10)=   "fraOptionFrame(31)"
+      Tab(6).Control(10).Enabled=   0   'False
       Tab(6).ControlCount=   11
       TabCaption(7)   =   "8. Saving/Plotting"
       TabPicture(7)   =   "frmEditAnalysisSettings.frx":00C4
       Tab(7).ControlEnabled=   0   'False
-      Tab(7).Control(0)=   "pctOptionsInIniFile(1)"
-      Tab(7).Control(1)=   "pctOptionsInIniFile(0)"
-      Tab(7).Control(2)=   "fraOptionFrame(33)"
-      Tab(7).Control(3)=   "fraOptionFrame(32)"
-      Tab(7).Control(4)=   "lblDescription(136)"
-      Tab(7).Control(5)=   "lblSavingAndExportingStatus"
+      Tab(7).Control(0)=   "lblSavingAndExportingStatus"
+      Tab(7).Control(1)=   "lblDescription(136)"
+      Tab(7).Control(2)=   "fraOptionFrame(32)"
+      Tab(7).Control(3)=   "fraOptionFrame(33)"
+      Tab(7).Control(4)=   "pctOptionsInIniFile(0)"
+      Tab(7).Control(5)=   "pctOptionsInIniFile(1)"
       Tab(7).ControlCount=   6
       Begin VB.PictureBox pctOptionsInIniFile 
          Height          =   2800
          Index           =   4
-         Left            =   4150
+         Left            =   -70850
          Picture         =   "frmEditAnalysisSettings.frx":00E0
          ScaleHeight     =   2745
          ScaleWidth      =   6885
@@ -163,7 +174,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.PictureBox pctOptionsInIniFile 
          Height          =   5055
          Index           =   3
-         Left            =   120
+         Left            =   -74880
          Picture         =   "frmEditAnalysisSettings.frx":15F52
          ScaleHeight     =   4995
          ScaleWidth      =   3855
@@ -372,7 +383,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.ComboBox cboRobustNETAdjustmentMode 
          Height          =   315
          ItemData        =   "frmEditAnalysisSettings.frx":2B1B8
-         Left            =   6600
+         Left            =   -68400
          List            =   "frmEditAnalysisSettings.frx":2B1BA
          Style           =   2  'Dropdown List
          TabIndex        =   329
@@ -410,7 +421,7 @@ Begin VB.Form frmEditAnalysisSettings
             Strikethrough   =   0   'False
          EndProperty
          Height          =   190
-         Left            =   4200
+         Left            =   -70800
          TabIndex        =   327
          Top             =   4230
          Width           =   2175
@@ -734,7 +745,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Text Export Options"
          Height          =   1995
          Index           =   31
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   456
          Top             =   5520
          Width           =   3255
@@ -1203,7 +1214,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Search (Identification) Tolerances"
          Height          =   1720
          Index           =   18
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   293
          Top             =   840
          Width           =   3735
@@ -1748,7 +1759,7 @@ Begin VB.Form frmEditAnalysisSettings
          BorderStyle     =   0  'None
          Height          =   735
          Index           =   45
-         Left            =   -70440
+         Left            =   4560
          TabIndex        =   419
          Top             =   840
          Width           =   375
@@ -1773,7 +1784,7 @@ Begin VB.Form frmEditAnalysisSettings
       End
       Begin VB.ComboBox cboDBSearchMode 
          Height          =   315
-         Left            =   -74760
+         Left            =   240
          Style           =   2  'Dropdown List
          TabIndex        =   405
          Top             =   1260
@@ -1781,7 +1792,7 @@ Begin VB.Form frmEditAnalysisSettings
       End
       Begin VB.ListBox lstDBSearchModes 
          Height          =   840
-         Left            =   -69960
+         Left            =   5040
          TabIndex        =   422
          Top             =   720
          Width           =   4215
@@ -1789,7 +1800,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.CheckBox chkDoNotSaveOrExport 
          Caption         =   "Disable all saving and exporting"
          Height          =   255
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   403
          Top             =   600
          Width           =   3015
@@ -1798,7 +1809,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Options for selected Database Search Mode"
          Height          =   3735
          Index           =   29
-         Left            =   -70680
+         Left            =   4320
          TabIndex        =   424
          Top             =   2160
          Width           =   6735
@@ -1894,12 +1905,22 @@ Begin VB.Form frmEditAnalysisSettings
             Begin VB.Frame fraOptionFrame 
                BorderStyle     =   0  'None
                Caption         =   "Frame1"
-               Height          =   855
+               Height          =   1095
                Index           =   49
                Left            =   4160
                TabIndex        =   436
                Top             =   360
                Width           =   1095
+               Begin VB.OptionButton optDBSearchModType 
+                  Caption         =   "Decoy"
+                  Height          =   255
+                  Index           =   2
+                  Left            =   120
+                  TabIndex        =   547
+                  Top             =   720
+                  Value           =   -1  'True
+                  Width           =   975
+               End
                Begin VB.OptionButton optDBSearchModType 
                   Caption         =   "Fixed"
                   Height          =   255
@@ -1915,8 +1936,7 @@ Begin VB.Form frmEditAnalysisSettings
                   Index           =   1
                   Left            =   120
                   TabIndex        =   439
-                  Top             =   525
-                  Value           =   -1  'True
+                  Top             =   500
                   Width           =   975
                End
                Begin VB.Label lblDescription 
@@ -2159,7 +2179,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Remove All"
          Height          =   255
          Index           =   2
-         Left            =   -69960
+         Left            =   5040
          TabIndex        =   423
          Top             =   1800
          Width           =   1335
@@ -2168,7 +2188,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Search Options"
          Height          =   2715
          Index           =   26
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   406
          Top             =   1740
          Width           =   3855
@@ -2296,7 +2316,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Search Result Export Options"
          Height          =   1485
          Index           =   30
-         Left            =   -70680
+         Left            =   4320
          TabIndex        =   462
          Top             =   6000
          Width           =   5295
@@ -4668,7 +4688,7 @@ Begin VB.Form frmEditAnalysisSettings
       End
       Begin TabDlg.SSTab tbsNETOptions 
          Height          =   3405
-         Left            =   4200
+         Left            =   -70800
          TabIndex        =   302
          Top             =   480
          Width           =   6645
@@ -4692,11 +4712,11 @@ Begin VB.Form frmEditAnalysisSettings
          TabCaption(2)   =   "MS Warp Options"
          TabPicture(2)   =   "frmEditAnalysisSettings.frx":6F02A
          Tab(2).ControlEnabled=   0   'False
-         Tab(2).Control(0)=   "cboMSWarpMassCalibrationType"
-         Tab(2).Control(1)=   "fraOptionFrame(35)"
+         Tab(2).Control(0)=   "lblDescription(160)"
+         Tab(2).Control(1)=   "lblDescription(155)"
          Tab(2).Control(2)=   "fraOptionFrame(34)"
-         Tab(2).Control(3)=   "lblDescription(155)"
-         Tab(2).Control(4)=   "lblDescription(160)"
+         Tab(2).Control(3)=   "fraOptionFrame(35)"
+         Tab(2).Control(4)=   "cboMSWarpMassCalibrationType"
          Tab(2).ControlCount=   5
          Begin VB.PictureBox pctOptionsInIniFile 
             Height          =   1125
@@ -4960,7 +4980,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.CheckBox chkSkipGANETSlopeAndInterceptComputation 
          Caption         =   "Skip NET Slope and Intercept Computation"
          Height          =   255
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   292
          Top             =   480
          Width           =   3735
@@ -4969,7 +4989,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Adjustment Mode"
          Height          =   240
          Index           =   156
-         Left            =   6600
+         Left            =   -68400
          TabIndex        =   328
          Top             =   3960
          Width           =   1695
@@ -5023,7 +5043,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Database Search Mode"
          Height          =   255
          Index           =   70
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   404
          Top             =   1020
          Width           =   1695
@@ -5032,7 +5052,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   $"frmEditAnalysisSettings.frx":86A8B
          ForeColor       =   &H00000080&
          Height          =   615
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   505
          Top             =   4560
          Width           =   3855
@@ -5333,8 +5353,9 @@ End Type
 Private Const SEARCH_N14 = 0
 Private Const SEARCH_N15 = 1
 
-Private Const MODS_FIXED = 0
+Private Const MODS_FIXED = 0            ' Aka Static
 Private Const MODS_DYNAMIC = 1
+Private Const MODS_DECOY = 2
 
 Private Const ASSUME_MT_NOT_LABELED = 0
 Private Const ASSUME_MT_LABELED = 1
@@ -7553,12 +7574,16 @@ On Error GoTo UpdateDynamicControlsErrorHandler
             txtDBSearchMinimumHighDiscriminantScore = Trim(.DBSearchMinimumHighDiscriminantScore)
             txtDBSearchMinimumPeptideProphetProbability = Trim(.DBSearchMinimumPeptideProphetProbability)
             
-            If .MassMods.DynamicMods Then
+            
+            If .MassMods.ModMode = 2 Then
+                optDBSearchModType(MODS_DECOY).Value = True
+            ElseIf .MassMods.ModMode = 1 Then
                 optDBSearchModType(MODS_DYNAMIC).Value = True
             Else
+                ' Assumed fixed
                 optDBSearchModType(MODS_FIXED).Value = True
             End If
-            
+                      
             If .MassMods.N15InsteadOfN14 Then
                 optDBSearchNType(SEARCH_N15).Value = True
             Else
@@ -8653,11 +8678,11 @@ Private Sub Form_Load()
     ShowHidePNNLMenus
 End Sub
 
-Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
 GetOLEData Data
 End Sub
 
-Private Sub fraOptionFrame_OLEDragDrop(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub fraOptionFrame_OLEDragDrop(Index As Integer, Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
     GetOLEData Data
 End Sub
 
@@ -8682,10 +8707,12 @@ End Sub
 Private Sub optDBSearchModType_Click(Index As Integer)
     If lstDBSearchModes.ListIndex >= 0 Then
         With mCurrentSettings.PrefsExpanded.AutoAnalysisOptions.AutoAnalysisSearchMode(lstDBSearchModes.ListIndex).MassMods
-            If Index = MODS_DYNAMIC Then
-                .DynamicMods = True
+            If Index = MODS_DECOY Then
+                .ModMode = 2
+            ElseIf Index = MODS_DYNAMIC Then
+                .ModMode = 1
             Else
-                .DynamicMods = False
+                .ModMode = 0
             End If
         End With
     End If
@@ -8782,7 +8809,7 @@ Private Sub optUMCSearchTolType_Click(Index As Integer)
     End If
 End Sub
 
-Private Sub tbsTabStrip_OLEDragDrop(Data As TabDlg.DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub tbsTabStrip_OLEDragDrop(Data As TabDlg.DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
     GetOLEData Data
 End Sub
 

@@ -377,6 +377,16 @@ On Error GoTo BinaryLoadDataErrorHandler
             blnSearchDefLoaded = True
         End If
     
+        If GelSearchDef(lngGelIndex).AMTSearchMassMods.ModMode > 2 Then
+            ' We loaded an old file that was saved with .DynamicMods instead of .ModMode
+            GelSearchDef(lngGelIndex).AMTSearchMassMods.ModMode = 1
+        End If
+        
+        If GelSearchDef(lngGelIndex).AMTSearchMassMods.UnusedByte <> 0 Then
+            ' Loaded an old file that was saved with .DynamicMods instead of .ModMode
+            GelSearchDef(lngGelIndex).AMTSearchMassMods.UnusedByte = 0
+        End If
+        
         If blnSearchDefLoaded Then
             ' Copy values from GelUMC(lngGelIndex).Def to UMCDef (part of Module12, UC.Bas)
             With GelSearchDef(lngGelIndex).UMCDef
@@ -2451,7 +2461,11 @@ Private Sub CopyGelSearchDef2003dToCurrent(OldDef As udtSearchDefinition2003dGro
         .AnalysisHistoryCount = OldDef.AnalysisHistoryCount
         .MassCalibrationInfo = OldDef.MassCalibrationInfo
         With .AMTSearchMassMods
-            .DynamicMods = OldDef.AMTSearchMassMods.DynamicMods
+            If OldDef.AMTSearchMassMods.DynamicMods Then
+                .ModMode = 1
+            Else
+                .ModMode = 0
+            End If
             .N15InsteadOfN14 = OldDef.AMTSearchMassMods.N15InsteadOfN14
             .PEO = OldDef.AMTSearchMassMods.PEO
             .ICATd0 = OldDef.AMTSearchMassMods.ICATd0

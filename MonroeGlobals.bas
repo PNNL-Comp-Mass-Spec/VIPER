@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "August 15, 2008"
+Public Const APP_BUILD_DATE As String = "September 3, 2008"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -579,7 +579,9 @@ End Type
 
 ' Note: udtSearchDefinitionGroupType depends on this, so do not change without considering the consequences
 Public Type udtDBSearchMassModificationOptionsType
-    DynamicMods As Boolean              ' When true, varying numbers of cysteine modifications are applied
+    ' OldParameter:DynamicMods          ' 2 bytes; When true, varying numbers of residue modifications are applied; if false, then a static mod
+    ModMode As Byte                     ' 1 byte; 0 = fixed (static mods); 1 = dynamic mods; 2 = decoy mods (like dynamic mods, but the NET value is varied for added AMTs)
+    UnusedByte As Byte                  ' 1 byte; was previously part of DynamicMods, a boolean
     N15InsteadOfN14 As Boolean
     PEO As Boolean
     ICATd0 As Boolean

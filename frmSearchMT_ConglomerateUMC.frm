@@ -5,17 +5,17 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
    ClientHeight    =   6915
    ClientLeft      =   60
    ClientTop       =   630
-   ClientWidth     =   7605
+   ClientWidth     =   7815
    LinkTopic       =   "Form1"
    ScaleHeight     =   6915
-   ScaleWidth      =   7605
+   ScaleWidth      =   7815
    StartUpPosition =   1  'CenterOwner
    Begin VB.CommandButton cmdSetDefaultsForToleranceRefinement 
       Cancel          =   -1  'True
       Caption         =   "Set to Tolerance Refinement Defaults"
       Height          =   495
       Left            =   5640
-      TabIndex        =   54
+      TabIndex        =   57
       Top             =   2280
       Width           =   1695
    End
@@ -32,7 +32,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Set to Defaults"
       Height          =   375
       Left            =   5640
-      TabIndex        =   52
+      TabIndex        =   55
       Top             =   1800
       Width           =   1695
    End
@@ -40,7 +40,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Height          =   285
       Left            =   60
       Locked          =   -1  'True
-      TabIndex        =   51
+      TabIndex        =   54
       Top             =   6525
       Width           =   7455
    End
@@ -57,7 +57,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Height          =   315
       Left            =   4200
       Style           =   2  'Dropdown List
-      TabIndex        =   50
+      TabIndex        =   53
       Top             =   1200
       Width           =   3255
    End
@@ -112,12 +112,22 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Left            =   0
       TabIndex        =   29
       Top             =   4560
-      Width           =   6735
+      Width           =   7575
+      Begin VB.TextBox txtDecoySearchNETWobble 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   5640
+         TabIndex        =   46
+         Text            =   "0.1"
+         Top             =   1080
+         Width           =   615
+      End
       Begin VB.ComboBox cboResidueToModify 
          Height          =   315
          Left            =   3120
          Style           =   2  'Dropdown List
          TabIndex        =   37
+         ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0000
          Top             =   480
          Width           =   1095
       End
@@ -136,17 +146,17 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Frame1"
          Height          =   855
          Index           =   47
-         Left            =   5760
-         TabIndex        =   44
+         Left            =   6600
+         TabIndex        =   47
          Top             =   360
-         Width           =   800
+         Width           =   795
          Begin VB.OptionButton optN 
             BackColor       =   &H00FFFFFF&
             Caption         =   "N14"
             Height          =   255
             Index           =   0
-            Left            =   0
-            TabIndex        =   46
+            Left            =   120
+            TabIndex        =   49
             Top             =   240
             Value           =   -1  'True
             Width           =   700
@@ -156,8 +166,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Caption         =   "N15"
             Height          =   255
             Index           =   1
-            Left            =   0
-            TabIndex        =   47
+            Left            =   120
+            TabIndex        =   50
             Top             =   525
             Width           =   700
          End
@@ -166,8 +176,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Caption         =   "N Type:"
             Height          =   255
             Index           =   103
-            Left            =   0
-            TabIndex        =   45
+            Left            =   120
+            TabIndex        =   48
             Top             =   0
             Width           =   600
          End
@@ -176,12 +186,23 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          BackColor       =   &H00FFFFFF&
          BorderStyle     =   0  'None
          Caption         =   "Frame1"
-         Height          =   855
+         Height          =   750
          Index           =   49
-         Left            =   4460
+         Left            =   4480
          TabIndex        =   40
-         Top             =   360
-         Width           =   1095
+         Top             =   240
+         Width           =   1920
+         Begin VB.OptionButton optDBSearchModType 
+            BackColor       =   &H00FFFFFF&
+            Caption         =   "Decoy"
+            Height          =   255
+            Index           =   2
+            Left            =   1080
+            TabIndex        =   44
+            ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":00D7
+            Top             =   360
+            Width           =   975
+         End
          Begin VB.OptionButton optDBSearchModType 
             BackColor       =   &H00FFFFFF&
             Caption         =   "Dynamic"
@@ -189,7 +210,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Index           =   1
             Left            =   120
             TabIndex        =   43
-            Top             =   525
+            ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0174
+            Top             =   480
             Value           =   -1  'True
             Width           =   975
          End
@@ -200,6 +222,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Index           =   0
             Left            =   120
             TabIndex        =   42
+            ToolTipText     =   "Changes the mass of all loaded AMTs, adding the value specified by the modification mass"
             Top             =   240
             Width           =   750
          End
@@ -260,6 +283,15 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Top             =   360
          Width           =   855
       End
+      Begin VB.Label lblDecoySearchNETWobble 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Decoy NET Wobble"
+         Height          =   375
+         Left            =   4560
+         TabIndex        =   45
+         Top             =   1080
+         Width           =   1095
+      End
       Begin VB.Label Label7 
          BackStyle       =   0  'Transparent
          Caption         =   "Residue to modify:"
@@ -287,8 +319,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       End
       Begin VB.Line Line1 
          Index           =   2
-         X1              =   5640
-         X2              =   5640
+         X1              =   6480
+         X2              =   6480
          Y1              =   240
          Y2              =   1440
       End
@@ -340,7 +372,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   375
          Left            =   2640
          TabIndex        =   21
-         ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0000
+         ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0206
          Top             =   180
          Width           =   1965
       End
@@ -416,7 +448,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   315
          Left            =   120
          Style           =   2  'Dropdown List
-         TabIndex        =   53
+         TabIndex        =   56
          Top             =   1080
          Width           =   1935
       End
@@ -523,7 +555,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Generic NET"
       Height          =   255
       Left            =   5280
-      TabIndex        =   49
+      TabIndex        =   52
       Top             =   6240
       Width           =   2175
    End
@@ -531,7 +563,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       BackStyle       =   0  'Transparent
       Height          =   255
       Left            =   120
-      TabIndex        =   48
+      TabIndex        =   51
       Top             =   6240
       Width           =   4935
    End
@@ -688,6 +720,7 @@ Const SEARCH_N15 = 1
 
 Const MODS_FIXED = 0
 Const MODS_DYNAMIC = 1
+Const MODS_DECOY = 2
 
 Const SEARCH_ALL = 0
 Const SEARCH_PAIRED = 1
@@ -701,6 +734,8 @@ Const MNG_TRIM = -2
 Const MNG_ADD_START_SIZE = -3
 
 Const MNG_START_SIZE = 500
+
+Const NET_WOBBLE_SEED = 1000
 
 'in this case CallerID is a public property
 Public CallerID As Long
@@ -913,74 +948,6 @@ Private Sub DisplayCurrentSearchTolerances()
     End With
 End Sub
 
-Private Sub GenerateUniqueMatchStats(ByRef lngUniqueUMCCount As Long, ByRef lngUniquePMTTagCount As Long, ByRef lngUniqueInternalStdCount As Long)
-    ' Determine the number of LC-MS Features with at least one match,
-    ' the unique number of MT tags matched, and the unique number of Internal Standards matched
-    
-    Dim blnUMCHasMatch() As Boolean
-    Dim blnPMTTagMatched() As Boolean
-    Dim blnInternalStdMatched() As Boolean
-    
-    Dim lngIndex As Long
-    Dim lngUMCIndexOriginal As Long
-    Dim lngInternalStdIndexOriginal As Long
-    Dim lngMassTagIndexPointer As Long
-    Dim lngMassTagIndexOriginal As Long
-    
-    ReDim blnUMCHasMatch(GelUMC(CallerID).UMCCnt - 1) As Boolean
-    ReDim blnPMTTagMatched(AMTCnt) As Boolean
-    If UMCInternalStandards.Count > 0 Then
-        ReDim blnInternalStdMatched(UMCInternalStandards.Count - 1) As Boolean
-    End If
-    
-    For lngIndex = 0 To mMatchStatsCount - 1
-        lngUMCIndexOriginal = mUMCMatchStats(lngIndex).UMCIndex
-        If lngUMCIndexOriginal < GelUMC(CallerID).UMCCnt Then
-            blnUMCHasMatch(lngUMCIndexOriginal) = True
-        Else
-            ' Invalid UMC index
-            Debug.Assert False
-        End If
-        
-        If mUMCMatchStats(lngIndex).IDIsInternalStd Then
-            lngInternalStdIndexOriginal = mInternalStdIndexPointers(mUMCMatchStats(lngIndex).IDIndex)
-            If lngInternalStdIndexOriginal < UMCInternalStandards.Count Then
-                blnInternalStdMatched(lngInternalStdIndexOriginal) = True
-            Else
-                ' Invalid Internal Standard index
-                Debug.Assert False
-            End If
-        Else
-            lngMassTagIndexPointer = mMTInd(mUMCMatchStats(lngIndex).IDIndex)
-            lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
-            If lngMassTagIndexOriginal <= AMTCnt Then
-                blnPMTTagMatched(lngMassTagIndexOriginal) = True
-            Else
-                ' Invalid MT tag index
-                Debug.Assert False
-            End If
-        End If
-    Next lngIndex
-    
-    lngUniqueUMCCount = 0
-    For lngIndex = 0 To UBound(blnUMCHasMatch)
-        If blnUMCHasMatch(lngIndex) Then lngUniqueUMCCount = lngUniqueUMCCount + 1
-    Next lngIndex
-    
-    lngUniquePMTTagCount = 0
-    For lngIndex = 0 To UBound(blnPMTTagMatched)
-        If blnPMTTagMatched(lngIndex) Then lngUniquePMTTagCount = lngUniquePMTTagCount + 1
-    Next lngIndex
-    
-    lngUniqueInternalStdCount = 0
-    If UMCInternalStandards.Count > 0 Then
-        For lngIndex = 0 To UBound(blnInternalStdMatched)
-            If blnInternalStdMatched(lngIndex) Then lngUniqueInternalStdCount = lngUniqueInternalStdCount + 1
-        Next lngIndex
-    End If
-    
-End Sub
-
 Private Function DisplayHitSummary(strSearchScope As String) As String
 
     Dim strMessage As String
@@ -1058,6 +1025,14 @@ VarVals(2) = MinFN
 VarVals(3) = MaxFN
 Elution = MyExprEva.ExprVal(VarVals())
 End Function
+
+Private Sub EnableDisableControls()
+    If optDBSearchModType(2).Value = True Then
+        txtDecoySearchNETWobble.Enabled = True
+    Else
+        txtDecoySearchNETWobble.Enabled = False
+    End If
+End Sub
 
 Private Sub EnableDisableNETFormulaControls()
     Dim i As Integer
@@ -1830,6 +1805,85 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
 
 End Function
 
+Private Sub GenerateUniqueMatchStats(ByRef lngUniqueUMCCount As Long, ByRef lngUniquePMTTagCount As Long, ByRef lngUniqueInternalStdCount As Long)
+    ' Determine the number of LC-MS Features with at least one match,
+    ' the unique number of MT tags matched, and the unique number of Internal Standards matched
+    
+    Dim blnUMCHasMatch() As Boolean
+    Dim blnPMTTagMatched() As Boolean
+    Dim blnInternalStdMatched() As Boolean
+    
+    Dim lngIndex As Long
+    Dim lngUMCIndexOriginal As Long
+    Dim lngInternalStdIndexOriginal As Long
+    Dim lngMassTagIndexPointer As Long
+    Dim lngMassTagIndexOriginal As Long
+    
+    ReDim blnUMCHasMatch(GelUMC(CallerID).UMCCnt - 1) As Boolean
+    ReDim blnPMTTagMatched(AMTCnt) As Boolean
+    If UMCInternalStandards.Count > 0 Then
+        ReDim blnInternalStdMatched(UMCInternalStandards.Count - 1) As Boolean
+    End If
+    
+    For lngIndex = 0 To mMatchStatsCount - 1
+        lngUMCIndexOriginal = mUMCMatchStats(lngIndex).UMCIndex
+        If lngUMCIndexOriginal < GelUMC(CallerID).UMCCnt Then
+            blnUMCHasMatch(lngUMCIndexOriginal) = True
+        Else
+            ' Invalid UMC index
+            Debug.Assert False
+        End If
+        
+        If mUMCMatchStats(lngIndex).IDIsInternalStd Then
+            lngInternalStdIndexOriginal = mInternalStdIndexPointers(mUMCMatchStats(lngIndex).IDIndex)
+            If lngInternalStdIndexOriginal < UMCInternalStandards.Count Then
+                blnInternalStdMatched(lngInternalStdIndexOriginal) = True
+            Else
+                ' Invalid Internal Standard index
+                Debug.Assert False
+            End If
+        Else
+            lngMassTagIndexPointer = mMTInd(mUMCMatchStats(lngIndex).IDIndex)
+            lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
+            If lngMassTagIndexOriginal <= AMTCnt Then
+                blnPMTTagMatched(lngMassTagIndexOriginal) = True
+            Else
+                ' Invalid MT tag index
+                Debug.Assert False
+            End If
+        End If
+    Next lngIndex
+    
+    lngUniqueUMCCount = 0
+    For lngIndex = 0 To UBound(blnUMCHasMatch)
+        If blnUMCHasMatch(lngIndex) Then lngUniqueUMCCount = lngUniqueUMCCount + 1
+    Next lngIndex
+    
+    lngUniquePMTTagCount = 0
+    For lngIndex = 0 To UBound(blnPMTTagMatched)
+        If blnPMTTagMatched(lngIndex) Then lngUniquePMTTagCount = lngUniquePMTTagCount + 1
+    Next lngIndex
+    
+    lngUniqueInternalStdCount = 0
+    If UMCInternalStandards.Count > 0 Then
+        For lngIndex = 0 To UBound(blnInternalStdMatched)
+            If blnInternalStdMatched(lngIndex) Then lngUniqueInternalStdCount = lngUniqueInternalStdCount + 1
+        Next lngIndex
+    End If
+    
+End Sub
+
+Private Function GetDBSearchModeType() As Byte
+    If optDBSearchModType(MODS_DECOY).Value Then
+        GetDBSearchModeType = 2
+    ElseIf optDBSearchModType(MODS_DYNAMIC).Value Then
+        GetDBSearchModeType = 1
+    Else
+        ' Assume mode MODS_FIXED mods
+        GetDBSearchModeType = 0
+    End If
+End Function
+
 Private Function GetTokenValue(ByVal S As String, ByVal t As String) As Long
 '---------------------------------------------------------------------------
 'returns value next to token T in string of type Token1/Value1 Token2/Value2
@@ -1858,6 +1912,20 @@ Exit Function
 
 exit_GetTokenValue:
 Debug.Assert False
+
+End Function
+
+Private Function GetWobbledNET(ByVal dblNET As Double, ByVal dblNETWobbleDistance As Double) As Double
+    Static PosWobble As Long
+    Static NegWobble As Long
+
+    If Rnd() < 0.5 Then
+        GetWobbledNET = dblNET - dblNETWobbleDistance
+        NegWobble = NegWobble + 1
+    Else
+        GetWobbledNET = dblNET + dblNETWobbleDistance
+        PosWobble = PosWobble + 1
+    End If
 
 End Function
 
@@ -2136,6 +2204,475 @@ Call txtAlkylationMWCorrection_LostFocus
 Call txtNETFormula_LostFocus
 End Sub
 
+Private Sub PopulateComboBoxes()
+    Dim intIndex As Integer
+    
+On Error GoTo PopulateComboBoxesErrorHandler
+
+    With cboResidueToModify
+        .Clear
+        .AddItem "Full MT"
+        For intIndex = 0 To 25
+            .AddItem Chr(vbKeyA + intIndex)
+        Next intIndex
+        .AddItem glPHOSPHORYLATION
+        .ListIndex = 0
+    End With
+    
+    With cboInternalStdSearchMode
+        .Clear
+        .AddItem "Search only MT tags", issmFindOnlyMassTags
+        .AddItem "Search MT tags & Int Stds", issmFindWithMassTags
+        .AddItem "Search only Internal Stds", issmFindOnlyInternalStandards
+        
+        If APP_BUILD_DISABLE_MTS Then
+            .ListIndex = issmFindOnlyMassTags
+        Else
+            .ListIndex = issmFindWithMassTags
+        End If
+    End With
+    
+    With cboAMTSearchResultsBehavior
+        .Clear
+        .AddItem "Auto remove existing results prior to search", asrbAMTSearchResultsBehaviorConstants.asrbAutoRemoveExisting
+        .AddItem "Keep existing results; do not skip LC-MS Features", asrbAMTSearchResultsBehaviorConstants.asrbKeepExisting
+        .AddItem "Keep existing results; skip LC-MS Features with results", asrbAMTSearchResultsBehaviorConstants.asrbKeepExistingAndSkip
+        .ListIndex = asrbAutoRemoveExisting
+    End With
+    
+    With cboSearchRegionShape
+        .Clear
+        .AddItem "Elliptical search region"
+        .AddItem "Rectangular search region"
+        .ListIndex = srsSearchRegionShapeConstants.srsElliptical
+    End With
+    
+    Exit Sub
+    
+PopulateComboBoxesErrorHandler:
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->PopulateComboBoxes"
+End Sub
+
+Private Function PrepareMTArrays() As Boolean
+    '---------------------------------------------------------------
+    'prepares masses from loaded MT tags based on specified
+    'modifications; returns True if succesful, False on any error
+    '---------------------------------------------------------------
+    Dim i As Long, j As Long
+    Dim TmpCnt As Long
+    Dim CysCnt As Long                 'Cysteine count in peptide
+    Dim CysLeft As Long                'Cysteine left for modification use
+    Dim CysUsedPEO As Long             'Cysteine already used in calculation for PEO
+    Dim CysUsedICAT_D0 As Long         'Cysteine already used in calculation for ICAT_D0
+    Dim CysUsedICAT_D8 As Long         'Cysteine already used in calculation for ICAT_D8
+    
+    Dim strResiduesToModify As String   ' One or more residues to modify (single letter amino acid symbols)
+    Dim dblResidueModMass As Double
+    Dim ResidueOccurrenceCount As Integer
+    Dim strResModToken As String
+    Dim blnAddMassTag As Boolean
+    
+    Dim dblNETWobbleDistance As Double
+    
+    On Error GoTo err_PrepareMTArrays
+    
+    ' Update GelSearchDef(CallerID).AMTSearchMassMods with the current settings
+    With GelSearchDef(CallerID).AMTSearchMassMods
+        .PEO = cChkBox(chkPEO)
+        .ICATd0 = cChkBox(chkICATLt)
+        .ICATd8 = cChkBox(chkICATHv)
+        .Alkylation = cChkBox(chkAlkylation)
+        .AlkylationMass = CDblSafe(txtAlkylationMWCorrection)
+        If cboResidueToModify.ListIndex > 0 Then
+            .ResidueToModify = cboResidueToModify
+        Else
+            .ResidueToModify = ""
+        End If
+        
+        .ResidueMassModification = CDblSafe(txtResidueToModifyMass)
+        txtResidueToModifyMass = Round(.ResidueMassModification, 5)
+        
+        strResiduesToModify = .ResidueToModify
+        dblResidueModMass = .ResidueMassModification
+        
+        .N15InsteadOfN14 = optN(SEARCH_N15).Value
+        
+        ' Superseded by .ModMode in August 2008
+        '.DynamicMods = optDBSearchModType(MODS_DYNAMIC).Value
+        
+        .ModMode = GetDBSearchModeType()
+    End With
+    
+    If IsNumeric(txtDBSearchMinimumHighNormalizedScore.Text) Then
+        mMTMinimumHighNormalizedScore = CSngSafe(txtDBSearchMinimumHighNormalizedScore.Text)
+    Else
+        mMTMinimumHighNormalizedScore = 0
+    End If
+        
+    If IsNumeric(txtDBSearchMinimumHighDiscriminantScore.Text) Then
+        mMTMinimumHighDiscriminantScore = CSngSafe(txtDBSearchMinimumHighDiscriminantScore.Text)
+    Else
+        mMTMinimumHighDiscriminantScore = 0
+    End If
+    
+    If IsNumeric(txtDBSearchMinimumPeptideProphetProbability.Text) Then
+        mMTMinimumPeptideProphetProbability = CSngSafe(txtDBSearchMinimumPeptideProphetProbability.Text)
+    Else
+        mMTMinimumPeptideProphetProbability = 0
+    End If
+    
+    If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
+        If mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
+            ' Make sure at least two of the loaded MT tags have score values >= mMTMinimumHighDiscriminantScore, also taking into account HighNormalizedScore
+            ValidateMTMinimumDiscriminantAndPepProphet AMTData(), 1, AMTCnt, mMTMinimumHighDiscriminantScore, mMTMinimumPeptideProphetProbability, mMTMinimumHighNormalizedScore, 2
+        Else
+            ' Make sure at least two of the loaded MT tags have score values >= mMTMinimumHighNormalizedScore
+            ValidateMTMinimimumHighNormalizedScore AMTData(), 1, AMTCnt, mMTMinimumHighNormalizedScore, 2
+        End If
+    End If
+    
+    ' Record the current state of .CustomNETsDefined
+    ' If chkDisableCustomNETs is checked, then this will have temporarily been set to False
+    mSearchUsedCustomNETs = GelData(CallerID).CustomNETsDefined
+    
+    If Not IsNumeric(txtDecoySearchNETWobble.Text) Then
+        txtDecoySearchNETWobble.Text = 0.1
+    End If
+    dblNETWobbleDistance = CSngSafe(txtDecoySearchNETWobble.Text)
+    
+    If AMTCnt <= 0 Then
+        mMTCnt = 0
+    Else
+       UpdateStatus "Preparing arrays for search..."
+       
+       If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+           Randomize NET_WOBBLE_SEED
+       End If
+             
+       'initially reserve space for AMTCnt peptides
+       ReDim mMTInd(AMTCnt - 1)
+       ReDim mMTOrInd(AMTCnt - 1)
+       ReDim mMTMWN14(AMTCnt - 1)
+       ReDim mMTMWN15(AMTCnt - 1)
+       ReDim mMTNET(AMTCnt - 1)
+       ReDim mMTMods(AMTCnt - 1)
+       mMTCnt = 0
+       For i = 1 To AMTCnt
+            If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
+                If AMTData(i).HighNormalizedScore >= mMTMinimumHighNormalizedScore And _
+                   AMTData(i).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore And _
+                   AMTData(i).PeptideProphetProbability >= mMTMinimumPeptideProphetProbability Then
+                    blnAddMassTag = True
+                Else
+                    blnAddMassTag = False
+                End If
+            Else
+                blnAddMassTag = True
+            End If
+            
+            If blnAddMassTag Then
+                mMTCnt = mMTCnt + 1
+                mMTInd(mMTCnt - 1) = mMTCnt - 1
+                mMTOrInd(mMTCnt - 1) = i             'index; not the ID
+                mMTMWN14(mMTCnt - 1) = AMTData(i).MW
+                mMTMWN15(mMTCnt - 1) = AMTData(i).MW + glN14N15_DELTA * AMTData(i).CNT_N       ' N15 is always fixed
+                Select Case samtDef.NETorRT
+                Case glAMT_NET
+                     mMTNET(mMTCnt - 1) = AMTData(i).NET
+                Case glAMT_RT_or_PNET
+                     mMTNET(mMTCnt - 1) = AMTData(i).PNET
+                End Select
+                mMTMods(mMTCnt - 1) = ""
+            End If
+       Next i
+       
+       If chkPEO.Value = vbChecked Then         'correct based on cys number for PEO label
+          UpdateStatus "Adding PEO labeled peptides..."
+          TmpCnt = mMTCnt
+          For i = 0 To TmpCnt - 1
+              CysCnt = AMTData(mMTOrInd(i)).CNT_Cys
+              If CysCnt > 0 Then
+                 If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 1 Or _
+                    GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                    
+                    ' Dynamic Mods
+                    For j = 1 To CysCnt
+                        mMTCnt = mMTCnt + 1
+                        mMTInd(mMTCnt - 1) = mMTCnt - 1
+                        mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
+                        mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * glPEO
+                        mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                        If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                            mMTNET(mMTCnt - 1) = GetWobbledNET(mMTNET(i), dblNETWobbleDistance)
+                        Else
+                            mMTNET(mMTCnt - 1) = mMTNET(i)
+                        End If
+                        
+                        mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_PEO & "/" & j
+                    Next j
+                 Else
+                    ' Static Mods
+                    ' Simply update the stats for this MT tag
+                    mMTMWN14(i) = mMTMWN14(i) + CysCnt * glPEO
+                    mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                    mMTMods(i) = mMTMods(i) & " " & MOD_TKN_PEO & "/" & CysCnt
+                 End If
+              End If
+          Next i
+       End If
+       
+       'yeah, yeah I know that same cysteine can not be labeled with PEO and ICAT at the same
+       'time but who cares anyway I can fix this here easily
+       If chkICATLt.Value = vbChecked Then         'correct based on cys number for ICAT label
+          UpdateStatus "Adding D0 ICAT labeled peptides..."
+          TmpCnt = mMTCnt
+          For i = 0 To TmpCnt - 1
+              CysCnt = AMTData(mMTOrInd(i)).CNT_Cys
+              CysUsedPEO = GetTokenValue(mMTMods(i), MOD_TKN_PEO)
+              If CysUsedPEO < 0 Then CysUsedPEO = 0
+              CysLeft = CysCnt - CysUsedPEO
+              If CysLeft > 0 Then
+                 If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 1 Or _
+                    GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                    
+                    ' Dynamic Mods
+                    For j = 1 To CysLeft
+                        mMTCnt = mMTCnt + 1
+                        mMTInd(mMTCnt - 1) = mMTCnt - 1
+                        mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
+                        mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * glICAT_Light
+                        mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                        
+                        If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                            mMTNET(mMTCnt - 1) = GetWobbledNET(mMTNET(i), dblNETWobbleDistance)
+                        Else
+                            mMTNET(mMTCnt - 1) = mMTNET(i)
+                        End If
+                        
+                        mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_ICAT_D0 & "/" & j
+                    Next j
+                 Else
+                    ' Static Mods
+                    ' Simply update the stats for this MT tag
+                    ' However, if use also has ICAT_d0 enabled, we need to duplicate this
+                    '  MT tag first
+                    If chkICATHv.Value = vbChecked Then
+                        mMTCnt = mMTCnt + 1
+                        mMTInd(mMTCnt - 1) = mMTCnt - 1
+                        mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
+                        mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + CysLeft * glICAT_Heavy
+                        mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                        mMTNET(mMTCnt - 1) = mMTNET(i)
+                        mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_ICAT_D8 & "/" & CysLeft
+                    End If
+                    
+                    ' Now update this MT tag to have ICAT_d0 on all the cysteines
+                    mMTMWN14(i) = mMTMWN14(i) + CysLeft * glICAT_Light
+                    mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                    mMTMods(i) = mMTMods(i) & " " & MOD_TKN_ICAT_D0 & "/" & CysLeft
+                 End If
+              End If
+          Next i
+       End If
+       
+       If chkICATHv.Value = vbChecked Then         'correct based on cys number for ICAT label
+          UpdateStatus "Adding D8 ICAT labeled peptides..."
+          TmpCnt = mMTCnt
+          For i = 0 To TmpCnt - 1
+              CysCnt = AMTData(mMTOrInd(i)).CNT_Cys
+              CysUsedPEO = GetTokenValue(mMTMods(i), MOD_TKN_PEO)
+              If CysUsedPEO < 0 Then CysUsedPEO = 0
+              CysUsedICAT_D0 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D0)
+              If CysUsedICAT_D0 < 0 Then CysUsedICAT_D0 = 0
+              CysUsedICAT_D8 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D8)
+              If CysUsedICAT_D8 < 0 Then CysUsedICAT_D8 = 0
+              CysLeft = CysCnt - CysUsedPEO - CysUsedICAT_D0 - CysUsedICAT_D8
+              If CysLeft > 0 Then
+                 If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 1 Or _
+                    GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                    
+                    ' Dynamic Mods
+                    For j = 1 To CysLeft
+                        mMTCnt = mMTCnt + 1
+                        mMTInd(mMTCnt - 1) = mMTCnt - 1
+                        mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
+                        mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * glICAT_Heavy
+                        mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                        
+                        If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                            mMTNET(mMTCnt - 1) = GetWobbledNET(mMTNET(i), dblNETWobbleDistance)
+                        Else
+                            mMTNET(mMTCnt - 1) = mMTNET(i)
+                        End If
+                        
+                        mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_ICAT_D8 & "/" & j
+                    Next j
+                 Else
+                    If chkICATLt.Value = vbChecked Then
+                        ' We shouldn't have reached this code since all of the cysteines should
+                        '  have been assigned ICAT_d0 or ICAT_d8
+                        Debug.Assert False
+                    Else
+                        ' Static Mods
+                        ' Simply update the stats for this MT tag
+                        mMTMWN14(i) = mMTMWN14(i) + CysLeft * glICAT_Heavy
+                        mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                        mMTMods(i) = mMTMods(i) & " " & MOD_TKN_ICAT_D8 & "/" & CysLeft
+                    End If
+                 End If
+              End If
+          Next i
+       End If
+       
+       If chkAlkylation.Value = vbChecked Then         'correct based on cys number for alkylation label
+          UpdateStatus "Adding alkylated peptides..."
+          TmpCnt = mMTCnt
+          For i = 0 To TmpCnt - 1
+              CysCnt = AMTData(mMTOrInd(i)).CNT_Cys
+              CysUsedPEO = GetTokenValue(mMTMods(i), MOD_TKN_PEO)
+              If CysUsedPEO < 0 Then CysUsedPEO = 0
+              CysUsedICAT_D0 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D0)
+              If CysUsedICAT_D0 < 0 Then CysUsedICAT_D0 = 0
+              CysUsedICAT_D8 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D8)
+              If CysUsedICAT_D8 < 0 Then CysUsedICAT_D8 = 0
+              CysLeft = CysCnt - CysUsedPEO - CysUsedICAT_D0 - CysUsedICAT_D8
+              If CysLeft > 0 Then
+                 If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 1 Or _
+                    GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                    
+                    ' Dynamic Mods
+                    For j = 1 To CysLeft
+                        mMTCnt = mMTCnt + 1
+                        mMTInd(mMTCnt - 1) = mMTCnt - 1
+                        mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
+                        mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * AlkMWCorrection
+                        mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                        
+                        If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                            mMTNET(mMTCnt - 1) = GetWobbledNET(mMTNET(i), dblNETWobbleDistance)
+                        Else
+                            mMTNET(mMTCnt - 1) = mMTNET(i)
+                        End If
+                        
+                        mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_ALK & "/" & j
+                    Next j
+                 Else
+                    ' Static Mods
+                    ' Simply update the stats for this MT tag
+                    mMTMWN14(i) = mMTMWN14(i) + CysLeft * AlkMWCorrection
+                    mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                    mMTMods(i) = mMTMods(i) & " " & MOD_TKN_ALK & "/" & CysLeft
+                 End If
+              End If
+          Next i
+       End If
+       
+       If dblResidueModMass <> 0 Or GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+          UpdateStatus "Adding modified residue mass peptides..."
+          TmpCnt = mMTCnt
+          For i = 0 To TmpCnt - 1
+                
+            If Len(strResiduesToModify) > 0 Then
+              ResidueOccurrenceCount = LookupResidueOccurrence(mMTOrInd(i), strResiduesToModify)
+              
+              If InStr(strResiduesToModify, "C") > 0 Then
+                CysUsedPEO = GetTokenValue(mMTMods(i), MOD_TKN_PEO)
+                If CysUsedPEO < 0 Then CysUsedPEO = 0
+                CysUsedICAT_D0 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D0)
+                If CysUsedICAT_D0 < 0 Then CysUsedICAT_D0 = 0
+                CysUsedICAT_D8 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D8)
+                If CysUsedICAT_D8 < 0 Then CysUsedICAT_D8 = 0
+                ResidueOccurrenceCount = ResidueOccurrenceCount - CysUsedPEO - CysUsedICAT_D0 - CysUsedICAT_D8
+              End If
+              strResModToken = MOD_TKN_RES_MOD
+            Else
+              ' Add dblResidueModMass once to the entire MT tag
+              ' Accomplish this by setting ResidueOccurrenceCount to 1
+              ResidueOccurrenceCount = 1
+              strResModToken = MOD_TKN_MT_MOD
+            End If
+            
+            If ResidueOccurrenceCount > 0 Then
+               If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 1 Or _
+                  GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                    
+                  ' Dynamic Mods
+                  For j = 1 To ResidueOccurrenceCount
+                      mMTCnt = mMTCnt + 1
+                      mMTInd(mMTCnt - 1) = mMTCnt - 1
+                      mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
+                      mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * dblResidueModMass
+                      mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                      
+                      If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+                          mMTNET(mMTCnt - 1) = GetWobbledNET(mMTNET(i), dblNETWobbleDistance)
+                      Else
+                          mMTNET(mMTCnt - 1) = mMTNET(i)
+                      End If
+                        
+                      mMTMods(mMTCnt - 1) = mMTMods(i) & " " & strResModToken & "/" & strResiduesToModify & j
+                  Next j
+               Else
+                  ' Static Mods
+                  ' Simply update the stats for this MT tag
+                  mMTMWN14(i) = mMTMWN14(i) + ResidueOccurrenceCount * dblResidueModMass
+                  mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
+                  mMTMods(i) = mMTMods(i) & " " & strResModToken & "/" & strResiduesToModify & ResidueOccurrenceCount
+               End If
+            End If
+          Next i
+       End If
+       
+       If mMTCnt > 0 Then
+          UpdateStatus "Preparing fast search structures..."
+          ReDim Preserve mMTInd(mMTCnt - 1)
+          ReDim Preserve mMTOrInd(mMTCnt - 1)
+          ReDim Preserve mMTMWN14(mMTCnt - 1)
+          ReDim Preserve mMTMWN15(mMTCnt - 1)
+          ReDim Preserve mMTNET(mMTCnt - 1)
+          ReDim Preserve mMTMods(mMTCnt - 1)
+          Select Case N14N15
+          Case SEARCH_N14
+               If Not PrepareSearchN14() Then
+                  Debug.Assert False
+                  Call DestroySearchStructures
+                  Exit Function
+               End If
+          Case SEARCH_N15
+               If Not PrepareSearchN15() Then
+                  Debug.Assert False
+                  Call DestroySearchStructures
+                  Exit Function
+               End If
+          End Select
+       End If
+    End If
+    
+    If Not PrepareSearchInternalStandards() Then
+         Debug.Assert False
+         Call DestroySearchStructures
+         Exit Function
+    End If
+    
+    PrepareMTArrays = True
+    Exit Function
+    
+err_PrepareMTArrays:
+    Select Case Err.Number
+    Case 9                      'add space in chunks of 10000
+       ReDim Preserve mMTInd(mMTCnt + 10000)
+       ReDim Preserve mMTOrInd(mMTCnt + 10000)
+       ReDim Preserve mMTMWN14(mMTCnt + 10000)
+       ReDim Preserve mMTMWN15(mMTCnt + 10000)
+       ReDim Preserve mMTNET(mMTCnt + 10000)
+       ReDim Preserve mMTMods(mMTCnt + 10000)
+       Resume
+    Case Else
+       Debug.Assert False
+       Call DestroySearchStructures
+    End Select
+End Function
+
 Private Function PrepareSearchInternalStandards() As Boolean
 Dim intIndex As Integer
 Dim dblInternalStdMasses() As Double
@@ -2208,418 +2745,6 @@ If mMTCnt > 0 Then
       If MWFastSearch.Fill(mMTMWN15()) Then PrepareSearchN15 = True
    End If
 End If
-End Function
-
-Private Sub PopulateComboBoxes()
-    Dim intIndex As Integer
-    
-On Error GoTo PopulateComboBoxesErrorHandler
-
-    With cboResidueToModify
-        .Clear
-        .AddItem "Full MT"
-        For intIndex = 0 To 25
-            .AddItem Chr(vbKeyA + intIndex)
-        Next intIndex
-        .AddItem glPHOSPHORYLATION
-        .ListIndex = 0
-    End With
-    
-    With cboInternalStdSearchMode
-        .Clear
-        .AddItem "Search only MT tags", issmFindOnlyMassTags
-        .AddItem "Search MT tags & Int Stds", issmFindWithMassTags
-        .AddItem "Search only Internal Stds", issmFindOnlyInternalStandards
-        
-        If APP_BUILD_DISABLE_MTS Then
-            .ListIndex = issmFindOnlyMassTags
-        Else
-            .ListIndex = issmFindWithMassTags
-        End If
-    End With
-    
-    With cboAMTSearchResultsBehavior
-        .Clear
-        .AddItem "Auto remove existing results prior to search", asrbAMTSearchResultsBehaviorConstants.asrbAutoRemoveExisting
-        .AddItem "Keep existing results; do not skip LC-MS Features", asrbAMTSearchResultsBehaviorConstants.asrbKeepExisting
-        .AddItem "Keep existing results; skip LC-MS Features with results", asrbAMTSearchResultsBehaviorConstants.asrbKeepExistingAndSkip
-        .ListIndex = asrbAutoRemoveExisting
-    End With
-    
-    With cboSearchRegionShape
-        .Clear
-        .AddItem "Elliptical search region"
-        .AddItem "Rectangular search region"
-        .ListIndex = srsSearchRegionShapeConstants.srsElliptical
-    End With
-    
-    Exit Sub
-    
-PopulateComboBoxesErrorHandler:
-    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->PopulateComboBoxes"
-End Sub
-
-Private Function PrepareMTArrays() As Boolean
-'---------------------------------------------------------------
-'prepares masses from loaded MT tags based on specified
-'modifications; returns True if succesful, False on any error
-'---------------------------------------------------------------
-Dim i As Long, j As Long
-Dim TmpCnt As Long
-Dim CysCnt As Long                 'Cysteine count in peptide
-Dim CysLeft As Long                'Cysteine left for modification use
-Dim CysUsedPEO As Long             'Cysteine already used in calculation for PEO
-Dim CysUsedICAT_D0 As Long         'Cysteine already used in calculation for ICAT_D0
-Dim CysUsedICAT_D8 As Long         'Cysteine already used in calculation for ICAT_D8
-
-Dim strResiduesToModify As String   ' One or more residues to modify (single letter amino acid symbols)
-Dim dblResidueModMass As Double
-Dim ResidueOccurrenceCount As Integer
-Dim strResModToken As String
-Dim blnAddMassTag As Boolean
-
-On Error GoTo err_PrepareMTArrays
-
-' Update GelSearchDef(CallerID).AMTSearchMassMods with the current settings
-With GelSearchDef(CallerID).AMTSearchMassMods
-    .PEO = cChkBox(chkPEO)
-    .ICATd0 = cChkBox(chkICATLt)
-    .ICATd8 = cChkBox(chkICATHv)
-    .Alkylation = cChkBox(chkAlkylation)
-    .AlkylationMass = CDblSafe(txtAlkylationMWCorrection)
-    If cboResidueToModify.ListIndex > 0 Then
-        .ResidueToModify = cboResidueToModify
-    Else
-        .ResidueToModify = ""
-    End If
-    
-    .ResidueMassModification = CDblSafe(txtResidueToModifyMass)
-    txtResidueToModifyMass = Round(.ResidueMassModification, 5)
-    
-    strResiduesToModify = .ResidueToModify
-    dblResidueModMass = .ResidueMassModification
-    
-    .N15InsteadOfN14 = optN(SEARCH_N15).Value
-    .DynamicMods = optDBSearchModType(MODS_DYNAMIC).Value
-End With
-
-If IsNumeric(txtDBSearchMinimumHighNormalizedScore.Text) Then
-    mMTMinimumHighNormalizedScore = CSngSafe(txtDBSearchMinimumHighNormalizedScore.Text)
-Else
-    mMTMinimumHighNormalizedScore = 0
-End If
-    
-If IsNumeric(txtDBSearchMinimumHighDiscriminantScore.Text) Then
-    mMTMinimumHighDiscriminantScore = CSngSafe(txtDBSearchMinimumHighDiscriminantScore.Text)
-Else
-    mMTMinimumHighDiscriminantScore = 0
-End If
-
-If IsNumeric(txtDBSearchMinimumPeptideProphetProbability.Text) Then
-    mMTMinimumPeptideProphetProbability = CSngSafe(txtDBSearchMinimumPeptideProphetProbability.Text)
-Else
-    mMTMinimumPeptideProphetProbability = 0
-End If
-
-If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
-    If mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
-        ' Make sure at least two of the loaded MT tags have score values >= mMTMinimumHighDiscriminantScore, also taking into account HighNormalizedScore
-        ValidateMTMinimumDiscriminantAndPepProphet AMTData(), 1, AMTCnt, mMTMinimumHighDiscriminantScore, mMTMinimumPeptideProphetProbability, mMTMinimumHighNormalizedScore, 2
-    Else
-        ' Make sure at least two of the loaded MT tags have score values >= mMTMinimumHighNormalizedScore
-        ValidateMTMinimimumHighNormalizedScore AMTData(), 1, AMTCnt, mMTMinimumHighNormalizedScore, 2
-    End If
-End If
-
-' Record the current state of .CustomNETsDefined
-' If chkDisableCustomNETs is checked, then this will have temporarily been set to False
-mSearchUsedCustomNETs = GelData(CallerID).CustomNETsDefined
-
-If AMTCnt <= 0 Then
-    mMTCnt = 0
-Else
-   UpdateStatus "Preparing arrays for search..."
-   'initially reserve space for AMTCnt peptides
-   ReDim mMTInd(AMTCnt - 1)
-   ReDim mMTOrInd(AMTCnt - 1)
-   ReDim mMTMWN14(AMTCnt - 1)
-   ReDim mMTMWN15(AMTCnt - 1)
-   ReDim mMTNET(AMTCnt - 1)
-   ReDim mMTMods(AMTCnt - 1)
-   mMTCnt = 0
-   For i = 1 To AMTCnt
-        If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
-            If AMTData(i).HighNormalizedScore >= mMTMinimumHighNormalizedScore And _
-               AMTData(i).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore And _
-               AMTData(i).PeptideProphetProbability >= mMTMinimumPeptideProphetProbability Then
-                blnAddMassTag = True
-            Else
-                blnAddMassTag = False
-            End If
-        Else
-            blnAddMassTag = True
-        End If
-        
-        If blnAddMassTag Then
-            mMTCnt = mMTCnt + 1
-            mMTInd(mMTCnt - 1) = mMTCnt - 1
-            mMTOrInd(mMTCnt - 1) = i             'index; not the ID
-            mMTMWN14(mMTCnt - 1) = AMTData(i).MW
-            mMTMWN15(mMTCnt - 1) = AMTData(i).MW + glN14N15_DELTA * AMTData(i).CNT_N       ' N15 is always fixed
-            Select Case samtDef.NETorRT
-            Case glAMT_NET
-                 mMTNET(mMTCnt - 1) = AMTData(i).NET
-            Case glAMT_RT_or_PNET
-                 mMTNET(mMTCnt - 1) = AMTData(i).PNET
-            End Select
-            mMTMods(mMTCnt - 1) = ""
-        End If
-   Next i
-   If chkPEO.Value = vbChecked Then         'correct based on cys number for PEO label
-      UpdateStatus "Adding PEO labeled peptides..."
-      TmpCnt = mMTCnt
-      For i = 0 To TmpCnt - 1
-          CysCnt = AMTData(mMTOrInd(i)).CNT_Cys
-          If CysCnt > 0 Then
-             If GelSearchDef(CallerID).AMTSearchMassMods.DynamicMods Then
-                ' Dynamic Mods
-                For j = 1 To CysCnt
-                    mMTCnt = mMTCnt + 1
-                    mMTInd(mMTCnt - 1) = mMTCnt - 1
-                    mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
-                    mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * glPEO
-                    mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                    mMTNET(mMTCnt - 1) = mMTNET(i)
-                    mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_PEO & "/" & j
-                Next j
-             Else
-                ' Static Mods
-                ' Simply update the stats for this MT tag
-                mMTMWN14(i) = mMTMWN14(i) + CysCnt * glPEO
-                mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                mMTMods(i) = mMTMods(i) & " " & MOD_TKN_PEO & "/" & CysCnt
-             End If
-          End If
-      Next i
-   End If
-   'yeah, yeah I know that same cysteine can not be labeled with PEO and ICAT at the same
-   'time but who cares anyway I can fix this here easily
-   If chkICATLt.Value = vbChecked Then         'correct based on cys number for ICAT label
-      UpdateStatus "Adding D0 ICAT labeled peptides..."
-      TmpCnt = mMTCnt
-      For i = 0 To TmpCnt - 1
-          CysCnt = AMTData(mMTOrInd(i)).CNT_Cys
-          CysUsedPEO = GetTokenValue(mMTMods(i), MOD_TKN_PEO)
-          If CysUsedPEO < 0 Then CysUsedPEO = 0
-          CysLeft = CysCnt - CysUsedPEO
-          If CysLeft > 0 Then
-             If GelSearchDef(CallerID).AMTSearchMassMods.DynamicMods Then
-                ' Dynamic Mods
-                For j = 1 To CysLeft
-                    mMTCnt = mMTCnt + 1
-                    mMTInd(mMTCnt - 1) = mMTCnt - 1
-                    mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
-                    mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * glICAT_Light
-                    mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                    mMTNET(mMTCnt - 1) = mMTNET(i)
-                    mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_ICAT_D0 & "/" & j
-                Next j
-             Else
-                ' Static Mods
-                ' Simply update the stats for this MT tag
-                ' However, if use also has ICAT_d0 enabled, we need to duplicate this
-                '  MT tag first
-                If chkICATHv.Value = vbChecked Then
-                    mMTCnt = mMTCnt + 1
-                    mMTInd(mMTCnt - 1) = mMTCnt - 1
-                    mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
-                    mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + CysLeft * glICAT_Heavy
-                    mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                    mMTNET(mMTCnt - 1) = mMTNET(i)
-                    mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_ICAT_D8 & "/" & CysLeft
-                End If
-                
-                ' Now update this MT tag to have ICAT_d0 on all the cysteines
-                mMTMWN14(i) = mMTMWN14(i) + CysLeft * glICAT_Light
-                mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                mMTMods(i) = mMTMods(i) & " " & MOD_TKN_ICAT_D0 & "/" & CysLeft
-             End If
-          End If
-      Next i
-   End If
-   
-   If chkICATHv.Value = vbChecked Then         'correct based on cys number for ICAT label
-      UpdateStatus "Adding D8 ICAT labeled peptides..."
-      TmpCnt = mMTCnt
-      For i = 0 To TmpCnt - 1
-          CysCnt = AMTData(mMTOrInd(i)).CNT_Cys
-          CysUsedPEO = GetTokenValue(mMTMods(i), MOD_TKN_PEO)
-          If CysUsedPEO < 0 Then CysUsedPEO = 0
-          CysUsedICAT_D0 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D0)
-          If CysUsedICAT_D0 < 0 Then CysUsedICAT_D0 = 0
-          CysUsedICAT_D8 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D8)
-          If CysUsedICAT_D8 < 0 Then CysUsedICAT_D8 = 0
-          CysLeft = CysCnt - CysUsedPEO - CysUsedICAT_D0 - CysUsedICAT_D8
-          If CysLeft > 0 Then
-             If GelSearchDef(CallerID).AMTSearchMassMods.DynamicMods Then
-                ' Dynamic Mods
-                For j = 1 To CysLeft
-                    mMTCnt = mMTCnt + 1
-                    mMTInd(mMTCnt - 1) = mMTCnt - 1
-                    mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
-                    mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * glICAT_Heavy
-                    mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                    mMTNET(mMTCnt - 1) = mMTNET(i)
-                    mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_ICAT_D8 & "/" & j
-                Next j
-             Else
-                If chkICATLt.Value = vbChecked Then
-                    ' We shouldn't have reached this code since all of the cysteines should
-                    '  have been assigned ICAT_d0 or ICAT_d8
-                    Debug.Assert False
-                Else
-                    ' Static Mods
-                    ' Simply update the stats for this MT tag
-                    mMTMWN14(i) = mMTMWN14(i) + CysLeft * glICAT_Heavy
-                    mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                    mMTMods(i) = mMTMods(i) & " " & MOD_TKN_ICAT_D8 & "/" & CysLeft
-                End If
-             End If
-          End If
-      Next i
-   End If
-   
-   If chkAlkylation.Value = vbChecked Then         'correct based on cys number for alkylation label
-      UpdateStatus "Adding alkylated peptides..."
-      TmpCnt = mMTCnt
-      For i = 0 To TmpCnt - 1
-          CysCnt = AMTData(mMTOrInd(i)).CNT_Cys
-          CysUsedPEO = GetTokenValue(mMTMods(i), MOD_TKN_PEO)
-          If CysUsedPEO < 0 Then CysUsedPEO = 0
-          CysUsedICAT_D0 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D0)
-          If CysUsedICAT_D0 < 0 Then CysUsedICAT_D0 = 0
-          CysUsedICAT_D8 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D8)
-          If CysUsedICAT_D8 < 0 Then CysUsedICAT_D8 = 0
-          CysLeft = CysCnt - CysUsedPEO - CysUsedICAT_D0 - CysUsedICAT_D8
-          If CysLeft > 0 Then
-             If GelSearchDef(CallerID).AMTSearchMassMods.DynamicMods Then
-                ' Dynamic Mods
-                For j = 1 To CysLeft
-                    mMTCnt = mMTCnt + 1
-                    mMTInd(mMTCnt - 1) = mMTCnt - 1
-                    mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
-                    mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * AlkMWCorrection
-                    mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                    mMTNET(mMTCnt - 1) = mMTNET(i)
-                    mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_ALK & "/" & j
-                Next j
-             Else
-                ' Static Mods
-                ' Simply update the stats for this MT tag
-                mMTMWN14(i) = mMTMWN14(i) + CysLeft * AlkMWCorrection
-                mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                mMTMods(i) = mMTMods(i) & " " & MOD_TKN_ALK & "/" & CysLeft
-             End If
-          End If
-      Next i
-   End If
-   
-   If dblResidueModMass <> 0 Then
-      UpdateStatus "Adding modified residue mass peptides..."
-      TmpCnt = mMTCnt
-      For i = 0 To TmpCnt - 1
-            
-        If Len(strResiduesToModify) > 0 Then
-          ResidueOccurrenceCount = LookupResidueOccurrence(mMTOrInd(i), strResiduesToModify)
-          
-          If InStr(strResiduesToModify, "C") > 0 Then
-            CysUsedPEO = GetTokenValue(mMTMods(i), MOD_TKN_PEO)
-            If CysUsedPEO < 0 Then CysUsedPEO = 0
-            CysUsedICAT_D0 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D0)
-            If CysUsedICAT_D0 < 0 Then CysUsedICAT_D0 = 0
-            CysUsedICAT_D8 = GetTokenValue(mMTMods(i), MOD_TKN_ICAT_D8)
-            If CysUsedICAT_D8 < 0 Then CysUsedICAT_D8 = 0
-            ResidueOccurrenceCount = ResidueOccurrenceCount - CysUsedPEO - CysUsedICAT_D0 - CysUsedICAT_D8
-          End If
-          strResModToken = MOD_TKN_RES_MOD
-        Else
-          ' Add dblResidueModMass once to the entire MT tag
-          ' Accomplish this by setting ResidueOccurrenceCount to 1
-          ResidueOccurrenceCount = 1
-          strResModToken = MOD_TKN_MT_MOD
-        End If
-        
-        If ResidueOccurrenceCount > 0 Then
-           If GelSearchDef(CallerID).AMTSearchMassMods.DynamicMods Then
-              ' Dynamic Mods
-              For j = 1 To ResidueOccurrenceCount
-                  mMTCnt = mMTCnt + 1
-                  mMTInd(mMTCnt - 1) = mMTCnt - 1
-                  mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
-                  mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * dblResidueModMass
-                  mMTMWN15(mMTCnt - 1) = mMTMWN14(mMTCnt - 1) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-                  mMTNET(mMTCnt - 1) = mMTNET(i)
-                  mMTMods(mMTCnt - 1) = mMTMods(i) & " " & strResModToken & "/" & strResiduesToModify & j
-              Next j
-           Else
-              ' Static Mods
-              ' Simply update the stats for this MT tag
-              mMTMWN14(i) = mMTMWN14(i) + ResidueOccurrenceCount * dblResidueModMass
-              mMTMWN15(i) = mMTMWN14(i) + glN14N15_DELTA * AMTData(mMTOrInd(i)).CNT_N
-              mMTMods(i) = mMTMods(i) & " " & strResModToken & "/" & strResiduesToModify & ResidueOccurrenceCount
-           End If
-        End If
-      Next i
-   End If
-   
-   If mMTCnt > 0 Then
-      UpdateStatus "Preparing fast search structures..."
-      ReDim Preserve mMTInd(mMTCnt - 1)
-      ReDim Preserve mMTOrInd(mMTCnt - 1)
-      ReDim Preserve mMTMWN14(mMTCnt - 1)
-      ReDim Preserve mMTMWN15(mMTCnt - 1)
-      ReDim Preserve mMTNET(mMTCnt - 1)
-      ReDim Preserve mMTMods(mMTCnt - 1)
-      Select Case N14N15
-      Case SEARCH_N14
-           If Not PrepareSearchN14() Then
-              Debug.Assert False
-              Call DestroySearchStructures
-              Exit Function
-           End If
-      Case SEARCH_N15
-           If Not PrepareSearchN15() Then
-              Debug.Assert False
-              Call DestroySearchStructures
-              Exit Function
-           End If
-      End Select
-   End If
-End If
-
-If Not PrepareSearchInternalStandards() Then
-     Debug.Assert False
-     Call DestroySearchStructures
-     Exit Function
-End If
-
-PrepareMTArrays = True
-Exit Function
-
-err_PrepareMTArrays:
-Select Case Err.Number
-Case 9                      'add space in chunks of 10000
-   ReDim Preserve mMTInd(mMTCnt + 10000)
-   ReDim Preserve mMTOrInd(mMTCnt + 10000)
-   ReDim Preserve mMTMWN14(mMTCnt + 10000)
-   ReDim Preserve mMTMWN15(mMTCnt + 10000)
-   ReDim Preserve mMTNET(mMTCnt + 10000)
-   ReDim Preserve mMTMods(mMTCnt + 10000)
-   Resume
-Case Else
-   Debug.Assert False
-   Call DestroySearchStructures
-End Select
 End Function
 
 Private Sub RecordSearchResultsInData()
@@ -3179,18 +3304,23 @@ Private Function SearchUMCTestNET(eMemberType As glDistType, lngMemberIndex As L
     
 End Function
 
-Public Sub SetAlkylationMWCorrection(dblMass As Double)
+Public Sub SetAlkylationMWCorrection(ByVal dblMass As Double)
     txtAlkylationMWCorrection = dblMass
     AlkMWCorrection = dblMass
 End Sub
 
-Private Sub SetDBSearchModType(blnDynamicMods As Boolean)
-    If blnDynamicMods Then
+Private Sub SetDBSearchModType(ByVal bytModMode As Byte)
+    If bytModMode = 2 Then
+        optDBSearchModType(MODS_DECOY).Value = True
+    ElseIf bytModMode = 1 Then
         optDBSearchModType(MODS_DYNAMIC).Value = True
     Else
+        ' Assumed fixed
         optDBSearchModType(MODS_FIXED).Value = True
     End If
-    GelSearchDef(CallerID).AMTSearchMassMods.DynamicMods = optDBSearchModType(MODS_DYNAMIC).Value
+
+    GelSearchDef(CallerID).AMTSearchMassMods.ModMode = GetDBSearchModeType()
+    
 End Sub
 
 Public Sub SetDBSearchNType(blnUseN15 As Boolean)
@@ -4427,6 +4557,8 @@ End If
 
 ShowHidePNNLMenus
 
+EnableDisableControls
+
 'set current Search Definition values
 DisplayCurrentSearchTolerances
 
@@ -4467,7 +4599,8 @@ With GelSearchDef(CallerID).AMTSearchMassMods
     txtResidueToModifyMass = Round(.ResidueMassModification, 5)
     
     SetAlkylationMWCorrection .AlkylationMass
-    SetDBSearchModType .DynamicMods
+    SetDBSearchModType .ModMode
+    
     SetDBSearchNType .N15InsteadOfN14
 End With
 
@@ -4668,6 +4801,10 @@ Private Sub mnuMTStatus_Click()
 Me.MousePointer = vbHourglass
 MsgBox CheckMassTags(), vbOKOnly
 Me.MousePointer = vbDefault
+End Sub
+
+Private Sub optDBSearchModType_Click(Index As Integer)
+    EnableDisableControls
 End Sub
 
 Private Sub optN_Click(Index As Integer)

@@ -1,5 +1,11 @@
 VIPER Change Log
 
+Version 3.45 - Build 397; September 3, 2008
+	- Added Decoy search mod mode to the the main Database Search window (frmSearchMT_ConglomerateUMC.frm)
+		- The decoy mod type is very similar to the Dynamic Mass mod type, with the difference that the NET values of the dynamically added AMTs will be shifted away from the NET of the original AMT
+		- The amount the NET is shifted by is the Decoy NET Wobble amount; the NET is randomly shifted right or left by the amount specified by the user
+		- Note that the random number generator is re-seeded with the same seed every time, guaranteeing that the NETs are wobbled randomly, yet repeatedly the same
+
 Version 3.45 - Build 395; August 8, 2008
 	- Updated to track IMS drift time when column drift_time is present in the _isos.csv file
 	- Updated the internal LC-MS feature finding algorithm (UMCIonNet) to allow for an IMS Drift Time dimension
