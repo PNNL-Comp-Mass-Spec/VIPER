@@ -3,17 +3,17 @@ Begin VB.Form frmNewAnalysis
    BackColor       =   &H00C0E0FF&
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Choose Analysis to Load"
-   ClientHeight    =   5775
+   ClientHeight    =   5835
    ClientLeft      =   45
    ClientTop       =   330
-   ClientWidth     =   7695
+   ClientWidth     =   7605
    Icon            =   "frmNewAnalysis.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   5775
+   ScaleHeight     =   5835
    ScaleMode       =   0  'User
-   ScaleWidth      =   7695
+   ScaleWidth      =   7605
    StartUpPosition =   3  'Windows Default
    Begin VB.CommandButton cmdGANETInfo 
       Caption         =   "&GANET Info"
@@ -63,9 +63,9 @@ Begin VB.Form frmNewAnalysis
       Caption         =   "Analysis Parameters"
       Height          =   4335
       Index           =   3
-      Left            =   4800
+      Left            =   2400
       TabIndex        =   34
-      Top             =   480
+      Top             =   720
       Visible         =   0   'False
       Width           =   7215
       Begin VB.CommandButton cmdResetParameters 
@@ -110,9 +110,9 @@ Begin VB.Form frmNewAnalysis
       Caption         =   "Selection of Analysis Result File"
       Height          =   4335
       Index           =   2
-      Left            =   3480
+      Left            =   1800
       TabIndex        =   29
-      Top             =   120
+      Top             =   720
       Visible         =   0   'False
       Width           =   7215
       Begin VB.TextBox txtShowTextFile 
@@ -166,9 +166,9 @@ Begin VB.Form frmNewAnalysis
       Caption         =   "Selection of ICR-2LS Analysis Result File"
       Height          =   4335
       Index           =   1
-      Left            =   2160
+      Left            =   1080
       TabIndex        =   16
-      Top             =   240
+      Top             =   360
       Visible         =   0   'False
       Width           =   7215
       Begin VB.CommandButton cmdSelectDatasetAnalysis 
@@ -322,17 +322,32 @@ Begin VB.Form frmNewAnalysis
       TabIndex        =   0
       Top             =   120
       Width           =   7215
+      Begin VB.CommandButton cmdSearchForDB 
+         Caption         =   "&Search"
+         Height          =   375
+         Left            =   4080
+         TabIndex        =   42
+         Top             =   3270
+         Width           =   1095
+      End
+      Begin VB.TextBox txtSearchForDB 
+         Height          =   285
+         Left            =   1200
+         TabIndex        =   41
+         Top             =   3320
+         Width           =   2655
+      End
       Begin VB.CheckBox chkShowUnusedDBs 
          BackColor       =   &H00C0E0FF&
          Caption         =   "Show Unused Databases"
          Height          =   255
          Left            =   3000
          TabIndex        =   4
-         Top             =   3240
+         Top             =   3000
          Width           =   2295
       End
       Begin VB.ListBox lstOrgMTDBNames 
-         Height          =   2400
+         Height          =   2205
          Left            =   240
          TabIndex        =   2
          Top             =   720
@@ -344,7 +359,7 @@ Begin VB.Form frmNewAnalysis
          Height          =   255
          Left            =   240
          TabIndex        =   3
-         Top             =   3240
+         Top             =   3000
          Value           =   1  'Checked
          Width           =   2535
       End
@@ -365,6 +380,16 @@ Begin VB.Form frmNewAnalysis
          Top             =   600
          Width           =   1900
       End
+      Begin VB.Label Label2 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Search for:"
+         Height          =   255
+         Index           =   3
+         Left            =   120
+         TabIndex        =   43
+         Top             =   3345
+         Width           =   855
+      End
       Begin VB.Label lblMTDBDesc 
          BackStyle       =   0  'Transparent
          Caption         =   "No directory data found; Server might be down!"
@@ -372,7 +397,7 @@ Begin VB.Form frmNewAnalysis
          Height          =   615
          Left            =   120
          TabIndex        =   5
-         Top             =   3600
+         Top             =   3650
          Width           =   6735
          WordWrap        =   -1  'True
       End
@@ -482,6 +507,40 @@ Dim BaseURLDataset As String
 Dim BaseURLAnalysis As String
 Dim BaseURLExperiment As String
 
+Private Sub HighlightDBByName(ByVal strTextToFind As String, ByVal intIndexStart)
+    
+    Dim i As Integer
+    Dim intCharLoc As Integer
+    
+    If Len(strTextToFind) > 0 And lstOrgMTDBNames.ListCount > 0 Then
+        ' Step through lstOrgMTDBNames and find the first to contain strTextToFind (starting at index intIndexStart)
+            
+        strTextToFind = LCase(strTextToFind)
+        
+        If intIndexStart < 0 Then
+            intIndexStart = lstOrgMTDBNames.ListCount - 1
+        End If
+
+        i = intIndexStart
+        Do
+            i = i + 1
+            If i > lstOrgMTDBNames.ListCount - 1 Then
+                i = 0
+            End If
+
+            intCharLoc = InStr(LCase(lstOrgMTDBNames.List(i)), strTextToFind)
+            
+            If intCharLoc > 0 Then
+                lstOrgMTDBNames.ListIndex = i
+                Exit Do
+            End If
+
+        Loop While i <> intIndexStart
+        
+    End If
+    
+End Sub
+
 Private Sub PopulateDatabaseCombobox()
     Dim i As Long
     Dim blnShowFrozenDBs As Boolean
@@ -564,6 +623,10 @@ With cmbFileType
         lbFileList.Pattern = "*.*"
     End Select
 End With
+End Sub
+
+Private Sub cmdSearchForDB_Click()
+    HighlightDBByName txtSearchForDB, lstOrgMTDBNames.ListIndex
 End Sub
 
 Private Sub lstOrgMTDBNames_Click()
@@ -1331,20 +1394,21 @@ Private Sub UpdateDatasetPath()
     Dim strTestFilename As String
     
     Dim intPreferredExtensionCount As Integer
-    Dim strPreferredExtensions(4) As String
+    Dim strPreferredExtensions(5) As String
     
     intPreferredExtensionCount = 5
-    strPreferredExtensions(0) = "_ic.pek"
-    strPreferredExtensions(1) = "_s.pek"
-    strPreferredExtensions(2) = ".pek"
-    strPreferredExtensions(3) = "DeCal.pek-3"
-    strPreferredExtensions(4) = ".pek-3"
+    strPreferredExtensions(0) = "_isos.csv"
+    strPreferredExtensions(1) = "_ic.pek"
+    strPreferredExtensions(2) = "_s.pek"
+    strPreferredExtensions(3) = ".pek"
+    strPreferredExtensions(4) = "DeCal.pek-3"
+    strPreferredExtensions(5) = ".pek-3"
 
 On Error GoTo PathSetErrorHandler
     ' Update the path for the File list control
     lbFileList.Path = fAnalysis.Desc_DataFolder
     
-    ' Now highlight the most logical .PEK file
+    ' Now highlight the most logical .PEK or .CSV file
     With lbFileList
         If .ListCount > 0 Then
             intBestIndex = -1

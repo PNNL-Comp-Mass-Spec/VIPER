@@ -3,7 +3,7 @@ Begin VB.Form frmNewDummyAnalysis
    BackColor       =   &H00C0E0FF&
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Select MT Database For Analysis"
-   ClientHeight    =   5010
+   ClientHeight    =   5355
    ClientLeft      =   45
    ClientTop       =   330
    ClientWidth     =   6585
@@ -11,50 +11,65 @@ Begin VB.Form frmNewDummyAnalysis
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   5010
+   ScaleHeight     =   5355
    ScaleWidth      =   6585
    StartUpPosition =   3  'Windows Default
    Begin VB.CommandButton cmdSelectMassTags 
-      Caption         =   "&Sel. Mass Tags"
+      Caption         =   "Select Mass Tags"
       Height          =   375
       Left            =   480
-      TabIndex        =   5
+      TabIndex        =   9
       ToolTipText     =   "Select mass tags to search with this analysis"
-      Top             =   4440
-      Width           =   1335
+      Top             =   4800
+      Width           =   1695
    End
    Begin VB.CommandButton cmdCancel 
       Caption         =   "&Cancel"
       Default         =   -1  'True
       Height          =   375
-      Left            =   2880
-      TabIndex        =   3
-      Top             =   4440
+      Left            =   3000
+      TabIndex        =   10
+      Top             =   4800
       Width           =   975
    End
    Begin VB.CommandButton cmdOK 
       Caption         =   "&OK"
       Height          =   375
-      Left            =   3960
-      TabIndex        =   2
-      Top             =   4440
+      Left            =   4080
+      TabIndex        =   11
+      Top             =   4800
       Width           =   975
    End
    Begin VB.Frame fraStage 
       BackColor       =   &H00C0E0FF&
       Caption         =   "Organism Mass Tag Database"
-      Height          =   4095
+      Height          =   4575
       Index           =   0
       Left            =   120
       TabIndex        =   0
       Top             =   120
       Width           =   6255
+      Begin VB.TextBox txtSearchForDB 
+         Height          =   285
+         Left            =   1200
+         TabIndex        =   6
+         Top             =   3330
+         Width           =   2655
+      End
+      Begin VB.CommandButton cmdSearchForDB 
+         Caption         =   "&Search"
+         Height          =   375
+         Left            =   4080
+         TabIndex        =   7
+         Top             =   3300
+         Width           =   1095
+      End
       Begin VB.CheckBox chkShowUnusedDBs 
          BackColor       =   &H00C0E0FF&
          Caption         =   "Show Unused Databases"
          Height          =   255
          Left            =   3000
-         TabIndex        =   8
+         TabIndex        =   4
          Top             =   3000
          Width           =   2295
       End
@@ -63,7 +78,7 @@ Begin VB.Form frmNewDummyAnalysis
          Caption         =   "Show Frozen Databases"
          Height          =   255
          Left            =   240
-         TabIndex        =   7
+         TabIndex        =   3
          Top             =   3000
          Value           =   1  'Checked
          Width           =   2535
@@ -71,9 +86,19 @@ Begin VB.Form frmNewDummyAnalysis
       Begin VB.ListBox lstOrgMTDBNames 
          Height          =   2205
          Left            =   240
-         TabIndex        =   6
+         TabIndex        =   2
          Top             =   720
          Width           =   4455
+      End
+      Begin VB.Label Label2 
+         BackStyle       =   0  'Transparent
+         Caption         =   "Search for:"
+         Height          =   255
+         Index           =   0
+         Left            =   120
+         TabIndex        =   5
+         Top             =   3360
+         Width           =   855
       End
       Begin VB.Label lblMTDBDesc 
          BackStyle       =   0  'Transparent
@@ -81,8 +106,8 @@ Begin VB.Form frmNewDummyAnalysis
          ForeColor       =   &H00000000&
          Height          =   615
          Left            =   240
-         TabIndex        =   4
-         Top             =   3360
+         TabIndex        =   8
+         Top             =   3840
          Width           =   5895
          WordWrap        =   -1  'True
       End
@@ -144,6 +169,40 @@ If Err Then
    nv.Value = NewValue
    objCol.Add nv, nv.Name
 End If
+End Sub
+
+Private Sub HighlightDBByName(ByVal strTextToFind As String, ByVal intIndexStart)
+    
+    Dim i As Integer
+    Dim intCharLoc As Integer
+    
+    If Len(strTextToFind) > 0 And lstOrgMTDBNames.ListCount > 0 Then
+        ' Step through lstOrgMTDBNames and find the first to contain strTextToFind (starting at index intIndexStart)
+            
+        strTextToFind = LCase(strTextToFind)
+        
+        If intIndexStart < 0 Then
+            intIndexStart = lstOrgMTDBNames.ListCount - 1
+        End If
+
+        i = intIndexStart
+        Do
+            i = i + 1
+            If i > lstOrgMTDBNames.ListCount - 1 Then
+                i = 0
+            End If
+
+            intCharLoc = InStr(LCase(lstOrgMTDBNames.List(i)), strTextToFind)
+            
+            If intCharLoc > 0 Then
+                lstOrgMTDBNames.ListIndex = i
+                Exit Do
+            End If
+
+        Loop While i <> intIndexStart
+        
+    End If
+    
 End Sub
 
 Private Sub PopulateDatabaseCombobox()
@@ -212,6 +271,10 @@ End Sub
 Private Sub cmdOK_Click()
 Me.Hide
 RaiseEvent AnalysisDialogClose
+End Sub
+
+Private Sub cmdSearchForDB_Click()
+    HighlightDBByName txtSearchForDB, lstOrgMTDBNames.ListIndex
 End Sub
 
 Private Sub cmdSelectMassTags_Click()

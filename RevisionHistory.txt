@@ -1,5 +1,14 @@
 VIPER Change Log
 
+Version 3.45 - Build 399; November 10, 2008
+	- New version of MassTagsAccess.dll
+		- Fixed bug that failed to auto-highlight Decon2LS _isos.csv files when a Decon2LS job was selected
+		- Added the option to search for a given MT Tag database by name
+
+Version 3.45 - Build 398; October 4, 2008
+	- Added option UMCIonNetUsesInternalClusteringCode to section [AutoAnalysisOptions]
+		- When True, then the internal LCMS Feature Finding algorithm is used during auto analysis
+
 Version 3.45 - Build 397; September 3, 2008
 	- Added Decoy search mod mode to the the main Database Search window (frmSearchMT_ConglomerateUMC.frm)
 		- The decoy mod type is very similar to the Dynamic Mass mod type, with the difference that the NET values of the dynamically added AMTs will be shifted away from the NET of the original AMT

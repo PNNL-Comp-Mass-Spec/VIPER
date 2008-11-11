@@ -1255,6 +1255,7 @@ On Error GoTo LoadSettingsFileHandler
             
             .SkipFindUMCs = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SkipFindUMCs", .SkipFindUMCs)
             .SkipGANETSlopeAndInterceptComputation = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SkipGANETSlopeAndInterceptComputation", .SkipGANETSlopeAndInterceptComputation)
+            .UMCIonNetUsesInternalClusteringCode = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "UMCIonNetUsesInternalClusteringCode", .UMCIonNetUsesInternalClusteringCode)
 
             .DBConnectionRetryAttemptMax = GetIniFileSettingInt(IniStuff, "AutoAnalysisOptions", "DBConnectionRetryAttemptMax", .DBConnectionRetryAttemptMax)
             .DBConnectionTimeoutSeconds = GetIniFileSettingInt(IniStuff, "AutoAnalysisOptions", "DBConnectionTimeoutSeconds", .DBConnectionTimeoutSeconds)
@@ -2352,6 +2353,7 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "DoNotSaveOrExport", .DoNotSaveOrExport
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SkipFindUMCs", .SkipFindUMCs
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SkipGANETSlopeAndInterceptComputation", .SkipGANETSlopeAndInterceptComputation
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UMCIonNetUsesInternalClusteringCode", .UMCIonNetUsesInternalClusteringCode
         
         AddKeyValueSettingInt sKeys, sVals, iKVCount, "DBConnectionRetryAttemptMax", .DBConnectionRetryAttemptMax
         AddKeyValueSettingInt sKeys, sVals, iKVCount, "DBConnectionTimeoutSeconds", .DBConnectionTimeoutSeconds
@@ -3774,8 +3776,9 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     
                 ' Note: The NetAdjustment options are located later in this sub
                 
-                .UMCShrinkingBoxWeightAverageMassByIntensity = False        ' Only applies to UMC2003
                 .UMCSearchMode = AUTO_ANALYSIS_UMCIonNet
+                .UMCShrinkingBoxWeightAverageMassByIntensity = False        ' Only applies to UMC2003
+                .UMCIonNetUsesInternalClusteringCode = False                ' Only applies to UMCIonNet
                 
                 .OutputFileSeparationCharacter = SEPARATION_CHARACTER_TAB_STRING            ' Gets converted to vbTab
                 .PEKFileExtensionPreferenceOrder = DEFAULT_PEK_FILE_EXTENSION_ORDER

@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "September 3, 2008"
+Public Const APP_BUILD_DATE As String = "November 10, 2008"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -25,7 +25,7 @@ Public Const PRISM_AUTOMATION_SP_POST_LOG_ENTRY_DEFAULT = "PostLogEntry"
 '       processed PEK/CSV/mzXML/mzData file name extensions.  Thus, if a file is found with any of these
 '       extensions (except for plain .pek) then the function will know that the PEK/CSV/mzXML/mzData file
 '       has been processed.  In that case, it will look for a plain .PEK file in the same folder
-'       This should be a comma delimeted list
+'       This should be a comma delimited list
 Public Const DEFAULT_PEK_FILE_EXTENSION_ORDER As String = CSV_ISOS_IC_FILE_SUFFIX & ", " & CSV_ISOS_FILE_SUFFIX & ", .mzxml, .mzdata, mzxml.xml, mzdata.xml, _ic.pek, _s.pek, .pek, DeCal.pek-3, .pek-3"
 
 Public Const KNOWN_FILE_EXTENSIONS As String = ".Pek, .CSV, .mzXML, mzxml.xml, .mzData, or mzdata.xml"
@@ -1072,6 +1072,7 @@ Public Type udtAutoAnalysisOptionsType
     
     UMCSearchMode As String                             ' AUTO_ANALYSIS_UMC2003 or AUTO_ANALYSIS_UMCIonNet
     UMCShrinkingBoxWeightAverageMassByIntensity As Boolean      ' Only used in AUTO_ANALYSIS_UMCListType2002 (which is now obsolete - July 2004)
+    UMCIonNetUsesInternalClusteringCode As Boolean      ' When true, then chkUseLCMSFeatureFinder is unchecked on frmUMCIonNet; however, this only honored during automated analysis
     
     OutputFileSeparationCharacter As String             ' Either a single character, or the word <TAB> to represent a Tab
     PEKFileExtensionPreferenceOrder As String
