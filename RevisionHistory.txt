@@ -1,5 +1,15 @@
 VIPER Change Log
 
+Version 3.45 - Build 402; February 13, 2009
+	- Updated the LCMSWarp window to allow for filtering the MT Tags used for alignment
+		- Can apply mass and/or NET filters
+		- Useful for diagnosing alignment problems
+	- Added ability to copy the LCMSWarp Alignment Scores and LCMSWarp Alignment Function values to the clipboard
+
+Version 3.45 - Build 401; December 30, 2008
+	- Recompiled source due to new development computer
+		- New versions of MassTagsAccess.dll and MassMatchCOM.dll
+
 Version 3.45 - Build 399; November 10, 2008
 	- New version of MassTagsAccess.dll
 		- Fixed bug that failed to auto-highlight Decon2LS _isos.csv files when a Decon2LS job was selected

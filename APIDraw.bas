@@ -224,24 +224,24 @@ Case glShapeTri
     ReDim ptAPIs(2)
     vptAPIs = GetTrianglePoints(cx, cy, 100, 1)
     For j = 0 To 2
-        ptAPIs(j).x = vptAPIs(j, 0)
-        ptAPIs(j).y = vptAPIs(j, 1)
+        ptAPIs(j).X = vptAPIs(j, 0)
+        ptAPIs(j).Y = vptAPIs(j, 1)
     Next j
     Polygon hDC, ptAPIs(0), 3
 Case glShapeSta
     ReDim ptAPIs(7)
     vptAPIs = Get4StarPoints(cx, cy, 100, 1)
     For j = 0 To 7
-        ptAPIs(j).x = vptAPIs(j, 0)
-        ptAPIs(j).y = vptAPIs(j, 1)
+        ptAPIs(j).X = vptAPIs(j, 0)
+        ptAPIs(j).Y = vptAPIs(j, 1)
     Next j
     Polygon hDC, ptAPIs(0), 8
 Case glShapeHex
     ReDim ptAPIs(5)
     vptAPIs = GetHexagonPoints(cx, cy, 100, 1)
     For j = 0 To 5
-        ptAPIs(j).x = vptAPIs(j, 0)
-        ptAPIs(j).y = vptAPIs(j, 1)
+        ptAPIs(j).X = vptAPIs(j, 0)
+        ptAPIs(j).Y = vptAPIs(j, 1)
     Next j
     Polygon hDC, ptAPIs(0), 6
 End Select
@@ -441,7 +441,7 @@ Dim hCR As Long
 On Error Resume Next
 Res = GetViewportOrgEx(hDC, ptOrg)
 Res = GetViewportExtEx(hDC, szExt)
-hCR = CreateRectRgn(ptOrg.x, ptOrg.y, ptOrg.x + szExt.cx, ptOrg.y + szExt.cy)
+hCR = CreateRectRgn(ptOrg.X, ptOrg.Y, ptOrg.X + szExt.cx, ptOrg.Y + szExt.cy)
 Res = SelectClipRgn(hDC, hCR)
 ClippingRegionA = hCR
 End Function
@@ -579,8 +579,8 @@ With GelDraw(Ind)
        If .CSID(i) > 0 And .CSR(i) > 0 Then
          vptAPIs = GetTrianglePoints(.CSX(i), .CSY(i), .CSR(i) \ 2, ar)
          For j = 0 To 2
-             ptAPIs(j).x = vptAPIs(j, 0)
-             ptAPIs(j).y = vptAPIs(j, 1)
+             ptAPIs(j).X = vptAPIs(j, 0)
+             ptAPIs(j).Y = vptAPIs(j, 1)
          Next j
          Polygon hDC, ptAPIs(0), 3
        End If
@@ -603,8 +603,8 @@ With GelDraw(Ind)
        If .IsoID(i) > 0 And .IsoR(i) > 0 Then
          vptAPIs = GetTrianglePoints(.IsoX(i), .IsoY(i), .IsoR(i) \ 2, ar)
          For j = 0 To 2
-             ptAPIs(j).x = vptAPIs(j, 0)
-             ptAPIs(j).y = vptAPIs(j, 1)
+             ptAPIs(j).X = vptAPIs(j, 0)
+             ptAPIs(j).Y = vptAPIs(j, 1)
          Next j
          Polygon hDC, ptAPIs(0), 3
        End If
@@ -627,8 +627,8 @@ With GelDraw(Ind)
        If .CSID(i) > 0 And .CSR(i) > 0 Then
          vptAPIs = Get4StarPoints(.CSX(i), .CSY(i), .CSR(i) \ 2, ar)
          For j = 0 To 7
-             ptAPIs(j).x = vptAPIs(j, 0)
-             ptAPIs(j).y = vptAPIs(j, 1)
+             ptAPIs(j).X = vptAPIs(j, 0)
+             ptAPIs(j).Y = vptAPIs(j, 1)
          Next j
          Polygon hDC, ptAPIs(0), 8
        End If
@@ -651,8 +651,8 @@ With GelDraw(Ind)
        If .IsoID(i) > 0 And .IsoR(i) > 0 Then
          vptAPIs = Get4StarPoints(.IsoX(i), .IsoY(i), .IsoR(i) \ 2, ar)
          For j = 0 To 7
-             ptAPIs(j).x = vptAPIs(j, 0)
-             ptAPIs(j).y = vptAPIs(j, 1)
+             ptAPIs(j).X = vptAPIs(j, 0)
+             ptAPIs(j).Y = vptAPIs(j, 1)
          Next j
          Polygon hDC, ptAPIs(0), 8
        End If
@@ -675,8 +675,8 @@ With GelDraw(Ind)
        If .IsoID(i) > 0 And .IsoR(i) > 0 Then
          vptAPIs = GetHexagonPoints(.IsoX(i), .IsoY(i), .IsoR(i) \ 2, ar)
          For j = 0 To 5
-             ptAPIs(j).x = vptAPIs(j, 0)
-             ptAPIs(j).y = vptAPIs(j, 1)
+             ptAPIs(j).X = vptAPIs(j, 0)
+             ptAPIs(j).Y = vptAPIs(j, 1)
          Next j
          Polygon hDC, ptAPIs(0), 6
        End If
@@ -699,8 +699,8 @@ With GelDraw(Ind)
        If .CSID(i) > 0 And .CSR(i) > 0 Then
          vptAPIs = GetHexagonPoints(.CSX(i), .CSY(i), .CSR(i) \ 2, ar)
          For j = 0 To 5
-             ptAPIs(j).x = vptAPIs(j, 0)
-             ptAPIs(j).y = vptAPIs(j, 1)
+             ptAPIs(j).X = vptAPIs(j, 0)
+             ptAPIs(j).Y = vptAPIs(j, 1)
          Next j
          Polygon hDC, ptAPIs(0), 6
        End If
@@ -776,8 +776,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrPens(.CSERClr(i)))
                vptAPIs = GetTrianglePoints(.CSX(i), .CSY(i), .CSR(i) \ 2, ar)
                For j = 0 To 2
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 3
             End If
@@ -794,8 +794,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrPens(.CSERClr(i)))
                vptAPIs = Get4StarPoints(.CSX(i), .CSY(i), .CSR(i) \ 2, ar)
                For j = 0 To 7
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 8
             End If
@@ -812,8 +812,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrPens(.CSERClr(i)))
                vptAPIs = GetHexagonPoints(.CSX(i), .CSY(i), .CSR(i) \ 2, ar)
                For j = 0 To 5
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 6
             End If
@@ -872,8 +872,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrBrushes(.CSERClr(i)))
                vptAPIs = GetTrianglePoints(.CSX(i), .CSY(i), .CSR(i) \ 2, ar)
                For j = 0 To 2
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 3
             End If
@@ -889,8 +889,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrBrushes(.CSERClr(i)))
                vptAPIs = Get4StarPoints(.CSX(i), .CSY(i), .CSR(i) \ 2, ar)
                For j = 0 To 7
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 8
             End If
@@ -906,8 +906,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrBrushes(.CSERClr(i)))
                vptAPIs = GetHexagonPoints(.CSX(i), .CSY(i), .CSR(i) \ 2, ar)
                For j = 0 To 5
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 6
             End If
@@ -986,8 +986,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrPens(.IsoERClr(i)))
                vptAPIs = GetTrianglePoints(.IsoX(i), .IsoY(i), .IsoR(i) \ 2, ar)
                For j = 0 To 2
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 3
             End If
@@ -1004,8 +1004,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrPens(.IsoERClr(i)))
                vptAPIs = Get4StarPoints(.IsoX(i), .IsoY(i), .IsoR(i) \ 2, ar)
                For j = 0 To 7
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 8
             End If
@@ -1022,8 +1022,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrPens(.IsoERClr(i)))
                vptAPIs = GetHexagonPoints(.IsoX(i), .IsoY(i), .IsoR(i) \ 2, ar)
                For j = 0 To 5
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 6
             End If
@@ -1082,8 +1082,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrBrushes(.IsoERClr(i)))
                vptAPIs = GetTrianglePoints(.IsoX(i), .IsoY(i), .IsoR(i) \ 2, ar)
                For j = 0 To 2
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 3
             End If
@@ -1099,8 +1099,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrBrushes(.IsoERClr(i)))
                vptAPIs = Get4StarPoints(.IsoX(i), .IsoY(i), .IsoR(i) \ 2, ar)
                For j = 0 To 7
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 8
             End If
@@ -1116,8 +1116,8 @@ With GelDraw(Ind)
                Res = SelectObject(hDC, hDDClrBrushes(.IsoERClr(i)))
                vptAPIs = GetHexagonPoints(.IsoX(i), .IsoY(i), .IsoR(i) \ 2, ar)
                For j = 0 To 5
-                 ptAPIs(j).x = vptAPIs(j, 0)
-                 ptAPIs(j).y = vptAPIs(j, 1)
+                 ptAPIs(j).X = vptAPIs(j, 0)
+                 ptAPIs(j).Y = vptAPIs(j, 1)
                Next j
                Polygon hDC, ptAPIs(0), 6
             End If
@@ -1332,71 +1332,71 @@ TextL = SP(vSelVec, LDfX0, LDfXE, lDfLX, szFNDt.cx)
 Res = TextOut(hDC, TextL, TextT, sFNDt, Len(sFNDt))
 End Sub
 
-Private Function Get4StarPoints(ByVal x As Long, ByVal y As Long, ByVal R As Long, ByVal ar As Double) As Variant
+Private Function Get4StarPoints(ByVal X As Long, ByVal Y As Long, ByVal R As Long, ByVal ar As Double) As Variant
 Dim pt(7, 1) As Long
 Dim i As Integer
 On Error Resume Next
 For i = 0 To 7
     Select Case i
     Case 0, 4
-        pt(i, 0) = x
+        pt(i, 0) = X
     Case 1, 3
-        pt(i, 0) = x - R \ 4
+        pt(i, 0) = X - R \ 4
     Case 5, 7
-        pt(i, 0) = x + R \ 4
+        pt(i, 0) = X + R \ 4
     Case 2
-        pt(i, 0) = x - R
+        pt(i, 0) = X - R
     Case 6
-        pt(i, 0) = x + R
+        pt(i, 0) = X + R
     End Select
     Select Case i
     Case 2, 6
-        pt(i, 1) = y
+        pt(i, 1) = Y
     Case 1, 7
-        pt(i, 1) = y - CLng(R / (4 * ar))
+        pt(i, 1) = Y - CLng(R / (4 * ar))
     Case 3, 5
-        pt(i, 1) = y + CLng(R / (4 * ar))
+        pt(i, 1) = Y + CLng(R / (4 * ar))
     Case 0
-        pt(i, 1) = y - CLng(R / ar)
+        pt(i, 1) = Y - CLng(R / ar)
     Case 4
-        pt(i, 1) = y + CLng(R / ar)
+        pt(i, 1) = Y + CLng(R / ar)
     End Select
 Next i
 Get4StarPoints = pt
 End Function
 
-Private Function GetTrianglePoints(ByVal x As Long, ByVal y As Long, ByVal R As Long, ByVal ar As Double) As Variant
+Private Function GetTrianglePoints(ByVal X As Long, ByVal Y As Long, ByVal R As Long, ByVal ar As Double) As Variant
 Dim pt(2, 1) As Long
 Dim HShift As Long
 On Error Resume Next
 
 HShift = CLng(0.87 * R)
-pt(0, 0) = x
-pt(1, 0) = x - HShift
-pt(2, 0) = x + HShift
-pt(0, 1) = y - CLng(R / ar)
-pt(1, 1) = y + CLng(R / (2 * ar))
+pt(0, 0) = X
+pt(1, 0) = X - HShift
+pt(2, 0) = X + HShift
+pt(0, 1) = Y - CLng(R / ar)
+pt(1, 1) = Y + CLng(R / (2 * ar))
 pt(2, 1) = pt(1, 1)
 GetTrianglePoints = pt
 End Function
 
-Private Function GetHexagonPoints(ByVal x As Long, ByVal y As Long, ByVal R As Long, ByVal ar As Double) As Variant
+Private Function GetHexagonPoints(ByVal X As Long, ByVal Y As Long, ByVal R As Long, ByVal ar As Double) As Variant
 Dim pt(5, 1) As Long
 Dim VShift As Long
 On Error Resume Next
 
-pt(0, 0) = x - R \ 2
-pt(1, 0) = x - R
+pt(0, 0) = X - R \ 2
+pt(1, 0) = X - R
 pt(2, 0) = pt(0, 0)
-pt(3, 0) = x + R \ 2
-pt(4, 0) = x + R
+pt(3, 0) = X + R \ 2
+pt(4, 0) = X + R
 pt(5, 0) = pt(3, 0)
 VShift = CLng(0.87 * R / ar)
-pt(0, 1) = y - VShift
-pt(1, 1) = y
-pt(2, 1) = y + VShift
+pt(0, 1) = Y - VShift
+pt(1, 1) = Y
+pt(2, 1) = Y + VShift
 pt(3, 1) = pt(2, 1)
-pt(4, 1) = y
+pt(4, 1) = Y
 pt(5, 1) = pt(0, 1)
 GetHexagonPoints = pt
 End Function
@@ -1798,14 +1798,14 @@ End Sub
 Private Sub GetSelFlagPoints(pts() As POINTAPI)
 'flag is something like letter F flag in 300x360 rectangle
 On Error Resume Next
-pts(1).x = pts(0).x + 83    '100\6
-pts(2).x = pts(0).x + 300
-pts(3).x = pts(0).x + 100   '300\3
-pts(4).x = pts(2).x
-pts(1).y = pts(0).y + 330   '11*360\12
-pts(2).y = pts(1).y
-pts(3).y = pts(0).y + 360
-pts(4).y = pts(3).y
+pts(1).X = pts(0).X + 83    '100\6
+pts(2).X = pts(0).X + 300
+pts(3).X = pts(0).X + 100   '300\3
+pts(4).X = pts(2).X
+pts(1).Y = pts(0).Y + 330   '11*360\12
+pts(2).Y = pts(1).Y
+pts(3).Y = pts(0).Y + 360
+pts(4).Y = pts(3).Y
 End Sub
 
 Private Sub DrawSelectedFlag(ByVal hDC As Long, _
@@ -1818,13 +1818,13 @@ Private Sub DrawSelectedFlag(ByVal hDC As Long, _
 'position the drawing
 Dim SomePenPos  As POINTAPI
 Dim Res As Long
-MoveToEx hDC, pts(0).x, pts(0).y, SomePenPos
-LineTo hDC, pts(3).x, pts(3).y
-LineTo hDC, pts(4).x, pts(4).y
-MoveToEx hDC, pts(1).x, pts(1).y, SomePenPos
-LineTo hDC, pts(2).x, pts(2).y
+MoveToEx hDC, pts(0).X, pts(0).Y, SomePenPos
+LineTo hDC, pts(3).X, pts(3).Y
+LineTo hDC, pts(4).X, pts(4).Y
+MoveToEx hDC, pts(1).X, pts(1).Y, SomePenPos
+LineTo hDC, pts(2).X, pts(2).Y
 'write label text
-Res = TextOut(hDC, pts(4).x + SLblX, pts(4).y + SlblY, Lbl, Len(Lbl))
+Res = TextOut(hDC, pts(4).X + SLblX, pts(4).Y + SlblY, Lbl, Len(Lbl))
 End Sub
 
 
@@ -1883,8 +1883,8 @@ Dim szLbl As Size
 Dim Res As Long
 With GelDraw(Ind)
   If .CSID(SelID) > 0 And .CSR(SelID) > 0 Then
-     ptAPIs(0).x = .CSX(SelID)
-     ptAPIs(0).y = .CSY(SelID)
+     ptAPIs(0).X = .CSX(SelID)
+     ptAPIs(0).Y = .CSY(SelID)
      GetSelFlagPoints ptAPIs
      Res = GetTextExtentPoint32(hDC, SelText, Len(SelText), szLbl)
      DrawSelectedFlag hDC, ptAPIs, SelText, szLbl.cx * SX, szLbl.cy * SY
@@ -1903,8 +1903,8 @@ Dim szLbl As Size
 Dim Res As Long
 With GelDraw(Ind)
   If .IsoID(SelID) > 0 And .IsoR(SelID) > 0 Then
-     ptAPIs(0).x = .IsoX(SelID)
-     ptAPIs(0).y = .IsoY(SelID)
+     ptAPIs(0).X = .IsoX(SelID)
+     ptAPIs(0).Y = .IsoY(SelID)
      GetSelFlagPoints ptAPIs
      Res = GetTextExtentPoint32(hDC, SelText, Len(SelText), szLbl)
      DrawSelectedFlag hDC, ptAPIs, SelText, szLbl.cx * SX, szLbl.cy * SY
@@ -1945,8 +1945,8 @@ Dim szLbl As Size
 Dim Res As Long
 With GelDraw(Ind)
    If .CSID(SelID) > 0 And .CSR(SelID) > 0 And .CSERClr(SelID) <> glDONT_DISPLAY Then
-      ptAPIs(0).x = .CSX(SelID)
-      ptAPIs(0).y = .CSY(SelID)
+      ptAPIs(0).X = .CSX(SelID)
+      ptAPIs(0).Y = .CSY(SelID)
       GetSelFlagPoints ptAPIs
       Res = GetTextExtentPoint32(hDC, SelText, Len(SelText), szLbl)
       DrawSelectedFlag hDC, ptAPIs, SelText, szLbl.cx * SX, szLbl.cy * SY
@@ -1965,8 +1965,8 @@ Dim szLbl As Size
 Dim Res As Long
 With GelDraw(Ind)
    If .IsoID(SelID) > 0 And .IsoR(SelID) > 0 And .IsoERClr(SelID) >= 0 Then
-      ptAPIs(0).x = .IsoX(SelID)
-      ptAPIs(0).y = .IsoY(SelID)
+      ptAPIs(0).X = .IsoX(SelID)
+      ptAPIs(0).Y = .IsoY(SelID)
       GetSelFlagPoints ptAPIs
       Res = GetTextExtentPoint32(hDC, SelText, Len(SelText), szLbl)
       DrawSelectedFlag hDC, ptAPIs, SelText, szLbl.cx * SX, szLbl.cy * SY
@@ -2090,8 +2090,8 @@ If SelCnt > 0 Then
      For i = 1 To SelCnt
         vptAPIs = GetTrianglePoints(.CSX(Sel(i)), .CSY(Sel(i)), .CSR(Sel(i)) \ 2, ar)
         For j = 0 To 2
-           ptAPIs(j).x = vptAPIs(j, 0)
-           ptAPIs(j).y = vptAPIs(j, 1)
+           ptAPIs(j).X = vptAPIs(j, 0)
+           ptAPIs(j).Y = vptAPIs(j, 1)
         Next j
         Polygon hDC, ptAPIs(0), 3
      Next i
@@ -2112,8 +2112,8 @@ If SelCnt > 0 Then
      For i = 1 To SelCnt
         vptAPIs = GetTrianglePoints(.IsoX(Sel(i)), .IsoY(Sel(i)), .IsoR(Sel(i)) \ 2, ar)
         For j = 0 To 2
-            ptAPIs(j).x = vptAPIs(j, 0)
-            ptAPIs(j).y = vptAPIs(j, 1)
+            ptAPIs(j).X = vptAPIs(j, 0)
+            ptAPIs(j).Y = vptAPIs(j, 1)
         Next j
         Polygon hDC, ptAPIs(0), 3
      Next i
@@ -2134,8 +2134,8 @@ If SelCnt > 0 Then
      For i = 1 To SelCnt
         vptAPIs = Get4StarPoints(.CSX(Sel(i)), .CSY(Sel(i)), .CSR(Sel(i)) \ 2, ar)
         For j = 0 To 7
-            ptAPIs(j).x = vptAPIs(j, 0)
-            ptAPIs(j).y = vptAPIs(j, 1)
+            ptAPIs(j).X = vptAPIs(j, 0)
+            ptAPIs(j).Y = vptAPIs(j, 1)
         Next j
         Polygon hDC, ptAPIs(0), 8
      Next i
@@ -2156,8 +2156,8 @@ If SelCnt > 0 Then
      For i = 1 To SelCnt
         vptAPIs = Get4StarPoints(.IsoX(Sel(i)), .IsoY(Sel(i)), .IsoR(Sel(i)) \ 2, ar)
         For j = 0 To 7
-            ptAPIs(j).x = vptAPIs(j, 0)
-            ptAPIs(j).y = vptAPIs(j, 1)
+            ptAPIs(j).X = vptAPIs(j, 0)
+            ptAPIs(j).Y = vptAPIs(j, 1)
         Next j
         Polygon hDC, ptAPIs(0), 8
      Next i
@@ -2178,8 +2178,8 @@ If SelCnt > 0 Then
      For i = 1 To SelCnt
         vptAPIs = GetHexagonPoints(.IsoX(Sel(i)), .IsoY(Sel(i)), .IsoR(Sel(i)) \ 2, ar)
         For j = 0 To 5
-            ptAPIs(j).x = vptAPIs(j, 0)
-            ptAPIs(j).y = vptAPIs(j, 1)
+            ptAPIs(j).X = vptAPIs(j, 0)
+            ptAPIs(j).Y = vptAPIs(j, 1)
         Next j
         Polygon hDC, ptAPIs(0), 6
      Next i
@@ -2200,8 +2200,8 @@ If SelCnt > 0 Then
      For i = 1 To SelCnt
         vptAPIs = GetHexagonPoints(.CSX(Sel(i)), .CSY(Sel(i)), .CSR(Sel(i)) \ 2, ar)
         For j = 0 To 5
-            ptAPIs(j).x = vptAPIs(j, 0)
-            ptAPIs(j).y = vptAPIs(j, 1)
+            ptAPIs(j).X = vptAPIs(j, 0)
+            ptAPIs(j).Y = vptAPIs(j, 1)
         Next j
         Polygon hDC, ptAPIs(0), 6
      Next i

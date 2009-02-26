@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
 Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Object = "{C02A7541-5364-11D2-9373-00A02411EBE6}#1.6#0"; "cw3dgrph.ocx"
 Begin VB.Form frmMSAlign 
@@ -18,7 +18,7 @@ Begin VB.Form frmMSAlign
       Height          =   315
       Left            =   11280
       Style           =   2  'Dropdown List
-      TabIndex        =   92
+      TabIndex        =   101
       Top             =   9240
       Width           =   2895
    End
@@ -27,7 +27,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Mass Refinment Stats"
       Height          =   1815
       Left            =   9000
-      TabIndex        =   79
+      TabIndex        =   88
       Top             =   7800
       Width           =   2175
       Begin VB.TextBox txtMassCalibrationOverallShiftCount 
@@ -35,7 +35,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1560
          Locked          =   -1  'True
-         TabIndex        =   83
+         TabIndex        =   92
          Text            =   "0"
          Top             =   840
          Width           =   495
@@ -45,7 +45,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   120
          Locked          =   -1  'True
-         TabIndex        =   81
+         TabIndex        =   90
          Text            =   "0"
          Top             =   480
          Width           =   1095
@@ -54,7 +54,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Revert to Original Masses"
          Height          =   375
          Left            =   50
-         TabIndex        =   84
+         TabIndex        =   93
          Top             =   1320
          Width           =   2055
       End
@@ -63,7 +63,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Mass shift count:"
          Height          =   255
          Left            =   120
-         TabIndex        =   82
+         TabIndex        =   91
          Top             =   870
          Width           =   1335
       End
@@ -72,7 +72,7 @@ Begin VB.Form frmMSAlign
          Height          =   255
          Index           =   1
          Left            =   2520
-         TabIndex        =   103
+         TabIndex        =   112
          Top             =   1140
          Width           =   600
       End
@@ -81,7 +81,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Avg mass shift (ppm):"
          Height          =   255
          Left            =   120
-         TabIndex        =   80
+         TabIndex        =   89
          Top             =   240
          Width           =   1695
       End
@@ -97,14 +97,14 @@ Begin VB.Form frmMSAlign
       _Version        =   393216
       Style           =   1
       Tabs            =   6
-      Tab             =   5
       TabsPerRow      =   6
       TabHeight       =   520
       BackColor       =   -2147483643
       TabCaption(0)   =   "NET Options"
       TabPicture(0)   =   "frmMSAlign.frx":0000
-      Tab(0).ControlEnabled=   0   'False
+      Tab(0).ControlEnabled=   -1  'True
       Tab(0).Control(0)=   "fraNETWarpOptions"
+      Tab(0).Control(0).Enabled=   0   'False
       Tab(0).ControlCount=   1
       TabCaption(1)   =   "Mass Options"
       TabPicture(1)   =   "frmMSAlign.frx":001C
@@ -125,22 +125,95 @@ Begin VB.Form frmMSAlign
       TabCaption(4)   =   "Advanced"
       TabPicture(4)   =   "frmMSAlign.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "Label21"
-      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(0)=   "fraMTRangeFilters"
+      Tab(4).Control(0).Enabled=   0   'False
+      Tab(4).Control(1)=   "txtWarpMassZScoreTolerance"
+      Tab(4).Control(1).Enabled=   0   'False
       Tab(4).Control(2)=   "Frame1"
-      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
-      Tab(4).ControlCount=   4
+      Tab(4).Control(2).Enabled=   0   'False
+      Tab(4).Control(3)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(3).Enabled=   0   'False
+      Tab(4).Control(4)=   "Label21"
+      Tab(4).Control(4).Enabled=   0   'False
+      Tab(4).ControlCount=   5
       TabCaption(5)   =   "Plots"
       TabPicture(5)   =   "frmMSAlign.frx":008C
-      Tab(5).ControlEnabled=   -1  'True
+      Tab(5).ControlEnabled=   0   'False
       Tab(5).Control(0)=   "fraResidualPlotOptions"
-      Tab(5).Control(0).Enabled=   0   'False
       Tab(5).ControlCount=   1
+      Begin VB.Frame fraMTRangeFilters 
+         Caption         =   "MT Tag Range Filters (leave blank to ignore)"
+         Height          =   975
+         Left            =   -72600
+         TabIndex        =   54
+         Top             =   720
+         Width           =   3855
+         Begin VB.TextBox txtAMTMassMax 
+            Height          =   285
+            Left            =   3000
+            TabIndex        =   62
+            Top             =   600
+            Width           =   735
+         End
+         Begin VB.TextBox txtAMTMassMin 
+            Height          =   285
+            Left            =   3000
+            TabIndex        =   60
+            Top             =   220
+            Width           =   735
+         End
+         Begin VB.TextBox txtAMTNetMax 
+            Height          =   285
+            Left            =   1080
+            TabIndex        =   58
+            Top             =   600
+            Width           =   735
+         End
+         Begin VB.TextBox txtAMTNetMin 
+            Height          =   285
+            Left            =   1080
+            TabIndex        =   56
+            Top             =   220
+            Width           =   735
+         End
+         Begin VB.Label Label25 
+            Caption         =   "Mass Max:"
+            Height          =   255
+            Left            =   2040
+            TabIndex        =   61
+            Top             =   620
+            Width           =   1005
+         End
+         Begin VB.Label Label24 
+            Caption         =   "Mass Min:"
+            Height          =   285
+            Left            =   2040
+            TabIndex        =   59
+            Top             =   250
+            Width           =   1005
+         End
+         Begin VB.Label lblAMTNetMax 
+            Caption         =   "NET Max:"
+            Height          =   255
+            Left            =   120
+            TabIndex        =   57
+            Top             =   620
+            Width           =   1000
+         End
+         Begin VB.Label lblAMTNetMin 
+            Caption         =   "NET Min:"
+            Height          =   285
+            Left            =   120
+            TabIndex        =   55
+            Top             =   250
+            Width           =   1000
+         End
+      End
       Begin VB.Frame fraResidualPlotOptions 
          Caption         =   "Residual Plot Options"
          Height          =   1350
-         Left            =   120
-         TabIndex        =   54
+         Left            =   -74880
+         TabIndex        =   63
          Top             =   360
          Width           =   6015
          Begin VB.CommandButton cmdZoomOutResidualsPlot 
@@ -148,7 +221,7 @@ Begin VB.Form frmMSAlign
             Caption         =   "Zoom Out"
             Height          =   375
             Left            =   4800
-            TabIndex        =   69
+            TabIndex        =   78
             Top             =   900
             Width           =   1095
          End
@@ -156,7 +229,7 @@ Begin VB.Form frmMSAlign
             Caption         =   "Set Range for Current Plot"
             Height          =   375
             Left            =   2640
-            TabIndex        =   68
+            TabIndex        =   77
             Top             =   900
             Width           =   2055
          End
@@ -164,7 +237,7 @@ Begin VB.Form frmMSAlign
             Alignment       =   2  'Center
             Height          =   285
             Left            =   4920
-            TabIndex        =   67
+            TabIndex        =   76
             Text            =   "0"
             Top             =   550
             Width           =   800
@@ -173,7 +246,7 @@ Begin VB.Form frmMSAlign
             Alignment       =   2  'Center
             Height          =   285
             Left            =   3120
-            TabIndex        =   63
+            TabIndex        =   72
             Text            =   "0"
             Top             =   550
             Width           =   800
@@ -182,7 +255,7 @@ Begin VB.Form frmMSAlign
             Alignment       =   2  'Center
             Height          =   285
             Left            =   4920
-            TabIndex        =   65
+            TabIndex        =   74
             Text            =   "0"
             Top             =   210
             Width           =   800
@@ -191,7 +264,7 @@ Begin VB.Form frmMSAlign
             Alignment       =   2  'Center
             Height          =   285
             Left            =   3120
-            TabIndex        =   61
+            TabIndex        =   70
             Text            =   "0"
             Top             =   210
             Width           =   800
@@ -202,7 +275,7 @@ Begin VB.Form frmMSAlign
             Left            =   1320
             List            =   "frmMSAlign.frx":00AA
             Style           =   2  'Dropdown List
-            TabIndex        =   58
+            TabIndex        =   67
             Top             =   600
             Width           =   645
          End
@@ -212,7 +285,7 @@ Begin VB.Form frmMSAlign
             Left            =   1320
             List            =   "frmMSAlign.frx":00AE
             Style           =   2  'Dropdown List
-            TabIndex        =   56
+            TabIndex        =   65
             Top             =   240
             Width           =   645
          End
@@ -220,7 +293,7 @@ Begin VB.Form frmMSAlign
             Caption         =   "Auto-zoom out after alignment"
             Height          =   255
             Left            =   120
-            TabIndex        =   59
+            TabIndex        =   68
             Top             =   960
             Value           =   1  'Checked
             Width           =   2535
@@ -229,7 +302,7 @@ Begin VB.Form frmMSAlign
             Caption         =   "Y Max"
             Height          =   255
             Left            =   4350
-            TabIndex        =   66
+            TabIndex        =   75
             Top             =   580
             Width           =   600
          End
@@ -237,7 +310,7 @@ Begin VB.Form frmMSAlign
             Caption         =   "X Max"
             Height          =   255
             Left            =   2550
-            TabIndex        =   62
+            TabIndex        =   71
             Top             =   585
             Width           =   600
          End
@@ -245,7 +318,7 @@ Begin VB.Form frmMSAlign
             Caption         =   "Y Min"
             Height          =   255
             Left            =   4350
-            TabIndex        =   64
+            TabIndex        =   73
             Top             =   240
             Width           =   600
          End
@@ -253,7 +326,7 @@ Begin VB.Form frmMSAlign
             Caption         =   "X Min"
             Height          =   255
             Left            =   2550
-            TabIndex        =   60
+            TabIndex        =   69
             Top             =   240
             Width           =   600
          End
@@ -261,7 +334,7 @@ Begin VB.Form frmMSAlign
             Caption         =   "Line Size"
             Height          =   285
             Left            =   120
-            TabIndex        =   57
+            TabIndex        =   66
             Top             =   630
             Width           =   975
          End
@@ -269,7 +342,7 @@ Begin VB.Form frmMSAlign
             Caption         =   "Point Size"
             Height          =   285
             Left            =   120
-            TabIndex        =   55
+            TabIndex        =   64
             Top             =   270
             Width           =   975
          End
@@ -284,41 +357,41 @@ Begin VB.Form frmMSAlign
       End
       Begin VB.Frame Frame1 
          Caption         =   "LSQ Options"
-         Height          =   855
+         Height          =   975
          Left            =   -74880
          TabIndex        =   49
          Top             =   720
-         Width           =   6015
+         Width           =   2175
          Begin VB.TextBox txtWarpMassLSQOutlierZScore 
             Height          =   285
-            Left            =   1680
+            Left            =   1320
             TabIndex        =   51
             Text            =   "3"
-            Top             =   360
+            Top             =   220
             Width           =   735
          End
          Begin VB.TextBox txtWarpMassLSQNumKnots 
             Height          =   285
-            Left            =   4200
+            Left            =   1320
             TabIndex        =   53
             Text            =   "12"
-            Top             =   360
+            Top             =   600
             Width           =   735
          End
          Begin VB.Label Label18 
             Caption         =   "Outlier z-score:"
             Height          =   285
-            Left            =   240
+            Left            =   120
             TabIndex        =   50
-            Top             =   390
+            Top             =   250
             Width           =   1215
          End
          Begin VB.Label Label20 
             Caption         =   "# of knots:"
             Height          =   255
-            Left            =   3240
+            Left            =   120
             TabIndex        =   52
-            Top             =   390
+            Top             =   620
             Width           =   1215
          End
       End
@@ -576,7 +649,7 @@ Begin VB.Form frmMSAlign
       Begin VB.Frame fraNETWarpOptions 
          Caption         =   "NET Warp Options"
          Height          =   1335
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   8
          Top             =   360
          Width           =   6135
@@ -694,7 +767,7 @@ Begin VB.Form frmMSAlign
       BackColor       =   &H80000005&
       Height          =   735
       Left            =   120
-      TabIndex        =   96
+      TabIndex        =   105
       Top             =   9600
       Width           =   11055
       Begin VB.Label lblUMCMassMode 
@@ -702,7 +775,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "LC-MS Feature Mass Mode"
          Height          =   255
          Left            =   120
-         TabIndex        =   98
+         TabIndex        =   107
          ToolTipText     =   "Status of the MT tag database"
          Top             =   390
          Width           =   10755
@@ -712,7 +785,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Status"
          Height          =   255
          Left            =   120
-         TabIndex        =   97
+         TabIndex        =   106
          Top             =   135
          Width           =   10815
       End
@@ -721,7 +794,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Set to Defaults"
       Height          =   375
       Left            =   11280
-      TabIndex        =   93
+      TabIndex        =   102
       Top             =   9720
       Width           =   1335
    End
@@ -730,7 +803,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "NET Alignment Stats"
       Height          =   1815
       Left            =   6600
-      TabIndex        =   70
+      TabIndex        =   79
       Top             =   7800
       Width           =   2295
       Begin VB.TextBox txtFit 
@@ -738,7 +811,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   78
+         TabIndex        =   87
          Top             =   1360
          Width           =   1095
       End
@@ -747,7 +820,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   76
+         TabIndex        =   85
          Top             =   960
          Width           =   1095
       End
@@ -755,7 +828,7 @@ Begin VB.Form frmMSAlign
          Alignment       =   2  'Center
          Height          =   285
          Left            =   840
-         TabIndex        =   72
+         TabIndex        =   81
          Text            =   "0"
          Top             =   240
          Width           =   1335
@@ -764,7 +837,7 @@ Begin VB.Form frmMSAlign
          Alignment       =   2  'Center
          Height          =   285
          Left            =   1080
-         TabIndex        =   74
+         TabIndex        =   83
          Text            =   "0"
          Top             =   600
          Width           =   1095
@@ -774,7 +847,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Mean residual:"
          Height          =   375
          Left            =   120
-         TabIndex        =   77
+         TabIndex        =   86
          Top             =   1260
          Width           =   975
       End
@@ -783,7 +856,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "R-squared:"
          Height          =   255
          Left            =   120
-         TabIndex        =   75
+         TabIndex        =   84
          Top             =   990
          Width           =   855
       End
@@ -792,7 +865,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Slope:"
          Height          =   255
          Left            =   120
-         TabIndex        =   71
+         TabIndex        =   80
          Top             =   270
          Width           =   615
       End
@@ -801,7 +874,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Intercept:"
          Height          =   255
          Left            =   120
-         TabIndex        =   73
+         TabIndex        =   82
          Top             =   640
          Width           =   855
       End
@@ -816,7 +889,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Abort"
       Height          =   375
       Left            =   12840
-      TabIndex        =   95
+      TabIndex        =   104
       Top             =   9960
       Width           =   1335
    End
@@ -825,7 +898,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Info"
       Height          =   1335
       Left            =   11280
-      TabIndex        =   85
+      TabIndex        =   94
       Top             =   7800
       Width           =   2895
       Begin VB.TextBox txtNumMatched 
@@ -833,7 +906,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1500
          Locked          =   -1  'True
-         TabIndex        =   91
+         TabIndex        =   100
          Top             =   960
          Width           =   1300
       End
@@ -842,7 +915,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1500
          Locked          =   -1  'True
-         TabIndex        =   89
+         TabIndex        =   98
          Top             =   600
          Width           =   1300
       End
@@ -851,7 +924,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1500
          Locked          =   -1  'True
-         TabIndex        =   87
+         TabIndex        =   96
          Top             =   240
          Width           =   1300
       End
@@ -860,7 +933,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Match Count:"
          Height          =   255
          Left            =   120
-         TabIndex        =   90
+         TabIndex        =   99
          Top             =   960
          Width           =   1450
       End
@@ -869,7 +942,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "LC-MS Features:"
          Height          =   255
          Left            =   120
-         TabIndex        =   88
+         TabIndex        =   97
          Top             =   600
          Width           =   1450
       End
@@ -878,7 +951,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "MT Tag Count:"
          Height          =   255
          Left            =   120
-         TabIndex        =   86
+         TabIndex        =   95
          Top             =   240
          Width           =   1450
       End
@@ -887,7 +960,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Align (Warped)"
       Height          =   375
       Left            =   12840
-      TabIndex        =   94
+      TabIndex        =   103
       Top             =   9720
       Width           =   1335
    End
@@ -1441,7 +1514,7 @@ Begin VB.Form frmMSAlign
       Begin CWUIControlsLib.CWGraph ctlMassVsMZResidual 
          Height          =   4455
          Left            =   1560
-         TabIndex        =   104
+         TabIndex        =   113
          Top             =   4200
          Width           =   6135
          _Version        =   393218
@@ -1751,7 +1824,7 @@ Begin VB.Form frmMSAlign
       Begin CWUIControlsLib.CWGraph ctlMassVsScanResidual 
          Height          =   4455
          Left            =   2880
-         TabIndex        =   102
+         TabIndex        =   111
          Top             =   2880
          Width           =   6135
          _Version        =   393218
@@ -2061,11 +2134,11 @@ Begin VB.Form frmMSAlign
       Begin VIPER.ctl2DHeatMap ctlFlatSurface 
          Height          =   1455
          Left            =   240
-         TabIndex        =   99
+         TabIndex        =   108
          Top             =   360
          Width           =   5055
-         _ExtentX        =   8916
-         _ExtentY        =   2566
+         _extentx        =   8916
+         _extenty        =   2566
       End
       Begin VB.CheckBox chkSurfaceShowsZScore 
          BackColor       =   &H00FFFFFF&
@@ -2100,11 +2173,11 @@ Begin VB.Form frmMSAlign
       Begin CW3DGraphLib.CWGraph3D ctlCWGraphNI 
          Height          =   4575
          Left            =   4800
-         TabIndex        =   100
+         TabIndex        =   109
          Top             =   960
          Visible         =   0   'False
          Width           =   5535
-         _Version        =   393218
+         _Version        =   393217
          _ExtentX        =   9763
          _ExtentY        =   8070
          _StockProps     =   68
@@ -2118,7 +2191,7 @@ Begin VB.Form frmMSAlign
             Strikethrough   =   0   'False
          EndProperty
          Reset_0         =   0   'False
-         CompatibleVers_0=   393218
+         CompatibleVers_0=   393217
          Graph3D_0       =   1
          ClassName_1     =   "CCWGraph3DFrame"
          opts_1          =   62
@@ -2201,8 +2274,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   9.71908206847002E-295
-         DataMax_5       =   9.71908206847002E-295
+         DataMin_5       =   5.33257101030242E-287
+         DataMax_5       =   5.33257101030242E-287
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2268,8 +2341,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   9.76322170458103E-295
-         DataMax_14      =   9.76322170458103E-295
+         DataMin_14      =   5.40620415586629E-287
+         DataMax_14      =   5.40620415586629E-287
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2337,8 +2410,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   9.80413598162574E-295
-         DataMax_23      =   9.80413598162574E-295
+         DataMin_23      =   5.43558526403086E-287
+         DataMax_23      =   5.43558526403086E-287
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -2534,7 +2607,7 @@ Begin VB.Form frmMSAlign
       Begin CWUIControlsLib.CWGraph ctlNETResidual 
          Height          =   4455
          Left            =   480
-         TabIndex        =   101
+         TabIndex        =   110
          Top             =   2280
          Width           =   6135
          _Version        =   393218
@@ -2938,6 +3011,15 @@ Begin VB.Form frmMSAlign
       Begin VB.Menu mnuEditSep3 
          Caption         =   "-"
       End
+      Begin VB.Menu mnuEditCopyAlignmentScoresToClipboard 
+         Caption         =   "Copy Alignment Scores to Clipboard"
+      End
+      Begin VB.Menu mnuEditCopyAlignmentFunctionToClipboard 
+         Caption         =   "Copy Alignment Function to Clipboard"
+      End
+      Begin VB.Menu mnuEditSep4 
+         Caption         =   "-"
+      End
       Begin VB.Menu cmdEditShowDefaults 
          Caption         =   "Show Default &Options"
       End
@@ -3117,11 +3199,24 @@ Private Enum mcMatchColumns
     mcMassError = 3
 End Enum
 
-' Contents are ??
+' 2D Array of variants, ranging from 0 to UBound(mMatchScores, 1) in the first dimension and 0 to UBound(mMatchScores, 2) in the second dimension
+' The number of rows corresponds to the number of time slices; the number of columns corresponds to the number of regions the NET scale was divided into
 Private mMatchScores As Variant
 
-' Contents are ??
+' 2D Array with the alignment function values, ranging from UBound(mAlignmentFunc, 1) in the first dimension and from 0 to 8 in the 2nd dimension
+' Columns for the 2nd dimension are given by afAlignmentFuncColumnConstants
 Private mAlignmentFunc As Variant
+Private Enum afAlignmentFuncColumnConstants
+    TimeSlice = 0
+    AlignmentFuncY1 = 1
+    AlignmentFuncY2 = 2
+    ScanStart = 3
+    ScanEnd = 4
+    NETStart = 5
+    NETEnd = 6
+    ScoreA = 7
+    ScoreB = 8
+End Enum
 
 Private mCalibrationType As rmcUMCRobustNETWarpMassCalibrationType
 Private mSplineOrder As Integer
@@ -3315,6 +3410,180 @@ Private Function ConstructHistoryTextForNETAlignment(ByVal strSecondsElapsed As 
     
                     
     ConstructHistoryTextForNETAlignment = strMessage
+End Function
+
+Public Function CopyTwoDimensionalVariantToClipboardOrFile(ByRef varTwoDimensionalArray As Variant, Optional strFilePath As String = "", Optional blnShowMessages As Boolean = True) As Long
+
+    ' Returns 0 if success; error number if error
+    
+    Dim lngRowIndexMax As Long
+    Dim lngColumnIndexMax As Long
+    Dim strData() As String     ' Ranges from 0 to lngRowIndexMax since row 0 is the header row
+    
+    Dim lngRowIndex As Long
+    Dim lngColumnIndex As Long
+    
+    Dim fso As FileSystemObject
+    Dim tsOutfile As TextStream
+    Dim strTextToCopy As String
+    
+On Error Resume Next
+    lngRowIndexMax = UBound(varTwoDimensionalArray, 2)
+    lngColumnIndexMax = UBound(varTwoDimensionalArray, 1)
+    If lngRowIndexMax = 0 Then
+        If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox "No data found to copy", vbInformation + vbOKOnly, "No data"
+        End If
+        CopyTwoDimensionalVariantToClipboardOrFile = -1
+        Exit Function
+    End If
+    
+On Error GoTo CopyTwoDimensionalVariantToClipboardOrFileErrorHandler
+
+    Me.MousePointer = vbHourglass
+    UpdateStatus "Exporting"
+    
+    ' Header row is strData(0)
+    ' Data is from strData(1) to strData(lngRowIndexMax)
+    ReDim strData(0 To lngRowIndexMax + 1)
+    
+    ' Define the header row
+    strData(0) = "Row"
+    For lngColumnIndex = 0 To lngColumnIndexMax
+        strData(0) = strData(0) & vbTab & "Column" & LTrim(CStr(lngColumnIndex + 1))
+    Next lngColumnIndex
+    
+    ' Fill strData()
+    For lngRowIndex = 0 To lngRowIndexMax
+        ' Store the first column of data
+        strData(lngRowIndex + 1) = "Row" & LTrim(CStr(lngRowIndex + 1))
+        
+        ' Store the remaining columns
+        For lngColumnIndex = 0 To lngColumnIndexMax - 1
+            strData(lngRowIndex + 1) = strData(lngRowIndex + 1) & vbTab & Round(varTwoDimensionalArray(lngColumnIndex, lngRowIndex), 4)
+        
+        Next lngColumnIndex
+    Next lngRowIndex
+      
+    If Len(strFilePath) > 0 Then
+        Set fso = New FileSystemObject
+        Set tsOutfile = fso.CreateTextFile(strFilePath, True)
+        
+        For lngRowIndex = 0 To UBound(strData)
+           tsOutfile.WriteLine strData(lngRowIndex)
+        Next lngRowIndex
+        
+        tsOutfile.Close
+    Else
+        strTextToCopy = FlattenStringArray(strData(), UBound(strData) + 1, vbCrLf, False)
+        Clipboard.Clear
+        Clipboard.SetText strTextToCopy, vbCFText
+    End If
+    
+    Me.MousePointer = vbDefault
+    UpdateStatus "Ready"
+    
+    CopyTwoDimensionalVariantToClipboardOrFile = 0
+    Exit Function
+
+CopyTwoDimensionalVariantToClipboardOrFileErrorHandler:
+    If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error exporting data: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    
+    CopyTwoDimensionalVariantToClipboardOrFile = Err.Number
+
+End Function
+
+Public Function CopyAlignmentFunctionToClipboardOrFile(Optional strFilePath As String = "", Optional blnShowMessages As Boolean = True) As Long
+
+    ' Returns 0 if success; error number if error
+    
+    Dim lngColumnIndexMax As Long
+    Dim lngRowIndexMax As Long
+    Dim strData() As String     ' Ranges from 0 to lngRowIndexMax since row 0 is the header row
+    
+    Dim lngColumnIndex As Long
+    Dim lngRowIndex As Long
+    
+    Dim fso As FileSystemObject
+    Dim tsOutfile As TextStream
+    Dim strTextToCopy As String
+    
+On Error Resume Next
+    lngRowIndexMax = UBound(mAlignmentFunc, 1)
+    lngColumnIndexMax = UBound(mAlignmentFunc, 2)
+    If lngRowIndexMax = 0 Then
+        If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox "No data found to copy", vbInformation + vbOKOnly, "No data"
+        End If
+        CopyAlignmentFunctionToClipboardOrFile = -1
+        Exit Function
+    End If
+    
+On Error GoTo CopyAlignmentFunctionToClipboardOrFileErrorHandler
+
+    Me.MousePointer = vbHourglass
+    UpdateStatus "Exporting"
+    
+    ' Header row is strData(0)
+    ' Data is from strData(1) to strData(lngColumnIndexMax)
+    ReDim strData(0 To lngRowIndexMax + 1)
+    
+    ' Define the header row
+    strData(0) = "TimeSlice" & vbTab & _
+                 "AlignmentFuncY1" & vbTab & _
+                 "AlignmentFuncY2" & vbTab & _
+                 "ScanStart" & vbTab & _
+                 "ScanEnd" & vbTab & _
+                 "NETStart" & vbTab & _
+                 "NETEnd" & vbTab & _
+                 "ScoreA" & vbTab & _
+                 "ScoreB"
+
+    ' Fill strData()
+    For lngRowIndex = 0 To lngRowIndexMax
+        ' Store the first column of data
+        strData(lngRowIndex + 1) = Round(mAlignmentFunc(lngRowIndex, 0), 4)
+        
+        ' Store the remaining columns
+        For lngColumnIndex = 1 To lngColumnIndexMax
+            strData(lngRowIndex + 1) = strData(lngRowIndex + 1) & vbTab & Round(mAlignmentFunc(lngRowIndex, lngColumnIndex), 4)
+        Next lngColumnIndex
+    Next lngRowIndex
+      
+    If Len(strFilePath) > 0 Then
+        Set fso = New FileSystemObject
+        Set tsOutfile = fso.CreateTextFile(strFilePath, True)
+        
+        For lngRowIndex = 0 To UBound(strData)
+           tsOutfile.WriteLine strData(lngRowIndex)
+        Next lngRowIndex
+        
+        tsOutfile.Close
+    Else
+        strTextToCopy = FlattenStringArray(strData(), UBound(strData) + 1, vbCrLf, False)
+        Clipboard.Clear
+        Clipboard.SetText strTextToCopy, vbCFText
+    End If
+    
+    Me.MousePointer = vbDefault
+    UpdateStatus "Ready"
+    
+    CopyAlignmentFunctionToClipboardOrFile = 0
+    Exit Function
+
+CopyAlignmentFunctionToClipboardOrFileErrorHandler:
+    If blnShowMessages And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error exporting data: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    
+    CopyAlignmentFunctionToClipboardOrFile = Err.Number
+
+End Function
+
+Public Function CopyAlignmentScoresToClipboardOrFile(Optional strFilePath As String = "", Optional blnShowMessages As Boolean = True) As Long
+    CopyAlignmentScoresToClipboardOrFile = CopyTwoDimensionalVariantToClipboardOrFile(mMatchScores, strFilePath, blnShowMessages)
 End Function
 
 Private Sub CopyLocalDataToGel(strSecondsElapsed As String, blnUpdateMassValues As Boolean)
@@ -5054,6 +5323,35 @@ MatchesAreValidErrorHandler:
     MatchesAreValid = False
 End Function
 
+Private Function MTPassesFilters(ByVal lngMTIndex As Long, ByVal lngObsCountMinimum As Long, _
+                                 ByVal blnUseNETFilter As Boolean, ByVal dblNETMinimum As Double, ByVal dblNETMaximum As Double, _
+                                 ByVal blnUseMassFilter As Boolean, ByVal dblMassMinimum As Double, ByVal dblMassMaximum As Double) As Boolean
+
+    Dim blnPassesFilters As Boolean
+    
+    If mLocalPMTs(lngMTIndex, PMTColumnConstants.pccObservationCount) >= lngObsCountMinimum Then
+        blnPassesFilters = True
+        If blnUseNETFilter Then
+            If mLocalPMTs(lngMTIndex, PMTColumnConstants.pccNET) < dblNETMinimum Or _
+               mLocalPMTs(lngMTIndex, PMTColumnConstants.pccNET) > dblNETMaximum Then
+                blnPassesFilters = False
+            End If
+        End If
+        
+        If blnUseMassFilter Then
+            If mLocalPMTs(lngMTIndex, PMTColumnConstants.pccMonoisotopicMass) < dblMassMinimum Or _
+               mLocalPMTs(lngMTIndex, PMTColumnConstants.pccMonoisotopicMass) > dblMassMaximum Then
+                blnPassesFilters = False
+            End If
+        End If
+    Else
+        blnPassesFilters = False
+    End If
+    
+    MTPassesFilters = blnPassesFilters
+    
+End Function
+            
 Private Function PlotNETLine() As Boolean
     ' Returns True if the plot is refreshed
 
@@ -6291,6 +6589,18 @@ Public Sub StartAlignment()
     Dim dblPMTs() As Double     ' 2D Array; containing a subset of mLocalPMTs, filtered on UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount
     Dim i As Long, j As Long
     
+    Dim lngObsCountFilterActual
+    
+    Dim blnUseNETFilter As Boolean
+    Dim blnUseMassFilter As Boolean
+    
+    Dim dblNETMinimum As Double
+    Dim dblNETMaximum As Double
+    Dim dblMassMinimum As Double
+    Dim dblMassMaximum As Double
+    
+    Dim strFilterMessage As String
+    
     If mLoading Then Exit Sub
     
 On Error GoTo StartAlignmentErrorHandler
@@ -6328,6 +6638,30 @@ On Error GoTo StartAlignmentErrorHandler
     graphNetErrors.ClearData
 
 
+    blnUseNETFilter = False
+    dblNETMinimum = 0
+    dblNETMaximum = 0
+    If IsNumeric(txtAMTNetMin) Then dblNETMinimum = CDblSafe(txtAMTNetMin)
+    If IsNumeric(txtAMTNetMax) Then dblNETMaximum = CDblSafe(txtAMTNetMax)
+    If dblNETMinimum > 0 Or dblNETMaximum > 0 Then
+        If dblNETMinimum > 0 And dblNETMaximum = 0 Then
+            dblNETMaximum = 10
+        End If
+        blnUseNETFilter = True
+    End If
+    
+    blnUseMassFilter = False
+    dblMassMinimum = 0
+    dblMassMaximum = 0
+    If IsNumeric(txtAMTMassMin) Then dblMassMinimum = CDblSafe(txtAMTMassMin)
+    If IsNumeric(txtAMTMassMax) Then dblMassMaximum = CDblSafe(txtAMTMassMax)
+    If dblMassMinimum > 0 Or dblMassMaximum > 0 Then
+        If dblMassMinimum > 0 And dblMassMaximum = 0 Then
+            dblMassMaximum = 1000000
+        End If
+        blnUseMassFilter = True
+    End If
+    
     ' Populate dblPMTs()
     ' First find the number of MT tags passing the observation count filter
     lngPMTCount = 0
@@ -6339,30 +6673,67 @@ On Error GoTo StartAlignmentErrorHandler
     
     If lngPMTCount = 0 Then
         ' No MT tags match the filter; use all of them
-        lngPMTCount = mLocalPMTCount
-        
-        ' Reserve space in dblPMTs
-        ReDim dblPMTs(lngPMTCount - 1, PMT_COLUMN_COUNT - 1)
-        
-        ' Copy the entire array into dblPMTs
-        dblPMTs = mLocalPMTs
+        lngObsCountFilterActual = 0
     Else
-        ' Reserve space in dblPMTs
-        ReDim dblPMTs(lngPMTCount - 1, PMT_COLUMN_COUNT - 1)
-        
-        ' Now copy the valid data from mLocalPMTs into dblPMTs
-        lngPMTCount = 0
-        For i = 0 To mLocalPMTCount - 1
-            If mLocalPMTs(i, PMTColumnConstants.pccObservationCount) >= UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount Then
-                For j = 0 To PMT_COLUMN_COUNT - 1
-                    dblPMTs(lngPMTCount, j) = mLocalPMTs(i, j)
-                Next j
-                lngPMTCount = lngPMTCount + 1
-            End If
-        Next i
+        ' One ore more MT Tags has an observation count >= .MinimumPMTTagObsCount
+        lngObsCountFilterActual = UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount
+    End If
+
+    ' Now determine the number of MT tags that will pass both the observation count filter and the mass and NET filters
+    lngPMTCount = 0
+    For i = 0 To mLocalPMTCount - 1
+        If MTPassesFilters(i, lngObsCountFilterActual, blnUseNETFilter, dblNETMinimum, dblNETMaximum, blnUseMassFilter, dblMassMinimum, dblMassMaximum) Then
+            lngPMTCount = lngPMTCount + 1
+        End If
+    Next i
     
+    strFilterMessage = ""
+    If blnUseMassFilter Or blnUseNETFilter Then
+        If blnUseNETFilter Then
+            strFilterMessage = strFilterMessage & "; NET between " & Round(dblNETMinimum, 3) & " and " & Round(dblNETMaximum, 3)
+        End If
+        
+        If blnUseMassFilter Then
+            strFilterMessage = strFilterMessage & "; Mass between " & Round(dblMassMinimum, 3) & " and " & Round(dblMassMaximum, 3)
+        End If
     End If
     
+    If lngPMTCount = 0 Then
+        strFilterMessage = "The specified NET and/or Mass filters excluded all of the MT Tags" & strFilterMessage
+        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox strFilterMessage, vbExclamation + vbOKOnly, "Error"
+        Else
+            AddToAnalysisHistory CallerID, strFilterMessage
+        End If
+        EnableDisableControls True
+        Exit Sub
+    Else
+        txtPMTCountLoaded.Text = LongToStringWithCommas(lngPMTCount)
+    End If
+    
+    ' Reserve space in dblPMTs for a maximum of lngPMTCount PMTs
+    ReDim dblPMTs(lngPMTCount - 1, PMT_COLUMN_COUNT - 1)
+    
+    ' Now copy the valid data from mLocalPMTs into dblPMTs
+    ' We will also apply the mass and NET filters at this time (if applicable)
+    lngPMTCount = 0
+    For i = 0 To mLocalPMTCount - 1
+        If MTPassesFilters(i, lngObsCountFilterActual, blnUseNETFilter, dblNETMinimum, dblNETMaximum, blnUseMassFilter, dblMassMinimum, dblMassMaximum) Then
+            For j = 0 To PMT_COLUMN_COUNT - 1
+                dblPMTs(lngPMTCount, j) = mLocalPMTs(i, j)
+            Next j
+            lngPMTCount = lngPMTCount + 1
+        End If
+    Next i
+
+    ' Verify that dblPMTS was populated the way we expected it to be
+    Debug.Assert UBound(dblPMTs, 1) = lngPMTCount - 1
+    
+    If Len(strFilterMessage) > 0 Then
+        strFilterMessage = "AMT Tags used for alignment are filtered" & strFilterMessage
+        AddToAnalysisHistory CallerID, strFilterMessage
+    End If
+   
     mCalibrationType = UMCNetAdjDef.MSWarpOptions.MassCalibrationType
     mSplineOrder = UMCNetAdjDef.MSWarpOptions.MassSplineOrder
     
@@ -6539,6 +6910,10 @@ Private Sub UpdateControlValues(ByVal blnUseDefaults As Boolean)
         txtWarpMassLSQNumKnots.Text = .MSWarpOptions.MassLSQNumKnots
         txtWarpMassLSQOutlierZScore.Text = .MSWarpOptions.MassLSQOutlierZScore
     
+        txtAMTMassMin.Text = ""
+        txtAMTMassMax.Text = ""
+        txtAMTNetMin.Text = ""
+        txtAMTNetMax.Text = ""
     
         Select Case .MSWarpOptions.MassCalibrationType
         Case rmcUMCRobustNETWarpMassCalibrationType.rmcMZRegressionRecal
@@ -7070,7 +7445,7 @@ Private Sub graphMassErrors_KeyPress(KeyAscii As Integer)
     End If
 End Sub
 
-Private Sub graphMassErrors_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub graphMassErrors_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbRightButton Then
         ZoomOutCWGraph graphMassErrors
     End If
@@ -7082,7 +7457,7 @@ Private Sub graphNetErrors_KeyPress(KeyAscii As Integer)
     End If
 End Sub
 
-Private Sub graphNetErrors_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub graphNetErrors_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Button = vbRightButton Then
          ZoomOutCWGraph graphNetErrors
     End If
@@ -7094,6 +7469,14 @@ End Sub
 
 Private Sub mnuEditCopy3DViewToClipboard_Click()
     Save3DViewToClipboardOrEMF ""
+End Sub
+
+Private Sub mnuEditCopyAlignmentFunctionToClipboard_Click()
+    CopyAlignmentFunctionToClipboardOrFile
+End Sub
+
+Private Sub mnuEditCopyAlignmentScoresToClipboard_Click()
+    CopyAlignmentScoresToClipboardOrFile
 End Sub
 
 Private Sub mnuEditCopyFlatViewToClipboard_Click()
@@ -7276,6 +7659,42 @@ Private Sub tmrAlignment_Timer()
     QueryMassMatchProgress
 End Sub
 
+Private Sub txtAMTMassMax_LostFocus()
+    If Len(txtAMTMassMax) > 0 Then
+        ValidateTextboxValueDbl txtAMTMassMax, 0, 1000000, -1000
+        If txtAMTMassMax = "-1000" Then
+            txtAMTMassMax = ""
+        End If
+    End If
+End Sub
+
+Private Sub txtAMTMassMin_LostFocus()
+    If Len(txtAMTMassMin) > 0 Then
+        ValidateTextboxValueDbl txtAMTMassMin, 0, 1000000, -1000
+        If txtAMTMassMin = "-1000" Then
+            txtAMTMassMin = ""
+        End If
+    End If
+End Sub
+
+Private Sub txtAMTNetMax_LostFocus()
+    If Len(txtAMTNetMax) > 0 Then
+        ValidateTextboxValueDbl txtAMTNetMax, -100, 100, -1000
+        If txtAMTNetMax = "-1000" Then
+            txtAMTNetMax = ""
+        End If
+    End If
+End Sub
+
+Private Sub txtAMTNetMin_LostFocus()
+    If Len(txtAMTNetMin) > 0 Then
+        ValidateTextboxValueDbl txtAMTNetMin, -100, 100, -1000
+        If txtAMTNetMin = "-1000" Then
+            txtAMTNetMin = ""
+        End If
+    End If
+End Sub
+
 Private Sub txtContractionFactor_LostFocus()
     UMCNetAdjDef.MSWarpOptions.ContractionFactor = ValidateTextboxValueLng(txtContractionFactor, 1, 10, 3)
 End Sub
@@ -7319,7 +7738,7 @@ Private Sub txtMaxDistortion_LostFocus()
 End Sub
 
 Private Sub txtMinMSMSObservations_LostFocus()
-    UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount = ValidateTextboxValueLng(txtMinMSMSObservations, 1, 100000, 5)
+    UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount = ValidateTextboxValueLng(txtMinMSMSObservations, 0, 1000000, 5)
 End Sub
 
 Private Sub txtNetTolerance_LostFocus()
