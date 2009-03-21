@@ -176,6 +176,9 @@ Private mDataFilterMode As dfmCSandIsoDataFilterModeConstants
 Private mMaximumDataCountEnabled As Boolean
 Private mMaximumDataCountToLoad As Long
 
+Private mTotalIntensityPercentageFilterEnabled As Boolean
+Private mTotalIntensityPercentageFilter As Single
+
 Private mPrescannedData As clsFileIOPrescannedData
 
 Private mIReportFile As Boolean
@@ -413,6 +416,7 @@ Public Function LoadNewPEK(ByVal strPEKFilePath As String, ByVal lngGelIndex As 
                            ByVal blnFilterByAbundance As Boolean, _
                            ByVal dblMinAbu As Double, ByVal dblMaxAbu As Double, _
                            ByVal blnMaximumDataCountEnabled As Boolean, ByVal lngMaximumDataCountToLoad As Long, _
+                           ByVal blnTotalIntensityPercentageFilterEnabled, ByVal sngTotalIntensityPercentageFilter, _
                            ByVal eScanFilterMode As eosEvenOddScanFilterModeConstants, _
                            ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants) As Long
     '-------------------------------------------------------------------------
@@ -426,6 +430,8 @@ Public Function LoadNewPEK(ByVal strPEKFilePath As String, ByVal lngGelIndex As 
     '-------------------------------------------------------------------------
     
     Dim intProgressCount As Integer
+    Dim blnFilePrescanEnabled As Boolean
+
     Dim lngReturnValue As Long
     Dim lngIndex As Long
     
@@ -456,11 +462,19 @@ On Error GoTo LoadNewPEKErrorHandler
     mMaximumDataCountEnabled = blnMaximumDataCountEnabled
     mMaximumDataCountToLoad = lngMaximumDataCountToLoad
     
-    If mMaximumDataCountEnabled Then
-        If mMaximumDataCountToLoad < 10 Then mMaximumDataCountToLoad = 10
+    mTotalIntensityPercentageFilterEnabled = blnTotalIntensityPercentageFilterEnabled
+    mTotalIntensityPercentageFilter = sngTotalIntensityPercentageFilter
+    
+    If mMaximumDataCountEnabled Or mTotalIntensityPercentageFilterEnabled Then
         intProgressCount = 6
+        blnFilePrescanEnabled = True
+    
+        If mMaximumDataCountToLoad < 10 Then mMaximumDataCountToLoad = 10
+        If sngTotalIntensityPercentageFilter < 1 Then sngTotalIntensityPercentageFilter = 1
+        If sngTotalIntensityPercentageFilter > 100 Then sngTotalIntensityPercentageFilter = 100
     Else
         intProgressCount = 4
+        blnFilePrescanEnabled = False
     End If
 
     mCurrentProgressStep = 0
@@ -512,7 +526,7 @@ On Error GoTo LoadNewPEKErrorHandler
         ReDim .IsoData(ISO_DATA_DIM_CHUNK)
     End With
 
-    If mMaximumDataCountEnabled Then
+    If blnFilePrescanEnabled Then
         mReadMode = rmReadModeConstants.rmPrescanData
     Else
         mReadMode = rmReadModeConstants.rmStoreData
@@ -524,7 +538,7 @@ On Error GoTo LoadNewPEKErrorHandler
     mWarnedUnknownCSColumnHeader = False
 
     Do While mReadMode < rmReadModeConstants.rmReadComplete
-        If mMaximumDataCountEnabled Then
+        If blnFilePrescanEnabled Then
             If mReadMode = rmPrescanData Then
                 mCurrentProgressStep = 0
             Else
@@ -539,7 +553,13 @@ On Error GoTo LoadNewPEKErrorHandler
         If mReadMode = rmReadModeConstants.rmPrescanData Then
             ' Initialize the prescanned data class
             Set mPrescannedData = New clsFileIOPrescannedData
-            mPrescannedData.MaximumDataCountToLoad = mMaximumDataCountToLoad
+            
+            With mPrescannedData
+                .MaximumDataCountEnabled = mMaximumDataCountEnabled
+                .MaximumDataCountToLoad = mMaximumDataCountToLoad
+                .TotalIntensityPercentageFilterEnabled = mTotalIntensityPercentageFilterEnabled
+                .TotalIntensityPercentageFilter = mTotalIntensityPercentageFilter
+            End With
             
             mSubtaskMessage = "Pre-scanning PEK file to determine data to load"
         Else
@@ -551,7 +571,7 @@ On Error GoTo LoadNewPEKErrorHandler
         mValidDataPointCount = 0
         lngTotalBytesRead = 0
         
-        lngReturnValue = ReadPEKFile(fso, strPEKFilePath, lngTotalBytesRead)
+        lngReturnValue = ReadPEKFile(fso, strPEKFilePath, lngTotalBytesRead, blnFilePrescanEnabled)
         If lngReturnValue <> 0 Then
             ' Error occurred
             Debug.Assert False
@@ -739,7 +759,10 @@ LoadNewPEKErrorHandler:
     LoadNewPEK = -10
 End Function
 
-Private Function ReadPEKFile(ByRef fso As FileSystemObject, ByVal strPEKFilePath As String, ByRef lngTotalBytesRead As Long) As Long
+Private Function ReadPEKFile(ByRef fso As FileSystemObject, _
+                             ByVal strPEKFilePath As String, _
+                             ByRef lngTotalBytesRead As Long, _
+                             ByVal blnFilePrescanEnabled As Boolean) As Long
     Dim tsInFile As TextStream
     Dim strLineIn As String
 
@@ -766,6 +789,7 @@ Private Function ReadPEKFile(ByRef fso As FileSystemObject, ByVal strPEKFilePath
     Dim CurrDataBPImz As Double
 
     Dim sngAbundance As Single
+    Dim intCharge As Integer
     Dim sngFit As Single
     
     Dim strResponse As String
@@ -937,6 +961,7 @@ On Error GoTo ReadPEKFileErrorHandler
             If Not mEvenOddScanFilter Or (lngScanNumber Mod 2 = mEvenOddModCompareVal) Then
               
                 sngAbundance = GetColumnValueSng(varData, intCSColumnMapping(crdCSRawDataIndex.crdAbu), -1)
+                intCharge = CInt(GetColumnValueLng(varData, intCSColumnMapping(crdCSRawDataIndex.crdCS), 1))
               
                 blnValidDataPoint = True
                 If mFilterByAbundance Then
@@ -954,10 +979,9 @@ On Error GoTo ReadPEKFileErrorHandler
                 
                 If blnValidDataPoint Then
                     If mReadMode = rmReadModeConstants.rmPrescanData Then
-                        sngAbundance = GetColumnValueSng(varData, intCSColumnMapping(crdCSRawDataIndex.crdAbu), -1)
-                        mPrescannedData.AddDataPoint sngAbundance, mValidDataPointCount
+                        mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
                     Else
-                        If mMaximumDataCountEnabled Then
+                        If blnFilePrescanEnabled Then
                             If mPrescannedData.GetAbundanceByIndex(mValidDataPointCount) >= 0 Then
                                 blnStoreDataPoint = True
                             Else
@@ -978,7 +1002,7 @@ On Error GoTo ReadPEKFileErrorHandler
                                 With .CSData(.CSLines)
                                     .ScanNumber = lngScanNumber
                                     
-                                    .Charge = CInt(GetColumnValueLng(varData, intCSColumnMapping(crdCSRawDataIndex.crdCS), 1))
+                                    .Charge = intCharge
                                     .ChargeCount = CInt(GetColumnValueLng(varData, intCSColumnMapping(crdCSRawDataIndex.crdNumberOfCS), 1))
                                     .Abundance = sngAbundance
                                     .Fit = 0
@@ -1022,6 +1046,7 @@ On Error GoTo ReadPEKFileErrorHandler
                 If Not mEvenOddScanFilter Or (lngScanNumber Mod 2 = mEvenOddModCompareVal) Then
                     
                     sngAbundance = GetColumnValueDbl(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdAbu), -1)
+                    intCharge = CInt(GetColumnValueLng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdCS), 1))
                     
                     blnValidDataPoint = True
                     If mFilterByAbundance Then
@@ -1039,10 +1064,9 @@ On Error GoTo ReadPEKFileErrorHandler
                     
                     If blnValidDataPoint Then
                         If mReadMode = rmReadModeConstants.rmPrescanData Then
-                            sngAbundance = GetColumnValueSng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdAbu), -1)
-                            mPrescannedData.AddDataPoint sngAbundance, mValidDataPointCount
+                            mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
                         Else
-                            If mMaximumDataCountEnabled Then
+                            If blnFilePrescanEnabled Then
                                 If mPrescannedData.GetAbundanceByIndex(mValidDataPointCount) >= 0 Then
                                     blnStoreDataPoint = True
                                 Else
@@ -1063,7 +1087,7 @@ On Error GoTo ReadPEKFileErrorHandler
                                     With .IsoData(.IsoLines)
                                         .ScanNumber = lngScanNumber
                                         
-                                        .Charge = CInt(GetColumnValueLng(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdCS), 1))
+                                        .Charge = intCharge
                                         .Abundance = sngAbundance
                                         .MZ = GetColumnValueDbl(varData, intIsosColumnMapping(irdIsoRawDataIndex.irdMZ), 0)
                                         .Fit = sngFit

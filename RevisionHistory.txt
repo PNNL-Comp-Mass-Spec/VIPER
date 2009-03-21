@@ -1,5 +1,10 @@
 VIPER Change Log
 
+Version 3.45 - Build 403; March 20, 2009
+	- Added new Total Cumulative Data Intensity filter option
+		- Use the File Load Options window to specify this filter (after you select the file to load)
+	- Changed the default file format for the File->New window to be .CSV files (was previously .PEK files)
+
 Version 3.45 - Build 402; February 13, 2009
 	- Updated the LCMSWarp window to allow for filtering the MT Tags used for alignment
 		- Can apply mass and/or NET filters

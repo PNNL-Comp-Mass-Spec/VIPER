@@ -41,6 +41,8 @@ Private mFirstScanRead As Boolean
 Private mReadMode As rmReadModeConstants
 Private mCurrentProgressStep As Integer
 
+Private mFilePrescanEnabled As Boolean
+
 Private mScanInfoCount As Long
 Private mValidDataPointCount As Long
 Private mSubtaskMessage As String
@@ -59,6 +61,9 @@ Private mAbundanceMax As Double
 
 Private mMaximumDataCountEnabled As Boolean
 Private mMaximumDataCountToLoad As Long
+
+Private mTotalIntensityPercentageFilterEnabled As Boolean
+Private mTotalIntensityPercentageFilter As Single
 
 Private mPrescannedData As clsFileIOPrescannedData
 
@@ -83,6 +88,8 @@ Private Sub InitializeLocalVariables()
     mMaximumDataCountEnabled = False
     mMaximumDataCountToLoad = 400000
     
+    mTotalIntensityPercentageFilterEnabled = False
+    mTotalIntensityPercentageFilter = 90
 End Sub
 
 Public Function LoadNewMZXML(ByVal mzXMLFilePath As String, ByVal lngGelIndex As Long, _
@@ -90,6 +97,7 @@ Public Function LoadNewMZXML(ByVal mzXMLFilePath As String, ByVal lngGelIndex As
                              ByVal blnFilterByAbundance As Boolean, _
                              ByVal dblMinAbu As Double, ByVal dblMaxAbu As Double, _
                              ByVal blnMaximumDataCountEnabled As Boolean, ByVal lngMaximumDataCountToLoad As Long, _
+                             ByVal blnTotalIntensityPercentageFilterEnabled, ByVal sngTotalIntensityPercentageFilter, _
                              ByVal eScanFilterMode As eosEvenOddScanFilterModeConstants, _
                              ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants, _
                              ByRef blnMSLevelFilter() As Boolean) As Long
@@ -130,12 +138,20 @@ On Error GoTo LoadNewMZXMLErrorHandler
         
     mMaximumDataCountEnabled = blnMaximumDataCountEnabled
     mMaximumDataCountToLoad = lngMaximumDataCountToLoad
+
+    mTotalIntensityPercentageFilterEnabled = blnTotalIntensityPercentageFilterEnabled
+    mTotalIntensityPercentageFilter = sngTotalIntensityPercentageFilter
     
-    If mMaximumDataCountEnabled Then
-        If mMaximumDataCountToLoad < 10 Then mMaximumDataCountToLoad = 10
+    If mMaximumDataCountEnabled Or mTotalIntensityPercentageFilterEnabled Then
         intProgressCount = 5
+        mFilePrescanEnabled = True
+    
+        If mMaximumDataCountToLoad < 10 Then mMaximumDataCountToLoad = 10
+        If sngTotalIntensityPercentageFilter < 1 Then sngTotalIntensityPercentageFilter = 1
+        If sngTotalIntensityPercentageFilter > 100 Then sngTotalIntensityPercentageFilter = 100
     Else
         intProgressCount = 3
+        mFilePrescanEnabled = False
     End If
 
     mCurrentProgressStep = 0
@@ -207,15 +223,15 @@ On Error GoTo ReadMZXMLFileErrorHandler
     
     Set mMZXmlReader = New MZXmlFileReaderDLL.mzXMLReader
     
-    If mMaximumDataCountEnabled Then
+    If mFilePrescanEnabled Then
         mReadMode = rmReadModeConstants.rmPrescanData
     Else
         mReadMode = rmReadModeConstants.rmStoreData
     End If
     
     Do While mReadMode < rmReadModeConstants.rmReadComplete
-        If mMaximumDataCountEnabled Then
-            If mReadMode = rmPrescanData Then
+        If mFilePrescanEnabled Then
+            If mReadMode = rmReadModeConstants.rmPrescanData Then
                 mCurrentProgressStep = 0
             Else
                 mCurrentProgressStep = 2
@@ -229,7 +245,13 @@ On Error GoTo ReadMZXMLFileErrorHandler
         If mReadMode = rmReadModeConstants.rmPrescanData Then
             ' Initialize the prescanned data class
             Set mPrescannedData = New clsFileIOPrescannedData
-            mPrescannedData.MaximumDataCountToLoad = mMaximumDataCountToLoad
+            
+            With mPrescannedData
+                .MaximumDataCountEnabled = mMaximumDataCountEnabled
+                .MaximumDataCountToLoad = mMaximumDataCountToLoad
+                .TotalIntensityPercentageFilterEnabled = mTotalIntensityPercentageFilterEnabled
+                .TotalIntensityPercentageFilter = mTotalIntensityPercentageFilter
+            End With
             
             mSubtaskMessage = "Pre-scanning mzXML file to determine data to load"
         Else
@@ -427,9 +449,10 @@ On Error GoTo StoreNextScanErrorHandler
             
                 If blnValidDataPoint Then
                     If mReadMode = rmReadModeConstants.rmPrescanData Then
-                        mPrescannedData.AddDataPoint IntensityList(lngDataIndex), mValidDataPointCount
+                        ' Note: always using charge of 1 since this is m/z data
+                        mPrescannedData.AddDataPoint IntensityList(lngDataIndex), 1, mValidDataPointCount
                     Else
-                        If mMaximumDataCountEnabled Then
+                        If mFilePrescanEnabled Then
                             If mPrescannedData.GetAbundanceByIndex(mValidDataPointCount) >= 0 Then
                                 blnStoreDataPoint = True
                             Else

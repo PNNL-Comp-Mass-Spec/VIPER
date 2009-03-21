@@ -2787,6 +2787,17 @@ On Error GoTo LoadInputFileErrorHandler
                             .MaximumDataCountToLoad = val(strKeyValue)
                         End If
                     End If
+                
+                    strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "TotalIntensityPercentageFilterEnabled", strDefault, udtAutoParams.FilePaths.IniFilePath)
+                    .TotalIntensityPercentageFilterEnabled = CBoolSafe(strKeyValue)
+                    
+                    If .TotalIntensityPercentageFilterEnabled Then
+                        strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "TotalIntensityPercentageFilter", Trim(.TotalIntensityPercentageFilter), udtAutoParams.FilePaths.IniFilePath)
+                        If IsNumeric(strKeyValue) Then
+                            .TotalIntensityPercentageFilter = val(strKeyValue)
+                        End If
+                    End If
+                
                 End With
                 
                 With .AutoAnalysisOptions
@@ -2849,9 +2860,13 @@ On Error GoTo LoadInputFileErrorHandler
                     
                     If udtAutoParams.FullyAutomatedPRISMMode Then
                         .MaximumDataCountEnabled = False
+                        .TotalIntensityPercentageFilterEnabled = False
                     Else
                         .MaximumDataCountEnabled = True
                         .MaximumDataCountToLoad = DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD
+                        
+                        .TotalIntensityPercentageFilterEnabled = True
+                        .TotalIntensityPercentageFilter = DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD
                     End If
                 End With
                 

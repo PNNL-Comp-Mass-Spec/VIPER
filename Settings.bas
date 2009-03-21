@@ -40,6 +40,7 @@ Public Const DEFAULT_MASS_BIN_SIZE_PPM As Single = 0.2
 Public Const DEFAULT_GANET_BIN_SIZE As Single = 0.001
 
 Public Const DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD As Long = 400000
+Public Const DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD As Single = 90       ' Value between 0 and 100
 
 Private Const ENTRY_NOT_FOUND = "<<NOT_FOUND>>"
 
@@ -495,6 +496,7 @@ On Error GoTo LoadSettingsFileHandler
     ' If MaximumDataCountEnabled=True is present in the .Ini file, then this will be re-enabled
     If udtPrefsExpanded.AutoAnalysisStatus.Enabled Then
         udtPrefsExpanded.AutoAnalysisFilterPrefs.MaximumDataCountEnabled = False
+        udtPrefsExpanded.AutoAnalysisFilterPrefs.TotalIntensityPercentageFilterEnabled = False
     End If
     
     ' Paths
@@ -1448,6 +1450,9 @@ On Error GoTo LoadSettingsFileHandler
             
             .MaximumDataCountEnabled = GetIniFileSettingBln(IniStuff, "AutoAnalysisFilterPrefs", "MaximumDataCountEnabled", .MaximumDataCountEnabled)
             .MaximumDataCountToLoad = GetIniFileSettingLng(IniStuff, "AutoAnalysisFilterPrefs", "MaximumDataCountToLoad", .MaximumDataCountToLoad)
+            
+            .TotalIntensityPercentageFilterEnabled = GetIniFileSettingBln(IniStuff, "AutoAnalysisFilterPrefs", "TotalIntensityPercentageFilterEnabled", .TotalIntensityPercentageFilterEnabled)
+            .TotalIntensityPercentageFilter = GetIniFileSettingSng(IniStuff, "AutoAnalysisFilterPrefs", "TotalIntensityPercentageFilter", .TotalIntensityPercentageFilter)
         End With
         
         ' Now attempt to load the database connection info
@@ -2499,6 +2504,11 @@ On Error GoTo SaveSettingsFileHandler
         ' Maximum data count filter
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "MaximumDataCountEnabled", .MaximumDataCountEnabled
         AddKeyValueSettingLng sKeys, sVals, iKVCount, "MaximumDataCountToLoad", .MaximumDataCountToLoad
+    
+        ' Total Intensity Percentage Filter
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "TotalIntensityPercentageFilterEnabled", .TotalIntensityPercentageFilterEnabled
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "TotalIntensityPercentageFilter", .TotalIntensityPercentageFilter
+    
     End With
     IniStuff.WriteSection "AutoAnalysisFilterPrefs", sKeys(), sVals(), iKVCount
     
@@ -3344,7 +3354,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
             .AMTSearchResultsBehavior = asrbAutoRemoveExisting
             .ICR2LSSpectrumViewZoomWindowWidthMZ = 5
             
-            .LastInputFileMode = ifmInputFileModeConstants.ifmPEKFile
+            .LastInputFileMode = ifmInputFileModeConstants.ifmCSVFile
             .LegacyAMTDBPath = ""
             
             ResetUMCAdvancedStatsOptions .UMCAdvancedStatsOptions
@@ -3726,6 +3736,10 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 
                 .MaximumDataCountEnabled = True
                 .MaximumDataCountToLoad = DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD
+                
+                .TotalIntensityPercentageFilterEnabled = False
+                .TotalIntensityPercentageFilter = DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD
+                
             End With
         End If
         

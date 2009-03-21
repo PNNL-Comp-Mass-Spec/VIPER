@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "February 13, 2009"
+Public Const APP_BUILD_DATE As String = "March 20, 2009"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -1141,11 +1141,15 @@ Public Type udtAutoAnalysisFilterPrefsType
     RestrictGANETRangeMin As Double
     RestrictGANETRangeMax As Double
     
-    RestrictToEvenScanNumbersOnly As Boolean        ' Only one of these options can be set to True at any given time; setting both to false means no restriction
+    RestrictToEvenScanNumbersOnly As Boolean           ' Only one of these options can be set to True at any given time; setting both to false means no restriction
     RestrictToOddScanNumbersOnly As Boolean
     
-    MaximumDataCountEnabled As Boolean
+    MaximumDataCountEnabled As Boolean                 ' This filter is only applied at the time the data is loaded into memory
     MaximumDataCountToLoad As Long
+
+    TotalIntensityPercentageFilterEnabled As Boolean   ' This filter is only applied at the time the data is loaded into memory
+    TotalIntensityPercentageFilter As Single
+
 End Type
 
 Public Type udtAutoAnalysisCachedDataType

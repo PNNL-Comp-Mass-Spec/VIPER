@@ -1,27 +1,27 @@
 VERSION 5.00
 Begin VB.Form frmFileLoadOptions 
    Caption         =   "File Load Options"
-   ClientHeight    =   5100
+   ClientHeight    =   5445
    ClientLeft      =   60
    ClientTop       =   450
    ClientWidth     =   7455
    LinkTopic       =   "Form1"
-   ScaleHeight     =   5100
+   ScaleHeight     =   5445
    ScaleWidth      =   7455
    StartUpPosition =   3  'Windows Default
    Begin VB.Frame fraDREAMS 
       Caption         =   "DREAMS Options"
       Height          =   1215
       Left            =   120
-      TabIndex        =   23
-      Top             =   3520
+      TabIndex        =   28
+      Top             =   3885
       Width           =   3375
       Begin VB.OptionButton optEvenOddScanFilter 
          Caption         =   "Only load odd-numbered scans"
          Height          =   255
          Index           =   1
          Left            =   240
-         TabIndex        =   25
+         TabIndex        =   30
          Top             =   540
          Width           =   2800
       End
@@ -30,7 +30,7 @@ Begin VB.Form frmFileLoadOptions
          Height          =   255
          Index           =   0
          Left            =   240
-         TabIndex        =   24
+         TabIndex        =   29
          Top             =   240
          Value           =   -1  'True
          Width           =   2800
@@ -40,7 +40,7 @@ Begin VB.Form frmFileLoadOptions
          Height          =   255
          Index           =   2
          Left            =   240
-         TabIndex        =   26
+         TabIndex        =   31
          Top             =   840
          Width           =   2800
       End
@@ -49,52 +49,95 @@ Begin VB.Form frmFileLoadOptions
       Caption         =   "Set to &Defaults"
       Height          =   375
       Left            =   5640
-      TabIndex        =   30
-      Top             =   4080
+      TabIndex        =   35
+      Top             =   4440
       Width           =   1575
    End
    Begin VB.Frame fraOptionFrame 
-      Caption         =   "Data Count Filter"
-      Height          =   1215
+      Caption         =   "Data Count / Data Intensity Percentage Filter"
+      Height          =   1695
       Index           =   22
       Left            =   3600
       TabIndex        =   19
       Top             =   2160
       Width           =   3615
+      Begin VB.CheckBox chkTotalIntensityPercentageFilterEnabled 
+         Caption         =   "Enable total intensity percentage filter"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   24
+         Top             =   1080
+         Width           =   3255
+      End
+      Begin VB.TextBox txtTotalIntensityPercentageFilter 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   2160
+         TabIndex        =   26
+         Text            =   "90"
+         Top             =   1320
+         Width           =   495
+      End
       Begin VB.TextBox txtMaximumDataCountToLoad 
          Alignment       =   1  'Right Justify
          Height          =   285
-         Left            =   2280
-         TabIndex        =   22
+         Left            =   2160
+         TabIndex        =   23
          Text            =   "125000"
          ToolTipText     =   "Higher abundance data is favored when determine the data to load"
-         Top             =   800
+         Top             =   720
          Width           =   1095
       End
       Begin VB.CheckBox chkMaximumDataCountEnabled 
-         Caption         =   "Maximum data count filter enabled (requires pre-scan of data file)"
-         Height          =   495
+         Caption         =   "Enable maximum data count filter"
+         Height          =   255
          Left            =   120
-         TabIndex        =   20
-         Top             =   230
+         TabIndex        =   21
+         Top             =   480
          Width           =   2895
       End
       Begin VB.Label lblDescription 
-         Caption         =   "Maximum data count to load"
+         Caption         =   "%"
+         Height          =   240
+         Index           =   1
+         Left            =   2760
+         TabIndex        =   27
+         Top             =   1360
+         Width           =   735
+      End
+      Begin VB.Label lblDescription 
+         Caption         =   "Cumulative % to retain"
+         Height          =   240
+         Index           =   0
+         Left            =   240
+         TabIndex        =   25
+         Top             =   1360
+         Width           =   1935
+      End
+      Begin VB.Label Label1 
+         Caption         =   "Note: the data file must be pre-scanned"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   20
+         Top             =   240
+         Width           =   2895
+      End
+      Begin VB.Label lblDescription 
+         Caption         =   "Maximum points to load:"
          Height          =   255
          Index           =   137
-         Left            =   120
-         TabIndex        =   21
-         Top             =   830
-         Width           =   2055
+         Left            =   240
+         TabIndex        =   22
+         Top             =   755
+         Width           =   1935
       End
    End
    Begin VB.Frame fraMSLevelFilter 
       Caption         =   "MS Level Filter"
       Height          =   1215
       Left            =   3600
-      TabIndex        =   27
-      Top             =   3520
+      TabIndex        =   32
+      Top             =   3885
       Width           =   1455
       Begin VB.ListBox lstMSLevelFilter 
          Height          =   840
@@ -102,7 +145,7 @@ Begin VB.Form frmFileLoadOptions
          Left            =   120
          List            =   "frmFileLoadOptions.frx":0002
          MultiSelect     =   2  'Extended
-         TabIndex        =   28
+         TabIndex        =   33
          Top             =   240
          Width           =   1215
       End
@@ -147,16 +190,16 @@ Begin VB.Form frmFileLoadOptions
       Caption         =   "&Cancel"
       Height          =   375
       Left            =   5640
-      TabIndex        =   31
-      Top             =   4560
+      TabIndex        =   36
+      Top             =   4920
       Width           =   1575
    End
    Begin VB.CommandButton cmdLoad 
       Caption         =   "&Load"
       Height          =   375
       Left            =   5640
-      TabIndex        =   29
-      Top             =   3600
+      TabIndex        =   34
+      Top             =   3960
       Width           =   1575
    End
    Begin VB.Frame fraIsoFitFilter 
@@ -414,10 +457,28 @@ Public Property Let MaximumDataCountToLoad(Value As Long)
     txtMaximumDataCountToLoad.Text = Value
 End Property
 Public Property Get MaximumDataCountToLoad() As Long
-    If IsNumeric(MaximumDataCountToLoad) Then
+    If IsNumeric(txtMaximumDataCountToLoad) Then
         MaximumDataCountToLoad = CLng(txtMaximumDataCountToLoad)
     Else
         MaximumDataCountToLoad = DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD
+    End If
+End Property
+
+Public Property Let TotalIntensityPercentageFilterEnabled(Value As Boolean)
+    SetCheckBox chkTotalIntensityPercentageFilterEnabled, Value
+End Property
+Public Property Get TotalIntensityPercentageFilterEnabled() As Boolean
+    TotalIntensityPercentageFilterEnabled = cChkBox(chkTotalIntensityPercentageFilterEnabled)
+End Property
+
+Public Property Let TotalIntensityPercentageFilter(Value As Single)
+    txtTotalIntensityPercentageFilter.Text = Value
+End Property
+Public Property Get TotalIntensityPercentageFilter() As Single
+    If IsNumeric(txtTotalIntensityPercentageFilter) Then
+        TotalIntensityPercentageFilter = CSng(txtTotalIntensityPercentageFilter)
+    Else
+        TotalIntensityPercentageFilter = DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD
     End If
 End Property
 
@@ -453,6 +514,9 @@ Private Sub ResetToDefaults()
     
     chkMaximumDataCountEnabled.Value = vbChecked
     Me.txtMaximumDataCountToLoad = DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD
+    
+    chkTotalIntensityPercentageFilterEnabled.Value = vbUnchecked
+    Me.txtTotalIntensityPercentageFilter.Text = DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD
     
     mLoadCancelled = False
     
@@ -620,4 +684,12 @@ End Sub
 
 Private Sub txtIsoFitMaxValue_LostFocus()
     ValidateTextboxValueDbl txtIsoFitMaxValue, 0, 1, 0.15
+End Sub
+
+Private Sub txtMaximumDataCountToLoad_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtMaximumDataCountToLoad, KeyAscii, True, False
+End Sub
+
+Private Sub txtTotalIntensityPercentageFilter_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtTotalIntensityPercentageFilter, KeyAscii, True, True, False
 End Sub

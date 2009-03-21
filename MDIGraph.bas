@@ -1626,6 +1626,9 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
         objLoadOptionsForm.MaximumDataCountEnabled = .MaximumDataCountEnabled
         objLoadOptionsForm.MaximumDataCountToLoad = .MaximumDataCountToLoad
         
+        objLoadOptionsForm.TotalIntensityPercentageFilterEnabled = .TotalIntensityPercentageFilterEnabled
+        objLoadOptionsForm.TotalIntensityPercentageFilter = .TotalIntensityPercentageFilter
+        
         If .RestrictToEvenScanNumbersOnly Or .RestrictToOddScanNumbersOnly Then
             If .RestrictToOddScanNumbersOnly Then
                 objLoadOptionsForm.EvenOddScanFilterMode = eosLoadOddScansOnly
@@ -1691,6 +1694,11 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                    .MaximumDataCountToLoad = objLoadOptionsForm.MaximumDataCountToLoad
                 End If
                 
+                .TotalIntensityPercentageFilterEnabled = objLoadOptionsForm.TotalIntensityPercentageFilterEnabled
+                If .TotalIntensityPercentageFilterEnabled Then
+                    .TotalIntensityPercentageFilter = objLoadOptionsForm.TotalIntensityPercentageFilter
+                End If
+                
                 .RestrictToOddScanNumbersOnly = False
                 .RestrictToEvenScanNumbersOnly = False
                 
@@ -1720,6 +1728,9 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 .MaximumDataCountEnabled = udtFilterPrefs.MaximumDataCountEnabled
                 .MaximumDataCountToLoad = udtFilterPrefs.MaximumDataCountToLoad
                 
+                .TotalIntensityPercentageFilterEnabled = udtFilterPrefs.TotalIntensityPercentageFilterEnabled
+                .TotalIntensityPercentageFilter = udtFilterPrefs.TotalIntensityPercentageFilter
+                
                 .RestrictToOddScanNumbersOnly = udtFilterPrefs.RestrictToOddScanNumbersOnly
                 .RestrictToEvenScanNumbersOnly = udtFilterPrefs.RestrictToEvenScanNumbersOnly
             End With
@@ -1738,6 +1749,7 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 intReturnCode = LoadNewPEK(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
                                            .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
                                            .MaximumDataCountEnabled, .MaximumDataCountToLoad, _
+                                           .TotalIntensityPercentageFilterEnabled, .TotalIntensityPercentageFilter, _
                                            eScanFilterMode, eDataFilterMode)
             End With
             
@@ -1746,6 +1758,7 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 intReturnCode = LoadNewCSV(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
                                            .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
                                            .MaximumDataCountEnabled, .MaximumDataCountToLoad, _
+                                           .TotalIntensityPercentageFilterEnabled, .TotalIntensityPercentageFilter, _
                                            eScanFilterMode, eDataFilterMode)
             End With
             
@@ -1755,6 +1768,7 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 intReturnCode = objMZXMLFileReader.LoadNewMZXML(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
                                                                 .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
                                                                 .MaximumDataCountEnabled, .MaximumDataCountToLoad, _
+                                                                .TotalIntensityPercentageFilterEnabled, .TotalIntensityPercentageFilter, _
                                                                 eScanFilterMode, eDataFilterMode, blnMSLevelFilter)
             End With
             Set objMZXMLFileReader = Nothing
@@ -1765,6 +1779,7 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 intReturnCode = objmzDataFileReader.LoadNewMZData(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
                                                                 .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
                                                                 .MaximumDataCountEnabled, .MaximumDataCountToLoad, _
+                                                                .TotalIntensityPercentageFilterEnabled, .TotalIntensityPercentageFilter, _
                                                                 eScanFilterMode, eDataFilterMode, blnMSLevelFilter)
             End With
             Set objmzDataFileReader = Nothing
@@ -1793,6 +1808,13 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 End With
             End If
             
+            If udtFilterPrefs.TotalIntensityPercentageFilterEnabled Then
+                With GelData(lngGelIndex)
+                    .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Applied cumulative sum intensity filter, retaining " & Trim(udtFilterPrefs.TotalIntensityPercentageFilter) & "% of the total intensity for each charge state"
+                    AddToAnalysisHistory lngGelIndex, "File Loaded; Applied cumulative sum intensity filter, retaining " & Trim(udtFilterPrefs.TotalIntensityPercentageFilter) & "% of the total intensity for each charge state (at user request)."
+                End With
+            End If
+                        
             AddToAnalysisHistory lngGelIndex, "File Loaded; data point count = " & CStr(GelData(lngGelIndex).IsoLines)
             
         End If
@@ -1805,7 +1827,7 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
     
     LoadNewData = intReturnCode
     
-Exit Function
+    Exit Function
 
 err_LoadNewData:
 ' Error during load

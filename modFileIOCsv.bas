@@ -100,6 +100,9 @@ Private mAbundanceMax As Double
 Private mMaximumDataCountEnabled As Boolean
 Private mMaximumDataCountToLoad As Long
 
+Private mTotalIntensityPercentageFilterEnabled As Boolean
+Private mTotalIntensityPercentageFilter As Single
+
 Private mPrescannedData As clsFileIOPrescannedData
 
 Private mValidDataPointCount As Long
@@ -329,6 +332,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
                            ByVal blnFilterByAbundance As Boolean, _
                            ByVal dblMinAbu As Double, ByVal dblMaxAbu As Double, _
                            ByVal blnMaximumDataCountEnabled As Boolean, ByVal lngMaximumDataCountToLoad As Long, _
+                           ByVal blnTotalIntensityPercentageFilterEnabled, ByVal sngTotalIntensityPercentageFilter, _
                            ByVal eScanFilterMode As eosEvenOddScanFilterModeConstants, _
                            ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants) As Long
     '-------------------------------------------------------------------------
@@ -343,6 +347,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     '-------------------------------------------------------------------------
     
     Dim intProgressCount As Integer
+    Dim blnFilePrescanEnabled As Boolean
     
     Dim strScansFilePath As String
     Dim strIsosFilePath As String
@@ -375,11 +380,19 @@ On Error GoTo LoadNewCSVErrorHandler
     mMaximumDataCountEnabled = blnMaximumDataCountEnabled
     mMaximumDataCountToLoad = lngMaximumDataCountToLoad
     
-    If mMaximumDataCountEnabled Then
-        If mMaximumDataCountToLoad < 10 Then mMaximumDataCountToLoad = 10
+    mTotalIntensityPercentageFilterEnabled = blnTotalIntensityPercentageFilterEnabled
+    mTotalIntensityPercentageFilter = sngTotalIntensityPercentageFilter
+    
+    If mMaximumDataCountEnabled Or mTotalIntensityPercentageFilterEnabled Then
         intProgressCount = 5
+        blnFilePrescanEnabled = True
+    
+        If mMaximumDataCountToLoad < 10 Then mMaximumDataCountToLoad = 10
+        If sngTotalIntensityPercentageFilter < 1 Then sngTotalIntensityPercentageFilter = 1
+        If sngTotalIntensityPercentageFilter > 100 Then sngTotalIntensityPercentageFilter = 100
     Else
         intProgressCount = 3
+        blnFilePrescanEnabled = False
     End If
 
     mCurrentProgressStep = 0
@@ -432,9 +445,6 @@ On Error GoTo LoadNewCSVErrorHandler
     ' Initialize the progress bar
     lngTotalBytesRead = 0
     lngByteCountTotal = FileLen(strIsosFilePath)
-''    If mMaximumDataCountEnabled Then
-''        lngByteCountTotal = lngByteCountTotal * 2
-''    End If
     
     If blnValidScanFile Then
         lngScansFileByteCount = FileLen(strScansFilePath)
@@ -458,7 +468,9 @@ On Error GoTo LoadNewCSVErrorHandler
     If lngReturnValue = 0 Then
         ' Read the Isos file
         ' Note that the CSV Isos file only contains isotopic data, not charge state data
-        lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseName, lngScansFileByteCount, lngByteCountTotal, lngTotalBytesRead, blnValidScanFile)
+        lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseName, _
+                                         lngScansFileByteCount, lngByteCountTotal, lngTotalBytesRead, _
+                                         blnValidScanFile, blnFilePrescanEnabled)
     End If
         
     LoadNewCSV = lngReturnValue
@@ -476,7 +488,8 @@ End Function
 
 Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFilePath As String, ByVal strBaseName As String, _
                                  ByVal lngScansFileByteCount As Long, ByVal lngByteCountTotal As Long, _
-                                 ByRef lngTotalBytesRead As Long, ByVal blnValidScanFile As Boolean) As Long
+                                 ByRef lngTotalBytesRead As Long, ByVal blnValidScanFile As Boolean, _
+                                 ByVal blnFilePrescanEnabled As Boolean) As Long
 
     ' Returns 0 if no error, the error number if an error
 
@@ -524,14 +537,14 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         ReDim .IsoData(ISO_DATA_DIM_CHUNK)
     End With
 
-    If mMaximumDataCountEnabled Then
+    If blnFilePrescanEnabled Then
         mReadMode = rmReadModeConstants.rmPrescanData
     Else
         mReadMode = rmReadModeConstants.rmStoreData
     End If
     
     Do While mReadMode < rmReadModeConstants.rmReadComplete
-        If mMaximumDataCountEnabled Then
+        If blnFilePrescanEnabled Then
             If mReadMode = rmPrescanData Then
                 mCurrentProgressStep = 0
             Else
@@ -546,7 +559,13 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         If mReadMode = rmReadModeConstants.rmPrescanData Then
             ' Initialize the prescanned data class
             Set mPrescannedData = New clsFileIOPrescannedData
-            mPrescannedData.MaximumDataCountToLoad = mMaximumDataCountToLoad
+            
+            With mPrescannedData
+                .MaximumDataCountEnabled = mMaximumDataCountEnabled
+                .MaximumDataCountToLoad = mMaximumDataCountToLoad
+                .TotalIntensityPercentageFilterEnabled = mTotalIntensityPercentageFilterEnabled
+                .TotalIntensityPercentageFilter = mTotalIntensityPercentageFilter
+            End With
             
             mSubtaskMessage = "Pre-scanning Isotopic CSV file to determine data to load"
         Else
@@ -559,7 +578,7 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         mValidDataPointCount = 0
         lngTotalBytesRead = 0
     
-        lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, lngTotalBytesRead, intColumnMapping, blnValidScanFile, sngMonoPlus4Intensities, sngMonoMinus4Intensities)
+        lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, lngTotalBytesRead, intColumnMapping, blnValidScanFile, sngMonoPlus4Intensities, sngMonoMinus4Intensities, blnFilePrescanEnabled)
         If lngReturnValue <> 0 Then
             ' Error occurred
             Debug.Assert False
@@ -784,7 +803,14 @@ ReadCSVIsosFileErrorHandler:
 
 End Function
 
-Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, ByVal strIsosFilePath As String, ByRef lngTotalBytesRead As Long, ByRef intColumnMapping() As Integer, ByVal blnValidScanFile As Boolean, ByRef sngMonoPlus4Intensities() As Single, ByRef sngMonoMinus4Intensities() As Single) As Long
+Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
+                                     ByVal strIsosFilePath As String, _
+                                     ByRef lngTotalBytesRead As Long, _
+                                     ByRef intColumnMapping() As Integer, _
+                                     ByVal blnValidScanFile As Boolean, _
+                                     ByRef sngMonoPlus4Intensities() As Single, _
+                                     ByRef sngMonoMinus4Intensities() As Single, _
+                                     ByVal blnFilePrescanEnabled As Boolean) As Long
     
     Dim tsInFile As TextStream
     Dim strLineIn As String
@@ -803,6 +829,7 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, ByVal strIso
     
     Dim sngFit As Single
     Dim sngAbundance As Single
+    Dim intCharge As Integer
     
     Dim strUnknownColumnList As String
     Dim strMessage As String
@@ -956,6 +983,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
         
                 sngFit = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.Fit), 0)
                 sngAbundance = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.Abundance), 0)
+                intCharge = CInt(GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.Charge), 1))
                 
                 blnValidDataPoint = True
                 If sngFit <= mMaxFit Or mMaxFit <= 0 Then
@@ -971,9 +999,9 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                 If blnValidDataPoint Then
                 
                     If mReadMode = rmReadModeConstants.rmPrescanData Then
-                        mPrescannedData.AddDataPoint sngAbundance, mValidDataPointCount
+                        mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
                     Else
-                        If mMaximumDataCountEnabled Then
+                        If blnFilePrescanEnabled Then
                             If mPrescannedData.GetAbundanceByIndex(mValidDataPointCount) >= 0 Then
                                 blnStoreDataPoint = True
                             Else
@@ -1025,7 +1053,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                
                                 With .IsoData(.IsoLines)
                                     .ScanNumber = lngScanNumber
-                                    .Charge = CInt(GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.Charge), 1))
+                                    .Charge = intCharge
                                     .Abundance = sngAbundance
                                     .MZ = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MZ), 0)
                                     .Fit = sngFit
