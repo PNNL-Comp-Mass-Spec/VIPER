@@ -631,6 +631,9 @@ Begin VB.Form frmGraph
       Begin VB.Menu mnu2lsFilterPointsByMass 
          Caption         =   "Filter Points by Mass (Auto-remove noise)"
       End
+      Begin VB.Menu mnu2lsFilterPointsByPolygon 
+         Caption         =   "Filter Points using Polygon Regions"
+      End
       Begin VB.Menu mnu2lsSep1 
          Caption         =   "-"
       End
@@ -2065,6 +2068,11 @@ Private Sub mnu2lsFilterPointsByMass_Click()
     frmExcludeMassRange.Show vbModal
 End Sub
 
+Private Sub mnu2lsFilterPointsByPolygon_Click()
+    frmExcludePolygonRegion.SetCallerID nMyIndex
+    frmExcludePolygonRegion.Show vbModal
+End Sub
+
 Private Sub mnu2lsInvertVisiblePoints_Click()
     PointVisiblilityInvert
 End Sub
@@ -3440,9 +3448,9 @@ Case glIsoType
 End Select
 End Sub
 
-Private Sub picGraph_DragDrop(Source As Control, x As Single, y As Single)
+Private Sub picGraph_DragDrop(Source As Control, X As Single, Y As Single)
 On Error Resume Next
-Source.Move x, y
+Source.Move X, Y
 End Sub
 
 Private Sub picGraph_GotFocus()
@@ -3471,11 +3479,11 @@ If (Shift And vbCtrlMask) > 0 Then
 End If
 End Sub
 
-Private Sub picGraph_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub picGraph_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
 
 ReDim paPoints(0)
-paPoints(0).x = x
-paPoints(0).y = y
+paPoints(0).X = X
+paPoints(0).Y = Y
 DevLogConversion ConvDPLP, 1
 If HotType = glNoType Then
    If Button = vbLeftButton Then lAction = glActionZoom
@@ -3486,7 +3494,7 @@ End If
 MouseButton = Button
 Select Case Button
 Case vbLeftButton
-    ZoomActionStart x, y, paPoints()
+    ZoomActionStart X, Y, paPoints()
 Case vbRightButton
     If lAction = glActionZoom Then
         ZoomActionCancel
@@ -3500,7 +3508,7 @@ Case Else
 End Select
 End Sub
 
-Private Sub picGraph_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub picGraph_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
 ' Update the zoom box dimensions in the status window
  Dim ZoomX1 As Double, ZoomY1 As Double, ZoomX2 As Double, ZoomY2 As Double
  Dim dblNET As Double
@@ -3509,29 +3517,29 @@ ReDim paPoints(1)
 
 If csMyCooSys Is Nothing Then Exit Sub
 
-paPoints(0).x = x
-paPoints(0).y = y
+paPoints(0).X = X
+paPoints(0).Y = Y
 DevLogConversion ConvDPLP, 1
-GetHotSpot nMyIndex, paPoints(0).x, paPoints(0).y, HotID, HotType
+GetHotSpot nMyIndex, paPoints(0).X, paPoints(0).Y, HotID, HotType
 
 If glTracking Then SetTrackingLabels nMyIndex, HotType, HotID
 If lAction = glActionZoom Then
    picGraph.Line (gbZoomX1, gbZoomY1)-(gbZoomX2, gbZoomY2), , B
-   gbZoomX2 = x
-   gbZoomY2 = y
+   gbZoomX2 = X
+   gbZoomY2 = Y
    picGraph.Line (gbZoomX1, gbZoomY1)-(gbZoomX2, gbZoomY2), , B
    
    If glTracking Then
-        paPoints(0).x = gbZoomX1
-        paPoints(0).y = gbZoomY1
-        paPoints(1).x = gbZoomX2
-        paPoints(1).y = gbZoomY2
+        paPoints(0).X = gbZoomX1
+        paPoints(0).Y = gbZoomY1
+        paPoints(1).X = gbZoomX2
+        paPoints(1).Y = gbZoomY2
         DevLogConversion ConvDPLP, 2
         
-        ZoomX1 = paPoints(0).x
-        ZoomY1 = paPoints(0).y
-        ZoomX2 = paPoints(1).x
-        ZoomY2 = paPoints(1).y
+        ZoomX1 = paPoints(0).X
+        ZoomY1 = paPoints(0).Y
+        ZoomX2 = paPoints(1).X
+        ZoomY2 = paPoints(1).Y
         
         csMyCooSys.LPToRP ZoomX1, ZoomY1, ZoomX2, ZoomY2
         frmTracker.lblIdentity = GetZoomBoxDimensions(ZoomX1, ZoomY1, ZoomX2, ZoomY2, True, True, True)
@@ -3539,8 +3547,8 @@ If lAction = glActionZoom Then
    End If
 Else
     ' Update the current position in the tracker box
-    ZoomX1 = paPoints(0).x
-    ZoomY1 = paPoints(0).y
+    ZoomX1 = paPoints(0).X
+    ZoomY1 = paPoints(0).Y
     csMyCooSys.LPToRP ZoomX1, ZoomY1, 0, 0
         
     mLastCursorPosFN = ZoomX1
@@ -3553,7 +3561,7 @@ Else
 End If
 End Sub
 
-Private Sub picGraph_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub picGraph_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
     If Button = vbLeftButton Then ZoomActionEnd
 End Sub
 
@@ -5092,12 +5100,12 @@ Private Sub ZoomActionEnd()
         picGraph.Line (gbZoomX1, gbZoomY1)-(gbZoomX2, gbZoomY2), , B
         picGraph.DrawStyle = vbSolid
         If (Abs(gbZoomX1 - gbZoomX2) > 10) And (Abs(gbZoomY1 - gbZoomY2) > 10) Then
-           paPoints(0).x = gbZoomX1
-           paPoints(0).y = gbZoomY1
-           paPoints(1).x = gbZoomX2
-           paPoints(1).y = gbZoomY2
+           paPoints(0).X = gbZoomX1
+           paPoints(0).Y = gbZoomY1
+           paPoints(1).X = gbZoomX2
+           paPoints(1).Y = gbZoomY2
            DevLogConversion ConvDPLP, 2
-           csMyCooSys.ZoomIn paPoints(0).x, paPoints(0).y, paPoints(1).x, paPoints(1).y
+           csMyCooSys.ZoomIn paPoints(0).X, paPoints(0).Y, paPoints(1).X, paPoints(1).Y
         End If
     End Select
     lAction = glNoAction
@@ -5105,29 +5113,29 @@ Private Sub ZoomActionEnd()
     If mnuSCopyPointsInViewToClipboardAuto.Checked Then CopyAllPointsInView mAutoCopyPointsMaxCount
 End Sub
 
-Private Sub ZoomActionStart(x As Single, y As Single, paPoints() As POINTAPI)
+Private Sub ZoomActionStart(X As Single, Y As Single, paPoints() As POINTAPI)
   Dim Res As Long
   Dim rcClip As Rect
   Dim paClip As POINTAPI
 
   If lAction = glActionZoom Then
-     gbZoomX1 = x
-     gbZoomY1 = y
+     gbZoomX1 = X
+     gbZoomY1 = Y
      gbZoomX2 = gbZoomX1
      gbZoomY2 = gbZoomY1
 'clip cursor on viewport
-     paPoints(0).x = gbZoomX1
-     paPoints(0).y = gbZoomY1
+     paPoints(0).X = gbZoomX1
+     paPoints(0).Y = gbZoomY1
      DevLogConversion ConvDPLP, 1
-     If (paPoints(0).x < LDfX0) Or (paPoints(0).x > LDfXE) Or _
-        (paPoints(0).y < LDfY0) Or (paPoints(0).y > LDfYE) Then
+     If (paPoints(0).X < LDfX0) Or (paPoints(0).X > LDfXE) Or _
+        (paPoints(0).Y < LDfY0) Or (paPoints(0).Y > LDfYE) Then
         lAction = glNoAction
         Exit Sub
      End If
-     paClip.x = 0
-     paClip.y = 0
+     paClip.X = 0
+     paClip.Y = 0
      Res = ClientToScreen(picGraph.hwnd, paClip)
-     csMyCooSys.GetViewPortRectangle paClip.x, paClip.y, rcClip.Top, rcClip.Left, rcClip.Bottom, rcClip.Right
+     csMyCooSys.GetViewPortRectangle paClip.X, paClip.Y, rcClip.Top, rcClip.Left, rcClip.Bottom, rcClip.Right
      Res = ClipCursor(rcClip)
      picGraph.DrawStyle = vbDot
   End If

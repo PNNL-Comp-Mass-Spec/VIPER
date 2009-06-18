@@ -478,6 +478,7 @@ Public Sub IniFileLoadSettings(ByRef udtPrefsExpanded As udtPreferencesExpandedT
     Dim blnLegacySectionName As Boolean
     
     Dim strModValue As String
+    Dim strPolygonDefs As String
     
 On Error GoTo LoadSettingsFileHandler
 
@@ -713,6 +714,10 @@ On Error GoTo LoadSettingsFileHandler
                 .MassUseLSQ = GetIniFileSettingBln(IniStuff, strSectionName, "MassUseLSQ", .MassUseLSQ)
                 .MassLSQOutlierZScore = GetIniFileSettingSng(IniStuff, strSectionName, "MassLSQOutlierZScore", .MassLSQOutlierZScore)
                 .MassLSQNumKnots = GetIniFileSettingInt(IniStuff, strSectionName, "MassLSQNumKnots", .MassLSQNumKnots)
+                
+                .SplitWarpMode = GetIniFileSettingInt(IniStuff, strSectionName, "SplitWarpMode", .SplitWarpMode)
+                .SplitWarpMZBoundary = GetIniFileSettingSng(IniStuff, strSectionName, "SplitWarpMZBoundary", .SplitWarpMZBoundary)
+
             End With
         End If
     End With
@@ -963,6 +968,10 @@ On Error GoTo LoadSettingsFileHandler
         
         .SearchScope = GetIniFileSettingInt(IniStuff, "NoiseRemovalOptions", "SearchScope", CInt(.SearchScope))
         .RequireIdenticalCharge = GetIniFileSettingBln(IniStuff, "NoiseRemovalOptions", "RequireIdenticalCharge", .RequireIdenticalCharge)
+        
+        strPolygonDefs = GetIniFileSetting(IniStuff, "NoiseRemovalOptions", "ExclusionPolygonDefs", "")
+        PolygonTextToDefs strPolygonDefs
+        
     End With
     
     ' Refine MS Data Options
@@ -1253,6 +1262,7 @@ On Error GoTo LoadSettingsFileHandler
         With .AutoAnalysisOptions
             .MDType = GetIniFileSettingLng(IniStuff, "AutoAnalysisOptions", "MDType", .MDType)
             .AutoRemoveNoiseStreaks = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "AutoRemoveNoiseStreaks", .AutoRemoveNoiseStreaks)
+            .AutoRemovePolygonRegions = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "AutoRemovePolygonRegions", .AutoRemovePolygonRegions)
             .DoNotSaveOrExport = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "DoNotSaveOrExport", .DoNotSaveOrExport)
             
             .SkipFindUMCs = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SkipFindUMCs", .SkipFindUMCs)
@@ -1583,6 +1593,8 @@ Public Sub IniFileSaveSettings(udtPrefsExpanded As udtPreferencesExpandedType, u
     Dim strMassTagSubsetID As String
     Dim strSectionName As String
     
+    Dim strPolygonDefs As String
+    
 On Error GoTo SaveSettingsFileHandler
 
     ' This Sub shouldn't need a progress bar, but without it, it takes 4 seconds to execute
@@ -1814,6 +1826,9 @@ On Error GoTo SaveSettingsFileHandler
             AddKeyValueSettingBln sKeys, sVals, iKVCount, "MassUseLSQ", .MassUseLSQ
             AddKeyValueSettingSng sKeys, sVals, iKVCount, "MassLSQOutlierZScore", .MassLSQOutlierZScore
             AddKeyValueSettingInt sKeys, sVals, iKVCount, "MassLSQNumKnots", .MassLSQNumKnots
+            
+            AddKeyValueSettingInt sKeys, sVals, iKVCount, "SplitWarpMode", .SplitWarpMode
+            AddKeyValueSettingSng sKeys, sVals, iKVCount, "SplitWarpMZBoundary", .SplitWarpMZBoundary
         End With
         IniStuff.WriteSection NET_ADJ_MS_WARP_SECTION, sKeys(), sVals(), iKVCount
     End If
@@ -2070,7 +2085,11 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingLng sKeys, sVals, iKVCount, "ScanEnd", .ScanEnd
         AddKeyValueSettingInt sKeys, sVals, iKVCount, "SearchScope", CInt(.SearchScope)
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "RequireIdenticalCharge", .RequireIdenticalCharge
+    
+        strPolygonDefs = PolygonDefsToText(.ExclusionPolygonCount, .ExclusionPolygonList, False, "")
+        AddKeyValueSetting sKeys, sVals, iKVCount, "ExclusionPolygonDefs", strPolygonDefs
     End With
+    
     IniStuff.WriteSection "NoiseRemovalOptions", sKeys(), sVals(), iKVCount
     frmProgress.UpdateProgressBar 2
     
@@ -2355,6 +2374,7 @@ On Error GoTo SaveSettingsFileHandler
         iKVCount = 0
         AddKeyValueSettingInt sKeys, sVals, iKVCount, "MDType", 1
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoRemoveNoiseStreaks", .AutoRemoveNoiseStreaks
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "AutoRemovePolygonRegions", .AutoRemovePolygonRegions
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "DoNotSaveOrExport", .DoNotSaveOrExport
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SkipFindUMCs", .SkipFindUMCs
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SkipGANETSlopeAndInterceptComputation", .SkipGANETSlopeAndInterceptComputation
@@ -3753,6 +3773,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .JobNumber = 0
                 .MDType = 1
                 .AutoRemoveNoiseStreaks = False
+                .AutoRemovePolygonRegions = False
                 .DoNotSaveOrExport = False
                 
                 .SkipFindUMCs = False

@@ -3632,7 +3632,7 @@ On Error GoTo InitializePairIndexLookupObjectsErrorHandler
             ' However, since .Pairs() is a UDT array, we need to copy the data from .Pairs().P1 into lngPairIndices()
             ReDim lngPairIndices(UBound(.Pairs))
             For lngIndex = 0 To UBound(.Pairs)
-                lngPairIndices(lngIndex) = .Pairs(lngIndex).P1
+                lngPairIndices(lngIndex) = .Pairs(lngIndex).p1
             Next lngIndex
             
             blnPairsPresent = objP1IndFastSearch.Fill(lngPairIndices())
@@ -3640,7 +3640,7 @@ On Error GoTo InitializePairIndexLookupObjectsErrorHandler
             If blnPairsPresent Then
                 
                 For lngIndex = 0 To UBound(.Pairs)
-                    lngPairIndices(lngIndex) = .Pairs(lngIndex).P2
+                    lngPairIndices(lngIndex) = .Pairs(lngIndex).p2
                 Next lngIndex
                 
                 blnPairsPresent = objP2IndFastSearch.Fill(lngPairIndices())
@@ -4231,6 +4231,227 @@ ParseCommandLineErrorHandler:
     
 End Sub
 
+Public Function PolygonDefsToText(ByVal intPolygonCount As Integer, ByRef udtPolygonList() As udtExclusionPolygonType, ByVal blnUseCarriageReturns As Boolean, ByRef strWarnings As String) As String
+
+    ' Parses udtPolygonList() to convert to a text-based representation
+    
+    Dim intPolygonIndex As Integer
+    Dim intVertexIndex As Integer
+    
+    Dim strVertex As String
+    Dim strPolygonDefs As String
+    Dim strCurrentPolygon As String
+    Dim strMultiPolygonDelimiter As String
+    
+On Error GoTo PolygonDefsToTextErrorHandler
+
+    strPolygonDefs = ""
+    strWarnings = ""
+
+    If blnUseCarriageReturns Then
+        strMultiPolygonDelimiter = vbCrLf
+    Else
+        strMultiPolygonDelimiter = " / "
+    End If
+
+    If intPolygonCount = 1 And blnUseCarriageReturns Then
+        ' One polygon is defined (and we're allowed to use carriage returns)
+        ' Enter one X,Y pair on each line
+        For intVertexIndex = 0 To udtPolygonList(0).VertexCount - 1
+            strVertex = LTrim(RTrim(udtPolygonList(0).VertexList(intVertexIndex)))
+            If strVertex = "" Then
+                strWarnings = strWarnings & "Empty vertex found at index " & intVertexIndex & vbCrLf
+            Else
+                strPolygonDefs = strPolygonDefs & strVertex & vbCrLf
+            End If
+        Next intVertexIndex
+    Else
+    
+        ' Multiple polygons are defined (or we have just one, but we're not using carriage returns)
+        ' Enter the vertices for each polygon all on a single line (each vertex is separated by a semicolon)
+        For intPolygonIndex = 0 To intPolygonCount - 1
+            strCurrentPolygon = ""
+        
+            For intVertexIndex = 0 To udtPolygonList(0).VertexCount - 1
+                strVertex = LTrim(RTrim(udtPolygonList(intPolygonIndex).VertexList(intVertexIndex)))
+                
+                If strVertex = "" Then
+                    strWarnings = strWarnings & "Empty vertex found at index " & intVertexIndex & " for polygon " & intPolygonIndex & vbCrLf
+                Else
+                    If strCurrentPolygon = "" Then
+                        strCurrentPolygon = strVertex
+                    Else
+                        strCurrentPolygon = strCurrentPolygon & "; " & strVertex
+                    End If
+                End If
+            Next intVertexIndex
+            
+            If strCurrentPolygon <> "" Then
+                If strPolygonDefs = "" Then
+                    strPolygonDefs = strCurrentPolygon
+                Else
+                    strPolygonDefs = strPolygonDefs & strMultiPolygonDelimiter & strCurrentPolygon
+                End If
+            End If
+            
+        Next intPolygonIndex
+    End If
+    
+    PolygonDefsToText = strPolygonDefs
+    Exit Function
+
+PolygonDefsToTextErrorHandler:
+    LogErrors Err.Number, "PolygonDefsToText"
+    Debug.Print "Error in PolygonDefsToText: " & Err.Description
+    Debug.Assert False
+    
+End Function
+
+' Parses strPolygonDefs to populate glbPreferencesExpanded.NoiseRemovalOptions.ExclusionPolygonCount and .ExclusionPolygonList
+Public Sub PolygonTextToDefs(ByVal strPolygonDefs As String, Optional strMultiPolygonSepChar As String = "/")
+
+    Const MAX_LIST_COUNT = 1000000
+    Const MAX_PARSE_COUNT = 50
+    
+    Dim strListItems() As String        ' 0-based array
+    Dim lngItemCount As Long
+    
+    Dim strXYPairList() As String
+    Dim lngXYPairCount As Long
+    
+    Dim strValue As String
+    Dim lngX As Long
+    Dim lngY As Long
+    
+    Dim lngIndex As Long
+    Dim lngXYIndex As Long
+    Dim intCommaLoc As Integer
+    
+    Dim blnMultiPolygonMode As Boolean
+    
+On Error GoTo PolygonTextToDefsErrorHandler
+
+    ' Clear .ExclusionPolygonCount
+    With glbPreferencesExpanded.NoiseRemovalOptions
+        .ExclusionPolygonCount = 0
+        ReDim .ExclusionPolygonList(0)
+        With .ExclusionPolygonList(0)
+            .VertexCount = 0
+            ' Initially reserve space for 4 vertices per polygon
+            ReDim .VertexList(3)
+        End With
+    End With
+    
+    If Len(strPolygonDefs) = 0 Then
+        Exit Sub
+    End If
+    
+    If strMultiPolygonSepChar <> "" Then
+        ' Replace all occurrences of strMultiPolygonSepChar with vbCrLf
+        strPolygonDefs = Replace(strPolygonDefs, strMultiPolygonSepChar, vbCrLf)
+    End If
+    
+    ' The following will populate strListItems() with each row in strPolygonDefs
+    ParseAndSortList strPolygonDefs, strListItems(), lngItemCount, "", False, True, False, False, False, MAX_LIST_COUNT
+    
+    If lngItemCount > 0 Then
+        ' See if the first row contains a semicolon
+        If InStr(strListItems(0), ";") > 0 Then
+            blnMultiPolygonMode = True
+        Else
+            blnMultiPolygonMode = False
+        End If
+    End If
+    
+    If Not blnMultiPolygonMode Then
+        ReDim strXYPairList(0)
+    End If
+    
+    ' Parse each item in strListItems() to determine the polygon vertices
+    For lngIndex = 0 To lngItemCount - 1
+        
+        If blnMultiPolygonMode Then
+            ' Split strListItems(lngIndex) on semicolons
+            ParseAndSortList strListItems(lngIndex), strXYPairList(), lngXYPairCount, ";", False, False, False, False, False, MAX_LIST_COUNT
+        
+        Else
+            strXYPairList(0) = strListItems(lngIndex)
+            lngXYPairCount = 1
+        End If
+    
+        If lngXYPairCount >= 1 Then
+        
+            If blnMultiPolygonMode Then
+                ' Add another polygon
+                 With glbPreferencesExpanded.NoiseRemovalOptions
+                    .ExclusionPolygonCount = .ExclusionPolygonCount + 1
+                    If .ExclusionPolygonCount > 1 Then
+                        ' Reserve more space in .ExclusionPolygonList()
+                        ReDim Preserve .ExclusionPolygonList(0 To .ExclusionPolygonCount - 1)
+                    End If
+                    .ExclusionPolygonList(.ExclusionPolygonCount - 1).VertexCount = 0
+                    ReDim .ExclusionPolygonList(.ExclusionPolygonCount - 1).VertexList(3)
+                End With
+            Else
+                glbPreferencesExpanded.NoiseRemovalOptions.ExclusionPolygonCount = 1
+            End If
+        
+            ' Parse out the X, Y pair from each item in strXYPairList()
+            For lngXYIndex = 0 To lngXYPairCount - 1
+                
+                intCommaLoc = InStr(strXYPairList(lngXYIndex), ",")
+                
+                strValue = Left(strXYPairList(lngXYIndex), intCommaLoc - 1)
+                If IsNumeric(strValue) Then
+                    lngX = CLng(strValue)
+                    
+                    strValue = Mid(strXYPairList(lngXYIndex), intCommaLoc + 1)
+                    If IsNumeric(strValue) Then
+                        lngY = CLng(strValue)
+                        
+                        With glbPreferencesExpanded.NoiseRemovalOptions
+                            With .ExclusionPolygonList(.ExclusionPolygonCount - 1)
+                                If .VertexCount >= UBound(.VertexList) Then
+                                    ReDim Preserve .VertexList(UBound(.VertexList) * 2 - 1)
+                                End If
+                                
+                                .VertexList(.VertexCount) = lngX & ", " & lngY
+                                
+                                .VertexCount = .VertexCount + 1
+                            End With
+                        End With
+                        
+                    End If
+
+                End If
+                
+            Next lngXYIndex
+
+        End If
+    Next lngIndex
+    
+    With glbPreferencesExpanded.NoiseRemovalOptions
+        ' Shrink the vertex list for each polygon
+        For lngIndex = 0 To .ExclusionPolygonCount - 1
+            With .ExclusionPolygonList(lngIndex)
+                If .VertexCount > 0 Then
+                    If UBound(.VertexList) >= .VertexCount Then
+                        ReDim Preserve .VertexList(.VertexCount - 1)
+                    End If
+                End If
+            End With
+        Next lngIndex
+    End With
+    
+    Exit Sub
+    
+PolygonTextToDefsErrorHandler:
+    LogErrors Err.Number, "PolygonTextToDefs"
+    Debug.Print "Error in PolygonTextToDefs: " & Err.Description
+    Debug.Assert False
+    
+End Sub
+
 Public Function PPMToMass(dblPPMToConvert As Double, dblCurrentMZ As Double) As Double
     ' Converts dblPPMToConvert to a mass value, which is dependent on dblCurrentMZ
     
@@ -4344,7 +4565,7 @@ Public Sub SmoothViaMovingAverage(dblArray() As Double, lngLowIndex As Long, lng
     ' If intSmoothsToPerform is > 1, then repeats the smooth multiple times
     
     Dim intIteration As Integer
-    Dim X As Long, Y As Long
+    Dim x As Long, y As Long
     Dim lngDataCount As Long
     
     Dim lngWindowHalfWidth As Long
@@ -4378,21 +4599,21 @@ On Error GoTo SmoothViaMovingAverageErrorHandler
         SmoothUsingMovingAverageEdgeMath dblArray, True, lngLowIndex, lngHighIndex, dblSmoothedData(), lngWindowSize
         
         ' Perform the smooth on the vast majority of points
-        For X = lngLowIndex + lngWindowHalfWidth To lngHighIndex - lngWindowHalfWidth
+        For x = lngLowIndex + lngWindowHalfWidth To lngHighIndex - lngWindowHalfWidth
             dblSum = 0
-            For Y = 0 To lngWindowSize - 1
-                dblSum = dblSum + dblArray(X - lngWindowHalfWidth + Y)
-            Next Y
-            dblSmoothedData(X) = dblSum / lngWindowSize
-        Next X
+            For y = 0 To lngWindowSize - 1
+                dblSum = dblSum + dblArray(x - lngWindowHalfWidth + y)
+            Next y
+            dblSmoothedData(x) = dblSum / lngWindowSize
+        Next x
         
         ' Smooth the last few points after a full window of points is available
         SmoothUsingMovingAverageEdgeMath dblArray, False, lngLowIndex, lngHighIndex, dblSmoothedData(), lngWindowSize
         
-        For X = lngLowIndex To lngHighIndex
+        For x = lngLowIndex To lngHighIndex
             ' Copy smoothed array to actual dblArray
-            dblArray(X) = dblSmoothedData(X)
-        Next X
+            dblArray(x) = dblSmoothedData(x)
+        Next x
     Next intIteration
     
     Exit Sub
@@ -4409,7 +4630,7 @@ Private Sub SmoothUsingMovingAverageEdgeMath(dblArray() As Double, blnSmoothBegi
     Dim StartIndex As Long, FinishIndex As Long
     Dim lngWindowHalfWidth As Long
     
-    Dim X As Long, Y As Long, lngPointToUse As Long
+    Dim x As Long, y As Long, lngPointToUse As Long
     Dim dblSum As Double, PointsUsed As Integer
     
     lngWindowHalfWidth = (lngWindowSize - 1) / 2
@@ -4424,11 +4645,11 @@ Private Sub SmoothUsingMovingAverageEdgeMath(dblArray() As Double, blnSmoothBegi
     
     
     ' Performs a shortened smooth at the beginning and end of a set of points
-    For X = StartIndex To FinishIndex
+    For x = StartIndex To FinishIndex
         dblSum = 0
         PointsUsed = 0
-        For Y = 0 To lngWindowSize - 1
-            lngPointToUse = X - lngWindowHalfWidth + Y
+        For y = 0 To lngWindowSize - 1
+            lngPointToUse = x - lngWindowHalfWidth + y
             If lngPointToUse >= lngLowIndex And lngPointToUse <= lngHighIndex Then
                 dblSum = dblSum + dblArray(lngPointToUse)
             Else
@@ -4439,11 +4660,11 @@ Private Sub SmoothUsingMovingAverageEdgeMath(dblArray() As Double, blnSmoothBegi
                 End If
             End If
             PointsUsed = PointsUsed + 1
-        Next Y
+        Next y
         If PointsUsed > 0 Then
-            dblSmoothedData(X) = dblSum / PointsUsed
+            dblSmoothedData(x) = dblSum / PointsUsed
         End If
-    Next X
+    Next x
 
 End Sub
 

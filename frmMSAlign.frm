@@ -18,7 +18,7 @@ Begin VB.Form frmMSAlign
       Height          =   315
       Left            =   11280
       Style           =   2  'Dropdown List
-      TabIndex        =   101
+      TabIndex        =   106
       Top             =   9240
       Width           =   2895
    End
@@ -27,7 +27,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Mass Refinment Stats"
       Height          =   1815
       Left            =   9000
-      TabIndex        =   88
+      TabIndex        =   93
       Top             =   7800
       Width           =   2175
       Begin VB.TextBox txtMassCalibrationOverallShiftCount 
@@ -35,7 +35,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1560
          Locked          =   -1  'True
-         TabIndex        =   92
+         TabIndex        =   97
          Text            =   "0"
          Top             =   840
          Width           =   495
@@ -45,7 +45,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   120
          Locked          =   -1  'True
-         TabIndex        =   90
+         TabIndex        =   95
          Text            =   "0"
          Top             =   480
          Width           =   1095
@@ -54,7 +54,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Revert to Original Masses"
          Height          =   375
          Left            =   50
-         TabIndex        =   93
+         TabIndex        =   98
          Top             =   1320
          Width           =   2055
       End
@@ -63,7 +63,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Mass shift count:"
          Height          =   255
          Left            =   120
-         TabIndex        =   91
+         TabIndex        =   96
          Top             =   870
          Width           =   1335
       End
@@ -72,7 +72,7 @@ Begin VB.Form frmMSAlign
          Height          =   255
          Index           =   1
          Left            =   2520
-         TabIndex        =   112
+         TabIndex        =   117
          Top             =   1140
          Width           =   600
       End
@@ -81,7 +81,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Avg mass shift (ppm):"
          Height          =   255
          Left            =   120
-         TabIndex        =   89
+         TabIndex        =   94
          Top             =   240
          Width           =   1695
       End
@@ -96,15 +96,15 @@ Begin VB.Form frmMSAlign
       _ExtentY        =   3201
       _Version        =   393216
       Style           =   1
-      Tabs            =   6
-      TabsPerRow      =   6
+      Tabs            =   7
+      Tab             =   5
+      TabsPerRow      =   7
       TabHeight       =   520
       BackColor       =   -2147483643
       TabCaption(0)   =   "NET Options"
       TabPicture(0)   =   "frmMSAlign.frx":0000
-      Tab(0).ControlEnabled=   -1  'True
+      Tab(0).ControlEnabled=   0   'False
       Tab(0).Control(0)=   "fraNETWarpOptions"
-      Tab(0).Control(0).Enabled=   0   'False
       Tab(0).ControlCount=   1
       TabCaption(1)   =   "Mass Options"
       TabPicture(1)   =   "frmMSAlign.frx":001C
@@ -117,30 +117,227 @@ Begin VB.Form frmMSAlign
       Tab(2).Control(0)=   "fraNETTolerances"
       Tab(2).Control(1)=   "fraBinningOptions"
       Tab(2).ControlCount=   2
-      TabCaption(3)   =   "Calibration Type"
+      TabCaption(3)   =   "Calib Type"
       TabPicture(3)   =   "frmMSAlign.frx":0054
       Tab(3).ControlEnabled=   0   'False
       Tab(3).Control(0)=   "fraMassCalibType"
       Tab(3).ControlCount=   1
-      TabCaption(4)   =   "Advanced"
+      TabCaption(4)   =   "Adv1"
       TabPicture(4)   =   "frmMSAlign.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "fraMTRangeFilters"
-      Tab(4).Control(0).Enabled=   0   'False
-      Tab(4).Control(1)=   "txtWarpMassZScoreTolerance"
-      Tab(4).Control(1).Enabled=   0   'False
+      Tab(4).Control(0)=   "Label21"
+      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
       Tab(4).Control(2)=   "Frame1"
-      Tab(4).Control(2).Enabled=   0   'False
-      Tab(4).Control(3)=   "chkWarpMassUseLSQ"
-      Tab(4).Control(3).Enabled=   0   'False
-      Tab(4).Control(4)=   "Label21"
-      Tab(4).Control(4).Enabled=   0   'False
+      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
+      Tab(4).Control(4)=   "fraMTRangeFilters"
       Tab(4).ControlCount=   5
-      TabCaption(5)   =   "Plots"
+      TabCaption(5)   =   "Adv2"
       TabPicture(5)   =   "frmMSAlign.frx":008C
-      Tab(5).ControlEnabled=   0   'False
-      Tab(5).Control(0)=   "fraResidualPlotOptions"
+      Tab(5).ControlEnabled=   -1  'True
+      Tab(5).Control(0)=   "fraSplitWarpOptions"
+      Tab(5).Control(0).Enabled=   0   'False
       Tab(5).ControlCount=   1
+      TabCaption(6)   =   "Plots"
+      TabPicture(6)   =   "frmMSAlign.frx":00A8
+      Tab(6).ControlEnabled=   0   'False
+      Tab(6).Control(0)=   "fraResidualPlotOptions"
+      Tab(6).ControlCount=   1
+      Begin VB.Frame fraSplitWarpOptions 
+         Caption         =   "Split warp options"
+         Height          =   1095
+         Left            =   240
+         TabIndex        =   63
+         Top             =   480
+         Width           =   4695
+         Begin VB.CommandButton cmdSplitWarpResume 
+            Caption         =   "Resume"
+            Height          =   255
+            Left            =   2760
+            TabIndex        =   120
+            Top             =   760
+            Visible         =   0   'False
+            Width           =   1455
+         End
+         Begin VB.CheckBox chkSplitWarpPauseBetweenIterations 
+            Caption         =   "Pause between iterations"
+            Height          =   200
+            Left            =   120
+            TabIndex        =   119
+            Top             =   760
+            Width           =   2295
+         End
+         Begin VB.TextBox txtSplitWarpMZBoundary 
+            Height          =   285
+            Left            =   3240
+            TabIndex        =   67
+            ToolTipText     =   "m/z value at which to split the data"
+            Top             =   240
+            Width           =   1185
+         End
+         Begin VB.OptionButton optSplitWarpOnMZ 
+            Caption         =   "Split on m/z"
+            Height          =   255
+            Left            =   120
+            TabIndex        =   65
+            Top             =   480
+            Width           =   1575
+         End
+         Begin VB.OptionButton optSplitWarpDisabled 
+            Caption         =   "Disabled"
+            Height          =   255
+            Left            =   120
+            TabIndex        =   64
+            Top             =   240
+            Value           =   -1  'True
+            Width           =   1575
+         End
+         Begin VB.Label lblSplitWarpMZBoundary 
+            Caption         =   "m/z boundary"
+            Height          =   315
+            Left            =   1920
+            TabIndex        =   66
+            Top             =   240
+            Width           =   1185
+         End
+      End
+      Begin VB.Frame fraResidualPlotOptions 
+         Caption         =   "Residual Plot Options"
+         Height          =   1350
+         Left            =   -74880
+         TabIndex        =   68
+         Top             =   360
+         Width           =   6015
+         Begin VB.CheckBox chkAutoZoomOut 
+            Caption         =   "Auto-zoom out after alignment"
+            Height          =   255
+            Left            =   120
+            TabIndex        =   73
+            Top             =   960
+            Value           =   1  'Checked
+            Width           =   2535
+         End
+         Begin VB.ComboBox cboResidualPlotPointSize 
+            Height          =   315
+            ItemData        =   "frmMSAlign.frx":00C4
+            Left            =   1320
+            List            =   "frmMSAlign.frx":00C6
+            Style           =   2  'Dropdown List
+            TabIndex        =   70
+            Top             =   240
+            Width           =   645
+         End
+         Begin VB.ComboBox cboResidualPlotTransformationFnLineSize 
+            Height          =   315
+            ItemData        =   "frmMSAlign.frx":00C8
+            Left            =   1320
+            List            =   "frmMSAlign.frx":00CA
+            Style           =   2  'Dropdown List
+            TabIndex        =   72
+            Top             =   600
+            Width           =   645
+         End
+         Begin VB.TextBox txtResidualPlotMinX 
+            Alignment       =   2  'Center
+            Height          =   285
+            Left            =   3120
+            TabIndex        =   75
+            Text            =   "0"
+            Top             =   210
+            Width           =   800
+         End
+         Begin VB.TextBox txtResidualPlotMinY 
+            Alignment       =   2  'Center
+            Height          =   285
+            Left            =   4920
+            TabIndex        =   79
+            Text            =   "0"
+            Top             =   210
+            Width           =   800
+         End
+         Begin VB.TextBox txtResidualPlotMaxX 
+            Alignment       =   2  'Center
+            Height          =   285
+            Left            =   3120
+            TabIndex        =   77
+            Text            =   "0"
+            Top             =   550
+            Width           =   800
+         End
+         Begin VB.TextBox txtResidualPlotMaxY 
+            Alignment       =   2  'Center
+            Height          =   285
+            Left            =   4920
+            TabIndex        =   81
+            Text            =   "0"
+            Top             =   550
+            Width           =   800
+         End
+         Begin VB.CommandButton cmdResidualPlotSetRange 
+            Caption         =   "Set Range for Current Plot"
+            Height          =   375
+            Left            =   2640
+            TabIndex        =   82
+            Top             =   900
+            Width           =   2055
+         End
+         Begin VB.CommandButton cmdZoomOutResidualsPlot 
+            Cancel          =   -1  'True
+            Caption         =   "Zoom Out"
+            Height          =   375
+            Left            =   4800
+            TabIndex        =   83
+            Top             =   900
+            Width           =   1095
+         End
+         Begin VB.Label Label22 
+            Caption         =   "Point Size"
+            Height          =   285
+            Left            =   120
+            TabIndex        =   69
+            Top             =   270
+            Width           =   975
+         End
+         Begin VB.Label Label23 
+            Caption         =   "Line Size"
+            Height          =   285
+            Left            =   120
+            TabIndex        =   71
+            Top             =   630
+            Width           =   975
+         End
+         Begin VB.Label lblResidualPlotMinX 
+            Caption         =   "X Min"
+            Height          =   255
+            Left            =   2550
+            TabIndex        =   74
+            Top             =   240
+            Width           =   600
+         End
+         Begin VB.Label lblResidualPlotMinY 
+            Caption         =   "Y Min"
+            Height          =   255
+            Left            =   4350
+            TabIndex        =   78
+            Top             =   240
+            Width           =   600
+         End
+         Begin VB.Label lblResidualPlotMaxX 
+            Caption         =   "X Max"
+            Height          =   255
+            Left            =   2550
+            TabIndex        =   76
+            Top             =   585
+            Width           =   600
+         End
+         Begin VB.Label lblResidualPlotMaxY 
+            Caption         =   "Y Max"
+            Height          =   255
+            Left            =   4350
+            TabIndex        =   80
+            Top             =   580
+            Width           =   600
+         End
+      End
       Begin VB.Frame fraMTRangeFilters 
          Caption         =   "MT Tag Range Filters (leave blank to ignore)"
          Height          =   975
@@ -207,144 +404,6 @@ Begin VB.Form frmMSAlign
             TabIndex        =   55
             Top             =   250
             Width           =   1000
-         End
-      End
-      Begin VB.Frame fraResidualPlotOptions 
-         Caption         =   "Residual Plot Options"
-         Height          =   1350
-         Left            =   -74880
-         TabIndex        =   63
-         Top             =   360
-         Width           =   6015
-         Begin VB.CommandButton cmdZoomOutResidualsPlot 
-            Cancel          =   -1  'True
-            Caption         =   "Zoom Out"
-            Height          =   375
-            Left            =   4800
-            TabIndex        =   78
-            Top             =   900
-            Width           =   1095
-         End
-         Begin VB.CommandButton cmdResidualPlotSetRange 
-            Caption         =   "Set Range for Current Plot"
-            Height          =   375
-            Left            =   2640
-            TabIndex        =   77
-            Top             =   900
-            Width           =   2055
-         End
-         Begin VB.TextBox txtResidualPlotMaxY 
-            Alignment       =   2  'Center
-            Height          =   285
-            Left            =   4920
-            TabIndex        =   76
-            Text            =   "0"
-            Top             =   550
-            Width           =   800
-         End
-         Begin VB.TextBox txtResidualPlotMaxX 
-            Alignment       =   2  'Center
-            Height          =   285
-            Left            =   3120
-            TabIndex        =   72
-            Text            =   "0"
-            Top             =   550
-            Width           =   800
-         End
-         Begin VB.TextBox txtResidualPlotMinY 
-            Alignment       =   2  'Center
-            Height          =   285
-            Left            =   4920
-            TabIndex        =   74
-            Text            =   "0"
-            Top             =   210
-            Width           =   800
-         End
-         Begin VB.TextBox txtResidualPlotMinX 
-            Alignment       =   2  'Center
-            Height          =   285
-            Left            =   3120
-            TabIndex        =   70
-            Text            =   "0"
-            Top             =   210
-            Width           =   800
-         End
-         Begin VB.ComboBox cboResidualPlotTransformationFnLineSize 
-            Height          =   315
-            ItemData        =   "frmMSAlign.frx":00A8
-            Left            =   1320
-            List            =   "frmMSAlign.frx":00AA
-            Style           =   2  'Dropdown List
-            TabIndex        =   67
-            Top             =   600
-            Width           =   645
-         End
-         Begin VB.ComboBox cboResidualPlotPointSize 
-            Height          =   315
-            ItemData        =   "frmMSAlign.frx":00AC
-            Left            =   1320
-            List            =   "frmMSAlign.frx":00AE
-            Style           =   2  'Dropdown List
-            TabIndex        =   65
-            Top             =   240
-            Width           =   645
-         End
-         Begin VB.CheckBox chkAutoZoomOut 
-            Caption         =   "Auto-zoom out after alignment"
-            Height          =   255
-            Left            =   120
-            TabIndex        =   68
-            Top             =   960
-            Value           =   1  'Checked
-            Width           =   2535
-         End
-         Begin VB.Label lblResidualPlotMaxY 
-            Caption         =   "Y Max"
-            Height          =   255
-            Left            =   4350
-            TabIndex        =   75
-            Top             =   580
-            Width           =   600
-         End
-         Begin VB.Label lblResidualPlotMaxX 
-            Caption         =   "X Max"
-            Height          =   255
-            Left            =   2550
-            TabIndex        =   71
-            Top             =   585
-            Width           =   600
-         End
-         Begin VB.Label lblResidualPlotMinY 
-            Caption         =   "Y Min"
-            Height          =   255
-            Left            =   4350
-            TabIndex        =   73
-            Top             =   240
-            Width           =   600
-         End
-         Begin VB.Label lblResidualPlotMinX 
-            Caption         =   "X Min"
-            Height          =   255
-            Left            =   2550
-            TabIndex        =   69
-            Top             =   240
-            Width           =   600
-         End
-         Begin VB.Label Label23 
-            Caption         =   "Line Size"
-            Height          =   285
-            Left            =   120
-            TabIndex        =   66
-            Top             =   630
-            Width           =   975
-         End
-         Begin VB.Label Label22 
-            Caption         =   "Point Size"
-            Height          =   285
-            Left            =   120
-            TabIndex        =   64
-            Top             =   270
-            Width           =   975
          End
       End
       Begin VB.TextBox txtWarpMassZScoreTolerance 
@@ -640,7 +699,7 @@ Begin VB.Form frmMSAlign
             BackStyle       =   0  'Transparent
             Caption         =   "Mass Window (ppm):"
             Height          =   285
-            Left            =   30
+            Left            =   0
             TabIndex        =   20
             Top             =   270
             Width           =   1605
@@ -649,7 +708,7 @@ Begin VB.Form frmMSAlign
       Begin VB.Frame fraNETWarpOptions 
          Caption         =   "NET Warp Options"
          Height          =   1335
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   8
          Top             =   360
          Width           =   6135
@@ -767,7 +826,7 @@ Begin VB.Form frmMSAlign
       BackColor       =   &H80000005&
       Height          =   735
       Left            =   120
-      TabIndex        =   105
+      TabIndex        =   110
       Top             =   9600
       Width           =   11055
       Begin VB.Label lblUMCMassMode 
@@ -775,7 +834,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "LC-MS Feature Mass Mode"
          Height          =   255
          Left            =   120
-         TabIndex        =   107
+         TabIndex        =   112
          ToolTipText     =   "Status of the MT tag database"
          Top             =   390
          Width           =   10755
@@ -785,7 +844,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Status"
          Height          =   255
          Left            =   120
-         TabIndex        =   106
+         TabIndex        =   111
          Top             =   135
          Width           =   10815
       End
@@ -794,7 +853,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Set to Defaults"
       Height          =   375
       Left            =   11280
-      TabIndex        =   102
+      TabIndex        =   107
       Top             =   9720
       Width           =   1335
    End
@@ -803,7 +862,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "NET Alignment Stats"
       Height          =   1815
       Left            =   6600
-      TabIndex        =   79
+      TabIndex        =   84
       Top             =   7800
       Width           =   2295
       Begin VB.TextBox txtFit 
@@ -811,7 +870,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   87
+         TabIndex        =   92
          Top             =   1360
          Width           =   1095
       End
@@ -820,7 +879,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1080
          Locked          =   -1  'True
-         TabIndex        =   85
+         TabIndex        =   90
          Top             =   960
          Width           =   1095
       End
@@ -828,7 +887,7 @@ Begin VB.Form frmMSAlign
          Alignment       =   2  'Center
          Height          =   285
          Left            =   840
-         TabIndex        =   81
+         TabIndex        =   86
          Text            =   "0"
          Top             =   240
          Width           =   1335
@@ -837,7 +896,7 @@ Begin VB.Form frmMSAlign
          Alignment       =   2  'Center
          Height          =   285
          Left            =   1080
-         TabIndex        =   83
+         TabIndex        =   88
          Text            =   "0"
          Top             =   600
          Width           =   1095
@@ -847,7 +906,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Mean residual:"
          Height          =   375
          Left            =   120
-         TabIndex        =   86
+         TabIndex        =   91
          Top             =   1260
          Width           =   975
       End
@@ -856,7 +915,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "R-squared:"
          Height          =   255
          Left            =   120
-         TabIndex        =   84
+         TabIndex        =   89
          Top             =   990
          Width           =   855
       End
@@ -865,7 +924,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Slope:"
          Height          =   255
          Left            =   120
-         TabIndex        =   80
+         TabIndex        =   85
          Top             =   270
          Width           =   615
       End
@@ -874,7 +933,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Intercept:"
          Height          =   255
          Left            =   120
-         TabIndex        =   82
+         TabIndex        =   87
          Top             =   640
          Width           =   855
       End
@@ -889,7 +948,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Abort"
       Height          =   375
       Left            =   12840
-      TabIndex        =   104
+      TabIndex        =   109
       Top             =   9960
       Width           =   1335
    End
@@ -898,7 +957,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Info"
       Height          =   1335
       Left            =   11280
-      TabIndex        =   94
+      TabIndex        =   99
       Top             =   7800
       Width           =   2895
       Begin VB.TextBox txtNumMatched 
@@ -906,7 +965,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1500
          Locked          =   -1  'True
-         TabIndex        =   100
+         TabIndex        =   105
          Top             =   960
          Width           =   1300
       End
@@ -915,7 +974,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1500
          Locked          =   -1  'True
-         TabIndex        =   98
+         TabIndex        =   103
          Top             =   600
          Width           =   1300
       End
@@ -924,7 +983,7 @@ Begin VB.Form frmMSAlign
          Height          =   285
          Left            =   1500
          Locked          =   -1  'True
-         TabIndex        =   96
+         TabIndex        =   101
          Top             =   240
          Width           =   1300
       End
@@ -933,7 +992,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "Match Count:"
          Height          =   255
          Left            =   120
-         TabIndex        =   99
+         TabIndex        =   104
          Top             =   960
          Width           =   1450
       End
@@ -942,7 +1001,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "LC-MS Features:"
          Height          =   255
          Left            =   120
-         TabIndex        =   97
+         TabIndex        =   102
          Top             =   600
          Width           =   1450
       End
@@ -951,7 +1010,7 @@ Begin VB.Form frmMSAlign
          Caption         =   "MT Tag Count:"
          Height          =   255
          Left            =   120
-         TabIndex        =   95
+         TabIndex        =   100
          Top             =   240
          Width           =   1450
       End
@@ -960,7 +1019,7 @@ Begin VB.Form frmMSAlign
       Caption         =   "Align (Warped)"
       Height          =   375
       Left            =   12840
-      TabIndex        =   103
+      TabIndex        =   108
       Top             =   9720
       Width           =   1335
    End
@@ -1514,7 +1573,7 @@ Begin VB.Form frmMSAlign
       Begin CWUIControlsLib.CWGraph ctlMassVsMZResidual 
          Height          =   4455
          Left            =   1560
-         TabIndex        =   113
+         TabIndex        =   118
          Top             =   4200
          Width           =   6135
          _Version        =   393218
@@ -1824,7 +1883,7 @@ Begin VB.Form frmMSAlign
       Begin CWUIControlsLib.CWGraph ctlMassVsScanResidual 
          Height          =   4455
          Left            =   2880
-         TabIndex        =   111
+         TabIndex        =   116
          Top             =   2880
          Width           =   6135
          _Version        =   393218
@@ -2134,11 +2193,11 @@ Begin VB.Form frmMSAlign
       Begin VIPER.ctl2DHeatMap ctlFlatSurface 
          Height          =   1455
          Left            =   240
-         TabIndex        =   108
+         TabIndex        =   113
          Top             =   360
          Width           =   5055
-         _extentx        =   8916
-         _extenty        =   2566
+         _ExtentX        =   8916
+         _ExtentY        =   2566
       End
       Begin VB.CheckBox chkSurfaceShowsZScore 
          BackColor       =   &H00FFFFFF&
@@ -2173,7 +2232,7 @@ Begin VB.Form frmMSAlign
       Begin CW3DGraphLib.CWGraph3D ctlCWGraphNI 
          Height          =   4575
          Left            =   4800
-         TabIndex        =   109
+         TabIndex        =   114
          Top             =   960
          Visible         =   0   'False
          Width           =   5535
@@ -2274,8 +2333,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   5.33257101030242E-287
-         DataMax_5       =   5.33257101030242E-287
+         DataMin_5       =   3.74843621077839E-287
+         DataMax_5       =   3.74843621077839E-287
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2341,8 +2400,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   5.40620415586629E-287
-         DataMax_14      =   5.40620415586629E-287
+         DataMin_14      =   3.7337456566961E-287
+         DataMax_14      =   3.7337456566961E-287
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2410,8 +2469,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   5.43558526403086E-287
-         DataMax_23      =   5.43558526403086E-287
+         DataMin_23      =   3.72228181367418E-287
+         DataMax_23      =   3.72228181367418E-287
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -2607,7 +2666,7 @@ Begin VB.Form frmMSAlign
       Begin CWUIControlsLib.CWGraph ctlNETResidual 
          Height          =   4455
          Left            =   480
-         TabIndex        =   110
+         TabIndex        =   115
          Top             =   2280
          Width           =   6135
          _Version        =   393218
@@ -3185,10 +3244,19 @@ End Enum
 Private mLocalPMTCount As Long
 Private mLocalPMTs() As Double
 
+' 2D Array; containing a subset of mLocalPMTs, filtered on UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount
+Private mLocalPMTsFiltered() As Double
+
 ' 2D Array, ranging from 0 to mLocalFeatureCount-1 in the 1st dimension and 0 to FEATURE_COLUMN_COUNT-1 in the second dimension
 ' Columns for the 2nd dimension are given by FeatureColumnConstants
 Private mLocalFeatureCount As Long
 Private mLocalFeatures() As Double
+
+Private mLocalFeaturesAreFiltered As Boolean
+
+' This variable is used when calling LCMSWarp multiple times, first with data below a boundary, and then with data above a boundary
+Private mSplitWarpIteration As Integer
+Private mPauseSplitWarpProcessing As Boolean
 
 ' 2D Array of variants, ranging from 0 to UBound(mMatches, 1) in the first dimension and containing 0 to 3 in the 2nd dimension
 Private mMatches As Variant
@@ -3279,6 +3347,7 @@ Private mScan2Nets As Variant
 Private mMassMatchObject As New MassMatchCOM.CMassMatchWrapper
 Private mMassMatchState As MassMatchProcessingStateConstants
 Private mProcessingStartTime As Date
+Private mAlignmentFinalizedOrAborted As Boolean
 
 Private mLocalGelUpdated As Boolean
 
@@ -3324,6 +3393,10 @@ Public Property Get MassMatchState() As MassMatchProcessingStateConstants
     MassMatchState = mMassMatchState
 End Property
 
+Public Property Get AlignmentFinalizedOrAborted() As Boolean
+    AlignmentFinalizedOrAborted = mAlignmentFinalizedOrAborted
+End Property
+
 Public Property Get RecalibratingMassDuringAutoAnalysis() As Boolean
     RecalibratingMassDuringAutoAnalysis = mRecalibratingMassDuringAutoAnalysis
 End Property
@@ -3339,6 +3412,7 @@ End Function
 
 Private Sub ClearLocalFeaturesArray()
     ReDim mLocalFeatures(0, FEATURE_COLUMN_COUNT - 1)
+    mLocalFeaturesAreFiltered = True
     txtFeatureCountLoaded.Text = "0"
 End Sub
 
@@ -3593,8 +3667,16 @@ Private Sub CopyLocalDataToGel(strSecondsElapsed As String, blnUpdateMassValues 
     Dim lngIndex As Long
     Dim lngStartIndex As Long
     
-    Dim lngDataCount As Long
-    Dim lngValidDataCount As Long
+    Dim lngDataCountNew As Long
+    Dim lngDataCountOld As Long
+    
+    Dim lngDataCountTotal As Long
+    Dim lngResidualDataTargetIndex As Long
+    Dim lngNETDataCountExpected As Long
+    
+    Dim lngResidualNETTargetIndexStart As Long
+    Dim lngResidualMassTargetIndexStart As Long
+    
     Dim lngScanCount As Long
     Dim lngScans() As Long
     Dim dblScanNETs() As Double
@@ -3622,6 +3704,26 @@ Private Sub CopyLocalDataToGel(strSecondsElapsed As String, blnUpdateMassValues 
     
     Dim blnSuccess As Boolean
     Dim dblMassError As Double
+    
+''    Dim blnMergeCachedResiduals As Boolean
+''
+''    ' 1a. scan vs. net error using linear function
+''    ' 1b. scan vs. net error using warping function
+''    ' 1c. scan vs. (net from ms warp - net from linear function)
+''    Dim dblScanMTNETvsLinearNETResidualOld() As Double
+''    Dim dblScanMTNETvsCustomNETResidualOld() As Double
+''    Dim dblScanCustomNetVsLinearNETResidualOld() As Double
+''
+''    ' 2a. scan vs. mass error before warping
+''    ' 2b. scan vs. mass error after warping
+''    Dim dblScanVsMassErrorOld() As Double
+''    Dim dblScanVsMassErrorCorrectedOld() As Double
+''
+''    ' 3a. m/z vs. mass error before warping
+''    ' 3b. m/z vs. mass error after warping
+''    Dim dblMZVsMassErrorOld() As Double
+''    Dim dblMZVsMassErrorCorrectedOld() As Double
+''
     
 On Error GoTo CopyLocalDataToGelErrorHandler
 
@@ -3709,22 +3811,27 @@ On Error GoTo CopyLocalDataToGelErrorHandler
         End With
         
         If MatchesAreValid Then
-            lngDataCount = UBound(mMatches, 1) + 1
+            lngDataCountNew = UBound(mMatches, 1) + 1
         Else
-            lngDataCount = 0
+            lngDataCountNew = 0
         End If
         
-        mLinearNETResidualMin = 0
-        mLinearNETResidualMax = 0
-        If lngDataCount = 0 Then
-           ' Erase the residual value arrays
-            ReDim mScanMTNETvsLinearNETResidual(1, 0)
-            ReDim mScanMTNETvsCustomNETResidual(1, 0)
-            ReDim mScanCustomNetVsLinearNETResidual(1, 0)
-            ReDim mScanVsMassError(1, 0)
-            ReDim mScanVsMassErrorCorrected(1, 0)
-            ReDim mMZVsMassError(1, 0)
-            ReDim mMZVsMassErrorCorrected(1, 0)
+        If lngDataCountNew = 0 Then
+            If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmDisabled Or _
+               mSplitWarpIteration < 2 Then
+                ' Erase the residual value arrays
+                ReDim mScanMTNETvsLinearNETResidual(1, 0)
+                ReDim mScanMTNETvsCustomNETResidual(1, 0)
+                ReDim mScanCustomNetVsLinearNETResidual(1, 0)
+                ReDim mScanVsMassError(1, 0)
+                ReDim mScanVsMassErrorCorrected(1, 0)
+                ReDim mMZVsMassError(1, 0)
+                ReDim mMZVsMassErrorCorrected(1, 0)
+                    
+                mLinearNETResidualMin = 0
+                mLinearNETResidualMax = 0
+            
+            End If
         Else
             
             '--------------------------------------------------
@@ -3757,25 +3864,70 @@ On Error GoTo CopyLocalDataToGelErrorHandler
             End With
             
         
-            ' Initialize the residual value arrays
-            ReDim mScanMTNETvsLinearNETResidual(1, lngDataCount - 1)
-            ReDim mScanMTNETvsCustomNETResidual(1, lngDataCount - 1)
-            ReDim mScanCustomNetVsLinearNETResidual(1, lngDataCount - 1)
-            ReDim mScanVsMassError(1, lngDataCount - 1)
-            ReDim mScanVsMassErrorCorrected(1, lngDataCount - 1)
-            ReDim mMZVsMassError(1, lngDataCount - 1)
-            ReDim mMZVsMassErrorCorrected(1, lngDataCount - 1)
+            If UMCNetAdjDef.MSWarpOptions.SplitWarpMode <> swmDisabled And mSplitWarpIteration >= 2 Then
+                ' We will append new residual values data to the arrays
+                ' Need to reserve more room in the arrays
+                
+                lngDataCountOld = UBound(mScanMTNETvsLinearNETResidual, 2) + 1
+                lngDataCountTotal = lngDataCountNew + lngDataCountOld
+                
+                If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmSplitOnMZ Then
+                    ' Clear out the NET residual arrays since we only keep the final NET alignment
+                    ReDim mScanMTNETvsLinearNETResidual(1, lngDataCountNew)
+                    ReDim mScanMTNETvsCustomNETResidual(1, lngDataCountNew)
+                    ReDim mScanCustomNetVsLinearNETResidual(1, lngDataCountNew)
+                    lngResidualNETTargetIndexStart = 0
+                    lngNETDataCountExpected = lngDataCountNew
+                Else
+                    ' Do not clear the NET residual arrays
+                    ReDim Preserve mScanMTNETvsLinearNETResidual(1, lngDataCountTotal - 1)
+                    ReDim Preserve mScanMTNETvsCustomNETResidual(1, lngDataCountTotal - 1)
+                    ReDim Preserve mScanCustomNetVsLinearNETResidual(1, lngDataCountTotal - 1)
+                    lngResidualNETTargetIndexStart = lngDataCountOld
+                    lngNETDataCountExpected = lngDataCountTotal
+                End If
+                
+                ReDim Preserve mScanVsMassError(1, lngDataCountTotal - 1)
+                ReDim Preserve mScanVsMassErrorCorrected(1, lngDataCountTotal - 1)
+                ReDim Preserve mMZVsMassError(1, lngDataCountTotal - 1)
+                ReDim Preserve mMZVsMassErrorCorrected(1, lngDataCountTotal - 1)
+                lngResidualMassTargetIndexStart = lngDataCountOld
+                
+            Else
 
-            mMinMZ = 100000
-            mMaxMZ = -100000
+                ' Initialize the residual value arrays
+                ReDim mScanMTNETvsLinearNETResidual(1, lngDataCountNew - 1)
+                ReDim mScanMTNETvsCustomNETResidual(1, lngDataCountNew - 1)
+                ReDim mScanCustomNetVsLinearNETResidual(1, lngDataCountNew - 1)
+                ReDim mScanVsMassError(1, lngDataCountNew - 1)
+                ReDim mScanVsMassErrorCorrected(1, lngDataCountNew - 1)
+                ReDim mMZVsMassError(1, lngDataCountNew - 1)
+                ReDim mMZVsMassErrorCorrected(1, lngDataCountNew - 1)
             
+                mLinearNETResidualMin = 0
+                mLinearNETResidualMax = 0
+                
+                mMassResidualMin = 0
+                mMassResidualMax = 0
+                
+                mMinMZ = 100000
+                mMaxMZ = -100000
+            
+                lngDataCountTotal = lngDataCountNew
+            
+                lngResidualNETTargetIndexStart = 0
+                lngNETDataCountExpected = lngDataCountNew
+                
+                lngResidualMassTargetIndexStart = 0
+                
+            End If
+
             '--------------------------------------------------
             ' Compute the residual NET values for the data
             '--------------------------------------------------
             strLastGoodPosition = "Compute the residual NET values for the data"
-            dblMeanNETResidual = 0
-            lngValidDataCount = 0
-            For lngIndex = 0 To lngDataCount - 1
+            lngResidualDataTargetIndex = lngResidualNETTargetIndexStart
+            For lngIndex = 0 To lngDataCountNew - 1
             
                 ' Lookup the scan number and custom NET value for lngIndex
                 strLastGoodPosition = "Lookup the scan number and custom NET value for lngIndex " & Trim(lngIndex)
@@ -3792,32 +3944,27 @@ On Error GoTo CopyLocalDataToGelErrorHandler
                     dblPredictedNETLinear = dblSlope * lngScanNumber + dblIntercept
                     
                     ' Subtract the NET of the MT tag from the linear model to get residual from the linear model
-                    mScanMTNETvsLinearNETResidual(0, lngIndex) = lngScanNumber
-                    mScanMTNETvsLinearNETResidual(1, lngIndex) = dblMassTagNET - dblPredictedNETLinear
+                    mScanMTNETvsLinearNETResidual(0, lngResidualDataTargetIndex) = lngScanNumber
+                    mScanMTNETvsLinearNETResidual(1, lngResidualDataTargetIndex) = dblMassTagNET - dblPredictedNETLinear
                     
                     ' Keep track of the minimum and maximum residual NET values
-                    If mScanMTNETvsLinearNETResidual(1, lngIndex) < mLinearNETResidualMin Then
-                        mLinearNETResidualMin = mScanMTNETvsLinearNETResidual(1, lngIndex)
+                    If mScanMTNETvsLinearNETResidual(1, lngResidualDataTargetIndex) < mLinearNETResidualMin Then
+                        mLinearNETResidualMin = mScanMTNETvsLinearNETResidual(1, lngResidualDataTargetIndex)
                     End If
-                    If mScanMTNETvsLinearNETResidual(1, lngIndex) > mLinearNETResidualMax Then
-                        mLinearNETResidualMax = mScanMTNETvsLinearNETResidual(1, lngIndex)
+                    If mScanMTNETvsLinearNETResidual(1, lngResidualDataTargetIndex) > mLinearNETResidualMax Then
+                        mLinearNETResidualMax = mScanMTNETvsLinearNETResidual(1, lngResidualDataTargetIndex)
                     End If
                     
                     ' Subtract the NET of the MT tag from the custom model to get residual from the custom model
-                    mScanMTNETvsCustomNETResidual(0, lngIndex) = lngScanNumber
-                    mScanMTNETvsCustomNETResidual(1, lngIndex) = dblMassTagNET - dblCustomNET
+                    mScanMTNETvsCustomNETResidual(0, lngResidualDataTargetIndex) = lngScanNumber
+                    mScanMTNETvsCustomNETResidual(1, lngResidualDataTargetIndex) = dblMassTagNET - dblCustomNET
                     
-                    mScanCustomNetVsLinearNETResidual(0, lngIndex) = lngScanNumber
-                    mScanCustomNetVsLinearNETResidual(1, lngIndex) = dblCustomNET - dblPredictedNETLinear
+                    mScanCustomNetVsLinearNETResidual(0, lngResidualDataTargetIndex) = lngScanNumber
+                    mScanCustomNetVsLinearNETResidual(1, lngResidualDataTargetIndex) = dblCustomNET - dblPredictedNETLinear
                     
-                    ' For the mean NET residual, use the difference between the MT tag NET value
-                    '  and the custom NET value
-                    dblMeanNETResidual = dblMeanNETResidual + Abs(dblMassTagNET - dblCustomNET)
-
-                    lngValidDataCount = lngValidDataCount + 1
+                    lngResidualDataTargetIndex = lngResidualDataTargetIndex + 1
                 End If
             Next lngIndex
-            
             
             ' Round mLinearNETResidualMin and mLinearNETResidualMax to the nearest 0.001 or nearest 0.01
             strLastGoodPosition = "Round mLinearNETResidualMin and mLinearNETResidualMax"
@@ -3832,13 +3979,13 @@ On Error GoTo CopyLocalDataToGelErrorHandler
             mLinearNETResidualMin = Int(mLinearNETResidualMin * intRoundingDivisor) / intRoundingDivisor
             mLinearNETResidualMax = Int(mLinearNETResidualMax * intRoundingDivisor) / intRoundingDivisor + 1 / intRoundingDivisor
             
-            If lngValidDataCount < lngDataCount Then
+            If lngResidualDataTargetIndex < lngNETDataCountExpected Then
                 ' This is unexpected; some of the data was not valid
                 Debug.Assert False
-                If lngValidDataCount > 0 Then
-                    ReDim Preserve mScanMTNETvsLinearNETResidual(1, lngValidDataCount - 1)
-                    ReDim Preserve mScanMTNETvsCustomNETResidual(1, lngValidDataCount - 1)
-                    ReDim Preserve mScanCustomNetVsLinearNETResidual(1, lngValidDataCount - 1)
+                If lngResidualDataTargetIndex > 0 Then
+                    ReDim Preserve mScanMTNETvsLinearNETResidual(1, lngResidualDataTargetIndex - 1)
+                    ReDim Preserve mScanMTNETvsCustomNETResidual(1, lngResidualDataTargetIndex - 1)
+                    ReDim Preserve mScanCustomNetVsLinearNETResidual(1, lngResidualDataTargetIndex - 1)
                 Else
                     ReDim mScanMTNETvsLinearNETResidual(1, 0)
                     ReDim mScanMTNETvsCustomNETResidual(1, 0)
@@ -3846,9 +3993,15 @@ On Error GoTo CopyLocalDataToGelErrorHandler
                 End If
             End If
             
-            If lngValidDataCount > 0 Then
+            If lngResidualDataTargetIndex > 0 Then
+            
                 ' Compute the mean residual value
-                dblMeanNETResidual = dblMeanNETResidual / lngValidDataCount
+                dblMeanNETResidual = 0
+                For lngIndex = 0 To lngResidualDataTargetIndex - 1
+                    ' Compute the mean NET residual (difference between the MT tag NET value and the custom NET value)
+                    dblMeanNETResidual = dblMeanNETResidual + Abs(mScanMTNETvsCustomNETResidual(1, lngIndex))
+                Next lngIndex
+                dblMeanNETResidual = dblMeanNETResidual / lngResidualDataTargetIndex
                 
                 SortTransformScanResidual
             Else
@@ -3900,9 +4053,8 @@ On Error GoTo CopyLocalDataToGelErrorHandler
             ' Compute the residual Mass value for the data
             '--------------------------------------------------
             strLastGoodPosition = "Compute the residual Mass value for the data"
-            mMassResidualMin = 0
-            mMassResidualMax = 0
-            For lngIndex = 0 To lngDataCount - 1
+            lngResidualDataTargetIndex = lngResidualMassTargetIndexStart
+            For lngIndex = 0 To lngDataCountNew - 1
             
                 ' Lookup the scan number, m/z, and custom NET value for lngIndex
                 strLastGoodPosition = "Lookup the scan number, m/z, and custom NET value for lngIndex " & Trim(lngIndex)
@@ -3916,26 +4068,26 @@ On Error GoTo CopyLocalDataToGelErrorHandler
                     dblMassError = mMatches(lngIndex, mcMatchColumns.mcMassError)
                     dblMassError = ValidateNotInfinity(dblMassError)
                     
-                    mScanVsMassError(0, lngIndex) = lngScanNumber
-                    mScanVsMassError(1, lngIndex) = dblMassError
+                    mScanVsMassError(0, lngResidualDataTargetIndex) = lngScanNumber
+                    mScanVsMassError(1, lngResidualDataTargetIndex) = dblMassError
                     
                     If blnUpdateMassValues Then
                         dblMassErrorCalibrated = dblMassError - GetPPMShift(dblMZ, CDbl(lngScanNumber))
                                             
-                        mScanVsMassErrorCorrected(0, lngIndex) = lngScanNumber
-                        mScanVsMassErrorCorrected(1, lngIndex) = dblMassErrorCalibrated
+                        mScanVsMassErrorCorrected(0, lngResidualDataTargetIndex) = lngScanNumber
+                        mScanVsMassErrorCorrected(1, lngResidualDataTargetIndex) = dblMassErrorCalibrated
                     Else
-                        mScanVsMassErrorCorrected(0, lngIndex) = lngScanNumber
-                        mScanVsMassErrorCorrected(1, lngIndex) = dblMassError
+                        mScanVsMassErrorCorrected(0, lngResidualDataTargetIndex) = lngScanNumber
+                        mScanVsMassErrorCorrected(1, lngResidualDataTargetIndex) = dblMassError
                     End If
                     
                     
                     ' Keep track of the minimum and maximum residual mass values
-                    If mScanVsMassErrorCorrected(1, lngIndex) < mMassResidualMin Then
-                        mMassResidualMin = mScanVsMassErrorCorrected(1, lngIndex)
+                    If mScanVsMassErrorCorrected(1, lngResidualDataTargetIndex) < mMassResidualMin Then
+                        mMassResidualMin = mScanVsMassErrorCorrected(1, lngResidualDataTargetIndex)
                     End If
-                    If mScanVsMassErrorCorrected(1, lngIndex) > mMassResidualMax Then
-                        mMassResidualMax = mScanVsMassErrorCorrected(1, lngIndex)
+                    If mScanVsMassErrorCorrected(1, lngResidualDataTargetIndex) > mMassResidualMax Then
+                        mMassResidualMax = mScanVsMassErrorCorrected(1, lngResidualDataTargetIndex)
                     End If
                 
                     '--------------------------------------------------
@@ -3943,15 +4095,15 @@ On Error GoTo CopyLocalDataToGelErrorHandler
                     '--------------------------------------------------
                     strLastGoodPosition = "Compute residual mass values vs. m/z (lngIndex = " & Trim(lngIndex) & ")"
                     
-                    mMZVsMassError(0, lngIndex) = dblMZ
-                    mMZVsMassError(1, lngIndex) = dblMassError
+                    mMZVsMassError(0, lngResidualDataTargetIndex) = dblMZ
+                    mMZVsMassError(1, lngResidualDataTargetIndex) = dblMassError
                     
                     If blnUpdateMassValues Then
-                        mMZVsMassErrorCorrected(0, lngIndex) = dblMZ
-                        mMZVsMassErrorCorrected(1, lngIndex) = dblMassErrorCalibrated
+                        mMZVsMassErrorCorrected(0, lngResidualDataTargetIndex) = dblMZ
+                        mMZVsMassErrorCorrected(1, lngResidualDataTargetIndex) = dblMassErrorCalibrated
                     Else
-                        mMZVsMassErrorCorrected(0, lngIndex) = dblMZ
-                        mMZVsMassErrorCorrected(1, lngIndex) = dblMassError
+                        mMZVsMassErrorCorrected(0, lngResidualDataTargetIndex) = dblMZ
+                        mMZVsMassErrorCorrected(1, lngResidualDataTargetIndex) = dblMassError
                     End If
                 End If
             
@@ -3962,6 +4114,8 @@ On Error GoTo CopyLocalDataToGelErrorHandler
                 If dblMZ > mMaxMZ Then
                     mMaxMZ = dblMZ
                 End If
+                
+                lngResidualDataTargetIndex = lngResidualDataTargetIndex + 1
             Next lngIndex
             
             ' Round mMassResidualMin and mMassResidualMax to the nearest 1, 5, or 10
@@ -4265,6 +4419,7 @@ Private Sub EnableDisableControls(blnEnabled As Boolean)
     
     cmdWarpAlign.Visible = blnEnabled
     cmdAbort.Visible = Not blnEnabled
+    cmdAbort.Caption = "Abort"
     
     mnuEdit.Enabled = blnEnabled
     mnuPMTTags.Enabled = blnEnabled
@@ -4439,20 +4594,157 @@ EstimateLinearNETErrorHandler:
     
 End Function
 
+Private Sub FilterAndAlignFeatures(ByVal intIteration As Integer)
+    Const NET_MIN As Double = 0
+    Const NET_MAX As Double = 1
+    
+    ' On the first call to this function, intIteration should be 1
+    ' On the second call, it should be 2
+        
+    Dim blnStartAlignment As Boolean
+    
+    blnStartAlignment = False
+    
+    If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmDisabled Then
+        If intIteration <= 1 Then
+            If mLocalFeaturesAreFiltered Then
+                ' Cached local features are filtered; need to update the cached data
+                PopulateLocalFeaturesArray True
+            End If
+            
+            blnStartAlignment = True
+        Else
+           ' No more iterations are required
+        End If
+        
+    ElseIf UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmSplitOnMZ Then
+        If intIteration = 0 Then intIteration = 1
+        If intIteration <= 2 Then
+            mSplitWarpIteration = intIteration
+            
+            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled And _
+               mSplitWarpIteration > 1 And _
+               chkSplitWarpPauseBetweenIterations.Value = vbChecked Then
+               
+                ' User has requested that we pause between each iteration (normally there are just 2 iterations)
+                mPauseSplitWarpProcessing = True
+                cmdSplitWarpResume.Visible = True
+                cmdAbort.Caption = "Paused (Abort)"
+                
+                Do
+                    Sleep 50
+                    DoEvents
+                    If mAlignmentFinalizedOrAborted Then
+                        cmdSplitWarpResume.Visible = False
+                        Exit Sub
+                    End If
+                Loop While mPauseSplitWarpProcessing
+                
+                cmdSplitWarpResume.Visible = False
+                cmdAbort.Caption = "Abort"
+                DoEvents
+                
+            End If
+            
+            ' Filter and cache the features
+            PopulateLocalFeaturesArray True
+
+            blnStartAlignment = True
+        Else
+            ' No more iterations are required
+        End If
+    End If
+    
+    If blnStartAlignment Then
+        tmrAlignment.Enabled = True
+        
+        With UMCNetAdjDef
+            ' Make sure this is true
+            .UseRobustNETAdjustment = True
+            
+            ' Reset the status to pscUninitialized (necessary in case the status is pscError or pscAborted)
+            Call mMassMatchObject.ResetStatus
+            
+            ' Set the MassMatch Options
+            Call mMassMatchObject.SetNetOptions(CLng(.MSWarpOptions.NumberOfSections), _
+                                             CInt(.MSWarpOptions.ContractionFactor), _
+                                             CInt(.MSWarpOptions.MaxDistortion), _
+                                             CDbl(.MSWarpOptions.NETTol), _
+                                             CDbl(NET_MIN), _
+                                             CDbl(NET_MAX), _
+                                             CLng(.MSWarpOptions.MatchPromiscuity))
+                                             
+            Call mMassMatchObject.SetMassOptions(CDbl(.MWTol), _
+                                             CLng(.MSWarpOptions.MassNumMassDeltaBins), _
+                                             CDbl(.MSWarpOptions.MassWindowPPM), _
+                                             CLng(.MSWarpOptions.MassMaxJump), _
+                                             CLng(.MSWarpOptions.MassNumXSlices), _
+                                             CDbl(UMCNetAdjDef.MSWarpOptions.MassZScoreTolerance), _
+                                             CLng(.MSWarpOptions.MassUseLSQ))
+                                             
+            Call mMassMatchObject.SetMassLSQOptions(.MSWarpOptions.MassLSQNumKnots, UMCNetAdjDef.MSWarpOptions.MassLSQOutlierZScore)
+            
+            mCalibrationType = .MSWarpOptions.MassCalibrationType
+            mSplineOrder = .MSWarpOptions.MassSplineOrder
+    
+            Call mMassMatchObject.SetRegressionOrder(mSplineOrder)
+            Call mMassMatchObject.SetRecalibrationType(mCalibrationType)
+            
+            If .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass Then
+                Call mMassMatchObject.SetAlignmentType(1)
+            Else
+                .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTime
+                Call mMassMatchObject.SetAlignmentType(0)
+            End If
+        End With
+        
+        ' Perform the alignment
+        ' Note: This process occurs asynchronously; when complete then
+        '       QueryMassMatchProgress will call FinalizeAlignment
+        Call mMassMatchObject.MS2MSMSDBAlignPeptidesThreaded(mLocalFeatures, mLocalPMTsFiltered)
+    End If
+    
+End Sub
+
 Private Sub FinalizeAlignment(strSecondsElapsed As String)
     Dim strMessage As String
     Dim blnUpdateMassValues As Boolean
     Dim blnAutoZoomOut As Boolean
 
+    Dim intNewIteration As Integer
+    
+    Dim varMassErrorHistogramOld As Variant
+    Dim varNetErrorHistogramOld As Variant
+    Dim blnMergeCachedHistogramData As Boolean
+    
 On Error GoTo FinalizeAlignmentErrorHandler
 
     ' Stop the timer
     tmrAlignment.Enabled = False
 
+    If UMCNetAdjDef.MSWarpOptions.SplitWarpMode <> swmDisabled Then
+        If mSplitWarpIteration >= 2 Then
+            ' Cache some of the error histogram values so that we can add them to the new values returned by .GetResults
+            
+            varMassErrorHistogramOld = mMassErrorHistogram
+            varNetErrorHistogramOld = mNetErrorHistogram
+            
+            blnMergeCachedHistogramData = True
+        End If
+    End If
+    
     ' Obtain the alignment results
     With glbPreferencesExpanded.ErrorPlottingOptions
         mMassMatchObject.GetResults mMatchScores, mAlignmentFunc, mMatches, mPepTransformRT, mTransformRT, mMassErrorHistogram, mNetErrorHistogram, CDbl(.MassBinSizePPM), CDbl(.GANETBinSize)
     End With
+    
+    If blnMergeCachedHistogramData Then
+        ' Merge the cached histogram data with the new histograms
+        
+        MergeHistogramData mMassErrorHistogram, varMassErrorHistogramOld, glbPreferencesExpanded.ErrorPlottingOptions.MassBinSizePPM
+        
+        MergeHistogramData mNetErrorHistogram, varNetErrorHistogramOld, glbPreferencesExpanded.ErrorPlottingOptions.GANETBinSize
+    End If
     
     If UMCNetAdjDef.RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass Then
         blnUpdateMassValues = True
@@ -4508,6 +4800,14 @@ On Error GoTo FinalizeAlignmentErrorHandler
         End If
     End Select
     
+    If UMCNetAdjDef.MSWarpOptions.SplitWarpMode <> swmDisabled Then
+        If mSplitWarpIteration < 2 Then
+            intNewIteration = mSplitWarpIteration + 1
+            FilterAndAlignFeatures intNewIteration
+            Exit Sub
+        End If
+    End If
+    
     strMessage = "Processing: 100% complete (" & strSecondsElapsed & " seconds elapsed)"
     If blnUpdateMassValues Then
         With GelSearchDef(CallerID).MassCalibrationInfo
@@ -4518,6 +4818,7 @@ On Error GoTo FinalizeAlignmentErrorHandler
     End If
     
     UpdateStatus strMessage
+    mAlignmentFinalizedOrAborted = True
 
     Exit Sub
     
@@ -4528,6 +4829,8 @@ FinalizeAlignmentErrorHandler:
         Debug.Assert False
         LogErrors Err.Number, "frmMSAlign.FinalizeAlignment"
     End If
+    
+    mAlignmentFinalizedOrAborted = True
 
 End Sub
 
@@ -4773,7 +5076,8 @@ On Error GoTo InitializeSearchErrorHandler
             lblUMCMassMode = "LC-MS Feature Mass = ?? Unable to determine; is it a new mass mode?"
         End Select
         
-        PopulateLocalFeaturesArray
+        mSplitWarpIteration = 0
+        PopulateLocalFeaturesArray False
     
         UMCNetAdjDef = GelUMCNETAdjDef(CallerID)
     
@@ -5100,6 +5404,8 @@ On Error GoTo LoadLCMSFeaturesFromFileErrorHandler
             mLocalFeatures(i, j) = dblTempUMCs(j, i)
         Next j
     Next i
+    
+    mLocalFeaturesAreFiltered = False
 
     If mAbortRequested Then
         UpdateStatus "Aborted load"
@@ -5131,6 +5437,41 @@ Private Function LookupMassCalibrationTypeName(eRobustNETWarpMassCalibrationType
     End Select
     
 End Function
+
+Private Sub MergeHistogramData(varHistogram As Variant, varHistogramOld As Variant, sngBinSize As Single)
+    Dim intIndex As Integer
+    Dim intIndexTarget As Integer
+    Dim intBestIndex As Integer
+    
+    Dim dblBestDiff As Double
+    Dim dblNewDiff As Double
+    
+On Error GoTo MergeHistogramDataErrorHander
+
+
+    For intIndex = 0 To UBound(varHistogramOld, 1)
+        ' Find the bin in varHistogram that is closest to varHistogramOld(intIndex, 0)
+        intBestIndex = 0
+        dblBestDiff = Abs(varHistogram(0, 0) - varHistogramOld(intIndex, 0))
+        
+        For intIndexTarget = 1 To UBound(varHistogram, 1)
+            dblNewDiff = Abs(varHistogram(intIndexTarget, 0) - varHistogramOld(intIndex, 0))
+            If dblNewDiff < dblBestDiff Then
+                dblBestDiff = dblNewDiff
+                intBestIndex = intIndexTarget
+            End If
+        Next intIndexTarget
+        
+        varHistogram(intBestIndex, 1) = varHistogram(intBestIndex, 1) + varHistogramOld(intIndex, 1)
+    Next intIndex
+    
+    Exit Sub
+
+MergeHistogramDataErrorHander:
+    Debug.Assert False
+    LogErrors Err.Number, "frmMSAlign.MergeHistogramData"
+    
+End Sub
 
 Private Sub SetMostRecentPlotViewMode(eNewViewMode As pvmPlotViewModeConstants)
     TraceLog 3, "SetMostRecentPlotViewMode", "Update view mode to: " & eNewViewMode
@@ -5454,7 +5795,7 @@ PopulateLocalPMTsArrayErrorHandler:
     
 End Sub
 
-Private Sub PopulateLocalFeaturesArray()
+Private Sub PopulateLocalFeaturesArray(ByVal blnLogToAnalysisHistory As Boolean)
 
     ' Copy the features into mLocalFeatures
 
@@ -5468,91 +5809,188 @@ Private Sub PopulateLocalFeaturesArray()
     Dim udtPairMatchStats() As udtPairMatchStatsType
 
     Dim dblMZ As Double
-
+    
+    Dim blnUseFeature As Boolean
+    Dim blnKeepFeaturesBelowBoundary As Boolean
+    Dim lngFeatureCountPassingFilter As Long
+    
+    Dim dblFeatureMZs() As Double
+    Dim lngFeatureScans() As Long
+    
+    Dim strMessage As String
+    
 On Error GoTo PopulateLocalFeaturesArrayErrorHandler
 
     If CallerID < 1 Then Exit Sub
     
     ' Initialize the PairIndex lookup objects
     blnPairsPresent = PairIndexLookupInitialize(CallerID, objP1IndFastSearch, objP2IndFastSearch)
-        
-    With GelUMC(CallerID)
-        mLocalFeatureCount = .UMCCnt
-        If mLocalFeatureCount > 0 Then
-            If UBound(mLocalFeatures, 1) <> mLocalFeatureCount Then
-                ReDim mLocalFeatures(mLocalFeatureCount - 1, FEATURE_COLUMN_COUNT - 1)
-            End If
-        
+    
+    
+    If GelUMC(CallerID).UMCCnt <= 0 Then
+        ReDim mLocalFeatures(0, FEATURE_COLUMN_COUNT - 1)
+        mLocalFeaturesAreFiltered = True
+        mMinMZ = 0
+        mMaxMZ = 3000
+    Else
+        With GelUMC(CallerID)
+            ReDim dblFeatureMZs(.UMCCnt)
+            ReDim lngFeatureScans(.UMCCnt)
+            
             mMinMZ = 100000
             mMaxMZ = -100000
-        Else
-            ReDim mLocalFeatures(0, FEATURE_COLUMN_COUNT - 1)
-            mMinMZ = 0
-            mMaxMZ = 3000
-        End If
-
-        ' Copy from .UMCS to mLocalFeatures
-        For lngUMCIndex = 0 To .UMCCnt - 1
-            With .UMCs(lngUMCIndex)
-                mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccUMCID) = lngUMCIndex
-                mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccClassMass) = .ClassMW
-                mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccClassAbundance) = .ClassAbundance
+            
+            ' First extract out the m/z and scan values for the features; we will use these below
+            ' We're also populating mMinMZ and mMaxMZ at this time
+            For lngUMCIndex = 0 To .UMCCnt - 1
+                With .UMCs(lngUMCIndex)
+                    Select Case .ClassRepType
+                    Case gldtCS
+                        ' It is important to convert the monoisotopic mass of the UMC to m/z using MonoMassToMZ, rather than using the m/z value of the class rep, since the m/z value is not changed when recalibrating the data
+                        ' Also, use .ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge rather than GelData(CallerID).CSData(.ClassRepInd).Charge
+                        dblFeatureMZs(lngUMCIndex) = MonoMassToMZ(.ClassMW, .ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge)
+                        lngFeatureScans(lngUMCIndex) = GelData(CallerID).CSData(.ClassRepInd).ScanNumber
+                        dblMZ = GelData(CallerID).CSData(.ClassRepInd).MZ
+                    Case gldtIS
+                        ' It is important to convert the monoisotopic mass of the UMC to m/z using MonoMassToMZ, rather than using the m/z value of the class rep, since the m/z value is not changed when recalibrating the data
+                        ' Also, use .ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge rather than GelData(CallerID).IsoData(.ClassRepInd).Charge
+                        dblFeatureMZs(lngUMCIndex) = MonoMassToMZ(.ClassMW, .ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge)
+                        lngFeatureScans(lngUMCIndex) = GelData(CallerID).IsoData(.ClassRepInd).ScanNumber
+                        dblMZ = GelData(CallerID).IsoData(.ClassRepInd).MZ
+                    Case Else
+                        ' This shouldn't happen; ignore it
+                        Debug.Assert False
+                    End Select
+                End With
                 
-                Select Case .ClassRepType
-                Case gldtCS
-                    ' It is important to convert the monoisotopic mass of the UMC to m/z using MonoMassToMZ, rather than using the m/z value of the class rep, since the m/z value is not changed when recalibrating the data
-                    ' Also, use .ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge rather than GelData(CallerID).CSData(.ClassRepInd).Charge
-                    mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccClassMZ) = MonoMassToMZ(.ClassMW, .ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge)
-                    mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccScanClassRep) = GelData(CallerID).CSData(.ClassRepInd).ScanNumber
-                    dblMZ = GelData(CallerID).CSData(.ClassRepInd).MZ
-                Case gldtIS
-                    ' It is important to convert the monoisotopic mass of the UMC to m/z using MonoMassToMZ, rather than using the m/z value of the class rep, since the m/z value is not changed when recalibrating the data
-                    ' Also, use .ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge rather than GelData(CallerID).IsoData(.ClassRepInd).Charge
-                    mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccClassMZ) = MonoMassToMZ(.ClassMW, .ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge)
-                    mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccScanClassRep) = GelData(CallerID).IsoData(.ClassRepInd).ScanNumber
-                    dblMZ = GelData(CallerID).IsoData(.ClassRepInd).MZ
-                Case Else
-                    ' This shouldn't happen; ignore it
-                    Debug.Assert False
-                End Select
-
                 If dblMZ < mMinMZ Then
                     mMinMZ = dblMZ
                 End If
                 If dblMZ > mMaxMZ Then
                     mMaxMZ = dblMZ
                 End If
+            
+            Next lngUMCIndex
+            
+            If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmDisabled Then
+                lngFeatureCountPassingFilter = .UMCCnt
+                mLocalFeaturesAreFiltered = False
+            Else
+                ' Filtering the UMCs on m/z and/or scan
+                ' Need to first determine how many UMCs pass the filters
                 
-                ' Could extract the MT tag IDs if needed using:
-''                Dim lngUMCsInViewCount As Long, lngUMCInViewCountDimmed As Long
-''                Dim udtUMCsInView() As udtUMCMassTagMatchStats          ' 0-based array
-''
-''                ExtractMTHitsFromUMCMembers CallerID, lngUMCIndex, False, udtUMCsInView, lngUMCsInViewCount, lngUMCInViewCountDimmed, False, False
-''                ExtractMTHitsFromUMCMembers CallerID, lngUMCIndex, True, udtUMCsInView, lngUMCsInViewCount, lngUMCInViewCountDimmed, False, False
+                If mSplitWarpIteration = 1 Then
+                    blnKeepFeaturesBelowBoundary = True
+                Else
+                    blnKeepFeaturesBelowBoundary = False
+                End If
 
-                mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccPMTTagID) = -1
-                mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccPairIndex) = -1
-                If blnPairsPresent Then
-                    lngPairIndex = -1
-                    lngPairMatchCount = 0
-                    ReDim udtPairMatchStats(0)
-                    InitializePairMatchStats udtPairMatchStats(0)
+                lngFeatureCountPassingFilter = 0
+                For lngUMCIndex = 0 To .UMCCnt - 1
                     
-                    lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndex, objP1IndFastSearch, objP2IndFastSearch, True, False, lngPairMatchCount, udtPairMatchStats())
-                    
-                    If lngPairMatchCount > 0 Then
-                        For lngPairMatchIndex = 0 To lngPairMatchCount - 1
-                            ' Note: Only save the first pair that this UMC belongs to
-                            mLocalFeatures(lngUMCIndex, FeatureColumnConstants.fccPairIndex) = udtPairMatchStats(lngPairMatchIndex).PairIndex
-                            Exit For
-                        Next lngPairMatchIndex
+                    If FeaturePassesSplitWarpFilter(dblFeatureMZs(lngUMCIndex), lngFeatureScans(lngUMCIndex), blnKeepFeaturesBelowBoundary) Then
+                        ' The feature passes the filters; increment the total count
+                        lngFeatureCountPassingFilter = lngFeatureCountPassingFilter + 1
+                    End If
+                Next lngUMCIndex
+                
+                If UMCNetAdjDef.MSWarpOptions.SplitWarpMode <> swmDisabled Then
+                    If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmSplitOnMZ Then
+                        strMessage = "Features for MS Warp NET Alignment are split at " & CStr(UMCNetAdjDef.MSWarpOptions.SplitWarpMZBoundary) & " m/z"
+                    Else
+                        strMessage = "Unknown split warp mode for MS Warp NET Alignment"
                     End If
                 End If
+
+                strMessage = strMessage & "; using " & LongToStringWithCommas(lngFeatureCountPassingFilter) & " / " & LongToStringWithCommas(.UMCCnt) & " LC-MS Features"
+                If blnKeepFeaturesBelowBoundary Then
+                    strMessage = strMessage & " below boundary"
+                Else
+                    strMessage = strMessage & " above boundary"
+                End If
                 
-            End With
-        
-        Next lngUMCIndex
-    End With
+                If blnLogToAnalysisHistory Then
+                    AddToAnalysisHistory CallerID, strMessage
+                End If
+                
+            End If
+            
+            If lngFeatureCountPassingFilter > 0 Then
+                If UBound(mLocalFeatures, 1) <> lngFeatureCountPassingFilter Then
+                    ReDim mLocalFeatures(lngFeatureCountPassingFilter - 1, FEATURE_COLUMN_COUNT - 1)
+                End If
+            Else
+                ReDim mLocalFeatures(0, FEATURE_COLUMN_COUNT - 1)
+            End If
+    
+            mLocalFeatureCount = 0
+            If lngFeatureCountPassingFilter > 0 Then
+                ' Copy data from GelUMC() to mLocalFeatures
+                
+                ' Step through the UMCs
+                ' Copy those that pass the filters into mLocalFeatures (or all if no filters)
+                mLocalFeatureCount = 0
+                For lngUMCIndex = 0 To .UMCCnt - 1
+                
+                    If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmDisabled Then
+                        blnUseFeature = True
+                    Else
+                        blnUseFeature = FeaturePassesSplitWarpFilter(dblFeatureMZs(lngUMCIndex), lngFeatureScans(lngUMCIndex), blnKeepFeaturesBelowBoundary)
+                    End If
+                    
+                    If blnUseFeature Then
+
+                        With .UMCs(lngUMCIndex)
+                            mLocalFeatures(mLocalFeatureCount, FeatureColumnConstants.fccUMCID) = lngUMCIndex
+                            mLocalFeatures(mLocalFeatureCount, FeatureColumnConstants.fccClassMass) = .ClassMW
+                            mLocalFeatures(mLocalFeatureCount, FeatureColumnConstants.fccClassAbundance) = .ClassAbundance
+                            
+                            mLocalFeatures(mLocalFeatureCount, FeatureColumnConstants.fccClassMZ) = dblFeatureMZs(lngUMCIndex)
+                            mLocalFeatures(mLocalFeatureCount, FeatureColumnConstants.fccScanClassRep) = lngFeatureScans(lngUMCIndex)
+            
+                            
+                            ' Could extract the MT tag IDs if needed using:
+            ''                Dim lngUMCsInViewCount As Long, lngUMCInViewCountDimmed As Long
+            ''                Dim udtUMCsInView() As udtUMCMassTagMatchStats          ' 0-based array
+            ''
+            ''                ExtractMTHitsFromUMCMembers CallerID, lngUMCIndex, False, udtUMCsInView, lngUMCsInViewCount, lngUMCInViewCountDimmed, False, False
+            ''                ExtractMTHitsFromUMCMembers CallerID, lngUMCIndex, True, udtUMCsInView, lngUMCsInViewCount, lngUMCInViewCountDimmed, False, False
+            
+                            mLocalFeatures(mLocalFeatureCount, FeatureColumnConstants.fccPMTTagID) = -1
+                            mLocalFeatures(mLocalFeatureCount, FeatureColumnConstants.fccPairIndex) = -1
+                            If blnPairsPresent Then
+                                lngPairIndex = -1
+                                lngPairMatchCount = 0
+                                ReDim udtPairMatchStats(0)
+                                InitializePairMatchStats udtPairMatchStats(0)
+                                
+                                lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndex, objP1IndFastSearch, objP2IndFastSearch, True, False, lngPairMatchCount, udtPairMatchStats())
+                                
+                                If lngPairMatchCount > 0 Then
+                                    For lngPairMatchIndex = 0 To lngPairMatchCount - 1
+                                        ' Note: Only save the first pair that this UMC belongs to
+                                        mLocalFeatures(mLocalFeatureCount, FeatureColumnConstants.fccPairIndex) = udtPairMatchStats(lngPairMatchIndex).PairIndex
+                                        Exit For
+                                    Next lngPairMatchIndex
+                                End If
+                            End If
+                            
+                        End With
+                    
+                        mLocalFeatureCount = mLocalFeatureCount + 1
+                    End If
+
+                Next lngUMCIndex
+            End If
+            
+            If mLocalFeatureCount < .UMCCnt Then
+                mLocalFeaturesAreFiltered = True
+            Else
+                mLocalFeaturesAreFiltered = False
+            End If
+
+        End With
+    End If
     
     ' Round mMinMZ and mMaxMZ to the nearest 50
     RoundValuesToNearestMultiple mMinMZ, mMaxMZ, 50
@@ -5564,6 +6002,22 @@ PopulateLocalFeaturesArrayErrorHandler:
     Debug.Assert False
     
 End Sub
+
+Private Function FeaturePassesSplitWarpFilter(ByVal dblMZ As Double, ByVal lngScan As Long, ByVal blnKeepFeaturesBelowBoundary As Boolean) As Boolean
+    Dim blnUseFeature As Boolean
+    
+    blnUseFeature = True
+    If UMCNetAdjDef.MSWarpOptions.SplitWarpMZBoundary > 0 Then
+        If dblMZ < UMCNetAdjDef.MSWarpOptions.SplitWarpMZBoundary Then
+            blnUseFeature = blnKeepFeaturesBelowBoundary
+        Else
+            blnUseFeature = Not blnKeepFeaturesBelowBoundary
+        End If
+    End If
+    
+    FeaturePassesSplitWarpFilter = blnUseFeature
+
+End Function
 
 Private Sub PositionControls()
     
@@ -5680,6 +6134,8 @@ On Error GoTo QueryMassMatchProgressErrorHandler
             strMessage = "MS Warp Mass Recalibration settings; " & ConstructHistoryTextForMassRecalibration()
             AddToAnalysisHistory CallerID, strMessage
         End If
+        
+        mAlignmentFinalizedOrAborted = True
     End Select
 
     If Not tmrAlignment.Enabled Then
@@ -5716,13 +6172,27 @@ Private Function RecalibrateMassesUsingWarpedData() As Boolean
     
     Dim strMessage As String
     Dim blnSuccess As Boolean
-
+    
+    Dim blnKeepFeaturesBelowBoundary As Boolean
+    Dim blnUpdateMass As Boolean
+    
 On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
 
     dblWeightingSum = 0
     dblIntensitySum = 0
     lngAdjustmentCount = 0
 
+        
+    If UMCNetAdjDef.MSWarpOptions.SplitWarpMode <> swmDisabled Then
+        ' Filtering the UMCs on m/z and/or scan
+        
+        If mSplitWarpIteration = 1 Then
+            blnKeepFeaturesBelowBoundary = True
+        Else
+            blnKeepFeaturesBelowBoundary = False
+        End If
+    End If
+    
     With GelData(CallerID)
         lngTotalDataPoints = .CSLines + .IsoLines
         
@@ -5732,8 +6202,16 @@ On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
             lngDataCountShiftedTooFar = 0
             For lngIndex = 1 To .CSLines
                 If .CSData(lngIndex).MZ > 0 Then
-                    If Abs(GetPPMShift(.CSData(lngIndex).MZ, .CSData(lngIndex).ScanNumber)) > MAXIMUM_MASS_SHIFT_PPM Then
-                        lngDataCountShiftedTooFar = lngDataCountShiftedTooFar + 1
+                    If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmDisabled Then
+                        blnUpdateMass = True
+                    Else
+                        blnUpdateMass = FeaturePassesSplitWarpFilter(.CSData(lngIndex).MZ, .CSData(lngIndex).ScanNumber, blnKeepFeaturesBelowBoundary)
+                    End If
+
+                    If blnUpdateMass Then
+                        If Abs(GetPPMShift(.CSData(lngIndex).MZ, .CSData(lngIndex).ScanNumber)) > MAXIMUM_MASS_SHIFT_PPM Then
+                            lngDataCountShiftedTooFar = lngDataCountShiftedTooFar + 1
+                        End If
                     End If
                 End If
             Next lngIndex
@@ -5741,8 +6219,16 @@ On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
             ' Process isotopic data
             For lngIndex = 1 To .IsoLines
                 If .IsoData(lngIndex).MonoisotopicMW > 0 Then
-                    If Abs(GetPPMShift(.IsoData(lngIndex).MZ, .IsoData(lngIndex).ScanNumber)) > MAXIMUM_MASS_SHIFT_PPM Then
-                        lngDataCountShiftedTooFar = lngDataCountShiftedTooFar + 1
+                    If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmDisabled Then
+                        blnUpdateMass = True
+                    Else
+                        blnUpdateMass = FeaturePassesSplitWarpFilter(.IsoData(lngIndex).MZ, .IsoData(lngIndex).ScanNumber, blnKeepFeaturesBelowBoundary)
+                    End If
+
+                    If blnUpdateMass Then
+                        If Abs(GetPPMShift(.IsoData(lngIndex).MZ, .IsoData(lngIndex).ScanNumber)) > MAXIMUM_MASS_SHIFT_PPM Then
+                            lngDataCountShiftedTooFar = lngDataCountShiftedTooFar + 1
+                        End If
                     End If
                 End If
             Next lngIndex
@@ -5759,17 +6245,26 @@ On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
                 ' Process CS data
                 For lngIndex = 1 To .CSLines
                     If .CSData(lngIndex).MZ > 0 Then
-                        ' Note: We're taking the value returned from GetPPMShift times -1
-                        dblMassShiftPPM = -1 * GetPPMShift(.CSData(lngIndex).MZ, .CSData(lngIndex).ScanNumber)
-                        
-                        If dblMassShiftPPM <> 0 Then
-                            dblWeightingSum = dblWeightingSum + (dblMassShiftPPM * .CSData(lngIndex).Abundance)
-                            dblIntensitySum = dblIntensitySum + .CSData(lngIndex).Abundance
-                            
-                            MassCalibrationApplyAdjustmentOnePoint .CSData(lngIndex), dblMassShiftPPM, False
-                            lngAdjustmentCount = lngAdjustmentCount + 1
+                    
+                        If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmDisabled Then
+                            blnUpdateMass = True
+                        Else
+                            blnUpdateMass = FeaturePassesSplitWarpFilter(.CSData(lngIndex).MZ, .CSData(lngIndex).ScanNumber, blnKeepFeaturesBelowBoundary)
                         End If
-        
+                        
+                        If blnUpdateMass Then
+                            ' Note: We're taking the value returned from GetPPMShift times -1
+                            dblMassShiftPPM = -1 * GetPPMShift(.CSData(lngIndex).MZ, .CSData(lngIndex).ScanNumber)
+                            
+                            If dblMassShiftPPM <> 0 Then
+                                dblWeightingSum = dblWeightingSum + (dblMassShiftPPM * .CSData(lngIndex).Abundance)
+                                dblIntensitySum = dblIntensitySum + .CSData(lngIndex).Abundance
+                                
+                                MassCalibrationApplyAdjustmentOnePoint .CSData(lngIndex), dblMassShiftPPM, False
+                                lngAdjustmentCount = lngAdjustmentCount + 1
+                            End If
+                        End If
+                        
                         If lngIndex Mod 5000 = 0 Then
                             UpdateStatus "Updating mass calibration: " & Round(lngIndex / lngTotalDataPoints * 100, 1) & "% done"
                         End If
@@ -5779,15 +6274,24 @@ On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
                 ' Process isotopic data
                 For lngIndex = 1 To .IsoLines
                     If .IsoData(lngIndex).MonoisotopicMW > 0 Then
-                        ' Note: We're taking the value returned from GetPPMShift times -1
-                        dblMassShiftPPM = -1 * GetPPMShift(.IsoData(lngIndex).MZ, .IsoData(lngIndex).ScanNumber)
-        
-                        If dblMassShiftPPM <> 0 Then
-                            dblWeightingSum = dblWeightingSum + (dblMassShiftPPM * .IsoData(lngIndex).Abundance)
-                            dblIntensitySum = dblIntensitySum + .IsoData(lngIndex).Abundance
-                            
-                            MassCalibrationApplyAdjustmentOnePoint .IsoData(lngIndex), dblMassShiftPPM, True
-                            lngAdjustmentCount = lngAdjustmentCount + 1
+                        
+                        If UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmDisabled Then
+                            blnUpdateMass = True
+                        Else
+                            blnUpdateMass = FeaturePassesSplitWarpFilter(.IsoData(lngIndex).MZ, .IsoData(lngIndex).ScanNumber, blnKeepFeaturesBelowBoundary)
+                        End If
+                        
+                        If blnUpdateMass Then
+                            ' Note: We're taking the value returned from GetPPMShift times -1
+                            dblMassShiftPPM = -1 * GetPPMShift(.IsoData(lngIndex).MZ, .IsoData(lngIndex).ScanNumber)
+            
+                            If dblMassShiftPPM <> 0 Then
+                                dblWeightingSum = dblWeightingSum + (dblMassShiftPPM * .IsoData(lngIndex).Abundance)
+                                dblIntensitySum = dblIntensitySum + .IsoData(lngIndex).Abundance
+                                
+                                MassCalibrationApplyAdjustmentOnePoint .IsoData(lngIndex), dblMassShiftPPM, True
+                                lngAdjustmentCount = lngAdjustmentCount + 1
+                            End If
                         End If
         
                         If lngIndex Mod 5000 = 0 Then
@@ -5819,7 +6323,7 @@ On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
         blnSuccess = CalculateClasses(CallerID, False, Me)
 
         ' Update mLocalFeatures
-        PopulateLocalFeaturesArray
+        PopulateLocalFeaturesArray False
 
         ' Update the stats displayed
         UpdateMassCalibrationStats
@@ -5844,6 +6348,8 @@ On Error GoTo RequestAbortErrorHandler
     
     tmrAlignment.Enabled = False
     EnableDisableControls True
+    
+    mAlignmentFinalizedOrAborted = True
     
     Exit Sub
     
@@ -6582,11 +7088,7 @@ Private Sub ShowAboutBox()
 End Sub
 
 Public Sub StartAlignment()
-    Const NET_MIN As Double = 0
-    Const NET_MAX As Double = 1
-    
     Dim lngPMTCount As Long
-    Dim dblPMTs() As Double     ' 2D Array; containing a subset of mLocalPMTs, filtered on UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount
     Dim i As Long, j As Long
     
     Dim lngObsCountFilterActual
@@ -6601,6 +7103,7 @@ Public Sub StartAlignment()
     
     Dim strFilterMessage As String
     
+    mAlignmentFinalizedOrAborted = True
     If mLoading Then Exit Sub
     
 On Error GoTo StartAlignmentErrorHandler
@@ -6618,6 +7121,9 @@ On Error GoTo StartAlignmentErrorHandler
     
     EnableDisableControls False
     mLocalGelUpdated = False
+    mAlignmentFinalizedOrAborted = False
+    mPauseSplitWarpProcessing = False
+    cmdSplitWarpResume.Visible = False
     
     If GelSearchDef(CallerID).MassCalibrationInfo.AdjustmentHistoryCount > 0 And UMCNetAdjDef.RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass Then
         If cChkBox(chkWarpMassAutoRemovePreviousMassCalibrations) Then
@@ -6626,6 +7132,7 @@ On Error GoTo StartAlignmentErrorHandler
     End If
     
     mMassMatchState = MassMatchProcessingStateConstants.pscRunning
+    
     mProcessingStartTime = Now
     tmrAlignment.Enabled = True
     
@@ -6662,7 +7169,7 @@ On Error GoTo StartAlignmentErrorHandler
         blnUseMassFilter = True
     End If
     
-    ' Populate dblPMTs()
+    ' Populate mLocalPMTsFiltered()
     ' First find the number of MT tags passing the observation count filter
     lngPMTCount = 0
     For i = 0 To mLocalPMTCount - 1
@@ -6706,77 +7213,37 @@ On Error GoTo StartAlignmentErrorHandler
             AddToAnalysisHistory CallerID, strFilterMessage
         End If
         EnableDisableControls True
+        mAlignmentFinalizedOrAborted = True
         Exit Sub
     Else
         txtPMTCountLoaded.Text = LongToStringWithCommas(lngPMTCount)
     End If
     
-    ' Reserve space in dblPMTs for a maximum of lngPMTCount PMTs
-    ReDim dblPMTs(lngPMTCount - 1, PMT_COLUMN_COUNT - 1)
+    ' Reserve space in mLocalPMTsFiltered for a maximum of lngPMTCount PMTs
+    ReDim mLocalPMTsFiltered(lngPMTCount - 1, PMT_COLUMN_COUNT - 1)
     
-    ' Now copy the valid data from mLocalPMTs into dblPMTs
+    ' Now copy the valid data from mLocalPMTs into mLocalPMTsFiltered
     ' We will also apply the mass and NET filters at this time (if applicable)
     lngPMTCount = 0
     For i = 0 To mLocalPMTCount - 1
         If MTPassesFilters(i, lngObsCountFilterActual, blnUseNETFilter, dblNETMinimum, dblNETMaximum, blnUseMassFilter, dblMassMinimum, dblMassMaximum) Then
             For j = 0 To PMT_COLUMN_COUNT - 1
-                dblPMTs(lngPMTCount, j) = mLocalPMTs(i, j)
+                mLocalPMTsFiltered(lngPMTCount, j) = mLocalPMTs(i, j)
             Next j
             lngPMTCount = lngPMTCount + 1
         End If
     Next i
 
-    ' Verify that dblPMTS was populated the way we expected it to be
-    Debug.Assert UBound(dblPMTs, 1) = lngPMTCount - 1
+    ' Verify that mLocalPMTsFiltered was populated the way we expected it to be
+    Debug.Assert UBound(mLocalPMTsFiltered, 1) = lngPMTCount - 1
     
     If Len(strFilterMessage) > 0 Then
         strFilterMessage = "AMT Tags used for alignment are filtered" & strFilterMessage
         AddToAnalysisHistory CallerID, strFilterMessage
     End If
-   
-    mCalibrationType = UMCNetAdjDef.MSWarpOptions.MassCalibrationType
-    mSplineOrder = UMCNetAdjDef.MSWarpOptions.MassSplineOrder
     
-    With UMCNetAdjDef
-        ' Make sure this is true
-        .UseRobustNETAdjustment = True
-        
-        ' Reset the status to pscUninitialized (necessary in case the status is pscError or pscAborted)
-        Call mMassMatchObject.ResetStatus
-        
-        ' Set the MassMatch Options
-        Call mMassMatchObject.SetNetOptions(CLng(.MSWarpOptions.NumberOfSections), _
-                                         CInt(.MSWarpOptions.ContractionFactor), _
-                                         CInt(.MSWarpOptions.MaxDistortion), _
-                                         CDbl(.MSWarpOptions.NETTol), _
-                                         CDbl(NET_MIN), _
-                                         CDbl(NET_MAX), _
-                                         CLng(.MSWarpOptions.MatchPromiscuity))
-        Call mMassMatchObject.SetMassOptions(CDbl(.MWTol), _
-                                         CLng(.MSWarpOptions.MassNumMassDeltaBins), _
-                                         CDbl(.MSWarpOptions.MassWindowPPM), _
-                                         CLng(.MSWarpOptions.MassMaxJump), _
-                                         CLng(.MSWarpOptions.MassNumXSlices), _
-                                         CDbl(UMCNetAdjDef.MSWarpOptions.MassZScoreTolerance), _
-                                         CLng(.MSWarpOptions.MassUseLSQ))
-                                         
-        Call mMassMatchObject.SetMassLSQOptions(.MSWarpOptions.MassLSQNumKnots, UMCNetAdjDef.MSWarpOptions.MassLSQOutlierZScore)
-        
-        Call mMassMatchObject.SetRegressionOrder(mSplineOrder)
-        Call mMassMatchObject.SetRecalibrationType(mCalibrationType)
-        
-        If .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass Then
-            Call mMassMatchObject.SetAlignmentType(1)
-        Else
-            .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTime
-            Call mMassMatchObject.SetAlignmentType(0)
-        End If
-    End With
-    
-    ' Perform the alignment
-    ' Note: This process occurs asynchronously; when complete then
-    '       QueryMassMatchProgress will call FinalizeAlignment
-    Call mMassMatchObject.MS2MSMSDBAlignPeptidesThreaded(mLocalFeatures, dblPMTs)
+    ' The following function will filter the features to align (if applicable) then call mMassMatchObject.MS2MSMSDBAlignPeptidesThreaded
+    FilterAndAlignFeatures 1
 
     Exit Sub
 
@@ -6788,6 +7255,8 @@ StartAlignmentErrorHandler:
         LogErrors Err.Number, "frmMSAlign.StartAlignment"
     End If
        
+    mAlignmentFinalizedOrAborted = True
+    
 End Sub
 
 Private Sub StartMassCalibrationRevert(blnQueryUserToConfirm As Boolean)
@@ -6798,7 +7267,7 @@ Private Sub StartMassCalibrationRevert(blnQueryUserToConfirm As Boolean)
   
     If blnDataUpdated Then
         ' Update mLocalFeatures
-        PopulateLocalFeaturesArray
+        PopulateLocalFeaturesArray False
         
         UpdateMassCalibrationStats
         
@@ -6932,6 +7401,17 @@ Private Sub UpdateControlValues(ByVal blnUseDefaults As Boolean)
         Else
             cboStepsToPerform.ListIndex = MassMatchStepsToPerformConstants.mmsWarpTime
         End If
+        
+        Select Case .MSWarpOptions.SplitWarpMode
+        Case swmSplitOnMZ
+            optSplitWarpOnMZ.Value = True
+        Case Else
+            ' Includes swmDisabled
+            optSplitWarpDisabled.Value = True
+        End Select
+        
+        txtSplitWarpMZBoundary.Text = .MSWarpOptions.SplitWarpMZBoundary
+        
     End With
     
     With glbPreferencesExpanded.ErrorPlottingOptions
@@ -7376,6 +7856,10 @@ Private Sub cmdSetDefaults_Click()
     SetDefaultOptions
 End Sub
 
+Private Sub cmdSplitWarpResume_Click()
+    mPauseSplitWarpProcessing = False
+End Sub
+
 'Private Sub cmdMassCalib_Click()
 '    Dim num_sections As Long, contraction_factor As Integer, max_discontinuity_jump As Integer
 '    Dim mass_tolerance As Double, net_tolerance As Double
@@ -7445,7 +7929,7 @@ Private Sub graphMassErrors_KeyPress(KeyAscii As Integer)
     End If
 End Sub
 
-Private Sub graphMassErrors_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub graphMassErrors_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
     If Button = vbRightButton Then
         ZoomOutCWGraph graphMassErrors
     End If
@@ -7457,7 +7941,7 @@ Private Sub graphNetErrors_KeyPress(KeyAscii As Integer)
     End If
 End Sub
 
-Private Sub graphNetErrors_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub graphNetErrors_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
     If Button = vbRightButton Then
          ZoomOutCWGraph graphNetErrors
     End If
@@ -7655,6 +8139,23 @@ Private Sub optMassRecalScanRegression_Click()
     End If
 End Sub
 
+Private Sub optSplitWarpDisabled_Click()
+    If Not mLoading Then
+        UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmDisabled
+    End If
+End Sub
+
+Private Sub optSplitWarpOnMZ_Click()
+    If Not mLoading Then
+        UMCNetAdjDef.MSWarpOptions.SplitWarpMode = swmSplitOnMZ
+        If UMCNetAdjDef.MSWarpOptions.SplitWarpMZBoundary <= 0 Then
+            ' Use the m/z boundary that is appropriate for the Thermo Exactive instrument
+            UMCNetAdjDef.MSWarpOptions.SplitWarpMZBoundary = 505.7
+            txtSplitWarpMZBoundary.Text = UMCNetAdjDef.MSWarpOptions.SplitWarpMZBoundary
+        End If
+    End If
+End Sub
+
 Private Sub tmrAlignment_Timer()
     QueryMassMatchProgress
 End Sub
@@ -7739,6 +8240,14 @@ End Sub
 
 Private Sub txtMinMSMSObservations_LostFocus()
     UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount = ValidateTextboxValueLng(txtMinMSMSObservations, 0, 1000000, 5)
+End Sub
+
+Private Sub txtSplitWarpMZBoundary_LostFocus()
+    UMCNetAdjDef.MSWarpOptions.SplitWarpMZBoundary = CSng(ValidateTextboxValueDbl(txtSplitWarpMZBoundary, 0, 100000, 0))
+End Sub
+
+Private Sub txtSplitWarpMZBoundary_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtSplitWarpMZBoundary, KeyAscii, True, True, False
 End Sub
 
 Private Sub txtNetTolerance_LostFocus()

@@ -778,21 +778,39 @@ End Sub
 Private Sub AutoAnalysisFilterNoiseStreaks(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType)
     
     Dim strMessage As String
-
+    Dim strPolygonDefs As String
+    Dim strWarnings As String
+    
 On Error GoTo AutoAnalysisFilterNoiseStreaksErrorHandler
         
-    With glbPreferencesExpanded
-        If .AutoAnalysisOptions.AutoRemoveNoiseStreaks Then
-            With frmExcludeMassRange
+    If glbPreferencesExpanded.AutoAnalysisOptions.AutoRemoveNoiseStreaks Then
+        With frmExcludeMassRange
+            .SetCallerID udtWorkingParams.GelIndex
+            .Show vbModeless
+            .InitializeForm
+            .AutoPopulateStart True
+            .IncludeExcludeIons True
+        End With
+        Unload frmExcludeMassRange
+    End If
+    
+    If glbPreferencesExpanded.AutoAnalysisOptions.AutoRemovePolygonRegions Then
+        If glbPreferencesExpanded.NoiseRemovalOptions.ExclusionPolygonCount <= 0 Then
+            AddToAnalysisHistory udtWorkingParams.GelIndex, "Warning: AutoRemovePolygonRegions=True but no polygon regions are defined using ExclusionPolygonList"
+        Else
+            With frmExcludePolygonRegion
                 .SetCallerID udtWorkingParams.GelIndex
                 .Show vbModeless
                 .InitializeForm
-                .AutoPopulateStart True
+                
+                strPolygonDefs = PolygonDefsToText(glbPreferencesExpanded.NoiseRemovalOptions.ExclusionPolygonCount, glbPreferencesExpanded.NoiseRemovalOptions.ExclusionPolygonList, True, strWarnings)
+                .DefinePolygonRegions strPolygonDefs
+                
                 .IncludeExcludeIons True
             End With
             Unload frmExcludeMassRange
         End If
-    End With
+    End If
     
     ' Write the latest AnalysisHistory information to the log
     AutoAnalysisAppendLatestHistoryToLog udtAutoParams, udtWorkingParams
@@ -3205,10 +3223,12 @@ On Error GoTo PerformNETAdjustmentErrorHandler
         
             lngTimerStart = Timer()
             Do
-                Sleep 200
+                Sleep 250
                 DoEvents
-                strLastGoodLocation = "Waiting while objMSAlign.MassMatchState = pscRunning (" & CStr(Timer - lngTimerStart) & " seconds elapsed)"
-            Loop While objMSAlign.MassMatchState = pscRunning
+                strLastGoodLocation = "Waiting while AlignmentFinalizedOrAborted = False (" & CStr(Timer - lngTimerStart) & " seconds elapsed)"
+                
+                ' Note: you cannot watch state objMSAlign.MassMatchState since it can change from pscRunning to pscComplete, then back to pscRunning
+            Loop While Not objMSAlign.AlignmentFinalizedOrAborted
           
             If objMSAlign.MassMatchState = pscComplete Then
                 strLastGoodLocation = "objMSAlign.MassMatchState now equals pscComplete"
@@ -3573,9 +3593,11 @@ End Sub
 ''        .StartAlignment
 ''
 ''        Do
-''            Sleep 200
+''            Sleep 250
 ''            DoEvents
-''        Loop While objMSAlign.MassMatchState = pscRunning
+''                ' Note: you cannot watch state objMSAlign.MassMatchState since it can change from pscRunning to pscComplete, then back to pscRunning
+''        Loop While Not objMSAlign.AlignmentFinalizedOrAborted
+
 ''
 ''        If objMSAlign.MassMatchState = pscComplete Then
 ''            ' Alignment succeeded
@@ -3736,19 +3758,19 @@ On Error GoTo RemovePairMemberHitsErrorHandler
             blnPossiblyRemoveUMC = False
             If glbPreferencesExpanded.PairSearchOptions.AutoAnalysisRemovePairMemberHitsRemoveHeavy Then
                 ' Only consider removing the heavy member UMC if its state is umcpHeavyUnique or umcpHeavyMultiple
-                lngUMCIndex = GelP_D_L(udtWorkingParams.GelIndex).Pairs(lngPairIndex).P2
+                lngUMCIndex = GelP_D_L(udtWorkingParams.GelIndex).Pairs(lngPairIndex).p2
                 If eClsPaired(lngUMCIndex) = umcpHeavyUnique Or eClsPaired(lngUMCIndex) = umcpHeavyMultiple Then
                     blnPossiblyRemoveUMC = True
                 End If
             Else
                 ' Only consider removing the light member UMC if its state is umcpLightUnique or umcpLightMultiple
-                lngUMCIndex = GelP_D_L(udtWorkingParams.GelIndex).Pairs(lngPairIndex).P1
+                lngUMCIndex = GelP_D_L(udtWorkingParams.GelIndex).Pairs(lngPairIndex).p1
                 If eClsPaired(lngUMCIndex) = umcpLightUnique Or eClsPaired(lngUMCIndex) = umcpLightMultiple Then
                     blnPossiblyRemoveUMC = True
                 End If
             End If
             
-            lngUMCIndexLight = GelP_D_L(udtWorkingParams.GelIndex).Pairs(lngPairIndex).P1
+            lngUMCIndexLight = GelP_D_L(udtWorkingParams.GelIndex).Pairs(lngPairIndex).p1
             
             If blnPossiblyRemoveUMC Then
                 ' See if any of the members of the light UMC have any database hits
@@ -3819,7 +3841,7 @@ On Error GoTo RemovePairMemberHitsErrorHandler
                 
                 For lngPairIndex = 0 To .PCnt - 1
                     
-                    If blnRemoveUMC(.Pairs(lngPairIndex).P1) Or blnRemoveUMC(.Pairs(lngPairIndex).P2) Then
+                    If blnRemoveUMC(.Pairs(lngPairIndex).p1) Or blnRemoveUMC(.Pairs(lngPairIndex).p2) Then
                         ' Do not copy this pair
                     Else
                         .Pairs(lngNewPairCount) = .Pairs(lngPairIndex)
@@ -5372,10 +5394,11 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
             
                 lngTimerStart = Timer()
                 Do
-                    Sleep 200
+                    Sleep 250
                     DoEvents
-                    strLastGoodLocation = "Waiting while objMSAlign.MassMatchState = pscRunning (" & CStr(Timer - lngTimerStart) & " seconds elapsed)"
-                Loop While objMSAlign.MassMatchState = pscRunning
+                    strLastGoodLocation = "Waiting while objMSAlign.AlignmentFinalizedOrAborted = False (" & CStr(Timer - lngTimerStart) & " seconds elapsed)"
+                    ' Note: you cannot watch state objMSAlign.MassMatchState since it can change from pscRunning to pscComplete, then back to pscRunning
+                Loop While Not objMSAlign.AlignmentFinalizedOrAborted
               
                 If objMSAlign.MassMatchState = pscComplete Then
                     strLastGoodLocation = "objMSAlign.MassMatchState now equals pscComplete"

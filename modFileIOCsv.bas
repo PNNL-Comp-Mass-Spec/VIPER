@@ -9,8 +9,30 @@ Public Const CSV_COLUMN_HEADER_UNKNOWN_WARNING As String = "Warning: unknown col
 Public Const CSV_COLUMN_HEADER_MISSING_WARNING As String = "Warning: expected important column headers"
 
 ' Note: These should all be lowercase string values
+Private Const SCANS_COLUMN_SCAN_NUM As String = "scan_num"
+Private Const SCANS_COLUMN_FRAME_NUM As String = "frame_num"        ' Represents IMS Frame Number; VIPER treats this as scan_num
+Private Const SCANS_COLUMN_TIME_A As String = "time"
+Private Const SCANS_COLUMN_TIME_B As String = "scan_time"           ' Represents the elution time of the given scan (or IMS frame); used in non-IMS data and also used in the 2008 version of the IMS _scans.csv file format
+Private Const SCANS_COLUMN_FRAME_TIME As String = "frame_time"      ' Represents the elution time of the IMS Frame Number; VIPER treats this as scan_time
+Private Const SCANS_COLUMN_DRIFT_TIME As String = "drift_time"      ' Old column that was only used in the 2008 version of the IMS file format
+Private Const SCANS_COLUMN_TYPE As String = "type"
+Private Const SCANS_COLUMN_NUM_DEISOTOPED As String = "num_deisotoped"
+Private Const SCANS_COLUMN_NUM_PEAKS As String = "num_peaks"
+Private Const SCANS_COLUMN_TIC As String = "tic"
+Private Const SCANS_COLUMN_BPI_MZ As String = "bpi_mz"
+Private Const SCANS_COLUMN_BPI As String = "bpi"
+Private Const SCANS_COLUMN_TIME_DOMAIN_SIGNAL As String = "time_domain_signal"
+Private Const SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD As String = "peak_intensity_threshold"
+Private Const SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD As String = "peptide_intensity_threshold"
+Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE As String = "frame_pressure"
+Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT As String = "frame_pressure_front"
+Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_BACK As String = "frame_pressure_back"
+
+' Note: These should all be lowercase string values
 Private Const ISOS_COLUMN_SCAN_NUM_A As String = "scan_num"
-Private Const ISOS_COLUMN_SCAN_NUM_B As String = "lc_scan_num"
+Private Const ISOS_COLUMN_SCAN_NUM_B As String = "lc_scan_num"  ' Represented Frame Number in the 2008 version of the IMS File format
+Private Const ISOS_COLUMN_FRAME_NUM As String = "frame_num"     ' Represents MS Frame Number; VIPER treats this as scan_num
+Private Const ISOS_COLUMN_IMS_SCAN_NUM As String = "ims_scan_num"
 Private Const ISOS_COLUMN_CHARGE As String = "charge"
 Private Const ISOS_COLUMN_ABUNDANCE As String = "abundance"
 Private Const ISOS_COLUMN_MZ As String = "mz"
@@ -25,27 +47,12 @@ Private Const ISOS_COLUMN_MONO_PLUS2_ABUNDANCE As String = "mono_plus2_abundance
 Private Const ISOS_COLUMN_MONO_PLUS4_ABUNDANCE As String = "mono_plus4_abundance"
 Private Const ISOS_COLUMN_MONO_MINUS4_ABUNDANCE As String = "mono_minus4_abundance"
 Private Const ISOS_COLUMN_IMS_DRIFT_TIME As String = "drift_time"
-Private Const ISOS_COLUMN_IMS_SCAN_NUM As String = "ims_scan_num"
-
-' Note: These should all be lowercase string values
-Private Const SCANS_COLUMN_SCAN_NUM As String = "scan_num"
-Private Const SCANS_COLUMN_TIME_A As String = "time"
-Private Const SCANS_COLUMN_TIME_B As String = "scan_time"
-Private Const SCANS_COLUMN_TYPE As String = "type"
-Private Const SCANS_COLUMN_NUM_DEISOTOPED As String = "num_deisotoped"
-Private Const SCANS_COLUMN_NUM_PEAKS As String = "num_peaks"
-Private Const SCANS_COLUMN_TIC As String = "tic"
-Private Const SCANS_COLUMN_BPI_MZ As String = "bpi_mz"
-Private Const SCANS_COLUMN_BPI As String = "bpi"
-Private Const SCANS_COLUMN_TIME_DOMAIN_SIGNAL As String = "time_domain_signal"
-Private Const SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD As String = "peak_intensity_threshold"
-Private Const SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD As String = "peptide_intensity_threshold"
-Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE As String = "frame_pressure"
+Private Const ISOS_COLUMN_IMS_CUMULATIVE_DRIFT_TIME As String = "cumulative_drift_time"
 
 Private Const SCAN_INFO_DIM_CHUNK As Long = 10000
 Private Const ISO_DATA_DIM_CHUNK As Long = 25000
 
-Private Const SCAN_FILE_COLUMN_COUNT As Integer = 12
+Private Const SCAN_FILE_COLUMN_COUNT As Integer = 13
 Private Enum ScanFileColumnConstants
     ScanNumber = 0
     ScanTime = 1
@@ -58,7 +65,8 @@ Private Enum ScanFileColumnConstants
     TimeDomainSignal = 8
     PeakIntensityThreshold = 9
     PeptideIntensityThreshold = 10
-    IMSFramePressure = 11               ' Only present in IMS datafiles
+    IMSFramePressureFront = 11               ' Only present in IMS datafiles
+    IMSFramePressureBack = 12               ' Only present in IMS datafiles
 End Enum
 
 Private Const ISOS_FILE_COLUMN_COUNT As Integer = 15
@@ -272,7 +280,12 @@ End Function
 Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean, blnIncludeIMSFileHeaders As Boolean) As String
     Dim strHeaders As String
     
-    strHeaders = ISOS_COLUMN_SCAN_NUM_A
+    If blnIncludeIMSFileHeaders Then
+        strHeaders = ISOS_COLUMN_FRAME_NUM & ", " & ISOS_COLUMN_IMS_SCAN_NUM
+    Else
+        strHeaders = ISOS_COLUMN_SCAN_NUM_A
+    End If
+    
     If Not blnRequiredColumnsOnly Then
         strHeaders = strHeaders & ", " & ISOS_COLUMN_CHARGE
     End If
@@ -296,6 +309,7 @@ Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean, 
         
         If blnIncludeIMSFileHeaders Then
             strHeaders = strHeaders & ", " & ISOS_COLUMN_IMS_DRIFT_TIME
+            strHeaders = strHeaders & ", " & ISOS_COLUMN_IMS_CUMULATIVE_DRIFT_TIME
         End If
     End If
 
@@ -305,8 +319,12 @@ End Function
 Private Function GetDefaultScansColumnHeaders(blnRequiredColumnsOnly As Boolean, blnIncludeIMSFileHeaders As Boolean) As String
     Dim strHeaders As String
 
-    strHeaders = SCANS_COLUMN_SCAN_NUM
-    strHeaders = strHeaders & ", " & SCANS_COLUMN_TIME_B
+    If blnIncludeIMSFileHeaders Then
+        strHeaders = SCANS_COLUMN_FRAME_NUM & ", " & SCANS_COLUMN_FRAME_TIME
+    Else
+        strHeaders = SCANS_COLUMN_SCAN_NUM & ", " & SCANS_COLUMN_TIME_B
+    End If
+    
     strHeaders = strHeaders & ", " & SCANS_COLUMN_TYPE
     
     If Not blnRequiredColumnsOnly Then
@@ -320,7 +338,7 @@ Private Function GetDefaultScansColumnHeaders(blnRequiredColumnsOnly As Boolean,
         strHeaders = strHeaders & ", " & SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD
         
         If blnIncludeIMSFileHeaders Then
-            strHeaders = strHeaders & ", " & SCANS_COLUMN_IMS_FRAME_PRESSURE
+            strHeaders = strHeaders & ", " & SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT & ", " & SCANS_COLUMN_IMS_FRAME_PRESSURE_BACK
         End If
     End If
     
@@ -914,6 +932,11 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         
                         Select Case strColumnHeader
                         Case ISOS_COLUMN_SCAN_NUM_A, ISOS_COLUMN_SCAN_NUM_B: intColumnMapping(IsosFileColumnConstants.ScanNumber) = lngIndex
+                        Case ISOS_COLUMN_FRAME_NUM
+                            ' We treat IMS frame number as if its the primary scan number
+                            intColumnMapping(IsosFileColumnConstants.ScanNumber) = lngIndex
+                        Case ISOS_COLUMN_IMS_SCAN_NUM
+                            ' Ignore this column; VIPER does not track the IMS scan number
                         Case ISOS_COLUMN_CHARGE: intColumnMapping(IsosFileColumnConstants.Charge) = lngIndex
                         Case ISOS_COLUMN_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.Abundance) = lngIndex
                         Case ISOS_COLUMN_MZ: intColumnMapping(IsosFileColumnConstants.MZ) = lngIndex
@@ -928,8 +951,8 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         Case ISOS_COLUMN_MONO_PLUS4_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance) = lngIndex
                         Case ISOS_COLUMN_MONO_MINUS4_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance) = lngIndex
                         Case ISOS_COLUMN_IMS_DRIFT_TIME: intColumnMapping(IsosFileColumnConstants.IMSDriftTime) = lngIndex
-                        Case ISOS_COLUMN_IMS_SCAN_NUM
-                            ' Ignore this column
+                        Case ISOS_COLUMN_IMS_CUMULATIVE_DRIFT_TIME
+                            ' Ignore this column; VIPER does not track the IMS cumulative drift time
                         Case Else
                             ' Unknown column header; ignore it, but post an entry to the analysis history
                             If Len(strUnknownColumnList) > 0 Then
@@ -1171,7 +1194,8 @@ On Error GoTo ReadCSVScanFileErrorHandler
                         intColumnMapping(ScanFileColumnConstants.TimeDomainSignal) = ScanFileColumnConstants.TimeDomainSignal
                         intColumnMapping(ScanFileColumnConstants.PeakIntensityThreshold) = ScanFileColumnConstants.PeakIntensityThreshold
                         intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold) = ScanFileColumnConstants.PeptideIntensityThreshold
-                        intColumnMapping(ScanFileColumnConstants.IMSFramePressure) = ScanFileColumnConstants.IMSFramePressure
+                        intColumnMapping(ScanFileColumnConstants.IMSFramePressureFront) = ScanFileColumnConstants.IMSFramePressureFront
+                        intColumnMapping(ScanFileColumnConstants.IMSFramePressureBack) = ScanFileColumnConstants.IMSFramePressureBack
 
                         ' Column headers were not present
                          AddToAnalysisHistory mGelIndex, "Scans file " & fso.GetFileName(strScansFilePath) & " did not contain column headers; using the default headers (" & GetDefaultScansColumnHeaders(False, False) & ")"
@@ -1193,7 +1217,16 @@ On Error GoTo ReadCSVScanFileErrorHandler
                             
                             Select Case strColumnHeader
                             Case SCANS_COLUMN_SCAN_NUM: intColumnMapping(ScanFileColumnConstants.ScanNumber) = lngIndex
+                            Case SCANS_COLUMN_FRAME_NUM
+                                ' VIPER treats frame_num as scan_num
+                                intColumnMapping(ScanFileColumnConstants.ScanNumber) = lngIndex
                             Case SCANS_COLUMN_TIME_A, SCANS_COLUMN_TIME_B: intColumnMapping(ScanFileColumnConstants.ScanTime) = lngIndex
+                            Case SCANS_COLUMN_FRAME_TIME
+                                ' VIPER treats frame_time as scan_time
+                                intColumnMapping(ScanFileColumnConstants.ScanTime) = lngIndex
+                            Case SCANS_COLUMN_DRIFT_TIME
+                                ' Old column that was only used in the 2008 version of the IMS file format
+                                ' Ignore this column
                             Case SCANS_COLUMN_TYPE: intColumnMapping(ScanFileColumnConstants.ScanType) = lngIndex
                             Case SCANS_COLUMN_NUM_DEISOTOPED: intColumnMapping(ScanFileColumnConstants.NumDeisotoped) = lngIndex
                             Case SCANS_COLUMN_NUM_PEAKS: intColumnMapping(ScanFileColumnConstants.NumPeaks) = lngIndex
@@ -1203,7 +1236,10 @@ On Error GoTo ReadCSVScanFileErrorHandler
                             Case SCANS_COLUMN_TIME_DOMAIN_SIGNAL: intColumnMapping(ScanFileColumnConstants.TimeDomainSignal) = lngIndex
                             Case SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD: intColumnMapping(ScanFileColumnConstants.PeakIntensityThreshold) = lngIndex
                             Case SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD: intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold) = lngIndex
-                            Case SCANS_COLUMN_IMS_FRAME_PRESSURE: intColumnMapping(ScanFileColumnConstants.IMSFramePressure) = lngIndex
+                            Case SCANS_COLUMN_IMS_FRAME_PRESSURE, SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT
+                                intColumnMapping(ScanFileColumnConstants.IMSFramePressureFront) = lngIndex
+                            Case SCANS_COLUMN_IMS_FRAME_PRESSURE_BACK
+                                intColumnMapping(ScanFileColumnConstants.IMSFramePressureBack) = lngIndex
                             Case Else
                                 ' Unknown column header; ignore it, but post an entry to the analysis history
                                 If Len(strUnknownColumnList) > 0 Then
@@ -1278,7 +1314,10 @@ On Error GoTo ReadCSVScanFileErrorHandler
     
                         .FrequencyShift = 0
                     
-                        .IMSFramePressure = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.IMSFramePressure), 0)
+                        .IMSFramePressure = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.IMSFramePressureFront), 0)
+                        
+                        ' Note: Not reading IMSFramePressureBack
+                        ' .IMSFramePressureBack = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.IMSFramePressureBack), 0)
                     
                     End With
                 End If

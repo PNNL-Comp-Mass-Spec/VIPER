@@ -34,7 +34,7 @@ Public Const cWindowTopLeft = 10
 '
 Public Declare Function SetWindowPos Lib "user32" _
     (ByVal hwnd As Long, ByVal hWndInsertAfter As Long, _
-     ByVal x As Long, ByVal y As Long, ByVal cx As Long, _
+     ByVal X As Long, ByVal Y As Long, ByVal cx As Long, _
      ByVal cy As Long, ByVal wFlags As Long) As Long
 
 ' Set some constant values (from WIN32API.TXT).
@@ -102,8 +102,8 @@ Private Type Rect
 End Type
 
 Private Type POINTAPI
-        x As Long
-        y As Long
+        X As Long
+        Y As Long
 End Type
 
 Private Type WINDOWPLACEMENT
@@ -1521,9 +1521,9 @@ Public Function IsLoaded(FormName As String) As Boolean
 
 End Function
 
-Public Function Log10(x As Double) As Double
+Public Function Log10(X As Double) As Double
    On Error Resume Next
-   Log10 = Log(x) / Log(10#)
+   Log10 = Log(X) / Log(10#)
 End Function
 
 ''''For use in a class contained in an external .dll
@@ -1609,7 +1609,7 @@ Public Sub ParseAndSortList(strSearchList As String, ByRef strTextArrayZeroBased
     If blnSpaceDelimeter Then strDelimeters = strDelimeters & " "
     If Len(strDelimeters) = 0 And blnCarriageReturnDelimeter Then
         ' Need to have at least one character in strDelimeters for the Replace() statement below to work
-        ' I'll use Chr(1) since
+        ' I'll use Chr(1) since that is a rarely used character
         strDelimeters = Chr(1)
     End If
     
@@ -1623,10 +1623,12 @@ Public Sub ParseAndSortList(strSearchList As String, ByRef strTextArrayZeroBased
     End If
     
     If blnCarriageReturnDelimeter Then
-        ' To make life easier, replace all of the carriage returns in strSearchList with
+        ' To make life easier, replace all of the carriage returns (and line feeds) in strSearchList with
         ' the first delimeter in strDelimeters (stored in strCrLfReplacement)
         strCrLfReplacement = Left(strDelimeters, 1)
         strSearchList = Replace(strSearchList, vbCrLf, strCrLfReplacement)
+        strSearchList = Replace(strSearchList, vbCr, strCrLfReplacement)
+        strSearchList = Replace(strSearchList, vbLf, strCrLfReplacement)
     End If
     
     lngTextArrayCount = ParseString(strSearchList, strTextArrayZeroBased(), lngMaxParseCount, strDelimeters, "", False, True, False)
@@ -1776,6 +1778,7 @@ ParseStringValuesErrorHandler:
     ParseStringValues = intParseTrack
 
 End Function
+
 
 Public Function ParseStringValuesDbl(ByVal strWork As String, ByRef dblParsedVals() As Double, intParseTrackMax As Integer, Optional strFieldDelimeter As String = FIELD_DELIMETER, Optional strRemaining As String, Optional boolMatchWholeDelimeter As Boolean = True, Optional boolCombineConsecutiveDelimeters As Boolean = False, Optional blnOneBaseArray As Boolean = True) As Integer
     ' See ParseStringText
@@ -3211,7 +3214,21 @@ Public Sub SwapValues(ByRef FirstValue As Variant, ByRef SecondValue As Variant)
     SecondValue = varTemp
 End Sub
 
-Public Sub TextBoxKeyPressHandler(txtThisTextBox As TextBox, ByRef KeyAscii As Integer, Optional AllowNumbers As Boolean = True, Optional AllowDecimalPoint As Boolean = False, Optional AllowNegativeSign As Boolean = False, Optional AllowCharacters As Boolean = False, Optional AllowPlusSign As Boolean = False, Optional AllowUnderscore As Boolean = False, Optional AllowDollarSign As Boolean = False, Optional AllowEmailChars As Boolean = False, Optional AllowSpaces As Boolean = False, Optional AllowECharacter As Boolean = False, Optional boolAllowCutCopyPaste As Boolean = True)
+Public Sub TextBoxKeyPressHandler(txtThisTextBox As TextBox, _
+                                  ByRef KeyAscii As Integer, _
+                                  Optional AllowNumbers As Boolean = True, _
+                                  Optional AllowDecimalPoint As Boolean = False, _
+                                  Optional AllowNegativeSign As Boolean = False, _
+                                  Optional AllowCharacters As Boolean = False, _
+                                  Optional AllowPlusSign As Boolean = False, _
+                                  Optional AllowUnderscore As Boolean = False, _
+                                  Optional AllowDollarSign As Boolean = False, _
+                                  Optional AllowEmailChars As Boolean = False, _
+                                  Optional AllowSpaces As Boolean = False, _
+                                  Optional AllowECharacter As Boolean = False, _
+                                  Optional boolAllowCutCopyPaste As Boolean = True, _
+                                  Optional AllowCommas As Boolean = False)
+                                  
     ' Note that the AllowECharacter option has been added to allow the
     '  user to type numbers in scientific notation
     
@@ -3237,6 +3254,7 @@ Public Sub TextBoxKeyPressHandler(txtThisTextBox As TextBox, ByRef KeyAscii As I
     Case 32: If Not AllowSpaces Then KeyAscii = 0
     Case 36: If Not AllowDollarSign Then KeyAscii = 0
     Case 43: If Not AllowPlusSign Then KeyAscii = 0
+    Case 44: If Not AllowCommas Then KeyAscii = 0
     Case 45: If Not AllowNegativeSign Then KeyAscii = 0
     Case 44, 46:
         Select Case glbDecimalSeparator

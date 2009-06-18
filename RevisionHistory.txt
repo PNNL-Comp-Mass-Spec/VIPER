@@ -1,5 +1,61 @@
 VIPER Change Log
 
+Version 3.45 - Build 408; June 17, 2009
+	- Added ability to pause between LCMSWarp iterations when the Split Warp by m/z option is enabled
+		- Useful for inspecting the results of the the alignment for the previous iteration
+
+Version 3.45 - Build 407; June 16, 2009
+	- Fixed LCMSWarp state monitoring bug that occurred during automated analysis
+
+Version 3.45 - Build 406; June 16, 2009
+	- Updated LCMSWarp window to support new Split Warp by m/z option
+		- Necessary for processing data from the Exactive instrument Exact01, since this instrument has a non-contiguous mass-calibration, with a sharp (5 ppm) boundary at 505.7 m/z
+
+Version 3.45 - Build 405; June 11, 2009
+	- Updated to support new column names in Decon2LS files for IMS data
+	- _Scans.csv file columns
+		LC_File        Old_IMS_file     New_IMS_file
+		---------      ---------        ---------
+		scan_num       scan_num         frame_num
+		scan_time      scan_time        frame_time        
+		type           type             type        
+		bpi            bpi              bpi        
+		bpi_mz         bpi_mz           bpi_mz        
+		tic            tic              tic        
+		num_peaks      num_peaks        num_peaks        
+		num_deisotoped num_deisotoped   num_deisotoped        
+		n/a            frame_pressure   frame_pressure_front        
+		n/a            n/a              frame_pressure_back 
+
+	- _Isos.csv file columns
+		LC_File          Old_IMS_file     New_IMS_file
+		---------        ---------        ---------
+		scan_num         lc_scan_num      frame_num        
+		n/a              ims_scan_num     ims_scan_num        
+		charge           charge           charge        
+		abundance        abundance        abundance        
+		mz               mz               mz        
+		fit              fit              fit        
+		average_mw       average_mw       average_mw        
+		monoisotopic_mw  monoisotopic_mw  monoisotopic_mw        
+		mostabundant_mw  mostabundant_mw  mostabundant_mw        
+		fwhm             fwhm             fwhm        
+		signal_noise     signal_noise     signal_noise        
+		mono_abundance   mono_abundance   mono_abundance        
+		mono_plus2_abundance  mono_plus2_abundance  mono_plus2_abundance        
+		n/a               drift_time      drift_time        
+		n/a               n/a             cumulative_drift_time      
+
+
+Version 3.45 - Build 404; April 15, 2009
+	- Added ability to filter data points using a user-defined polygon region
+		- Useful for excluding surfactant data that appears in the latter part of a dataset, but for which a triangular or trapezoidal region is most effective at removing the data
+	- Use parameter AutoRemovePolygonRegions in the Viper.ini file to automatically remove one or more polygonal regions during automated processing
+		- Define the regions using parameter ExclusionPolygonDefs
+		- This variable holds a semicolon separated list of X,Y pairs
+		- Separate the definitions for multiple polygons using a forward slash: /
+		- For example: 7000, 0; 20000, 300; 20000, 3000; 7500, 500 / 0, 0; 1000, 0; 1000, 5000; 0, 5000
+
 Version 3.45 - Build 403; March 20, 2009
 	- Added new Total Cumulative Data Intensity filter option
 		- Use the File Load Options window to specify this filter (after you select the file to load)

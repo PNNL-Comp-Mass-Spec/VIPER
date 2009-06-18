@@ -506,31 +506,31 @@ If ePairedSearchUMCSelection <> punaPairedAndUnpaired Then
         If ePairedSearchUMCSelection = punaPairedAll Then
             ' Add back all LC-MS Features belonging to pairs
             For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P1) = True
-                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P2) = True
+                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p1) = True
+                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p2) = True
             Next i
         ElseIf ePairedSearchUMCSelection = punaPairedHeavy Then
             ' Add back LC-MS Features belonging to the heavy member of pairs
             For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P2) = True
+                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p2) = True
             Next i
         Else
             ' punaPairedLight
             ' Add back LC-MS Features belonging to the light member of pairs
             For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P1) = True
+                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p1) = True
             Next i
         End If
     Case punaUnpairedOnly
         ' Exclude LC-MS Features that are paired
         For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-            UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P1) = False
-            UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P2) = False
+            UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p1) = False
+            UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p2) = False
         Next i
     Case punaUnpairedPlusPairedLight
         ' Exclude LC-MS Features that belong to heavy members of pairs
         For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-            UseUMC(GelP_D_L(lngGelIndex).Pairs(i).P2) = False
+            UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p2) = False
         Next i
     End Select
     
@@ -1589,8 +1589,9 @@ With udtUMCNetAdjDef
         .MassLSQOutlierZScore = 3
         .MassLSQNumKnots = 12
         
-        .AdditionalValue1 = 0
-        .AdditionalValue2 = 0
+        .SplitWarpMode = swmDisabled
+        .SplitWarpMZBoundary = 0
+        
         .AdditionalValue3 = 0
         .AdditionalValue4 = 0
         .AdditionalValue5 = 0

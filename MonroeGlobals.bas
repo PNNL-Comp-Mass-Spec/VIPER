@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "March 20, 2009"
+Public Const APP_BUILD_DATE As String = "June 17, 2009"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -900,6 +900,11 @@ Public Type udtExclusionIonType
     ScanEnd As Long
 End Type
 
+Public Type udtExclusionPolygonType
+    VertexCount As Integer
+    VertexList() As String      ' X,Y pairs defining the vertices of the polygon; X is scan number and Y is monoisotopic mass (both must be integers)
+End Type
+
 Public Type udtErrorPlottingPeakCacheType
     Center As Double
     width As Double
@@ -934,6 +939,9 @@ Public Type udtNoiseRemovalOptionsType
 
     ExclusionListCount As Long
     ExclusionList() As udtExclusionIonType
+    
+    ExclusionPolygonCount As Integer
+    ExclusionPolygonList() As udtExclusionPolygonType
 End Type
 
 Public Type udtRefineMSDataOptionsType
@@ -1009,9 +1017,12 @@ End Type
 
 Public Type udtAutoAnalysisOptionsType
     DatasetID As Long                                       ' This can be provided on the command line (in the .Par file), or in the .Ini file
-    JobNumber As Long                                    ' This can be provided on the command line (in the .Par file), or in the .Ini file
+    JobNumber As Long                                       ' This can be provided on the command line (in the .Par file), or in the .Ini file
     MDType As Long                                          ' Defined in T_MMD_Type_Name
+    
     AutoRemoveNoiseStreaks As Boolean
+    AutoRemovePolygonRegions As Boolean
+    
     DoNotSaveOrExport As Boolean
     SkipFindUMCs As Boolean                        ' Only appropriate if loading data from a .Gel file (however, this is not forced to false if a .Pek, .CSV, .mzXML, or .mzData file is loaded)
     SkipGANETSlopeAndInterceptComputation As Boolean

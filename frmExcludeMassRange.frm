@@ -2,14 +2,14 @@ VERSION 5.00
 Begin VB.Form frmExcludeMassRange 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Filter By Mass Range"
-   ClientHeight    =   7110
+   ClientHeight    =   7125
    ClientLeft      =   45
    ClientTop       =   360
    ClientWidth     =   8925
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   7110
+   ScaleHeight     =   7125
    ScaleWidth      =   8925
    ShowInTaskbar   =   0   'False
    StartUpPosition =   3  'Windows Default
@@ -383,7 +383,7 @@ Private mCancelOperation As Boolean
 
 Private Sub AddToExclusionList(udtNewEntry As udtExclusionIonType, Optional blnAllowMergingWithExistingEntries As Boolean = True, Optional blnRePopulateExclusionListArray As Boolean = True, Optional blnUpdateExclusionListTextbox As Boolean = False)
 
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim dblAbsTolerance As Double, dblAbsToleranceNewEntry As Double
     
     Dim dblExcludeIonStartMass As Double, dblExcludeIonEndMass As Double
@@ -406,8 +406,8 @@ Private Sub AddToExclusionList(udtNewEntry As udtExclusionIonType, Optional blnA
         End With
         
         With glbPreferencesExpanded.NoiseRemovalOptions
-            For lngindex = 0 To .ExclusionListCount - 1
-                With .ExclusionList(lngindex)
+            For lngIndex = 0 To .ExclusionListCount - 1
+                With .ExclusionList(lngIndex)
                     dblAbsTolerance = PPMToMass(.TolerancePPM, .IonMass)
                     
                     dblExcludeIonStartMass = .IonMass - dblAbsTolerance
@@ -437,7 +437,7 @@ Private Sub AddToExclusionList(udtNewEntry As udtExclusionIonType, Optional blnA
                     End If
                 End With
                 If blnEntriesMerged Then Exit For
-            Next lngindex
+            Next lngIndex
         End With
     End If
     
@@ -470,7 +470,7 @@ Private Function AutoPopulateFindPercentScansInUse(udtAutoPopulateStats As udtAu
     Dim lngScansInUseCount As Long
     
     Dim blnUseMatchIon As Boolean
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     MWRangeMinInd = 0
     MWRangeMaxInd = O_Cnt - 1
@@ -492,29 +492,29 @@ Private Function AutoPopulateFindPercentScansInUse(udtAutoPopulateStats As udtAu
                     ' However, do not change ScanUsed() if limiting to identical charge
                     '   or if limiting scan range and out of range
                     blnUseMatchIon = True
-                    For lngindex = MWRangeMinInd To MWRangeMaxInd
+                    For lngIndex = MWRangeMinInd To MWRangeMaxInd
                         ' Possibly check for matching charge
                         If .RequireIdenticalCharge Then
-                            blnUseMatchIon = (O_Charge(IndMW(lngindex)) = .Charge)
+                            blnUseMatchIon = (O_Charge(IndMW(lngIndex)) = .Charge)
                         End If
                         
                         ' Possibly check for scan within range
                         If .LimitScanRange Then
                             If blnUseMatchIon Then
-                                If O_Scan(IndMW(lngindex)) < .ScanRangeStart Or _
-                                   O_Scan(IndMW(lngindex)) > .ScanRangeEnd Then
+                                If O_Scan(IndMW(lngIndex)) < .ScanRangeStart Or _
+                                   O_Scan(IndMW(lngIndex)) > .ScanRangeEnd Then
                                     blnUseMatchIon = False
                                 End If
                             End If
                         End If
                         
                         If blnUseMatchIon Then
-                            If Not ScanUsed(O_Scan(IndMW(lngindex))) Then
-                                ScanUsed(O_Scan(IndMW(lngindex))) = True
+                            If Not ScanUsed(O_Scan(IndMW(lngIndex))) Then
+                                ScanUsed(O_Scan(IndMW(lngIndex))) = True
                                 lngScansInUseCount = lngScansInUseCount + 1
                             End If
                         End If
-                    Next lngindex
+                    Next lngIndex
                     
                     ' We can now compute the rigorous percent scans in use
                     sngPercentScansInUse = lngScansInUseCount / CSng(.ScanRangeCount) * 100
@@ -532,9 +532,9 @@ Private Function AutoPopulateFindPercentScansInUse(udtAutoPopulateStats As udtAu
         If sngPercentScansInUse >= .PercentScansInUseThreshold Then
             If blnMarkIonsIfOverThreshold Then
                 ' Mark the ions in this slice as matched
-                For lngindex = MWRangeMinInd To MWRangeMaxInd
-                    IsMatched(IndMW(lngindex)) = True
-                Next lngindex
+                For lngIndex = MWRangeMinInd To MWRangeMaxInd
+                    IsMatched(IndMW(lngIndex)) = True
+                Next lngIndex
             End If
             
             AutoPopulateFindPercentScansInUse = True
@@ -991,7 +991,7 @@ Private Sub FillExclusionListFromTextbox(Optional blnUpdateTextBox As Boolean = 
     
     Dim strExclusionList As String
     
-    Dim lngindex As Long
+    Dim lngIndex As Long
     Dim dblParsedVals() As Double       ' 0-based array
     Dim intParseCount As Integer
     
@@ -1016,38 +1016,51 @@ Private Sub FillExclusionListFromTextbox(Optional blnUpdateTextBox As Boolean = 
     If blnUseSpaceDelimeter Then strDelimeterList = strDelimeterList & " "
     If blnUseTabDelimeter Then strDelimeterList = strDelimeterList & vbTab
     
-    ' Parse each item in strListItems() to find the specific exclusion parameters
-    For lngindex = 0 To lngItemCount - 1
-        intParseCount = ParseStringValuesDbl(strListItems(lngindex), dblParsedVals(), MAX_PARSE_COUNT, strDelimeterList, "", False, True, False)
-    
-        If intParseCount >= 1 Then
-            With glbPreferencesExpanded.NoiseRemovalOptions
-                .ExclusionListCount = .ExclusionListCount + 1
-                ReDim Preserve .ExclusionList(0 To .ExclusionListCount - 1)
-                With .ExclusionList(.ExclusionListCount - 1)
-                    .IonMass = dblParsedVals(0)
+    If lngItemCount > 0 Then
+        ' Reserve space for up to lngItemCount entries
+        ReDim glbPreferencesExpanded.NoiseRemovalOptions.ExclusionList(lngItemCount - 1)
+        
+        ' Parse each item in strListItems() to find the specific exclusion parameters
+        For lngIndex = 0 To lngItemCount - 1
+            intParseCount = ParseStringValuesDbl(strListItems(lngIndex), dblParsedVals(), MAX_PARSE_COUNT, strDelimeterList, "", False, True, False)
+        
+            If intParseCount >= 1 Then
+                With glbPreferencesExpanded.NoiseRemovalOptions
+                    With .ExclusionList(.ExclusionListCount)
+                        .IonMass = dblParsedVals(0)
+                        
+                        If intParseCount >= 2 Then
+                            .TolerancePPM = dblParsedVals(1)
+                        Else
+                            .TolerancePPM = dblDefaultTolerancePPM
+                        End If
+                        If intParseCount >= 3 Then
+                            .Charge = dblParsedVals(2)
+                        Else
+                            .Charge = 0
+                        End If
+                        If intParseCount >= 5 Then
+                            .LimitScanRange = True
+                            .ScanStart = dblParsedVals(3)
+                            .ScanEnd = dblParsedVals(4)
+                        Else
+                            .LimitScanRange = False
+                        End If
+                    End With
                     
-                    If intParseCount >= 2 Then
-                        .TolerancePPM = dblParsedVals(1)
-                    Else
-                        .TolerancePPM = dblDefaultTolerancePPM
-                    End If
-                    If intParseCount >= 3 Then
-                        .Charge = dblParsedVals(2)
-                    Else
-                        .Charge = 0
-                    End If
-                    If intParseCount >= 5 Then
-                        .LimitScanRange = True
-                        .ScanStart = dblParsedVals(3)
-                        .ScanEnd = dblParsedVals(4)
-                    Else
-                        .LimitScanRange = False
-                    End If
+                    .ExclusionListCount = .ExclusionListCount + 1
+                    
                 End With
-            End With
-        End If
-    Next lngindex
+            End If
+        Next lngIndex
+        
+        With glbPreferencesExpanded.NoiseRemovalOptions
+            If .ExclusionListCount < lngItemCount Then
+                ' Shrink the list
+                ReDim Preserve .ExclusionList(.ExclusionListCount - 1)
+            End If
+        End With
+    End If
     
     If blnUpdateTextBox Then
         FillExclusionTextBox
@@ -1056,7 +1069,7 @@ Private Sub FillExclusionListFromTextbox(Optional blnUpdateTextBox As Boolean = 
 End Sub
 
 Private Sub FillExclusionTextBox()
-    ' Fills the exclusion textbox using the data in .ExclusionList()
+    ' Fills the exclusion textbox using the data in glbPreferencesExpanded.NoiseRemovalOptions.ExclusionList()
     ' Format is: Monoisotopic mass, ppm width, charge, scan start, scan end
     
     Dim strExclusionList As String
@@ -1064,7 +1077,7 @@ Private Sub FillExclusionTextBox()
     Dim blnSuccess As Boolean
     Dim qsDbl As New QSDouble
     
-    Dim lngindex As Long
+    Dim lngIndex As Long
     
     ' Fill in order of increasing mass
     strExclusionList = ""
@@ -1073,10 +1086,10 @@ Private Sub FillExclusionTextBox()
             If .ExclusionListCount > 1 Then
                 ReDim dblExclusionMasses(0 To .ExclusionListCount - 1)
                 ReDim lngExclusionMassPointers(0 To .ExclusionListCount - 1)
-                For lngindex = 0 To .ExclusionListCount - 1
-                    dblExclusionMasses(lngindex) = .ExclusionList(lngindex).IonMass
-                    lngExclusionMassPointers(lngindex) = lngindex
-                Next lngindex
+                For lngIndex = 0 To .ExclusionListCount - 1
+                    dblExclusionMasses(lngIndex) = .ExclusionList(lngIndex).IonMass
+                    lngExclusionMassPointers(lngIndex) = lngIndex
+                Next lngIndex
                 
                 blnSuccess = qsDbl.QSAsc(dblExclusionMasses(), lngExclusionMassPointers())
                 Debug.Assert blnSuccess
@@ -1085,15 +1098,15 @@ Private Sub FillExclusionTextBox()
                 lngExclusionMassPointers(0) = 0
             End If
             
-            For lngindex = 0 To .ExclusionListCount - 1
-                With .ExclusionList(lngExclusionMassPointers(lngindex))
+            For lngIndex = 0 To .ExclusionListCount - 1
+                With .ExclusionList(lngExclusionMassPointers(lngIndex))
                     strExclusionList = strExclusionList & Trim(.IonMass) & ", " & Trim(.TolerancePPM) & ", " & Trim(.Charge)
                     If .LimitScanRange Then
                         strExclusionList = strExclusionList & ", " & Trim(.ScanStart) & ", " & Trim(.ScanEnd)
                     End If
                     strExclusionList = strExclusionList & vbCrLf
                 End With
-            Next lngindex
+            Next lngIndex
         End If
     End With
     
@@ -1113,7 +1126,7 @@ Public Function IncludeExcludeIons(blnExcludeIons As Boolean) As Long
     Dim blnSuccess As Boolean
     Dim eScopeAtStart As glScope
     
-    Dim lngExclusionIndex As Long, lngindex As Long
+    Dim lngExclusionIndex As Long, lngIndex As Long
     Dim lngMultiplier As Long           ' -1 for exclude, 1 for include
     
     Dim dblAbsMassTolerance As Double
@@ -1140,7 +1153,7 @@ On Error GoTo IncludeExcludeIonsErrorHandler
         UpdateCurrentNoiseRemovalOptions
         
         With glbPreferencesExpanded.NoiseRemovalOptions
-            ' Must have current scope be All when Including ions (i.,e. whe blnExcludeIons = False)
+            ' Must have current scope be All when Including ions (i.e. when blnExcludeIons = False)
             eScopeAtStart = .SearchScope
             If Not blnExcludeIons And .SearchScope = glScope.glSc_Current Then
                 .SearchScope = glScope.glSc_All
@@ -1162,11 +1175,11 @@ On Error GoTo IncludeExcludeIonsErrorHandler
                             
                             If MWRangeFinder.FindIndexRange(.IonMass, dblAbsMassTolerance, MWRangeMinInd, MWRangeMaxInd) Then
                                 ' Mark the ions in the given range as "Matched"
-                                For lngindex = MWRangeMinInd To MWRangeMaxInd
-                                    If Not .LimitScanRange Or (O_Scan(IndMW(lngindex)) >= .ScanStart And O_Scan(IndMW(lngindex)) <= .ScanEnd) Then
-                                        IsMatched(IndMW(lngindex)) = True
+                                For lngIndex = MWRangeMinInd To MWRangeMaxInd
+                                    If Not .LimitScanRange Or (O_Scan(IndMW(lngIndex)) >= .ScanStart And O_Scan(IndMW(lngIndex)) <= .ScanEnd) Then
+                                        IsMatched(IndMW(lngIndex)) = True
                                     End If
-                                Next lngindex
+                                Next lngIndex
                             End If
                             
                         End With
@@ -1175,17 +1188,17 @@ On Error GoTo IncludeExcludeIonsErrorHandler
                 
                 ' Exclude data by setting .CSID or .IsoID to a negative value for data with IsMatched() = True
                 ' Include data by setting .CSID or .IsoID to a positive value for data with IsMatched() = true
-                For lngindex = 0 To O_Cnt - 1
-                    If IsMatched(lngindex) Then
-                        If O_Type(lngindex) = gldtCS Then
-                            GelDraw(CallerID).CSID(O_Index(lngindex)) = lngMultiplier * Abs(GelDraw(CallerID).CSID(O_Index(lngindex)))
+                For lngIndex = 0 To O_Cnt - 1
+                    If IsMatched(lngIndex) Then
+                        If O_Type(lngIndex) = gldtCS Then
+                            GelDraw(CallerID).CSID(O_Index(lngIndex)) = lngMultiplier * Abs(GelDraw(CallerID).CSID(O_Index(lngIndex)))
                         Else
-                            Debug.Assert O_Type(lngindex) = gldtIS
-                            GelDraw(CallerID).IsoID(O_Index(lngindex)) = lngMultiplier * Abs(GelDraw(CallerID).IsoID(O_Index(lngindex)))
+                            Debug.Assert O_Type(lngIndex) = gldtIS
+                            GelDraw(CallerID).IsoID(O_Index(lngIndex)) = lngMultiplier * Abs(GelDraw(CallerID).IsoID(O_Index(lngIndex)))
                         End If
                         lngIonMatchCount = lngIonMatchCount + 1
                     End If
-                Next lngindex
+                Next lngIndex
             
                 GelBody(CallerID).RequestRefreshPlot
                 

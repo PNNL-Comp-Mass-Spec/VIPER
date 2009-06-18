@@ -65,6 +65,11 @@ Public Enum rmcUMCRobustNETWarpMassCalibrationType
     rmcHybridRecal = 2
 End Enum
 
+Public Enum swmUMCRobustNETUMCFilterType
+    swmDisabled = 0
+    swmSplitOnMZ = 1
+End Enum
+
 Public Enum UMCManageConstants
     UMCMngInitialize = 0
     UMCMngErase = 1
@@ -407,29 +412,32 @@ Public Type NetAdjDefinition2005b
 End Type
 
 Public Type udtMSWarpOptionsType
-    MassCalibrationType As Integer             ' Actually type rmcUMCRobustNETWarpMassCalibrationType
-    MinimumPMTTagObsCount As Long              ' Typically 5
-    MatchPromiscuity As Integer                ' Typically 2
+    MassCalibrationType As Integer              ' Actually type rmcUMCRobustNETWarpMassCalibrationType
+    MinimumPMTTagObsCount As Long               ' Typically 5
+    MatchPromiscuity As Integer                 ' Typically 2
     
-    NETTol As Single                           ' Typically 0.02
-    NumberOfSections As Long                   ' Typically 100
-    MaxDistortion As Integer                   ' Typically 10
-    ContractionFactor As Integer               ' Typically 3
+    NETTol As Single                            ' Typically 0.02
+    NumberOfSections As Long                    ' Typically 100
+    MaxDistortion As Integer                    ' Typically 10
+    ContractionFactor As Integer                ' Typically 3
     
-    MassWindowPPM As Single                    ' Typically 50
-    MassSplineOrder As Integer                 ' Typically 2
-    MassNumXSlices As Integer                  ' Typically 20
-    MassNumMassDeltaBins As Integer            ' Typically 100
-    MassMaxJump As Integer                     ' Typically 50
+    MassWindowPPM As Single                     ' Typically 50
+    MassSplineOrder As Integer                  ' Typically 2
+    MassNumXSlices As Integer                   ' Typically 20
+    MassNumMassDeltaBins As Integer             ' Typically 100
+    MassMaxJump As Integer                      ' Typically 50
     
-    MassZScoreTolerance As Single              ' Typically 3
-    MassUseLSQ As Boolean                      ' Typically True
-    MassLSQOutlierZScore As Single             ' Typically 3
-    MassLSQNumKnots As Integer                 ' Typically 12
-        
-    AdditionalValue1 As Long        ' 4 bytes; use for future expansion (name can be changed in the future)
-    AdditionalValue2 As Long        ' 4 bytes
-    AdditionalValue3 As Long        ' 4 bytes
+    MassZScoreTolerance As Single               ' Typically 3
+    MassUseLSQ As Boolean                       ' Typically True
+    MassLSQOutlierZScore As Single              ' Typically 3
+    MassLSQNumKnots As Integer                  ' Typically 12
+    
+    SplitWarpMode As Integer                    ' Actually type swmUMCRobustNETMultiPartWarpType (0 = disabled, 1 = split by m/z, 2 = split by scan); was part of AdditionalValue1, a Long
+    AdditionalValue1 As Integer                 ' 2 bytes
+    
+    SplitWarpMZBoundary As Single               ' When non-zero, then the data is divided into two parts by m/z and LCMSWarp is run twice (applicable to Thermo Exactive instruments with a discontinuous mass calibration function); this was AdditionalValue2
+    
+    AdditionalValue3 As Long        ' 4 bytes; use for future expansion (name can be changed in the future)
     AdditionalValue4 As Long        ' 4 bytes
     AdditionalValue5 As Long        ' 4 bytes
     AdditionalValue6 As Long        ' 4 bytes
