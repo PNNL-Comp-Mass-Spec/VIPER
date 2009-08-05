@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmUMCIonNet 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "LC-MS Feature (UMC) Ion Networks"
@@ -2371,7 +2371,7 @@ On Error GoTo FinalizeNewUMCsErrorHandler
         
         If Not blnUMCIndicesUpdated Then
             ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-            blnSuccess = UpdateUMCStatArrays(CallerID, False, Me)
+            blnSuccess = UpdateUMCStatArrays(CallerID, True, False, Me)
         Else
             blnSuccess = True
         End If
@@ -4433,7 +4433,7 @@ Private Sub ShowHideCommandButtons(ByVal blnCalculating As Boolean)
 
     fraDREAMS.Enabled = Not blnCalculating
     fraUMCScope.Enabled = Not blnCalculating
-    fraNET(0).Enabled = Not blnCalculating
+    fraNet(0).Enabled = Not blnCalculating
     fraLCMSFeatureStats.Enabled = Not blnCalculating
     fraOptionFrame(0).Enabled = Not blnCalculating
     fraOptionFrame(1).Enabled = Not blnCalculating

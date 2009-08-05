@@ -1,20 +1,53 @@
 VERSION 5.00
 Begin VB.Form frmFileLoadOptions 
    Caption         =   "File Load Options"
-   ClientHeight    =   5445
+   ClientHeight    =   5865
    ClientLeft      =   60
-   ClientTop       =   450
-   ClientWidth     =   7455
+   ClientTop       =   570
+   ClientWidth     =   7470
    LinkTopic       =   "Form1"
-   ScaleHeight     =   5445
-   ScaleWidth      =   7455
-   StartUpPosition =   3  'Windows Default
+   ScaleHeight     =   5865
+   ScaleWidth      =   7470
+   Begin VB.Frame fraPredefinedLCMSFeatureOptions 
+      Caption         =   "Predefined LC-MS Feature Options"
+      Height          =   975
+      Left            =   120
+      TabIndex        =   32
+      Top             =   4680
+      Width           =   3375
+      Begin VB.TextBox txtAutoMapDataPointsMassTolerancePPM 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   2160
+         TabIndex        =   34
+         Text            =   "5"
+         Top             =   360
+         Width           =   495
+      End
+      Begin VB.Label lblDescription 
+         Caption         =   "ppm"
+         Height          =   240
+         Index           =   2
+         Left            =   2760
+         TabIndex        =   35
+         Top             =   390
+         Width           =   450
+      End
+      Begin VB.Label lblAutoMapDataPointsMassTolerancePPM 
+         Caption         =   "Mass Tolerance for auto-mapping data points to predefined features"
+         Height          =   615
+         Left            =   120
+         TabIndex        =   33
+         Top             =   240
+         Width           =   1935
+      End
+   End
    Begin VB.Frame fraDREAMS 
       Caption         =   "DREAMS Options"
       Height          =   1215
       Left            =   120
       TabIndex        =   28
-      Top             =   3885
+      Top             =   3360
       Width           =   3375
       Begin VB.OptionButton optEvenOddScanFilter 
          Caption         =   "Only load odd-numbered scans"
@@ -49,7 +82,7 @@ Begin VB.Form frmFileLoadOptions
       Caption         =   "Set to &Defaults"
       Height          =   375
       Left            =   5640
-      TabIndex        =   35
+      TabIndex        =   39
       Top             =   4440
       Width           =   1575
    End
@@ -136,7 +169,7 @@ Begin VB.Form frmFileLoadOptions
       Caption         =   "MS Level Filter"
       Height          =   1215
       Left            =   3600
-      TabIndex        =   32
+      TabIndex        =   36
       Top             =   3885
       Width           =   1455
       Begin VB.ListBox lstMSLevelFilter 
@@ -145,14 +178,14 @@ Begin VB.Form frmFileLoadOptions
          Left            =   120
          List            =   "frmFileLoadOptions.frx":0002
          MultiSelect     =   2  'Extended
-         TabIndex        =   33
+         TabIndex        =   37
          Top             =   240
          Width           =   1215
       End
    End
    Begin VB.Frame fraCSandIsoDataFilter 
       Caption         =   "Data Type Filter"
-      Height          =   1215
+      Height          =   1095
       Left            =   120
       TabIndex        =   15
       Top             =   2160
@@ -163,7 +196,7 @@ Begin VB.Form frmFileLoadOptions
          Index           =   2
          Left            =   240
          TabIndex        =   18
-         Top             =   840
+         Top             =   720
          Width           =   3000
       End
       Begin VB.OptionButton optCSandIsoDataFilterMode 
@@ -172,7 +205,7 @@ Begin VB.Form frmFileLoadOptions
          Index           =   1
          Left            =   240
          TabIndex        =   17
-         Top             =   540
+         Top             =   480
          Width           =   3000
       End
       Begin VB.OptionButton optCSandIsoDataFilterMode 
@@ -190,7 +223,7 @@ Begin VB.Form frmFileLoadOptions
       Caption         =   "&Cancel"
       Height          =   375
       Left            =   5640
-      TabIndex        =   36
+      TabIndex        =   40
       Top             =   4920
       Width           =   1575
    End
@@ -198,7 +231,7 @@ Begin VB.Form frmFileLoadOptions
       Caption         =   "&Load"
       Height          =   375
       Left            =   5640
-      TabIndex        =   34
+      TabIndex        =   38
       Top             =   3960
       Width           =   1575
    End
@@ -345,15 +378,26 @@ Private mFileType As ifmInputFileModeConstants
 
 Private mLoadCancelled As Boolean
 
+Public Property Let AutoMapDataPointsMassTolerancePPM(sngValue As Single)
+    txtAutoMapDataPointsMassTolerancePPM = sngValue
+End Property
+Public Property Get AutoMapDataPointsMassTolerancePPM() As Single
+    If IsNumeric(txtAutoMapDataPointsMassTolerancePPM) Then
+        AutoMapDataPointsMassTolerancePPM = txtAutoMapDataPointsMassTolerancePPM
+    Else
+        AutoMapDataPointsMassTolerancePPM = 5
+    End If
+End Property
+
 Public Property Get LoadCancelled() As Boolean
     LoadCancelled = mLoadCancelled
 End Property
 
 Public Property Let FilterOnIsoFit(blnEnable As Boolean)
     If blnEnable Then
-        optIsoFitFilter(1).Value = blnEnable
+        optIsoFitFilter(1).Value = True
     Else
-        optIsoFitFilter(0).Value = blnEnable
+        optIsoFitFilter(0).Value = True
     End If
 End Property
 Public Property Get FilterOnIsoFit() As Boolean
@@ -539,6 +583,7 @@ Private Sub ResetToDefaults()
         .Selected(1) = True
     End With
     
+    ' Call SetFileType to set file-type specific filters
     SetFileType mFileType
 End Sub
 
@@ -546,6 +591,11 @@ Public Sub SetFileType(eFileType As ifmInputFileModeConstants)
     Dim blnEnableDataTypeFilter As Boolean
     Dim blnEnableIsoFitFilter As Boolean
     Dim blnEnableMSLevelFilter As Boolean
+    Dim blnEnableDreamsFilters As Boolean
+    Dim blnEnableAbundanceFilters As Boolean
+    Dim blnEnableDatacountFilters As Boolean
+    Dim blnEnableLCMSFeatureFilters As Boolean
+    
     Dim intIndex As Integer
     
     mFileType = eFileType
@@ -554,20 +604,49 @@ Public Sub SetFileType(eFileType As ifmInputFileModeConstants)
         blnEnableDataTypeFilter = True
         blnEnableIsoFitFilter = True
         blnEnableMSLevelFilter = False
+        blnEnableDreamsFilters = True
+        blnEnableAbundanceFilters = True
+        blnEnableDatacountFilters = True
+        blnEnableLCMSFeatureFilters = False
+    
     Case ifmInputFileModeConstants.ifmmzXMLFile, ifmInputFileModeConstants.ifmmzXMLFileWithXMLExtension
         blnEnableDataTypeFilter = False
         blnEnableIsoFitFilter = False
         blnEnableMSLevelFilter = True
+        blnEnableDreamsFilters = True
+        blnEnableAbundanceFilters = True
+        blnEnableDatacountFilters = True
+        blnEnableLCMSFeatureFilters = False
+    
     Case ifmInputFileModeConstants.ifmmzDataFile, ifmInputFileModeConstants.ifmmzDataFileWithXMLExtension
         blnEnableDataTypeFilter = False
         blnEnableIsoFitFilter = False
         blnEnableMSLevelFilter = True
+        blnEnableDreamsFilters = True
+        blnEnableAbundanceFilters = True
+        blnEnableDatacountFilters = True
+        blnEnableLCMSFeatureFilters = False
+    
+    Case ifmDelimitedTextFile
+        blnEnableDataTypeFilter = False
+        blnEnableIsoFitFilter = False
+        blnEnableMSLevelFilter = False
+        blnEnableDreamsFilters = False
+        blnEnableAbundanceFilters = False
+        blnEnableDatacountFilters = False
+        blnEnableLCMSFeatureFilters = True
+    
     Case Else
         ' Unknown file type
         Debug.Assert False
         blnEnableDataTypeFilter = False
         blnEnableIsoFitFilter = False
         blnEnableMSLevelFilter = False
+        blnEnableDreamsFilters = False
+        blnEnableAbundanceFilters = False
+        blnEnableDatacountFilters = False
+        blnEnableLCMSFeatureFilters = False
+    
     End Select
 
     optCSandIsoDataFilterMode(0).Enabled = blnEnableDataTypeFilter
@@ -577,6 +656,26 @@ Public Sub SetFileType(eFileType As ifmInputFileModeConstants)
     optIsoFitFilter(0).Enabled = blnEnableIsoFitFilter
     optIsoFitFilter(1).Enabled = blnEnableIsoFitFilter
     txtIsoFitMaxValue.Enabled = blnEnableIsoFitFilter
+    
+    optEvenOddScanFilter(0).Enabled = blnEnableDreamsFilters
+    optEvenOddScanFilter(1).Enabled = blnEnableDreamsFilters
+    optEvenOddScanFilter(2).Enabled = blnEnableDreamsFilters
+    If Not blnEnableDreamsFilters Then
+        optEvenOddScanFilter(0).Value = True
+    End If
+
+    optAbuFilter(0).Enabled = blnEnableAbundanceFilters
+    optAbuFilter(1).Enabled = blnEnableAbundanceFilters
+    If Not blnEnableAbundanceFilters Then
+        optAbuFilter(0).Value = True
+    End If
+    
+    chkMaximumDataCountEnabled.Enabled = blnEnableDatacountFilters
+    chkTotalIntensityPercentageFilterEnabled.Enabled = blnEnableDatacountFilters
+    If Not blnEnableDatacountFilters Then
+        chkMaximumDataCountEnabled.Value = vbUnchecked
+        chkTotalIntensityPercentageFilterEnabled.Value = vbUnchecked
+    End If
     
     lstMSLevelFilter.Enabled = blnEnableMSLevelFilter
     If Not blnEnableMSLevelFilter Then
@@ -594,6 +693,8 @@ Public Sub SetFileType(eFileType As ifmInputFileModeConstants)
 ''        Next intIndex
     End If
 
+    txtAutoMapDataPointsMassTolerancePPM.Enabled = blnEnableLCMSFeatureFilters
+    
 End Sub
 
 Public Sub SetFilePath(strFilePath As String)
@@ -603,15 +704,20 @@ Public Sub SetFilePath(strFilePath As String)
     
     On Error GoTo InitializeErrorHandler
     
-    mFileSize = FileLen(strFilePath)
-
-    If mFileSize > FILE_SIZE_THRESHOLD_BYTES Then
-        optIsoFitFilter(1).Value = True
+    If FileExists(strFilePath) Then
+        mFileSize = FileLen(strFilePath)
+    
+        If mFileSize > FILE_SIZE_THRESHOLD_BYTES Then
+            optIsoFitFilter(1).Value = True
+        Else
+            optIsoFitFilter(1).Value = False
+        End If
+        
+        lblFileSize = Round(mFileSize / 1024 / 1024, 1) & " MB"
     Else
-        optIsoFitFilter(1).Value = False
+        lblFileSize = "?? MB"
     End If
     
-    lblFileSize = Round(mFileSize / 1024 / 1024, 1) & " MB"
     lblFilePath = CompactPathString(strFilePath, 65)
     
     If DetermineFileType(strFilePath, eFileType) Then

@@ -49,6 +49,8 @@ On Error GoTo DetermineFileTypeErrorHandler
         Else
             blnKnownType = False
         End If
+    Case ".txt"
+        eFileType = ifmInputFileModeConstants.ifmDelimitedTextFile
     Case Else
         blnKnownType = False
     End Select

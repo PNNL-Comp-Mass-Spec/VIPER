@@ -5,6 +5,10 @@ Public Const CSV_ISOS_IC_FILE_SUFFIX As String = "isos_ic.csv"
 Public Const CSV_ISOS_FILE_SUFFIX As String = "isos.csv"
 Public Const CSV_ISOS_PAIRS_SUFFIX As String = "pairs_isos.csv"
 Public Const CSV_SCANS_FILE_SUFFIX As String = "scans.csv"
+
+Public Const LCMS_FEATURES_FILE_SUFFIX As String = "LCMSFeatures.txt"
+Public Const LCMS_FEATURE_TO_PEAK_MAP_FILE_SUFFIX As String = "LCMSFeatureToPeakMap.txt"
+
 Public Const CSV_COLUMN_HEADER_UNKNOWN_WARNING As String = "Warning: unknown column headers"
 Public Const CSV_COLUMN_HEADER_MISSING_WARNING As String = "Warning: expected important column headers"
 
@@ -352,7 +356,10 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
                            ByVal blnMaximumDataCountEnabled As Boolean, ByVal lngMaximumDataCountToLoad As Long, _
                            ByVal blnTotalIntensityPercentageFilterEnabled, ByVal sngTotalIntensityPercentageFilter, _
                            ByVal eScanFilterMode As eosEvenOddScanFilterModeConstants, _
-                           ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants) As Long
+                           ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants, _
+                           ByVal blnLoadPredefinedLCMSFeatures As Boolean, _
+                           ByVal sngAutoMapDataPointsMassTolerancePPM As Single, _
+                           ByRef strErrorMessage) As Long
     '-------------------------------------------------------------------------
     'Returns 0 if data successfuly loaded, -2 if data set is too large,
     '-3 if problems with scan numbers, -4 if no data found, -5 if user cancels load,
@@ -369,7 +376,10 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     
     Dim strScansFilePath As String
     Dim strIsosFilePath As String
-    Dim strBaseName As String
+    Dim strBaseFilePath As String
+    
+    Dim strLCMSFeaturesFilePath As String
+    Dim strLCMSFeatureToPeakMapFilePath As String
     
     Dim eResponse As VbMsgBoxResult
     
@@ -377,7 +387,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     Dim tsInFile As TextStream
     Dim strLineIn As String
     
-    Dim blnValidScanFile As Boolean
+    Dim blnValidScansFile As Boolean
     Dim blnValidDataPoint As Boolean
     
     Dim lngReturnValue As Long
@@ -400,7 +410,7 @@ On Error GoTo LoadNewCSVErrorHandler
     
     mTotalIntensityPercentageFilterEnabled = blnTotalIntensityPercentageFilterEnabled
     mTotalIntensityPercentageFilter = sngTotalIntensityPercentageFilter
-    
+
     If mMaximumDataCountEnabled Or mTotalIntensityPercentageFilterEnabled Then
         intProgressCount = 5
         blnFilePrescanEnabled = True
@@ -419,9 +429,10 @@ On Error GoTo LoadNewCSVErrorHandler
     
     ' Resolve the CSV FilePath given to the ScansFilePath and the IsosFilePath variables
     
-    If Not ResolveCSVFilePaths(CSVFilePath, strScansFilePath, strIsosFilePath, strBaseName) Then
+    If Not ResolveCSVFilePaths(CSVFilePath, strScansFilePath, strIsosFilePath, strBaseFilePath) Then
+        strErrorMessage = "Unable to resolve the given FilePath to the _isos.csv and _scans.csv files: " & vbCrLf & CSVFilePath
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "Unable to resolve the given FilePath to the _isos.csv and _scans.csv files: " & vbCrLf & CSVFilePath, vbExclamation + vbOKOnly, glFGTU
+            MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
         End If
         LoadNewCSV = -7
         Exit Function
@@ -429,11 +440,41 @@ On Error GoTo LoadNewCSVErrorHandler
     
     ' Validate that the input file(s) exist
     If Not fso.FileExists(strIsosFilePath) Then
-        LoadNewCSV = -6
+        strErrorMessage = "Decon2LS _isos.csv file not found: " & vbCrLf & strIsosFilePath
+        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
+        End If
+        LoadNewCSV = -7
         Exit Function
     End If
     
-    blnValidScanFile = True
+    If blnLoadPredefinedLCMSFeatures Then
+    
+        ' Define the path to the LCMSFeature file and the FeatureToPeakMap file
+        strLCMSFeaturesFilePath = strBaseFilePath & LCMS_FEATURES_FILE_SUFFIX
+        strLCMSFeatureToPeakMapFilePath = strBaseFilePath & LCMS_FEATURE_TO_PEAK_MAP_FILE_SUFFIX
+        
+        ' Make sure the LCMSFeatures file exists
+        If Not fso.FileExists(strLCMSFeaturesFilePath) Then
+            strErrorMessage = "The LCMSFeatures file does not exist: " & vbCrLf & strLCMSFeaturesFilePath
+            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
+            End If
+            LoadNewCSV = -7
+            Exit Function
+        End If
+    
+        ' See if the FeatureToPeakMap file exists; it's OK if it doesn't
+        If Not fso.FileExists(strLCMSFeatureToPeakMapFilePath) Then
+            strErrorMessage = "Warning: The LCMS Feature to Peak Map file does not exist: " & vbCrLf & strLCMSFeatureToPeakMapFilePath & vbCrLf & "VIPER will infer the feature to peak mapping by looking for peaks within the scan range of each LC-MS feature and within " & sngAutoMapDataPointsMassTolerancePPM & " ppm of the feature's mass"
+            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
+            End If
+        End If
+    
+    End If
+    
+    blnValidScansFile = True
     If Not fso.FileExists(strScansFilePath) Then
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             eResponse = MsgBox("CSV Scans file not found: " & vbCrLf & strScansFilePath & vbCrLf & "Load the Isos.csv file anyway?  If yes, then scan type will be assumed to be MS and scan time will be unknown.  Choose No or Cancel to abort.", vbExclamation + vbYesNoCancel + vbDefaultButton3, glFGTU)
@@ -446,25 +487,28 @@ On Error GoTo LoadNewCSVErrorHandler
             LoadNewCSV = -7
             Exit Function
         Else
-            blnValidScanFile = False
+            blnValidScansFile = False
         End If
     End If
     
     ' Initialize the even/odd scan filter variables
     mEvenOddScanFilter = False
-    If eScanFilterMode = eosLoadOddScansOnly Then
-        mEvenOddScanFilter = True
-        mEvenOddModCompareVal = 1                     ' Use scans where Scan Mod 2 = 1
-    ElseIf eScanFilterMode = eosLoadEvenScansOnly Then
-        mEvenOddScanFilter = True
-        mEvenOddModCompareVal = 0                     ' Use scans where Scan Mod 2 = 0
+    
+    If Not blnLoadPredefinedLCMSFeatures Then
+        If eScanFilterMode = eosLoadOddScansOnly Then
+            mEvenOddScanFilter = True
+            mEvenOddModCompareVal = 1                     ' Use scans where Scan Mod 2 = 1
+        ElseIf eScanFilterMode = eosLoadEvenScansOnly Then
+            mEvenOddScanFilter = True
+            mEvenOddModCompareVal = 0                     ' Use scans where Scan Mod 2 = 0
+        End If
     End If
     
     ' Initialize the progress bar
     lngTotalBytesRead = 0
     lngByteCountTotal = FileLen(strIsosFilePath)
     
-    If blnValidScanFile Then
+    If blnValidScansFile Then
         lngScansFileByteCount = FileLen(strScansFilePath)
         lngByteCountTotal = lngByteCountTotal + lngScansFileByteCount
     End If
@@ -476,9 +520,9 @@ On Error GoTo LoadNewCSVErrorHandler
     
     GelData(mGelIndex).DataStatusBits = 0
     
-    If blnValidScanFile Then
+    If blnValidScansFile Then
         ' Read the scans file and populate .ScanInfo
-        lngReturnValue = ReadCSVScanFile(fso, strScansFilePath, strBaseName, lngTotalBytesRead)
+        lngReturnValue = ReadCSVScanFile(fso, strScansFilePath, strBaseFilePath, lngTotalBytesRead)
     Else
         lngReturnValue = 0
     End If
@@ -486,9 +530,16 @@ On Error GoTo LoadNewCSVErrorHandler
     If lngReturnValue = 0 Then
         ' Read the Isos file
         ' Note that the CSV Isos file only contains isotopic data, not charge state data
-        lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseName, _
+        lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseFilePath, _
                                          lngScansFileByteCount, lngByteCountTotal, lngTotalBytesRead, _
-                                         blnValidScanFile, blnFilePrescanEnabled)
+                                         blnValidScansFile, blnFilePrescanEnabled, _
+                                         blnLoadPredefinedLCMSFeatures)
+    
+        If lngReturnValue = 0 Then
+            If blnLoadPredefinedLCMSFeatures Then
+                lngReturnValue = ReadLCMSFeatureFiles(fso, strLCMSFeaturesFilePath, strLCMSFeatureToPeakMapFilePath, sngAutoMapDataPointsMassTolerancePPM)
+            End If
+        End If
     End If
         
     LoadNewCSV = lngReturnValue
@@ -499,15 +550,18 @@ LoadNewCSVErrorHandler:
     lngReturnValue = Err.Number
     LogErrors Err.Number, "LoadNewCSV"
     
+    strErrorMessage = "Error in LoadNewCSVErrorHandler: " & Err.Description
+    
     If lngReturnValue = 0 Then lngReturnValue = -10
     LoadNewCSV = lngReturnValue
     
 End Function
 
-Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFilePath As String, ByVal strBaseName As String, _
+Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFilePath As String, ByVal strBaseFilePath As String, _
                                  ByVal lngScansFileByteCount As Long, ByVal lngByteCountTotal As Long, _
-                                 ByRef lngTotalBytesRead As Long, ByVal blnValidScanFile As Boolean, _
-                                 ByVal blnFilePrescanEnabled As Boolean) As Long
+                                 ByRef lngTotalBytesRead As Long, ByVal blnValidScansFile As Boolean, _
+                                 ByVal blnFilePrescanEnabled As Boolean, _
+                                 ByVal blnLoadPredefinedLCMSFeatures As Boolean) As Long
 
     ' Returns 0 if no error, the error number if an error
 
@@ -528,7 +582,17 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
     Dim sngMonoPlus4Intensities() As Single
     Dim sngMonoMinus4Intensities() As Single
     
+    Dim blnIgnoreAllFiltersAndLoadAllData As Boolean
+    
 On Error GoTo ReadCSVIsosFileErrorHandler
+
+    ' If we're loading predefined LC/MS features, then we need to ignore all filters and load all of the data
+    blnIgnoreAllFiltersAndLoadAllData = blnLoadPredefinedLCMSFeatures
+    
+    If blnIgnoreAllFiltersAndLoadAllData Then
+        ' Make sure blnFilePrescanEnabled is false, since we're ignoring all filters and loading all of the data
+        blnFilePrescanEnabled = False
+    End If
 
     ReDim intColumnMapping(ISOS_FILE_COLUMN_COUNT - 1) As Integer
     
@@ -537,12 +601,12 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         intColumnMapping(lngIndex) = -1
     Next lngIndex
     
-    If Len(strBaseName) = 0 Then
-        strBaseName = fso.GetBaseName(strIsosFilePath)
+    If Len(strBaseFilePath) = 0 Then
+        strBaseFilePath = fso.GetBaseName(strIsosFilePath)
     End If
         
     With GelData(mGelIndex)
-        If Not blnValidScanFile Then
+        If Not blnValidScansFile Then
             mScanInfoCount = 0
             ReDim .ScanInfo(SCAN_INFO_DIM_CHUNK)
         End If
@@ -596,7 +660,10 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         mValidDataPointCount = 0
         lngTotalBytesRead = 0
     
-        lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, lngTotalBytesRead, intColumnMapping, blnValidScanFile, sngMonoPlus4Intensities, sngMonoMinus4Intensities, blnFilePrescanEnabled)
+        lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, lngTotalBytesRead, _
+                                             intColumnMapping, blnValidScansFile, _
+                                             sngMonoPlus4Intensities, sngMonoMinus4Intensities, _
+                                             blnFilePrescanEnabled, blnIgnoreAllFiltersAndLoadAllData)
         If lngReturnValue <> 0 Then
             ' Error occurred
             Debug.Assert False
@@ -763,7 +830,7 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         .DataFilter(fltIsoCS, 2) = 1000                'maximum charge state
          
       
-        If Not blnValidScanFile Then
+        If Not blnValidScansFile Then
             If mScanInfoCount > 0 Then
                 ReDim Preserve .ScanInfo(mScanInfoCount)
             Else
@@ -773,7 +840,7 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         
     End With
     
-    If Not blnValidScanFile Then
+    If Not blnValidScansFile Then
         ' Elution time wasn't defined
         ' Define the default elution time to range from 0 to 1
         DefineDefaultElutionTimes GelData(mGelIndex).ScanInfo, 0, 1
@@ -786,21 +853,23 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         ReadCSVIsosFile = -5
         frmProgress.HideForm
         Exit Function
-    Else
-        mCurrentProgressStep = mCurrentProgressStep + 1
-        frmProgress.UpdateProgressBar mCurrentProgressStep
-        frmProgress.InitializeSubtask "Sorting isotopic data", 0, GelData(mGelIndex).IsoLines
     End If
     
-    ' Sort the data
-    SortIsotopicData mGelIndex
+    ' Update the progress bar
+    mCurrentProgressStep = mCurrentProgressStep + 1
+    frmProgress.UpdateProgressBar mCurrentProgressStep
+    frmProgress.InitializeSubtask "Sorting isotopic data", 0, GelData(mGelIndex).IsoLines
+    
+    If Not blnLoadPredefinedLCMSFeatures Then
+        ' Sort the data, though we skip this step if we have loaded predefined LCMSFeatures
+        SortIsotopicData mGelIndex
+    End If
     
     If (GelData(mGelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IREPORT) = GEL_DATA_STATUS_BIT_IREPORT Then
         ' Fix the mono plus 2 abundance values
         FixIsosMonoPlus2Abu mGelIndex
     End If
-    
-    
+        
     If KeyPressAbortProcess > 1 Then
         ' User Cancelled Load
         ReadCSVIsosFile = -5
@@ -825,10 +894,11 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
                                      ByVal strIsosFilePath As String, _
                                      ByRef lngTotalBytesRead As Long, _
                                      ByRef intColumnMapping() As Integer, _
-                                     ByVal blnValidScanFile As Boolean, _
+                                     ByVal blnValidScansFile As Boolean, _
                                      ByRef sngMonoPlus4Intensities() As Single, _
                                      ByRef sngMonoMinus4Intensities() As Single, _
-                                     ByVal blnFilePrescanEnabled As Boolean) As Long
+                                     ByVal blnFilePrescanEnabled As Boolean, _
+                                     ByVal blnIgnoreAllFiltersAndLoadAllData As Boolean) As Long
     
     Dim tsInFile As TextStream
     Dim strLineIn As String
@@ -1009,22 +1079,25 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                 intCharge = CInt(GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.Charge), 1))
                 
                 blnValidDataPoint = True
-                If sngFit <= mMaxFit Or mMaxFit <= 0 Then
-                    If mFilterByAbundance Then
-                        If sngAbundance < mAbundanceMin Or sngAbundance > mAbundanceMax Then
-                            blnValidDataPoint = False
+                
+                If Not blnIgnoreAllFiltersAndLoadAllData Then
+                    If sngFit <= mMaxFit Or mMaxFit <= 0 Then
+                        If mFilterByAbundance Then
+                            If sngAbundance < mAbundanceMin Or sngAbundance > mAbundanceMax Then
+                                blnValidDataPoint = False
+                            End If
                         End If
+                    Else
+                        blnValidDataPoint = False
                     End If
-                Else
-                    blnValidDataPoint = False
                 End If
-
+                
                 If blnValidDataPoint Then
                 
                     If mReadMode = rmReadModeConstants.rmPrescanData Then
                         mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
                     Else
-                        If blnFilePrescanEnabled Then
+                        If blnFilePrescanEnabled And Not blnIgnoreAllFiltersAndLoadAllData Then
                             If mPrescannedData.GetAbundanceByIndex(mValidDataPointCount) >= 0 Then
                                 blnStoreDataPoint = True
                             Else
@@ -1039,8 +1112,10 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                 .DataLines = .DataLines + 1
                                 .IsoLines = .IsoLines + 1
                         
-                                If Not blnValidScanFile Then
+                                If Not blnValidScansFile Then
                                     ' Possibly add a new entry to .ScanInfo()
+                                    ' Assumes data in the _isos.csv file is sorted by ascending scan number
+                                    
                                     If mScanInfoCount = 0 Then
                                         mScanInfoCount = 1
                                         With .ScanInfo(1)
@@ -1119,7 +1194,7 @@ ReadCSVIsosFileWorkErrorHandler:
     ReadCSVIsosFileWork = lngReturnValue
 End Function
 
-Private Function ReadCSVScanFile(ByRef fso As FileSystemObject, ByVal strScansFilePath As String, ByVal strBaseName As String, ByRef lngTotalBytesRead As Long) As Long
+Private Function ReadCSVScanFile(ByRef fso As FileSystemObject, ByVal strScansFilePath As String, ByVal strBaseFilePath As String, ByRef lngTotalBytesRead As Long) As Long
     ' Returns 0 if no error, the error number if an error
 
     Dim tsInFile As TextStream
@@ -1149,8 +1224,8 @@ On Error GoTo ReadCSVScanFileErrorHandler
         intColumnMapping(lngIndex) = -1
     Next lngIndex
     
-    If Len(strBaseName) = 0 Then
-        strBaseName = fso.GetBaseName(strScansFilePath)
+    If Len(strBaseFilePath) = 0 Then
+        strBaseFilePath = fso.GetBaseName(strScansFilePath)
     End If
     
     frmProgress.UpdateCurrentSubTask "Reading Scan Info file"
@@ -1297,7 +1372,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
                         .ScanType = intScanType
                         If .ScanType < 1 Then .ScanType = 1
     
-                        .ScanFileName = strBaseName & "." & Format(.ScanNumber, "00000")
+                        .ScanFileName = strBaseFilePath & "." & Format(.ScanNumber, "00000")
                         .ScanPI = 0
     
                         .NumDeisotoped = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.NumDeisotoped), 0)
@@ -1358,7 +1433,27 @@ ReadCSVScanFileErrorHandler:
 
 End Function
 
-Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScansFilePath As String, ByRef strIsosFilePath As String, ByRef strBaseName As String) As Boolean
+Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
+                                      ByVal strLCMSFeaturesFilePath As String, _
+                                      ByVal strLCMSFeatureToPeakMapFilePath As String, _
+                                      ByVal sngAutoMapDataPointsMassTolerancePPM As Single) As Long
+                                      
+    Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
+    Dim lngReturnCode As Long
+    
+    Set objReadLCMSFeatures = New clsFileIOPredefinedLCMSFeatures
+    
+    
+    objReadLCMSFeatures.ShowDialogBoxes = Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled
+    objReadLCMSFeatures.AutoMapDataPointsMassTolerancePPM = sngAutoMapDataPointsMassTolerancePPM
+    
+    lngReturnCode = objReadLCMSFeatures.LoadLCMSFeatureFiles(strLCMSFeaturesFilePath, strLCMSFeatureToPeakMapFilePath, mGelIndex)
+    
+    ReadLCMSFeatureFiles = lngReturnCode
+    
+End Function
+
+Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScansFilePath As String, ByRef strIsosFilePath As String, ByRef strBaseFilePath As String) As Boolean
     ' Define the _scans.csv and _isos.csv FilePaths, given strFilePath
     ' strFilePath could contain either the _scans.csv name or the _isos.csv name
     ' Does not confirm that the files actually exist
@@ -1370,22 +1465,22 @@ Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScans
     blnSuccess = False
     strScansFilePath = ""
     strIsosFilePath = ""
-    strBaseName = ""
+    strBaseFilePath = ""
     
     lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_SCANS_FILE_SUFFIX))
     If lngCharLoc >= 1 Then
         ' strFilePath contains the _scans.csv file to this function
         ' Look for the corresponding _isos.csv file
         strScansFilePath = strFilePath
-        strBaseName = Left(strFilePath, lngCharLoc - 1)
-        strIsosFilePath = strBaseName & CSV_ISOS_IC_FILE_SUFFIX
+        strBaseFilePath = Left(strFilePath, lngCharLoc - 1)
+        strIsosFilePath = strBaseFilePath & CSV_ISOS_IC_FILE_SUFFIX
         
         If Not FileExists(strIsosFilePath) Then
-            strIsosFilePath = strBaseName & CSV_ISOS_PAIRS_SUFFIX
+            strIsosFilePath = strBaseFilePath & CSV_ISOS_PAIRS_SUFFIX
         End If
         
         If Not FileExists(strIsosFilePath) Then
-            strIsosFilePath = strBaseName & CSV_ISOS_FILE_SUFFIX
+            strIsosFilePath = strBaseFilePath & CSV_ISOS_FILE_SUFFIX
         End If
         
         blnSuccess = True
@@ -1412,8 +1507,8 @@ Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScans
         If lngCharLoc >= 1 Then
             strIsosFilePath = strFilePath
             
-            strBaseName = Left(strFilePath, lngCharLoc - 1)
-            strScansFilePath = strBaseName & CSV_SCANS_FILE_SUFFIX
+            strBaseFilePath = Left(strFilePath, lngCharLoc - 1)
+            strScansFilePath = strBaseFilePath & CSV_SCANS_FILE_SUFFIX
             
             blnSuccess = True
         Else

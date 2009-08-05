@@ -1066,7 +1066,7 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
        If chkRemovePairedLUMC.Value = vbChecked Then
           If .PCnt > 0 And PairsUMCInSync Then
              For i = 0 To .PCnt - 1
-                 TmpInc(.Pairs(i).P1) = REMOVE_UMC_MARK
+                 TmpInc(.Pairs(i).p1) = REMOVE_UMC_MARK
              Next i
           End If
           If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
@@ -1075,7 +1075,7 @@ On Error GoTo AutoRemoveUMCsWorkErrorHandler
        If chkRemovePairedHUMC.Value = vbChecked Then
           If .PCnt > 0 And PairsUMCInSync Then
              For i = 0 To .PCnt - 1
-                 TmpInc(.Pairs(i).P2) = REMOVE_UMC_MARK
+                 TmpInc(.Pairs(i).p2) = REMOVE_UMC_MARK
              Next i
           End If
           If Len(strProcessSummary) > 0 Then strProcessSummary = strProcessSummary & "; "
@@ -1430,7 +1430,7 @@ If NeedToSave Then
       GelUMC(CallerID) = tmp
       
       ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-      UpdateUMCStatArrays CallerID, False, Me
+      UpdateUMCStatArrays CallerID, True, False, Me
       
       GelP_D_L(CallerID).SyncWithUMC = PairsUMCInSync
       AddToAnalysisHistory CallerID, mChangeList, False

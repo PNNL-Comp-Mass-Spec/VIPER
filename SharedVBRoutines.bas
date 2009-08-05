@@ -2475,6 +2475,54 @@ ShellSortErrorHandler:
     Debug.Assert False
 End Sub
 
+Public Sub ShellSortLongWithParallelLong(ByRef lngArray() As Long, ByRef lngParallelArray() As Long, ByVal lngLowIndex As Long, ByVal lngHighIndex As Long)
+    Dim lngCount As Long
+    Dim lngIncrement As Long
+    Dim lngIndex As Long
+    Dim lngIndexCompare As Long
+    Dim lngCompareVal As Long
+    Dim lngSwap As Long
+
+On Error GoTo ShellSortErrorHandler
+
+' sort array[lngLowIndex..lngHighIndex]
+
+    ' compute largest increment
+    lngCount = lngHighIndex - lngLowIndex + 1
+    lngIncrement = 1
+    If (lngCount < 14) Then
+        lngIncrement = 1
+    Else
+        Do While lngIncrement < lngCount
+            lngIncrement = 3 * lngIncrement + 1
+        Loop
+        lngIncrement = lngIncrement \ 3
+        lngIncrement = lngIncrement \ 3
+    End If
+
+    Do While lngIncrement > 0
+        ' sort by insertion in increments of lngIncrement
+        For lngIndex = lngLowIndex + lngIncrement To lngHighIndex
+            lngCompareVal = lngArray(lngIndex)
+            lngSwap = lngParallelArray(lngIndex)
+            For lngIndexCompare = lngIndex - lngIncrement To lngLowIndex Step -lngIncrement
+                ' Use <= to sort ascending; Use > to sort descending
+                If lngArray(lngIndexCompare) <= lngCompareVal Then Exit For
+                lngArray(lngIndexCompare + lngIncrement) = lngArray(lngIndexCompare)
+                lngParallelArray(lngIndexCompare + lngIncrement) = lngParallelArray(lngIndexCompare)
+            Next lngIndexCompare
+            lngArray(lngIndexCompare + lngIncrement) = lngCompareVal
+            lngParallelArray(lngIndexCompare + lngIncrement) = lngSwap
+        Next lngIndex
+        lngIncrement = lngIncrement \ 3
+    Loop
+    
+    Exit Sub
+
+ShellSortErrorHandler:
+    Debug.Assert False
+End Sub
+
 Public Sub ShellSortSingleWithParallelLong(ByRef sngArray() As Single, ByRef lngParallelArray() As Long, ByVal lngLowIndex As Long, ByVal lngHighIndex As Long)
     Dim lngCount As Long
     Dim lngIncrement As Long

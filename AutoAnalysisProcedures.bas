@@ -2815,6 +2815,11 @@ On Error GoTo LoadInputFileErrorHandler
                             .TotalIntensityPercentageFilter = val(strKeyValue)
                         End If
                     End If
+
+                    strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "AutoMapDataPointsMassTolerancePPM", Trim(.AutoMapDataPointsMassTolerancePPM), udtAutoParams.FilePaths.IniFilePath)
+                    If IsNumeric(strKeyValue) Then
+                        .AutoMapDataPointsMassTolerancePPM = val(strKeyValue)
+                    End If
                 
                 End With
                 
@@ -2886,6 +2891,8 @@ On Error GoTo LoadInputFileErrorHandler
                         .TotalIntensityPercentageFilterEnabled = True
                         .TotalIntensityPercentageFilter = DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD
                     End If
+                    
+                    .AutoMapDataPointsMassTolerancePPM = 5
                 End With
                 
                 .AutoAnalysisOptions.GenerateMonoPlus4IsoLabelingFile = False
@@ -3832,7 +3839,7 @@ On Error GoTo RemovePairMemberHitsErrorHandler
         AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage & strMessageSuffix
                     
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
-        UpdateUMCStatArrays udtWorkingParams.GelIndex, False
+        UpdateUMCStatArrays udtWorkingParams.GelIndex, True, False
         
         ' Now that we have removed some LC-MS Features, we need to remove any pairs that used those LC-MS Features
         With GelP_D_L(udtWorkingParams.GelIndex)
@@ -6073,7 +6080,7 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
 ''                dblMassErrorOverallSaved = .OverallMassAdjustment
 ''                eMassUnitsSaved = .MassUnits
 ''                blnSuccess = MassCalibrationRevertToOriginal(udtWorkingParams.GelIndex, False, False)
-''                blnSuccess = UpdateUMCStatArrays(lngGelIndex, False, objCallingForm)
+''                blnSuccess = UpdateUMCStatArrays(lngGelIndex, True, False, objCallingForm)
 ''            Else
 ''                dblMassErrorOverallSaved = 0
 ''            End If

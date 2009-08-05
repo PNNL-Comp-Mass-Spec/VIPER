@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Object = "{C02A7541-5364-11D2-9373-00A02411EBE6}#1.6#0"; "cw3dgrph.ocx"
 Begin VB.Form frmMSAlign 
@@ -2333,8 +2333,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   3.74843621077839E-287
-         DataMax_5       =   3.74843621077839E-287
+         DataMin_5       =   4.01897889775899E-287
+         DataMax_5       =   4.01897889775899E-287
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2400,8 +2400,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   3.7337456566961E-287
-         DataMax_14      =   3.7337456566961E-287
+         DataMin_14      =   4.05759922206535E-287
+         DataMax_14      =   4.05759922206535E-287
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2469,8 +2469,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   3.72228181367418E-287
-         DataMax_23      =   3.72228181367418E-287
+         DataMin_23      =   4.07178873405752E-287
+         DataMax_23      =   4.07178873405752E-287
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -3704,27 +3704,7 @@ Private Sub CopyLocalDataToGel(strSecondsElapsed As String, blnUpdateMassValues 
     
     Dim blnSuccess As Boolean
     Dim dblMassError As Double
-    
-''    Dim blnMergeCachedResiduals As Boolean
-''
-''    ' 1a. scan vs. net error using linear function
-''    ' 1b. scan vs. net error using warping function
-''    ' 1c. scan vs. (net from ms warp - net from linear function)
-''    Dim dblScanMTNETvsLinearNETResidualOld() As Double
-''    Dim dblScanMTNETvsCustomNETResidualOld() As Double
-''    Dim dblScanCustomNetVsLinearNETResidualOld() As Double
-''
-''    ' 2a. scan vs. mass error before warping
-''    ' 2b. scan vs. mass error after warping
-''    Dim dblScanVsMassErrorOld() As Double
-''    Dim dblScanVsMassErrorCorrectedOld() As Double
-''
-''    ' 3a. m/z vs. mass error before warping
-''    ' 3b. m/z vs. mass error after warping
-''    Dim dblMZVsMassErrorOld() As Double
-''    Dim dblMZVsMassErrorCorrectedOld() As Double
-''
-    
+   
 On Error GoTo CopyLocalDataToGelErrorHandler
 
     '--------------------------------------------------
@@ -6320,7 +6300,7 @@ On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
 
         ' Recompute the UMC class mass stats
         UpdateStatus "Updating mass calibration: 100% done; now recomputing LC-MS Feature stats"
-        blnSuccess = CalculateClasses(CallerID, False, Me)
+        blnSuccess = CalculateClasses(CallerID, True, False, Me)
 
         ' Update mLocalFeatures
         PopulateLocalFeaturesArray False

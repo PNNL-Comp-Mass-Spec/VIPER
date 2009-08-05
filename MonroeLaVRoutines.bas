@@ -3678,7 +3678,16 @@ PairsPresentErrorHandler:
 
 End Function
 
-Public Function PairIndexLookupSearch(ByVal lngGelIndex As Long, ByVal lngUMCIndex As Long, ByRef objP1IndFastSearch As FastSearchArrayLong, ByRef objP2IndFastSearch As FastSearchArrayLong, ByVal blnReturnAllPairInstances As Boolean, ByVal blnFavorHeavy As Boolean, ByRef lngPairMatchCount As Long, ByRef udtPairMatchStats() As udtPairMatchStatsType, Optional ByVal dblValueIfERNotDefined As Double = ER_NO_RATIO) As Long
+Public Function PairIndexLookupSearch(ByVal lngGelIndex As Long, _
+                                      ByVal lngUMCIndex As Long, _
+                                      ByRef objP1IndFastSearch As FastSearchArrayLong, _
+                                      ByRef objP2IndFastSearch As FastSearchArrayLong, _
+                                      ByVal blnReturnAllPairInstances As Boolean, _
+                                      ByVal blnFavorHeavy As Boolean, _
+                                      ByRef lngPairMatchCount As Long, _
+                                      ByRef udtPairMatchStats() As udtPairMatchStatsType, _
+                                      Optional ByVal dblValueIfERNotDefined As Double = ER_NO_RATIO) As Long
+                                      
     ' Returns the index in GelP_D_L(lngGelIndex).P1() or GelP_D_L(lngGelIndex).P2() that contains lngUMCIndex
     ' In addition, returns various stats in udtPairMatchStats()
     '
@@ -3688,7 +3697,7 @@ Public Function PairIndexLookupSearch(ByVal lngGelIndex As Long, ByVal lngUMCInd
     '  looking for the pair with the closest ER value to that stored in the UMC
     ' This can be problematic, and isn't always desired, therefore this function has been updated to return arrays
     '  of the various stats, including an array of all of the pair indices that the UMC belongs to, with
-    '  the caveate that if blnReturnAllPairInstances = False, then the array only contains the pairs for which the UMC
+    '  the caveat that if blnReturnAllPairInstances = False, then the array only contains the pairs for which the UMC
     ' is the light member (if blnFavorHeavy = False) or for which the UMC is the heavy member (if blnFavorHeavy = True)
     ' If blnReturnAllPairInstances = True, then returns all instances of the UMC in all pairs, regardless of
     '  whether it is a light or a heavy member
@@ -4565,7 +4574,7 @@ Public Sub SmoothViaMovingAverage(dblArray() As Double, lngLowIndex As Long, lng
     ' If intSmoothsToPerform is > 1, then repeats the smooth multiple times
     
     Dim intIteration As Integer
-    Dim x As Long, y As Long
+    Dim X As Long, Y As Long
     Dim lngDataCount As Long
     
     Dim lngWindowHalfWidth As Long
@@ -4599,21 +4608,21 @@ On Error GoTo SmoothViaMovingAverageErrorHandler
         SmoothUsingMovingAverageEdgeMath dblArray, True, lngLowIndex, lngHighIndex, dblSmoothedData(), lngWindowSize
         
         ' Perform the smooth on the vast majority of points
-        For x = lngLowIndex + lngWindowHalfWidth To lngHighIndex - lngWindowHalfWidth
+        For X = lngLowIndex + lngWindowHalfWidth To lngHighIndex - lngWindowHalfWidth
             dblSum = 0
-            For y = 0 To lngWindowSize - 1
-                dblSum = dblSum + dblArray(x - lngWindowHalfWidth + y)
-            Next y
-            dblSmoothedData(x) = dblSum / lngWindowSize
-        Next x
+            For Y = 0 To lngWindowSize - 1
+                dblSum = dblSum + dblArray(X - lngWindowHalfWidth + Y)
+            Next Y
+            dblSmoothedData(X) = dblSum / lngWindowSize
+        Next X
         
         ' Smooth the last few points after a full window of points is available
         SmoothUsingMovingAverageEdgeMath dblArray, False, lngLowIndex, lngHighIndex, dblSmoothedData(), lngWindowSize
         
-        For x = lngLowIndex To lngHighIndex
+        For X = lngLowIndex To lngHighIndex
             ' Copy smoothed array to actual dblArray
-            dblArray(x) = dblSmoothedData(x)
-        Next x
+            dblArray(X) = dblSmoothedData(X)
+        Next X
     Next intIteration
     
     Exit Sub
@@ -4630,7 +4639,7 @@ Private Sub SmoothUsingMovingAverageEdgeMath(dblArray() As Double, blnSmoothBegi
     Dim StartIndex As Long, FinishIndex As Long
     Dim lngWindowHalfWidth As Long
     
-    Dim x As Long, y As Long, lngPointToUse As Long
+    Dim X As Long, Y As Long, lngPointToUse As Long
     Dim dblSum As Double, PointsUsed As Integer
     
     lngWindowHalfWidth = (lngWindowSize - 1) / 2
@@ -4645,11 +4654,11 @@ Private Sub SmoothUsingMovingAverageEdgeMath(dblArray() As Double, blnSmoothBegi
     
     
     ' Performs a shortened smooth at the beginning and end of a set of points
-    For x = StartIndex To FinishIndex
+    For X = StartIndex To FinishIndex
         dblSum = 0
         PointsUsed = 0
-        For y = 0 To lngWindowSize - 1
-            lngPointToUse = x - lngWindowHalfWidth + y
+        For Y = 0 To lngWindowSize - 1
+            lngPointToUse = X - lngWindowHalfWidth + Y
             If lngPointToUse >= lngLowIndex And lngPointToUse <= lngHighIndex Then
                 dblSum = dblSum + dblArray(lngPointToUse)
             Else
@@ -4660,11 +4669,11 @@ Private Sub SmoothUsingMovingAverageEdgeMath(dblArray() As Double, blnSmoothBegi
                 End If
             End If
             PointsUsed = PointsUsed + 1
-        Next y
+        Next Y
         If PointsUsed > 0 Then
-            dblSmoothedData(x) = dblSum / PointsUsed
+            dblSmoothedData(X) = dblSum / PointsUsed
         End If
-    Next x
+    Next X
 
 End Sub
 
@@ -5048,14 +5057,17 @@ UpdateNetAdjRangeStatsErrorHandler:
     lblNetAdjInitialNETStats = "Error computing Scan to NET examples"
 End Sub
 
-Public Function UpdateUMCStatArrays(ByVal lngGelIndex As Long, Optional ByVal blnUseProgressForm As Boolean = False, Optional ByRef frmCallingForm As VB.Form) As Boolean
+Public Function UpdateUMCStatArrays(ByVal lngGelIndex As Long, _
+                                    ByVal blnComputeClassMassAndAbundance As Boolean, _
+                                    Optional ByVal blnUseProgressForm As Boolean = False, _
+                                    Optional ByRef frmCallingForm As VB.Form) As Boolean
     ' Returns True if success, False otherwise
     
     Dim blnSuccess As Boolean
     
     If Not glAbortUMCProcessing Then
         ' Update the UMC Classes info
-        blnSuccess = CalculateClasses(lngGelIndex, blnUseProgressForm, frmCallingForm)
+        blnSuccess = CalculateClasses(lngGelIndex, blnComputeClassMassAndAbundance, blnUseProgressForm, frmCallingForm)
     End If
     
     If blnSuccess And Not glAbortUMCProcessing Then

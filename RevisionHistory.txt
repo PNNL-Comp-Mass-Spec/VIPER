@@ -1,5 +1,26 @@
 VIPER Change Log
 
+Version 3.45 - Build 411; August 5, 2009
+	- Added ability to load _LCMSFeatures.txt files
+		- These files are created by LCMSFeatureFinder.exe or by a similar program
+		- Expected columns: Feature_Index	Scan	Scan_Start	Scan_End	Scan_Aligned	NET	Monoisotopic_Mass	Monoisotopic_Mass_Calibrated	Abundance	Class_Rep_MZ	Class_Rep_Charge
+		- User must also provide Decon2LS _isos.csv and _scans.csv files during loading
+		- User should also provide a _LCMSFeatureToPeakMap.txt file, though this is not required
+		- If a _LCMSFeatureToPeakMap.txt file is not available, then VIPER will automatically map the loaded data points to the LC-MS features by looking for data points within the scan range of the LCMSFeature and within a user defined mass tolerance of the feature's class mass
+
+Version 3.45 - Build 410; July 27, 2009
+	- Updated "Copy UMCs in View" to include column PairMemberType, which allows the user to determine if a given UMC is the light or heavy member of a pair
+		- 0 for not paired, 1 for light, 2 for heavy
+	- On the Conglomerate UMC search form, now reporting all pairs that a UMC is a member of when the user choose "Report Results by UMCs" or "Export Results to MT Tag DB"
+	- On the Conglomerate UMC search form, the "Report Results by UMCs" report now includes column PairMemberType
+
+Version 3.45 - Build 409; July 22, 2009
+	- Removed MwtWinDLL.dll from the installer
+		- This DLL has not been required since September 2006
+
+Version 3.45 - Build 409; June 25, 2009
+	- Fixed bug that always applied the IsotopicFitFilter value during automated analysis
+
 Version 3.45 - Build 408; June 17, 2009
 	- Added ability to pause between LCMSWarp iterations when the Split Warp by m/z option is enabled
 		- Useful for inspecting the results of the the alignment for the previous iteration
@@ -85,6 +106,11 @@ Version 3.45 - Build 397; September 3, 2008
 		- The decoy mod type is very similar to the Dynamic Mass mod type, with the difference that the NET values of the dynamically added AMTs will be shifted away from the NET of the original AMT
 		- The amount the NET is shifted by is the Decoy NET Wobble amount; the NET is randomly shifted right or left by the amount specified by the user
 		- Note that the random number generator is re-seeded with the same seed every time, guaranteeing that the NETs are wobbled randomly, yet repeatedly the same
+	- In the .Ini file, renamed DynamicMods to ModMode
+		- Currently supported ModMods:
+			ModMode 0:  fixed (static mods); used to be DynamicMods=False
+			ModMode 1:  dynamic mods;        used to be DynamicMods=True
+			ModMode 2:  decoy mods (like dynamic mods, but the NET value is varied for added AMTs)
 
 Version 3.45 - Build 395; August 8, 2008
 	- Updated to track IMS drift time when column drift_time is present in the _isos.csv file

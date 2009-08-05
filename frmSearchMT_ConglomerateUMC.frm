@@ -762,6 +762,7 @@ Private InternalStdFastSearch As MWUtil
 Private AlkMWCorrection As Double
 Private N14N15 As Long                  ' SEARCH_N14 or SEARCH_N15
 Private SearchType As Long              ' SEARCH_ALL, SEARCH_PAIRED, SEARCH_NON_PAIRED, or SEARCH_PAIRED_PLUS_NON_PAIRED
+Private mMTListContains16O18OMods As Boolean            ' Set to True when the user enters a full-peptide modification of 4.0085 Da (+/- 0.01 Da)
 Private mSearchRegionShape As srsSearchRegionShapeConstants
 
 Private LastSearchTypeN14N15 As Long
@@ -1315,7 +1316,12 @@ End Function
 ''            ReDim udtPairMatchStats(0)
 ''            InitializePairMatchStats udtPairMatchStats(0)
 ''            If eClsPaired(lngUMCIndexOriginal) <> umcpNone And blnPairsPresent Then
-''                lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndexOriginal, objP1IndFastSearch, objP2IndFastSearch, False, (LastSearchTypeN14N15 = SEARCH_N15), lngPairMatchCount, udtPairMatchStats())
+''                 blnReturnAllPairInstances = True
+''                 blnFavorHeavy = (LastSearchTypeN14N15 = SEARCH_N15)
+''                 lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndexOriginal, _
+''                                                 objP1IndFastSearch, objP2IndFastSearch, _
+''                                                 blnReturnAllPairInstances, blnFavorHeavy, _
+''                                                 lngPairMatchCount, udtPairMatchStats())
 ''            End If
 ''
 ''            ' If pairs exist, then we need to output an entry for each pair that this UMC is a member of
@@ -1395,13 +1401,14 @@ Dim lngUMCIndexOriginalLastStored As Long
 
 Dim lngUMCIndexOriginalPairOther As Long
 Dim lngPeakFPRType As Long
-Dim lngPeakFPRTypeLight As Long, lngPeakFPRTypeHeavy As Long
 
 Dim lngPairIndex As Long
 
 Dim objP1IndFastSearch As FastSearchArrayLong
 Dim objP2IndFastSearch As FastSearchArrayLong
 Dim blnPairsPresent As Boolean
+Dim blnReturnAllPairInstances As Boolean
+Dim blnFavorHeavy As Boolean
 
 Dim lngPairMatchCount As Long, lngPairMatchIndex As Long
 Dim udtPairMatchStats() As udtPairMatchStatsType
@@ -1509,9 +1516,6 @@ Case SEARCH_N15
      NTypeStr = MOD_TKN_N15
 End Select
 
-lngPeakFPRTypeLight = PairsLookupFPRType(CallerID, False)
-lngPeakFPRTypeHeavy = PairsLookupFPRType(CallerID, True)
-
 Me.Caption = "Exporting LC-MS Features to DB: 0 / " & Trim(mMatchStatsCount)
 
 'now export data
@@ -1564,7 +1568,13 @@ InternalStdExpCnt = 0
             ReDim udtPairMatchStats(0)
             InitializePairMatchStats udtPairMatchStats(0)
             If eClsPaired(lngUMCIndexOriginal) <> umcpNone And blnPairsPresent Then
-                lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndexOriginal, objP1IndFastSearch, objP2IndFastSearch, False, (LastSearchTypeN14N15 = SEARCH_N15), lngPairMatchCount, udtPairMatchStats())
+                blnReturnAllPairInstances = True
+                blnFavorHeavy = (LastSearchTypeN14N15 = SEARCH_N15)
+                
+                lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndexOriginal, _
+                                                     objP1IndFastSearch, objP2IndFastSearch, _
+                                                     blnReturnAllPairInstances, blnFavorHeavy, _
+                                                     lngPairMatchCount, udtPairMatchStats())
             End If
           
             ' If pairs exist, then we need to output an entry for each pair that this UMC is a member of
@@ -1574,10 +1584,10 @@ InternalStdExpCnt = 0
                 For lngPairMatchIndex = 0 To lngPairMatchCount - 1
                     ' Lookup whether this UMC is the light or heavy member in the pair
                     With GelP_D_L(CallerID).Pairs(udtPairMatchStats(lngPairMatchIndex).PairIndex)
-                        If .P1 = lngUMCIndexOriginal Then
-                            lngPeakFPRType = lngPeakFPRTypeLight
+                        If .p1 = lngUMCIndexOriginal Then
+                            lngPeakFPRType = FPR_Type_N14_N15_L      ' Light member of pair
                         Else
-                            lngPeakFPRType = lngPeakFPRTypeHeavy
+                            lngPeakFPRType = FPR_Type_N14_N15_H      ' Heavy member of pair
                         End If
                     End With
                     
@@ -1590,14 +1600,14 @@ InternalStdExpCnt = 0
                     ' Add the other member of the pair too (typically the heavy member)
                     ' Need to determine the UMC index for the other member of the pair
                     With GelP_D_L(CallerID).Pairs(udtPairMatchStats(lngPairMatchIndex).PairIndex)
-                        If .P1 = lngUMCIndexOriginal Then
+                        If .p1 = lngUMCIndexOriginal Then
                             ' Already saved the light member, now save the heavy member
-                            lngUMCIndexOriginalPairOther = .P2
-                            lngPeakFPRType = lngPeakFPRTypeHeavy
+                            lngUMCIndexOriginalPairOther = .p2
+                            lngPeakFPRType = FPR_Type_N14_N15_H
                         Else
                             ' Already saved the heavy member, now save the light member
-                            lngUMCIndexOriginalPairOther = .P1
-                            lngPeakFPRType = lngPeakFPRTypeLight
+                            lngUMCIndexOriginalPairOther = .p1
+                            lngPeakFPRType = FPR_Type_N14_N15_L
                         End If
                         
                         ' Always export the other member of the pair, even if it has already been exported
@@ -1670,7 +1680,13 @@ InternalStdExpCnt = 0
                         ReDim udtPairMatchStats(0)
                         InitializePairMatchStats udtPairMatchStats(0)
                         If eClsPaired(lngUMCIndex) <> umcpNone And blnPairsPresent Then
-                            lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndex, objP1IndFastSearch, objP2IndFastSearch, False, (LastSearchTypeN14N15 = SEARCH_N15), lngPairMatchCount, udtPairMatchStats())
+                            blnReturnAllPairInstances = True
+                            blnFavorHeavy = (LastSearchTypeN14N15 = SEARCH_N15)
+                            
+                            lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndex, _
+                                                                 objP1IndFastSearch, objP2IndFastSearch, _
+                                                                 blnReturnAllPairInstances, blnFavorHeavy, _
+                                                                 lngPairMatchCount, udtPairMatchStats())
                         End If
                             
                         ' If pairs exist, then we need to output an entry for each pair that this UMC is a member of
@@ -1678,10 +1694,10 @@ InternalStdExpCnt = 0
                             For lngPairMatchIndex = 0 To lngPairMatchCount - 1
                                 ' Lookup whether this UMC is the light or heavy member in the pair
                                 With GelP_D_L(CallerID).Pairs(udtPairMatchStats(lngPairMatchIndex).PairIndex)
-                                    If .P1 = lngUMCIndex Then
-                                        lngPeakFPRType = lngPeakFPRTypeLight
+                                    If .p1 = lngUMCIndex Then
+                                        lngPeakFPRType = FPR_Type_N14_N15_L      ' Light member of pair
                                     Else
-                                        lngPeakFPRType = lngPeakFPRTypeHeavy
+                                        lngPeakFPRType = FPR_Type_N14_N15_H      ' Heavy member of pair
                                     End If
                                 End With
                                         
@@ -2302,6 +2318,14 @@ Private Function PrepareMTArrays() As Boolean
         
         .ModMode = GetDBSearchModeType()
     End With
+    
+    ' Check whether the user is using a 4.0085 Da, full peptide modification, which would indicate 16O/18O modification
+    If Abs(dblResidueModMass - glO16O18_DELTA) <= 0.01 And Len(strResiduesToModify) = 0 Then
+        mMTListContains16O18OMods = True
+    Else
+        mMTListContains16O18OMods = False
+    End If
+    
     
     If IsNumeric(txtDBSearchMinimumHighNormalizedScore.Text) Then
         mMTMinimumHighNormalizedScore = CSngSafe(txtDBSearchMinimumHighNormalizedScore.Text)
@@ -3747,6 +3771,11 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     Dim lngPairMatchCount As Long, lngPairMatchIndex As Long
     Dim udtPairMatchStats() As udtPairMatchStatsType
     
+    Dim blnReturnAllPairInstances As Boolean
+    Dim blnFavorHeavy As Boolean
+    
+    Dim lngPeakFPRType As Long
+    
 On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     
     If blnIncludeORFInfo Then
@@ -3781,9 +3810,9 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     
     strSepChar = LookupDefaultSeparationCharacter()
     
-    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
+    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; PairMemberType; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
-    strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar
+    strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar & "PairMemberType" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar
     strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar & "Peptide" & strSepChar
@@ -3911,14 +3940,29 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
         ReDim udtPairMatchStats(0)
         InitializePairMatchStats udtPairMatchStats(0)
         If eClsPaired(lngUMCIndexOriginal) <> umcpNone And blnPairsPresent Then
-            lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndexOriginal, objP1IndFastSearch, objP2IndFastSearch, False, (LastSearchTypeN14N15 = SEARCH_N15), lngPairMatchCount, udtPairMatchStats())
+            blnReturnAllPairInstances = True
+            blnFavorHeavy = (LastSearchTypeN14N15 = SEARCH_N15)
+            
+            lngPairIndex = PairIndexLookupSearch(CallerID, lngUMCIndexOriginal, _
+                                                 objP1IndFastSearch, objP2IndFastSearch, _
+                                                 blnReturnAllPairInstances, blnFavorHeavy, _
+                                                 lngPairMatchCount, udtPairMatchStats())
         End If
         
         strLineOutEndAddnl = ""
         If lngPairMatchCount > 0 Then
             For lngPairMatchIndex = 0 To lngPairMatchCount - 1
+                ' Lookup whether this UMC is the light or heavy member in the pair
+                With GelP_D_L(CallerID).Pairs(udtPairMatchStats(lngPairMatchIndex).PairIndex)
+                    If .p1 = lngUMCIndexOriginal Then
+                        lngPeakFPRType = FPR_Type_N14_N15_L      ' Light member of pair
+                    Else
+                        lngPeakFPRType = FPR_Type_N14_N15_H      ' Heavy member of pair
+                    End If
+                End With
+                
                 With udtPairMatchStats(lngPairMatchIndex)
-                    strLineOutMiddle = Trim(.PairIndex) & strSepChar & Trim(.ExpressionRatio) & strSepChar & Trim(.ExpressionRatioStDev) & strSepChar & Trim(.ExpressionRatioChargeStateBasisCount) & strSepChar & Trim(.ExpressionRatioMemberBasisCount) & strSepChar
+                    strLineOutMiddle = Trim(.PairIndex) & strSepChar & Trim(lngPeakFPRType) & strSepChar & Trim(.ExpressionRatio) & strSepChar & Trim(.ExpressionRatioStDev) & strSepChar & Trim(.ExpressionRatioChargeStateBasisCount) & strSepChar & Trim(.ExpressionRatioMemberBasisCount) & strSepChar
                     
                     If blnCorrectedIReportEREnabled Then
                         strLineOutEndAddnl = strSepChar & Round(.LabellingEfficiencyF, 4) & strSepChar & .LogERCorrectedForF & strSepChar & .LogERStandardError
@@ -3938,7 +3982,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             Next lngPairMatchIndex
         Else
             ' No pair, and thus no expression ratio values
-            strLineOutMiddle = Trim(-1) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar
+            strLineOutMiddle = Trim(-1) & strSepChar & Trim(-1) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar
             
             If blnCorrectedIReportEREnabled Then
                 strLineOutEndAddnl = strSepChar & "0" & strSepChar & "0" & strSepChar & "0"

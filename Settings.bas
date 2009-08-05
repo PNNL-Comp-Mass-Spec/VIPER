@@ -1463,6 +1463,8 @@ On Error GoTo LoadSettingsFileHandler
             
             .TotalIntensityPercentageFilterEnabled = GetIniFileSettingBln(IniStuff, "AutoAnalysisFilterPrefs", "TotalIntensityPercentageFilterEnabled", .TotalIntensityPercentageFilterEnabled)
             .TotalIntensityPercentageFilter = GetIniFileSettingSng(IniStuff, "AutoAnalysisFilterPrefs", "TotalIntensityPercentageFilter", .TotalIntensityPercentageFilter)
+            
+            .AutoMapDataPointsMassTolerancePPM = GetIniFileSettingSng(IniStuff, "AutoAnalysisFilterPrefs", "AutoMapDataPointsMassTolerancePPM", .AutoMapDataPointsMassTolerancePPM)
         End With
         
         ' Now attempt to load the database connection info
@@ -2528,6 +2530,8 @@ On Error GoTo SaveSettingsFileHandler
         ' Total Intensity Percentage Filter
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "TotalIntensityPercentageFilterEnabled", .TotalIntensityPercentageFilterEnabled
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "TotalIntensityPercentageFilter", .TotalIntensityPercentageFilter
+        
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "AutoMapDataPointsMassTolerancePPM", .AutoMapDataPointsMassTolerancePPM
     
     End With
     IniStuff.WriteSection "AutoAnalysisFilterPrefs", sKeys(), sVals(), iKVCount
@@ -3760,6 +3764,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .TotalIntensityPercentageFilterEnabled = False
                 .TotalIntensityPercentageFilter = DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD
                 
+                .AutoMapDataPointsMassTolerancePPM = 5
             End With
         End If
         

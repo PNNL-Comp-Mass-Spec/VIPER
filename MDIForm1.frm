@@ -842,7 +842,7 @@ If Not MyAnalysisInit.NewAnalysis Is Nothing Then
                   OpenResult = -50
                 End If
             Else
-                OpenResult = LoadNewData(sFileName, Ind, True)
+                OpenResult = LoadNewData(fso, sFileName, Ind, True, "")
             End If
         End If
         

@@ -4092,6 +4092,8 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim lngPairMatchCount As Long, lngPairMatchIndex As Long
     Dim udtPairMatchStats() As udtPairMatchStatsType
 
+    Dim lngPeakFPRType As Long
+
     Dim intIsotopeLabelIndex As Integer
     Dim eIsotopeLabelCurrent As iltIsotopeLabelTagConstants
     Dim blnIsotopeLabelPresent(ISOTOPE_LABEL_TAG_CONSTANT_COUNT) As Boolean
@@ -4288,7 +4290,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
          strLineOut = strLineOut & "PercentMembersNormal" & strSepChar & "PercentMembersMonoPlus4" & strSepChar & "PercentMembersMonoMinus4" & strSepChar
     End If
 
-    strLineOut = strLineOut & "PairIndex" & strSepChar & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
+    strLineOut = strLineOut & "PairIndex" & strSepChar & "PairMemberType" & strSepChar & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar & "Peptide"
     
     With GelP_D_L(nMyIndex)
@@ -4454,8 +4456,17 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
         strLineOutEndAddnl = ""
         If lngPairMatchCount > 0 Then
             For lngPairMatchIndex = 0 To lngPairMatchCount - 1
+                ' Lookup whether this UMC is the light or heavy member in the pair
+                With GelP_D_L(nMyIndex).Pairs(udtPairMatchStats(lngPairMatchIndex).PairIndex)
+                    If .p1 = lngUMCIndexOriginal Then
+                        lngPeakFPRType = FPR_Type_N14_N15_L      ' Light member of pair
+                    Else
+                        lngPeakFPRType = FPR_Type_N14_N15_H      ' Heavy member of pair
+                    End If
+                End With
+
                 With udtPairMatchStats(lngPairMatchIndex)
-                    strLineOutMiddle = Trim(.PairIndex) & strSepChar & Trim(.ExpressionRatio) & strSepChar & Trim(.ExpressionRatioStDev) & strSepChar & Trim(.ExpressionRatioChargeStateBasisCount) & strSepChar & Trim(.ExpressionRatioMemberBasisCount) & strSepChar
+                    strLineOutMiddle = Trim(.PairIndex) & strSepChar & Trim(lngPeakFPRType) & strSepChar & Trim(.ExpressionRatio) & strSepChar & Trim(.ExpressionRatioStDev) & strSepChar & Trim(.ExpressionRatioChargeStateBasisCount) & strSepChar & Trim(.ExpressionRatioMemberBasisCount) & strSepChar
                     
                     If blnCorrectedIReportEREnabled Then
                         strLineOutEndAddnl = strSepChar & Round(.LabellingEfficiencyF, 4) & strSepChar & .LogERCorrectedForF & strSepChar & .LogERStandardError
@@ -4466,7 +4477,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             Next lngPairMatchIndex
         Else
             ' No pair, and thus no expression ratio values
-            strLineOutMiddle = Trim(-1) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar
+            strLineOutMiddle = Trim(-1) & strSepChar & Trim(-1) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar & Trim(0) & strSepChar
             
             If blnCorrectedIReportEREnabled Then
                 strLineOutEndAddnl = strSepChar & "0" & strSepChar & "0" & strSepChar & "0"

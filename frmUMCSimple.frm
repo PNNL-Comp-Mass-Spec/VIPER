@@ -1632,7 +1632,7 @@ On Error GoTo UMCSearchErrorHandler
        
        If Not blnUMCIndicesUpdated Then
            ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-           If Not UpdateUMCStatArrays(CallerID, False, Me) Then GoTo ExitIfFailed
+           If Not UpdateUMCStatArrays(CallerID, True, False, Me) Then GoTo ExitIfFailed
        End If
        
        ' Note: we need to update GelSearchDef before calling SplitUMCsByAbundance

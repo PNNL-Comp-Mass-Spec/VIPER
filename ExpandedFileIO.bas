@@ -257,7 +257,7 @@ On Error GoTo BinaryLoadDataErrorHandler
         
         If blnUMCDataLoaded Then
             ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-            UpdateUMCStatArrays lngGelIndex, True
+            UpdateUMCStatArrays lngGelIndex, True, False
         End If
     
     End If
@@ -1181,9 +1181,9 @@ Private Sub CopyDeltaLabelPairDetails2004bToCurrent(ByVal OldPairDetailsCount As
                 ReDim .Pairs(MaxInd)
                 For i = 0 To MaxInd
                     With .Pairs(i)
-                        .P1 = OldDeltaLabelPairDetails(i).P1
+                        .p1 = OldDeltaLabelPairDetails(i).p1
                         .P1LblCnt = OldDeltaLabelPairDetails(i).P1LblCnt
-                        .P2 = OldDeltaLabelPairDetails(i).P2
+                        .p2 = OldDeltaLabelPairDetails(i).p2
                         .P2DltCnt = OldDeltaLabelPairDetails(i).P2DltCnt
                         .P2LblCnt = OldDeltaLabelPairDetails(i).P2LblCnt
                         .ER = OldDeltaLabelPairDetails(i).ER
@@ -1258,14 +1258,14 @@ Private Sub CopyDeltaLabelPairs2003ToCurrent(OldDeltaLabelPairs As IsoPairsDltLb
         .PCnt = OldDeltaLabelPairs.PCnt
         
         If OldDeltaLabelPairs.PCnt > 0 Then
-            MaxInd = UBound(OldDeltaLabelPairs.P1)
+            MaxInd = UBound(OldDeltaLabelPairs.p1)
             If MaxInd > 0 Then
                 ReDim .Pairs(MaxInd)
                 For i = 0 To MaxInd
                     With .Pairs(i)
-                        .P1 = OldDeltaLabelPairs.P1(i)
+                        .p1 = OldDeltaLabelPairs.p1(i)
                         .P1LblCnt = OldDeltaLabelPairs.P1LblCnt(i)
-                        .P2 = OldDeltaLabelPairs.P2(i)
+                        .p2 = OldDeltaLabelPairs.p2(i)
                         .P2DltCnt = OldDeltaLabelPairs.P2DltCnt(i)
                         .P2LblCnt = OldDeltaLabelPairs.P2LblCnt(i)
                         .ER = OldDeltaLabelPairs.P1P2ER(i)
@@ -1343,9 +1343,9 @@ Private Sub CopyDeltaLabelPairs2004aToCurrent(OldDeltaLabelPairs As IsoPairsDltL
                 ReDim .Pairs(MaxInd)
                 For i = 0 To MaxInd
                     With .Pairs(i)
-                        .P1 = OldDeltaLabelPairs.Pairs(i).P1
+                        .p1 = OldDeltaLabelPairs.Pairs(i).p1
                         .P1LblCnt = OldDeltaLabelPairs.Pairs(i).P1LblCnt
-                        .P2 = OldDeltaLabelPairs.Pairs(i).P2
+                        .p2 = OldDeltaLabelPairs.Pairs(i).p2
                         .P2DltCnt = OldDeltaLabelPairs.Pairs(i).P2DltCnt
                         .P2LblCnt = OldDeltaLabelPairs.Pairs(i).P2LblCnt
                         .ER = OldDeltaLabelPairs.Pairs(i).ER

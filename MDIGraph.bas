@@ -772,9 +772,9 @@ Public Type IsoPairsDltLbl2003Type
    DltMW As Double
    ERCalcType As Long                               ' Actually type ectERCalcTypeConstants, though can also be glER_None = 0
    PCnt As Long             'count of pairs
-   P1() As Long             'index of light member; pointer to index in GelUMC if UMC-based pairs
+   p1() As Long             'index of light member; pointer to index in GelUMC if UMC-based pairs
    P1LblCnt() As Integer    'number of PEO labels in light member
-   P2() As Long             'index of heavy member; pointer to index in GelUMC if UMC-based pairs
+   p2() As Long             'index of heavy member; pointer to index in GelUMC if UMC-based pairs
    P2DltCnt() As Integer    'count of N deltas
    P2LblCnt() As Integer    'count of PEO labels in heavy member
    P1P2ER() As Double       'expression ratio
@@ -788,9 +788,9 @@ End Type
 
 ' Old structure
 Public Type udtIsoPairsDetails2004aType
-    P1 As Long                      'index of light member; pointer to index in GelUMC if UMC-based pairs
+    p1 As Long                      'index of light member; pointer to index in GelUMC if UMC-based pairs
     P1LblCnt As Integer             'number of PEO labels in light member
-    P2 As Long                      'index of heavy member; pointer to index in GelUMC if UMC-based pairs
+    p2 As Long                      'index of heavy member; pointer to index in GelUMC if UMC-based pairs
     P2DltCnt As Integer             'count of N deltas
     P2LblCnt As Integer             'count of PEO labels in heavy member
     ER As Double                    'expression ratio
@@ -802,9 +802,9 @@ End Type
 
 ' Old Structure
 Public Type udtIsoPairsDetails2004bType
-    P1 As Long                      'index of light member; pointer to index in GelUMC if UMC-based pairs
+    p1 As Long                      'index of light member; pointer to index in GelUMC if UMC-based pairs
     P1LblCnt As Integer             'number of PEO labels in light member
-    P2 As Long                      'index of heavy member; pointer to index in GelUMC if UMC-based pairs
+    p2 As Long                      'index of heavy member; pointer to index in GelUMC if UMC-based pairs
     P2DltCnt As Integer             'count of N deltas
     P2LblCnt As Integer             'count of PEO labels in heavy member
     ER As Double                    'expression ratio
@@ -839,9 +839,9 @@ Public Type IsoPairsDltLbl2004aType
 End Type
 
 Public Type udtIsoPairsDetailsType
-    P1 As Long                              'index of light member; pointer to index in GelUMC if UMC-based pairs
+    p1 As Long                              'index of light member; pointer to index in GelUMC if UMC-based pairs
     P1LblCnt As Integer                     'number of PEO labels in light member
-    P2 As Long                              'index of heavy member; pointer to index in GelUMC if UMC-based pairs
+    p2 As Long                              'index of heavy member; pointer to index in GelUMC if UMC-based pairs
     P2DltCnt As Integer                     'count of N or O or C deltas
     P2LblCnt As Integer                     'count of PEO labels in heavy member
     ER As Double                            'expression ratio; format is defined by glbPreferencesExpanded.PairSearchOptions.SearchDef.ERCalcType
@@ -1376,7 +1376,10 @@ Else                                'legacy database
 End If
 End Sub
 
-Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath As String = "", Optional lngGelIndexToForce As Long = 0, Optional ByRef strErrorMessage As String = "") As Long
+Public Function FileNew(ByVal hwndOwner As Long, _
+                        Optional ByVal strInputFilePath As String = "", _
+                        Optional lngGelIndexToForce As Long = 0, _
+                        Optional ByRef strErrorMessage As String = "") As Long
     '---------------------------------------------------------------------------------------
     'Opens the file given by strInputFilePath, or prompts the user to choose a .Pek, .CSV, .mzXML, or .mzData file
     'Returns the index of the file in memory if success, 0 otherwise
@@ -1420,16 +1423,16 @@ Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath
     If Len(sFileName) > 0 Then ' User selected a file.
         UpdatePreferredFileExtension sFileName
        
-       'Find the next available index
-       If lngGelIndexToForce > 0 And lngGelIndexToForce <= UBound(GelBody()) Then
-          fIndex = lngGelIndexToForce
-       Else
-          fIndex = FindFreeIndex()
-       End If
-       GelData(fIndex).Comment = glCOMMENT_CREATED & Now & vbCrLf & glCOMMENT_USER & UserName
-       
-       ' MonroeMod
-       AddToAnalysisHistory fIndex, "New gel created (user " & UserName & ")"
+        'Find the next available index
+        If lngGelIndexToForce > 0 And lngGelIndexToForce <= UBound(GelBody()) Then
+            fIndex = lngGelIndexToForce
+        Else
+            fIndex = FindFreeIndex()
+        End If
+        GelData(fIndex).Comment = glCOMMENT_CREATED & Now & vbCrLf & glCOMMENT_USER & UserName
+        
+        ' MonroeMod
+        AddToAnalysisHistory fIndex, "New gel created (user " & UserName & ")"
        
     ' No longer supported (March 2006)
     ''   IsDBFile = (LCase(GetFileExtension(sFileName)) = ".mdb")
@@ -1473,7 +1476,8 @@ Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath
     ''     OpenResult = LoadNewDBGel(sFileName, fIndex)
     ''   Else
        
-       OpenResult = LoadNewData(sFileName, fIndex, blnInteractiveMode)
+       OpenResult = LoadNewData(fso, sFileName, fIndex, blnInteractiveMode, strErrorMessage)
+       
        Select Case OpenResult
        Case 0      'success
           Debug.Assert Not GelStatus(fIndex).Deleted
@@ -1492,7 +1496,7 @@ Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath
           FileNew = 0
        Case -2     'data sets too large
           MDIStatus False, "Done"
-          strErrorMessage = "Dataset too large"
+          If strErrorMessage = "" Then strErrorMessage = "Dataset too large"
           If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
               MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
           End If
@@ -1500,7 +1504,7 @@ Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath
           FileNew = 0
        Case -3     'data structure problem
           MDIStatus False, "Done"
-          strErrorMessage = "Scan numbers in the input file must be in ascending order."
+          If strErrorMessage = "" Then strErrorMessage = "Scan numbers in the input file must be in ascending order."
           If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
               MsgBox strErrorMessage & vbCrLf & "Open the " & GetFileExtension(sFileName) & " file with any text editor and make changes.", vbOKOnly, glFGTU
           End If
@@ -1508,7 +1512,7 @@ Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath
           FileNew = 0
        Case -4     'no valid data
           MDIStatus False, "Done"
-          strErrorMessage = "No valid data found in file"
+          If strErrorMessage = "" Then strErrorMessage = "No valid data found in file"
           If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
               MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
           End If
@@ -1516,7 +1520,7 @@ Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath
           FileNew = 0
        Case -5     ' User Cancelled load in the middle of loading (or post-load processing)
           MDIStatus False, "Done"
-          strErrorMessage = "Load cancelled"
+          If strErrorMessage = "" Then strErrorMessage = "Load cancelled"
           If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
               MsgBox strErrorMessage, vbOKOnly, glFGTU
           End If
@@ -1524,7 +1528,7 @@ Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath
           FileNew = 0
        Case -6, -7
           MDIStatus False, "Done"
-          strErrorMessage = "File not found"
+          If strErrorMessage = "" Then strErrorMessage = "File not found"
           If OpenResult = -6 And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
               MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
           End If
@@ -1532,7 +1536,7 @@ Public Function FileNew(ByVal hwndOwner As Long, Optional ByVal strInputFilePath
           FileNew = 0
        Case Else   'some other error
           MDIStatus False, "Done"
-          strErrorMessage = "Error loading data from file; file maybe contains no data or structure does not match expected format"
+          If strErrorMessage = "" Then strErrorMessage = "Error loading data from file; file maybe contains no data or structure does not match expected format"
           If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
               MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
           End If
@@ -1561,14 +1565,20 @@ Public Function FileNewSelectFile(hwndOwner As Long) As String
                       "mzXML Files (*.mzXML)|*.mzXml|" & _
                       "mzXML Files (*mzXML.xml)|*mzXML.xml|" & _
                       "mzData Files (*.mzData)|*.mzData|" & _
-                      "mzData Files (*mzData.xml)|*mzData.xml", _
+                      "mzData Files (*mzData.xml)|*mzData.xml|" & _
+                      "LCMSFeature Files (*LCMSFeatures.txt)|*LCMSFeatures.txt", _
                       glbPreferencesExpanded.LastInputFileMode + 2)
 
     FileNewSelectFile = sFileName
     
 End Function
 
-Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex As Long, ByVal blnInteractiveMode As Boolean) As Integer
+Public Function LoadNewData(ByRef fso As FileSystemObject, _
+                            ByVal strInputFilePath As String, _
+                            ByVal lngGelIndex As Long, _
+                            ByVal blnInteractiveMode As Boolean, _
+                            ByRef strErrorMessage As String) As Integer
+                            
     '---------------------------------------------------------------------------------------
     'Returns 0 if data successfuly loaded, -1 if a user cancelled loading of large file, -2
     'if data set is too large, -3 if problems with scan numbers, -4 if no data found, -5
@@ -1583,6 +1593,7 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
     
     Dim udtFilterPrefs As udtAutoAnalysisFilterPrefsType
     Dim blnMSLevelFilter() As Boolean
+    Dim blnLoadPredefinedLCMSFeatures As Boolean
     
     Dim eScanFilterMode As eosEvenOddScanFilterModeConstants
     Dim eDataFilterMode As dfmCSandIsoDataFilterModeConstants
@@ -1590,19 +1601,67 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
     Dim eFileType As ifmInputFileModeConstants
     Dim intReturnCode As Integer
     
+    Dim intIndex As Integer
+    Dim strSuffixToCheck As String
+    Dim strInputFileNameNoPath As String
+    
     On Error GoTo err_LoadNewData
     
+    strErrorMessage = ""
+    
     If Not DetermineFileType(strInputFilePath, eFileType) Then
+        strErrorMessage = "The input file contains an unknown extension.  It must be " & KNOWN_FILE_EXTENSIONS
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "The input file contains an unknown extension.  It must be " & KNOWN_FILE_EXTENSIONS, vbExclamation + vbOKCancel, glFGTU
+            MsgBox strErrorMessage, vbExclamation + vbOKCancel, glFGTU
         End If
         intReturnCode = -7
         LoadNewData = intReturnCode
         Exit Function
     End If
-       
+    
+    strInputFileNameNoPath = fso.GetFileName(strInputFilePath)
+    
+    If eFileType = ifmDelimitedTextFile Then
+        ' Check the suffix on the text file
+        
+        ' If it is _LCMSFeatures.txtor _LCMSFeatureToPeakMap.txt then
+        '  change eFileType to ifmCSVFile
+        '  and set blnLoadPredefinedLCMSFeatures to True
+        
+        For intIndex = 1 To 2
+            Select Case intIndex
+            Case 1: strSuffixToCheck = LCMS_FEATURES_FILE_SUFFIX
+            Case 2: strSuffixToCheck = LCMS_FEATURE_TO_PEAK_MAP_FILE_SUFFIX
+            End Select
+            
+            If Len(strInputFileNameNoPath) > Len(strSuffixToCheck) Then
+                If LCase(Right(strInputFilePath, Len(strSuffixToCheck))) = LCase(strSuffixToCheck) Then
+                    ' Match found
+                    
+                    eFileType = ifmCSVFile
+                    blnLoadPredefinedLCMSFeatures = True
+                
+                    ' Update strInputFilePath to be the Decon2LS _isos.csv file
+                    strInputFilePath = Left(strInputFilePath, Len(strInputFilePath) - Len(strSuffixToCheck)) & CSV_ISOS_FILE_SUFFIX
+                
+                    Exit For
+                End If
+            End If
+            
+        Next intIndex
+        
+    End If
+    
     Set objLoadOptionsForm = New frmFileLoadOptions
     objLoadOptionsForm.SetFilePath strInputFilePath
+    
+    If blnLoadPredefinedLCMSFeatures Then
+        ' The call to .SetFilePath will likely have triggered a call to .SetFileType() that will change the file type to ifmCSVFile
+        ' Although one of the file types were loading is ifmCSVFile, we want the tracked file type to be ifmDelimitedTextFile
+        ' Thus, we need to override things
+        objLoadOptionsForm.SetFileType ifmDelimitedTextFile
+    End If
+    
     
     ' Copy the data from .AutoAnalysisFilterPrefs
     udtFilterPrefs = glbPreferencesExpanded.AutoAnalysisFilterPrefs
@@ -1628,6 +1687,8 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
         
         objLoadOptionsForm.TotalIntensityPercentageFilterEnabled = .TotalIntensityPercentageFilterEnabled
         objLoadOptionsForm.TotalIntensityPercentageFilter = .TotalIntensityPercentageFilter
+        
+        objLoadOptionsForm.AutoMapDataPointsMassTolerancePPM = .AutoMapDataPointsMassTolerancePPM
         
         If .RestrictToEvenScanNumbersOnly Or .RestrictToOddScanNumbersOnly Then
             If .RestrictToOddScanNumbersOnly Then
@@ -1670,6 +1731,12 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 Else
                     eScanFilterMode = eosEvenOddScanFilterModeConstants.eosLoadAllScans
                 End If
+                
+                If .ExcludeIsoByFit Then
+                    .ExcludeIsoByFitMaxVal = objLoadOptionsForm.IsoFitMax
+                Else
+                    .ExcludeIsoByFitMaxVal = 100
+                End If
             End With
         Else
             With udtFilterPrefs
@@ -1698,6 +1765,8 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 If .TotalIntensityPercentageFilterEnabled Then
                     .TotalIntensityPercentageFilter = objLoadOptionsForm.TotalIntensityPercentageFilter
                 End If
+                
+                .AutoMapDataPointsMassTolerancePPM = objLoadOptionsForm.AutoMapDataPointsMassTolerancePPM
                 
                 .RestrictToOddScanNumbersOnly = False
                 .RestrictToEvenScanNumbersOnly = False
@@ -1731,6 +1800,8 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                 .TotalIntensityPercentageFilterEnabled = udtFilterPrefs.TotalIntensityPercentageFilterEnabled
                 .TotalIntensityPercentageFilter = udtFilterPrefs.TotalIntensityPercentageFilter
                 
+                .AutoMapDataPointsMassTolerancePPM = udtFilterPrefs.AutoMapDataPointsMassTolerancePPM
+                
                 .RestrictToOddScanNumbersOnly = udtFilterPrefs.RestrictToOddScanNumbersOnly
                 .RestrictToEvenScanNumbersOnly = udtFilterPrefs.RestrictToEvenScanNumbersOnly
             End With
@@ -1753,13 +1824,20 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
                                            eScanFilterMode, eDataFilterMode)
             End With
             
+            If intReturnCode <> 0 Then
+                strErrorMessage = "LoadNewPEK returned non-zero return code: " & intReturnCode
+            End If
+            
         Case ifmInputFileModeConstants.ifmCSVFile
             With udtFilterPrefs
                 intReturnCode = LoadNewCSV(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
                                            .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
                                            .MaximumDataCountEnabled, .MaximumDataCountToLoad, _
                                            .TotalIntensityPercentageFilterEnabled, .TotalIntensityPercentageFilter, _
-                                           eScanFilterMode, eDataFilterMode)
+                                           eScanFilterMode, eDataFilterMode, _
+                                           blnLoadPredefinedLCMSFeatures, _
+                                           .AutoMapDataPointsMassTolerancePPM, _
+                                           strErrorMessage)
             End With
             
         Case ifmInputFileModeConstants.ifmmzXMLFile, ifmInputFileModeConstants.ifmmzXMLFileWithXMLExtension
@@ -1773,6 +1851,10 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
             End With
             Set objMZXMLFileReader = Nothing
             
+            If intReturnCode <> 0 Then
+                strErrorMessage = "LoadNewMZXML returned non-zero return code: " & intReturnCode
+            End If
+            
         Case ifmInputFileModeConstants.ifmmzDataFile, ifmInputFileModeConstants.ifmmzDataFileWithXMLExtension
             Set objmzDataFileReader = New clsFileIOMZData
             With udtFilterPrefs
@@ -1784,8 +1866,14 @@ Public Function LoadNewData(ByVal strInputFilePath As String, ByVal lngGelIndex 
             End With
             Set objmzDataFileReader = Nothing
             
+            If intReturnCode <> 0 Then
+                strErrorMessage = "LoadNewMZData returned non-zero return code: " & intReturnCode
+            End If
+            
         Case Else
-            intReturnCode = -7
+            Debug.Assert False
+            strErrorMessage = "Unknown/unsupported file type"
+            intReturnCode = -6
         End Select
         
         If intReturnCode = 0 Then

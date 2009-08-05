@@ -2784,7 +2784,10 @@ ManageClasses = True
 exit_ManageClasses:
 End Function
 
-Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgressForm As Boolean = False, Optional frmCallingForm As VB.Form) As Boolean
+Public Function CalculateClasses(ByVal lngGelIndex As Long, _
+                                 ByVal blnComputeClassMassAndAbundance As Boolean, _
+                                 Optional blnUseProgressForm As Boolean = False, _
+                                 Optional frmCallingForm As VB.Form) As Boolean
 '--------------------------------------------------------------------------------
 'Recalculates parameters of the unique mass classes; returns True on success
 '
@@ -2795,6 +2798,9 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
 'May 2004: Expanded to allow use of subset of members of UMC for computing mass and abundance stats, as
 '            specified by glbPreferencesExpanded.UMCAdvancedStatsOptions
 '          MinScan and MaxScan are still computed using the entire class
+'
+'August 2009: Added parameter blnComputeClassMassAndAbundance, which should be false if we read
+'             predefined LCMSFeature info using clsFileIOPredefinedLCMSFeatures
 '
 '--------------------------------------------------------------------------------
 
@@ -2906,9 +2912,6 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                    ' Also determine which charge states are present
                    ' In addition, keep track of stats related to IReportTagType
                    '
-                   .MinScan = glHugeLong:               .MaxScan = -glHugeLong
-                   .MinMW = glHugeDouble:               .MaxMW = -glHugeDouble
-
                    If blnComputeIsoStats Then
                         For intTagIndex = 0 To IREPORT_TAG_TYPE_CONSTANT_COUNT - 1
                             UMCMemberIsoStats(intTagIndex) = 0
@@ -2916,6 +2919,10 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                    End If
 
                    If .ClassCount > 0 Then
+                      
+                      .MinScan = glHugeLong:               .MaxScan = -glHugeLong
+                      .MinMW = glHugeDouble:               .MaxMW = -glHugeDouble
+                      
                       lngMaxMemberIndex = .ClassCount - 1
                       UMCMembersMaxIndex = lngMaxMemberIndex
                       Do While UMCMembersMaxIndex > UBound(UMCMembersMW)
@@ -3132,41 +3139,44 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                     End If
                     .UMCs(i).ChargeStateStatsRepInd = intBestIndex
     
-                    ' Populate .ClassMW, .ClassMWStD, and .ClassAbundance
-                    If .def.UMCClassStatsUseStatsFromMostAbuChargeState Then
-                        With .UMCs(i)
-                            .ClassMW = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Mass
-                            .ClassMWStD = .ChargeStateBasedStats(.ChargeStateStatsRepInd).MassStD
-                            .ClassAbundance = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Abundance
+                    If blnComputeClassMassAndAbundance Then
+                        
+                        ' Populate .ClassMW, .ClassMWStD, and .ClassAbundance
+                        If .def.UMCClassStatsUseStatsFromMostAbuChargeState Then
+                            With .UMCs(i)
+                                .ClassMW = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Mass
+                                .ClassMWStD = .ChargeStateBasedStats(.ChargeStateStatsRepInd).MassStD
+                                .ClassAbundance = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Abundance
+                                
+                                ' Update .ClassRepInd and .ClassRepType to contain the ClassRep values for
+                                '   for the class rep of the best charge state group
+                                lngClassMIndexPointer = .ChargeStateBasedStats(.ChargeStateStatsRepInd).GroupRepIndex
+                                .ClassRepInd = .ClassMInd(lngClassMIndexPointer)
+                                .ClassRepType = .ClassMType(lngClassMIndexPointer)
+                            End With
+                        Else
+                            ' Lookup the Class Rep MW and Abu; needed for call to CalculateClassesComputeStats
+                            ' Note that .ClassRepInd and .ClassRepType will have already been correctly defined
+                            With .UMCs(i)
+                                Select Case .ClassRepType
+                                Case glCSType
+                                     RepMW = GelData(lngGelIndex).CSData(.ClassRepInd).AverageMW
+                                     RepAbu = GelData(lngGelIndex).CSData(.ClassRepInd).Abundance
+                                Case glIsoType
+                                     RepMW = GetIsoMass(GelData(lngGelIndex).IsoData(.ClassRepInd), ISMWField)
+                                     RepAbu = GelData(lngGelIndex).IsoData(.ClassRepInd).Abundance
+                                End Select
+                            End With
                             
-                            ' Update .ClassRepInd and .ClassRepType to contain the ClassRep values for
-                            '   for the class rep of the best charge state group
-                            lngClassMIndexPointer = .ChargeStateBasedStats(.ChargeStateStatsRepInd).GroupRepIndex
-                            .ClassRepInd = .ClassMInd(lngClassMIndexPointer)
-                            .ClassRepType = .ClassMType(lngClassMIndexPointer)
-                        End With
-                    Else
-                        ' Lookup the Class Rep MW and Abu; needed for call to CalculateClassesComputeStats
-                        ' Note that .ClassRepInd and .ClassRepType will have already been correctly defined
-                        With .UMCs(i)
-                            Select Case .ClassRepType
-                            Case glCSType
-                                 RepMW = GelData(lngGelIndex).CSData(.ClassRepInd).AverageMW
-                                 RepAbu = GelData(lngGelIndex).CSData(.ClassRepInd).Abundance
-                            Case glIsoType
-                                 RepMW = GetIsoMass(GelData(lngGelIndex).IsoData(.ClassRepInd), ISMWField)
-                                 RepAbu = GelData(lngGelIndex).IsoData(.ClassRepInd).Abundance
-                            End Select
-                        End With
-                        
-                        ' Compute the class stats
-                        CalculateClassesComputeStats lngGelIndex, .def, UMCMembersMaxIndex, UMCMembersMW(), UMCMembersAbu(), UMCMembersScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
-                        
-                        With .UMCs(i)
-                            .ClassMW = dblConglomerateMW
-                            .ClassMWStD = dblConglomerateMWStD
-                            .ClassAbundance = dblConglomerateAbu
-                        End With
+                            ' Compute the class stats
+                            CalculateClassesComputeStats lngGelIndex, .def, UMCMembersMaxIndex, UMCMembersMW(), UMCMembersAbu(), UMCMembersScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
+                            
+                            With .UMCs(i)
+                                .ClassMW = dblConglomerateMW
+                                .ClassMWStD = dblConglomerateMWStD
+                                .ClassAbundance = dblConglomerateAbu
+                            End With
+                        End If
                     End If
                     
                     If blnComputeIsoStats Then
@@ -3178,16 +3188,26 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, Optional blnUseProgr
                         .UMCs(i).PercentMembersIReportMonoMinus4 = 0
                     End If
                     
-               Else     ' ClassCount is 0; something is wrong
-                    ' This code shouldn't be reached
+               Else
+                    ' ClassCount is 0; something is wrong
+                    ' This code won't normally be reached
+                    
+                    ' However, if predefined LC-MS Features were loaded (from a _LCMSFeatures.txt file),
+                    '   and the user did not include a _LCMSFeatureToPeakMap.txt file (or the provided file is incomplete)
+                    '   then VIPER will have auto-mapped the data points to the LC-MS Features, and if
+                    '   the value for AutoMapDataPointsMassTolerancePPM is too small, then it is possible some
+                    '   features won't have any members (lots of IFs, huh?)
+                    
                     Debug.Assert False
-                    With .UMCs(i)
-                        .ClassAbundance = -1
-                        .ClassMW = -1
-                        .ClassMWStD = -1
-                        .MinScan = -1
-                        .MaxScan = -1
-                    End With
+                    If blnComputeClassMassAndAbundance Then
+                        With .UMCs(i)
+                            .ClassAbundance = -1
+                            .ClassMW = -1
+                            .ClassMWStD = -1
+                            .MinScan = -1
+                            .MaxScan = -1
+                        End With
+                    End If
                End If
                
                If i Mod 500 = 0 Then

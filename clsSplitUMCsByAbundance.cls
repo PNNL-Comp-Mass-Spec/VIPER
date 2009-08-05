@@ -376,7 +376,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
     
     If lngUMCsAdded > 0 Or lngUMCsSplit > 0 Then
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
-        blnSuccess = UpdateUMCStatArrays(lngGelIndex, False, frmCallingForm)
+        blnSuccess = UpdateUMCStatArrays(lngGelIndex, True, False, frmCallingForm)
         Debug.Assert blnSuccess
     
         frmCallingForm.Caption = strCaptionSaved

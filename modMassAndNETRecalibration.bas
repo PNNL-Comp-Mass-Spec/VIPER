@@ -90,7 +90,7 @@ On Error GoTo ApplyMassCalibrationAdjustmentErrorHandler
     
     If blnProceed Then
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
-        blnSuccess = UpdateUMCStatArrays(lngGelIndex, False, frmCallingForm)
+        blnSuccess = UpdateUMCStatArrays(lngGelIndex, True, False, frmCallingForm)
         Debug.Assert blnSuccess
         
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
@@ -224,7 +224,7 @@ On Error GoTo MassCalibrationRevertToOriginalErrorHandler
     
     If blnDataUpdated Then
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
-        blnSuccess = UpdateUMCStatArrays(lngGelIndex, False, frmCallingForm)
+        blnSuccess = UpdateUMCStatArrays(lngGelIndex, True, False, frmCallingForm)
         Debug.Assert blnSuccess
     End If
     

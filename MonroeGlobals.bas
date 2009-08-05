@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "June 17, 2009"
+Public Const APP_BUILD_DATE As String = "August 5, 2009"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -178,6 +178,7 @@ Public Enum ifmInputFileModeConstants
     ifmmzDataFile = 4                       ' i.e. InputFile.mzData
     ifmmzDataFileWithXMLExtension = 5       ' i.e. InputFile_mzData.xml
     ifmGelFile = 6
+    ifmDelimitedTextFile = 7
 End Enum
 
 Public Enum pftPictureFileTypeConstants
@@ -1161,6 +1162,7 @@ Public Type udtAutoAnalysisFilterPrefsType
     TotalIntensityPercentageFilterEnabled As Boolean   ' This filter is only applied at the time the data is loaded into memory
     TotalIntensityPercentageFilter As Single
 
+    AutoMapDataPointsMassTolerancePPM As Single        ' This setting is only used when we load _LCMSFeatures.txt files and we need to auto-map the data points to the features
 End Type
 
 Public Type udtAutoAnalysisCachedDataType
