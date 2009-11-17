@@ -137,8 +137,10 @@ End Sub
 Private Function AddFeatureMembersToUMCs(ByRef lngFeatureToPeakMapFeatureIdx() As Long, _
                                          ByRef lngFeatureToPeakMapPeakIdx() As Long, _
                                          ByVal lngFeatureToPeakMapCount As Long) As Boolean
-    ' Be sure to call SortFeatureMapMembers before calling this function
-    ' It assumes that the data in lngFeatureToPeakMapFeatureIdx and lngFeatureToPeakMapPeakIdx is properly sorted and is unique
+    
+    ' Be sure to call SortFeatureMapMembers before calling this function because this function
+    '  assumes that the data in lngFeatureToPeakMapFeatureIdx and lngFeatureToPeakMapPeakIdx
+    '  is properly sorted and is unique
     
     Dim lngIndex As Long
     Dim lngIndexStart As Long
@@ -206,7 +208,7 @@ On Error GoTo AddFeatureMembersToUMCsErrorHandler
             dblMinMass = dblMass
             dblMaxMass = dblMass
             
-            For lngIndex = lngIndexStart To lngIndexEnd
+            For lngIndex = lngIndexStart + 1 To lngIndexEnd
                 
                 If Not GetIsoDataInfo(mFeatureToPeakMapPeakIdx(lngIndex), lngScan, dblMass, dblAbundance) Then
                     ' lngClassRepIndexPointer did not point to a valid index in GelData().IsoData()
@@ -994,7 +996,7 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                     
                     .MinScan = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ScanStart), lngScanCenter)
                     .MaxScan = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ScanEnd), lngScanCenter)
-                    .MinMW = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMass), 0)
+                    .MinMW = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMass), 0)
                     .MaxMW = .MinMW
                                         
                     .ChargeStateStatsRepInd = 0

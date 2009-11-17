@@ -2707,21 +2707,28 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
     Dim strNameToAdd As String, strValueToAdd As String, strCurrentValue As String
     Dim strMassTagSubsetID As String
     
+    Dim strTraceLocation As String
+    
     Dim udtDefaultGelAnalysisInfo As udtGelAnalysisInfoType
 
     On Error GoTo IniFileReadSingleDBConnectionErrorHandler
 
+    strTraceLocation = "Instantiate MTDBInfoRetriever"
     Dim objMTDBInfoRetriever As New MTDBInfoRetriever
 
+    strTraceLocation = "Call GetIniFileSettingLng"
     lngInfoVersion = GetIniFileSettingLng(objIniStuff, strSectionName, RECENT_DB_CONNECTION_INFOVERSION_NAME, 0)
     If lngInfoVersion = RECENT_DB_CONNECTION_INFOVERSION Then
             
         ' Note: ReadSection() returns True if success
+        strTraceLocation = "Call objIniStuff.ReadSection"
         If objIniStuff.ReadSection(strSectionName, strKeys(), strValues()) Then
         
+            strTraceLocation = "Determine UBound(strKeys())"
             lngArrayCount = UBound(strKeys())
             
             With udtDBSettingsSingle
+                strTraceLocation = "Examine .ConnectionString"
                 .ConnectionString = LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "ConnectionString")
                 .DatabaseName = ExtractDBNameFromConnectionString(.ConnectionString)
                 .DBSchemaVersion = CSngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "DBSchemaVersion"))
@@ -2750,6 +2757,7 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
                 .ModificationList = LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "ModificationList")
                 .SelectedMassTagCount = CLngSafe(LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "SelectedMassTagCount"))
                 
+                strTraceLocation = "Examine .AnalysisInfo"
                 With .AnalysisInfo
                     .Analysis_Tool = LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "AnalysisTool")
                     .Created = LookupParallelStringArrayItemByName(strKeys(), strValues(), lngArrayCount, "Created")
@@ -2811,12 +2819,15 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
                         End If
                     End If
                     
+                    strTraceLocation = "Update objMTDBInfoRetriever.InitFilePath"
                     objMTDBInfoRetriever.InitFilePath = glInitFile
                     objMTDBInfoRetriever.GetMTDBSchema
                     
                     ' Grab the default MTDB settings
+                    strTraceLocation = "Call FillGelAnalysisInfo"
                     FillGelAnalysisInfo udtDefaultGelAnalysisInfo, objMTDBInfoRetriever.fAnalysis
                     
+                    strTraceLocation = "Update .MTDB"
                     With .MTDB
                         ' Make sure all of the required MTDB info is present
                         ' None will be present if strSectionName wasn't present in the .Ini file or if lngArrayCount = 0
@@ -2863,6 +2874,7 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
                     blnSuccess = True
                 End With
                 
+                strTraceLocation = "Examine .DBSchemaVersion"
                 If .DBSchemaVersion = 0 And Len(.ConnectionString) > 0 Then
                     .DBSchemaVersion = LookupDBSchemaVersionViaCNString(.ConnectionString)
                 End If
@@ -2877,6 +2889,7 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
         blnSuccess = False
     End If
     
+    strTraceLocation = "Destroy objMTDBInfoRetriever"
     If Not objMTDBInfoRetriever Is Nothing Then Set objMTDBInfoRetriever = Nothing
 
     udtDBSettingsSingle.IsDeleted = Not blnSuccess
@@ -2885,7 +2898,7 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
     
 IniFileReadSingleDBConnectionErrorHandler:
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox "Error reading single DB connection from file " & objIniStuff.FileName & "; Sub IniFileReadSingleDBConnection in Settings.Bas" & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+        MsgBox "Error reading single DB connection from file " & objIniStuff.FileName & "; Sub IniFileReadSingleDBConnection in Settings.Bas; Last Trace: " & strTraceLocation & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
     Else
         Debug.Print "Error in IniFileReadSingleDBConnection: " & Err.Description
         Debug.Assert False

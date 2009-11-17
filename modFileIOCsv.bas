@@ -992,11 +992,6 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     strUnknownColumnList = ""
                     
                     For lngIndex = 0 To UBound(strData)
-                        If lngIndex >= ISOS_FILE_COLUMN_COUNT Then
-                            ' Too many column headers
-                            Debug.Assert False
-                            Exit For
-                        End If
                         
                         strColumnHeader = StripQuotes(LCase(Trim(strData(lngIndex))))
                         
@@ -1282,11 +1277,6 @@ On Error GoTo ReadCSVScanFileErrorHandler
                         strUnknownColumnList = ""
                         
                         For lngIndex = 0 To UBound(strData)
-                            If lngIndex >= SCAN_FILE_COLUMN_COUNT Then
-                                ' Too many column headers
-                                Debug.Assert False
-                                Exit For
-                            End If
 
                             strColumnHeader = StripQuotes(LCase(Trim(strData(lngIndex))))
                             

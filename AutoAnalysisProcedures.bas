@@ -6200,6 +6200,27 @@ Private Sub CountSubFolders(strFolderStartPath As String, ByRef fso As FileSyste
 
 End Sub
 
+''Public Function CreateMontageImageFileTest() As Long
+''
+''    Dim udtWorkingParams As udtAutoAnalysisWorkingParamsType
+''
+''    Dim strFilePathA As String
+''    Dim strFilePathB As String
+''    Dim strWorkingCombinedFilePath As String
+''    Dim lngDefaultMaxWidth As Long
+''    Dim lngDefaultMaxHeight As Long
+''
+''    lngDefaultMaxWidth = 644
+''    lngDefaultMaxHeight = 279
+''
+''    strFilePathA = "ImageA.png"
+''    strFilePathB = "ImageB.png"
+''    strWorkingCombinedFilePath = "Image_AB.png"
+''
+''    CreateMontageImageFile udtWorkingParams, strFilePathA, strFilePathB, strWorkingCombinedFilePath, lngDefaultMaxWidth, lngDefaultMaxHeight
+''
+''End Function
+
 Private Function CreateMontageImageFile(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByVal strSrcFilePathA As String, ByVal strSrcFilePathB As String, ByVal strDestinationFilePath As String, Optional lngDefaultMaxWidth As Long = 644, Optional lngDefaultMaxHeight As Long = 279) As Long
     ' Note: lngDefaultMaxWidth and lngDefaultMaxHeight are used as the maximum dimensions if the Identify command fails
     

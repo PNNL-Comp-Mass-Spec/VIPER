@@ -2918,6 +2918,8 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                         Next intTagIndex
                    End If
 
+                   Erase ChargeStatePresent()       ' Reset all to 0
+                   
                    If .ClassCount > 0 Then
                       
                       .MinScan = glHugeLong:               .MaxScan = -glHugeLong
@@ -2932,7 +2934,6 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                           ReDim UMCMembersFit(UBound(UMCMembersMW))
                           ReDim UMCMembersCharge(UBound(UMCMembersMW))
                       Loop
-                      Erase ChargeStatePresent()       ' Reset all to 0
                       
                       If GelUMC(lngGelIndex).def.RequireMatchingIsotopeTag Then
                         ISMWField = GelUMC(lngGelIndex).def.MWField
@@ -2986,9 +2987,9 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                ' Determine the number of charge states present
                intChargeStatesPresent = 0
                For intChargeState = 0 To MAX_CHARGE_STATE
-                    If ChargeStatePresent(intChargeState) > 0 Then
-                        intChargeStatesPresent = intChargeStatesPresent + 1
-                    End If
+                     If ChargeStatePresent(intChargeState) > 0 Then
+                         intChargeStatesPresent = intChargeStatesPresent + 1
+                     End If
                Next intChargeState
                
                ' Reset the charge state based stats

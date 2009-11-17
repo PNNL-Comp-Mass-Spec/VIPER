@@ -258,6 +258,8 @@ InitializeSubtaskErrorHandler:
 End Sub
 
 Public Sub InitializeForm(ByVal CurrentTask As String, ByVal OverallProgressBarMinNew As Long, ByVal OverallProgressBarMaxNew As Long, Optional ByVal blnShowTimeStats As Boolean = False, Optional ByVal blnShowSubTaskProgress As Boolean = False, Optional ByVal blnShowPauseButton As Boolean = True, Optional ByRef frmObjOwnerForm As VB.Form)
+    Static lngErrorLogCount As Long
+    
     lngProgressMin = OverallProgressBarMinNew
     lngProgressMax = OverallProgressBarMaxNew
     
@@ -348,7 +350,11 @@ InitializeFormErrorHandler:
         Debug.Assert False
         Resume Next
     Else
-        MsgBox "An error occurred while initializing the progress bar: " & vbCrLf & Err.Description, vbInformation + vbOKOnly, "Error"
+        If lngErrorLogCount < 5 Then
+            Debug.Assert False
+            lngErrorLogCount = lngErrorLogCount + 1
+            LogErrors Err.Number, "InitializeForm", "An error occurred while initializing the progress bar: " & Err.Description, 0, False
+        End If
         Resume Next
     End If
     

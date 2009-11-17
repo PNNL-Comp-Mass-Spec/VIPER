@@ -581,6 +581,7 @@ lblStatus.Left = picToolbar.width - lblStatus.width - 100
 Initialize
 Me.MousePointer = vbDefault
 
+
 Exit Sub
 
 MDIFormLoadErrorHandler:

@@ -903,7 +903,15 @@ If lngGelIndex >= 1 Then
     AddToAnalysisHistory lngGelIndex, sTmp
 End If
 
-TraceLog 10, procName, "Error occurred: " & Error(en)
+If en = 0 Then
+    TraceLog 10, procName, "Error occurred: " & Description
+Else
+    TraceLog 10, procName, "Error occurred: " & Error(en)
+    If Description <> Error(en) Then
+        TraceLog 10, procName, "  Additional info: " & Description
+    End If
+End If
+
 ' MonroeMod Finish
 
 Exit Sub

@@ -2,6 +2,9 @@ Attribute VB_Name = "MonroeLaVRoutines"
 Option Explicit
 
 Private Const DotNET_DLL_REGISTRATION_FILE As String = "DotNET_DLL_Registration.ini"
+Private Const IMAGEMAGICK_CONVERT_TOOL As String = "Convert.exe"
+Private Const IMAGEMAGICK_IDENTIFY_TOOL As String = "Identify.exe"
+Private Const IMAGEMAGICK_MONTAGE_TOOL As String = "Montage.exe"
 
 Public Enum sdcSqlDecimalConstants
     sdcSqlDecimal9x4 = 0
@@ -2552,25 +2555,93 @@ Public Sub FillGelAnalysisObject(objGelAnalysis As FTICRAnalysis, udtGelAnalysis
 
 End Sub
 
-Public Function ConvertEmfToPng(strEmfFilePath As String, strTargetFilePath As String, Optional lngWidthPixels As Long = 1024, Optional lngHeightPixels As Long = 768) As Long
+Private Function ConfirmImageMagicMontageFilesExist(ByRef fso As FileSystemObject, ByRef strIdentifyAppPath As String, ByRef strMontageAppPath As String, ByVal blnReportErrors As Boolean) As Boolean
+    
+    Dim strErrorMessage As String
+    Dim blnSuccess As Boolean
+    
+    ' Make sure Identify.exe exists
+    strIdentifyAppPath = App.Path
+    strIdentifyAppPath = fso.BuildPath(strIdentifyAppPath, IMAGEMAGICK_IDENTIFY_TOOL)
+    
+    If Not fso.FileExists(strIdentifyAppPath) Then
+        If blnReportErrors Then
+            strErrorMessage = "Error - Identify app not found at " & strIdentifyAppPath & "; unable to create Montage image"
+            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+            Else
+                LogErrors -1, "ConfirmImageMagicMontageFilesExist", strErrorMessage
+            End If
+        End If
+        
+        blnSuccess = False
+    Else
+        blnSuccess = True
+    End If
+
+    If blnSuccess Then
+        ' Make sure Montage.exe exists
+        strMontageAppPath = App.Path
+        strMontageAppPath = fso.BuildPath(strMontageAppPath, IMAGEMAGICK_MONTAGE_TOOL)
+        
+        If Not fso.FileExists(strMontageAppPath) Then
+            If blnReportErrors Then
+                strErrorMessage = "Error - Montage app not found at " & strMontageAppPath & "; unable to create Montage image"
+                If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                    MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+                Else
+                    LogErrors -1, "ConfirmImageMagicMontageFilesExist", strErrorMessage
+                End If
+            End If
+            
+            blnSuccess = False
+        Else
+            blnSuccess = True
+        End If
+    End If
+    
+    ConfirmImageMagicMontageFilesExist = blnSuccess
+    
+End Function
+
+Public Function ConvertEmfToPng(ByVal strEmfFilePath As String, ByVal strTargetFilePath As String, Optional ByVal lngWidthPixels As Long = 1024, Optional ByVal lngHeightPixels As Long = 768) As Long
     ' Returns 0 if success, the error number if an error
+    
+    Static intImageMagickObjectFailureCount As Integer
     
     Dim strGeometry As String
     Dim strResult As String
+    Dim strLastGoodLocation As String
     
     Dim fso As FileSystemObject
     Dim objImage As ImageMagickObject.MagickImage
     
+    Dim lngResult As Long
+    Dim blnImageConverted As Boolean
+    
 On Error GoTo ConvertEmfToPngErrorHandler
 
+    If intImageMagickObjectFailureCount > 3 Then
+        ' Conversion has failed 3 or more times; use Convert.exe to conver the image
+        lngResult = ConvertEmfToPngUsingEXE(strEmfFilePath, strTargetFilePath, lngWidthPixels, lngHeightPixels)
+        
+        ConvertEmfToPng = lngResult
+        Exit Function
+    End If
+    
+    strLastGoodLocation = "Instantiate objImage as ImageMagickObject.MagickImage"
     Set objImage = New ImageMagickObject.MagickImage
     Set fso = New FileSystemObject
     
     strTargetFilePath = FileExtensionForce(strTargetFilePath, "png")
     strGeometry = lngWidthPixels & "X" & lngHeightPixels
     
+    strLastGoodLocation = "Call objImage.Convert with params: '" & strGeometry & "', '" & strEmfFilePath & "', '" & strTargetFilePath & "'"
     strResult = objImage.Convert("-size", strGeometry, strEmfFilePath, strTargetFilePath)
     
+    blnImageConverted = True
+    
+    strLastGoodLocation = "objImage.Convert returned: " & strResult
     If Len(strResult) > 0 Then
         fso.DeleteFile strEmfFilePath
         ConvertEmfToPng = 0
@@ -2578,19 +2649,146 @@ On Error GoTo ConvertEmfToPngErrorHandler
         ConvertEmfToPng = -1
     End If
     
+    strLastGoodLocation = "Destroy objects"
     Set fso = Nothing
     Set objImage = Nothing
     
     Exit Function
     
 ConvertEmfToPngErrorHandler:
+    If Not blnImageConverted Then
+        intImageMagickObjectFailureCount = intImageMagickObjectFailureCount + 1
+        
+        ' Automation error using the ImageMagick DLL (imagemagickobject.dll)
+        ' Try shelling to DOS to call Convert.exe
+        lngResult = ConvertEmfToPngUsingEXE(strEmfFilePath, strTargetFilePath, lngWidthPixels, lngHeightPixels)
+        ConvertEmfToPng = lngResult
+        Exit Function
+    End If
+    
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox "Error in ConvertEmfToPng: " & Err.Description
+        MsgBox "Error in ConvertEmfToPng (" & strLastGoodLocation & "; Error Number " & Err.Number & "): " & Err.Description
     Else
-        LogErrors Err.Number, "ConvertEmfToPng"
+        LogErrors Err.Number, "ConvertEmfToPng", strLastGoodLocation & " (Error Number " & Err.Number & "): " & Err.Description
     End If
     
     ConvertEmfToPng = Err.Number
+End Function
+
+Public Function ConvertEmfToPngUsingEXE(ByVal strEmfFilePath As String, ByVal strTargetFilePath As String, ByVal lngWidthPixels As Long, ByVal lngHeightPixels As Long) As Long
+    ' Returns 0 if success, the error number if an error
+    
+    Const APP_MONITOR_INTERVAL_MSEC As Integer = 50
+    Const MAX_WAIT_TIME_SECONDS As Integer = 30
+    
+    Dim strConvertAppPath As String
+    Dim strErrorMessage As String
+    Dim blnSuccess As Boolean
+    
+    Dim strGeometry As String
+    Dim strResult As String
+    Dim strLastGoodLocation As String
+    
+    Dim fso As FileSystemObject
+    
+    Dim objProgRunner As clsProgRunner
+    Dim strArguments As String
+    
+    Dim dtProcessingStartTime As Date
+    Dim sngProcessingTimeSeconds As Single
+    Dim lngIteration As Long
+    
+On Error GoTo ConvertEmfToPngUsingEXEErrorHandler
+
+    blnSuccess = False
+    
+    strLastGoodLocation = "Instantiate the FileSystemObject"
+    Set fso = New FileSystemObject
+    
+    strLastGoodLocation = "Look for Convert.exe"
+    
+    strConvertAppPath = App.Path
+    strConvertAppPath = fso.BuildPath(strConvertAppPath, IMAGEMAGICK_CONVERT_TOOL)
+    
+    ' Make sure Convert.exe exists
+    If Not fso.FileExists(strConvertAppPath) Then
+        strErrorMessage = "Error - Convert app not found at " & strConvertAppPath & "; unable to convert EMF files to PNG"
+        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox strErrorMessage, vbExclamation + vbOKOnly, "Error"
+        Else
+            LogErrors -1, "ConvertEmfToPngUsingEXE", strErrorMessage
+        End If
+        
+        blnSuccess = False
+    Else
+        blnSuccess = True
+    End If
+
+    If blnSuccess Then
+        
+        strTargetFilePath = FileExtensionForce(strTargetFilePath, "png")
+        strGeometry = lngWidthPixels & "X" & lngHeightPixels
+        
+        strArguments = " -size " & strGeometry & " """ & strEmfFilePath & """ """ & strTargetFilePath & """"
+        strLastGoodLocation = "Instantiate the ProgRunner to call Convert.exe with params: '" & strArguments & "'"
+    
+        TraceLog 5, "ConvertEmfToPngUsingEXE", "Call " & strConvertAppPath & " with arguments: " & strArguments
+    
+        Set objProgRunner = New clsProgRunner
+        dtProcessingStartTime = Now()
+        
+        If objProgRunner.StartProgram(strConvertAppPath, strArguments, vbMinimizedNoFocus) Then
+                
+            lngIteration = 0
+            Do While objProgRunner.AppRunning
+                Sleep APP_MONITOR_INTERVAL_MSEC
+                
+                sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
+                
+                If sngProcessingTimeSeconds > MAX_WAIT_TIME_SECONDS Then
+                    ' Over 30 seconds has elapsed
+                    objProgRunner.AbortProcessing
+                    DoEvents
+                     
+                    Debug.Assert False
+                    LogErrors -1, "ConvertEmfToPngUsingEXE", "Over " & MAX_WAIT_TIME_SECONDS & " has elapsed while calling Convert.exe with '" & strArguments & "'"
+                     
+                    blnSuccess = False
+                    Exit Do
+                End If
+                
+                DoEvents
+                
+                lngIteration = lngIteration + 1
+            Loop
+        Else
+            blnSuccess = False
+        End If
+    End If
+    
+
+    strLastGoodLocation = "Delete EMF file"
+    If blnSuccess Then
+        fso.DeleteFile strEmfFilePath
+        ConvertEmfToPngUsingEXE = 0
+    Else
+        ConvertEmfToPngUsingEXE = -1
+    End If
+    
+    strLastGoodLocation = "Destroy objects"
+    Set fso = Nothing
+    
+    Exit Function
+    
+ConvertEmfToPngUsingEXEErrorHandler:
+    
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error in ConvertEmfToPngUsingEXE (" & strLastGoodLocation & "; Error Number " & Err.Number & "): " & Err.Description
+    Else
+        LogErrors Err.Number, "ConvertEmfToPngEXE", strLastGoodLocation & " (Error Number " & Err.Number & "): " & Err.Description
+    End If
+    
+    ConvertEmfToPngUsingEXE = Err.Number
 End Function
 
 Public Sub CopyCSDataToLegacy(ByRef udtIsotopicData As udtIsotopicDataType, ByRef CSNum() As Double, ByRef CSVar() As Variant, ByVal lngCSIndex As Long)
@@ -2775,15 +2973,19 @@ Public Sub CopyLegacyIsoToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, 
 
 End Sub
 
-Public Function CreateMontageImage(ByVal strFilePathA As String, ByVal strFilePathB As String, ByVal strOutputFilePath As String, blnDeleteSourceFiles As Boolean, Optional lngDefaultMaxWidth As Long = 644, Optional lngDefaultMaxHeight As Long = 279) As Boolean
+Public Function CreateMontageImage(ByVal strFilePathA As String, ByVal strFilePathB As String, ByVal strOutputFilePath As String, blnDeleteSourceFiles As Boolean, Optional lngDefaultMaxWidth As Long = 644, Optional lngDefaultMaxHeight As Long = 279) As Long
     ' Returns 0 if success, Error number (or -1) if an error
     ' Note: lngDefaultMaxWidth and lngDefaultMaxHeight are used as the maximum dimensions if the Identify command fails
     
+    Static intImageMagickObjectFailureCount As Integer
+     
     Const BORDER_WIDTH As Long = 1
     Dim strGeometry As String
     Dim strBorderInfo As String
     Dim strTileInfo As String
+    
     Dim strResult As String
+    Dim lngResult As Long
     
     Dim lngValue As Long
     Dim lngMaxWidth As Long
@@ -2792,8 +2994,19 @@ Public Function CreateMontageImage(ByVal strFilePathA As String, ByVal strFilePa
     Dim fso As FileSystemObject
     Dim objImage As ImageMagickObject.MagickImage
     
+    Dim blnImageCreated As Boolean
+    
 On Error GoTo CreateMontageImageErrorHandler
     
+    If intImageMagickObjectFailureCount > 3 Then
+        ' Conversion has failed 3 or more times; use Montage.exe to convert the image
+        lngResult = CreateMontageImageUsingEXE(strFilePathA, strFilePathB, strOutputFilePath, blnDeleteSourceFiles, lngDefaultMaxWidth, lngDefaultMaxHeight)
+        
+        CreateMontageImage = lngResult
+        Exit Function
+    End If
+     
+     
     Set objImage = New ImageMagickObject.MagickImage
     Set fso = New FileSystemObject
     
@@ -2837,6 +3050,8 @@ CreateMontageImageContinue:
     strResult = objImage.Montage("-tile", "1x2", "-geometry", strGeometry, "-borderwidth", Trim(BORDER_WIDTH), "-bordercolor", "black", strFilePathA, strFilePathB, strOutputFilePath)
     
     If Len(strResult) > 0 Then
+        blnImageCreated = True
+        
         If blnDeleteSourceFiles And gTraceLogLevel = 0 Then
             ' Note: Only delete the source files if the trace log level is 0
             On Error Resume Next
@@ -2854,6 +3069,17 @@ CreateMontageImageContinue:
     Exit Function
     
 CreateMontageImageErrorHandler:
+    If Not blnImageCreated Then
+        intImageMagickObjectFailureCount = intImageMagickObjectFailureCount + 1
+        
+        ' Automation error using the ImageMagick DLL (imagemagickobject.dll)
+        ' Try shelling to DOS to call Identify.exe and Montage.exe
+        lngResult = CreateMontageImageUsingEXE(strFilePathA, strFilePathB, strOutputFilePath, blnDeleteSourceFiles, lngDefaultMaxWidth, lngDefaultMaxHeight)
+        
+        CreateMontageImage = lngResult
+        Exit Function
+    End If
+    
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox "Error in CreateMontageImage: " & Err.Description
     Else
@@ -2868,20 +3094,182 @@ CreateMontageImageErrorHandler:
     Exit Function
     
 CreateMontageImageIdentifyErrorHandler:
-    ' Call to identify failed; use the default max width and height values
+    ' Call to identify failed; If Identify.exe and Montage.exe exist, then call CreateMontageImageUsingEXE
+    ' Otherwise, use the default max width and height values
     Debug.Assert False
-    
+
+    If ConfirmImageMagicMontageFilesExist(fso, "", "", False) Then
+        intImageMagickObjectFailureCount = intImageMagickObjectFailureCount + 1
+        
+        ' Automation error using the ImageMagick DLL (imagemagickobject.dll)
+        ' Try shelling to DOS to call Identify.exe and Montage.exe
+        lngResult = CreateMontageImageUsingEXE(strFilePathA, strFilePathB, strOutputFilePath, blnDeleteSourceFiles, lngDefaultMaxWidth, lngDefaultMaxHeight)
+        
+        CreateMontageImage = lngResult
+        Exit Function
+    End If
+
+
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox "Error in CreateMontageImage during Identify: " & Err.Description
     Else
         Debug.Assert False
         LogErrors Err.Number, "CreateMontageImage->Identify", Err.Description & "; will use default values of MaxWidth = " & Trim(lngDefaultMaxWidth) & " and MaxHeight = " & Trim(lngDefaultMaxHeight)
     End If
-     
+
     lngMaxWidth = lngDefaultMaxWidth
     lngMaxHeight = lngDefaultMaxHeight
-    
+
     Resume CreateMontageImageContinue
+End Function
+
+Public Function CreateMontageImageUsingEXE(ByVal strFilePathA As String, ByVal strFilePathB As String, ByVal strOutputFilePath As String, blnDeleteSourceFiles As Boolean, lngDefaultMaxWidth As Long, lngDefaultMaxHeight As Long) As Long
+    ' Returns 0 if success, the error number if an error
+    
+    Const APP_MONITOR_INTERVAL_MSEC As Integer = 50
+    Const MAX_WAIT_TIME_SECONDS As Integer = 30
+    
+    Const BORDER_WIDTH As Long = 1
+    
+    Dim strGeometry As String
+    Dim strBorderInfo As String
+    Dim strTileInfo As String
+    Dim strResult As String
+    
+    Dim blnSuccess As Boolean
+    
+    Dim lngWidth As Long
+    Dim lngHeight As Long
+    Dim lngMaxWidth As Long
+    Dim lngMaxHeight As Long
+    
+    Dim fso As FileSystemObject
+    
+    Dim strIdentifyAppPath As String
+    Dim strMontageAppPath As String
+    
+    Dim objProgRunner As clsProgRunner
+    Dim strArguments As String
+    
+    Dim dtProcessingStartTime As Date
+    Dim sngProcessingTimeSeconds As Single
+    Dim lngIteration As Long
+    
+    Dim strLastGoodLocation As String
+    Dim strErrorMessage As String
+    
+On Error GoTo CreateMontageImageUsingEXEErrorHandler
+
+    blnSuccess = False
+    
+    strLastGoodLocation = "Instantiate the FileSystemObject"
+    Set fso = New FileSystemObject
+    
+    ' Make sure Identify.exe and Montage.exe exist
+    strLastGoodLocation = "Look for Identify.exe and Montage.exe"
+    blnSuccess = ConfirmImageMagicMontageFilesExist(fso, strIdentifyAppPath, strMontageAppPath, True)
+
+    If blnSuccess Then
+        lngMaxWidth = 0
+        lngMaxHeight = 0
+
+        strLastGoodLocation = "Determine dimensions for file: " & strFilePathA
+        
+        blnSuccess = DetermineImageDimensions(fso, strIdentifyAppPath, strFilePathA, lngWidth, lngHeight)
+        
+        If blnSuccess Then
+            If lngWidth > lngMaxWidth Then lngMaxWidth = lngWidth
+            If lngHeight > lngMaxHeight Then lngMaxHeight = lngHeight
+        End If
+        
+        Sleep 200
+        
+        strLastGoodLocation = "Determine dimensions for file: " & strFilePathB
+        
+        blnSuccess = DetermineImageDimensions(fso, strIdentifyAppPath, strFilePathB, lngWidth, lngHeight)
+        If blnSuccess Then
+            If lngWidth > lngMaxWidth Then lngMaxWidth = lngWidth
+            If lngHeight > lngMaxHeight Then lngMaxHeight = lngHeight
+        End If
+        
+        If lngMaxWidth = 0 Then lngMaxWidth = lngDefaultMaxWidth
+        If lngMaxHeight = 0 Then lngMaxHeight = lngDefaultMaxHeight
+    
+    
+        TraceLog 5, "CreateMontageImage", "Creating montage of " & strFilePathA & " and " & strFilePathB
+                
+        strGeometry = Trim(lngMaxWidth) & "X" & Trim(lngMaxHeight) & "+" & Trim(BORDER_WIDTH) & "+" & Trim(BORDER_WIDTH)
+                
+        strArguments = " -tile 1x2 -geometry " & strGeometry & " -borderwidth " & Trim(BORDER_WIDTH) & " -bordercolor black """ & strFilePathA & """ """ & strFilePathB & """ """ & strOutputFilePath & """"
+        strLastGoodLocation = "Instantiate the ProgRunner to call Montage.exe with params: '" & strArguments & "'"
+    
+        TraceLog 5, "ConvertMontageImageUsingEXE", "Call " & strMontageAppPath & " with arguments: " & strArguments
+    
+        ' Set this to True for now
+        blnSuccess = True
+        
+        Set objProgRunner = New clsProgRunner
+        dtProcessingStartTime = Now()
+        
+        If objProgRunner.StartProgram(strMontageAppPath, strArguments, vbMinimizedNoFocus) Then
+                
+            lngIteration = 0
+            Do While objProgRunner.AppRunning
+                Sleep APP_MONITOR_INTERVAL_MSEC
+                
+                sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
+                
+                If sngProcessingTimeSeconds > MAX_WAIT_TIME_SECONDS Then
+                    ' Over 30 seconds has elapsed
+                    objProgRunner.AbortProcessing
+                    DoEvents
+                     
+                    Debug.Assert False
+                    LogErrors -1, "ConvertMontageImageUsingEXE", "Over " & MAX_WAIT_TIME_SECONDS & " has elapsed while calling Montage.exe with '" & strArguments & "'"
+                     
+                    blnSuccess = False
+                    Exit Do
+                End If
+                
+                DoEvents
+                
+                lngIteration = lngIteration + 1
+            Loop
+        Else
+            blnSuccess = False
+        End If
+        
+    End If
+    
+    strLastGoodLocation = "Delete source images"
+    If blnSuccess Then
+        
+        If blnDeleteSourceFiles And gTraceLogLevel = 0 Then
+            ' Note: Only delete the source files if the trace log level is 0
+            On Error Resume Next
+            fso.DeleteFile strFilePathA
+            fso.DeleteFile strFilePathB
+        End If
+        
+        CreateMontageImageUsingEXE = 0
+    Else
+        CreateMontageImageUsingEXE = -1
+    End If
+    
+    strLastGoodLocation = "Destroy objects"
+    Set fso = Nothing
+    
+    Exit Function
+    
+CreateMontageImageUsingEXEErrorHandler:
+    
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error in CreateMontageImageUsingEXE (" & strLastGoodLocation & "; Error Number " & Err.Number & "): " & Err.Description
+    Else
+        LogErrors Err.Number, "CreateMontageImageUsingEXE", strLastGoodLocation & " (Error Number " & Err.Number & "): " & Err.Description
+    End If
+      
+    CreateMontageImageUsingEXE = Err.Number
 End Function
 
 Public Sub DefineDefaultElutionTimes(udtScanInfo() As udtScanInfoType, Optional ByVal sngNETStart As Single = 0, Optional ByVal sngNETEnd As Single = 1)
@@ -2914,6 +3302,165 @@ DefineDefaultElutionTimesErrorHandler:
     LogErrors Err.Number, "DefineDefaultElutionTimes"
     
 End Sub
+
+' This function uses Identify.exe (path defined by strIdentifyAppPath) to determine the length and width of strImageFilePath
+Private Function DetermineImageDimensions(ByRef fso As FileSystemObject, ByVal strIdentifyAppPath As String, ByVal strImageFilePath As String, ByRef lngWidth As Long, ByRef lngHeight As Long) As Boolean
+    
+    Const APP_MONITOR_INTERVAL_MSEC As Integer = 50
+    Const MAX_WAIT_TIME_SECONDS As Integer = 20
+    
+    Dim objProgRunner As clsProgRunner
+    Dim strArguments As String
+    
+    Dim dtProcessingStartTime As Date
+    Dim sngProcessingTimeSeconds As Single
+    Dim lngIteration As Long
+    
+    Dim strBatchFilePath As String
+    Dim strIdentifyResultsFilePath As String
+    Dim blnSuccess As Boolean
+        
+    Dim tsOutfile As TextStream
+    Dim tsInFile As TextStream
+    
+    Dim strUniqueSuffix As String
+    Dim strBatchFileCommand As String
+    Dim strContents As String
+    Dim lngCommaLoc As Long
+        
+On Error GoTo DetermineImageDimensionsErrorHandler
+
+    ' Clear the outputs
+    lngWidth = 0
+    lngHeight = 0
+
+    If Not fso.FileExists(strImageFilePath) Then
+        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox "Unable to determine image dimensions; Image file not found: " & strImageFilePath
+        Else
+            LogErrors Err.Number, "DetermineImageDimensions", "Unable to determine image dimensions; Image file not found: " & strImageFilePath
+        End If
+    End If
+    
+    ' Note from Matt Monroe (10/8/2009)
+    ' For some unknown reason, if we call "Identify.exe" with an argument string list this:
+    '  -format "%w,%h" "C:\temp\FileName.png" >> "C:\temp\IdentifyResults.tmp"
+    ' the program does not successfully process the file and store the results in IdentifyResults.tmp
+    '
+
+    ' However, if we create a valid Batch file, then call the batch file, then things work properly
+    
+    ' Note that strArguments has %w and %h while the batch command has %%w and %%h
+    strArguments = " -format ""%w,%h"" """ & strImageFilePath & """ > """ & strIdentifyResultsFilePath & """"
+    
+    ' Sleep for a random interval between 50 and 300 milliseconds
+    Sleep Int((300 - 50 + 1) * Rnd() + 50)
+    strUniqueSuffix = "_" & Mid(Format(Rnd(), "0.0000000"), 3)
+    
+    ' Define the path to the text file that will hold the results of the Identity operation
+    strIdentifyResultsFilePath = GetTemporaryDir()
+    strIdentifyResultsFilePath = fso.BuildPath(strIdentifyResultsFilePath, "IdentifyResults" & strUniqueSuffix & ".tmp")
+        
+    strBatchFilePath = GetTemporaryDir()
+    strBatchFilePath = fso.BuildPath(strBatchFilePath, "CallIdentify" & strUniqueSuffix & ".bat")
+        
+    strBatchFileCommand = """" & strIdentifyAppPath & """ -format ""%%w,%%h"" """ & strImageFilePath & """ >> """ & strIdentifyResultsFilePath & """"
+        
+    TraceLog 5, "DetermineImageDimensions", "Create batch file that will call the Identify program"
+    
+    Set tsOutfile = fso.CreateTextFile(strBatchFilePath, True, False)
+    tsOutfile.WriteLine strBatchFileCommand
+    tsOutfile.Close
+
+    Sleep 50
+
+    TraceLog 5, "DetermineImageDimensions", "Call " & strBatchFilePath & " with command: " & strBatchFileCommand
+
+    Set objProgRunner = New clsProgRunner
+    dtProcessingStartTime = Now()
+    
+    blnSuccess = True
+    
+    If objProgRunner.StartProgram(strBatchFilePath, "", vbMinimizedNoFocus) Then
+            
+        lngIteration = 0
+        Do While objProgRunner.AppRunning
+            Sleep APP_MONITOR_INTERVAL_MSEC
+            
+            sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
+            
+            If sngProcessingTimeSeconds > MAX_WAIT_TIME_SECONDS Then
+                ' Over 30 seconds has elapsed
+                objProgRunner.AbortProcessing
+                DoEvents
+                 
+                Debug.Assert False
+                LogErrors -1, "DetermineImageDimensions", "Over " & MAX_WAIT_TIME_SECONDS & " has elapsed while calling Identify.exe with '" & strArguments & "'"
+                 
+                blnSuccess = False
+                Exit Do
+            End If
+            
+            DoEvents
+            
+            lngIteration = lngIteration + 1
+        Loop
+    Else
+        blnSuccess = False
+    End If
+        
+    If blnSuccess Then
+    
+        Sleep 500
+        
+        ' Open the results file and extract the dimensions
+        
+        If Not fso.FileExists(strIdentifyResultsFilePath) Then
+            LogErrors 0, "DetermineImageDimensions", "Identify Results file not found (using arguments '" & strArguments & "'): " & strIdentifyResultsFilePath
+            blnSuccess = False
+        Else
+            
+            Set tsInFile = fso.OpenTextFile(strIdentifyResultsFilePath, ForReading, False, TristateUseDefault)
+            strContents = tsInFile.ReadLine
+            tsInFile.Close
+            
+            ' Find the first comma in strContents
+            lngCommaLoc = InStr(strContents, ",")
+            
+            If lngCommaLoc > 1 Then
+                ' Text up to the first comma should be the width
+                ' Text after the first comma should be the height
+                lngWidth = CLngSafe(Left(strContents, lngCommaLoc - 1))
+                
+                lngHeight = CLngSafe(Mid(strContents, lngCommaLoc + 1))
+            Else
+                blnSuccess = False
+            End If
+        End If
+    End If
+        
+    ' Delete the temporary files
+    If gTraceLogLevel = 0 Then
+        On Error Resume Next
+        fso.DeleteFile strBatchFilePath
+        fso.DeleteFile strIdentifyResultsFilePath
+    End If
+    
+    DetermineImageDimensions = blnSuccess
+    
+    Exit Function
+    
+DetermineImageDimensionsErrorHandler:
+
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error in DetermineImageDimensions (using arguments '" & strArguments & "'): " & Err.Description
+    Else
+        LogErrors Err.Number, "DetermineImageDimensions", "Error in DetermineImageDimensions (using arguments '" & strArguments & "'): " & Err.Description
+    End If
+    
+    DetermineImageDimensions = False
+
+End Function
 
 Public Function DetermineSourceDataRawFileType(ByVal lngGelIndex As Long, ByVal blnForceUpdate As Boolean) As Boolean
     ' Attempts to determine the source raw data file type

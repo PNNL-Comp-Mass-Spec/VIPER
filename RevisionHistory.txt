@@ -1,6 +1,18 @@
 VIPER Change Log
 
-Version 3.45 - Build 411; August 5, 2009
+Version 3.45 - Build 417; October 8, 2009
+	- Now calling Identify.exe and Montage.exe if the call to ImageMagicObject.dll fails
+
+Version 3.45 - Build 416; October 7, 2009
+	- Now calling Convert.exe if the call to ImageMagicObject.dll fails
+
+Version 3.45 - Build 415; October 7, 2009
+	- Removed limit of 15 columns in _Isos.csv files
+
+Version 3.45 - Build 414; September 25, 2009
+	- Recompiled on new development machine
+
+Version 3.45 - Build 412; August 5, 2009
 	- Added ability to load _LCMSFeatures.txt files
 		- These files are created by LCMSFeatureFinder.exe or by a similar program
 		- Expected columns: Feature_Index	Scan	Scan_Start	Scan_End	Scan_Aligned	NET	Monoisotopic_Mass	Monoisotopic_Mass_Calibrated	Abundance	Class_Rep_MZ	Class_Rep_Charge
