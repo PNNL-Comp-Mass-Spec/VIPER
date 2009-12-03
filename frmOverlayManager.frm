@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{6B7E6392-850A-101B-AFC0-4210102A8DA7}#1.3#0"; "COMCTL32.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl.OCX"
 Begin VB.Form frmOverlayManager 
    BackColor       =   &H00C0C0C0&
    BorderStyle     =   3  'Fixed Dialog
@@ -854,7 +854,7 @@ Begin VB.Form frmOverlayManager
          Width           =   1935
       End
    End
-   Begin ComctlLib.TabStrip TabStrip1 
+   Begin MSComctlLib.TabStrip TabStrip1 
       Height          =   4695
       Left            =   120
       TabIndex        =   0

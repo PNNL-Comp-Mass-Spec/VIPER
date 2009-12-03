@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{6B7E6392-850A-101B-AFC0-4210102A8DA7}#1.3#0"; "comctl32.ocx"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl.OCX"
 Begin VB.Form frmGraphOverlayPrintMetric 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Print Metric Settings"
@@ -836,7 +836,7 @@ Begin VB.Form frmGraphOverlayPrintMetric
          WordWrap        =   -1  'True
       End
    End
-   Begin ComctlLib.TabStrip TabStrip1 
+   Begin MSComctlLib.TabStrip TabStrip1 
       Height          =   4215
       Left            =   120
       TabIndex        =   1
