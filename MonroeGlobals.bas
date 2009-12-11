@@ -190,6 +190,12 @@ Public Enum pftPictureFileTypeConstants
     pftBMP = 5
 End Enum
 
+Public Enum plmPointsLoadModeConstants
+    plmLoadAllPoints = 0
+    plmLoadMappedPointsOnly = 1
+    plmLoadOnePointPerLCMSFeature = 2
+End Enum
+
 ' Up to 4 different auto searches can be performed
 Public Const MAX_AUTO_SEARCH_MODE_COUNT = 4
 
@@ -1163,6 +1169,7 @@ Public Type udtAutoAnalysisFilterPrefsType
     TotalIntensityPercentageFilter As Single
 
     AutoMapDataPointsMassTolerancePPM As Single        ' This setting is only used when we load _LCMSFeatures.txt files and we need to auto-map the data points to the features
+    PointsLoadMode As plmPointsLoadModeConstants
 End Type
 
 Public Type udtAutoAnalysisCachedDataType

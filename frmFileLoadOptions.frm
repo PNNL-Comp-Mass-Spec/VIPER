@@ -1,20 +1,30 @@
 VERSION 5.00
 Begin VB.Form frmFileLoadOptions 
    Caption         =   "File Load Options"
-   ClientHeight    =   5865
+   ClientHeight    =   6465
    ClientLeft      =   60
    ClientTop       =   570
    ClientWidth     =   7470
    LinkTopic       =   "Form1"
-   ScaleHeight     =   5865
+   ScaleHeight     =   6465
    ScaleWidth      =   7470
    Begin VB.Frame fraPredefinedLCMSFeatureOptions 
       Caption         =   "Predefined LC-MS Feature Options"
-      Height          =   975
+      Height          =   1695
       Left            =   120
       TabIndex        =   32
       Top             =   4680
       Width           =   3375
+      Begin VB.ComboBox cmbPointsLoadMode 
+         Height          =   315
+         ItemData        =   "frmFileLoadOptions.frx":0000
+         Left            =   120
+         List            =   "frmFileLoadOptions.frx":0002
+         Style           =   2  'Dropdown List
+         TabIndex        =   41
+         Top             =   1200
+         Width           =   3000
+      End
       Begin VB.TextBox txtAutoMapDataPointsMassTolerancePPM 
          Alignment       =   1  'Right Justify
          Height          =   285
@@ -25,12 +35,21 @@ Begin VB.Form frmFileLoadOptions
          Width           =   495
       End
       Begin VB.Label lblDescription 
+         Caption         =   "Choose which points to load:"
+         Height          =   255
+         Index           =   3
+         Left            =   120
+         TabIndex        =   42
+         Top             =   960
+         Width           =   2175
+      End
+      Begin VB.Label lblDescription 
          Caption         =   "ppm"
          Height          =   240
          Index           =   2
          Left            =   2760
          TabIndex        =   35
-         Top             =   390
+         Top             =   360
          Width           =   450
       End
       Begin VB.Label lblAutoMapDataPointsMassTolerancePPM 
@@ -174,9 +193,9 @@ Begin VB.Form frmFileLoadOptions
       Width           =   1455
       Begin VB.ListBox lstMSLevelFilter 
          Height          =   840
-         ItemData        =   "frmFileLoadOptions.frx":0000
+         ItemData        =   "frmFileLoadOptions.frx":0004
          Left            =   120
-         List            =   "frmFileLoadOptions.frx":0002
+         List            =   "frmFileLoadOptions.frx":0006
          MultiSelect     =   2  'Extended
          TabIndex        =   37
          Top             =   240
@@ -389,6 +408,13 @@ Public Property Get AutoMapDataPointsMassTolerancePPM() As Single
     End If
 End Property
 
+Public Property Let PointsLoadMode(intValue As Integer)
+    cmbPointsLoadMode.ListIndex = intValue
+End Property
+Public Property Get PointsLoadMode() As Integer
+    PointsLoadMode = cmbPointsLoadMode.ListIndex
+End Property
+
 Public Property Get LoadCancelled() As Boolean
     LoadCancelled = mLoadCancelled
 End Property
@@ -585,6 +611,12 @@ Private Sub ResetToDefaults()
     
     ' Call SetFileType to set file-type specific filters
     SetFileType mFileType
+    
+    With cmbPointsLoadMode
+        .AddItem ("Load All Points")
+        .AddItem ("Load Mapped Points Only")
+        .AddItem ("Load 1 Point Per LC-MS Feature")
+    End With
 End Sub
 
 Public Sub SetFileType(eFileType As ifmInputFileModeConstants)
@@ -694,6 +726,7 @@ Public Sub SetFileType(eFileType As ifmInputFileModeConstants)
     End If
 
     txtAutoMapDataPointsMassTolerancePPM.Enabled = blnEnableLCMSFeatureFilters
+    cmbPointsLoadMode.Enabled = blnEnableLCMSFeatureFilters
     
 End Sub
 

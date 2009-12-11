@@ -80,6 +80,9 @@ Private mFeatureToPeakMapPeakIdx() As Long          ' These indices are the inde
 Private mErrorMessage As String
 Private mShowDialogBoxes As Boolean
 
+Private mPointsLoadMode As plmPointsLoadModeConstants
+Private mHashMapOfPointsKept As Dictionary
+
 Private mProgressDescription As String
 Private mProgressPctComplete As Single          ' Number between 0 and 100
 
@@ -125,6 +128,20 @@ Public Property Get AutoMapDataPointsMassTolerancePPM() As Double
 End Property
 Public Property Let AutoMapDataPointsMassTolerancePPM(ByVal Value As Double)
     mAutoMapDataPointsMassTolerancePPM = Value
+End Property
+
+Public Property Get PointsLoadMode() As plmPointsLoadModeConstants
+    PointsLoadMode = mPointsLoadMode
+End Property
+Public Property Let PointsLoadMode(ByVal plmValue As plmPointsLoadModeConstants)
+    mPointsLoadMode = plmValue
+End Property
+
+Public Property Get HashMapOfPointsKept() As Dictionary
+    Set HashMapOfPointsKept = mHashMapOfPointsKept
+End Property
+Public Property Let HashMapOfPointsKept(ByRef Ref As Dictionary)
+    Set mHashMapOfPointsKept = Ref
 End Property
 
 Private Sub Class_Initialize()
@@ -371,6 +388,7 @@ On Error GoTo AutoMapDataPointsToFeaturesErrorHandler
             
             lngUMCIndex = lngUMCAbuPointerArray(lngPointerIndex)
             With GelUMC(mGelIndex).UMCs(lngUMCIndex)
+                
                 lngMinScan = .MinScan
                 lngMaxScan = .MaxScan
                 
@@ -808,6 +826,152 @@ LoadLCMSFeatureFilesErrorHandler:
     LoadLCMSFeatureFiles = lngReturnValue
     
 End Function
+
+Public Function RefinePeakListFromFeatureFile(ByVal strLCMSFeaturesFilePath As String, _
+                                              ByRef PointsToKeep As Dictionary, _
+                                              ByRef FeatureToScanMap As Dictionary) As Long
+                                            
+    '-------------------------------------------------------------------------
+    'Returns 0 if data successfuly loaded,
+    '-6 for file not found or invalid file,
+    '-10 for any other error
+    '-------------------------------------------------------------------------
+                                        
+    Dim fso As New FileSystemObject
+    Dim tsInFile As TextStream
+    Dim strLineIn As String
+    Dim strUnknownColumnList As String
+    Dim strMessage As String
+    
+    Dim lngIndex As Long
+    Dim lngFeatureIndex As Long
+    Dim lngScanCenter As Long
+    
+    Dim blnColumnsDefined As Boolean
+    Dim blnDataLine As Boolean
+    
+    Dim strData() As String
+    Dim strColumnHeader As String
+    
+    Dim element
+    
+    Set FeatureToScanMap = New Dictionary
+    
+    If Not fso.FileExists(strLCMSFeaturesFilePath) Then
+        mErrorMessage = "File not found: " & strLCMSFeaturesFilePath
+        RefinePeakListFromFeatureFile = -6
+        Exit Function
+    End If
+    
+    ReDim intColumnMapping(LCMSFEATURES_FILE_COLUMN_COUNT - 1)
+    
+    ' Set the column mappings to -1 (not present) for now
+    For lngIndex = 0 To LCMSFEATURES_FILE_COLUMN_COUNT - 1
+        intColumnMapping(lngIndex) = -1
+    Next lngIndex
+    
+    Set tsInFile = fso.OpenTextFile(strLCMSFeaturesFilePath, ForReading, False)
+    Do While Not tsInFile.AtEndOfStream
+
+        strLineIn = tsInFile.ReadLine
+        
+        ' Check for valid line (must contain at least one tab and must be
+        ' the header line or start with a number)
+        strLineIn = Trim(strLineIn)
+        If InStr(strLineIn, vbTab) > 0 Then
+            If blnColumnsDefined Then
+                blnDataLine = IsNumeric(Left(strLineIn, 1))
+            Else
+                ' Haven't found the column header line yet
+                ' If the line starts with a number, then assume the column header line is missing and use the default column order
+                ' If the line starts with text, then assume this is the column header line
+                
+                If IsNumeric(Left(strLineIn, 1)) Then
+                    ' Use the default column mappings
+
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex) = LCMSFeaturesFileColumnConstants.FeatureIndex
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.Scan) = LCMSFeaturesFileColumnConstants.Scan
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.ScanStart) = LCMSFeaturesFileColumnConstants.ScanStart
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.ScanEnd) = LCMSFeaturesFileColumnConstants.ScanEnd
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.ScanAligned) = LCMSFeaturesFileColumnConstants.ScanAligned
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.NET) = LCMSFeaturesFileColumnConstants.NET
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMass) = LCMSFeaturesFileColumnConstants.MonoisotopicMass
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMassCalibrated) = LCMSFeaturesFileColumnConstants.MonoisotopicMassCalibrated
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance) = LCMSFeaturesFileColumnConstants.Abundance
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepMZ) = LCMSFeaturesFileColumnConstants.ClassRepMZ
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepCharge) = LCMSFeaturesFileColumnConstants.ClassRepCharge
+                    
+                    blnDataLine = True
+                Else
+                    ' Define the column mappings
+                    strData = Split(strLineIn, vbTab)
+                    strUnknownColumnList = ""
+                    
+                    For lngIndex = 0 To UBound(strData)
+                        If lngIndex >= LCMSFEATURES_FILE_COLUMN_COUNT Then
+                            ' Too many column headers; ignore the extra columns
+                            Debug.Assert False
+                            Exit For
+                        End If
+
+                        strColumnHeader = StripQuotes(LCase(Trim(strData(lngIndex))))
+                        
+                        Select Case strColumnHeader
+                        Case LCMSFEATURES_COLUMN_FEATURE_INDEX:         intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex) = lngIndex
+                        Case LCMSFEATURES_COLUMN_SCAN:                  intColumnMapping(LCMSFeaturesFileColumnConstants.Scan) = lngIndex
+                        End Select
+                                                
+                    Next lngIndex
+                    
+                    blnDataLine = False
+                
+                End If
+                
+                blnColumnsDefined = True
+            End If
+        End If
+        
+        If blnDataLine Then
+        
+            strData = Split(strLineIn, vbTab)
+            
+            ' Extract out the Feature index; ignore any features defined more than once
+            lngFeatureIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex), -1)
+            
+            ' May only want to enter this If statement if the current feature number exists in PointsToKeep<peak, feature>
+            If lngFeatureIndex >= 0 Then
+                
+                lngScanCenter = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Scan), 0)
+                
+                FeatureToScanMap.add lngFeatureIndex, lngScanCenter
+                
+                ' PointsToKeep<peak, feature>
+                ' Use Current PointsToKeep HashMap to replace the feature with the scan
+                '   - Then we will be left with: PointsToKeep<peak, scan>
+                '   - Later on, when we read the FeatureToPeak file, a point will only be valid if it has the right peak and scan,
+                '           not just the right peak
+                
+                
+                '' I don't think the below method is working correctly ... if it is, it takes too long or causes viper to freeze
+                ''  - I probably just need to create a new HashMap instead of trying this trickery, but I would like to see if I can get this way to work
+                'With PointsToKeep
+                '    For Each element In .Keys
+                '        If .Item(element) = lngFeatureIndex Then
+                '            .Item(element) = lngScanCenter
+                '        End If
+                '    Next
+                'End With
+                
+            End If
+        
+        End If
+        
+    Loop
+    
+    RefinePeakListFromFeatureFile = 0
+    Exit Function
+        
+End Function
     
 Private Function ReadLCMSFeaturesFile(ByRef fso As FileSystemObject, _
                                       ByVal strLCMSFeaturesFilePath As String, _
@@ -996,6 +1160,7 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                     
                     .MinScan = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ScanStart), lngScanCenter)
                     .MaxScan = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ScanEnd), lngScanCenter)
+                    
                     .MinMW = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMass), 0)
                     .MaxMW = .MinMW
                                         
@@ -1045,6 +1210,118 @@ ReadLCMSFeaturesFileErrorHandler:
 
 End Function
 
+Public Function CreatePeakListFromFeatureToPeakMapFile(ByVal strLCMSFeatureToPeakMapFilePath As String, _
+                                                       ByRef PointsToKeep As Dictionary) As Long
+                                            
+        '-------------------------------------------------------------------------
+        'Returns 0 if data successfuly loaded,
+        '-6 for file not found or invalid file,
+        '-10 for any other error
+        '-------------------------------------------------------------------------
+                                            
+        Dim fso As New FileSystemObject
+        Dim tsInFile As TextStream
+        Dim strLineIn As String
+        Dim strUnknownColumnList As String
+        Dim strMessage As String
+        
+        Dim lngIndex As Long
+        
+        Dim blnColumnsDefined As Boolean
+        Dim blnDataLine As Boolean
+        
+        Dim strData() As String
+        Dim strColumnHeader As String
+        
+        Dim intColumnMapping() As Integer
+        
+        Dim lngFeatureIndex As Long
+        Dim lngPeakIndex As Long
+        
+        Set PointsToKeep = New Dictionary
+        
+        If Not fso.FileExists(strLCMSFeatureToPeakMapFilePath) Then
+            mErrorMessage = "File not found: " & strLCMSFeatureToPeakMapFilePath
+            CreatePeakListFromFeatureToPeakMapFile = -6
+            Exit Function
+        End If
+        
+        ReDim intColumnMapping(PEAK_MAP_FILE_COLUMN_COUNT - 1)
+    
+        ' Set the column mappings to -1 (not present) for now
+        For lngIndex = 0 To PEAK_MAP_FILE_COLUMN_COUNT - 1
+            intColumnMapping(lngIndex) = -1
+        Next lngIndex
+                
+        Set tsInFile = fso.OpenTextFile(strLCMSFeatureToPeakMapFilePath, ForReading, False)
+        Do While Not tsInFile.AtEndOfStream
+            strLineIn = tsInFile.ReadLine
+            ' Check for valid line (must contain at least one tab and must be
+            ' the header line or start with a number)
+            strLineIn = Trim(strLineIn)
+            If InStr(strLineIn, vbTab) > 0 Then
+                If blnColumnsDefined Then
+                    blnDataLine = IsNumeric(Left(strLineIn, 1))
+                Else
+                    ' Haven't found the column header line yet
+                    ' If the line starts with a number, then assume the column header line is missing and use the default column order
+                    ' If the line starts with text, then assume this is the column header line
+                
+                    If IsNumeric(Left(strLineIn, 1)) Then
+                        ' Use the default column mappings
+                        intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex) = LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex
+                        intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex) = LCMSFeatureToPeakMapFileColumnConstants.PeakIndex
+                    
+                        blnDataLine = True
+                    Else
+                        ' Define the column mappings
+                        strData = Split(strLineIn, vbTab)
+                        strUnknownColumnList = ""
+                    
+                        For lngIndex = 0 To UBound(strData)
+                            If lngIndex >= PEAK_MAP_FILE_COLUMN_COUNT Then
+                                ' Too many column headers; ignore the extra columns
+                                Debug.Assert False
+                                Exit For
+                            End If
+
+                            strColumnHeader = StripQuotes(LCase(Trim(strData(lngIndex))))
+                        
+                            Select Case strColumnHeader
+                            Case PEAK_MAP_COLUMN_FEATURE_INDEX:    intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex) = lngIndex
+                            Case PEAK_MAP_COLUMN_PEAK_INDEX:       intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex) = lngIndex
+                            End Select
+                        
+                        Next lngIndex
+                    
+                        blnDataLine = False
+                
+                    End If
+                
+                    blnColumnsDefined = True
+                End If
+            End If
+                
+            If blnDataLine Then
+            
+                strData = Split(strLineIn, vbTab)
+            
+                ' Extract out the Feature index and Peak Index
+                lngFeatureIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex), -1)
+                lngPeakIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex), -1)
+                lngPeakIndex = lngPeakIndex + 1 'Add 1 to handle LCMS_Features.txt type of index
+            
+                If lngFeatureIndex >= 0 And lngPeakIndex >= 0 Then
+                    PointsToKeep.add lngPeakIndex, lngFeatureIndex
+                End If
+            End If
+        Loop
+        
+        CreatePeakListFromFeatureToPeakMapFile = 0
+        Exit Function
+
+End Function
+
 Private Function ReadLCMSFeatureToPeakMapFile(ByRef fso As FileSystemObject, _
                                               ByVal strLCMSFeatureToPeakMapFilePath As String, _
                                               ByRef htLCMSFeatureIndexMap As Dictionary, _
@@ -1063,6 +1340,7 @@ Private Function ReadLCMSFeatureToPeakMapFile(ByRef fso As FileSystemObject, _
     
     Dim blnColumnsDefined As Boolean
     Dim blnDataLine As Boolean
+    Dim blnValidPeak As Boolean
     
     Dim strData() As String
     Dim strColumnHeader As String
@@ -1183,8 +1461,22 @@ On Error GoTo ReadLCMSFeatureToPeakMapFileErrorHandler
             ' Extract out the Feature index and Peak Index
             lngFeatureIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex), -1)
             lngPeakIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex), -1)
+            lngPeakIndex = lngPeakIndex + 1 'Add 1 to handle LCMS_Features.txt type of index
             
-            If lngFeatureIndex >= 0 And lngPeakIndex >= 0 Then
+            blnValidPeak = True
+            
+            If PointsLoadMode >= plmLoadMappedPointsOnly Then
+                If PointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+                    If Not mHashMapOfPointsKept.Exists(lngPeakIndex) Then
+                        blnValidPeak = False
+                    End If
+                End If
+                If blnValidPeak Then
+                    lngPeakIndex = mHashMapOfPointsKept.Item(lngPeakIndex)
+                End If
+            End If
+            
+            If blnValidPeak And lngFeatureIndex >= 0 And lngPeakIndex >= 0 Then
                 
                 ' Add this mapping to the mFeatureToPeakMap arrays
                 

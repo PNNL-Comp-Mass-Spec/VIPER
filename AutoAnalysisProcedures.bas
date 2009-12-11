@@ -2651,14 +2651,15 @@ On Error GoTo LoadInputFileErrorHandler
                     
                     If intFileExtensionsPrefListCount = 0 Then
                         Debug.Assert False
-                        intFileExtensionsPrefListCount = 7
-                        strFileExtensionsPrefList(0) = CSV_ISOS_IC_FILE_SUFFIX
-                        strFileExtensionsPrefList(1) = CSV_ISOS_FILE_SUFFIX
-                        strFileExtensionsPrefList(2) = ".mzxml"
-                        strFileExtensionsPrefList(3) = ".mzdata"
-                        strFileExtensionsPrefList(4) = "mzxml.xml"
-                        strFileExtensionsPrefList(5) = "mzdata.xml"
-                        strFileExtensionsPrefList(6) = ".pek"
+                        intFileExtensionsPrefListCount = 8
+                        strFileExtensionsPrefList(0) = "_lcmsfeatures.txt"
+                        strFileExtensionsPrefList(1) = CSV_ISOS_IC_FILE_SUFFIX
+                        strFileExtensionsPrefList(2) = CSV_ISOS_FILE_SUFFIX
+                        strFileExtensionsPrefList(3) = ".mzxml"
+                        strFileExtensionsPrefList(4) = ".mzdata"
+                        strFileExtensionsPrefList(5) = "mzxml.xml"
+                        strFileExtensionsPrefList(6) = "mzdata.xml"
+                        strFileExtensionsPrefList(7) = ".pek"
                     End If
                     
                     ' Now step through strFileExtensionsPrefList() and see if any of the files in strWildcardFileMatches() match
@@ -2820,6 +2821,11 @@ On Error GoTo LoadInputFileErrorHandler
                     If IsNumeric(strKeyValue) Then
                         .AutoMapDataPointsMassTolerancePPM = val(strKeyValue)
                     End If
+                    
+                    strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "PointsLoadMode", Trim(.PointsLoadMode), udtAutoParams.FilePaths.IniFilePath)
+                    If IsNumeric(strKeyValue) Then
+                        .PointsLoadMode = val(strKeyValue)
+                    End If
                 
                 End With
                 
@@ -2893,6 +2899,7 @@ On Error GoTo LoadInputFileErrorHandler
                     End If
                     
                     .AutoMapDataPointsMassTolerancePPM = 5
+                    .PointsLoadMode = plmLoadMappedPointsOnly
                 End With
                 
                 .AutoAnalysisOptions.GenerateMonoPlus4IsoLabelingFile = False

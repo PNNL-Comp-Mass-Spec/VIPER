@@ -117,6 +117,10 @@ Private mTotalIntensityPercentageFilter As Single
 
 Private mPrescannedData As clsFileIOPrescannedData
 
+Private mPointsToKeep As Dictionary
+Private mHashMapOfPointsKept As Dictionary
+Private mFeatureToScanMap As Dictionary
+
 Private mValidDataPointCount As Long
 Private mSubtaskMessage As String
 
@@ -359,7 +363,8 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
                            ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants, _
                            ByVal blnLoadPredefinedLCMSFeatures As Boolean, _
                            ByVal sngAutoMapDataPointsMassTolerancePPM As Single, _
-                           ByRef strErrorMessage) As Long
+                           ByRef strErrorMessage, _
+                           ByVal plmPointsLoadMode As Integer) As Long
     '-------------------------------------------------------------------------
     'Returns 0 if data successfuly loaded, -2 if data set is too large,
     '-3 if problems with scan numbers, -4 if no data found, -5 if user cancels load,
@@ -395,6 +400,8 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     Dim lngScansFileByteCount As Long
     Dim lngByteCountTotal As Long
     Dim lngTotalBytesRead As Long
+    
+    Dim objSplitUMCs As clsSplitUMCsByAbundance
     
 On Error GoTo LoadNewCSVErrorHandler
 
@@ -527,20 +534,36 @@ On Error GoTo LoadNewCSVErrorHandler
         lngReturnValue = 0
     End If
     
+    If plmPointsLoadMode >= plmLoadMappedPointsOnly Then
+        Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
+        Set objReadLCMSFeatures = New clsFileIOPredefinedLCMSFeatures
+        lngReturnValue = objReadLCMSFeatures.CreatePeakListFromFeatureToPeakMapFile(strLCMSFeatureToPeakMapFilePath, mPointsToKeep)
+        If plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+            lngReturnValue = objReadLCMSFeatures.RefinePeakListFromFeatureFile(strLCMSFeaturesFilePath, mPointsToKeep, mFeatureToScanMap)
+        End If
+    End If
+    
     If lngReturnValue = 0 Then
         ' Read the Isos file
         ' Note that the CSV Isos file only contains isotopic data, not charge state data
         lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseFilePath, _
                                          lngScansFileByteCount, lngByteCountTotal, lngTotalBytesRead, _
                                          blnValidScansFile, blnFilePrescanEnabled, _
-                                         blnLoadPredefinedLCMSFeatures)
+                                         blnLoadPredefinedLCMSFeatures, plmPointsLoadMode)
     
         If lngReturnValue = 0 Then
             If blnLoadPredefinedLCMSFeatures Then
-                lngReturnValue = ReadLCMSFeatureFiles(fso, strLCMSFeaturesFilePath, strLCMSFeatureToPeakMapFilePath, sngAutoMapDataPointsMassTolerancePPM)
+                lngReturnValue = ReadLCMSFeatureFiles(fso, strLCMSFeaturesFilePath, strLCMSFeatureToPeakMapFilePath, sngAutoMapDataPointsMassTolerancePPM, plmPointsLoadMode)
             End If
         End If
     End If
+    
+    ''Commented out because there is a splitting problem. This code wil be in place when splitting is fixed.
+    'If plmPointsLoadMode < plmLoadOnePointPerLCMSFeature Then
+    '    Set objSplitUMCs = New clsSplitUMCsByAbundance
+    '    objSplitUMCs.ExamineUMCs mGelIndex, frmProgress, GelUMC(mGelIndex).def.OddEvenProcessingMode, True, False
+    '    Set objSplitUMCs = Nothing
+    'End If
         
     LoadNewCSV = lngReturnValue
     Exit Function
@@ -561,7 +584,8 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
                                  ByVal lngScansFileByteCount As Long, ByVal lngByteCountTotal As Long, _
                                  ByRef lngTotalBytesRead As Long, ByVal blnValidScansFile As Boolean, _
                                  ByVal blnFilePrescanEnabled As Boolean, _
-                                 ByVal blnLoadPredefinedLCMSFeatures As Boolean) As Long
+                                 ByVal blnLoadPredefinedLCMSFeatures As Boolean, _
+                                 ByVal plmPointsLoadMode As Integer) As Long
 
     ' Returns 0 if no error, the error number if an error
 
@@ -663,7 +687,8 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, lngTotalBytesRead, _
                                              intColumnMapping, blnValidScansFile, _
                                              sngMonoPlus4Intensities, sngMonoMinus4Intensities, _
-                                             blnFilePrescanEnabled, blnIgnoreAllFiltersAndLoadAllData)
+                                             blnFilePrescanEnabled, blnIgnoreAllFiltersAndLoadAllData, _
+                                             plmPointsLoadMode)
         If lngReturnValue <> 0 Then
             ' Error occurred
             Debug.Assert False
@@ -898,7 +923,8 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
                                      ByRef sngMonoPlus4Intensities() As Single, _
                                      ByRef sngMonoMinus4Intensities() As Single, _
                                      ByVal blnFilePrescanEnabled As Boolean, _
-                                     ByVal blnIgnoreAllFiltersAndLoadAllData As Boolean) As Long
+                                     ByVal blnIgnoreAllFiltersAndLoadAllData As Boolean, _
+                                     ByVal plmPointsLoadMode As Integer) As Long
     
     Dim tsInFile As TextStream
     Dim strLineIn As String
@@ -906,6 +932,8 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
     Dim lngLinesRead As Long
     Dim lngIndex As Long
     Dim lngScanNumber As Long
+    Dim lngIsoIndex As Long
+    Dim lngFeatureIndex As Long
     
     Dim blnColumnsDefined As Boolean
     Dim blnDataLine As Boolean
@@ -923,6 +951,8 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
     Dim strMessage As String
     Dim lngReturnValue As Long
     
+    Set mHashMapOfPointsKept = New Dictionary
+    
 On Error GoTo ReadCSVIsosFileWorkErrorHandler
     
     ' Reserve space in these arrays, but only if we're not pre-scanning the data
@@ -932,6 +962,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
     End If
     
     lngLinesRead = 0
+    lngIsoIndex = 1 'Start index at 1 to handle LCMS_Features.txt type of index
     
     Set tsInFile = fso.OpenTextFile(strIsosFilePath, ForReading, False)
     Do While Not tsInFile.AtEndOfStream
@@ -1087,7 +1118,23 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     End If
                 End If
                 
+                If plmPointsLoadMode >= plmLoadMappedPointsOnly And blnValidDataPoint Then
+                    If Not mPointsToKeep.Exists(lngIsoIndex) Then
+                        blnValidDataPoint = False
+                    Else
+                        If plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+                            lngFeatureIndex = mPointsToKeep.Item(lngIsoIndex)
+                            
+                            If Not mFeatureToScanMap.Item(lngFeatureIndex) = lngScanNumber Then
+                                blnValidDataPoint = False
+                            End If
+                        End If
+                    End If
+                End If
+            
                 If blnValidDataPoint Then
+                
+                    mHashMapOfPointsKept.add lngIsoIndex, GelData(mGelIndex).IsoLines + 1
                 
                     If mReadMode = rmReadModeConstants.rmPrescanData Then
                         mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
@@ -1171,6 +1218,8 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     mValidDataPointCount = mValidDataPointCount + 1
                 End If
             End If
+            
+            lngIsoIndex = lngIsoIndex + 1
         End If
     Loop
         
@@ -1426,7 +1475,8 @@ End Function
 Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
                                       ByVal strLCMSFeaturesFilePath As String, _
                                       ByVal strLCMSFeatureToPeakMapFilePath As String, _
-                                      ByVal sngAutoMapDataPointsMassTolerancePPM As Single) As Long
+                                      ByVal sngAutoMapDataPointsMassTolerancePPM As Single, _
+                                      ByVal plmPointsLoadMode As Integer) As Long
                                       
     Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
     Dim lngReturnCode As Long
@@ -1436,6 +1486,12 @@ Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
     
     objReadLCMSFeatures.ShowDialogBoxes = Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled
     objReadLCMSFeatures.AutoMapDataPointsMassTolerancePPM = sngAutoMapDataPointsMassTolerancePPM
+    
+    objReadLCMSFeatures.PointsLoadMode = plmPointsLoadMode
+    
+    If plmPointsLoadMode >= plmLoadMappedPointsOnly Then
+        objReadLCMSFeatures.HashMapOfPointsKept = mHashMapOfPointsKept
+    End If
     
     lngReturnCode = objReadLCMSFeatures.LoadLCMSFeatureFiles(strLCMSFeaturesFilePath, strLCMSFeatureToPeakMapFilePath, mGelIndex)
     

@@ -1689,6 +1689,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
         objLoadOptionsForm.TotalIntensityPercentageFilter = .TotalIntensityPercentageFilter
         
         objLoadOptionsForm.AutoMapDataPointsMassTolerancePPM = .AutoMapDataPointsMassTolerancePPM
+        objLoadOptionsForm.PointsLoadMode = .PointsLoadMode
         
         If .RestrictToEvenScanNumbersOnly Or .RestrictToOddScanNumbersOnly Then
             If .RestrictToOddScanNumbersOnly Then
@@ -1767,6 +1768,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 End If
                 
                 .AutoMapDataPointsMassTolerancePPM = objLoadOptionsForm.AutoMapDataPointsMassTolerancePPM
+                .PointsLoadMode = objLoadOptionsForm.PointsLoadMode
                 
                 .RestrictToOddScanNumbersOnly = False
                 .RestrictToEvenScanNumbersOnly = False
@@ -1801,6 +1803,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 .TotalIntensityPercentageFilter = udtFilterPrefs.TotalIntensityPercentageFilter
                 
                 .AutoMapDataPointsMassTolerancePPM = udtFilterPrefs.AutoMapDataPointsMassTolerancePPM
+                .PointsLoadMode = udtFilterPrefs.PointsLoadMode
                 
                 .RestrictToOddScanNumbersOnly = udtFilterPrefs.RestrictToOddScanNumbersOnly
                 .RestrictToEvenScanNumbersOnly = udtFilterPrefs.RestrictToEvenScanNumbersOnly
@@ -1830,6 +1833,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
             
         Case ifmInputFileModeConstants.ifmCSVFile
             With udtFilterPrefs
+                ''kc todo: Replace True with .PointsLoadMode and update code to handle the Enum instead of a Boolean
                 intReturnCode = LoadNewCSV(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
                                            .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
                                            .MaximumDataCountEnabled, .MaximumDataCountToLoad, _
@@ -1837,7 +1841,8 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                                            eScanFilterMode, eDataFilterMode, _
                                            blnLoadPredefinedLCMSFeatures, _
                                            .AutoMapDataPointsMassTolerancePPM, _
-                                           strErrorMessage)
+                                           strErrorMessage, _
+                                           .PointsLoadMode)
             End With
             
         Case ifmInputFileModeConstants.ifmmzXMLFile, ifmInputFileModeConstants.ifmmzXMLFileWithXMLExtension
