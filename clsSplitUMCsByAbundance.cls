@@ -45,6 +45,7 @@ Public Sub ExamineUMCs(ByVal lngGelIndex As Long, ByRef frmCallingForm As VB.For
     '
     ' In addition, if .GapMaxSize is > 0, then will also split LC-MS Features with gaps larger than .GapMaxSize, regardless of intensity or mass
     
+    Dim lngUMCCount As Long
     Dim lngUMCCountAtStart As Long
     Dim lngUMCIndex As Long
     Dim lngScanIndex As Long
@@ -104,6 +105,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
     lngMinimumClassCountToCheck = udtOptions.PeakWidthPointsMinimum * 2
     
     lngUMCCountAtStart = GelUMC(lngGelIndex).UMCCnt
+    lngUMCCount = GelUMC(lngGelIndex).UMCCnt
     lngUMCsAdded = 0
     lngUMCsSplit = 0
     
@@ -121,7 +123,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
        
         ' First split any LC-MS Features with gaps that are too large
         ' This should only affect LC-MS Features found using UMCIonNet, and not UMCListType2002 or UMC2003
-        For lngUMCIndex = 0 To lngUMCCountAtStart - 1
+        For lngUMCIndex = 0 To lngUMCCount - 1
             If GelUMC(lngGelIndex).UMCs(lngUMCIndex).ClassCount > GelSearchDef(lngGelIndex).UMCDef.GapMaxSize Then
                 SplitUMCsPopulateArrays lngGelIndex, lngUMCIndex, dblXData(), dblYData(), lngDataCount, lngMemberScanNumbersRelative(), lngClassMemberCount, eOddEvenProcessingMode
                     
@@ -202,7 +204,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
             End If
             
             If lngUMCIndex Mod 50 = 0 Then
-                strMessage = "Splitting LC-MS Features with gaps that are too large: " & Trim(lngUMCIndex) & " / " & Trim(lngUMCCountAtStart)
+                strMessage = "Splitting LC-MS Features with gaps that are too large: " & Trim(lngUMCIndex) & " / " & Trim(lngUMCCount)
                 If blnUseStatusFunctionOnCallingForm Then
                     frmCallingForm.Status strMessage
                 Else
@@ -216,9 +218,9 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
     End If
     
     If Not mAbortRequested Then
-        lngUMCCountAtStart = GelUMC(lngGelIndex).UMCCnt
+        lngUMCCount = GelUMC(lngGelIndex).UMCCnt
     
-        strMessage = "Splitting LC-MS Features with multiple abundance profiles: 0 / " & Trim(lngUMCCountAtStart)
+        strMessage = "Splitting LC-MS Features with multiple abundance profiles: 0 / " & Trim(lngUMCCount)
         If blnUseStatusFunctionOnCallingForm Then
             frmCallingForm.Status strMessage
         Else
@@ -226,7 +228,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
         End If
     
         ' Now see if any of the LC-MS Features need to be split due to subregions with differing abundances and mass
-        For lngUMCIndex = 0 To lngUMCCountAtStart - 1
+        For lngUMCIndex = 0 To lngUMCCount - 1
             If GelUMC(lngGelIndex).UMCs(lngUMCIndex).ClassCount >= lngMinimumClassCountToCheck Then
                 
                 SplitUMCsPopulateArrays lngGelIndex, lngUMCIndex, dblXData(), dblYData(), lngDataCount, lngMemberScanNumbersRelative(), lngClassMemberCount, eOddEvenProcessingMode
@@ -361,7 +363,7 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
             End If
             
             If lngUMCIndex Mod 50 = 0 Then
-                strMessage = "Splitting LC-MS Features with multiple abundance profiles: " & Trim(lngUMCIndex) & " / " & Trim(lngUMCCountAtStart)
+                strMessage = "Splitting LC-MS Features with multiple abundance profiles: " & Trim(lngUMCIndex) & " / " & Trim(lngUMCCount)
                 If blnUseStatusFunctionOnCallingForm Then
                     frmCallingForm.Status strMessage
                 Else

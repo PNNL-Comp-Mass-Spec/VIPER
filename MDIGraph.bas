@@ -1833,7 +1833,6 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
             
         Case ifmInputFileModeConstants.ifmCSVFile
             With udtFilterPrefs
-                ''kc todo: Replace True with .PointsLoadMode and update code to handle the Enum instead of a Boolean
                 intReturnCode = LoadNewCSV(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
                                            .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
                                            .MaximumDataCountEnabled, .MaximumDataCountToLoad, _
@@ -1882,6 +1881,18 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
         End Select
         
         If intReturnCode = 0 Then
+            If udtFilterPrefs.PointsLoadMode > plmLoadAllPoints Then
+                With GelData(lngGelIndex)
+                    If udtFilterPrefs.PointsLoadMode = plmLoadMappedPointsOnly Then
+                        .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Only the points that are part of an LC-MS Feature were loaded."
+                        AddToAnalysisHistory lngGelIndex, "File Loaded; Only points that are part of an LC-MS Feature were loaded (at user request)."
+                    ElseIf udtFilterPrefs.PointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+                        .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Only the representative point(s) for each LC-MS Feature were loaded."
+                        AddToAnalysisHistory lngGelIndex, "File Loaded; Only the representative point(s) for each LC-MS Feature were loaded (at user request)."
+                    End If
+                End With
+            End If
+        
             If udtFilterPrefs.ExcludeIsoByFit Then
                 With GelData(lngGelIndex)
                     .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Only loaded isotopic data with calculated fit better than " & udtFilterPrefs.ExcludeIsoByFitMaxVal

@@ -56,6 +56,7 @@ Public Const GEL_DATA_STATUS_BIT_IREPORT = 2                        ' When the g
 Public Const GEL_DATA_STATUS_BIT_ISOTOPE_LABEL_TAG = 4              ' When the gel data contains Isotope LabelTag info (field .IsotopeLabel), this this bit is turned on
 Public Const GEL_DATA_STATUS_BIT_ADDED_MONOPLUSMINUS4_DATA = 8      ' When the gel data contains data loaded from _Pairs_isos.csv files and MonoPlus4 or MonoMinus4 data was added, then this this bit is turned on
 Public Const GEL_DATA_STATUS_BIT_IMS_DATA = 16                      ' When the gel data contains IMS data, then this bit is turned on
+Public Const GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA = 32             ' When the gel data contains data loaded from a _LCMSFeatures.txt file, then this bit is turned on
 
 Public Enum natNETTypeConstants
     natGeneric = 0

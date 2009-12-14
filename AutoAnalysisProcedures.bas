@@ -942,6 +942,12 @@ Private Sub AutoAnalysisFindUMCs(ByRef udtWorkingParams As udtAutoAnalysisWorkin
     Dim blnSuccess As Boolean
     
 On Error GoTo FindUMCsErrorHandler
+
+    If (GelData(udtWorkingParams.GelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA) = GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA Then
+        glbPreferencesExpanded.AutoAnalysisOptions.SkipFindUMCs = True
+        strMessage = "Since LC-MS Features were loaded from an _LCMSFeatures.txt file, the SkipFindUMCs option was set to True."
+        AutoAnalysisLog udtAutoParams, udtWorkingParams, strMessage
+    End If
     
     If glbPreferencesExpanded.AutoAnalysisOptions.SkipFindUMCs Then
         If GelUMC(udtWorkingParams.GelIndex).UMCCnt = 0 Then
@@ -3050,6 +3056,16 @@ On Error GoTo LoadInputFileErrorHandler
         If blnGeneratedMonoPlus4IsoLabelingFile Then
             ' Append strMonoPlus4IsoLabelingMessage to the analysis status history
             AddToAnalysisHistory udtWorkingParams.GelIndex, strMonoPlus4IsoLabelingMessage
+        End If
+        
+        If DetermineFileType(udtAutoParams.FilePaths.InputFilePath, eFileType) Then
+            With GelData(udtWorkingParams.GelIndex)
+                If eFileType = ifmDelimitedTextFile Then
+                    .DataStatusBits = .DataStatusBits Or GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA
+                Else
+                    .DataStatusBits = .DataStatusBits And Not GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA
+                End If
+            End With
         End If
     End If
     

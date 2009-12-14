@@ -555,7 +555,7 @@ Dim ORFld() As Double       'values from ordering field
 Dim IndFN() As Long
 Dim RelFN() As Long
 
-Public Function AutoRefineUMCs(ByVal lngGelIndex As Long, ByRef frmCallingForm As VB.Form) As Boolean
+Public Function AutoRefineUMCs(ByVal lngGelIndex As Long, ByRef frmCallingForm As VB.Form, Optional ByVal blnUseStatusFunctionOnCallingForm As Boolean = False) As Boolean
 '---------------------------------------------------------
 ' This function is called by frmUMCWithAutoRefine, frmUMCSimple, and frmUMCIonNet
 ' Returns True if the UMCIndices were updated (via the UpdateUMCStatArrays function) during auto-refinement
@@ -577,7 +577,11 @@ On Error GoTo AutoRefineUMCsErrorHandler
             ' Use frmVisUMC to do this
             
             ' Initialize frmVisUMC
-            frmCallingForm.Status "Auto-refining LC-MS Features: Initializing"
+            If blnUseStatusFunctionOnCallingForm Then
+                frmCallingForm.Status "Auto-refining LC-MS Features: Initializing"
+            Else
+                frmCallingForm.Caption = "Auto-refining LC-MS Features: Initializing"
+            End If
         
             frmVisUMC.Tag = lngGelIndex
             frmVisUMC.InitializeUMCs
@@ -586,10 +590,18 @@ On Error GoTo AutoRefineUMCsErrorHandler
             frmVisUMC.chkRemovePairedHUMC = vbUnchecked
         
             glbPreferencesExpanded.AutoAnalysisStatus.AutoRefiningUMCs = True
-            frmCallingForm.Status "Auto-refining LC-MS Features: Refining"
+            If blnUseStatusFunctionOnCallingForm Then
+                frmCallingForm.Status "Auto-refining LC-MS Features: Refining"
+            Else
+                frmCallingForm.Caption = "Auto-refining LC-MS Features: Refining"
+            End If
             frmVisUMC.AutoRemoveUMCsWork
         
-            frmCallingForm.Status "Auto-refining LC-MS Features: Cleaning up"
+            If blnUseStatusFunctionOnCallingForm Then
+                frmCallingForm.Status "Auto-refining LC-MS Features: Cleaning up"
+            Else
+                frmCallingForm.Caption = "Auto-refining LC-MS Features: Cleaning up"
+            End If
             Unload frmVisUMC
             
             glbPreferencesExpanded.AutoAnalysisStatus.AutoRefiningUMCs = False

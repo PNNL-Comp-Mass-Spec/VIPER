@@ -394,6 +394,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     
     Dim blnValidScansFile As Boolean
     Dim blnValidDataPoint As Boolean
+    Dim blnSuccess As Boolean
     
     Dim lngReturnValue As Long
     
@@ -558,12 +559,12 @@ On Error GoTo LoadNewCSVErrorHandler
         End If
     End If
     
-    ''Commented out because there is a splitting problem. This code wil be in place when splitting is fixed.
-    'If plmPointsLoadMode < plmLoadOnePointPerLCMSFeature Then
-    '    Set objSplitUMCs = New clsSplitUMCsByAbundance
-    '    objSplitUMCs.ExamineUMCs mGelIndex, frmProgress, GelUMC(mGelIndex).def.OddEvenProcessingMode, True, False
-    '    Set objSplitUMCs = Nothing
-    'End If
+    If glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance And plmPointsLoadMode < plmLoadOnePointPerLCMSFeature Then
+        Set objSplitUMCs = New clsSplitUMCsByAbundance
+        blnSuccess = UpdateUMCStatArrays(mGelIndex, True, False, frmProgress)
+        objSplitUMCs.ExamineUMCs mGelIndex, frmProgress, GelUMC(mGelIndex).def.OddEvenProcessingMode, True, False
+        Set objSplitUMCs = Nothing
+    End If
         
     LoadNewCSV = lngReturnValue
     Exit Function
