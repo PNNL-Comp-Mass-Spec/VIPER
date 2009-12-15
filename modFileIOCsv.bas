@@ -127,6 +127,8 @@ Private mSubtaskMessage As String
 Private mReadMode As rmReadModeConstants
 Private mCurrentProgressStep As Integer
 
+Private mLoadPredefinedLCMSFeatures As Boolean
+
 Private Sub DuplicateIsoLineDataPoint(ByRef udtSrcIsoData As udtIsotopicDataType, ByRef udtTargetIsoData() As udtIsotopicDataType, ByVal lngTargetIndex As Long, ByVal dblTargetMassDelta As Double, ByVal sngTargetIntensity As Single, ByVal eIReportTagType As irtIReportTagTypeConstants)
 
     Static intErrorLogCount As Integer
@@ -407,6 +409,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
 On Error GoTo LoadNewCSVErrorHandler
 
     ' Update the filter variables
+    mLoadPredefinedLCMSFeatures = blnLoadPredefinedLCMSFeatures
     mGelIndex = lngGelIndex
     mMaxFit = MaxFit
     mFilterByAbundance = blnFilterByAbundance
@@ -456,7 +459,7 @@ On Error GoTo LoadNewCSVErrorHandler
         Exit Function
     End If
     
-    If blnLoadPredefinedLCMSFeatures Then
+    If mLoadPredefinedLCMSFeatures Then
     
         ' Define the path to the LCMSFeature file and the FeatureToPeakMap file
         strLCMSFeaturesFilePath = strBaseFilePath & LCMS_FEATURES_FILE_SUFFIX
@@ -502,7 +505,7 @@ On Error GoTo LoadNewCSVErrorHandler
     ' Initialize the even/odd scan filter variables
     mEvenOddScanFilter = False
     
-    If Not blnLoadPredefinedLCMSFeatures Then
+    If Not mLoadPredefinedLCMSFeatures Then
         If eScanFilterMode = eosLoadOddScansOnly Then
             mEvenOddScanFilter = True
             mEvenOddModCompareVal = 1                     ' Use scans where Scan Mod 2 = 1
@@ -535,7 +538,7 @@ On Error GoTo LoadNewCSVErrorHandler
         lngReturnValue = 0
     End If
     
-    If frmFileLoadOptions.cmbPointsLoadMode.Enabled And plmPointsLoadMode >= plmLoadMappedPointsOnly Then
+    If mLoadPredefinedLCMSFeatures And plmPointsLoadMode >= plmLoadMappedPointsOnly Then
         Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
         Set objReadLCMSFeatures = New clsFileIOPredefinedLCMSFeatures
         lngReturnValue = objReadLCMSFeatures.CreatePeakListFromFeatureToPeakMapFile(strLCMSFeatureToPeakMapFilePath, mPointsToKeep)
@@ -550,17 +553,17 @@ On Error GoTo LoadNewCSVErrorHandler
         lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseFilePath, _
                                          lngScansFileByteCount, lngByteCountTotal, lngTotalBytesRead, _
                                          blnValidScansFile, blnFilePrescanEnabled, _
-                                         blnLoadPredefinedLCMSFeatures, plmPointsLoadMode)
+                                         plmPointsLoadMode)
     
         If lngReturnValue = 0 Then
-            If blnLoadPredefinedLCMSFeatures Then
+            If mLoadPredefinedLCMSFeatures Then
                 lngReturnValue = ReadLCMSFeatureFiles(fso, strLCMSFeaturesFilePath, strLCMSFeatureToPeakMapFilePath, sngAutoMapDataPointsMassTolerancePPM, plmPointsLoadMode)
             End If
         End If
     End If
     
     If (glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance _
-            And frmFileLoadOptions.cmbPointsLoadMode.Enabled _
+            And mLoadPredefinedLCMSFeatures _
             And plmPointsLoadMode < plmLoadOnePointPerLCMSFeature) Then
         
         Set objSplitUMCs = New clsSplitUMCsByAbundance
@@ -589,7 +592,6 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
                                  ByVal lngScansFileByteCount As Long, ByVal lngByteCountTotal As Long, _
                                  ByRef lngTotalBytesRead As Long, ByVal blnValidScansFile As Boolean, _
                                  ByVal blnFilePrescanEnabled As Boolean, _
-                                 ByVal blnLoadPredefinedLCMSFeatures As Boolean, _
                                  ByVal plmPointsLoadMode As Integer) As Long
 
     ' Returns 0 if no error, the error number if an error
@@ -616,7 +618,7 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
 On Error GoTo ReadCSVIsosFileErrorHandler
 
     ' If we're loading predefined LC/MS features, then we need to ignore all filters and load all of the data
-    blnIgnoreAllFiltersAndLoadAllData = blnLoadPredefinedLCMSFeatures
+    blnIgnoreAllFiltersAndLoadAllData = mLoadPredefinedLCMSFeatures
     
     If blnIgnoreAllFiltersAndLoadAllData Then
         ' Make sure blnFilePrescanEnabled is false, since we're ignoring all filters and loading all of the data
@@ -890,7 +892,7 @@ On Error GoTo ReadCSVIsosFileErrorHandler
     frmProgress.UpdateProgressBar mCurrentProgressStep
     frmProgress.InitializeSubtask "Sorting isotopic data", 0, GelData(mGelIndex).IsoLines
     
-    If Not blnLoadPredefinedLCMSFeatures Then
+    If Not mLoadPredefinedLCMSFeatures Then
         ' Sort the data, though we skip this step if we have loaded predefined LCMSFeatures
         SortIsotopicData mGelIndex
     End If
@@ -1123,7 +1125,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     End If
                 End If
                 
-                If frmFileLoadOptions.cmbPointsLoadMode.Enabled And plmPointsLoadMode >= plmLoadMappedPointsOnly And blnValidDataPoint Then
+                If mLoadPredefinedLCMSFeatures And plmPointsLoadMode >= plmLoadMappedPointsOnly And blnValidDataPoint Then
                     If Not mPointsToKeep.Exists(lngIsoIndex) Then
                         blnValidDataPoint = False
                     Else
@@ -1494,7 +1496,7 @@ Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
     
     objReadLCMSFeatures.PointsLoadMode = plmPointsLoadMode
     
-    If frmFileLoadOptions.cmbPointsLoadMode.Enabled And plmPointsLoadMode >= plmLoadMappedPointsOnly Then
+    If mLoadPredefinedLCMSFeatures And plmPointsLoadMode >= plmLoadMappedPointsOnly Then
         objReadLCMSFeatures.HashMapOfPointsKept = mHashMapOfPointsKept
     End If
     
