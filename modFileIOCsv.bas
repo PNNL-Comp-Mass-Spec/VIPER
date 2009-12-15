@@ -535,7 +535,7 @@ On Error GoTo LoadNewCSVErrorHandler
         lngReturnValue = 0
     End If
     
-    If plmPointsLoadMode >= plmLoadMappedPointsOnly Then
+    If frmFileLoadOptions.cmbPointsLoadMode.Enabled And plmPointsLoadMode >= plmLoadMappedPointsOnly Then
         Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
         Set objReadLCMSFeatures = New clsFileIOPredefinedLCMSFeatures
         lngReturnValue = objReadLCMSFeatures.CreatePeakListFromFeatureToPeakMapFile(strLCMSFeatureToPeakMapFilePath, mPointsToKeep)
@@ -559,11 +559,15 @@ On Error GoTo LoadNewCSVErrorHandler
         End If
     End If
     
-    If glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance And plmPointsLoadMode < plmLoadOnePointPerLCMSFeature Then
+    If (glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance _
+            And frmFileLoadOptions.cmbPointsLoadMode.Enabled _
+            And plmPointsLoadMode < plmLoadOnePointPerLCMSFeature) Then
+        
         Set objSplitUMCs = New clsSplitUMCsByAbundance
         blnSuccess = UpdateUMCStatArrays(mGelIndex, True, False, frmProgress)
         objSplitUMCs.ExamineUMCs mGelIndex, frmProgress, GelUMC(mGelIndex).def.OddEvenProcessingMode, True, False
         Set objSplitUMCs = Nothing
+    
     End If
         
     LoadNewCSV = lngReturnValue
@@ -1119,7 +1123,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     End If
                 End If
                 
-                If plmPointsLoadMode >= plmLoadMappedPointsOnly And blnValidDataPoint Then
+                If frmFileLoadOptions.cmbPointsLoadMode.Enabled And plmPointsLoadMode >= plmLoadMappedPointsOnly And blnValidDataPoint Then
                     If Not mPointsToKeep.Exists(lngIsoIndex) Then
                         blnValidDataPoint = False
                     Else
@@ -1490,7 +1494,7 @@ Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
     
     objReadLCMSFeatures.PointsLoadMode = plmPointsLoadMode
     
-    If plmPointsLoadMode >= plmLoadMappedPointsOnly Then
+    If frmFileLoadOptions.cmbPointsLoadMode.Enabled And plmPointsLoadMode >= plmLoadMappedPointsOnly Then
         objReadLCMSFeatures.HashMapOfPointsKept = mHashMapOfPointsKept
     End If
     
