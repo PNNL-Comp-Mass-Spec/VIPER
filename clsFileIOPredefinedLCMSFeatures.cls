@@ -938,29 +938,11 @@ Public Function RefinePeakListFromFeatureFile(ByVal strLCMSFeaturesFilePath As S
             ' Extract out the Feature index; ignore any features defined more than once
             lngFeatureIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex), -1)
             
-            ' May only want to enter this If statement if the current feature number exists in PointsToKeep<peak, feature>
             If lngFeatureIndex >= 0 Then
                 
                 lngScanCenter = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Scan), 0)
                 
                 FeatureToScanMap.add lngFeatureIndex, lngScanCenter
-                
-                ' PointsToKeep<peak, feature>
-                ' Use Current PointsToKeep HashMap to replace the feature with the scan
-                '   - Then we will be left with: PointsToKeep<peak, scan>
-                '   - Later on, when we read the FeatureToPeak file, a point will only be valid if it has the right peak and scan,
-                '           not just the right peak
-                
-                
-                '' I don't think the below method is working correctly ... if it is, it takes too long or causes viper to freeze
-                ''  - I probably just need to create a new HashMap instead of trying this trickery, but I would like to see if I can get this way to work
-                'With PointsToKeep
-                '    For Each element In .Keys
-                '        If .Item(element) = lngFeatureIndex Then
-                '            .Item(element) = lngScanCenter
-                '        End If
-                '    Next
-                'End With
                 
             End If
         
