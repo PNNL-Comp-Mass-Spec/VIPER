@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
 Begin VB.Form frmUMCIonNet 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "LC-MS Feature (UMC) Ion Networks"
@@ -32,10 +32,11 @@ Begin VB.Form frmUMCIonNet
       _ExtentY        =   8916
       _Version        =   393216
       Style           =   1
+      Tab             =   2
       TabHeight       =   520
       TabCaption(0)   =   "1. Find Connections"
       TabPicture(0)   =   "frmUMCIonNet.frx":0000
-      Tab(0).ControlEnabled=   -1  'True
+      Tab(0).ControlEnabled=   0   'False
       Tab(0).Control(0)=   "lblLCMSFeatureFinderInfo"
       Tab(0).Control(0).Enabled=   0   'False
       Tab(0).Control(1)=   "fraNet(0)"
@@ -56,18 +57,19 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "lblFilterConnections"
-      Tab(1).Control(1)=   "Frame1"
+      Tab(1).Control(0)=   "Frame1"
+      Tab(1).Control(1)=   "lblFilterConnections"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
-      Tab(2).ControlEnabled=   0   'False
+      Tab(2).ControlEnabled=   -1  'True
       Tab(2).Control(0)=   "fraNet(1)"
+      Tab(2).Control(0).Enabled=   0   'False
       Tab(2).ControlCount=   1
       Begin VB.CheckBox chkRequireMatchingIsotopeTag 
          Caption         =   "Require matching isotope label tag (e.g. N14 or N15); if enabled, stores mono mass for N14 and average mass for N15"
          Height          =   375
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   152
          Top             =   3720
          Width           =   5385
@@ -75,7 +77,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.CommandButton cmdFindConnectionsThenUMCs 
          Caption         =   "&Find Connections then LC-MS Features"
          Height          =   615
-         Left            =   8280
+         Left            =   -66720
          TabIndex        =   58
          ToolTipText     =   "Create Net based on current settings, then Find LC-MS Features"
          Top             =   3840
@@ -84,7 +86,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.CommandButton cmdAbortFindConnections 
          Caption         =   "Abort!"
          Height          =   375
-         Left            =   8880
+         Left            =   -66120
          TabIndex        =   151
          Top             =   3960
          Width           =   975
@@ -92,7 +94,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraDREAMS 
          Caption         =   "DREAMS Options"
          Height          =   1935
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   4
          Top             =   1560
          Width           =   1815
@@ -137,7 +139,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.CheckBox chkUseLCMSFeatureFinder 
          Caption         =   "Use LCMSFeatureFinder external app"
          Height          =   255
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   147
          Top             =   4200
          Value           =   1  'Checked
@@ -146,7 +148,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraUMCScope 
          Caption         =   "Definition Scope"
          Height          =   975
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   1
          Top             =   420
          Width           =   1815
@@ -220,7 +222,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   4455
          Index           =   1
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   65
          Top             =   360
          Width           =   10695
@@ -405,23 +407,25 @@ Begin VB.Form frmUMCIonNet
             _ExtentY        =   5953
             _Version        =   393216
             Style           =   1
+            Tab             =   1
             TabHeight       =   520
             TabCaption(0)   =   "Auto-Refine Options"
             TabPicture(0)   =   "frmUMCIonNet.frx":0058
-            Tab(0).ControlEnabled=   -1  'True
+            Tab(0).ControlEnabled=   0   'False
             Tab(0).Control(0)=   "fraOptionFrame(0)"
             Tab(0).Control(0).Enabled=   0   'False
             Tab(0).ControlCount=   1
             TabCaption(1)   =   "Split Features Options"
             TabPicture(1)   =   "frmUMCIonNet.frx":0074
-            Tab(1).ControlEnabled=   0   'False
+            Tab(1).ControlEnabled=   -1  'True
             Tab(1).Control(0)=   "fraOptionFrame(1)"
+            Tab(1).Control(0).Enabled=   0   'False
             Tab(1).ControlCount=   1
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassMassTopX"
-            Tab(2).Control(1)=   "fraClassAbundanceTopX"
+            Tab(2).Control(0)=   "fraClassAbundanceTopX"
+            Tab(2).Control(1)=   "fraClassMassTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -552,7 +556,7 @@ Begin VB.Form frmUMCIonNet
             Begin VB.Frame fraOptionFrame 
                Height          =   2920
                Index           =   1
-               Left            =   -74880
+               Left            =   120
                TabIndex        =   97
                Top             =   330
                Width           =   4300
@@ -733,7 +737,7 @@ Begin VB.Form frmUMCIonNet
             Begin VB.Frame fraOptionFrame 
                Height          =   2700
                Index           =   0
-               Left            =   120
+               Left            =   -74880
                TabIndex        =   75
                Top             =   300
                Width           =   4545
@@ -944,7 +948,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   3255
          Index           =   0
-         Left            =   2040
+         Left            =   -72960
          TabIndex        =   9
          Top             =   420
          Width           =   8535
@@ -1402,7 +1406,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Label lblLCMSFeatureFinderInfo 
          Caption         =   $"frmUMCIonNet.frx":00AC
          Height          =   405
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   148
          Top             =   4440
          Width           =   5415
@@ -4398,8 +4402,8 @@ With UMCDef
     SetMolecularMassFieldDropdown CInt(.MWField)
     SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
     
-    optDefScope(.DefScope).Value = True
-    optEvenOddScanFilter(.OddEvenProcessingMode).Value = True
+    optDefScope(.DefScope).value = True
+    optEvenOddScanFilter(.OddEvenProcessingMode).value = True
     
     SetCheckBox chkRequireMatchingIsotopeTag, .RequireMatchingIsotopeTag
     
@@ -4433,14 +4437,14 @@ Private Sub ShowHideCommandButtons(ByVal blnCalculating As Boolean)
 
     fraDREAMS.Enabled = Not blnCalculating
     fraUMCScope.Enabled = Not blnCalculating
-    fraNet(0).Enabled = Not blnCalculating
+    fraNET(0).Enabled = Not blnCalculating
     fraLCMSFeatureStats.Enabled = Not blnCalculating
     fraOptionFrame(0).Enabled = Not blnCalculating
     fraOptionFrame(1).Enabled = Not blnCalculating
     fraClassAbundanceTopX.Enabled = Not blnCalculating
     fraClassMassTopX.Enabled = Not blnCalculating
     
-    blnShowConnectionsButtons = Not cChkBox(chkUseLCMSFeatureFinder.Value)
+    blnShowConnectionsButtons = Not cChkBox(chkUseLCMSFeatureFinder.value)
     
     cmdFindConnections.Visible = blnShowConnectionsButtons
         
@@ -4474,7 +4478,7 @@ Public Function StartUMCSearch() As Boolean
     
 On Error GoTo StartUMCSearchErrorHandler
 
-    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
+    If cChkBox(chkUseLCMSFeatureFinder.value) Then
         blnSuccess = FindUMCsUsingLCMSFeatureFinder(False)
         
         If Not blnSuccess And Not mAbortProcess Then
@@ -4658,7 +4662,7 @@ Private Function UpdateNetDimInfo() As Boolean
     ' Update .NetActualDim
     MyDef.NetActualDim = 0
     For i = 0 To chkUse.Count - 1
-        If chkUse(i).Value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
+        If chkUse(i).value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
     Next i
     
     If MyDef.NetActualDim < 1 Then
@@ -4736,7 +4740,7 @@ End Sub
 
 Private Sub optDefScope_Click(Index As Integer)
     If mCalculating Then
-        optDefScope(UMCDef.DefScope).Value = True
+        optDefScope(UMCDef.DefScope).value = True
     Else
         UMCDef.DefScope = Index
     End If
@@ -4744,7 +4748,7 @@ End Sub
 
 Private Sub optEvenOddScanFilter_Click(Index As Integer)
     If mCalculating Then
-        optEvenOddScanFilter(UMCDef.OddEvenProcessingMode).Value = True
+        optEvenOddScanFilter(UMCDef.OddEvenProcessingMode).value = True
     Else
         UMCDef.OddEvenProcessingMode = Index
     End If
@@ -4989,7 +4993,7 @@ End Sub
 Private Sub cmdFindConnections_Click()
     If mCalculating Then Exit Sub
     
-    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
+    If cChkBox(chkUseLCMSFeatureFinder.value) Then
         MsgBox "Finding connections is not available when the LCMS Feature Finder external app mode is enabled", vbExclamation + vbOKOnly, "Not Applicable"
     Else
         FindIonNetConnections
@@ -5000,7 +5004,7 @@ Private Sub cmdFindConnectionsThenUMCs_Click()
     If mCalculating Then Exit Sub
     Dim blnUseExternalFinder As Boolean
     
-    blnUseExternalFinder = cChkBox(chkUseLCMSFeatureFinder.Value)
+    blnUseExternalFinder = cChkBox(chkUseLCMSFeatureFinder.value)
     
     If blnUseExternalFinder Then
         FindUMCsUsingLCMSFeatureFinder True
@@ -5016,7 +5020,7 @@ End Sub
 Private Sub cmdFindUMCsUsingNETConnections_Click()
     If mCalculating Then Exit Sub
     
-    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
+    If cChkBox(chkUseLCMSFeatureFinder.value) Then
         If mLCMSResultsMappingCount > 0 Then
             BuildUMCsUsingLCMSResultsMapping True
         Else
@@ -5107,7 +5111,7 @@ Private Sub chkUse_Click(Index As Integer)
     If mCalculating Then
         SetCheckBox chkUse(Index), MyDef.MetricData(Index).Use
     Else
-        MyDef.MetricData(Index).Use = (chkUse(Index).Value = vbChecked)
+        MyDef.MetricData(Index).Use = (chkUse(Index).value = vbChecked)
     End If
 End Sub
 
@@ -5128,7 +5132,7 @@ Private Sub chkUseUntangledAsSingle_Click()
     If mCalculating Then
         SetCheckBox chkUseUntangledAsSingle, UMCMakeSingleMemberClasses
     Else
-        UMCMakeSingleMemberClasses = cChkBox(chkUseUntangledAsSingle.Value)
+        UMCMakeSingleMemberClasses = cChkBox(chkUseUntangledAsSingle.value)
         glbPreferencesExpanded.UMCIonNetOptions.MakeSingleMemberClasses = UMCMakeSingleMemberClasses
     End If
 End Sub

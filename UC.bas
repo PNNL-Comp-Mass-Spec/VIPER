@@ -3210,8 +3210,10 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                     '   then VIPER will have auto-mapped the data points to the LC-MS Features, and if
                     '   the value for AutoMapDataPointsMassTolerancePPM is too small, then it is possible some
                     '   features won't have any members (lots of IFs, huh?)
+                    '
+                    ' Another case where this is possible is if predefined lC_MS features were loaded, but the user applied an Isotopic Fit filter or Abundance filter when loading the _Isos.csv file
                     
-                    Debug.Assert False
+                    'Debug.Assert False
                     If blnComputeClassMassAndAbundance Then
                         With .UMCs(i)
                             .ClassAbundance = -1

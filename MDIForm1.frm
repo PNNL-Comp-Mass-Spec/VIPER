@@ -556,6 +556,38 @@ End Sub
 
 Private Sub MDIForm_Load()
 
+''
+''Dim objTest2 As New Dictionary
+''
+''objTest2.add 15, 1
+''objTest2.add 20, 2
+''objTest2.add 22, 3
+''
+''Dim lngItemsToKeep() As Long
+''ReDim lngItemsToKeep(99)
+''Dim lngItemCount As Long
+''
+''lngItemCount = 0
+''
+''lngItemsToKeep(lngItemCount) = 15
+''lngItemCount = lngItemCount + 1
+''
+''If UBound(lngItemCount) <= lngItemCount Then
+''    ReDim Preserve lngItemCount(UBound(lngItemCount) * 2 - 1)
+''End If
+''
+''lngItemsToKeep(lngItemCount) = 20
+''lngItemCount = lngItemCount + 1
+''
+''lngItemsToKeep(lngItemCount) = 22
+''lngItemCount = lngItemCount + 1
+''
+''
+''ShellSortLong lngItemsToKeep, 0, lngItemCount - 1
+''lngIndex = BinarySearchLng(lngItemsToKeep, 15, 0, lngItemCount - 1)
+''
+''Debug.Print "done"
+
 On Error Resume Next
 ChDir App.Path
 ChDrive App.Path
@@ -591,6 +623,173 @@ LogErrors Err.Number, "MDIForm1->MDIForm_Load (or one of its subroutines)"
 Resume Next
 
 End Sub
+
+'Private Sub BenchmarkDictionary()
+'    Dim lngIndex As Long
+'    Dim lngDictionarySize As Long
+'    Dim lngDataArraySize As Long
+'
+'    Dim htKeys As clsHashTable
+'    Dim objKeyValPairs As clsParallelLngArrays
+'
+'    Dim lngKeys() As Long
+'    Dim lngItems() As Long
+'    Dim varItem As Variant
+'
+'    Dim lngDataArray() As Long
+'    Dim lngValue As Long
+'    Dim lngMatchCount As Long
+'    Dim lngIndexMatch As Long
+'
+'    Dim blnMatchFound As Boolean
+'
+'    Dim dtStartTime As Date
+'    Const MAX_WAIT_TIME_SECONDS As Integer = 30
+'
+'    lngDictionarySize = 1000000
+'    lngDataArraySize = 5000000
+'
+''    Set htKeys = New Dictionary
+''    Debug.Print Now() & "; Populate htKeys"
+''    dtStartTime = Now()
+''
+''    ' Populate the dictionary
+''    For lngIndex = 0 To lngDictionarySize - 1
+''        htKeys.Add lngIndex * 3, 1234
+''        If lngIndex Mod 25000 = 0 Then
+''            Debug.Print Now() & "; Populating hashtable: " & lngIndex
+''            If DateDiff("s", dtStartTime, Now()) >= MAX_WAIT_TIME_SECONDS Then Exit For
+''        End If
+''    Next lngIndex
+''
+''    Debug.Print Now() & "; Processing " & lngDataArraySize & " data rows against the hash table (contains " & htKeys.Count & " keys)"
+''    dtStartTime = Now()
+''
+''    lngMatchCount = 0
+''    For lngIndex = 0 To lngDataArraySize
+''        If htKeys.Exists(lngIndex) Then
+''            lngMatchCount = lngMatchCount + 1
+''            lngValue = htKeys(lngIndex)
+''        End If
+''        If lngIndex Mod 10000 = 0 Then
+''            Debug.Print Now() & "; Testing hashtable: " & lngIndex
+''            If DateDiff("s", dtStartTime, Now()) >= MAX_WAIT_TIME_SECONDS Then Exit For
+''        End If
+''    Next lngIndex
+''
+''    Debug.Print Now() & "; Found " & lngMatchCount & " matches against the hash table"
+''
+''
+''    Set htKeys = New clsHashTable
+''
+''    ' Can turn off Ignore Case since our keys are numbers
+''    htKeys.IgnoreCase = False
+''    htKeys.SetSize lngDictionarySize
+''
+''    Debug.Print Now() & "; Populate htKeys (using clsHashTable)"
+''    dtStartTime = Now()
+''
+''    ' Populate the dictionary
+''    For lngIndex = 0 To lngDictionarySize - 1
+''        htKeys.Add lngIndex * 3, 1234
+''        If lngIndex Mod 25000 = 0 Then
+''            Debug.Print Now() & "; Populating hashtable: " & lngIndex
+''            If DateDiff("s", dtStartTime, Now()) >= MAX_WAIT_TIME_SECONDS Then Exit For
+''        End If
+''    Next lngIndex
+''
+''    Debug.Print Now() & "; Processing " & lngDataArraySize & " data rows against the hash table (contains " & htKeys.Count & " keys)"
+''    dtStartTime = Now()
+''
+''    lngMatchCount = 0
+''    For lngIndex = 0 To lngDataArraySize
+''        varItem = htKeys.Item(CStr(lngIndex))
+''        If Not IsEmpty(varItem) Then
+''            lngMatchCount = lngMatchCount + 1
+''            lngValue = CStr(varItem)
+''        End If
+''        If lngIndex Mod 100000 = 0 Then
+''            Debug.Print Now() & "; Testing hashtable: " & lngIndex
+''            If DateDiff("s", dtStartTime, Now()) >= MAX_WAIT_TIME_SECONDS Then Exit For
+''        End If
+''    Next lngIndex
+''
+''    Debug.Print Now() & "; Found " & lngMatchCount & " matches against the hash table"
+'
+'
+'    Set objKeyValPairs = New clsParallelLngArrays
+'
+'    objKeyValPairs.SetSize lngDictionarySize
+'    objKeyValPairs.PreventDuplicateKeys = False
+'
+'    Debug.Print Now() & "; Populate objKeyValPairs (using clsParallelLngArrays)"
+'    dtStartTime = Now()
+'
+'    ' Populate the dictionary
+'    For lngIndex = 0 To lngDictionarySize - 1
+'        objKeyValPairs.Add lngIndex * 3, 1234
+'        If lngIndex Mod 25000 = 0 Then
+'            Debug.Print Now() & "; Populating hashtable: " & lngIndex
+'            If DateDiff("s", dtStartTime, Now()) >= MAX_WAIT_TIME_SECONDS Then Exit For
+'        End If
+'    Next lngIndex
+'
+'    Debug.Print Now() & "; Sorting the keys in objKeyValPairs"
+'    objKeyValPairs.SortNow
+'
+'    Debug.Print Now() & "; Processing " & lngDataArraySize & " data rows against the hash table (contains " & objKeyValPairs.Count & " keys)"
+'    dtStartTime = Now()
+'
+'    lngMatchCount = 0
+'    For lngIndex = 0 To lngDataArraySize
+'        lngValue = objKeyValPairs.GetItemForKey(lngIndex, blnMatchFound)
+'
+'        If blnMatchFound Then
+'            lngMatchCount = lngMatchCount + 1
+'        End If
+'        If lngIndex Mod 100000 = 0 Then
+'            Debug.Print Now() & "; Testing hashtable: " & lngIndex
+'            If DateDiff("s", dtStartTime, Now()) >= MAX_WAIT_TIME_SECONDS Then Exit For
+'        End If
+'    Next lngIndex
+'
+'    Debug.Print Now() & "; Found " & lngMatchCount & " matches against the hash table"
+'
+'
+'
+'    Debug.Print Now() & "; Populate lngKeys() and lngItems()"
+'
+'    ReDim lngKeys(lngDictionarySize - 1)
+'    ReDim lngItems(lngDictionarySize - 1)
+'
+'    For lngIndex = 0 To lngDictionarySize - 1
+'        lngKeys(lngIndex) = (lngDictionarySize - 1 - lngIndex) * 3
+'        lngItems(lngIndex) = 1234
+'        If lngIndex Mod 25000 = 0 Then Debug.Print Now() & "; Populating parallel arrays: " & lngIndex
+'    Next lngIndex
+'
+'    Debug.Print Now() & "; Sort lngKeys() and lngItems()"
+'    ShellSortLongWithParallelLong lngKeys, lngItems, 0, lngDictionarySize - 1
+'
+'    Debug.Print Now() & "; Processing " & lngDataArraySize & " data rows against the parallel arrays"
+'
+'    lngMatchCount = 0
+'    For lngIndex = 0 To lngDataArraySize
+'        lngIndexMatch = BinarySearchLng(lngKeys, lngIndex)
+'
+'        If lngIndexMatch >= 0 Then
+'            lngValue = lngItems(lngIndexMatch)
+'            lngMatchCount = lngMatchCount + 1
+'        End If
+'
+'        If lngIndex Mod 100000 = 0 Then Debug.Print Now() & "; Testing parallel arrays: " & lngIndex
+'    Next lngIndex
+'
+'    Debug.Print Now() & "; Found " & lngMatchCount & " matches against the parallel arrays"
+'
+'    Debug.Assert False
+'
+'End Sub
 
 Private Sub MDIForm_Resize()
 If IsWinLoaded(TrackerCaption) Then

@@ -1,5 +1,25 @@
 VIPER Change Log
 
+Version 3.47 - Build 420; January 7, 2010
+	- Replaced Dictionary-based hashtable objects with new class, clsParallelLngArrays.cls
+		- Improves load time for large _LCMSFeature files by 75-fold
+
+Version 3.46 - Build 419; January 6, 2010
+	- Added support for loading data from _LCMSFeature.txt files
+		- This mode requires that both the LCMSFeature files and the Decon2LS files be present in the input folder
+		- Expected files:
+			- DatasetName_LCMSFeatures.txt
+			- DatasetName_LCMSFeatureToPeakMap.txt
+			- DatasetName_isos.csv
+			- DatasetName_scans.csv
+	- Added parameter LCMSFeaturePointsLoadMode to section [AutoAnalysisFilterPrefs] in the .Ini file
+		- Only used if loading data from _LCMSFeature.txt files
+		- Mode 0 means load all points
+		- Mode 1 means load mapped points (as defined in the _LCMSFeatureToPeakMap.txt file); this is the default mode if this parameter is missing from the .Ini file
+		- Mode 2 means to load (nominally) one point per LC-MS Feature
+			- In reality, Mode 2 loads all data points whose scan number matches the central scan number of the LC-MS feature, as defined in the _LCMSFeatures.txt file
+			- For IMS data, there is very often a number of data points that match the central scan number; each will have a different drift time and/or charge state
+
 Version 3.45 - Build 417; October 8, 2009
 	- Now calling Identify.exe and Montage.exe if the call to ImageMagicObject.dll fails
 

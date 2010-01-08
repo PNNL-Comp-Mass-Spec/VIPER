@@ -499,8 +499,8 @@ Public Type DocumentData           'file format for Certificate = glCERT2004_Mod
                                 ' Note that GelStatus().SourceDataRawFileType will get updated from rfcUnknown to rfcZippedSFolders or rfcFinniganRaw
   PathtoDatabase As String      ' Holds the path to the Legacy DB (Access DB) used for search (if appropriate)
   MediaType As String
-  LinesRead As Long
-  DataLines As Long
+  LinesRead As Long             ' Number of lines processed in the input file
+  DataLines As Long             ' Number of lines that contained usable data
   CSLines As Long
   IsoLines As Long             ' Number of isotopic data points:  Note, .CSData() and .IsoData() range from 1 to .IsoLines and are thus 1-based arrays (this is for historical reasons)
   CalEquation As String
@@ -1624,7 +1624,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
     If eFileType = ifmDelimitedTextFile Then
         ' Check the suffix on the text file
         
-        ' If it is _LCMSFeatures.txtor _LCMSFeatureToPeakMap.txt then
+        ' If it is _LCMSFeatures.txt or _LCMSFeatureToPeakMap.txt then
         '  change eFileType to ifmCSVFile
         '  and set blnLoadPredefinedLCMSFeatures to True
         
@@ -1657,7 +1657,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
     
     If blnLoadPredefinedLCMSFeatures Then
         ' The call to .SetFilePath will likely have triggered a call to .SetFileType() that will change the file type to ifmCSVFile
-        ' Although one of the file types were loading is ifmCSVFile, we want the tracked file type to be ifmDelimitedTextFile
+        ' Although one of the file types we're loading is ifmCSVFile, we want the tracked file type to be ifmDelimitedTextFile
         ' Thus, we need to override things
         objLoadOptionsForm.SetFileType ifmDelimitedTextFile
     End If
@@ -1689,7 +1689,15 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
         objLoadOptionsForm.TotalIntensityPercentageFilter = .TotalIntensityPercentageFilter
         
         objLoadOptionsForm.AutoMapDataPointsMassTolerancePPM = .AutoMapDataPointsMassTolerancePPM
-        objLoadOptionsForm.PointsLoadMode = .PointsLoadMode
+        objLoadOptionsForm.LCMSFeaturePointsLoadMode = .LCMSFeaturePointsLoadMode
+        
+        If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            ' Auto analysis; use whatever setting is defined in glbPreferencesExpanded
+            objLoadOptionsForm.LCMSFeatureSplitUMCsByExaminingAbundance = glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance
+        Else
+            ' Manual analysis; default to False
+            objLoadOptionsForm.LCMSFeatureSplitUMCsByExaminingAbundance = False
+        End If
         
         If .RestrictToEvenScanNumbersOnly Or .RestrictToOddScanNumbersOnly Then
             If .RestrictToOddScanNumbersOnly Then
@@ -1768,7 +1776,16 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 End If
                 
                 .AutoMapDataPointsMassTolerancePPM = objLoadOptionsForm.AutoMapDataPointsMassTolerancePPM
-                .PointsLoadMode = objLoadOptionsForm.PointsLoadMode
+                .LCMSFeaturePointsLoadMode = objLoadOptionsForm.LCMSFeaturePointsLoadMode
+                
+                If blnLoadPredefinedLCMSFeatures Then
+                    ' Loading predefined LCMS Features
+                    ' Update glbPreferencesExpanded
+                    glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance = objLoadOptionsForm.LCMSFeatureSplitUMCsByExaminingAbundance
+                Else
+                    ' Not loading predefined LCMS Features
+                    ' Do not update glbPreferencesExpanded
+                End If
                 
                 .RestrictToOddScanNumbersOnly = False
                 .RestrictToEvenScanNumbersOnly = False
@@ -1803,7 +1820,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 .TotalIntensityPercentageFilter = udtFilterPrefs.TotalIntensityPercentageFilter
                 
                 .AutoMapDataPointsMassTolerancePPM = udtFilterPrefs.AutoMapDataPointsMassTolerancePPM
-                .PointsLoadMode = udtFilterPrefs.PointsLoadMode
+                .LCMSFeaturePointsLoadMode = udtFilterPrefs.LCMSFeaturePointsLoadMode
                 
                 .RestrictToOddScanNumbersOnly = udtFilterPrefs.RestrictToOddScanNumbersOnly
                 .RestrictToEvenScanNumbersOnly = udtFilterPrefs.RestrictToEvenScanNumbersOnly
@@ -1841,7 +1858,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                                            blnLoadPredefinedLCMSFeatures, _
                                            .AutoMapDataPointsMassTolerancePPM, _
                                            strErrorMessage, _
-                                           .PointsLoadMode)
+                                           .LCMSFeaturePointsLoadMode)
             End With
             
         Case ifmInputFileModeConstants.ifmmzXMLFile, ifmInputFileModeConstants.ifmmzXMLFileWithXMLExtension
@@ -1881,12 +1898,12 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
         End Select
         
         If intReturnCode = 0 Then
-            If udtFilterPrefs.PointsLoadMode > plmLoadAllPoints Then
+            If udtFilterPrefs.LCMSFeaturePointsLoadMode > plmLoadAllPoints Then
                 With GelData(lngGelIndex)
-                    If udtFilterPrefs.PointsLoadMode = plmLoadMappedPointsOnly Then
+                    If udtFilterPrefs.LCMSFeaturePointsLoadMode = plmLoadMappedPointsOnly Then
                         .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Only the points that are part of an LC-MS Feature were loaded."
                         AddToAnalysisHistory lngGelIndex, "File Loaded; Only points that are part of an LC-MS Feature were loaded (at user request)."
-                    ElseIf udtFilterPrefs.PointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+                    ElseIf udtFilterPrefs.LCMSFeaturePointsLoadMode = plmLoadOnePointPerLCMSFeature Then
                         .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Only the representative point(s) for each LC-MS Feature were loaded."
                         AddToAnalysisHistory lngGelIndex, "File Loaded; Only the representative point(s) for each LC-MS Feature were loaded (at user request)."
                     End If

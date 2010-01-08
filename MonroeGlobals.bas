@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "October 8, 2009"
+Public Const APP_BUILD_DATE As String = "January 7, 2010"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -26,7 +26,9 @@ Public Const PRISM_AUTOMATION_SP_POST_LOG_ENTRY_DEFAULT = "PostLogEntry"
 '       extensions (except for plain .pek) then the function will know that the PEK/CSV/mzXML/mzData file
 '       has been processed.  In that case, it will look for a plain .PEK file in the same folder
 '       This should be a comma delimited list
-Public Const DEFAULT_PEK_FILE_EXTENSION_ORDER As String = CSV_ISOS_IC_FILE_SUFFIX & ", " & CSV_ISOS_FILE_SUFFIX & ", .mzxml, .mzdata, mzxml.xml, mzdata.xml, _ic.pek, _s.pek, .pek, DeCal.pek-3, .pek-3"
+'
+' This list is also used during automated analysis to automatically find the best file to load
+Public Const DEFAULT_PEK_FILE_EXTENSION_ORDER As String = LCMS_FEATURES_FILE_SUFFIX & ", " & CSV_ISOS_IC_FILE_SUFFIX & ", " & CSV_ISOS_FILE_SUFFIX & ", .mzxml, .mzdata, mzxml.xml, mzdata.xml, _ic.pek, _s.pek, .pek, DeCal.pek-3, .pek-3"
 
 Public Const KNOWN_FILE_EXTENSIONS As String = ".Pek, .CSV, .mzXML, mzxml.xml, .mzData, or mzdata.xml"
 Public Const KNOWN_FILE_EXTENSIONS_WITH_GEL As String = ".Pek, .CSV, .mzXML, mzxml.xml, .mzData, mzdata.xml, or .Gel"
@@ -1032,7 +1034,7 @@ Public Type udtAutoAnalysisOptionsType
     AutoRemovePolygonRegions As Boolean
     
     DoNotSaveOrExport As Boolean
-    SkipFindUMCs As Boolean                        ' Only appropriate if loading data from a .Gel file (however, this is not forced to false if a .Pek, .CSV, .mzXML, or .mzData file is loaded)
+    SkipFindUMCs As Boolean                        ' Only appropriate if loading data from a .Gel file or an _LCMSFeatures.txt file (however, this is not forced to false if a .Pek, .CSV, .mzXML, or .mzData file is loaded)
     SkipGANETSlopeAndInterceptComputation As Boolean
     
     DBConnectionRetryAttemptMax As Integer
@@ -1170,7 +1172,7 @@ Public Type udtAutoAnalysisFilterPrefsType
     TotalIntensityPercentageFilter As Single
 
     AutoMapDataPointsMassTolerancePPM As Single        ' This setting is only used when we load _LCMSFeatures.txt files and we need to auto-map the data points to the features
-    PointsLoadMode As plmPointsLoadModeConstants
+    LCMSFeaturePointsLoadMode As plmPointsLoadModeConstants
 End Type
 
 Public Type udtAutoAnalysisCachedDataType

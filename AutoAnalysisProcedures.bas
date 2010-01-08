@@ -2537,6 +2537,7 @@ Private Function AutoAnalysisLoadInputFile(ByRef udtWorkingParams As udtAutoAnal
     Dim blnFileExists As Boolean
     Dim blnInvalidFolder As Boolean
     Dim blnSuccess As Boolean
+    Dim blnSuffixFound As Boolean
     
     Dim strInputFilePathNew As String
     Dim strScansFilePathLocal As String
@@ -2658,7 +2659,7 @@ On Error GoTo LoadInputFileErrorHandler
                     If intFileExtensionsPrefListCount = 0 Then
                         Debug.Assert False
                         intFileExtensionsPrefListCount = 8
-                        strFileExtensionsPrefList(0) = "_lcmsfeatures.txt"
+                        strFileExtensionsPrefList(0) = LCMS_FEATURES_FILE_SUFFIX
                         strFileExtensionsPrefList(1) = CSV_ISOS_IC_FILE_SUFFIX
                         strFileExtensionsPrefList(2) = CSV_ISOS_FILE_SUFFIX
                         strFileExtensionsPrefList(3) = ".mzxml"
@@ -2666,15 +2667,41 @@ On Error GoTo LoadInputFileErrorHandler
                         strFileExtensionsPrefList(5) = "mzxml.xml"
                         strFileExtensionsPrefList(6) = "mzdata.xml"
                         strFileExtensionsPrefList(7) = ".pek"
+                    ElseIf intFileExtensionsPrefListCount < MAX_FILE_EXTENSIONS_PREF_LIST_COUNT Then
+                        ' Make sure strFileExtensionsPrefList() contains LCMS_FEATURES_FILE_SUFFIX
+                        ' If it doesn't, then add it as the first item
+                        
+                        blnSuffixFound = False
+                        For intIndex = 0 To intFileExtensionsPrefListCount - 1
+                            If InStr(LCase(strFileExtensionsPrefList(intIndex)), LCase(LCMS_FEATURES_FILE_SUFFIX)) > 0 Then
+                                ' Match found
+                                blnSuffixFound = True
+                                Exit For
+                            End If
+                        Next intIndex
+                        
+                        If Not blnSuffixFound Then
+                            ' LCMS_FEATURES_FILE_SUFFIX not found; add it at the beginning
+                            intFileExtensionsPrefListCount = intFileExtensionsPrefListCount + 1
+                            For intIndex = intFileExtensionsPrefListCount - 1 To 1 Step -1
+                                strFileExtensionsPrefList(intIndex) = strFileExtensionsPrefList(intIndex - 1)
+                            Next intIndex
+                            strFileExtensionsPrefList(0) = LCMS_FEATURES_FILE_SUFFIX
+                        End If
                     End If
+                    
                     
                     ' Now step through strFileExtensionsPrefList() and see if any of the files in strWildcardFileMatches() match
                     strWildcardFileMatch = ""
                     For intExtensionIndex = 0 To intFileExtensionsPrefListCount - 1
+                        ' Make sure the text to find is lowercase
                         strFileExtensionsPrefList(intExtensionIndex) = LCase(Trim(strFileExtensionsPrefList(intExtensionIndex)))
+                        
                         intExtensionLength = Len(strFileExtensionsPrefList(intExtensionIndex))
                         If intExtensionLength > 0 Then
                         
+                            ' Look for files that end with strFileExtensionsPrefList(intExtensionIndex)
+                            
                             If strFileExtensionsPrefList(intExtensionIndex) = ".pek" Or strFileExtensionsPrefList(intExtensionIndex) = ".csv" Then
                                 ' Preferentially choose the .pek. or .csv file over the _*.??? file (like _ic.pek or _s.pek or _ic.csv or _s.csv)
                                 
@@ -2828,9 +2855,9 @@ On Error GoTo LoadInputFileErrorHandler
                         .AutoMapDataPointsMassTolerancePPM = val(strKeyValue)
                     End If
                     
-                    strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "PointsLoadMode", Trim(.PointsLoadMode), udtAutoParams.FilePaths.IniFilePath)
+                    strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "LCMSFeaturePointsLoadMode", Trim(.LCMSFeaturePointsLoadMode), udtAutoParams.FilePaths.IniFilePath)
                     If IsNumeric(strKeyValue) Then
-                        .PointsLoadMode = val(strKeyValue)
+                        .LCMSFeaturePointsLoadMode = val(strKeyValue)
                     End If
                 
                 End With
@@ -2905,7 +2932,7 @@ On Error GoTo LoadInputFileErrorHandler
                     End If
                     
                     .AutoMapDataPointsMassTolerancePPM = 5
-                    .PointsLoadMode = plmLoadMappedPointsOnly
+                    .LCMSFeaturePointsLoadMode = plmLoadMappedPointsOnly
                 End With
                 
                 .AutoAnalysisOptions.GenerateMonoPlus4IsoLabelingFile = False
@@ -2978,7 +3005,7 @@ On Error GoTo LoadInputFileErrorHandler
                     udtWorkingParams.GelIndex = ReadGelFile(udtAutoParams.FilePaths.InputFilePath, udtAutoParams.GelIndexToForce)
                     udtWorkingParams.LoadedGelFile = True
                 Else
-                    ' Loading a .Pek, .CSV, .mzXML, or .mzData file; use FileNew
+                    ' Loading a .Pek, .CSV, .mzXML, .mzData, or _LCMSFeatures file; use FileNew
                     If udtAutoParams.GelIndexToForce > 0 And udtAutoParams.GelIndexToForce <= UBound(GelBody()) Then
                         udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, udtAutoParams.GelIndexToForce, strErrorMessage)
                     Else
@@ -3061,6 +3088,7 @@ On Error GoTo LoadInputFileErrorHandler
         If DetermineFileType(udtAutoParams.FilePaths.InputFilePath, eFileType) Then
             With GelData(udtWorkingParams.GelIndex)
                 If eFileType = ifmDelimitedTextFile Then
+                    ' Assume we loaded an _LCMSFeatures.txt file (along with Decon2LS CSV files)
                     .DataStatusBits = .DataStatusBits Or GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA
                 Else
                     .DataStatusBits = .DataStatusBits And Not GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA

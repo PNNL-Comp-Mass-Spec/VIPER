@@ -244,9 +244,9 @@ Public Sub EnableActionMove()
     ClearEvents
     
     With Chart2D.ActionMaps
-        .add WM_LBUTTONDOWN, 0, 0, oc2dActionModifyStart
-        .add WM_MOUSEMOVE, MK_LBUTTON, 0, oc2dActionTranslate
-        .add WM_LBUTTONUP, 0, 0, oc2dActionModifyEnd
+        .Add WM_LBUTTONDOWN, 0, 0, oc2dActionModifyStart
+        .Add WM_MOUSEMOVE, MK_LBUTTON, 0, oc2dActionTranslate
+        .Add WM_LBUTTONUP, 0, 0, oc2dActionModifyEnd
     End With
 
     mCurrentAction = oc2dActionTranslate
@@ -269,9 +269,9 @@ Public Sub EnableActionRotate()
     ClearEvents
     
     With Chart2D.ActionMaps
-        .add WM_LBUTTONDOWN, 0, 0, oc2dActionModifyStart
-        .add WM_MOUSEMOVE, MK_LBUTTON, 0, oc2dActionRotate
-        .add WM_LBUTTONUP, 0, 0, oc2dActionModifyEnd
+        .Add WM_LBUTTONDOWN, 0, 0, oc2dActionModifyStart
+        .Add WM_MOUSEMOVE, MK_LBUTTON, 0, oc2dActionRotate
+        .Add WM_LBUTTONUP, 0, 0, oc2dActionModifyEnd
     End With
     
     mCurrentAction = oc2dActionRotate
@@ -285,9 +285,9 @@ Public Sub EnableActionScale()
     ClearEvents
     
     With Chart2D.ActionMaps
-        .add WM_LBUTTONDOWN, 0, 0, oc2dActionModifyStart
-        .add WM_MOUSEMOVE, MK_LBUTTON, 0, oc2dActionScale
-        .add WM_LBUTTONUP, 0, 0, oc2dActionModifyEnd
+        .Add WM_LBUTTONDOWN, 0, 0, oc2dActionModifyStart
+        .Add WM_MOUSEMOVE, MK_LBUTTON, 0, oc2dActionScale
+        .Add WM_LBUTTONUP, 0, 0, oc2dActionModifyEnd
     End With
     
     mCurrentAction = oc2dActionScale
@@ -301,10 +301,10 @@ Public Sub EnableActionZoom()
     ClearEvents
     
     With Chart2D.ActionMaps
-        .add WM_LBUTTONDOWN, 0, 0, oc2dActionZoomStart
-        .add WM_MOUSEMOVE, MK_LBUTTON, 0, oc2dActionZoomUpdate
-        .add WM_LBUTTONUP, 0, 0, oc2dActionZoomEnd
-        .add WM_KEYDOWN, MK_LBUTTON, VK_ESCAPE, oc2dActionZoomCancel
+        .Add WM_LBUTTONDOWN, 0, 0, oc2dActionZoomStart
+        .Add WM_MOUSEMOVE, MK_LBUTTON, 0, oc2dActionZoomUpdate
+        .Add WM_LBUTTONUP, 0, 0, oc2dActionZoomEnd
+        .Add WM_KEYDOWN, MK_LBUTTON, VK_ESCAPE, oc2dActionZoomCancel
     End With
     
     mCurrentAction = oc2dActionZoomStart
@@ -455,7 +455,7 @@ Private Sub InitializeGraphControl()
     UserControl.Height = 300
 End Sub
 
-Private Sub LogEventToConsole(Msg As Integer, modf As Integer, key As Integer, action As Integer)
+Private Sub LogEventToConsole(Msg As Integer, modf As Integer, Key As Integer, action As Integer)
     'Debugging output for the ActionMaps.  Uncomment in chart_Click to view these.
     
     Dim Output As String
@@ -497,7 +497,7 @@ Private Sub LogEventToConsole(Msg As Integer, modf As Integer, key As Integer, a
         
     Output = Output & ", "
     
-    If key <> 0 Then Output = Output & Chr(key)
+    If Key <> 0 Then Output = Output & Chr(Key)
     
     Output = Output & " = "
     
@@ -988,10 +988,10 @@ Public Sub SetZoomMode(blnGraphical As Boolean)
                 
     If blnGraphical Then
         Chart2D.ActionMaps.Remove WM_LBUTTONUP, 0, 0       'oc2dActionAxisBound
-        Chart2D.ActionMaps.add WM_LBUTTONUP, 0, 0, oc2dActionZoomEnd
+        Chart2D.ActionMaps.Add WM_LBUTTONUP, 0, 0, oc2dActionZoomEnd
     Else
         Chart2D.ActionMaps.Remove WM_LBUTTONUP, 0, 0       'oc2dActionZoomEnd
-        Chart2D.ActionMaps.add WM_LBUTTONUP, 0, 0, oc2dActionZoomAxisEnd
+        Chart2D.ActionMaps.Add WM_LBUTTONUP, 0, 0, oc2dActionZoomAxisEnd
     End If
 
 End Sub

@@ -1465,7 +1465,7 @@ On Error GoTo LoadSettingsFileHandler
             .TotalIntensityPercentageFilter = GetIniFileSettingSng(IniStuff, "AutoAnalysisFilterPrefs", "TotalIntensityPercentageFilter", .TotalIntensityPercentageFilter)
             
             .AutoMapDataPointsMassTolerancePPM = GetIniFileSettingSng(IniStuff, "AutoAnalysisFilterPrefs", "AutoMapDataPointsMassTolerancePPM", .AutoMapDataPointsMassTolerancePPM)
-            .PointsLoadMode = GetIniFileSettingInt(IniStuff, "AutoAnalysisFilterPrefs", "PointsLoadMode", CInt(.PointsLoadMode))
+            .LCMSFeaturePointsLoadMode = GetIniFileSettingInt(IniStuff, "AutoAnalysisFilterPrefs", "LCMSFeaturePointsLoadMode", CInt(.LCMSFeaturePointsLoadMode))
         End With
         
         ' Now attempt to load the database connection info
@@ -2533,7 +2533,7 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "TotalIntensityPercentageFilter", .TotalIntensityPercentageFilter
         
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "AutoMapDataPointsMassTolerancePPM", .AutoMapDataPointsMassTolerancePPM
-        AddKeyValueSettingInt sKeys, sVals, iKVCount, "PointsLoadMode", CInt(.PointsLoadMode)
+        AddKeyValueSettingInt sKeys, sVals, iKVCount, "LCMSFeaturePointsLoadMode", CInt(.LCMSFeaturePointsLoadMode)
     
     End With
     IniStuff.WriteSection "AutoAnalysisFilterPrefs", sKeys(), sVals(), iKVCount
@@ -3780,7 +3780,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .TotalIntensityPercentageFilter = DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD
                 
                 .AutoMapDataPointsMassTolerancePPM = 5
-                .PointsLoadMode = plmLoadMappedPointsOnly
+                .LCMSFeaturePointsLoadMode = plmLoadMappedPointsOnly
             End With
         End If
         

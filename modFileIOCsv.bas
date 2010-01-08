@@ -117,10 +117,6 @@ Private mTotalIntensityPercentageFilter As Single
 
 Private mPrescannedData As clsFileIOPrescannedData
 
-Private mPointsToKeep As Dictionary
-Private mHashMapOfPointsKept As Dictionary
-Private mFeatureToScanMap As Dictionary
-
 Private mValidDataPointCount As Long
 Private mSubtaskMessage As String
 
@@ -355,6 +351,25 @@ Private Function GetDefaultScansColumnHeaders(blnRequiredColumnsOnly As Boolean,
     GetDefaultScansColumnHeaders = strHeaders
 End Function
 
+Private Function GetLCMSFeaturePointLoadModeText(ByVal plmPointsLoadMode As Integer) As String
+    Dim strModeText As String
+    strModeText = ""
+    
+    Select Case plmPointsLoadMode
+    Case plmLoadAllPoints
+        strModeText = "LoadAllPoints"
+    Case plmLoadMappedPointsOnly
+        strModeText = "LoadMappedPointsOnly"
+    Case plmLoadOnePointPerLCMSFeature
+        strModeText = "LoadOnePointPerLCMSFeature"
+    Case Else
+        strModeText = "??"
+    End Select
+    
+    GetLCMSFeaturePointLoadModeText = strModeText
+
+End Function
+
 Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Long, _
                            ByVal MaxFit As Double, _
                            ByVal blnFilterByAbundance As Boolean, _
@@ -388,6 +403,8 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     Dim strLCMSFeaturesFilePath As String
     Dim strLCMSFeatureToPeakMapFilePath As String
     
+    Dim strMessage As String
+    
     Dim eResponse As VbMsgBoxResult
     
     Dim fso As New FileSystemObject
@@ -406,6 +423,17 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     
     Dim objSplitUMCs As clsSplitUMCsByAbundance
     
+    ' This HashTable will only be used if loading LCMS Features
+    Dim objFeatureToScanMap As clsParallelLngArrays
+
+    ' This HashTable will only be used if loading LCMS Features and the point load mode is plmLoadOnePointPerLCMSFeature
+    '  Key is PeakIndex
+    '  Value is FeatureIndex
+    Dim objPointsToKeep As clsParallelLngArrays
+    
+    ' This HashTable maps the the line number of the data point in the input file with the index in GelData(mGelIndex).IsoData() that the data point is stored
+    Dim objHashMapOfPointsKept As clsParallelLngArrays
+
 On Error GoTo LoadNewCSVErrorHandler
 
     ' Update the filter variables
@@ -441,24 +469,31 @@ On Error GoTo LoadNewCSVErrorHandler
     ' Resolve the CSV FilePath given to the ScansFilePath and the IsosFilePath variables
     
     If Not ResolveCSVFilePaths(CSVFilePath, strScansFilePath, strIsosFilePath, strBaseFilePath) Then
-        strErrorMessage = "Unable to resolve the given FilePath to the _isos.csv and _scans.csv files: " & vbCrLf & CSVFilePath
+        strErrorMessage = "Error: Unable to resolve the given FilePath to the _isos.csv and _scans.csv files: " & vbCrLf & CSVFilePath
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
         End If
+        AddToAnalysisHistory mGelIndex, strErrorMessage
         LoadNewCSV = -7
         Exit Function
     End If
     
     ' Validate that the input file(s) exist
     If Not fso.FileExists(strIsosFilePath) Then
-        strErrorMessage = "Decon2LS _isos.csv file not found: " & vbCrLf & strIsosFilePath
+        strErrorMessage = "Error: Decon2LS _isos.csv file not found: " & vbCrLf & strIsosFilePath
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
         End If
+        AddToAnalysisHistory mGelIndex, strErrorMessage
         LoadNewCSV = -7
         Exit Function
     End If
     
+    ' Initialize the hash tables
+    Set objHashMapOfPointsKept = New clsParallelLngArrays
+    Set objPointsToKeep = New clsParallelLngArrays
+    Set objFeatureToScanMap = New clsParallelLngArrays
+
     If mLoadPredefinedLCMSFeatures Then
     
         ' Define the path to the LCMSFeature file and the FeatureToPeakMap file
@@ -467,10 +502,11 @@ On Error GoTo LoadNewCSVErrorHandler
         
         ' Make sure the LCMSFeatures file exists
         If Not fso.FileExists(strLCMSFeaturesFilePath) Then
-            strErrorMessage = "The LCMSFeatures file does not exist: " & vbCrLf & strLCMSFeaturesFilePath
+            strErrorMessage = "Error: The LCMSFeatures file does not exist: " & vbCrLf & strLCMSFeaturesFilePath
             If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                 MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
             End If
+            AddToAnalysisHistory mGelIndex, strErrorMessage
             LoadNewCSV = -7
             Exit Function
         End If
@@ -481,6 +517,7 @@ On Error GoTo LoadNewCSVErrorHandler
             If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
                 MsgBox strErrorMessage, vbExclamation + vbOKOnly, glFGTU
             End If
+            AddToAnalysisHistory mGelIndex, strErrorMessage
         End If
     
     End If
@@ -538,12 +575,37 @@ On Error GoTo LoadNewCSVErrorHandler
         lngReturnValue = 0
     End If
     
-    If mLoadPredefinedLCMSFeatures And plmPointsLoadMode >= plmLoadMappedPointsOnly Then
+    If lngReturnValue = 0 And mLoadPredefinedLCMSFeatures And plmPointsLoadMode >= plmLoadMappedPointsOnly Then
         Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
         Set objReadLCMSFeatures = New clsFileIOPredefinedLCMSFeatures
-        lngReturnValue = objReadLCMSFeatures.CreatePeakListFromFeatureToPeakMapFile(strLCMSFeatureToPeakMapFilePath, mPointsToKeep)
-        If plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
-            lngReturnValue = objReadLCMSFeatures.RefinePeakListFromFeatureFile(strLCMSFeaturesFilePath, mPointsToKeep, mFeatureToScanMap)
+        objReadLCMSFeatures.ProgressForm = frmProgress
+        
+        frmProgress.UpdateCurrentSubTask "Caching peak to feature mapping data"
+        
+        strMessage = "Loading predefined LCMS Features; PointsLoadMode = " & plmPointsLoadMode
+        strMessage = strMessage & " (" & GetLCMSFeaturePointLoadModeText(plmPointsLoadMode) & ")"
+        AddToAnalysisHistory mGelIndex, strMessage
+        
+        lngReturnValue = objReadLCMSFeatures.CacheFeatureToPeakMapIndices(lngGelIndex, strLCMSFeatureToPeakMapFilePath, objPointsToKeep)
+        
+        If lngReturnValue = 0 Then
+            AddToAnalysisHistory mGelIndex, "Parsed FeatureToPeakMap file; cached " & Format(objPointsToKeep.Count, "0,000") & " peaks"
+        Else
+            AddToAnalysisHistory mGelIndex, "Error " & lngReturnValue & " returned by CacheFeatureToPeakMapIndices for file " & strLCMSFeatureToPeakMapFilePath
+        End If
+        
+        If lngReturnValue = 0 And plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+            
+            frmProgress.UpdateCurrentSubTask "Caching the scan center for each LC-MS Feature"
+            
+            lngReturnValue = objReadLCMSFeatures.CacheScanCenterForLCMSFeatures(lngGelIndex, strLCMSFeaturesFilePath, objFeatureToScanMap)
+        
+            If lngReturnValue = 0 Then
+                AddToAnalysisHistory mGelIndex, "Parsed LCMSFeatures file; cached scan center for " & Format(objFeatureToScanMap.Count, "0,000") & " features"
+            Else
+                AddToAnalysisHistory mGelIndex, "Error " & lngReturnValue & " returned by CacheScanCenterForLCMSFeatures for file " & strLCMSFeaturesFilePath
+            End If
+        
         End If
     End If
     
@@ -553,26 +615,46 @@ On Error GoTo LoadNewCSVErrorHandler
         lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseFilePath, _
                                          lngScansFileByteCount, lngByteCountTotal, lngTotalBytesRead, _
                                          blnValidScansFile, blnFilePrescanEnabled, _
-                                         plmPointsLoadMode)
+                                         plmPointsLoadMode, _
+                                         objFeatureToScanMap, _
+                                         objPointsToKeep, _
+                                         objHashMapOfPointsKept)
     
         If lngReturnValue = 0 Then
             If mLoadPredefinedLCMSFeatures Then
-                lngReturnValue = ReadLCMSFeatureFiles(fso, strLCMSFeaturesFilePath, strLCMSFeatureToPeakMapFilePath, sngAutoMapDataPointsMassTolerancePPM, plmPointsLoadMode)
+                frmProgress.UpdateCurrentSubTask "Loading Predefined LCMS Features"
+                
+                lngReturnValue = ReadLCMSFeatureFiles( _
+                                    fso, _
+                                    strLCMSFeaturesFilePath, _
+                                    strLCMSFeatureToPeakMapFilePath, _
+                                    sngAutoMapDataPointsMassTolerancePPM, _
+                                    plmPointsLoadMode, _
+                                    objPointsToKeep, _
+                                    objHashMapOfPointsKept)
             End If
         End If
     End If
     
-    If (glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance _
-            And mLoadPredefinedLCMSFeatures _
-            And plmPointsLoadMode < plmLoadOnePointPerLCMSFeature) Then
+    If lngReturnValue = 0 Then
+        If (glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance And _
+            mLoadPredefinedLCMSFeatures And _
+            plmPointsLoadMode < plmLoadOnePointPerLCMSFeature) Then
+            
+            frmProgress.UpdateCurrentSubTask "Splitting loaded LC-MS Features"
+            
+            strMessage = "Splitting loaded LC-MS Features since SplitUMCsByAbundance=True"
+            AddToAnalysisHistory mGelIndex, strMessage
+            
+            Set objSplitUMCs = New clsSplitUMCsByAbundance
+            blnSuccess = UpdateUMCStatArrays(mGelIndex, True, False, frmProgress)
+            
+            objSplitUMCs.ExamineUMCs mGelIndex, frmProgress, GelUMC(mGelIndex).def.OddEvenProcessingMode, False, False
+            Set objSplitUMCs = Nothing
         
-        Set objSplitUMCs = New clsSplitUMCsByAbundance
-        blnSuccess = UpdateUMCStatArrays(mGelIndex, True, False, frmProgress)
-        objSplitUMCs.ExamineUMCs mGelIndex, frmProgress, GelUMC(mGelIndex).def.OddEvenProcessingMode, True, False
-        Set objSplitUMCs = Nothing
-    
+        End If
     End If
-        
+    
     LoadNewCSV = lngReturnValue
     Exit Function
 
@@ -592,7 +674,10 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
                                  ByVal lngScansFileByteCount As Long, ByVal lngByteCountTotal As Long, _
                                  ByRef lngTotalBytesRead As Long, ByVal blnValidScansFile As Boolean, _
                                  ByVal blnFilePrescanEnabled As Boolean, _
-                                 ByVal plmPointsLoadMode As Integer) As Long
+                                 ByVal plmPointsLoadMode As Integer, _
+                                 ByRef objFeatureToScanMap As clsParallelLngArrays, _
+                                 ByRef objPointsToKeep As clsParallelLngArrays, _
+                                 ByRef objHashMapOfPointsKept As clsParallelLngArrays) As Long
 
     ' Returns 0 if no error, the error number if an error
 
@@ -614,11 +699,19 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
     Dim sngMonoMinus4Intensities() As Single
     
     Dim blnIgnoreAllFiltersAndLoadAllData As Boolean
-    
+
 On Error GoTo ReadCSVIsosFileErrorHandler
 
     ' If we're loading predefined LC/MS features, then we need to ignore all filters and load all of the data
-    blnIgnoreAllFiltersAndLoadAllData = mLoadPredefinedLCMSFeatures
+    
+    If mLoadPredefinedLCMSFeatures Then
+        If plmPointsLoadMode >= plmLoadMappedPointsOnly Then
+            blnIgnoreAllFiltersAndLoadAllData = True
+        End If
+        
+        ' Make sure blnFilePrescanEnabled is false, since this isn't compatible with loading Predefined LCMS Features
+        blnFilePrescanEnabled = False
+    End If
     
     If blnIgnoreAllFiltersAndLoadAllData Then
         ' Make sure blnFilePrescanEnabled is false, since we're ignoring all filters and loading all of the data
@@ -695,7 +788,10 @@ On Error GoTo ReadCSVIsosFileErrorHandler
                                              intColumnMapping, blnValidScansFile, _
                                              sngMonoPlus4Intensities, sngMonoMinus4Intensities, _
                                              blnFilePrescanEnabled, blnIgnoreAllFiltersAndLoadAllData, _
-                                             plmPointsLoadMode)
+                                             plmPointsLoadMode, _
+                                             objFeatureToScanMap, _
+                                             objPointsToKeep, _
+                                             objHashMapOfPointsKept)
         If lngReturnValue <> 0 Then
             ' Error occurred
             Debug.Assert False
@@ -890,15 +986,18 @@ On Error GoTo ReadCSVIsosFileErrorHandler
     ' Update the progress bar
     mCurrentProgressStep = mCurrentProgressStep + 1
     frmProgress.UpdateProgressBar mCurrentProgressStep
-    frmProgress.InitializeSubtask "Sorting isotopic data", 0, GelData(mGelIndex).IsoLines
     
+    ' Sort the data, though we skip this step if we have loaded predefined LCMSFeatures
+    '  since the order of the data in the original file cannot be altered
     If Not mLoadPredefinedLCMSFeatures Then
-        ' Sort the data, though we skip this step if we have loaded predefined LCMSFeatures
+        frmProgress.InitializeSubtask "Sorting isotopic data", 0, GelData(mGelIndex).IsoLines
         SortIsotopicData mGelIndex
     End If
     
     If (GelData(mGelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IREPORT) = GEL_DATA_STATUS_BIT_IREPORT Then
         ' Fix the mono plus 2 abundance values
+        frmProgress.InitializeSubtask "Fixing the mono plus 2 abundance values", 0, GelData(mGelIndex).IsoLines
+        
         FixIsosMonoPlus2Abu mGelIndex
     End If
         
@@ -931,15 +1030,19 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
                                      ByRef sngMonoMinus4Intensities() As Single, _
                                      ByVal blnFilePrescanEnabled As Boolean, _
                                      ByVal blnIgnoreAllFiltersAndLoadAllData As Boolean, _
-                                     ByVal plmPointsLoadMode As Integer) As Long
+                                     ByVal plmPointsLoadMode As Integer, _
+                                     ByRef objFeatureToScanMap As clsParallelLngArrays, _
+                                     ByRef objPointsToKeep As clsParallelLngArrays, _
+                                     ByRef objHashMapOfPointsKept As clsParallelLngArrays) As Long
     
     Dim tsInFile As TextStream
     Dim strLineIn As String
     
     Dim lngLinesRead As Long
+    Dim lngCurrentDataLine As Long
+    
     Dim lngIndex As Long
     Dim lngScanNumber As Long
-    Dim lngIsoIndex As Long
     Dim lngFeatureIndex As Long
     
     Dim blnColumnsDefined As Boolean
@@ -958,9 +1061,13 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
     Dim strMessage As String
     Dim lngReturnValue As Long
     
-    Set mHashMapOfPointsKept = New Dictionary
+    Dim blnMatchFound As Boolean
+    Dim lngFeatureCentralScan As Long
     
 On Error GoTo ReadCSVIsosFileWorkErrorHandler
+    
+    ' Make sure objHashMapOfPointsKept is empty
+    objHashMapOfPointsKept.Clear
     
     ' Reserve space in these arrays, but only if we're not pre-scanning the data
     If mReadMode <> rmReadModeConstants.rmPrescanData Then
@@ -969,7 +1076,11 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
     End If
     
     lngLinesRead = 0
-    lngIsoIndex = 1 'Start index at 1 to handle LCMS_Features.txt type of index
+    
+    ' This variable is used when loading data from LCMSFeature.txt files
+    ' Need to start at 1 to remain consistent with .IsoLines starting at 1
+    ' and to remain consistent with objPointsToKeep
+    lngCurrentDataLine = 1
     
     Set tsInFile = fso.OpenTextFile(strIsosFilePath, ForReading, False)
     Do While Not tsInFile.AtEndOfStream
@@ -984,10 +1095,6 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
         
         If blnColumnsDefined Then
             lngLinesRead = lngLinesRead + 1
-            
-            If mReadMode = rmReadModeConstants.rmStoreData Then
-                GelData(mGelIndex).LinesRead = lngLinesRead
-            End If
         End If
         
         ' Check for valid line (must contain at least one comma and must be
@@ -1024,6 +1131,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                      AddToAnalysisHistory mGelIndex, "Isos file " & fso.GetFileName(strIsosFilePath) & " did not contain column headers; using the default headers (" & GetDefaultIsosColumnHeaders(False, False) & ")"
 
                     blnDataLine = True
+                    blnColumnsDefined = True
                 Else
                     ' Define the column mappings
                     strData = Split(strLineIn, ",")
@@ -1063,7 +1171,9 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                             End If
                             strUnknownColumnList = strUnknownColumnList & Trim(strData(lngIndex))
                             
-                            Debug.Assert False
+                            If Trim(strData(lngIndex)) <> "orig_intensity" And Trim(strData(lngIndex)) <> "TIA_orig_intensity" Then
+                                Debug.Assert False
+                            End If
                         End Select
                         
                     Next lngIndex
@@ -1097,139 +1207,195 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                 
         If blnDataLine Then
             
-            strData = Split(strLineIn, ",")
-            
-            If UBound(strData) >= 0 Then
-                lngScanNumber = GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.ScanNumber), -1)
-            Else
-                lngScanNumber = -1
-            End If
-    
-            If lngScanNumber >= 0 And (Not mEvenOddScanFilter Or (lngScanNumber Mod 2 = mEvenOddModCompareVal)) Then
-        
-                sngFit = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.Fit), 0)
-                sngAbundance = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.Abundance), 0)
-                intCharge = CInt(GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.Charge), 1))
+            blnValidDataPoint = True
+            If mLoadPredefinedLCMSFeatures And plmPointsLoadMode >= plmLoadMappedPointsOnly And blnValidDataPoint Then
+                ' Loading LC-MS Features
+                ' Check now whether or not to retain this data piont
+                ' If not, then there is no point in continuing the parse strLineIn
                 
-                blnValidDataPoint = True
-                
-                If Not blnIgnoreAllFiltersAndLoadAllData Then
-                    If sngFit <= mMaxFit Or mMaxFit <= 0 Then
-                        If mFilterByAbundance Then
-                            If sngAbundance < mAbundanceMin Or sngAbundance > mAbundanceMax Then
-                                blnValidDataPoint = False
-                            End If
-                        End If
-                    Else
-                        blnValidDataPoint = False
-                    End If
-                End If
-                
-                If mLoadPredefinedLCMSFeatures And plmPointsLoadMode >= plmLoadMappedPointsOnly And blnValidDataPoint Then
-                    If Not mPointsToKeep.Exists(lngIsoIndex) Then
-                        blnValidDataPoint = False
-                    Else
-                        If plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
-                            lngFeatureIndex = mPointsToKeep.Item(lngIsoIndex)
+                If Not objPointsToKeep.Exists(lngCurrentDataLine) Then
+                    ' Data point doesn't exist in the _LCMSFeatureToPeakMap.txt file
+                    ' Do not load this point
+                    blnValidDataPoint = False
+                Else
+                    If plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+                        lngFeatureIndex = objPointsToKeep.GetItemForKey(lngCurrentDataLine, blnMatchFound)
+                        
+                        If Not blnMatchFound Then
+                            ' objPointsToKeep doesn't contain lngCurrentDataLine; this is unexpected
+                            Debug.Assert False
+                            blnValidDataPoint = False
+                        Else
+                            lngFeatureCentralScan = objFeatureToScanMap.GetItemForKey(lngFeatureIndex, blnMatchFound)
                             
-                            If Not mFeatureToScanMap.Item(lngFeatureIndex) = lngScanNumber Then
+                            If Not blnMatchFound Then
+                                ' objFeatureToScanMap doesn't contain lngFeatureIndex; this is unexpected
+                                Debug.Assert False
                                 blnValidDataPoint = False
+                            Else
+                                ' Parse out the scan number of this feature
+                                If intColumnMapping(IsosFileColumnConstants.ScanNumber) < 0 Then
+                                    ' Can't determine scan number since the ScanNumber header wasn't present in the input file
+                                    lngScanNumber = -1
+                                Else
+                                    strData = Split(strLineIn, ",", intColumnMapping(IsosFileColumnConstants.ScanNumber) + 2)
+                                    
+                                    If UBound(strData) >= 0 Then
+                                        lngScanNumber = GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.ScanNumber), -1)
+                                    Else
+                                        lngScanNumber = -1
+                                    End If
+                                End If
+                                
+                                If lngScanNumber <> lngFeatureCentralScan Then
+                                    ' This data point's scan number is not the same as the central scan number for this point's LC-MS feature
+                                    ' Do not load this point
+                                    blnValidDataPoint = False
+                                End If
                             End If
                         End If
                     End If
                 End If
+            End If
+                        
+            If blnValidDataPoint Then
+                
+                strData = Split(strLineIn, ",")
+                
+                If UBound(strData) >= 0 Then
+                    lngScanNumber = GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.ScanNumber), -1)
+                Else
+                    lngScanNumber = -1
+                End If
+        
+                If lngScanNumber >= 0 And (Not mEvenOddScanFilter Or (lngScanNumber Mod 2 = mEvenOddModCompareVal)) Then
             
-                If blnValidDataPoint Then
-                
-                    mHashMapOfPointsKept.add lngIsoIndex, GelData(mGelIndex).IsoLines + 1
-                
-                    If mReadMode = rmReadModeConstants.rmPrescanData Then
-                        mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
-                    Else
-                        If blnFilePrescanEnabled And Not blnIgnoreAllFiltersAndLoadAllData Then
-                            If mPrescannedData.GetAbundanceByIndex(mValidDataPointCount) >= 0 Then
-                                blnStoreDataPoint = True
-                            Else
-                                blnStoreDataPoint = False
+                    sngFit = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.Fit), 0)
+                    sngAbundance = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.Abundance), 0)
+                    intCharge = CInt(GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.Charge), 1))
+                    
+                    blnValidDataPoint = True
+                    
+                    If Not blnIgnoreAllFiltersAndLoadAllData Then
+                        If sngFit <= mMaxFit Or mMaxFit <= 0 Then
+                            If mFilterByAbundance Then
+                                If sngAbundance < mAbundanceMin Or sngAbundance > mAbundanceMax Then
+                                    blnValidDataPoint = False
+                                End If
                             End If
                         Else
-                            blnStoreDataPoint = True
+                            blnValidDataPoint = False
                         End If
+                    End If
+               
+                    If blnValidDataPoint Then
+    
+                        If mReadMode = rmReadModeConstants.rmPrescanData Then
+                            mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
+                        Else
                         
-                        If blnStoreDataPoint Then
-                            With GelData(mGelIndex)
-                                .DataLines = .DataLines + 1
-                                .IsoLines = .IsoLines + 1
-                        
-                                If Not blnValidScansFile Then
-                                    ' Possibly add a new entry to .ScanInfo()
-                                    ' Assumes data in the _isos.csv file is sorted by ascending scan number
-                                    
-                                    If mScanInfoCount = 0 Then
-                                        mScanInfoCount = 1
-                                        With .ScanInfo(1)
-                                            .ScanNumber = lngScanNumber
-                                            .ElutionTime = 0
-                                            .ScanType = 1
-                                        End With
-                                    Else
-                                        If .ScanInfo(mScanInfoCount).ScanNumber < lngScanNumber Then
-                                            mScanInfoCount = mScanInfoCount + 1
-                                            
-                                            If mScanInfoCount > UBound(.ScanInfo) Then
-                                                ReDim Preserve .ScanInfo(UBound(.ScanInfo) + SCAN_INFO_DIM_CHUNK)
-                                            End If
-                                            
-                                            With .ScanInfo(mScanInfoCount)
+                            ' Keep track of the mapping between the line number of the data point in the input file and the index value in GelData(mGelIndex).IsoData() where this data point is being stored
+                            objHashMapOfPointsKept.Add lngCurrentDataLine, GelData(mGelIndex).IsoLines + 1
+                            
+                            If blnFilePrescanEnabled And Not blnIgnoreAllFiltersAndLoadAllData Then
+                                If mPrescannedData.GetAbundanceByIndex(mValidDataPointCount) >= 0 Then
+                                    blnStoreDataPoint = True
+                                Else
+                                    blnStoreDataPoint = False
+                                End If
+                            Else
+                                blnStoreDataPoint = True
+                            End If
+                            
+                            If blnStoreDataPoint Then
+                                With GelData(mGelIndex)
+                                    .DataLines = .DataLines + 1
+                                    .IsoLines = .IsoLines + 1
+                            
+                                    If Not blnValidScansFile Then
+                                        ' Possibly add a new entry to .ScanInfo()
+                                        ' Assumes data in the _isos.csv file is sorted by ascending scan number
+                                        
+                                        If mScanInfoCount = 0 Then
+                                            mScanInfoCount = 1
+                                            With .ScanInfo(1)
                                                 .ScanNumber = lngScanNumber
                                                 .ElutionTime = 0
                                                 .ScanType = 1
                                             End With
+                                        Else
+                                            If .ScanInfo(mScanInfoCount).ScanNumber < lngScanNumber Then
+                                                mScanInfoCount = mScanInfoCount + 1
+                                                
+                                                If mScanInfoCount > UBound(.ScanInfo) Then
+                                                    ReDim Preserve .ScanInfo(UBound(.ScanInfo) + SCAN_INFO_DIM_CHUNK)
+                                                End If
+                                                
+                                                With .ScanInfo(mScanInfoCount)
+                                                    .ScanNumber = lngScanNumber
+                                                    .ElutionTime = 0
+                                                    .ScanType = 1
+                                                End With
+                                            End If
                                         End If
                                     End If
-                                End If
-                
-                                If .IsoLines > UBound(.IsoData) Then
-                                    ReDim Preserve .IsoData(UBound(.IsoData) + ISO_DATA_DIM_CHUNK)
-                                    
-                                    If mReadMode <> rmReadModeConstants.rmPrescanData Then
-                                        ReDim Preserve sngMonoPlus4Intensities(UBound(.IsoData))
-                                        ReDim Preserve sngMonoMinus4Intensities(UBound(.IsoData))
-                                    End If
-                                End If
-                               
-                                With .IsoData(.IsoLines)
-                                    .ScanNumber = lngScanNumber
-                                    .Charge = intCharge
-                                    .Abundance = sngAbundance
-                                    .MZ = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MZ), 0)
-                                    .Fit = sngFit
-                                    .AverageMW = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.AverageMW), 0)
-                                    .MonoisotopicMW = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MonoisotopicMW), 0)
-                                    .MostAbundantMW = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MostAbundantMW), 0)
-                                    .FWHM = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.FWHM), 0)
-                                    .SignalToNoise = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.SignalToNoise), 0)
-                                    .IntensityMono = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoAbundance), 0)
-                                    .IntensityMonoPlus2 = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance), 0)
-                                    .IMSDriftTime = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.IMSDriftTime), 0)
-                                End With
-                            
-                                If mReadMode <> rmReadModeConstants.rmPrescanData Then
-                                    sngMonoPlus4Intensities(.IsoLines) = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance), 0)
-                                    sngMonoMinus4Intensities(.IsoLines) = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance), 0)
-                                End If
-                            End With
-                        End If
-                    End If
                     
-                    mValidDataPointCount = mValidDataPointCount + 1
+                                    If .IsoLines > UBound(.IsoData) Then
+                                        ReDim Preserve .IsoData(UBound(.IsoData) + ISO_DATA_DIM_CHUNK)
+                                        
+                                        If mReadMode <> rmReadModeConstants.rmPrescanData Then
+                                            ReDim Preserve sngMonoPlus4Intensities(UBound(.IsoData))
+                                            ReDim Preserve sngMonoMinus4Intensities(UBound(.IsoData))
+                                        End If
+                                    End If
+                                   
+                                    With .IsoData(.IsoLines)
+                                        .ScanNumber = lngScanNumber
+                                        .Charge = intCharge
+                                        .Abundance = sngAbundance
+                                        .MZ = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MZ), 0)
+                                        .Fit = sngFit
+                                        .AverageMW = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.AverageMW), 0)
+                                        .MonoisotopicMW = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MonoisotopicMW), 0)
+                                        .MostAbundantMW = GetColumnValueDbl(strData, intColumnMapping(IsosFileColumnConstants.MostAbundantMW), 0)
+                                        .FWHM = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.FWHM), 0)
+                                        .SignalToNoise = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.SignalToNoise), 0)
+                                        .IntensityMono = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoAbundance), 0)
+                                        .IntensityMonoPlus2 = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance), 0)
+                                        .IMSDriftTime = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.IMSDriftTime), 0)
+                                    End With
+                                
+                                    If mReadMode <> rmReadModeConstants.rmPrescanData Then
+                                        sngMonoPlus4Intensities(.IsoLines) = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance), 0)
+                                        sngMonoMinus4Intensities(.IsoLines) = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance), 0)
+                                    End If
+                                End With
+                            End If
+                        End If
+                        
+                        mValidDataPointCount = mValidDataPointCount + 1
+                    End If
                 End If
             End If
             
-            lngIsoIndex = lngIsoIndex + 1
+            lngCurrentDataLine = lngCurrentDataLine + 1
+        
+            If mReadMode = rmReadModeConstants.rmStoreData Then
+                ' Update .LinesRead
+                GelData(mGelIndex).LinesRead = lngCurrentDataLine
+            End If
+        
         End If
     Loop
-        
+    
+    If mReadMode <> rmReadModeConstants.rmPrescanData Then
+        Debug.Assert GelData(mGelIndex).IsoLines = mValidDataPointCount
+        AddToAnalysisHistory mGelIndex, "Processed " & Format(GelData(mGelIndex).LinesRead, "0,000") & " isotopic data lines; retained " & Format(mValidDataPointCount, "0,000") & " data points"
+    
+        ' Sort the data in objHashMapOfPointsKept
+        objHashMapOfPointsKept.SortNow
+    End If
+    
     tsInFile.Close
     ReadCSVIsosFileWork = 0
     Exit Function
@@ -1327,6 +1493,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
                          AddToAnalysisHistory mGelIndex, "Scans file " & fso.GetFileName(strScansFilePath) & " did not contain column headers; using the default headers (" & GetDefaultScansColumnHeaders(False, False) & ")"
 
                         blnDataLine = True
+                        blnColumnsDefined = True
                     Else
                         ' Define the column mappings
                         strData = Split(strLineIn, ",")
@@ -1483,21 +1650,34 @@ Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
                                       ByVal strLCMSFeaturesFilePath As String, _
                                       ByVal strLCMSFeatureToPeakMapFilePath As String, _
                                       ByVal sngAutoMapDataPointsMassTolerancePPM As Single, _
-                                      ByVal plmPointsLoadMode As Integer) As Long
-                                      
+                                      ByVal plmPointsLoadMode As Integer, _
+                                      ByRef objPointsToKeep As clsParallelLngArrays, _
+                                      ByRef objHashMapOfPointsKept As clsParallelLngArrays) As Long
+
     Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
     Dim lngReturnCode As Long
     
     Set objReadLCMSFeatures = New clsFileIOPredefinedLCMSFeatures
-    
     
     objReadLCMSFeatures.ShowDialogBoxes = Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled
     objReadLCMSFeatures.AutoMapDataPointsMassTolerancePPM = sngAutoMapDataPointsMassTolerancePPM
     
     objReadLCMSFeatures.PointsLoadMode = plmPointsLoadMode
     
-    If mLoadPredefinedLCMSFeatures And plmPointsLoadMode >= plmLoadMappedPointsOnly Then
-        objReadLCMSFeatures.HashMapOfPointsKept = mHashMapOfPointsKept
+    ' Associate the progress window with objReadLCMSFeatures
+    objReadLCMSFeatures.ProgressForm = frmProgress
+    
+    ' Pass object objHashMapOfPointsKept to objReadLCMSFeatures
+    objReadLCMSFeatures.HashMapOfPointsKept = objHashMapOfPointsKept
+    
+    If objPointsToKeep Is Nothing Then
+        objReadLCMSFeatures.ClearFeatureToPeakMapping
+    Else
+        If objPointsToKeep.Count > 0 Then
+            objReadLCMSFeatures.DefineFeatureToPeakMapping objPointsToKeep
+        Else
+            objReadLCMSFeatures.ClearFeatureToPeakMapping
+        End If
     End If
     
     lngReturnCode = objReadLCMSFeatures.LoadLCMSFeatureFiles(strLCMSFeaturesFilePath, strLCMSFeatureToPeakMapFilePath, mGelIndex)

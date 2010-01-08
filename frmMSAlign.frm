@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
 Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Object = "{C02A7541-5364-11D2-9373-00A02411EBE6}#1.6#0"; "cw3dgrph.ocx"
 Begin VB.Form frmMSAlign 
@@ -114,8 +114,8 @@ Begin VB.Form frmMSAlign
       TabCaption(2)   =   "Tolerances"
       TabPicture(2)   =   "frmMSAlign.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraNETTolerances"
-      Tab(2).Control(1)=   "fraBinningOptions"
+      Tab(2).Control(0)=   "fraBinningOptions"
+      Tab(2).Control(1)=   "fraNETTolerances"
       Tab(2).ControlCount=   2
       TabCaption(3)   =   "Calib Type"
       TabPicture(3)   =   "frmMSAlign.frx":0054
@@ -125,11 +125,11 @@ Begin VB.Form frmMSAlign
       TabCaption(4)   =   "Adv1"
       TabPicture(4)   =   "frmMSAlign.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "Label21"
-      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(0)=   "fraMTRangeFilters"
+      Tab(4).Control(1)=   "txtWarpMassZScoreTolerance"
       Tab(4).Control(2)=   "Frame1"
-      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
-      Tab(4).Control(4)=   "fraMTRangeFilters"
+      Tab(4).Control(3)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(4)=   "Label21"
       Tab(4).ControlCount=   5
       TabCaption(5)   =   "Adv2"
       TabPicture(5)   =   "frmMSAlign.frx":008C
@@ -2333,8 +2333,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   4.01897889775899E-287
-         DataMax_5       =   4.01897889775899E-287
+         DataMin_5       =   2.86288237764049E-259
+         DataMax_5       =   2.86288237764049E-259
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2400,8 +2400,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   4.05759922206535E-287
-         DataMax_14      =   4.05759922206535E-287
+         DataMin_14      =   2.84928627702171E-259
+         DataMax_14      =   2.84928627702171E-259
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2469,8 +2469,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   4.07178873405752E-287
-         DataMax_23      =   4.07178873405752E-287
+         DataMin_23      =   2.81000644764278E-259
+         DataMax_23      =   2.81000644764278E-259
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -4679,8 +4679,8 @@ Private Sub FilterAndAlignFeatures(ByVal intIteration As Integer)
         End With
         
         ' Perform the alignment
-        ' Note: This process occurs asynchronously; when complete then
-        '       QueryMassMatchProgress will call FinalizeAlignment
+        ' Note: This process occurs asynchronously;
+        '       when complete then QueryMassMatchProgress will call FinalizeAlignment
         Call mMassMatchObject.MS2MSMSDBAlignPeptidesThreaded(mLocalFeatures, mLocalPMTsFiltered)
     End If
     
