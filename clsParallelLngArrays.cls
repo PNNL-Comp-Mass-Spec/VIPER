@@ -24,6 +24,9 @@ Private mValues() As Long
 Private mKeyValueMin As Long
 Private mKeyValueMax As Long
 
+' The following is true if mKeys is empty or has just one item
+' When more items are added to mKeys, if each new item is larger than mKeyValueMax, then this will remain true
+' As soon as an item is added that is < mKeyValueMax, then this will become false
 Private mIsSorted As Boolean
 Private mPreventDuplicateKeys As Boolean
 
@@ -89,7 +92,7 @@ End Sub
 ' Add a new Key / Value pair
 ' If PreventDuplicateKeys = True, then will make sure duplicate keys are not added
 ' Return True if successfully added, false if a duplicate exists and thus not added
-Public Function Add(ByVal Key As Long, ByVal Value As Long) As Boolean
+Public Function add(ByVal Key As Long, ByVal Value As Long) As Boolean
      
     If mCount >= UBound(mKeys) Then
         SetSize UBound(mKeys) * 2
@@ -98,7 +101,7 @@ Public Function Add(ByVal Key As Long, ByVal Value As Long) As Boolean
     If mPreventDuplicateKeys Then
         ' Make sure this key doesn't yet exist
         If Me.Exists(Key) Then
-            Add = False
+            add = False
             Exit Function
         End If
     End If
@@ -107,30 +110,33 @@ Public Function Add(ByVal Key As Long, ByVal Value As Long) As Boolean
     mValues(mCount) = Value
     
     mCount = mCount + 1
-    mIsSorted = False
     
     ' Update the min and max key value tracking variables
     If mCount = 1 Then
         mKeyValueMin = Key
         mKeyValueMax = Key
+        mIsSorted = True
     Else
         If Key < mKeyValueMin Then
             mKeyValueMin = Key
+            mIsSorted = False
         End If
 
-        If Key > mKeyValueMax Then
+        If Key >= mKeyValueMax Then
             mKeyValueMax = Key
+        Else
+            mIsSorted = False
         End If
     End If
     
-    Add = True
+    add = True
      
 End Function
 
 ' Clear the parallel arrays (doesn't actually release the memory, however)
 Public Sub Clear()
     mCount = 0
-    mIsSorted = False
+    mIsSorted = True
     mKeyValueMin = 0
     mKeyValueMax = 0
 End Sub
@@ -173,7 +179,7 @@ Private Function GetIndexForKey(ByVal Key As Long) As Long
             
             If Key >= mKeyValueMin And Key <= mKeyValueMax Then
                 ' Use a brute-force search to look for the key
-                For lngIndex = 0 To mCount - 1
+                For lngIndex = mCount - 1 To 0 Step -1
                     If mKeys(lngIndex) = Key Then
                         lngIndexMatch = lngIndex
                         Exit For
@@ -216,8 +222,10 @@ Public Sub Remove(ByVal Key As Long)
         Next lngIndex
         
         ' Decrement the count
-        ' Note: we can leave mSorted unchanged since, if the data started out sorted, it is still sorted
         mCount = mCount - 1
+    
+        ' Note: we can leave mIsSorted unchanged since, if the data started out sorted, it is still sorted
+    
     End If
     
 End Sub

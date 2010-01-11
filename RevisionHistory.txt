@@ -1,8 +1,13 @@
 VIPER Change Log
 
-Version 3.47 - Build 420; January 7, 2010
+Version 3.47 - Build 421; January 10, 2010
+	- Updated modFileIOCSV to support reading .csv files up to 4 GB in size
+
+Version 3.47 - Build 420; January 8, 2010
 	- Replaced Dictionary-based hashtable objects with new class, clsParallelLngArrays.cls
 		- Improves load time for large _LCMSFeature files by 75-fold
+	- Updated the logic when keeping one point per LC-MS Feature to truly keep just one point, per charge state, for each feature
+		- Important for IMS data where each LC-MS Feature has numerous points observed in the same LC Scan (aka frame num) but with different drift times
 
 Version 3.46 - Build 419; January 6, 2010
 	- Added support for loading data from _LCMSFeature.txt files

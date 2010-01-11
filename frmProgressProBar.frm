@@ -126,12 +126,12 @@ Option Explicit
 
 Private ePauseStatus As ppProgressPauseConstants
 
-Private lngProgressMin As Long
-Private lngProgressMax As Long
+Private mProgressMin As Single
+Private mProgressMax As Single
 Private dblLatestProgressBarValue As Double
 
-Private lngSubTaskProgressMin As Long
-Private lngSubTaskProgressMax As Long
+Private mSubTaskProgressMin As Single
+Private mSubTaskProgressMax As Single
 Private dblLatestSubTaskProgressBarValue As Double
 
 Private mblnWorking As Boolean
@@ -187,18 +187,18 @@ Public Function GetElapsedTime() As Single
     
 End Function
 
-Public Function GetProgressBarValue(ByRef lngMinimum As Long, ByRef lngMaximum As Long) As Double
+Public Function GetProgressBarValue(ByRef sngMinimum As Single, ByRef sngMaximum As Single) As Double
     ' Returns the current value of the progress bar, plus the Min and Max, returning them ByRef
-    lngMinimum = lngProgressMin
-    lngMaximum = lngProgressMax
+    sngMinimum = mProgressMin
+    sngMaximum = mProgressMax
     
     GetProgressBarValue = dblLatestProgressBarValue
 End Function
 
-Public Function GetSubTaskProgressBarValue(ByRef lngMinimum As Long, ByRef lngMaximum As Long) As Double
+Public Function GetSubTaskProgressBarValue(ByRef sngMinimum As Single, ByRef sngMaximum As Single) As Double
     ' Returns the current value of the subtask progress bar, plus the Min and Max, returning them ByRef
-    lngMinimum = lngSubTaskProgressMin
-    lngMaximum = lngSubTaskProgressMax
+    sngMinimum = mSubTaskProgressMin
+    sngMaximum = mSubTaskProgressMax
     
     GetSubTaskProgressBarValue = dblLatestSubTaskProgressBarValue
 End Function
@@ -218,26 +218,26 @@ Public Sub HideForm(Optional blnResetKeyPressAbortProcess As Boolean = True)
     
 End Sub
 
-Public Sub InitializeSubtask(CurrentSubTask As String, SubTaskProgressBarMinNew As Long, SubTaskProgressBarMaxNew As Long)
-    lngSubTaskProgressMin = SubTaskProgressBarMinNew
-    lngSubTaskProgressMax = SubTaskProgressBarMaxNew
+Public Sub InitializeSubtask(ByVal CurrentSubTask As String, ByVal SubTaskProgressBarMinNew As Single, ByVal SubTaskProgressBarMaxNew As Single)
+    mSubTaskProgressMin = SubTaskProgressBarMinNew
+    mSubTaskProgressMax = SubTaskProgressBarMaxNew
     
-    If lngSubTaskProgressMin > lngSubTaskProgressMax Then
+    If mSubTaskProgressMin > mSubTaskProgressMax Then
         ' Swap them
-        SwapValues lngSubTaskProgressMin, lngSubTaskProgressMax
+        SwapValues mSubTaskProgressMin, mSubTaskProgressMax
     End If
     
-    If lngSubTaskProgressMin < 0 Then lngSubTaskProgressMin = 0
-    If lngSubTaskProgressMin > lngSubTaskProgressMax Then lngSubTaskProgressMax = lngSubTaskProgressMin + 1
-    If lngSubTaskProgressMax < 1 Then lngSubTaskProgressMax = 1
+    If mSubTaskProgressMin < 0 Then mSubTaskProgressMin = 0
+    If mSubTaskProgressMin > mSubTaskProgressMax Then mSubTaskProgressMax = mSubTaskProgressMin + 1
+    If mSubTaskProgressMax < 1 Then mSubTaskProgressMax = 1
     
 On Error Resume Next
 
     With pbarSubProgress
         .Value = .Min
-        .Max = lngSubTaskProgressMax
-        .Min = lngSubTaskProgressMin
-        .Max = lngSubTaskProgressMax
+        .Max = mSubTaskProgressMax
+        .Min = mSubTaskProgressMin
+        .Max = mSubTaskProgressMax
         .Value = .Min
     End With
     
@@ -245,7 +245,7 @@ On Error GoTo InitializeSubtaskErrorHandler
     
     UpdateCurrentSubTask CurrentSubTask
     
-    UpdateSubtaskProgressBar lngSubTaskProgressMin
+    UpdateSubtaskProgressBar mSubTaskProgressMin
     
     mblnWorking = True
     
@@ -257,44 +257,44 @@ InitializeSubtaskErrorHandler:
 
 End Sub
 
-Public Sub InitializeForm(ByVal CurrentTask As String, ByVal OverallProgressBarMinNew As Long, ByVal OverallProgressBarMaxNew As Long, Optional ByVal blnShowTimeStats As Boolean = False, Optional ByVal blnShowSubTaskProgress As Boolean = False, Optional ByVal blnShowPauseButton As Boolean = True, Optional ByRef frmObjOwnerForm As VB.Form)
+Public Sub InitializeForm(ByVal CurrentTask As String, ByVal OverallProgressBarMinNew As Single, ByVal OverallProgressBarMaxNew As Single, Optional ByVal blnShowTimeStats As Boolean = False, Optional ByVal blnShowSubTaskProgress As Boolean = False, Optional ByVal blnShowPauseButton As Boolean = True, Optional ByRef frmObjOwnerForm As VB.Form)
     Static lngErrorLogCount As Long
     
-    lngProgressMin = OverallProgressBarMinNew
-    lngProgressMax = OverallProgressBarMaxNew
+    mProgressMin = OverallProgressBarMinNew
+    mProgressMax = OverallProgressBarMaxNew
     
-    If lngProgressMin > lngProgressMax Then
+    If mProgressMin > mProgressMax Then
         ' Swap them
-        SwapValues lngProgressMin, lngProgressMax
+        SwapValues mProgressMin, mProgressMax
     End If
     
-    If lngProgressMin < 0 Then lngProgressMin = 0
-    If lngProgressMin > lngProgressMax Then lngProgressMax = lngProgressMin + 1
-    If lngProgressMax < 1 Then lngProgressMax = 1
+    If mProgressMin < 0 Then mProgressMin = 0
+    If mProgressMin > mProgressMax Then mProgressMax = mProgressMin + 1
+    If mProgressMax < 1 Then mProgressMax = 1
     
     On Error Resume Next
     With pbarProgress
-        If lngProgressMax < .Min Then .Min = lngProgressMin
-        If lngProgressMin > .Max Then .Max = lngProgressMax
+        If mProgressMax < .Min Then .Min = mProgressMin
+        If mProgressMin > .Max Then .Max = mProgressMax
         
         ' Need to set .Max, then .Min, then .Max again in case an error occurs in the first setting of .Max
         .Value = .Min
-        .Max = lngProgressMax
-        .Min = lngProgressMin
-        .Max = lngProgressMax
+        .Max = mProgressMax
+        .Min = mProgressMin
+        .Max = mProgressMax
         .Value = .Min
         
-        Debug.Assert .Max = CSng(lngProgressMax)
-        Debug.Assert .Min = CSng(lngProgressMin)
+        Debug.Assert .Max = CSng(mProgressMax)
+        Debug.Assert .Min = CSng(mProgressMin)
     End With
     
-    lngSubTaskProgressMin = 0
-    lngSubTaskProgressMax = 1
+    mSubTaskProgressMin = 0
+    mSubTaskProgressMax = 1
     With pbarSubProgress
         .Value = 0
-        .Max = lngSubTaskProgressMax
-        .Min = lngSubTaskProgressMin
-        .Max = lngSubTaskProgressMax
+        .Max = mSubTaskProgressMax
+        .Min = mSubTaskProgressMin
+        .Max = mSubTaskProgressMax
         .Value = 0
     End With
     
@@ -326,7 +326,7 @@ On Error GoTo InitializeFormErrorHandler
         CheckForPauseUnpause
     End If
     
-    UpdateProgressBar lngProgressMin, True
+    UpdateProgressBar mProgressMin, True
     
     KeyPressAbortProcess = 0
     mLastQueryUnloadTickCount = 0
@@ -431,11 +431,11 @@ Private Function SetProgressBarValue(ByRef dblNewValue As Double, Optional blnIn
     
     Dim dblRatioCompleted As Double
     
-    If dblNewValue < lngProgressMin Then dblNewValue = lngProgressMin
-    If dblNewValue > lngProgressMax Then dblNewValue = lngProgressMax
+    If dblNewValue < mProgressMin Then dblNewValue = mProgressMin
+    If dblNewValue > mProgressMax Then dblNewValue = mProgressMax
     
-    If lngProgressMax > lngProgressMin Then
-        dblRatioCompleted = (dblNewValue - lngProgressMin) / (lngProgressMax - lngProgressMin)
+    If mProgressMax > mProgressMin Then
+        dblRatioCompleted = (dblNewValue - mProgressMin) / (mProgressMax - mProgressMin)
     Else
         dblRatioCompleted = 0
     End If
@@ -459,15 +459,15 @@ End Function
 Public Sub UpdateSubtaskProgressBar(ByVal dblNewValue As Double, Optional ByVal blnFractionallyIncreaseOverallProgressValue As Boolean = True)
     Dim dblPartialIncrementToAdd As Double, dblNewTotalProgressValue As Double
     Dim dblRatioCompleted As Double
-    Dim lngSubtaskProgressBarLength As Long
+    Dim sngSubtaskProgressBarLength As Single
     
-    If dblNewValue < lngSubTaskProgressMin Then dblNewValue = lngSubTaskProgressMin
-    If dblNewValue > lngSubTaskProgressMax Then dblNewValue = lngSubTaskProgressMax
+    If dblNewValue < mSubTaskProgressMin Then dblNewValue = mSubTaskProgressMin
+    If dblNewValue > mSubTaskProgressMax Then dblNewValue = mSubTaskProgressMax
     
     dblLatestSubTaskProgressBarValue = dblNewValue
     
-    If lngSubTaskProgressMax > 0 Then
-        dblRatioCompleted = (dblNewValue - lngSubTaskProgressMin) / lngSubTaskProgressMax
+    If mSubTaskProgressMax > 0 Then
+        dblRatioCompleted = (dblNewValue - mSubTaskProgressMin) / mSubTaskProgressMax
     Else
         dblRatioCompleted = 0
     End If
@@ -478,9 +478,9 @@ Public Sub UpdateSubtaskProgressBar(ByVal dblNewValue As Double, Optional ByVal 
     
     pbarSubProgress.Value = dblNewValue
     
-    lngSubtaskProgressBarLength = lngSubTaskProgressMax - lngSubTaskProgressMin
-    If lngSubtaskProgressBarLength > 0 And blnFractionallyIncreaseOverallProgressValue Then
-        dblPartialIncrementToAdd = (dblNewValue - lngSubTaskProgressMin) / CDbl(lngSubtaskProgressBarLength)
+    sngSubtaskProgressBarLength = mSubTaskProgressMax - mSubTaskProgressMin
+    If sngSubtaskProgressBarLength > 0 And blnFractionallyIncreaseOverallProgressValue Then
+        dblPartialIncrementToAdd = (dblNewValue - mSubTaskProgressMin) / CDbl(sngSubtaskProgressBarLength)
         
         dblNewTotalProgressValue = dblLatestProgressBarValue + dblPartialIncrementToAdd
         If dblNewTotalProgressValue > dblLatestProgressBarValue Then

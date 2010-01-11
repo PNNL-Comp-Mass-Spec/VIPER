@@ -581,7 +581,9 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
     lngByteCountTotal = FileLen(strLCMSFeatureToPeakMapFilePath)
     
     mProgressDescription = "Caching LCMS feature to peak mapping"
-    mProgressForm.InitializeSubtask mProgressDescription, 0, 100
+    If Not mProgressForm Is Nothing Then
+        mProgressForm.InitializeSubtask mProgressDescription, 0, 105
+    End If
     
     lngDataLineCount = 0
     
@@ -596,7 +598,9 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
         
         If mFeatureToPeakMapCount Mod 500 = 0 Then
             mProgressPctComplete = lngTotalBytesRead / CSng(lngByteCountTotal) * 100
-            mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, False
+            If Not mProgressForm Is Nothing Then
+                mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, False
+            End If
         End If
                 
         If InStr(strLineIn, vbTab) > 0 Then
@@ -662,7 +666,7 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
                 ' Add 1 to keep indexing in sync with VIPER data structures
                 lngPeakIndex = lngPeakIndex + 1
                 
-                objPointsToKeep.Add lngPeakIndex, lngFeatureIndex
+                objPointsToKeep.add lngPeakIndex, lngFeatureIndex
             End If
         
             lngDataLineCount = lngDataLineCount + 1
@@ -679,6 +683,10 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
         AddToAnalysisHistory lngGelIndex, "Loaded feature to peak map information for " & Format(objPointsToKeep.Count, "0,000") & " data points"
     End If
     
+    If Not mProgressForm Is Nothing Then
+        mProgressForm.UpdateCurrentSubTask "Sorting cached features"
+    End If
+     
     ' Sort the data in objPointsToKeep
     objPointsToKeep.SortNow
     
@@ -754,7 +762,9 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
     lngByteCountTotal = FileLen(strLCMSFeaturesFilePath)
     
     mProgressDescription = "Caching scan centers for LC-MS features"
-    mProgressForm.InitializeSubtask mProgressDescription, 0, 100
+    If Not mProgressForm Is Nothing Then
+        mProgressForm.InitializeSubtask mProgressDescription, 0, 100
+    End If
     
     Set tsInFile = fso.OpenTextFile(strLCMSFeaturesFilePath, ForReading, False)
     Do While Not tsInFile.AtEndOfStream
@@ -767,7 +777,9 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
         
         If objFeatureToScanMap.Count Mod 50 = 0 Then
             mProgressPctComplete = lngTotalBytesRead / CSng(lngByteCountTotal) * 100
-            mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, False
+            If Not mProgressForm Is Nothing Then
+                mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, False
+            End If
         End If
         
         
@@ -831,7 +843,7 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
             lngScanCenter = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Scan), 0)
             
             If lngFeatureIndex >= 0 Then
-                objFeatureToScanMap.Add lngFeatureIndex, lngScanCenter
+                objFeatureToScanMap.add lngFeatureIndex, lngScanCenter
             End If
         
         End If
@@ -1273,9 +1285,19 @@ On Error GoTo LoadLCMSFeatureFilesErrorHandler
         
         If lngReturnValue = 0 Then
            
+            mProgressDescription = "Sort peak to feature mapping"
+            If Not mProgressForm Is Nothing Then
+                mProgressForm.UpdateCurrentSubTask mProgressDescription
+            End If
+
             ' Make sure the mFeatureToPeakMap arrays are sorted by Feature Index, then peak index
             ' In addition, make sure there are no duplicates
             SortFeatureMapMembers
+            
+            mProgressDescription = "Associating peaks with features"
+            If Not mProgressForm Is Nothing Then
+                mProgressForm.UpdateCurrentSubTask mProgressDescription
+            End If
             
             ' Now update GelUMC() with the data in mFeatureToPeakMap
             blnSuccess = AddFeatureMembersToUMCs()
@@ -1341,7 +1363,9 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
     Next lngIndex
     
     mProgressDescription = "Reading LCMS Features file"
-    mProgressForm.InitializeSubtask mProgressDescription, 0, 100
+    If Not mProgressForm Is Nothing Then
+        mProgressForm.InitializeSubtask mProgressDescription, 0, 100
+    End If
     
     GelUMC(mGelIndex).UMCCnt = 0
     
@@ -1353,7 +1377,9 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
         
         If GelUMC(mGelIndex).UMCCnt Mod 50 = 0 Then
             mProgressPctComplete = lngTotalBytesRead / CSng(lngByteCountTotal) * 100
-            mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, True
+            If Not mProgressForm Is Nothing Then
+                mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, True
+            End If
         End If
         
         ' Check for valid line (must contain at least one tab and must be
@@ -1514,7 +1540,7 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                 End With
                 
                 ' Store the mapping between Index in the LCMSFeatures file and Index in VIPER
-                objLCMSFeatureIndexMap.Add lngFeatureIndex, GelUMC(mGelIndex).UMCCnt
+                objLCMSFeatureIndexMap.add lngFeatureIndex, GelUMC(mGelIndex).UMCCnt
                 
                 GelUMC(mGelIndex).UMCCnt = GelUMC(mGelIndex).UMCCnt + 1
             End If
@@ -1592,7 +1618,9 @@ On Error GoTo ReadLCMSFeatureToPeakMapFileErrorHandler
     Next lngIndex
     
     mProgressDescription = "Reading LCMS Feature to Peak Map file"
-    mProgressForm.UpdateCurrentSubTask mProgressDescription
+    If Not mProgressForm Is Nothing Then
+        mProgressForm.UpdateCurrentSubTask mProgressDescription
+    End If
 
     ' Make sure mHashMapOfPointsKept is sorted
     If Not mHashMapOfPointsKept.IsSorted Then
@@ -1611,7 +1639,9 @@ On Error GoTo ReadLCMSFeatureToPeakMapFileErrorHandler
         
         If mFeatureToPeakMapCount Mod 500 = 0 Then
             mProgressPctComplete = lngTotalBytesRead / CSng(lngByteCountTotal) * 100
-            mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, True
+            If Not mProgressForm Is Nothing Then
+                mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, True
+            End If
         End If
         
         ' Check for valid line (must contain at least one tab and must be

@@ -98,6 +98,12 @@ Private Enum rmReadModeConstants
     rmReadComplete = 2
 End Enum
 
+Private Type udtIsoDataCurrentScanType
+    CurrentDataLine As Long
+    IsoDataIndex As Long
+    FeatureIndex As Long
+End Type
+
 Private mGelIndex As Long
 Private mScanInfoCount As Long
 
@@ -408,6 +414,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     Dim eResponse As VbMsgBoxResult
     
     Dim fso As New FileSystemObject
+    Dim objFile As Object
     Dim tsInFile As TextStream
     Dim strLineIn As String
     
@@ -417,9 +424,9 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     
     Dim lngReturnValue As Long
     
-    Dim lngScansFileByteCount As Long
-    Dim lngByteCountTotal As Long
-    Dim lngTotalBytesRead As Long
+    Dim dblScansFileByteCount As Double
+    Dim dblByteCountTotal As Double
+    Dim dblTotalBytesRead As Double
     
     Dim objSplitUMCs As clsSplitUMCsByAbundance
     
@@ -552,16 +559,32 @@ On Error GoTo LoadNewCSVErrorHandler
         End If
     End If
     
+    On Error Resume Next
+    
     ' Initialize the progress bar
-    lngTotalBytesRead = 0
-    lngByteCountTotal = FileLen(strIsosFilePath)
+    dblTotalBytesRead = 0
+    dblByteCountTotal = -1
+    
+    Set objFile = fso.GetFile(strIsosFilePath)
+    dblByteCountTotal = objFile.Size
+    
+''
+''    dblByteCountTotal = FileLen(strIsosFilePath)
+''
+''    If dblByteCountTotal < 0 Then
+''        ' File is likely over 2 GB in size
+''        ' Use a bitwise AND to get the correct value
+''        dblByteCountTotal = CDbl(glHugeLong) + (dblByteCountTotal And 2147483647)
+''    End If
     
     If blnValidScansFile Then
-        lngScansFileByteCount = FileLen(strScansFilePath)
-        lngByteCountTotal = lngByteCountTotal + lngScansFileByteCount
+        dblScansFileByteCount = FileLen(strScansFilePath)
+        dblByteCountTotal = dblByteCountTotal + dblScansFileByteCount
     End If
     
-    frmProgress.InitializeSubtask "Reading data", 0, lngByteCountTotal
+    frmProgress.InitializeSubtask "Reading data", 0, 100
+    
+    On Error GoTo LoadNewCSVErrorHandler
     
     mScanInfoCount = 0
     ReDim GelData(mGelIndex).ScanInfo(0)
@@ -570,7 +593,7 @@ On Error GoTo LoadNewCSVErrorHandler
     
     If blnValidScansFile Then
         ' Read the scans file and populate .ScanInfo
-        lngReturnValue = ReadCSVScanFile(fso, strScansFilePath, strBaseFilePath, lngTotalBytesRead)
+        lngReturnValue = ReadCSVScanFile(fso, strScansFilePath, strBaseFilePath, dblTotalBytesRead, dblByteCountTotal)
     Else
         lngReturnValue = 0
     End If
@@ -613,7 +636,7 @@ On Error GoTo LoadNewCSVErrorHandler
         ' Read the Isos file
         ' Note that the CSV Isos file only contains isotopic data, not charge state data
         lngReturnValue = ReadCSVIsosFile(fso, strIsosFilePath, strBaseFilePath, _
-                                         lngScansFileByteCount, lngByteCountTotal, lngTotalBytesRead, _
+                                         dblScansFileByteCount, dblByteCountTotal, dblTotalBytesRead, _
                                          blnValidScansFile, blnFilePrescanEnabled, _
                                          plmPointsLoadMode, _
                                          objFeatureToScanMap, _
@@ -671,8 +694,8 @@ LoadNewCSVErrorHandler:
 End Function
 
 Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFilePath As String, ByVal strBaseFilePath As String, _
-                                 ByVal lngScansFileByteCount As Long, ByVal lngByteCountTotal As Long, _
-                                 ByRef lngTotalBytesRead As Long, ByVal blnValidScansFile As Boolean, _
+                                 ByVal dblScansFileByteCount As Double, ByVal dblByteCountTotal As Double, _
+                                 ByRef dblTotalBytesRead As Double, ByVal blnValidScansFile As Boolean, _
                                  ByVal blnFilePrescanEnabled As Boolean, _
                                  ByVal plmPointsLoadMode As Integer, _
                                  ByRef objFeatureToScanMap As clsParallelLngArrays, _
@@ -777,14 +800,17 @@ On Error GoTo ReadCSVIsosFileErrorHandler
         Else
             mSubtaskMessage = "Reading Isotopic CSV file"
         End If
-        frmProgress.InitializeSubtask mSubtaskMessage, 0, lngByteCountTotal
-        frmProgress.UpdateSubtaskProgressBar lngScansFileByteCount
+        
+        frmProgress.InitializeSubtask mSubtaskMessage, 0, 100
+        If dblByteCountTotal > 0 Then
+            frmProgress.UpdateSubtaskProgressBar CSng(dblScansFileByteCount / dblByteCountTotal * 100#)
+        End If
         
         ' Reset the tracking variables
         mValidDataPointCount = 0
-        lngTotalBytesRead = 0
+        dblTotalBytesRead = 0
     
-        lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, lngTotalBytesRead, _
+        lngReturnValue = ReadCSVIsosFileWork(fso, strIsosFilePath, dblTotalBytesRead, dblByteCountTotal, _
                                              intColumnMapping, blnValidScansFile, _
                                              sngMonoPlus4Intensities, sngMonoMinus4Intensities, _
                                              blnFilePrescanEnabled, blnIgnoreAllFiltersAndLoadAllData, _
@@ -1023,7 +1049,8 @@ End Function
 
 Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
                                      ByVal strIsosFilePath As String, _
-                                     ByRef lngTotalBytesRead As Long, _
+                                     ByRef dblTotalBytesRead As Double, _
+                                     ByVal dblByteCountTotal As Double, _
                                      ByRef intColumnMapping() As Integer, _
                                      ByVal blnValidScansFile As Boolean, _
                                      ByRef sngMonoPlus4Intensities() As Single, _
@@ -1064,6 +1091,10 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
     Dim blnMatchFound As Boolean
     Dim lngFeatureCentralScan As Long
     
+    Dim lngIsoDataCurrentScanNum As Long
+    Dim lngIsoDataCurrentScanCount As Long
+    Dim udtIsoDataCurrentScan() As udtIsoDataCurrentScanType
+                                                                      
 On Error GoTo ReadCSVIsosFileWorkErrorHandler
     
     ' Make sure objHashMapOfPointsKept is empty
@@ -1082,14 +1113,23 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
     ' and to remain consistent with objPointsToKeep
     lngCurrentDataLine = 1
     
+    ' Initialize the variables used by ReadCSVIsosFilePostFilterPreviousScan
+    lngIsoDataCurrentScanNum = -100
+    lngIsoDataCurrentScanCount = 0
+    ReDim udtIsoDataCurrentScan(10000)
+    
     Set tsInFile = fso.OpenTextFile(strIsosFilePath, ForReading, False)
     Do While Not tsInFile.AtEndOfStream
 
         strLineIn = tsInFile.ReadLine
-        lngTotalBytesRead = lngTotalBytesRead + Len(strLineIn) + 2          ' Add 2 bytes to account for CrLf at end of line
+        dblTotalBytesRead = dblTotalBytesRead + Len(strLineIn) + 2          ' Add 2 bytes to account for CrLf at end of line
         
         If lngLinesRead Mod 100 = 0 Then
-            frmProgress.UpdateSubtaskProgressBar lngTotalBytesRead, True
+            If dblByteCountTotal > 0 Then
+                frmProgress.UpdateSubtaskProgressBar CSng(dblTotalBytesRead / dblByteCountTotal * 100#), True
+            Else
+                DoEvents
+            End If
             If KeyPressAbortProcess > 1 Then Exit Do
         End If
         
@@ -1213,45 +1253,57 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                 ' Check now whether or not to retain this data piont
                 ' If not, then there is no point in continuing the parse strLineIn
                 
-                If Not objPointsToKeep.Exists(lngCurrentDataLine) Then
+                lngFeatureIndex = objPointsToKeep.GetItemForKey(lngCurrentDataLine, blnMatchFound)
+                If Not blnMatchFound Then
                     ' Data point doesn't exist in the _LCMSFeatureToPeakMap.txt file
                     ' Do not load this point
                     blnValidDataPoint = False
                 Else
                     If plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
-                        lngFeatureIndex = objPointsToKeep.GetItemForKey(lngCurrentDataLine, blnMatchFound)
+                        lngFeatureCentralScan = objFeatureToScanMap.GetItemForKey(lngFeatureIndex, blnMatchFound)
                         
                         If Not blnMatchFound Then
-                            ' objPointsToKeep doesn't contain lngCurrentDataLine; this is unexpected
+                            ' objFeatureToScanMap doesn't contain lngFeatureIndex; this is unexpected
                             Debug.Assert False
                             blnValidDataPoint = False
                         Else
-                            lngFeatureCentralScan = objFeatureToScanMap.GetItemForKey(lngFeatureIndex, blnMatchFound)
-                            
-                            If Not blnMatchFound Then
-                                ' objFeatureToScanMap doesn't contain lngFeatureIndex; this is unexpected
-                                Debug.Assert False
-                                blnValidDataPoint = False
+                            ' Parse out the scan number of this feature
+                            If intColumnMapping(IsosFileColumnConstants.ScanNumber) < 0 Then
+                                ' Can't determine scan number since the ScanNumber header wasn't present in the input file
+                                lngScanNumber = -1
                             Else
-                                ' Parse out the scan number of this feature
-                                If intColumnMapping(IsosFileColumnConstants.ScanNumber) < 0 Then
-                                    ' Can't determine scan number since the ScanNumber header wasn't present in the input file
-                                    lngScanNumber = -1
+                                strData = Split(strLineIn, ",", intColumnMapping(IsosFileColumnConstants.ScanNumber) + 2)
+                                
+                                If UBound(strData) >= 0 Then
+                                    lngScanNumber = GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.ScanNumber), -1)
                                 Else
-                                    strData = Split(strLineIn, ",", intColumnMapping(IsosFileColumnConstants.ScanNumber) + 2)
-                                    
-                                    If UBound(strData) >= 0 Then
-                                        lngScanNumber = GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.ScanNumber), -1)
-                                    Else
-                                        lngScanNumber = -1
-                                    End If
+                                    lngScanNumber = -1
+                                End If
+                            End If
+                            
+                            If lngScanNumber <> lngIsoDataCurrentScanNum Then
+                                ' This is a new scan number
+                                ' We need to process the data in GelData(mGelIndex).IsoData() and udtIsoDataCurrentScan()
+                                '  to remove the extra data points for each feature
+                                ' The goal is to only retain the highest abundance data point for each charge state for each feature
+                                
+                                If True Then
+                                ReadCSVIsosFilePostFilterPreviousScan lngIsoDataCurrentScanCount, _
+                                                                      udtIsoDataCurrentScan, _
+                                                                      objHashMapOfPointsKept, _
+                                                                      mValidDataPointCount, _
+                                                                      lngIsoDataCurrentScanNum
                                 End If
                                 
-                                If lngScanNumber <> lngFeatureCentralScan Then
-                                    ' This data point's scan number is not the same as the central scan number for this point's LC-MS feature
-                                    ' Do not load this point
-                                    blnValidDataPoint = False
-                                End If
+                                ' Clear udtIsoDataCurrentScan() and update lngIsoDataCurrentScanNum
+                                lngIsoDataCurrentScanCount = 0
+                                lngIsoDataCurrentScanNum = lngScanNumber
+                            End If
+                            
+                            If lngScanNumber <> lngFeatureCentralScan Then
+                                ' This data point's scan number is not the same as the central scan number for this point's LC-MS feature
+                                ' Do not load this point
+                                blnValidDataPoint = False
                             End If
                         End If
                     End If
@@ -1293,9 +1345,6 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         If mReadMode = rmReadModeConstants.rmPrescanData Then
                             mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
                         Else
-                        
-                            ' Keep track of the mapping between the line number of the data point in the input file and the index value in GelData(mGelIndex).IsoData() where this data point is being stored
-                            objHashMapOfPointsKept.Add lngCurrentDataLine, GelData(mGelIndex).IsoLines + 1
                             
                             If blnFilePrescanEnabled And Not blnIgnoreAllFiltersAndLoadAllData Then
                                 If mPrescannedData.GetAbundanceByIndex(mValidDataPointCount) >= 0 Then
@@ -1308,6 +1357,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                             End If
                             
                             If blnStoreDataPoint Then
+                                
                                 With GelData(mGelIndex)
                                     .DataLines = .DataLines + 1
                                     .IsoLines = .IsoLines + 1
@@ -1370,6 +1420,24 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                         sngMonoMinus4Intensities(.IsoLines) = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance), 0)
                                     End If
                                 End With
+                                
+                                ' Keep track of the mapping between the line number of the data point in the input file
+                                ' and the index value in GelData(mGelIndex).IsoData() where this data point has been stored
+                                objHashMapOfPointsKept.add lngCurrentDataLine, GelData(mGelIndex).IsoLines
+                                                                
+                                If mLoadPredefinedLCMSFeatures And plmPointsLoadMode >= plmLoadOnePointPerLCMSFeature Then
+                                    ' Store additional information in udtIsoDataCurrentScan()
+                                    If lngIsoDataCurrentScanCount >= UBound(udtIsoDataCurrentScan) Then
+                                        ReDim Preserve udtIsoDataCurrentScan(UBound(udtIsoDataCurrentScan) * 2)
+                                    End If
+                                    
+                                    With udtIsoDataCurrentScan(lngIsoDataCurrentScanCount)
+                                        .CurrentDataLine = lngCurrentDataLine
+                                        .IsoDataIndex = GelData(mGelIndex).IsoLines
+                                        .FeatureIndex = lngFeatureIndex
+                                    End With
+                                    lngIsoDataCurrentScanCount = lngIsoDataCurrentScanCount + 1
+                                End If
                             End If
                         End If
                         
@@ -1411,7 +1479,144 @@ ReadCSVIsosFileWorkErrorHandler:
     ReadCSVIsosFileWork = lngReturnValue
 End Function
 
-Private Function ReadCSVScanFile(ByRef fso As FileSystemObject, ByVal strScansFilePath As String, ByVal strBaseFilePath As String, ByRef lngTotalBytesRead As Long) As Long
+
+' Process the data for the most recent scan stored in GelData(mGelIndex).IsoData()
+' Use udtIsoDataCurrentScan() to guide the removal of extra data points for each feature
+' The goal is to only retain the highest abundance data point for each charge state for each feature
+Private Sub ReadCSVIsosFilePostFilterPreviousScan(ByVal lngIsoDataCurrentScanCount As Long, _
+                                                  ByRef udtIsoDataCurrentScan() As udtIsoDataCurrentScanType, _
+                                                  ByRef objHashMapOfPointsKept As clsParallelLngArrays, _
+                                                  ByRef lngValidDataPointCount As Long, _
+                                                  ByVal lngIsoDataCurrentScan As Long)
+    Const CHARGE_STATE_MAX As Integer = 100
+    Const DELETION_FLAG As Long = -1000
+    
+    Dim lngIndex As Long
+    Dim lngKeyIndex As Long
+    Dim lngFeatureIndex As Long
+    Dim lngChargeIndex As Long
+    
+    Dim lngTargetIndex As Long
+    Dim intCS As Integer
+    Dim intCSMax As Integer
+    
+    ' This array tracks the maximum abundance values for each charge state for the given feature
+    Dim sngMaxAbuByCS(CHARGE_STATE_MAX) As Single
+    
+    ' This array tracks the index corresponding to the max abundance value for each charge state
+    Dim lngMaxAbuByCSIsoIndex(CHARGE_STATE_MAX) As Long
+    
+    Dim objKeys() As Variant
+    
+    Static objFeatureInfo As Dictionary
+    
+    If objFeatureInfo Is Nothing Then
+        Set objFeatureInfo = New Dictionary
+    End If
+    
+    If lngIsoDataCurrentScanCount <= 0 Then Exit Sub
+    
+    ' Steps:
+    ' 1) Construct a list of the FeatureIndex values in udtIsoDataCurrentScan
+    ' 2) For each one, step through udtIsoDataCurrentScan() to determine the index with the highest abundance for each charge state
+    ' 3) Now step through GelData(mGelIndex).IsoData() and zero-out rows for this feature that didn't have the highest abundance
+    ' 4) Step through GelData(mGelIndex).IsoData() and copy in place to remove the zeroed out rows
+    
+    objFeatureInfo.RemoveAll
+    
+    For lngIndex = 0 To lngIsoDataCurrentScanCount - 1
+        If Not objFeatureInfo.Exists(udtIsoDataCurrentScan(lngIndex).FeatureIndex) Then
+            objFeatureInfo.add udtIsoDataCurrentScan(lngIndex).FeatureIndex, 1
+        End If
+    Next lngIndex
+    
+    ' Now process each of the features in objFeatureInfo()
+    objKeys = objFeatureInfo.Keys
+    intCSMax = 0
+    
+    For lngKeyIndex = 0 To objFeatureInfo.Count - 1
+        lngFeatureIndex = CLng(objKeys(lngKeyIndex))
+        
+        ' Reset the MaxAbu arrays
+        ' To save time, we only need to update charge states up to intCSMax
+        For lngChargeIndex = 1 To CHARGE_STATE_MAX
+            sngMaxAbuByCS(lngChargeIndex) = 0
+            lngMaxAbuByCSIsoIndex(lngChargeIndex) = 0
+            If lngChargeIndex >= intCSMax Then Exit For
+        Next lngChargeIndex
+    
+        ' Determine the data point in this scan that has the highest abundance for each charge state for this feature
+        For lngIndex = 0 To lngIsoDataCurrentScanCount - 1
+            If udtIsoDataCurrentScan(lngIndex).FeatureIndex = lngFeatureIndex Then
+                ' This data point corresponds to lngFeatureIndex
+                ' Examine its charge
+                intCS = GelData(mGelIndex).IsoData(udtIsoDataCurrentScan(lngIndex).IsoDataIndex).Charge
+                If intCS >= 0 And intCS <= CHARGE_STATE_MAX Then
+                    
+                    If lngMaxAbuByCSIsoIndex(intCS) = 0 Then
+                        ' This is the first observation of this CS for this feature
+                        ' Update the MaxAbu arrays
+                        sngMaxAbuByCS(intCS) = GelData(mGelIndex).IsoData(udtIsoDataCurrentScan(lngIndex).IsoDataIndex).Abundance
+                        lngMaxAbuByCSIsoIndex(intCS) = lngIndex
+                    Else
+                        If GelData(mGelIndex).IsoData(udtIsoDataCurrentScan(lngIndex).IsoDataIndex).Abundance > sngMaxAbuByCS(intCS) Then
+                            ' This feature's abundance is larger than sngMaxAbuByCS(intCS)
+                            ' Update the MaxAbu arrays
+                            sngMaxAbuByCS(intCS) = GelData(mGelIndex).IsoData(udtIsoDataCurrentScan(lngIndex).IsoDataIndex).Abundance
+                            lngMaxAbuByCSIsoIndex(intCS) = lngIndex
+                        End If
+                    End If
+                    
+                    If intCS > intCSMax Then
+                        intCSMax = intCS
+                    End If
+                    
+                End If
+            End If
+        Next lngIndex
+    
+        ' Flag data points for deletion for this feature
+        For lngIndex = 0 To lngIsoDataCurrentScanCount - 1
+            If udtIsoDataCurrentScan(lngIndex).FeatureIndex = lngFeatureIndex Then
+                intCS = GelData(mGelIndex).IsoData(udtIsoDataCurrentScan(lngIndex).IsoDataIndex).Charge
+                If intCS >= 0 And intCS <= CHARGE_STATE_MAX Then
+                    If lngIndex <> lngMaxAbuByCSIsoIndex(intCS) Then
+                        GelData(mGelIndex).IsoData(udtIsoDataCurrentScan(lngIndex).IsoDataIndex).Abundance = DELETION_FLAG
+                    End If
+                End If
+            End If
+        Next lngIndex
+    Next lngKeyIndex
+    
+    ' Finally, step through GelData() and copy in place to remove points with .Abundance = DELETION_FLAG
+    
+    lngTargetIndex = udtIsoDataCurrentScan(0).IsoDataIndex
+    
+    For lngIndex = 0 To lngIsoDataCurrentScanCount - 1
+        If GelData(mGelIndex).IsoData(udtIsoDataCurrentScan(lngIndex).IsoDataIndex).Abundance = DELETION_FLAG Then
+            ' Remove this point (it will get copied over on the next iteration of the for loop)
+            objHashMapOfPointsKept.Remove udtIsoDataCurrentScan(lngIndex).CurrentDataLine
+            
+            ' Decrement the counters
+            GelData(mGelIndex).IsoLines = GelData(mGelIndex).IsoLines - 1
+            GelData(mGelIndex).DataLines = GelData(mGelIndex).DataLines - 1
+            mValidDataPointCount = mValidDataPointCount - 1
+        Else
+            ' Keep this point
+            If lngTargetIndex <> udtIsoDataCurrentScan(lngIndex).IsoDataIndex Then
+                GelData(mGelIndex).IsoData(lngTargetIndex) = GelData(mGelIndex).IsoData(udtIsoDataCurrentScan(lngIndex).IsoDataIndex)
+                
+                ' Update the tracking of the line number of the data point in the input file
+                ' and the index value in GelData(mGelIndex).IsoData() where this data point has been stored
+                objHashMapOfPointsKept.Update udtIsoDataCurrentScan(lngIndex).CurrentDataLine, lngTargetIndex
+            End If
+            lngTargetIndex = lngTargetIndex + 1
+        End If
+    Next lngIndex
+    
+End Sub
+                                
+Private Function ReadCSVScanFile(ByRef fso As FileSystemObject, ByVal strScansFilePath As String, ByVal strBaseFilePath As String, ByRef dblTotalBytesRead As Double, ByVal dblByteCountTotal As Double) As Long
     ' Returns 0 if no error, the error number if an error
 
     Dim tsInFile As TextStream
@@ -1455,10 +1660,12 @@ On Error GoTo ReadCSVScanFileErrorHandler
         Do While Not tsInFile.AtEndOfStream
     
             strLineIn = tsInFile.ReadLine
-            lngTotalBytesRead = lngTotalBytesRead + Len(strLineIn) + 2          ' Add 2 bytes to account for CrLf at end of line
+            dblTotalBytesRead = dblTotalBytesRead + Len(strLineIn) + 2          ' Add 2 bytes to account for CrLf at end of line
             
             If mScanInfoCount Mod 50 = 0 Then
-                frmProgress.UpdateSubtaskProgressBar lngTotalBytesRead
+                If dblByteCountTotal > 0 Then
+                    frmProgress.UpdateSubtaskProgressBar CSng(dblTotalBytesRead / dblByteCountTotal * 100#)
+                End If
             End If
             
             ' Check for valid line (must contain at least one comma and must be
