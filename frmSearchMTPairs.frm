@@ -695,6 +695,7 @@ Private ExpAnalysisSPName As String             ' Stored procedure AddMatchMakin
 Private ExpUmcSPName As String                  ' Stored procedure AddFTICRUmc
 Private ExpUMCMemberSPName As String            ' Stored procedure AddFTICRUmcMember
 Private ExpUmcMatchSPName As String             ' Stored procedure AddFTICRUmcMatch
+Private ExpUMCCSStats As String                 ' Stored procedure AddFTICRUmcCSStats
 Private ExpQuantitationDescription As String    ' Stored procedure AddQuantitationDescription
 
 Private mKeyPressAbortProcess As Integer
@@ -1270,6 +1271,10 @@ Dim udtPutUMCMemberParams As udtPutUMCMemberParamsListType
 Dim cmdPutNewUMCMatch As New ADODB.Command
 Dim udtPutUMCMatchParams As udtPutUMCMatchParamsListType
 
+'ADO objects for stored procedure adding FTICR UMC CS Stats
+Dim cmdPutNewUMCCSStats As New ADODB.Command
+Dim udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType
+
 Dim strSearchDescription As String
 
 On Error GoTo err_ExportMTDBbyUMC
@@ -1337,6 +1342,9 @@ ExportMTDBInitializePutNewUMCMemberParams cnNew, cmdPutNewUMCMember, udtPutUMCMe
 TraceLog 3, "frmSearchMTPairs->ExportIDPairsToUMCResultsTable", "Call ExportMTDBInitializePutUMCMatchParams"
 ExportMTDBInitializePutUMCMatchParams cnNew, cmdPutNewUMCMatch, udtPutUMCMatchParams, ExpUmcMatchSPName
 
+' Initialize the variables for accessing the AddFTICRUmcCSStats SP
+ExportMTDBInitializePutUMCCSStatsParams cnNew, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, ExpUMCCSStats
+
 Me.Caption = "Exporting LC-MS Features to DB: 0 / " & Trim(PCount)
 
 'now export data
@@ -1351,8 +1359,8 @@ For lngPairInd = 0 To PCount - 1
     
     If PIDCnt(lngPairInd) > 0 And _
        (blnExportExcludedPairs Or GelP_D_L(CallerID).Pairs(lngPairInd).STATE <> glPAIR_Exc) Then      'this pair is identified
-        IndL = GelP_D_L(CallerID).Pairs(lngPairInd).P1
-        IndH = GelP_D_L(CallerID).Pairs(lngPairInd).P2
+        IndL = GelP_D_L(CallerID).Pairs(lngPairInd).p1
+        IndH = GelP_D_L(CallerID).Pairs(lngPairInd).p2
        
         ' First, add a new row to T_FTICR_UMC_Results for the light member of the pair
         With GelP_D_L(CallerID).Pairs(lngPairInd)
@@ -1363,7 +1371,7 @@ For lngPairInd = 0 To PCount - 1
             udtPairMatchStats.ExpressionRatioMemberBasisCount = .ERMemberBasisCount
         End With
         
-        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, blnExportUMCMembers, CallerID, IndL, PIDCnt(lngPairInd), ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_L, 0
+        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndL, PIDCnt(lngPairInd), ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_L, 0
         
         ' Write the match results for this UMC
         udtPutUMCMatchParams.UMCResultsID.Value = FixNullLng(udtPutUMCParams.UMCResultsIDReturn.Value)
@@ -1393,7 +1401,7 @@ For lngPairInd = 0 To PCount - 1
         
         ' Second, add a new row to T_FTICR_UMC_Results for the heavy member of the pair
         ' Note that we do not record any MT tag hits for the heavy member of the pair
-        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, blnExportUMCMembers, CallerID, IndH, 0, ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_H, 0
+        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndH, 0, ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_H, 0
         
     End If
 Next lngPairInd
@@ -2037,7 +2045,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
             End If
             
             lngPairIndexOriginal = mUMCMatchStats(lngIndex).PairIndex
-            lngUMCIndexOriginal = GelP_D_L(CallerID).Pairs(lngPairIndexOriginal).P1
+            lngUMCIndexOriginal = GelP_D_L(CallerID).Pairs(lngPairIndexOriginal).p1
             
             lngMassTagIndexOriginal = mMTOrInd(mMTInd(mUMCMatchStats(lngIndex).IDIndex))
             
@@ -2157,7 +2165,7 @@ Dim dblClassMass As Double
 On Error GoTo err_SearchPairSingleMass
 
 'couple of shortcut variables
-ClsInd1 = GelP_D_L(CallerID).Pairs(PairInd).P1
+ClsInd1 = GelP_D_L(CallerID).Pairs(PairInd).p1
 DltCnt = GelP_D_L(CallerID).Pairs(PairInd).P2DltCnt
 
 If ManageCurrID(MNG_RESET) Then
@@ -2541,8 +2549,8 @@ Public Function ShowOrSavePairsAndIDs(Optional strOutputFilePath As String = "",
             If blnShowExcludedPairs Or (GelP_D_L(CallerID).Pairs(lngPairInd).STATE <> glPAIR_Exc) Then
                 'extract pairs information
                 With GelP_D_L(CallerID).Pairs(lngPairInd)
-                    lngUMCIndexLight = .P1
-                    lngUMCIndexHeavy = .P2
+                    lngUMCIndexLight = .p1
+                    lngUMCIndexHeavy = .p2
                 End With
                     
                 strPairInfo = Trim(lngPairInd) & strSepChar
@@ -3002,6 +3010,7 @@ With glbPreferencesExpanded.MTSConnectionInfo
     ExpUmcSPName = .spPutUMC
     ExpUMCMemberSPName = .spPutUMCMember
     ExpUmcMatchSPName = .spPutUMCMatch
+    ExpUMCCSStats = .spPutUMCCSStats
     ExpQuantitationDescription = .spAddQuantitationDescription
 End With
 
@@ -3014,6 +3023,11 @@ If Len(ExpUmcMatchSPName) = 0 Then
     ExpUmcMatchSPName = "AddFTICRUmcMatch"
 End If
 Debug.Assert ExpUmcMatchSPName = "AddFTICRUmcMatch"
+
+If Len(ExpUMCCSStats) = 0 Then
+    ExpUMCCSStats = "AddFTICRUmcCSStats"
+End If
+Debug.Assert ExpUMCCSStats = "AddFTICRUmcCSStats"
 
 If Len(ExpQuantitationDescription) = 0 Then
     ExpQuantitationDescription = "AddQuantitationDescription"

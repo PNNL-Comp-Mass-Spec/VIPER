@@ -2621,6 +2621,7 @@ On Error GoTo SaveSettingsFileHandler
             AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCMember", .spPutUMCMember
             AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCMatch", .spPutUMCMatch
             AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCInternalStdMatch", .spPutUMCInternalStdMatch
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCCSStats", .spPutUMCCSStats
             AddKeyValueSetting sKeys, sVals, iKVCount, "spEditGANET", .spEditGANET
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetORFs", .spGetORFs
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetORFSeq", .spGetORFSeq
@@ -3927,6 +3928,8 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .spPutUMCMember = "AddFTICRUmcMember"
                     .spPutUMCMatch = "AddFTICRUmcMatch"
                     .spPutUMCInternalStdMatch = "AddFTICRUmcInternalStdMatch"
+                    .spPutUMCCSStats = "AddFTICRUmcCSStats"
+                    
                     .spEditGANET = "EditFAD_GANET"
                     .spGetORFs = "srvGetORFs"
                     .spGetORFSeq = "srvGetORFSequenceForORFID"

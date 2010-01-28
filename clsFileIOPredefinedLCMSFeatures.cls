@@ -50,8 +50,10 @@ Private Const LCMSFEATURES_COLUMN_UMC_MW_MIN As String = "umc_mw_min"
 Private Const LCMSFEATURES_COLUMN_UMC_MW_MAX As String = "umc_mw_max"
 Private Const LCMSFEATURES_COLUMN_UMC_MEMBER_COUNT As String = "umc_member_count"
 Private Const LCMSFEATURES_COLUMN_ABUNDANCE_MAX As String = "max_abundance"
+
 Private Const PEAK_MAP_COLUMN_FEATURE_INDEX As String = "feature_index"
 Private Const PEAK_MAP_COLUMN_PEAK_INDEX As String = "peak_index"
+Private Const PEAK_MAP_COLUMN_FILTERED_PEAK_INDEX As String = "filtered_peak_index"
 
 Private Const LCMSFEATURES_FILE_COLUMN_COUNT As Integer = 14
 Private Enum LCMSFeaturesFileColumnConstants
@@ -71,10 +73,11 @@ Private Enum LCMSFeaturesFileColumnConstants
     MemberCount = 13
 End Enum
 
-Private Const PEAK_MAP_FILE_COLUMN_COUNT As Integer = 2
+Private Const PEAK_MAP_FILE_COLUMN_COUNT As Integer = 3
 Private Enum LCMSFeatureToPeakMapFileColumnConstants
     FeatureIndex = 0
     PeakIndex = 1
+    FilteredPeakIndex = 2
 End Enum
 
 ' Class-wide variables
@@ -90,6 +93,8 @@ Private mCachedFeatureToPeakMapDefined As Boolean
 
 Private mErrorMessage As String
 Private mShowDialogBoxes As Boolean
+
+Private mReadingFilteredIsosFile As Boolean         ' When True, then will use column Filtered_Peak_Index instead of column Peak_Index in the _LCMSFeatureToPeakMap.txt file
 
 Private mPointsLoadMode As plmPointsLoadModeConstants
 Private mHashMapOfPointsKept As clsParallelLngArrays
@@ -161,6 +166,12 @@ Public Property Let ProgressForm(ByRef objForm As frmProgress)
     Set mProgressForm = objForm
 End Property
 
+Public Property Let ReadingFilteredIsosFile(ByVal Value As Boolean)
+    mReadingFilteredIsosFile = Value
+End Property
+Public Property Get ReadingFilteredIsosFile() As Boolean
+    ReadingFilteredIsosFile = mReadingFilteredIsosFile
+End Property
 Private Sub Class_Initialize()
     mGelIndex = 0
     mAutoMapDataPointsMassTolerancePPM = 5
@@ -549,6 +560,7 @@ Public Function CacheFeatureToPeakMapIndices(ByVal lngGelIndex As Long, _
     
     Dim blnColumnsDefined As Boolean
     Dim blnDataLine As Boolean
+    Dim blnMissingColumns As Boolean
     
     Dim strData() As String
     Dim strColumnHeader As String
@@ -629,6 +641,7 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
                         Select Case strColumnHeader
                         Case PEAK_MAP_COLUMN_FEATURE_INDEX:    intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex) = lngIndex
                         Case PEAK_MAP_COLUMN_PEAK_INDEX:       intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex) = lngIndex
+                        Case PEAK_MAP_COLUMN_FILTERED_PEAK_INDEX: intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FilteredPeakIndex) = lngIndex
                         Case Else
                             ' Ignore this column; either it's unknown or we don't need it in this function
                         End Select
@@ -640,10 +653,22 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
                 End If
             
                 ' Warn the user if any of the important columns are missing
-                If intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex) < 0 Or _
-                   intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex) < 0 Then
-                   
-                    strMessage = COLUMN_HEADER_MISSING_WARNING & " not found in file " & fso.GetFileName(strLCMSFeatureToPeakMapFilePath) & "; the expected columns are: " & PEAK_MAP_COLUMN_FEATURE_INDEX & " and " & PEAK_MAP_COLUMN_PEAK_INDEX
+                
+                blnMissingColumns = False
+                If mReadingFilteredIsosFile Then
+                    If intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex) < 0 Or _
+                       intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FilteredPeakIndex) < 0 Then
+                       blnMissingColumns = True
+                    End If
+                Else
+                    If intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex) < 0 Or _
+                       intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex) < 0 Then
+                       blnMissingColumns = True
+                    End If
+                End If
+                
+                If blnMissingColumns Then
+                    strMessage = COLUMN_HEADER_MISSING_WARNING & " not found in file " & fso.GetFileName(strLCMSFeatureToPeakMapFilePath) & "; the expected columns are: " & PEAK_MAP_COLUMN_FEATURE_INDEX & " and " & PEAK_MAP_COLUMN_PEAK_INDEX & " or " & PEAK_MAP_COLUMN_FILTERED_PEAK_INDEX
                     If mShowDialogBoxes Then
                         MsgBox strMessage, vbExclamation + vbOKOnly, glFGTU
                     End If
@@ -659,7 +684,13 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
             strData = Split(strLineIn, vbTab)
         
             ' Extract out the peak index and feature index that it is mapped to
-            lngPeakIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex), -1)
+            
+            If mReadingFilteredIsosFile Then
+                lngPeakIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FilteredPeakIndex), -1)
+            Else
+                lngPeakIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex), -1)
+            End If
+            
             lngFeatureIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex), -1)
             
             If lngFeatureIndex >= 0 And lngPeakIndex >= 0 Then

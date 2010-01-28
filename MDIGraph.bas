@@ -1590,6 +1590,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
     Dim objmzDataFileReader As clsFileIOMZData
     
     Dim strFileExtension As String
+    Dim strPathTest As String
     
     Dim udtFilterPrefs As udtAutoAnalysisFilterPrefsType
     Dim blnMSLevelFilter() As Boolean
@@ -1641,8 +1642,13 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                     eFileType = ifmCSVFile
                     blnLoadPredefinedLCMSFeatures = True
                 
-                    ' Update strInputFilePath to be the Decon2LS _isos.csv file
-                    strInputFilePath = Left(strInputFilePath, Len(strInputFilePath) - Len(strSuffixToCheck)) & CSV_ISOS_FILE_SUFFIX
+                    ' Update strInputFilePath to be the Decon2LS _filtered_isos.csv file or the _isos.csv file
+                    strPathTest = Left(strInputFilePath, Len(strInputFilePath) - Len(strSuffixToCheck)) & CSV_FILTERED_ISOS_FILE_SUFFIX
+                    If fso.FileExists(strPathTest) Then
+                        strInputFilePath = strPathTest
+                    Else
+                        strInputFilePath = Left(strInputFilePath, Len(strInputFilePath) - Len(strSuffixToCheck)) & CSV_ISOS_FILE_SUFFIX
+                    End If
                 
                     Exit For
                 End If
@@ -1898,13 +1904,13 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
         End Select
         
         If intReturnCode = 0 Then
-            If udtFilterPrefs.LCMSFeaturePointsLoadMode > plmLoadAllPoints Then
+            If blnLoadPredefinedLCMSFeatures And udtFilterPrefs.LCMSFeaturePointsLoadMode > plmLoadAllPoints Then
                 With GelData(lngGelIndex)
                     If udtFilterPrefs.LCMSFeaturePointsLoadMode = plmLoadMappedPointsOnly Then
-                        .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Only the points that are part of an LC-MS Feature were loaded."
+                        .Comment = .Comment & vbCrLf & "File loaded; Only the points that are part of an LC-MS Feature were loaded."
                         AddToAnalysisHistory lngGelIndex, "File Loaded; Only points that are part of an LC-MS Feature were loaded (at user request)."
                     ElseIf udtFilterPrefs.LCMSFeaturePointsLoadMode = plmLoadOnePointPerLCMSFeature Then
-                        .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Only the representative point(s) for each LC-MS Feature were loaded."
+                        .Comment = .Comment & vbCrLf & "File loaded; Only the representative point(s) for each LC-MS Feature were loaded."
                         AddToAnalysisHistory lngGelIndex, "File Loaded; Only the representative point(s) for each LC-MS Feature were loaded (at user request)."
                     End If
                 End With

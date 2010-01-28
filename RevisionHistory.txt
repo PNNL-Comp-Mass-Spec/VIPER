@@ -1,5 +1,15 @@
 VIPER Change Log
 
+Version 3.47 - Build 423; January 14, 2010
+	- Added support for reading _filtered_isos.csv files, as created by the FeatureFinderRunner.exe app
+
+	- ToDo: Add ability to use only the top XX UMCs when aligning the data with LCMSWarp -- needed for IMS
+
+
+Version 3.47 - Build 422; January 13, 2010
+	- Now populating table T_FTICR_UMC_CS_Stats using SP AddFTICRUmcCSStats when exporting results to the database
+		- This table tracks the abundance and mass on a charge-state basis for each UMC
+
 Version 3.47 - Build 421; January 10, 2010
 	- Updated modFileIOCSV to support reading .csv files up to 4 GB in size
 

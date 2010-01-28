@@ -80,6 +80,16 @@ Public Type udtPutUMCInternalStdMatchParamsListType
     DelMatchScore As ADODB.Parameter
 End Type
 
+Public Type udtPutUMCCSStatsParamsListType
+    UMCResultsID As ADODB.Parameter
+    ChargeState As ADODB.Parameter
+    MemberCount As ADODB.Parameter
+    MonoisotopicMass As ADODB.Parameter
+    Abundance As ADODB.Parameter
+    ElutionTime As ADODB.Parameter
+    DriftTime As ADODB.Parameter
+End Type
+
 Private Const MASS_PRECISION = 6
 Private Const FIT_PRECISION = 3
 Private Const NET_PRECISION = 5
@@ -558,55 +568,55 @@ End With
 End Sub
 
 Public Sub ExportMTDBInitializePutNewUMCMemberParams(cnNew As ADODB.Connection, cmdPutNewUMCMember As ADODB.Command, udtPutUMCMemberParams As udtPutUMCMemberParamsListType, strStoredProcName As String)
-
-' Initialize the SP
-InitializeSPCommand cmdPutNewUMCMember, cnNew, strStoredProcName
     
-With udtPutUMCMemberParams
-    Set .UMCResultsID = New ADODB.Parameter
-    Set .MemberTypeID = New ADODB.Parameter
-    Set .IndexInUMC = New ADODB.Parameter
-    Set .ScanNumber = New ADODB.Parameter
-    Set .MZ = New ADODB.Parameter
-    Set .ChargeState = New ADODB.Parameter
-    Set .MonoisotopicMass = New ADODB.Parameter
-    Set .Abundance = New ADODB.Parameter
-    Set .IsotopicFit = New ADODB.Parameter
-    Set .ElutionTime = New ADODB.Parameter
-    Set .IsChargeStateRep = New ADODB.Parameter
-    
-    Set .UMCResultsID = cmdPutNewUMCMember.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .UMCResultsID
-    
-    Set .MemberTypeID = cmdPutNewUMCMember.CreateParameter("MemberTypeID", adTinyInt, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .MemberTypeID
-    
-    Set .IndexInUMC = cmdPutNewUMCMember.CreateParameter("IndexInUMC", adSmallInt, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .IndexInUMC
-    
-    Set .ScanNumber = cmdPutNewUMCMember.CreateParameter("ScanNumber", adInteger, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .ScanNumber
-    
-    Set .MZ = cmdPutNewUMCMember.CreateParameter("MZ", adDouble, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .MZ
-    
-    Set .ChargeState = cmdPutNewUMCMember.CreateParameter("ChargeState", adSmallInt, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .ChargeState
-    
-    Set .MonoisotopicMass = cmdPutNewUMCMember.CreateParameter("MonoisotopicMass", adDouble, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .MonoisotopicMass
-    
-    Set .Abundance = cmdPutNewUMCMember.CreateParameter("Abundance", adDouble, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .Abundance
-    Set .IsotopicFit = cmdPutNewUMCMember.CreateParameter("IsotopicFit", adSingle, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .IsotopicFit
-    
-    Set .ElutionTime = cmdPutNewUMCMember.CreateParameter("ElutionTime", adSingle, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .ElutionTime
-    Set .IsChargeStateRep = cmdPutNewUMCMember.CreateParameter("IsChargeStateRep", adTinyInt, adParamInput, , 0)
-    cmdPutNewUMCMember.Parameters.Append .IsChargeStateRep
-    
-End With
+    ' Initialize the SP
+    InitializeSPCommand cmdPutNewUMCMember, cnNew, strStoredProcName
+        
+    With udtPutUMCMemberParams
+        Set .UMCResultsID = New ADODB.Parameter
+        Set .MemberTypeID = New ADODB.Parameter
+        Set .IndexInUMC = New ADODB.Parameter
+        Set .ScanNumber = New ADODB.Parameter
+        Set .MZ = New ADODB.Parameter
+        Set .ChargeState = New ADODB.Parameter
+        Set .MonoisotopicMass = New ADODB.Parameter
+        Set .Abundance = New ADODB.Parameter
+        Set .IsotopicFit = New ADODB.Parameter
+        Set .ElutionTime = New ADODB.Parameter
+        Set .IsChargeStateRep = New ADODB.Parameter
+        
+        Set .UMCResultsID = cmdPutNewUMCMember.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .UMCResultsID
+        
+        Set .MemberTypeID = cmdPutNewUMCMember.CreateParameter("MemberTypeID", adTinyInt, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .MemberTypeID
+        
+        Set .IndexInUMC = cmdPutNewUMCMember.CreateParameter("IndexInUMC", adSmallInt, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .IndexInUMC
+        
+        Set .ScanNumber = cmdPutNewUMCMember.CreateParameter("ScanNumber", adInteger, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .ScanNumber
+        
+        Set .MZ = cmdPutNewUMCMember.CreateParameter("MZ", adDouble, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .MZ
+        
+        Set .ChargeState = cmdPutNewUMCMember.CreateParameter("ChargeState", adSmallInt, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .ChargeState
+        
+        Set .MonoisotopicMass = cmdPutNewUMCMember.CreateParameter("MonoisotopicMass", adDouble, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .MonoisotopicMass
+        
+        Set .Abundance = cmdPutNewUMCMember.CreateParameter("Abundance", adDouble, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .Abundance
+        Set .IsotopicFit = cmdPutNewUMCMember.CreateParameter("IsotopicFit", adSingle, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .IsotopicFit
+        
+        Set .ElutionTime = cmdPutNewUMCMember.CreateParameter("ElutionTime", adSingle, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .ElutionTime
+        Set .IsChargeStateRep = cmdPutNewUMCMember.CreateParameter("IsChargeStateRep", adTinyInt, adParamInput, , 0)
+        cmdPutNewUMCMember.Parameters.Append .IsChargeStateRep
+        
+    End With
 
 End Sub
 
@@ -721,11 +731,53 @@ End With
 
 End Sub
 
+
+Public Sub ExportMTDBInitializePutUMCCSStatsParams(cnNew As ADODB.Connection, cmdPutNewUMCCSStat As ADODB.Command, udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType, strStoredProcName As String)
+  
+    ' Initialize the SP
+    InitializeSPCommand cmdPutNewUMCCSStat, cnNew, strStoredProcName
+        
+    With udtPutUMCCSStatsParams
+        Set .UMCResultsID = New ADODB.Parameter
+        Set .ChargeState = New ADODB.Parameter
+        Set .MemberCount = New ADODB.Parameter
+        Set .MonoisotopicMass = New ADODB.Parameter
+        Set .Abundance = New ADODB.Parameter
+        Set .ElutionTime = New ADODB.Parameter
+        Set .DriftTime = New ADODB.Parameter
+       
+        Set .UMCResultsID = cmdPutNewUMCCSStat.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
+        cmdPutNewUMCCSStat.Parameters.Append .UMCResultsID
+        
+        Set .ChargeState = cmdPutNewUMCCSStat.CreateParameter("ChargeState", adSmallInt, adParamInput, , 0)
+        cmdPutNewUMCCSStat.Parameters.Append .ChargeState
+       
+        Set .MemberCount = cmdPutNewUMCCSStat.CreateParameter("MemberCount", adSmallInt, adParamInput, , 0)
+        cmdPutNewUMCCSStat.Parameters.Append .MemberCount
+        
+        Set .MonoisotopicMass = cmdPutNewUMCCSStat.CreateParameter("MonoisotopicMass", adDouble, adParamInput, , 0)
+        cmdPutNewUMCCSStat.Parameters.Append .MonoisotopicMass
+        
+        Set .Abundance = cmdPutNewUMCCSStat.CreateParameter("Abundance", adDouble, adParamInput, , 0)
+        cmdPutNewUMCCSStat.Parameters.Append .Abundance
+        
+        Set .ElutionTime = cmdPutNewUMCCSStat.CreateParameter("ElutionTime", adSingle, adParamInput, , 0)
+        cmdPutNewUMCCSStat.Parameters.Append .ElutionTime
+
+        Set .DriftTime = cmdPutNewUMCCSStat.CreateParameter("DriftTime", adSingle, adParamInput, , 0)
+        cmdPutNewUMCCSStat.Parameters.Append .DriftTime
+        
+    End With
+
+End Sub
+
 Public Sub ExportMTDBAddUMCResultRow( _
             ByRef cmdPutNewUMC As ADODB.Command, _
             ByRef udtPutUMCParams As udtPutUMCParamsListType, _
             ByRef cmdPutNewUMCMember As ADODB.Command, _
             ByRef udtPutUMCMemberParams As udtPutUMCMemberParamsListType, _
+            ByRef cmdPutNewUMCCSStats As ADODB.Command, _
+            ByRef udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType, _
             ByVal blnExportUMCMembers As Boolean, _
             ByVal lngGelIndex As Long, _
             ByVal lngUMCIndexOriginal As Long, _
@@ -736,6 +788,8 @@ Public Sub ExportMTDBAddUMCResultRow( _
             Optional lngInternalStdMatchCount As Long = 0)
             
     ' Adds row to T_FTICR_UMC_Results table
+    ' Also adds row to T_FTICR_UMC_CS_Stats table
+    
     ' If blnExportUMCMembers, then adds rows to T_FTICR_UMC_Members table
     ' Note that DBs must have DB Schema Version >= 2 in order to save UMC members
     
@@ -746,6 +800,7 @@ Public Sub ExportMTDBAddUMCResultRow( _
     Dim lngScanNumberMin As Long, lngScanNumberMax As Long
     Dim lngMemberIndex As Long, lngDataIndex As Long
     Dim intChargeIndex As Integer
+    Dim lngUMCResultsIDInDB As Long
     
 On Error GoTo AddUMCErrorHandler
     
@@ -844,84 +899,182 @@ On Error GoTo AddUMCErrorHandler
     
     cmdPutNewUMC.Execute
     
-On Error GoTo AddUMCMembersErrorHandler
+    
+On Error GoTo AddAddnlInfoErrorHandler
 
+    lngUMCResultsIDInDB = FixNullLng(udtPutUMCParams.UMCResultsIDReturn.Value)
+    
+    ExportMTDBAddUMCCSStatsRow cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, lngGelIndex, lngUMCIndexOriginal, lngUMCResultsIDInDB
+    
     If blnExportUMCMembers Then
-        ' Now add the members of the UMC to T_FTICR_UMC_Members (if the table exists in the database)
-        ' Store the UMCResultsID value
-        udtPutUMCMemberParams.UMCResultsID.Value = FixNullLng(udtPutUMCParams.UMCResultsIDReturn.Value)
-        
-        With GelUMC(lngGelIndex).UMCs(lngUMCIndexOriginal)
-            For lngMemberIndex = 0 To .ClassCount - 1
-                udtPutUMCMemberParams.IndexInUMC = lngMemberIndex
-                lngDataIndex = .ClassMInd(lngMemberIndex)
-                
-                Select Case .ClassMType(lngMemberIndex)
-                Case gldtCS
-                    udtPutUMCMemberParams.MemberTypeID = gldtCS
-                
-                    udtPutUMCMemberParams.ScanNumber = GelData(lngGelIndex).CSData(lngDataIndex).ScanNumber
-                
-                    udtPutUMCMemberParams.MZ = GelData(lngGelIndex).CSData(lngDataIndex).AverageMW
-                    udtPutUMCMemberParams.ChargeState = GelData(lngGelIndex).CSData(lngDataIndex).Charge
-                    udtPutUMCMemberParams.MonoisotopicMass = GelData(lngGelIndex).CSData(lngDataIndex).AverageMW
-                    udtPutUMCMemberParams.Abundance = GelData(lngGelIndex).CSData(lngDataIndex).Abundance
-                    udtPutUMCMemberParams.IsotopicFit = GelData(lngGelIndex).CSData(lngDataIndex).MassStDev
-                    udtPutUMCMemberParams.ElutionTime = ScanToGANET(lngGelIndex, GelData(lngGelIndex).CSData(lngDataIndex).ScanNumber)
-                
-                Case gldtIS
-                    udtPutUMCMemberParams.MemberTypeID = gldtIS
-                
-                    udtPutUMCMemberParams.ScanNumber = GelData(lngGelIndex).IsoData(lngDataIndex).ScanNumber
-                
-                    udtPutUMCMemberParams.MZ = GelData(lngGelIndex).IsoData(lngDataIndex).MZ
-                    udtPutUMCMemberParams.ChargeState = GelData(lngGelIndex).IsoData(lngDataIndex).Charge
-                    udtPutUMCMemberParams.MonoisotopicMass = GelData(lngGelIndex).IsoData(lngDataIndex).MonoisotopicMW
-                    udtPutUMCMemberParams.Abundance = GelData(lngGelIndex).IsoData(lngDataIndex).Abundance
-                    udtPutUMCMemberParams.IsotopicFit = GelData(lngGelIndex).IsoData(lngDataIndex).Fit
-                    udtPutUMCMemberParams.ElutionTime = ScanToGANET(lngGelIndex, GelData(lngGelIndex).IsoData(lngDataIndex).ScanNumber)
-                
-                Case Else
-                    ' This shouldn't happen; don't export data point if .ClassMType(lngMemberIndex) = 0
-                    Debug.Assert False
-                    udtPutUMCMemberParams.MemberTypeID = 0
-                End Select
-                
-                If udtPutUMCMemberParams.MemberTypeID > 0 Then
-                
-                    ' Check whether or not data point is the Charge State Based Stats group rep (most abundant point within the charge state)
-                    udtPutUMCMemberParams.IsChargeStateRep = 0
-                    For intChargeIndex = 0 To .ChargeStateCount - 1
-                        If lngMemberIndex = .ChargeStateBasedStats(intChargeIndex).GroupRepIndex Then
-                            udtPutUMCMemberParams.IsChargeStateRep = 1
-                            Exit For
-                        End If
-                    Next intChargeIndex
-                        
-                    cmdPutNewUMCMember.Execute
-                End If
-            
-            Next lngMemberIndex
-            
-        End With
+        ExportMTDBAddUMCResultMemberRow cmdPutNewUMCMember, udtPutUMCMemberParams, lngGelIndex, lngUMCIndexOriginal, lngUMCResultsIDInDB
     End If
     
-
     Exit Sub
 
 AddUMCErrorHandler:
     ' Error populating or executing cmdPutNewUMC
     
-    Debug.Print "Error occurred: Err Code = " & Err.Number & vbCrLf & Err.Description
+    Debug.Print "Error occurred at AddUMCErrorHandler: Err Code = " & Err.Number & vbCrLf & Err.Description
     Debug.Assert False
     
     Err.Raise Err.Number
     Exit Sub
 
+AddAddnlInfoErrorHandler:
+
+    Debug.Print "Error occurred at AddAddnlInfoErrorHandler: Err Code = " & Err.Number & vbCrLf & Err.Description
+    Debug.Assert False
+    
+    Err.Raise Err.Number
+    Exit Sub
+    
+End Sub
+
+Private Sub ExportMTDBAddUMCCSStatsRow( _
+            ByRef cmdPutNewUMCCSStats As ADODB.Command, _
+            ByRef udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType, _
+            ByVal lngGelIndex As Long, _
+            ByVal lngUMCIndexOriginal As Long, _
+            ByVal lngUMCResultsIDInDB As Long)
+
+    ' Adds row to T_FTICR_UMC_CS_Stats table
+
+    Dim intChargeIndex As Integer
+    Dim lngClassMIndexPointer As Long
+    
+On Error GoTo AddUMCCSStatsErrorHandler
+
+
+    ' Now add the charge stats for this UMC to T_FTICR_UMC_CS_Stats (if the table exists in the database)
+    
+    ' Store the UMCResultsID value
+    udtPutUMCCSStatsParams.UMCResultsID = lngUMCResultsIDInDB
+    
+    With GelUMC(lngGelIndex).UMCs(lngUMCIndexOriginal)
+
+        For intChargeIndex = 0 To .ChargeStateCount - 1
+                
+            udtPutUMCCSStatsParams.ChargeState = .ChargeStateBasedStats(intChargeIndex).Charge
+            udtPutUMCCSStatsParams.MemberCount = .ChargeStateBasedStats(intChargeIndex).Count
+            udtPutUMCCSStatsParams.MonoisotopicMass = Round(.ChargeStateBasedStats(intChargeIndex).Mass, MASS_PRECISION)
+            udtPutUMCCSStatsParams.Abundance = .ChargeStateBasedStats(intChargeIndex).Abundance
+            
+            lngClassMIndexPointer = .ChargeStateBasedStats(intChargeIndex).GroupRepIndex
+             
+            If lngClassMIndexPointer < 0 Then
+                udtPutUMCCSStatsParams.ElutionTime = 0
+                udtPutUMCCSStatsParams.DriftTime = 0
+            Else
+                Select Case .ClassMType(lngClassMIndexPointer)
+                Case glCSType
+                    udtPutUMCCSStatsParams.ElutionTime = Round(ScanToGANET(lngGelIndex, GelData(lngGelIndex).CSData(.ClassMInd(lngClassMIndexPointer)).ScanNumber), NET_PRECISION)
+                    udtPutUMCCSStatsParams.DriftTime = GelData(lngGelIndex).CSData(lngClassMIndexPointer).IMSDriftTime
+                
+                Case glIsoType
+                    udtPutUMCCSStatsParams.ElutionTime = Round(ScanToGANET(lngGelIndex, GelData(lngGelIndex).IsoData(.ClassMInd(lngClassMIndexPointer)).ScanNumber), NET_PRECISION)
+                    udtPutUMCCSStatsParams.DriftTime = GelData(lngGelIndex).IsoData(lngClassMIndexPointer).IMSDriftTime
+                
+                End Select
+            End If
+            
+            cmdPutNewUMCCSStats.Execute
+            
+        Next intChargeIndex
+
+    End With
+    
+
+    Exit Sub
+
+AddUMCCSStatsErrorHandler:
+    ' Error populating or executing cmdPutNewUMCCSStats
+    
+    Debug.Print "Error occurred in ExportMTDBAddUMCCSStatsRow: Err Code = " & Err.Number & vbCrLf & Err.Description
+    Debug.Assert False
+    
+    Err.Raise Err.Number
+    
+End Sub
+
+Private Sub ExportMTDBAddUMCResultMemberRow( _
+            ByRef cmdPutNewUMCMember As ADODB.Command, _
+            ByRef udtPutUMCMemberParams As udtPutUMCMemberParamsListType, _
+            ByVal lngGelIndex As Long, _
+            ByVal lngUMCIndexOriginal As Long, _
+            ByVal lngUMCResultsIDInDB As Long)
+            
+    ' Adds row to T_FTICR_UMC_Members table
+    
+    Dim lngMemberIndex As Long, lngDataIndex As Long
+    Dim intChargeIndex As Integer
+    
+On Error GoTo AddUMCMembersErrorHandler
+
+    ' Now add the members of the UMC to T_FTICR_UMC_Members (if the table exists in the database)
+    ' Store the UMCResultsID value
+    udtPutUMCMemberParams.UMCResultsID.Value = lngUMCResultsIDInDB
+    
+    With GelUMC(lngGelIndex).UMCs(lngUMCIndexOriginal)
+        For lngMemberIndex = 0 To .ClassCount - 1
+            udtPutUMCMemberParams.IndexInUMC = lngMemberIndex
+            lngDataIndex = .ClassMInd(lngMemberIndex)
+            
+            Select Case .ClassMType(lngMemberIndex)
+            Case gldtCS
+                udtPutUMCMemberParams.MemberTypeID = gldtCS
+            
+                udtPutUMCMemberParams.ScanNumber = GelData(lngGelIndex).CSData(lngDataIndex).ScanNumber
+            
+                udtPutUMCMemberParams.MZ = GelData(lngGelIndex).CSData(lngDataIndex).AverageMW
+                udtPutUMCMemberParams.ChargeState = GelData(lngGelIndex).CSData(lngDataIndex).Charge
+                udtPutUMCMemberParams.MonoisotopicMass = GelData(lngGelIndex).CSData(lngDataIndex).AverageMW
+                udtPutUMCMemberParams.Abundance = GelData(lngGelIndex).CSData(lngDataIndex).Abundance
+                udtPutUMCMemberParams.IsotopicFit = GelData(lngGelIndex).CSData(lngDataIndex).MassStDev
+                udtPutUMCMemberParams.ElutionTime = ScanToGANET(lngGelIndex, GelData(lngGelIndex).CSData(lngDataIndex).ScanNumber)
+            
+            Case gldtIS
+                udtPutUMCMemberParams.MemberTypeID = gldtIS
+            
+                udtPutUMCMemberParams.ScanNumber = GelData(lngGelIndex).IsoData(lngDataIndex).ScanNumber
+            
+                udtPutUMCMemberParams.MZ = GelData(lngGelIndex).IsoData(lngDataIndex).MZ
+                udtPutUMCMemberParams.ChargeState = GelData(lngGelIndex).IsoData(lngDataIndex).Charge
+                udtPutUMCMemberParams.MonoisotopicMass = GelData(lngGelIndex).IsoData(lngDataIndex).MonoisotopicMW
+                udtPutUMCMemberParams.Abundance = GelData(lngGelIndex).IsoData(lngDataIndex).Abundance
+                udtPutUMCMemberParams.IsotopicFit = GelData(lngGelIndex).IsoData(lngDataIndex).Fit
+                udtPutUMCMemberParams.ElutionTime = ScanToGANET(lngGelIndex, GelData(lngGelIndex).IsoData(lngDataIndex).ScanNumber)
+            
+            Case Else
+                ' This shouldn't happen; don't export data point if .ClassMType(lngMemberIndex) = 0
+                Debug.Assert False
+                udtPutUMCMemberParams.MemberTypeID = 0
+            End Select
+            
+            If udtPutUMCMemberParams.MemberTypeID > 0 Then
+            
+                ' Check whether or not data point is the Charge State Based Stats group rep (most abundant point within the charge state)
+                udtPutUMCMemberParams.IsChargeStateRep = 0
+                For intChargeIndex = 0 To .ChargeStateCount - 1
+                    If lngMemberIndex = .ChargeStateBasedStats(intChargeIndex).GroupRepIndex Then
+                        udtPutUMCMemberParams.IsChargeStateRep = 1
+                        Exit For
+                    End If
+                Next intChargeIndex
+                    
+                cmdPutNewUMCMember.Execute
+            End If
+        
+        Next lngMemberIndex
+        
+    End With
+
+    Exit Sub
+
 AddUMCMembersErrorHandler:
     ' Error populating or executing cmdPutNewUMCMember
     
-    Debug.Print "Error occurred: Err Code = " & Err.Number & vbCrLf & Err.Description
+    Debug.Print "Error occurred in ExportMTDBAddUMCResultMemberRow: Err Code = " & Err.Number & vbCrLf & Err.Description
     Debug.Assert False
     
     Err.Raise Err.Number

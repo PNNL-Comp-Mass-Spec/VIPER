@@ -5,6 +5,7 @@ Public Const CSV_ISOS_IC_FILE_SUFFIX As String = "isos_ic.csv"
 Public Const CSV_ISOS_FILE_SUFFIX As String = "isos.csv"
 Public Const CSV_ISOS_PAIRS_SUFFIX As String = "pairs_isos.csv"
 Public Const CSV_SCANS_FILE_SUFFIX As String = "scans.csv"
+Public Const CSV_FILTERED_ISOS_FILE_SUFFIX As String = "filtered_isos.csv"
 
 Public Const LCMS_FEATURES_FILE_SUFFIX As String = "LCMSFeatures.txt"
 Public Const LCMS_FEATURE_TO_PEAK_MAP_FILE_SUFFIX As String = "LCMSFeatureToPeakMap.txt"
@@ -242,10 +243,16 @@ Public Function GetDatasetNameFromDecon2LSFilename(ByVal strFilePath As String) 
     
     If StringEndsWith(strFileName, "_" & CSV_ISOS_IC_FILE_SUFFIX) Then
         strBase = StringTrimEnd(strFileName, "_" & CSV_ISOS_IC_FILE_SUFFIX)
+        
     ElseIf StringEndsWith(strFileName, "_" & CSV_ISOS_FILE_SUFFIX) Then
         strBase = StringTrimEnd(strFileName, "_" & CSV_ISOS_FILE_SUFFIX)
+        
+    ElseIf StringEndsWith(strFileName, "_" & CSV_FILTERED_ISOS_FILE_SUFFIX) Then
+        strBase = StringTrimEnd(strFileName, "_" & CSV_FILTERED_ISOS_FILE_SUFFIX)
+        
     ElseIf StringEndsWith(strFileName, "_" & CSV_ISOS_PAIRS_SUFFIX) Then
         strBase = StringTrimEnd(strFileName, "_" & CSV_ISOS_PAIRS_SUFFIX)
+        
     ElseIf StringEndsWith(strFileName, "_" & CSV_SCANS_FILE_SUFFIX) Then
         strBase = StringTrimEnd(strFileName, "_" & CSV_SCANS_FILE_SUFFIX)
     Else
@@ -420,8 +427,10 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     
     Dim blnValidScansFile As Boolean
     Dim blnValidDataPoint As Boolean
+    Dim blnLoadingFilteredIsosFile As Boolean
     Dim blnSuccess As Boolean
     
+    Dim lngCharLoc As Long
     Dim lngReturnValue As Long
     
     Dim dblScansFileByteCount As Double
@@ -472,6 +481,8 @@ On Error GoTo LoadNewCSVErrorHandler
     mCurrentProgressStep = 0
     frmProgress.InitializeForm "Loading data file", mCurrentProgressStep, intProgressCount, False, True, True, MDIForm1
     lngReturnValue = -10
+    
+    blnLoadingFilteredIsosFile = False
     
     ' Resolve the CSV FilePath given to the ScansFilePath and the IsosFilePath variables
     
@@ -527,6 +538,12 @@ On Error GoTo LoadNewCSVErrorHandler
             AddToAnalysisHistory mGelIndex, strErrorMessage
         End If
     
+        ' Check whether we're loading the filtered isos file
+        lngCharLoc = InStr(LCase(strIsosFilePath), LCase(CSV_FILTERED_ISOS_FILE_SUFFIX))
+        If lngCharLoc >= 1 Then
+            blnLoadingFilteredIsosFile = True
+        End If
+        
     End If
     
     blnValidScansFile = True
@@ -602,6 +619,8 @@ On Error GoTo LoadNewCSVErrorHandler
         Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
         Set objReadLCMSFeatures = New clsFileIOPredefinedLCMSFeatures
         objReadLCMSFeatures.ProgressForm = frmProgress
+        
+        objReadLCMSFeatures.ReadingFilteredIsosFile = blnLoadingFilteredIsosFile
         
         frmProgress.UpdateCurrentSubTask "Caching peak to feature mapping data"
         
@@ -1896,7 +1915,7 @@ End Function
 Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScansFilePath As String, ByRef strIsosFilePath As String, ByRef strBaseFilePath As String) As Boolean
     ' Define the _scans.csv and _isos.csv FilePaths, given strFilePath
     ' strFilePath could contain either the _scans.csv name or the _isos.csv name
-    ' Does not confirm that the files actually exist
+    ' NOTE: Does not necessarily confirm that the files actually exist
     
     
     Dim lngCharLoc As Long
@@ -1913,15 +1932,21 @@ Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScans
         ' Look for the corresponding _isos.csv file
         strScansFilePath = strFilePath
         strBaseFilePath = Left(strFilePath, lngCharLoc - 1)
-        strIsosFilePath = strBaseFilePath & CSV_ISOS_IC_FILE_SUFFIX
+        strIsosFilePath = strBaseFilePath & CSV_FILTERED_ISOS_FILE_SUFFIX
         
         If Not FileExists(strIsosFilePath) Then
             strIsosFilePath = strBaseFilePath & CSV_ISOS_PAIRS_SUFFIX
+        
+            If Not FileExists(strIsosFilePath) Then
+                strIsosFilePath = strBaseFilePath & CSV_ISOS_IC_FILE_SUFFIX
+                
+                If Not FileExists(strIsosFilePath) Then
+                    strIsosFilePath = strBaseFilePath & CSV_ISOS_FILE_SUFFIX
+                End If
+            End If
+            
         End If
         
-        If Not FileExists(strIsosFilePath) Then
-            strIsosFilePath = strBaseFilePath & CSV_ISOS_FILE_SUFFIX
-        End If
         
         blnSuccess = True
         
@@ -1933,13 +1958,17 @@ Private Function ResolveCSVFilePaths(ByVal strFilePath As String, ByRef strScans
         ' First look for pairs_isos.csv
         lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_PAIRS_SUFFIX))
         If lngCharLoc < 1 Then
-            ' No match, look for isos.csv
-            lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_IC_FILE_SUFFIX))
+            ' No match, look for filtered_isos.csv
+            lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_FILTERED_ISOS_FILE_SUFFIX))
             If lngCharLoc < 1 Then
-                ' No match, look for isos.csv
-                lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_FILE_SUFFIX))
+                ' No match, look for ic_isos.csv
+                lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_IC_FILE_SUFFIX))
                 If lngCharLoc < 1 Then
-                    ' No match
+                    ' No match, look for isos.csv
+                    lngCharLoc = InStr(LCase(strFilePath), LCase(CSV_ISOS_FILE_SUFFIX))
+                    If lngCharLoc < 1 Then
+                        ' No match
+                    End If
                 End If
             End If
         End If

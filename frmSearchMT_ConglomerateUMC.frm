@@ -796,6 +796,7 @@ Private ExpUmcSPName As String                  ' Stored procedure AddFTICRUmc
 Private ExpUMCMemberSPName As String            ' Stored procedure AddFTICRUmcMember
 Private ExpUmcMatchSPName As String             ' Stored procedure AddFTICRUmcMatch
 Private ExpUmcInternalStdMatchSPName As String  ' Stored procedure AddFTICRUmcInternalStdMatch
+Private ExpUMCCSStats As String                 ' Stored procedure AddFTICRUmcCSStats
 Private ExpQuantitationDescription As String    ' Stored procedure AddQuantitationDescription
 
 Private mUMCCountSkippedSinceRefPresent As Long
@@ -1440,8 +1441,12 @@ Dim cmdPutNewUMCMatch As New ADODB.Command
 Dim udtPutUMCMatchParams As udtPutUMCMatchParamsListType
 
 'ADO objects for stored procedure adding FTICR UMC Internal Standard Details
-Dim cmPutNewUMCInternalStdMatch As New ADODB.Command
+Dim cmdPutNewUMCInternalStdMatch As New ADODB.Command
 Dim udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType
+
+'ADO objects for stored procedure adding FTICR UMC CS Stats
+Dim cmdPutNewUMCCSStats As New ADODB.Command
+Dim udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType
 
 Dim blnUMCMatchFound() As Boolean       ' 0-based array, used to keep track of whether or not the UMC matched any MT tags or Internal Standards
 
@@ -1504,7 +1509,10 @@ ExportMTDBInitializePutNewUMCMemberParams cnNew, cmdPutNewUMCMember, udtPutUMCMe
 ExportMTDBInitializePutUMCMatchParams cnNew, cmdPutNewUMCMatch, udtPutUMCMatchParams, ExpUmcMatchSPName
 
 ' Initialize the variables for accessing the AddFTICRUmcInternalStdMatch SP
-ExportMTDBInitializePutUMCInternalStdMatchParams cnNew, cmPutNewUMCInternalStdMatch, udtPutUMCInternalStdMatchParams, ExpUmcInternalStdMatchSPName
+ExportMTDBInitializePutUMCInternalStdMatchParams cnNew, cmdPutNewUMCInternalStdMatch, udtPutUMCInternalStdMatchParams, ExpUmcInternalStdMatchSPName
+
+' Initialize the variables for accessing the AddFTICRUmcCSStats SP
+ExportMTDBInitializePutUMCCSStatsParams cnNew, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, ExpUMCCSStats
 
 ' Initialize the PairIndex lookup objects
 blnPairsPresent = PairIndexLookupInitialize(CallerID, objP1IndFastSearch, objP2IndFastSearch)
@@ -1591,7 +1599,7 @@ InternalStdExpCnt = 0
                         End If
                     End With
                     
-                    ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, lngInternalStdMatchCount
+                    ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, lngInternalStdMatchCount
                     blnUMCMatchFound(lngUMCIndexOriginal) = True
         
                     ' Populate array with return value
@@ -1612,7 +1620,7 @@ InternalStdExpCnt = 0
                         
                         ' Always export the other member of the pair, even if it has already been exported
                         ' Note that we do not record any MT tag hits for the other member of the pair
-                        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginalPairOther, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0
+                        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginalPairOther, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0
                         blnUMCMatchFound(lngUMCIndexOriginalPairOther) = True
                         
                     End With
@@ -1621,7 +1629,7 @@ InternalStdExpCnt = 0
             Else
                 lngPeakFPRType = FPR_Type_Standard
             
-                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, lngInternalStdMatchCount
+                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, lngInternalStdMatchCount
                 blnUMCMatchFound(lngUMCIndexOriginal) = True
         
                 udtPutUMCMatchParams.UMCResultsID.Value = FixNullLng(udtPutUMCParams.UMCResultsIDReturn.Value)
@@ -1636,10 +1644,10 @@ InternalStdExpCnt = 0
                 udtPutUMCMatchParams.UMCResultsID.Value = lngUMCResultsIDReturn(lngPairMatchIndex)
                 udtPutUMCInternalStdMatchParams.UMCResultsID.Value = lngUMCResultsIDReturn(lngPairMatchIndex)
                 
-                ExportMTDBbyUMCToUMCResultDetailsTable lngPointer, udtPutUMCInternalStdMatchParams, cmPutNewUMCInternalStdMatch, udtPutUMCMatchParams, cmdPutNewUMCMatch
+                ExportMTDBbyUMCToUMCResultDetailsTable lngPointer, udtPutUMCInternalStdMatchParams, cmdPutNewUMCInternalStdMatch, udtPutUMCMatchParams, cmdPutNewUMCMatch
             Next lngPairMatchIndex
         Else
-            ExportMTDBbyUMCToUMCResultDetailsTable lngPointer, udtPutUMCInternalStdMatchParams, cmPutNewUMCInternalStdMatch, udtPutUMCMatchParams, cmdPutNewUMCMatch
+            ExportMTDBbyUMCToUMCResultDetailsTable lngPointer, udtPutUMCInternalStdMatchParams, cmdPutNewUMCInternalStdMatch, udtPutUMCMatchParams, cmdPutNewUMCMatch
         End If
             
         If mUMCMatchStats(lngPointer).IDIsInternalStd Then
@@ -1701,12 +1709,12 @@ InternalStdExpCnt = 0
                                     End If
                                 End With
                                         
-                                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0
+                                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0
                             Next lngPairMatchIndex
                         Else
                             lngPeakFPRType = FPR_Type_Standard
                         
-                            ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, 0
+                            ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, 0
                         End If
                             
                     End If
@@ -1764,7 +1772,7 @@ ExportMTDBbyUMCToUMCResultsTable = "Error: " & lngErrorNumber & vbCrLf & Err.Des
 
 End Function
 
-Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRef udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType, ByRef cmPutNewUMCInternalStdMatch As ADODB.Command, ByRef udtPutUMCMatchParams As udtPutUMCMatchParamsListType, cmdPutNewUMCMatch As ADODB.Command)
+Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRef udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType, ByRef cmdPutNewUMCInternalStdMatch As ADODB.Command, ByRef udtPutUMCMatchParams As udtPutUMCMatchParamsListType, cmdPutNewUMCMatch As ADODB.Command)
 
     Dim lngInternalStdIndexOriginal As Long
     Dim lngMassTagIndexPointer As Long, lngMassTagIndexOriginal As Long
@@ -1782,7 +1790,7 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
         udtPutUMCInternalStdMatchParams.ExpectedNET.Value = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).NET
         udtPutUMCInternalStdMatchParams.DelMatchScore.Value = mUMCMatchStats(lngPointer).DelSLiC
         
-        cmPutNewUMCInternalStdMatch.Execute
+        cmdPutNewUMCInternalStdMatch.Execute
         
     Else
         ' Write an entry to T_FTICR_UMC_ResultDetails
@@ -4660,6 +4668,7 @@ With glbPreferencesExpanded.MTSConnectionInfo
     ExpUMCMemberSPName = .spPutUMCMember
     ExpUmcMatchSPName = .spPutUMCMatch
     ExpUmcInternalStdMatchSPName = .spPutUMCInternalStdMatch
+    ExpUMCCSStats = .spPutUMCCSStats
     ExpQuantitationDescription = .spAddQuantitationDescription
 End With
 
@@ -4683,6 +4692,11 @@ If Len(ExpUmcInternalStdMatchSPName) = 0 Then
     ExpUmcInternalStdMatchSPName = "AddFTICRUmcInternalStdMatch"
 End If
 Debug.Assert ExpUmcInternalStdMatchSPName = "AddFTICRUmcInternalStdMatch"
+
+If Len(ExpUMCCSStats) = 0 Then
+    ExpUMCCSStats = "AddFTICRUmcCSStats"
+End If
+Debug.Assert ExpUMCCSStats = "AddFTICRUmcCSStats"
 
 If Len(ExpQuantitationDescription) = 0 Then
     ExpQuantitationDescription = "AddQuantitationDescription"
