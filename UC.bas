@@ -77,7 +77,7 @@ Public Enum UMCManageConstants
     UMCMngAdd = 3
 End Enum
 
-Public Const UMC_STATISTICS1_MAX_INDEX As Integer = 18
+Public Const UMC_STATISTICS1_MAX_INDEX As Integer = 19
 Public Enum ustUMCStatistics1Constants
     ustClassIndex = 0
     ustClassRepMW = 1
@@ -98,6 +98,7 @@ Public Enum ustUMCStatistics1Constants
     ustMassMin = 16
     ustMassMax = 17
     ustMassStDev = 18
+    ustDriftTime = 19
 End Enum
 
 'definition type for the Unique Masses Classes
@@ -1369,6 +1370,7 @@ Public Function UMCStatistics1(ByVal Ind As Long, _
 'statistic array (0-bounded); rows represent unique classes
 'last modified: 03/22/2001; nt
 'last modified: 05/20/2003; mem
+'last modified: 03/03/2010; klc - added drift time
 '---------------------------------------------------------------
 'column 0 (ustClassIndex)       - class index in .UMCs
 'column 1 (ustClassRepMW)       - dblMW of class representative
@@ -1395,6 +1397,7 @@ Public Function UMCStatistics1(ByVal Ind As Long, _
 'column 16 (ustMassMin)         - minimum mass
 'column 17 (ustMassMax)         - maximum mass
 'column 18 (ustMassStDev)       - standard deviation of mass
+'column 19 (ustDriftTime)       - Representative Drift Time
 
 Dim i As Long
 Dim j As Long
@@ -1433,9 +1436,11 @@ With GelUMC(Ind)
              Case gldtCS
                Stat(i, ustClassRepMW) = GelData(Ind).CSData(.ClassRepInd).AverageMW
                Stat(i, ustClassRepIntensity) = GelData(Ind).CSData(.ClassRepInd).Abundance
+               Stat(i, ustDriftTime) = GelData(Ind).CSData(.ClassRepInd).IMSDriftTime
              Case gldtIS
                Stat(i, ustClassRepMW) = GetIsoMass(GelData(Ind).IsoData(.ClassRepInd), ISF)
                Stat(i, ustClassRepIntensity) = GelData(Ind).IsoData(.ClassRepInd).Abundance
+               Stat(i, ustDriftTime) = GelData(Ind).IsoData(.ClassRepInd).IMSDriftTime
              End Select
              
              'class members are sometimes sorted on scan number, but not always

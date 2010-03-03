@@ -706,11 +706,11 @@ Public Type udtUMCType
   PercentMembersIReportMonoPlus4 As Byte       ' % of the data in the UMC that was added due to MonoPlus4 data (was previously part of AdditionalValue1, a long)
   PercentMembersIReportMonoMinus4 As Byte      ' % of the data in the UMC that was added due to MonoMinus4 data (was previously part of AdditionalValue1, a long)
   
-  AdditionalValue1 As Integer
+  DriftTime As Single                   ' 4 bytes (previously part of AdditionalValue1 and AdditionalValue2)
   
-  AdditionalValue2 As Long          ' New for this version; use for future expansion (name can be changed in the future)
-  AdditionalValue3 As Single        ' New for this version; use for future expansion (name can be changed in the future)
-  AdditionalValue4 As Single        ' New for this version; use for future expansion (name can be changed in the future)
+  AdditionalValue2 As Integer       ' New for this version; use for future expansion (name can be changed in the future); 2 bytes
+  AdditionalValue3 As Single        ' New for this version; use for future expansion (name can be changed in the future); 4 bytes
+  AdditionalValue4 As Single        ' New for this version; use for future expansion (name can be changed in the future); 4 bytes
   
   OtherInfo As String
 End Type

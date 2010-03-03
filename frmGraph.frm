@@ -4099,6 +4099,9 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim blnIsotopeLabelPresent(ISOTOPE_LABEL_TAG_CONSTANT_COUNT) As Boolean
     Dim strIsotopes As String
     
+    Dim blnIMSData As Boolean
+    Dim sngIMSDriftTime As Single
+    
 On Error GoTo CopyAllUMCsInViewErrorHandler
 
     lngAllUMCCount = GelUMC(nMyIndex).UMCCnt
@@ -4282,6 +4285,11 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar
     
+    If ((GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA) Then
+        blnIMSData = True
+        strLineOut = strLineOut & "IMS_Drift_Time" & strSepChar
+    End If
+    
     If blnContainsIsotopeTags Then
          strLineOut = strLineOut & "Isotope Tag Label" & strSepChar
     End If
@@ -4359,6 +4367,10 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             End If
         
             strLineOut = strLineOut & Round(ClsStat(lngUMCIndexOriginal, ustFitAverage), 3) & strSepChar
+            
+            If blnIMSData Then
+                strLineOut = strLineOut & Round(ClsStat(lngUMCIndexOriginal, ustDriftTime), 3) & strSepChar
+            End If
             
             If blnContainsIsotopeTags Then
                 For intIsotopeLabelIndex = 0 To UBound(blnIsotopeLabelPresent)
