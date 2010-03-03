@@ -4100,7 +4100,6 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim strIsotopes As String
     
     Dim blnIMSData As Boolean
-    Dim sngIMSDriftTime As Single
     
 On Error GoTo CopyAllUMCsInViewErrorHandler
 
