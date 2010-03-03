@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
 Begin VB.Form frmErrorDistribution2DLoadedData 
    BackColor       =   &H00FFFFFF&
    Caption         =   "Tolerance Refinement (Mass and NET Error Plots)"
@@ -1443,6 +1443,9 @@ Private Function AddNewErrValues(ByRef sngRawMassErrorsPPM() As Single, ByRef sn
     Dim dblMassErrorPPM As Double               ' Mass error newly computed here (in ppm); if dblMassErrorPPMFromID is smaller, then it gets updated to that
     Dim dblMassErrorPPMFromID As Double         ' Mass error recorded in Refs()
     
+    Dim dblMaxMassErrprPPMtoStore As Double     ' Mass error values larger than this will be ignored
+    Dim dblMaxMassErrorPPMtoStore As Double
+    
     Dim sngGANETError As Single
     Dim blnValidSLiC As Boolean
     Dim blnHitFound As Boolean
@@ -1459,7 +1462,9 @@ On Error GoTo AddNewErrValuesErrorHandler
         End If
     End If
     
-
+    dblMaxMassErrorPPMtoStore = glbPreferencesExpanded.RefineMSDataOptions.MassToleranceMaximum
+    dblMaxMassErrorPPMtoStore = dblMaxMassErrorPPMtoStore * 5
+    
     blnHitFound = False
     If RefsCnt > 0 Then
         For lngMatchIndex = 1 To RefsCnt
@@ -1559,7 +1564,7 @@ On Error GoTo AddNewErrValuesErrorHandler
                         ' The reason for the decrease of the computed mass error by 55% is to try to prevent inadvertent updating due to rounding errors
                         If Abs(dblMassErrorPPMFromID) < Abs(dblMassErrorPPM) * 0.45 Then
                             If dblMassErrorPPMFromID = 0 Then
-                                Debug.Assert Abs(dblMassErrorPPM) < 0.01
+                                'Debug.Assert Abs(dblMassErrorPPM) < 0.01
                             End If
                             
                             dblMassErrorPPM = dblMassErrorPPMFromID
@@ -1569,20 +1574,30 @@ On Error GoTo AddNewErrValuesErrorHandler
                         sngGANETError = sngIonGANET - dblRefNET
                     End If
                     
-                    If lngRawErrorsCount >= UBound(sngRawMassErrorsPPM) + 1 Then
-                        lngNewDataCount = (UBound(sngRawMassErrorsPPM) + 1) * 2
-                        ReDim Preserve sngRawMassErrorsPPM(lngNewDataCount - 1)
-                        ReDim Preserve sngRawMassErrorsDa(lngNewDataCount - 1)
-                        ReDim Preserve sngRawNETErrors(lngNewDataCount - 1)
-                        ''ReDim Preserve mDataSourceIonIndex(lngNewDataCount - 1)
+                    ' Check whether dblMassErrorPPM is more than 4 times larger than
+                    '  glbPreferencesExpanded.RefineMSDataOptions.MassToleranceMaximum
+                    ' If it is, ignore it
+                    ' This can be the case if we loaded predefined LC-MS Features, and the features include
+                    '  data points +/- 1 Da apart
+                    
+                    If Abs(dblMassErrorPPM) < dblMaxMassErrorPPMtoStore Then
+                    
+                        If lngRawErrorsCount >= UBound(sngRawMassErrorsPPM) + 1 Then
+                            lngNewDataCount = (UBound(sngRawMassErrorsPPM) + 1) * 2
+                            ReDim Preserve sngRawMassErrorsPPM(lngNewDataCount - 1)
+                            ReDim Preserve sngRawMassErrorsDa(lngNewDataCount - 1)
+                            ReDim Preserve sngRawNETErrors(lngNewDataCount - 1)
+                            ''ReDim Preserve mDataSourceIonIndex(lngNewDataCount - 1)
+                        End If
+                        
+                        ' Add Errors to sngRawMassErrorsPPM(), sngRawMassErrorsDa(), and sngRawNETErrors()
+                        sngRawMassErrorsPPM(lngRawErrorsCount) = dblMassErrorPPM
+                        sngRawMassErrorsDa(lngRawErrorsCount) = CSng(dblMassErrorDa)
+                        sngRawNETErrors(lngRawErrorsCount) = sngGANETError
+                        
+                        lngRawErrorsCount = lngRawErrorsCount + 1
+                    
                     End If
-                    
-                    ' Add Errors to sngRawMassErrorsPPM(), sngRawMassErrorsDa(), and sngRawNETErrors()
-                    sngRawMassErrorsPPM(lngRawErrorsCount) = CSng(MassToPPM(dblMassErrorDa, dblIonMass))
-                    sngRawMassErrorsDa(lngRawErrorsCount) = CSng(dblMassErrorDa)
-                    sngRawNETErrors(lngRawErrorsCount) = sngGANETError
-                    
-                    lngRawErrorsCount = lngRawErrorsCount + 1
                     
                     ''mDataSourceIonIndex(lngRawErrorsCount) = lngIonIndex
                     
