@@ -49,9 +49,9 @@ Begin VB.Form frmGraph
          Top             =   240
          Visible         =   0   'False
          Width           =   3165
-         _ExtentX        =   5583
-         _ExtentY        =   3863
-         BackColor       =   -2147483633
+         _extentx        =   5583
+         _extenty        =   3863
+         backcolor       =   -2147483633
       End
    End
    Begin VB.Menu mnuFile 
@@ -4047,6 +4047,8 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim lngScanClassRep As Long
     Dim dblGANETClassRep As Double, dblAMTMW As Double, dblAMTNet As Double, dblAMTNetStDev As Double
     Dim sngPeptideProphetProbability As Single
+    Dim sngMassShiftPPMClassRep As Single
+    
     Dim strPeptideSequence As String
     
     ' The following two arrays are used to look up the mass of each MT tag, given the MT tag ID
@@ -4280,9 +4282,10 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     lngExportCountDimmed = lngCSCount + lngIsoCount
     ReDim strExport(lngExportCountDimmed)
     
+    ' Construct the header line
     ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; ExpressionRatioStDev; ExpressionRatioBasisCount; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagNET; MassTagNETStDev; SLiC Score; DelSLiC; MemberCountMatchingMassTag; IsInternalStdMatch; PeptideProphetProbability
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
-    strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar
+    strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "MassShiftPPMClassRep" & strSepChar
     
     If ((GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA) Then
         blnIMSData = True
@@ -4328,8 +4331,10 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             Select Case .ClassRepType
             Case gldtCS
                 lngScanClassRep = GelData(nMyIndex).CSData(.ClassRepInd).ScanNumber
+                sngMassShiftPPMClassRep = GelData(nMyIndex).CSData(.ClassRepInd).MassShiftOverallPPM
             Case gldtIS
                 lngScanClassRep = GelData(nMyIndex).IsoData(.ClassRepInd).ScanNumber
+                sngMassShiftPPMClassRep = GelData(nMyIndex).IsoData(.ClassRepInd).MassShiftOverallPPM
             Case Else
                 Debug.Assert False
                 lngScanClassRep = (.MinScan + .MaxScan) / 2
@@ -4366,6 +4371,13 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             End If
         
             strLineOut = strLineOut & Round(ClsStat(lngUMCIndexOriginal, ustFitAverage), 3) & strSepChar
+            
+            If sngMassShiftPPMClassRep = 0 Then
+                strLineOut = strLineOut & "0" & strSepChar
+            Else
+                strLineOut = strLineOut & Round(sngMassShiftPPMClassRep, 3) & strSepChar
+            End If
+                                    
             
             If blnIMSData Then
                 strLineOut = strLineOut & Round(ClsStat(lngUMCIndexOriginal, ustDriftTime), 3) & strSepChar

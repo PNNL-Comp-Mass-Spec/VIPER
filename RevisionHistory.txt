@@ -1,5 +1,8 @@
 VIPER Change Log
 
+Version 3.47 - Build 425; March 10, 2010
+	- Copy All UMCs in View now includes column MassShiftPPMClassRep
+
 Version 3.47 - Build 424; March 3, 2010
 	- Now tracking the central drift time value for each UMC (LC-MS Feature) when processing IMS data
 	- Copy All UMCs in View now includes column IMS_Drift_Time
