@@ -49,9 +49,9 @@ Begin VB.Form frmGraph
          Top             =   240
          Visible         =   0   'False
          Width           =   3165
-         _extentx        =   5583
-         _extenty        =   3863
-         backcolor       =   -2147483633
+         _ExtentX        =   5583
+         _ExtentY        =   3863
+         BackColor       =   -2147483633
       End
    End
    Begin VB.Menu mnuFile 
@@ -1354,6 +1354,10 @@ End Sub
 Private Function ShowMSSpectrum(ByVal lngScanNumber As Long, ByVal blnIsMoverZ As Boolean, ByVal dblTargetMZ As Double, ByRef hScope As Integer, ByVal dblVisibleMZMinimum As Double, ByVal dblVisibleMZMaximum As Double, Optional blnInformUserOnError As Boolean = True) As Boolean
     Dim blnSuccess As Boolean
     
+    MsgBox "Sorry; MS Spectrum viewing is no longer available.", vbOKOnly, "Not Supported"
+    ShowMSSpectrum = False
+    Exit Function
+    
     Select Case GelStatus(nMyIndex).SourceDataRawFileType
     Case rfcZippedSFolders
         blnSuccess = ICR2LSLoadSpectrumViaCache(nMyIndex, lngScanNumber, blnIsMoverZ, dblTargetMZ, hScope, dblVisibleMZMinimum, dblVisibleMZMaximum)
@@ -1397,6 +1401,9 @@ Private Sub ShowMSSpectrumForAllSelected(ByVal blnSumSpectra As Boolean)
     Dim hScopeBase As Integer
     
 On Error GoTo ShowSpectrumErrorHandler
+
+    MsgBox "Sorry; MS Spectrum viewing is no longer available.", vbOKOnly, "Not Supported"
+    Exit Sub
 
     DetermineSourceDataRawFileType nMyIndex, False
     
@@ -1593,6 +1600,9 @@ Private Sub ShowMSSpectrumForPointNearestCursor()
     
 On Error GoTo ShowSpectrumErrorHandler
             
+    MsgBox "Sorry; MS Spectrum viewing is no longer available.", vbOKOnly, "Not Supported"
+    Exit Sub
+    
     blnIsMoverZ = False
     lngScanNumber = mLastCursorPosFN
     dblTargetMonoIsoMass = mLastCursorPosMass
@@ -1649,6 +1659,9 @@ Private Sub ShowMSSpectrumForLastID()
     Dim hScope As Integer
     
 On Error GoTo ShowSpectrumErrorHandler
+
+    MsgBox "Sorry; MS Spectrum viewing is no longer available.", vbOKOnly, "Not Supported"
+    Exit Sub
 
     With GelData(nMyIndex)
         Select Case LastType

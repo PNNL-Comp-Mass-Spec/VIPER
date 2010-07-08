@@ -492,7 +492,7 @@ err_LoadMassTags:
         
         ErrCnt = ErrCnt + 1
         If ErrCnt < 10 Then
-           LogErrors Err.Number, "LoadMassTags"
+           LogErrors Err.Number, "LoadMassTags", Err.Description
            Resume Next
         End If
         blnDBConnectionError = True

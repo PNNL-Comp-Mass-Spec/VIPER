@@ -1,5 +1,8 @@
 VIPER Change Log
 
+Version 3.47 - Build 426; May 11, 2010
+	- Removed ability to use ICR-2LS to view spectra (hasn't worked in a few years)
+
 Version 3.47 - Build 425; March 10, 2010
 	- Copy All UMCs in View now includes column MassShiftPPMClassRep
 

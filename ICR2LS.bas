@@ -41,6 +41,7 @@ Private mMSSpectraCache As clsMSSpectraCache
 
 Public Sub CleanICR2LS()
     On Error Resume Next
+    If objICR2LS Is Nothing Then Exit Sub
     objICR2LS.Kill
     Set objICR2LS = Nothing
     Set mMSSpectraCache = Nothing
@@ -239,6 +240,8 @@ Public Sub ICR2LSCloseAllScopes(blnConfirmClose As Boolean)
     Dim i As Integer
     Dim eResponse As VbMsgBoxResult
     
+    If objICR2LS Is Nothing Then Exit Sub
+    
     If blnConfirmClose Then
         eResponse = MsgBox("Close all ICR-2LS spectra windows?", vbQuestion + vbYesNoCancel + vbDefaultButton3, "Close Scopes")
         If eResponse <> VbMsgBoxResult.vbYes Then Exit Sub
@@ -300,6 +303,9 @@ End Function
 Public Sub ICR2LSLoadScope(ByVal FileName As String, ByRef hScope As Integer)
     Dim opScope As Integer
     On Error Resume Next
+    
+    If objICR2LS Is Nothing Then Exit Sub
+    
     hScope = objICR2LS.LoadScope(FileName)
     If Err.Number <> 0 Then
         hScope = -1
@@ -313,6 +319,9 @@ End Sub
 Private Sub ICR2LSLoadScopeMW(ByVal FileName As String, ByRef hScope As Integer, ByVal MW As Double, Optional ByVal dblZoomWidthMZLeft As Double = 1.25, Optional ByVal dblZoomWidthMZRight As Double = 3.75)
     Dim opScope As Integer
     On Error Resume Next
+    
+    If objICR2LS Is Nothing Then Exit Sub
+    
     hScope = objICR2LS.LoadScope(FileName)
     If Err.Number <> 0 Then
         hScope = -1
@@ -332,6 +341,8 @@ Private Sub ICR2LSLoadScopeMOverZ(ByVal FileName As String, ByVal MOverZ As Doub
     Dim opScope As Integer
     On Error Resume Next
     
+    If objICR2LS Is Nothing Then Exit Sub
+   
     hScope = objICR2LS.LoadScope(FileName)
     If Err.Number <> 0 Then
         hScope = -1
@@ -346,6 +357,8 @@ End Sub
 Private Sub ICR2LSLoadFinniganScopeMOverZ(ByVal RawFilePath As String, ByVal ScanNumber As Long, ByVal MOverZ As Double, ByRef hScope As Integer, Optional ByVal dblZoomWidthMZLeft As Double = 1.25, Optional ByVal dblZoomWidthMZRight As Double = 3.75)
     Dim opScope As Integer
     On Error Resume Next
+    
+    If objICR2LS Is Nothing Then Exit Sub
     
     If ScanNumber > 32768 Then
         MsgBox "ICR-2LS contains a programming error and cannot display scan numbers larger than 32,768.  If you need to do this, contact NavDeep Jaitly.", vbExclamation + vbOKOnly, "Error"

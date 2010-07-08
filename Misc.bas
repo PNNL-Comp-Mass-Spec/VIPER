@@ -315,7 +315,10 @@ SetSelColorObjects
 CreateOlyBackClrObject OlyOptions.BackColor
 CreateOlyForeClrObject OlyOptions.ForeColor
 SetDDRColorObjects
-InitICR2LS
+
+' No longer instantiating the ICR-2LS object
+''InitICR2LS
+
 ' Unused function (September 2006)
 ''InitMwtWin
 ValidateDotNETDLLs
