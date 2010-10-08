@@ -523,6 +523,7 @@ On Error Resume Next
 
 'always reinitialize statistics arrays
 InitAMTStat
+GelData(CallerID).MostRecentSearchUsedSTAC = False
 samtDef.Formula = Trim$(txtNETFormula.Text)
 Me.MousePointer = vbHourglass
 If samtDef.MassTag > 0 Then

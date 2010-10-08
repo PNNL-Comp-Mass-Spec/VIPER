@@ -36,7 +36,7 @@ Public Type udtPutUMCParamsListType
     UMCResultsIDReturn As ADODB.Parameter           ' Return value of the index of the row just added
     ClassStatsChargeBasis As ADODB.Parameter        ' Charge state of the charge group used for determing Class Mass and Class Abundance when GelUMC().def.UMCClassStatsUseStatsFromMostAbuChargeState = True; Otherwise use 0
     InternalStdCount As ADODB.Parameter             ' The number of Internal Standards that this UMC matched
-
+    DriftTime As ADODB.Parameter                    ' IMS Drift Time
 ' Future parameters
 ''    LabellingEfficiencyF As ADODB.Parameter
 ''    LogERCorrectedForF As ADODB.Parameter           ' Base-2 log
@@ -68,6 +68,7 @@ Public Type udtPutUMCMatchParamsListType
     MassTagMods As ADODB.Parameter
     MassTagModMass As ADODB.Parameter
     DelMatchScore As ADODB.Parameter
+    UniquenessProbability As ADODB.Parameter
 End Type
 
 Public Type udtPutUMCInternalStdMatchParamsListType
@@ -78,6 +79,7 @@ Public Type udtPutUMCInternalStdMatchParamsListType
     MatchState As ADODB.Parameter
     ExpectedNET As ADODB.Parameter
     DelMatchScore As ADODB.Parameter
+    UniquenessProbability As ADODB.Parameter
 End Type
 
 Public Type udtPutUMCCSStatsParamsListType
@@ -94,7 +96,15 @@ Private Const MASS_PRECISION = 6
 Private Const FIT_PRECISION = 3
 Private Const NET_PRECISION = 5
 
-Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Connection, ByRef lngMDID As Long, ByVal ExpAnalysisSPName As String, ByVal lngGelIndex As Long, ByVal lngMatchHitCount As Long, ByVal blnUsedCustomNETs As Boolean, Optional ByVal blnSetStateToOK As Boolean = True, Optional ByVal strIniFileName As String = "") As Long
+Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Connection, _
+                                                      ByRef lngMDID As Long, _
+                                                      ByVal ExpAnalysisSPName As String, _
+                                                      ByVal lngGelIndex As Long, _
+                                                      ByVal lngMatchHitCount As Long, _
+                                                      ByVal blnUsedCustomNETs As Boolean, _
+                                                      Optional ByVal blnSetStateToOK As Boolean = True, _
+                                                      Optional ByVal strIniFileName As String = "") As Long
+                                                      
     ' Returns 0 if success, the error number if an error
     
     Dim cmdPutNewMM As New ADODB.Command
@@ -143,6 +153,7 @@ Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Conne
     Dim prmLimitToPMTsFromDataset As New ADODB.Parameter        ' 1 if the MT tags were limited to only come from the dataset associated with the loaded job
     
     Dim prmMinimumPeptideProphetProbability As New ADODB.Parameter  ' Minimum Peptide Prophet Probability for MT tags loaded from database
+    Dim prmMatchScoreMode As New ADODB.Parameter                ' 0 if .UseStac = False; 1 if .UseStac = True
     
     Dim strEntryInAnalysisHistory As String, lngValueFromAnalysisHistory As Long
     Dim strNetAdjUMCsWithDBHits As String
@@ -155,7 +166,8 @@ Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Conne
     
     Dim lngGelScanNumberMin As Long, lngGelScanNumberMax As Long
     Dim dblMassCalPPMShift As Double
-
+    Dim intMatchScoreMode As Integer
+    
 On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
 
     ' First, write new analysis in T_Match_Making_Description table
@@ -399,6 +411,15 @@ On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
     Set prmMinimumPeptideProphetProbability = cmdPutNewMM.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamInput, , CurrMTFilteringOptions.MinimumPeptideProphetProbability)
     cmdPutNewMM.Parameters.Append prmMinimumPeptideProphetProbability
     
+    If GelData(lngGelIndex).MostRecentSearchUsedSTAC Then
+        ' We used STAC for the search
+        intMatchScoreMode = 1
+    Else
+        intMatchScoreMode = 0
+    End If
+    
+    Set prmMatchScoreMode = cmdPutNewMM.CreateParameter("MatchScoreMode", adTinyInt, adParamInput, , intMatchScoreMode)
+    cmdPutNewMM.Parameters.Append prmMatchScoreMode
 
     ' Call the SP
     cmdPutNewMM.Execute
@@ -467,6 +488,7 @@ With udtPutUMCParams
     Set .UMCResultsIDReturn = New ADODB.Parameter
     Set .ClassStatsChargeBasis = New ADODB.Parameter
     Set .InternalStdCount = New ADODB.Parameter
+    Set .DriftTime = New ADODB.Parameter
 
 ' Future parameters
 ''    Set .LabellingEfficiencyF = New ADODB.Parameter
@@ -555,6 +577,9 @@ With udtPutUMCParams
     Set .MemberCountUsedForAbu = cmdPutNewUMC.CreateParameter("MemberCountUsedForAbu", adInteger, adParamInput, , 0)
     cmdPutNewUMC.Parameters.Append .MemberCountUsedForAbu
 
+    Set .DriftTime = cmdPutNewUMC.CreateParameter("DriftTime", adSingle, adParamInput, , 0)
+    cmdPutNewUMC.Parameters.Append .DriftTime
+    
 ' Future parameters
 ''    Set .LabellingEfficiencyF = cmdPutNewUMC.CreateParameter("LabellingEfficiencyF", adSingle, adParamInput, , 0)
 ''    cmdPutNewUMC.Parameters.Append .LabellingEfficiencyF
@@ -635,6 +660,7 @@ With udtPutUMCMatchParams
     Set .MassTagMods = New ADODB.Parameter
     Set .MassTagModMass = New ADODB.Parameter
     Set .DelMatchScore = New ADODB.Parameter
+    Set .UniquenessProbability = New ADODB.Parameter
     
     Set .UMCResultsID = cmdPutNewUMCMatch.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
     cmdPutNewUMCMatch.Parameters.Append .UMCResultsID
@@ -667,7 +693,7 @@ With udtPutUMCMatchParams
     Set .MassTagMods = cmdPutNewUMCMatch.CreateParameter("MassTagMods", adVarChar, adParamInput, PUT_UMC_MATCH_MAX_MODSTRING_LENGTH, "")
     cmdPutNewUMCMatch.Parameters.Append .MassTagMods
     
-    Set .MassTagModMass = cmdPutNewUMCMatch.CreateParameter("MassTagModMass", adDouble, adParamInput, , 0)
+    Set .MassTagModMass = cmdPutNewUMCMatch.CreateParameter("MassTagModMass", adSingle, adParamInput, , 0)
     cmdPutNewUMCMatch.Parameters.Append .MassTagModMass
    
     Set .DelMatchScore = cmdPutNewUMCMatch.CreateParameter("DelMatchScore", adDecimal, adParamInput)
@@ -678,6 +704,9 @@ With udtPutUMCMatchParams
     End With
     cmdPutNewUMCMatch.Parameters.Append .DelMatchScore
    
+    Set .UniquenessProbability = cmdPutNewUMCMatch.CreateParameter("UniquenessProbability", adSingle, adParamInput, , 0)
+    cmdPutNewUMCMatch.Parameters.Append .UniquenessProbability
+    
 End With
 
 End Sub
@@ -695,6 +724,7 @@ With udtPutUMCInternalStdMatchParams
     Set .MatchState = New ADODB.Parameter
     Set .ExpectedNET = New ADODB.Parameter
     Set .DelMatchScore = New ADODB.Parameter
+    Set .UniquenessProbability = New ADODB.Parameter
     
     Set .UMCResultsID = cmPutNewUMCInternalStdMatch.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
     cmPutNewUMCInternalStdMatch.Parameters.Append .UMCResultsID
@@ -727,6 +757,9 @@ With udtPutUMCInternalStdMatchParams
     End With
     cmPutNewUMCInternalStdMatch.Parameters.Append .DelMatchScore
    
+    Set .UniquenessProbability = cmPutNewUMCInternalStdMatch.CreateParameter("UniquenessProbability", adSingle, adParamInput, , 0)
+    cmPutNewUMCInternalStdMatch.Parameters.Append .UniquenessProbability
+    
 End With
 
 End Sub
@@ -807,12 +840,20 @@ On Error GoTo AddUMCErrorHandler
     udtPutUMCParams.UMCInd.Value = lngUMCIndexOriginal
     
     With GelUMC(lngGelIndex).UMCs(lngUMCIndexOriginal)
-        udtPutUMCParams.MemberCount.Value = .ClassCount
+        If .ClassCountPredefinedLCMSFeatures > .ClassCount Then
+            ' Use the class-count value stored in .ClassCountPredefinedLCMSFeatures
+            ' This value gets populated when we read in features from a _LCMSFeatures.txt file
+            udtPutUMCParams.MemberCount.Value = .ClassCountPredefinedLCMSFeatures
+        Else
+            udtPutUMCParams.MemberCount.Value = .ClassCount
+        End If
         
         udtPutUMCParams.ScanFirst.Value = .MinScan
         udtPutUMCParams.ScanLast.Value = .MaxScan
         
         udtPutUMCParams.ClassMass.Value = Round(.ClassMW, MASS_PRECISION)
+        
+        udtPutUMCParams.UMCScore.Value = .ClassScore
         
         udtPutUMCParams.MonoisotopicMassMin.Value = Round(.MinMW, MASS_PRECISION)
         udtPutUMCParams.MonoisotopicMassMax.Value = Round(.MaxMW, MASS_PRECISION)
@@ -823,19 +864,26 @@ On Error GoTo AddUMCErrorHandler
         ' Thus, the following may possibly be False
         Debug.Assert Round(udtPutUMCParams.MonoisotopicMassStDev.Value, 1) = Round(.ClassMWStD, 1)
         
-        Select Case .ClassRepType
-        Case glCSType
-            udtPutUMCParams.ScanMaxAbundance.Value = GelData(lngGelIndex).CSData(.ClassRepInd).ScanNumber
-            udtPutUMCParams.MonoisotopicMassMaxAbu.Value = Round(GelData(lngGelIndex).CSData(.ClassRepInd).AverageMW, MASS_PRECISION)
-            udtPutUMCParams.ChargeStateMaxAbu.Value = GelData(lngGelIndex).CSData(.ClassRepInd).Charge
-            udtPutUMCParams.AbundanceMax.Value = GelData(lngGelIndex).CSData(.ClassRepInd).Abundance
-            
-        Case glIsoType
-            udtPutUMCParams.ScanMaxAbundance.Value = GelData(lngGelIndex).IsoData(.ClassRepInd).ScanNumber
-            udtPutUMCParams.MonoisotopicMassMaxAbu.Value = Round(GelData(lngGelIndex).IsoData(.ClassRepInd).MonoisotopicMW, MASS_PRECISION)
-            udtPutUMCParams.ChargeStateMaxAbu.Value = GelData(lngGelIndex).IsoData(.ClassRepInd).Charge
-            udtPutUMCParams.AbundanceMax.Value = GelData(lngGelIndex).IsoData(.ClassRepInd).Abundance
-        End Select
+        If .ClassRepInd > 0 Then
+            Select Case .ClassRepType
+            Case glCSType
+                udtPutUMCParams.ScanMaxAbundance.Value = GelData(lngGelIndex).CSData(.ClassRepInd).ScanNumber
+                udtPutUMCParams.MonoisotopicMassMaxAbu.Value = Round(GelData(lngGelIndex).CSData(.ClassRepInd).AverageMW, MASS_PRECISION)
+                udtPutUMCParams.ChargeStateMaxAbu.Value = GelData(lngGelIndex).CSData(.ClassRepInd).Charge
+                udtPutUMCParams.AbundanceMax.Value = GelData(lngGelIndex).CSData(.ClassRepInd).Abundance
+                
+            Case glIsoType
+                udtPutUMCParams.ScanMaxAbundance.Value = GelData(lngGelIndex).IsoData(.ClassRepInd).ScanNumber
+                udtPutUMCParams.MonoisotopicMassMaxAbu.Value = Round(GelData(lngGelIndex).IsoData(.ClassRepInd).MonoisotopicMW, MASS_PRECISION)
+                udtPutUMCParams.ChargeStateMaxAbu.Value = GelData(lngGelIndex).IsoData(.ClassRepInd).Charge
+                udtPutUMCParams.AbundanceMax.Value = GelData(lngGelIndex).IsoData(.ClassRepInd).Abundance
+            End Select
+        Else
+            udtPutUMCParams.ScanMaxAbundance.Value = 0
+            udtPutUMCParams.MonoisotopicMassMaxAbu.Value = Round(.ClassMW, MASS_PRECISION)
+            udtPutUMCParams.ChargeStateMaxAbu.Value = 0
+            udtPutUMCParams.AbundanceMax.Value = .ClassAbundance
+        End If
         
         udtPutUMCParams.ExpressionRatio.Value = Round(udtPairMatchStats.ExpressionRatio, 6)
         udtPutUMCParams.ExpressionRatioStDev.Value = Round(udtPairMatchStats.ExpressionRatioStDev, 6)
@@ -874,7 +922,14 @@ On Error GoTo AddUMCErrorHandler
         udtPutUMCParams.FitStDev.Value = Round(ClsStat(lngUMCIndexOriginal, ustFitStDev), FIT_PRECISION)
         
         ' Convert from scan number to NET
-        udtPutUMCParams.ElutionTime.Value = Round(ScanToGANET(lngGelIndex, udtPutUMCParams.ScanMaxAbundance.Value), NET_PRECISION)
+        If udtPutUMCParams.ScanMaxAbundance.Value > 0 Then
+            udtPutUMCParams.ElutionTime.Value = Round(ScanToGANET(lngGelIndex, udtPutUMCParams.ScanMaxAbundance.Value), NET_PRECISION)
+        Else
+            ' This shouldn't happen
+            Debug.Assert False
+            udtPutUMCParams.ElutionTime.Value = .ClassNET       ' ClassNET is likely zero at present
+        End If
+        
         
         udtPutUMCParams.PeakFPRType.Value = lngPeakFPRType
         udtPutUMCParams.MassTagHitCount.Value = lngMassTagHitCount
@@ -890,6 +945,8 @@ On Error GoTo AddUMCErrorHandler
 
         udtPutUMCParams.InternalStdCount.Value = lngInternalStdMatchCount
     
+        udtPutUMCParams.DriftTime.Value = .DriftTime
+        
 ' Future parameters
 ''        udtPutUMCParams.LabellingEfficiencyF = udtPairMatchStats.LabellingEfficiencyF
 ''        udtPutUMCParams.LogERCorrectedForF = udtPairMatchStats.LogERCorrectedForF
@@ -942,6 +999,7 @@ Private Sub ExportMTDBAddUMCCSStatsRow( _
 
     Dim intChargeIndex As Integer
     Dim lngClassMIndexPointer As Long
+    Dim sngDriftTime As Single
     
 On Error GoTo AddUMCCSStatsErrorHandler
 
@@ -963,19 +1021,47 @@ On Error GoTo AddUMCCSStatsErrorHandler
             lngClassMIndexPointer = .ChargeStateBasedStats(intChargeIndex).GroupRepIndex
              
             If lngClassMIndexPointer < 0 Then
-                udtPutUMCCSStatsParams.ElutionTime = 0
-                udtPutUMCCSStatsParams.DriftTime = 0
+                Debug.Assert False
+                udtPutUMCCSStatsParams.ElutionTime = .ClassNET      ' ClassNET is likely zero at present
+                udtPutUMCCSStatsParams.DriftTime = .DriftTime       ' Use the class-based drift time; however, if we loaded predefined LC-MS features, then it should be defined
             Else
-                Select Case .ClassMType(lngClassMIndexPointer)
-                Case glCSType
-                    udtPutUMCCSStatsParams.ElutionTime = Round(ScanToGANET(lngGelIndex, GelData(lngGelIndex).CSData(.ClassMInd(lngClassMIndexPointer)).ScanNumber), NET_PRECISION)
-                    udtPutUMCCSStatsParams.DriftTime = GelData(lngGelIndex).CSData(lngClassMIndexPointer).IMSDriftTime
+                If lngClassMIndexPointer <= UBound(.ClassMType) Then
+                    Select Case .ClassMType(lngClassMIndexPointer)
+                    Case glCSType
+                        udtPutUMCCSStatsParams.ElutionTime = Round(ScanToGANET(lngGelIndex, GelData(lngGelIndex).CSData(.ClassMInd(lngClassMIndexPointer)).ScanNumber), NET_PRECISION)
+                        sngDriftTime = GelData(lngGelIndex).CSData(lngClassMIndexPointer).IMSDriftTime
+                    
+                    Case glIsoType
+                        udtPutUMCCSStatsParams.ElutionTime = Round(ScanToGANET(lngGelIndex, GelData(lngGelIndex).IsoData(.ClassMInd(lngClassMIndexPointer)).ScanNumber), NET_PRECISION)
+                        sngDriftTime = GelData(lngGelIndex).IsoData(lngClassMIndexPointer).IMSDriftTime
+                        
+                    Case Else
+                        sngDriftTime = 0
+                    End Select
+                Else
+                    ' This shouldn't happen; lngMemberIndex is invalid
+                    Debug.Assert False
+                    udtPutUMCCSStatsParams.ElutionTime = .ClassNET
+                    sngDriftTime = 0
+                End If
                 
-                Case glIsoType
-                    udtPutUMCCSStatsParams.ElutionTime = Round(ScanToGANET(lngGelIndex, GelData(lngGelIndex).IsoData(.ClassMInd(lngClassMIndexPointer)).ScanNumber), NET_PRECISION)
-                    udtPutUMCCSStatsParams.DriftTime = GelData(lngGelIndex).IsoData(lngClassMIndexPointer).IMSDriftTime
+                If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures And GelUMC(lngGelIndex).def.OnePointPerLCMSFeature Then
                 
-                End Select
+                    ' Check this code for IMS data
+                    Debug.Assert False
+                
+                    ' Loaded predefined LC-MS features and only loaded one point per feature
+                    ' Favor the class-based drift time
+                    If .DriftTime > 0 Then sngDriftTime = .DriftTime
+                End If
+                
+                If sngDriftTime = 0 And .DriftTime > 0 Then
+                    ' Use the class-based drift time since sngDriftTime is 0
+                    udtPutUMCCSStatsParams.DriftTime = .DriftTime
+                Else
+                    udtPutUMCCSStatsParams.DriftTime = sngDriftTime
+                End If
+                
             End If
             
             cmdPutNewUMCCSStats.Execute
@@ -1020,36 +1106,42 @@ On Error GoTo AddUMCMembersErrorHandler
             udtPutUMCMemberParams.IndexInUMC = lngMemberIndex
             lngDataIndex = .ClassMInd(lngMemberIndex)
             
-            Select Case .ClassMType(lngMemberIndex)
-            Case gldtCS
-                udtPutUMCMemberParams.MemberTypeID = gldtCS
-            
-                udtPutUMCMemberParams.ScanNumber = GelData(lngGelIndex).CSData(lngDataIndex).ScanNumber
-            
-                udtPutUMCMemberParams.MZ = GelData(lngGelIndex).CSData(lngDataIndex).AverageMW
-                udtPutUMCMemberParams.ChargeState = GelData(lngGelIndex).CSData(lngDataIndex).Charge
-                udtPutUMCMemberParams.MonoisotopicMass = GelData(lngGelIndex).CSData(lngDataIndex).AverageMW
-                udtPutUMCMemberParams.Abundance = GelData(lngGelIndex).CSData(lngDataIndex).Abundance
-                udtPutUMCMemberParams.IsotopicFit = GelData(lngGelIndex).CSData(lngDataIndex).MassStDev
-                udtPutUMCMemberParams.ElutionTime = ScanToGANET(lngGelIndex, GelData(lngGelIndex).CSData(lngDataIndex).ScanNumber)
-            
-            Case gldtIS
-                udtPutUMCMemberParams.MemberTypeID = gldtIS
-            
-                udtPutUMCMemberParams.ScanNumber = GelData(lngGelIndex).IsoData(lngDataIndex).ScanNumber
-            
-                udtPutUMCMemberParams.MZ = GelData(lngGelIndex).IsoData(lngDataIndex).MZ
-                udtPutUMCMemberParams.ChargeState = GelData(lngGelIndex).IsoData(lngDataIndex).Charge
-                udtPutUMCMemberParams.MonoisotopicMass = GelData(lngGelIndex).IsoData(lngDataIndex).MonoisotopicMW
-                udtPutUMCMemberParams.Abundance = GelData(lngGelIndex).IsoData(lngDataIndex).Abundance
-                udtPutUMCMemberParams.IsotopicFit = GelData(lngGelIndex).IsoData(lngDataIndex).Fit
-                udtPutUMCMemberParams.ElutionTime = ScanToGANET(lngGelIndex, GelData(lngGelIndex).IsoData(lngDataIndex).ScanNumber)
-            
-            Case Else
-                ' This shouldn't happen; don't export data point if .ClassMType(lngMemberIndex) = 0
+            If lngMemberIndex <= UBound(.ClassMType) Then
+                Select Case .ClassMType(lngMemberIndex)
+                Case gldtCS
+                    udtPutUMCMemberParams.MemberTypeID = gldtCS
+                
+                    udtPutUMCMemberParams.ScanNumber = GelData(lngGelIndex).CSData(lngDataIndex).ScanNumber
+                
+                    udtPutUMCMemberParams.MZ = GelData(lngGelIndex).CSData(lngDataIndex).AverageMW
+                    udtPutUMCMemberParams.ChargeState = GelData(lngGelIndex).CSData(lngDataIndex).Charge
+                    udtPutUMCMemberParams.MonoisotopicMass = GelData(lngGelIndex).CSData(lngDataIndex).AverageMW
+                    udtPutUMCMemberParams.Abundance = GelData(lngGelIndex).CSData(lngDataIndex).Abundance
+                    udtPutUMCMemberParams.IsotopicFit = GelData(lngGelIndex).CSData(lngDataIndex).MassStDev
+                    udtPutUMCMemberParams.ElutionTime = ScanToGANET(lngGelIndex, GelData(lngGelIndex).CSData(lngDataIndex).ScanNumber)
+                
+                Case gldtIS
+                    udtPutUMCMemberParams.MemberTypeID = gldtIS
+                
+                    udtPutUMCMemberParams.ScanNumber = GelData(lngGelIndex).IsoData(lngDataIndex).ScanNumber
+                
+                    udtPutUMCMemberParams.MZ = GelData(lngGelIndex).IsoData(lngDataIndex).MZ
+                    udtPutUMCMemberParams.ChargeState = GelData(lngGelIndex).IsoData(lngDataIndex).Charge
+                    udtPutUMCMemberParams.MonoisotopicMass = GelData(lngGelIndex).IsoData(lngDataIndex).MonoisotopicMW
+                    udtPutUMCMemberParams.Abundance = GelData(lngGelIndex).IsoData(lngDataIndex).Abundance
+                    udtPutUMCMemberParams.IsotopicFit = GelData(lngGelIndex).IsoData(lngDataIndex).Fit
+                    udtPutUMCMemberParams.ElutionTime = ScanToGANET(lngGelIndex, GelData(lngGelIndex).IsoData(lngDataIndex).ScanNumber)
+                
+                Case Else
+                    ' This shouldn't happen; don't export data point if .ClassMType(lngMemberIndex) = 0
+                    Debug.Assert False
+                    udtPutUMCMemberParams.MemberTypeID = 0
+                End Select
+            Else
+                 ' This shouldn't happen; lngMemberIndex is invalid
                 Debug.Assert False
                 udtPutUMCMemberParams.MemberTypeID = 0
-            End Select
+            End If
             
             If udtPutUMCMemberParams.MemberTypeID > 0 Then
             

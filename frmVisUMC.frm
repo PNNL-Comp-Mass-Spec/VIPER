@@ -1430,7 +1430,12 @@ If NeedToSave Then
       GelUMC(CallerID) = tmp
       
       ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-      UpdateUMCStatArrays CallerID, True, False, Me
+      
+      ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
+      Dim blnComputeClassMassAndAbundance As Boolean
+      blnComputeClassMassAndAbundance = True
+              
+      UpdateUMCStatArrays CallerID, blnComputeClassMassAndAbundance, False, Me
       
       GelP_D_L(CallerID).SyncWithUMC = PairsUMCInSync
       AddToAnalysisHistory CallerID, mChangeList, False

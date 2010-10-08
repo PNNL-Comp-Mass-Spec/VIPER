@@ -351,24 +351,23 @@ Public Function LoadMassTags(ByVal lngGelIndex As Long, frmCallingForm As VB.For
                 ' MonroeMod: Store -1 as the Mass value when the MT tag Mass value is Null
                AMTData(AMTCnt).MW = FixNullDbl(.Fields(2).Value, MASS_VALUE_IF_NULL)
                 
-    ''           If blnUseTheoreticalNETs Then
-    ''               AMTData(AMTCnt).NET = LookupPredictedGANET(AMTData(AMTCnt).Sequence)
-    ''               AMTData(AMTCnt).NETStDev = 0
-    ''               AMTData(AMTCnt).MSMSObsCount = 10            ' We set observation count to 10 when loading from Legacy DBs since MS Warp penalizes MT tags with an Obs Count < 5 and we don't want to allow that to happen for Legacy DB data
-    ''           Else
-                   ' MonroeMod: Store -100000 as the NET value when the MT tag NET value is Null
-                   AMTData(AMTCnt).NET = FixNullDbl(.Fields(3).Value, NET_VALUE_IF_NULL)
-                   AMTData(AMTCnt).NETStDev = FixNullDbl(.Fields(6).Value, 0)
-                   AMTData(AMTCnt).MSMSObsCount = FixNullLng(.Fields(8).Value, 1)
-    ''           End If
+                ' MonroeMod: Store -100000 as the NET value when the MT tag NET value is Null
+                AMTData(AMTCnt).NET = FixNullDbl(.Fields(3).Value, NET_VALUE_IF_NULL)
+                AMTData(AMTCnt).NETStDev = FixNullDbl(.Fields(6).Value, 0)
+                
+               'AMTData(AMTCnt).NETCount = FixNullLng(.Fields("Cnt_GANET").Value, 0)
+               AMTData(AMTCnt).NETCount = FixNullLng(.Fields(12).Value, 0)
+                
+                AMTData(AMTCnt).MSMSObsCount = FixNullLng(.Fields(8).Value, 1)
                
                AMTData(AMTCnt).PNET = .Fields(4).Value         ' Field PNET in the database
                
         ' MonroeMod: the NitrogenCount() Function replaces the ELCount Function
-        ''     AMTData(AMTCnt).CNT_N = ELCount(AMTData(AMTCnt).Sequence, "N")         'look for nitrogen, provided objICR2LS.GetMF() works
                AMTData(AMTCnt).CNT_N = NitrogenCount(AMTData(AMTCnt).Sequence)
                 
                AMTData(AMTCnt).CNT_Cys = AACount(AMTData(AMTCnt).Sequence, "C")       'look for cysteine
+               
+               ' Advance to the next row
                .MoveNext
         
         ' MonroeMod: Possibly skip MT tags with null mass values or null NET values
@@ -484,7 +483,7 @@ err_LoadMassTags:
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             MsgBox "Error loading MT tags from the database. Error could " _
                  & "have been caused by network/server issues(timeout) so you " _
-                 & "might try loading again with Refresh function.", vbOKOnly, glFGTU
+                 & "might try loading again with Refresh function: " & Err.Description, vbOKOnly, glFGTU
         End If
         blnDBConnectionError = True
     Case Else

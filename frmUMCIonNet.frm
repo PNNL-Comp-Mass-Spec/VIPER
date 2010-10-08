@@ -32,11 +32,10 @@ Begin VB.Form frmUMCIonNet
       _ExtentY        =   8916
       _Version        =   393216
       Style           =   1
-      Tab             =   2
       TabHeight       =   520
       TabCaption(0)   =   "1. Find Connections"
       TabPicture(0)   =   "frmUMCIonNet.frx":0000
-      Tab(0).ControlEnabled=   0   'False
+      Tab(0).ControlEnabled=   -1  'True
       Tab(0).Control(0)=   "lblLCMSFeatureFinderInfo"
       Tab(0).Control(0).Enabled=   0   'False
       Tab(0).Control(1)=   "fraNet(0)"
@@ -57,19 +56,18 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "Frame1"
-      Tab(1).Control(1)=   "lblFilterConnections"
+      Tab(1).Control(0)=   "lblFilterConnections"
+      Tab(1).Control(1)=   "Frame1"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
-      Tab(2).ControlEnabled=   -1  'True
+      Tab(2).ControlEnabled=   0   'False
       Tab(2).Control(0)=   "fraNet(1)"
-      Tab(2).Control(0).Enabled=   0   'False
       Tab(2).ControlCount=   1
       Begin VB.CheckBox chkRequireMatchingIsotopeTag 
          Caption         =   "Require matching isotope label tag (e.g. N14 or N15); if enabled, stores mono mass for N14 and average mass for N15"
          Height          =   375
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   152
          Top             =   3720
          Width           =   5385
@@ -77,7 +75,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.CommandButton cmdFindConnectionsThenUMCs 
          Caption         =   "&Find Connections then LC-MS Features"
          Height          =   615
-         Left            =   -66720
+         Left            =   8280
          TabIndex        =   58
          ToolTipText     =   "Create Net based on current settings, then Find LC-MS Features"
          Top             =   3840
@@ -86,7 +84,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.CommandButton cmdAbortFindConnections 
          Caption         =   "Abort!"
          Height          =   375
-         Left            =   -66120
+         Left            =   8880
          TabIndex        =   151
          Top             =   3960
          Width           =   975
@@ -94,7 +92,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraDREAMS 
          Caption         =   "DREAMS Options"
          Height          =   1935
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   4
          Top             =   1560
          Width           =   1815
@@ -139,7 +137,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.CheckBox chkUseLCMSFeatureFinder 
          Caption         =   "Use LCMSFeatureFinder external app"
          Height          =   255
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   147
          Top             =   4200
          Value           =   1  'Checked
@@ -148,7 +146,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraUMCScope 
          Caption         =   "Definition Scope"
          Height          =   975
-         Left            =   -74880
+         Left            =   120
          TabIndex        =   1
          Top             =   420
          Width           =   1815
@@ -222,7 +220,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   4455
          Index           =   1
-         Left            =   120
+         Left            =   -74880
          TabIndex        =   65
          Top             =   360
          Width           =   10695
@@ -413,7 +411,6 @@ Begin VB.Form frmUMCIonNet
             TabPicture(0)   =   "frmUMCIonNet.frx":0058
             Tab(0).ControlEnabled=   0   'False
             Tab(0).Control(0)=   "fraOptionFrame(0)"
-            Tab(0).Control(0).Enabled=   0   'False
             Tab(0).ControlCount=   1
             TabCaption(1)   =   "Split Features Options"
             TabPicture(1)   =   "frmUMCIonNet.frx":0074
@@ -424,8 +421,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassAbundanceTopX"
-            Tab(2).Control(1)=   "fraClassMassTopX"
+            Tab(2).Control(0)=   "fraClassMassTopX"
+            Tab(2).Control(1)=   "fraClassAbundanceTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -948,7 +945,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Frame fraNet 
          Height          =   3255
          Index           =   0
-         Left            =   -72960
+         Left            =   2040
          TabIndex        =   9
          Top             =   420
          Width           =   8535
@@ -1406,7 +1403,7 @@ Begin VB.Form frmUMCIonNet
       Begin VB.Label lblLCMSFeatureFinderInfo 
          Caption         =   $"frmUMCIonNet.frx":00AC
          Height          =   405
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   148
          Top             =   4440
          Width           =   5415
@@ -1463,8 +1460,11 @@ Private Const HUMCInUse As Byte = 1
 Private Const HUMCUsed As Byte = 2
 
 Private Const LCMS_FEATURE_FINDER_APP_NAME As String = "LCMSFeatureFinder.exe"
-Private Const LCMS_FEATURE_FINDER_ISOTOPE_FEATURES_FILE As String = "Tmp_Export_LCMSFeaturesToSearch.txt"
-Private Const LCMS_FEATURE_FINDER_INI_FILE As String = "Tmp_Export_LCMSFeaturesToSearch.ini"
+Private Const LCMS_FEATURE_FINDER_ISOTOPE_FEATURES_FILE As String = "Tmp_Export_LCMSFeaturesToSearch"
+Private Const LCMS_FEATURE_FINDER_INI_FILE As String = "Tmp_Export_LCMSFeaturesToSearch"
+
+Private Const TEMP_FILE_FLAG As String = "FILE"
+Private Const TEMP_FOLDER_FLAG As String = "FOLDER"
 
 Private CallerID As Long
 Private bLoading As Boolean
@@ -1519,6 +1519,9 @@ Private mLCMSResultsMappingUMCs() As Long
 Private mLCMSResultsMappingDataIndices() As Long
 
 Private mSplitUMCs As clsSplitUMCsByAbundance
+
+Private mFFSessionID As String
+Private mTempFilesToDelete As Dictionary
 
 Private mAbortProcess As Boolean
 Private mCalculating As Boolean
@@ -1805,6 +1808,41 @@ Resume Next
 
 End Sub
 
+
+Private Sub DeleteTempFiles()
+
+    Dim lngIndex As Long
+    Dim objKeys() As Variant
+    
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo DeleteTempFilesErrorHandler
+    
+    If mTempFilesToDelete.Count > 0 Then
+        objKeys = mTempFilesToDelete.Keys
+        For lngIndex = 0 To mTempFilesToDelete.Count - 1
+            If CStr(mTempFilesToDelete.Item(objKeys(lngIndex))) = TEMP_FOLDER_FLAG Then
+                ' This is a folder
+                If fso.FolderExists(objKeys(lngIndex)) Then
+                    fso.DeleteFolder objKeys(lngIndex), True
+                End If
+            Else
+                ' This is a file
+                If fso.FileExists(objKeys(lngIndex)) Then
+                    fso.DeleteFile objKeys(lngIndex)
+                End If
+            End If
+        Next lngIndex
+    End If
+    
+    Exit Sub
+
+DeleteTempFilesErrorHandler:
+    Debug.Assert False
+    Resume Next
+    
+End Sub
+
 Private Sub DisplayCurrentOptions()
     Dim blnLoadingSaved As Boolean
     
@@ -2007,7 +2045,14 @@ LogErrors Err.Number, "frmUMCIonNet->EliminateLongConnections_NET"
 Resume Next
 End Function
 
-Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, ByRef strLCMSFeaturesFilePath As String, ByRef strIniFilePath As String, ByVal intOddEvenIteration As Integer, ByVal intIsotopeTagIndex As Integer, ByRef eIsotopeTagList() As iltIsotopeLabelTagConstants) As Boolean
+Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, _
+                                          ByVal strFFSessionID As String, _
+                                          ByRef strLCMSFeaturesFilePath As String, _
+                                          ByRef strIniFilePath As String, _
+                                          ByVal intOddEvenIteration As Integer, _
+                                          ByVal intIsotopeTagIndex As Integer, _
+                                          ByRef eIsotopeTagList() As iltIsotopeLabelTagConstants) As Boolean
+                                          
     Const COL_DELIMITER As String = vbTab
     
     Dim lngIndex As Long
@@ -2065,8 +2110,12 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     End If
 
     ' Write out the data in view
-    strLCMSFeaturesFilePath = fso.BuildPath(strOutputFolder, LCMS_FEATURE_FINDER_ISOTOPE_FEATURES_FILE)
+    strLCMSFeaturesFilePath = fso.BuildPath(strOutputFolder, LCMS_FEATURE_FINDER_ISOTOPE_FEATURES_FILE & strFFSessionID & ".txt")
     Set tsOutfile = fso.CreateTextFile(strLCMSFeaturesFilePath, True)
+    
+    If Not mTempFilesToDelete.Exists(strLCMSFeaturesFilePath) Then
+        mTempFilesToDelete.add strLCMSFeaturesFilePath, TEMP_FILE_FLAG
+    End If
     
     ' Write the header line
     strLineOut = "scan_num" & COL_DELIMITER & _
@@ -2155,8 +2204,12 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     ChangeStatus "Exporting parameters for finding LC-MS features with external application"
     
      ' Write out the parameters to use to find the LC-MS Features
-    strIniFilePath = fso.BuildPath(strOutputFolder, LCMS_FEATURE_FINDER_INI_FILE)
+    strIniFilePath = fso.BuildPath(strOutputFolder, LCMS_FEATURE_FINDER_INI_FILE & strFFSessionID & ".ini")
     Set tsOutfile = fso.CreateTextFile(strIniFilePath, True)
+    
+    If Not mTempFilesToDelete.Exists(strIniFilePath) Then
+        mTempFilesToDelete.add strIniFilePath, TEMP_FILE_FLAG
+    End If
     
     tsOutfile.WriteLine "[UMCCreationOptions]"
     
@@ -2375,7 +2428,12 @@ On Error GoTo FinalizeNewUMCsErrorHandler
         
         If Not blnUMCIndicesUpdated Then
             ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-            blnSuccess = UpdateUMCStatArrays(CallerID, True, False, Me)
+                
+            ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
+            Dim blnComputeClassMassAndAbundance As Boolean
+            blnComputeClassMassAndAbundance = True
+        
+            blnSuccess = UpdateUMCStatArrays(CallerID, blnComputeClassMassAndAbundance, False, Me)
         Else
             blnSuccess = True
         End If
@@ -2822,8 +2880,15 @@ On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
     
     ' Check for the existence of LCMSFeatureFinder.exe
     strFeatureFinderAppPath = fso.BuildPath(App.Path, LCMS_FEATURE_FINDER_APP_NAME)
-    strWorkingDirPath = App.Path
-        
+    
+    ' Use the Windows Temp Directory for the working path (in case the user doesn't have write-access to the folder with VIPER)
+    strWorkingDirPath = GetTemporaryDir
+    
+    ' Generate a Uniquifier in case two copies of VIPER are running at once
+    If mFFSessionID = "" Then
+        mFFSessionID = "_" & CLng(Timer()) & "_" & CLng(Rnd(1) * 100000)
+    End If
+
     If Not fso.FileExists(strFeatureFinderAppPath) Then
         strMessage = "LCMS Feature Finder app not found, unable to continue: " & vbCrLf & strFeatureFinderAppPath
         If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
@@ -2876,7 +2941,10 @@ On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
             For intIsotopeTagIndex = intIsotopeTagIndexStart To intIsotopeTagIndexEnd
                 
                 ' Create two text files for LCMSFeatureFinder.exe to read
-                blnSuccessCurrentIteration = ExportPeaksForUMCFinding(strWorkingDirPath, strLCMSFeaturesFilePath, strIniFilePath, intOddEvenIteration, intIsotopeTagIndex, eIsotopeTagList)
+                blnSuccessCurrentIteration = ExportPeaksForUMCFinding( _
+                                               strWorkingDirPath, mFFSessionID, _
+                                               strLCMSFeaturesFilePath, strIniFilePath, _
+                                               intOddEvenIteration, intIsotopeTagIndex, eIsotopeTagList)
                         
                 If mAbortProcess Then
                     GoTo FindUMCsUsingLCMSFeatureFinderCleanup
@@ -2947,9 +3015,19 @@ On Error GoTo FindUMCsUsingLCMSFeatureFinderErrorHandler
                         If blnSuccess Then
                             ' Read the data from the _Features.txt & _PeakToFeatureMap.txt files
                             If intIsotopeTagIndex >= 0 Then
-                                blnSuccessCurrentIteration = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages, intOddEvenIteration, eIsotopeTagList(intIsotopeTagIndex))
+                                blnSuccessCurrentIteration = LoadFeatureInfoFromDisk( _
+                                                                    fso, strWorkingDirPath, _
+                                                                    strLCMSFeaturesFilePath, _
+                                                                    blnShowMessages, _
+                                                                    intOddEvenIteration, _
+                                                                    eIsotopeTagList(intIsotopeTagIndex))
                             Else
-                                blnSuccessCurrentIteration = LoadFeatureInfoFromDisk(fso, strWorkingDirPath, strLCMSFeaturesFilePath, blnShowMessages, intOddEvenIteration, iltNone)
+                                blnSuccessCurrentIteration = LoadFeatureInfoFromDisk( _
+                                                                    fso, strWorkingDirPath, _
+                                                                    strLCMSFeaturesFilePath, _
+                                                                    blnShowMessages, _
+                                                                    intOddEvenIteration, _
+                                                                    iltNone)
                             End If
                             
                             If blnSuccessCurrentIteration Then
@@ -3589,7 +3667,12 @@ InitializeUMCSearchErrorHandler:
     
 End Sub
 
-Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, ByVal strWorkingDirPath As String, ByVal strLCMSFeaturesFilePath As String, ByVal blnShowMessages As Boolean, ByVal intOddEvenIteration As Integer, ByVal eIsotopeTag As iltIsotopeLabelTagConstants) As Boolean
+Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, _
+                                         ByVal strWorkingDirPath As String, _
+                                         ByVal strLCMSFeaturesFilePath As String, _
+                                         ByVal blnShowMessages As Boolean, _
+                                         ByVal intOddEvenIteration As Integer, _
+                                         ByVal eIsotopeTag As iltIsotopeLabelTagConstants) As Boolean
 
     Dim strMessage As String
     Dim strResultsFilePath As String
@@ -3612,9 +3695,12 @@ Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, ByVal st
     blnSuccess = False
     
     
-    'strResultsFilePath = fso.BuildPath(strWorkingDirPath, fso.GetBaseName(strLCMSFeaturesFilePath) & "_Features.txt")
+    ' Note: we do not actually read this file, but we'll want to delete it when the form closes, so we construct the path
+    strResultsFilePath = fso.BuildPath(strWorkingDirPath, fso.GetBaseName(strLCMSFeaturesFilePath) & "_Features.txt")
     
+    ' This is the file we'll read
     strResultingMappingFilePath = fso.BuildPath(strWorkingDirPath, fso.GetBaseName(strLCMSFeaturesFilePath) & "_PeakToFeatureMap.txt")
+    
     If Not fso.FileExists(strResultingMappingFilePath) Then
         strMessage = "LCMS feature to peak map file not found, unable to continue: " & vbCrLf & strResultingMappingFilePath
         If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
@@ -3624,6 +3710,16 @@ Private Function LoadFeatureInfoFromDisk(ByRef fso As FileSystemObject, ByVal st
         End If
         blnSuccess = False
     Else
+        If Not mTempFilesToDelete.Exists(strResultingMappingFilePath) Then
+            mTempFilesToDelete.add strResultingMappingFilePath, TEMP_FILE_FLAG
+        End If
+        
+        If Not mTempFilesToDelete.Exists(strResultsFilePath) Then
+            mTempFilesToDelete.add strResultsFilePath, TEMP_FILE_FLAG
+        End If
+        
+
+
         Set objFile = fso.GetFile(strResultingMappingFilePath)
         lngFileSizeBytes = objFile.Size
         If lngFileSizeBytes < 1 Then lngFileSizeBytes = 1
@@ -4402,8 +4498,8 @@ With UMCDef
     SetMolecularMassFieldDropdown CInt(.MWField)
     SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
     
-    optDefScope(.DefScope).value = True
-    optEvenOddScanFilter(.OddEvenProcessingMode).value = True
+    optDefScope(.DefScope).Value = True
+    optEvenOddScanFilter(.OddEvenProcessingMode).Value = True
     
     SetCheckBox chkRequireMatchingIsotopeTag, .RequireMatchingIsotopeTag
     
@@ -4444,7 +4540,7 @@ Private Sub ShowHideCommandButtons(ByVal blnCalculating As Boolean)
     fraClassAbundanceTopX.Enabled = Not blnCalculating
     fraClassMassTopX.Enabled = Not blnCalculating
     
-    blnShowConnectionsButtons = Not cChkBox(chkUseLCMSFeatureFinder.value)
+    blnShowConnectionsButtons = Not cChkBox(chkUseLCMSFeatureFinder.Value)
     
     cmdFindConnections.Visible = blnShowConnectionsButtons
         
@@ -4478,7 +4574,7 @@ Public Function StartUMCSearch() As Boolean
     
 On Error GoTo StartUMCSearchErrorHandler
 
-    If cChkBox(chkUseLCMSFeatureFinder.value) Then
+    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
         blnSuccess = FindUMCsUsingLCMSFeatureFinder(False)
         
         If Not blnSuccess And Not mAbortProcess Then
@@ -4662,7 +4758,7 @@ Private Function UpdateNetDimInfo() As Boolean
     ' Update .NetActualDim
     MyDef.NetActualDim = 0
     For i = 0 To chkUse.Count - 1
-        If chkUse(i).value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
+        If chkUse(i).Value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
     Next i
     
     If MyDef.NetActualDim < 1 Then
@@ -4726,7 +4822,9 @@ Private Sub Form_Activate()
 End Sub
 
 Private Sub Form_Load()
-    mOneSecond = 1 / 24 / 60 / 60
+    mOneSecond = 1# / 24# / 60# / 60#
+    Set mTempFilesToDelete = New Dictionary
+    
     bLoading = True
     mCalculating = False
     mAbortProcess = False
@@ -4736,11 +4834,12 @@ End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
     UMCIonNetDef = MyDef
+    DeleteTempFiles
 End Sub
 
 Private Sub optDefScope_Click(Index As Integer)
     If mCalculating Then
-        optDefScope(UMCDef.DefScope).value = True
+        optDefScope(UMCDef.DefScope).Value = True
     Else
         UMCDef.DefScope = Index
     End If
@@ -4748,7 +4847,7 @@ End Sub
 
 Private Sub optEvenOddScanFilter_Click(Index As Integer)
     If mCalculating Then
-        optEvenOddScanFilter(UMCDef.OddEvenProcessingMode).value = True
+        optEvenOddScanFilter(UMCDef.OddEvenProcessingMode).Value = True
     Else
         UMCDef.OddEvenProcessingMode = Index
     End If
@@ -4993,7 +5092,7 @@ End Sub
 Private Sub cmdFindConnections_Click()
     If mCalculating Then Exit Sub
     
-    If cChkBox(chkUseLCMSFeatureFinder.value) Then
+    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
         MsgBox "Finding connections is not available when the LCMS Feature Finder external app mode is enabled", vbExclamation + vbOKOnly, "Not Applicable"
     Else
         FindIonNetConnections
@@ -5004,7 +5103,7 @@ Private Sub cmdFindConnectionsThenUMCs_Click()
     If mCalculating Then Exit Sub
     Dim blnUseExternalFinder As Boolean
     
-    blnUseExternalFinder = cChkBox(chkUseLCMSFeatureFinder.value)
+    blnUseExternalFinder = cChkBox(chkUseLCMSFeatureFinder.Value)
     
     If blnUseExternalFinder Then
         FindUMCsUsingLCMSFeatureFinder True
@@ -5020,7 +5119,7 @@ End Sub
 Private Sub cmdFindUMCsUsingNETConnections_Click()
     If mCalculating Then Exit Sub
     
-    If cChkBox(chkUseLCMSFeatureFinder.value) Then
+    If cChkBox(chkUseLCMSFeatureFinder.Value) Then
         If mLCMSResultsMappingCount > 0 Then
             BuildUMCsUsingLCMSResultsMapping True
         Else
@@ -5111,7 +5210,7 @@ Private Sub chkUse_Click(Index As Integer)
     If mCalculating Then
         SetCheckBox chkUse(Index), MyDef.MetricData(Index).Use
     Else
-        MyDef.MetricData(Index).Use = (chkUse(Index).value = vbChecked)
+        MyDef.MetricData(Index).Use = (chkUse(Index).Value = vbChecked)
     End If
 End Sub
 
@@ -5132,7 +5231,7 @@ Private Sub chkUseUntangledAsSingle_Click()
     If mCalculating Then
         SetCheckBox chkUseUntangledAsSingle, UMCMakeSingleMemberClasses
     Else
-        UMCMakeSingleMemberClasses = cChkBox(chkUseUntangledAsSingle.value)
+        UMCMakeSingleMemberClasses = cChkBox(chkUseUntangledAsSingle.Value)
         glbPreferencesExpanded.UMCIonNetOptions.MakeSingleMemberClasses = UMCMakeSingleMemberClasses
     End If
 End Sub

@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "May 11, 2010"
+Public Const APP_BUILD_DATE As String = "October 7, 2010"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -893,8 +893,9 @@ Public Type udtUMCMassTagMatchStats
     IDIsInternalStd As Boolean      ' True if the ID is an Internal Std, False if a MT tag
     AMTMods As String               ' Mods, if any (Like PEO, ICAT, etc.); only applies to AMT's
     MemberHitCount As Long          ' The number of members of a given UMC that matched the given MT tag or Internal Standard
-    SLiCScore As Double             ' SLiC Score (Spatially Localized Confidence score)
-    DelSLiC As Double               ' Similar to DelCN, difference in SLiC score between top match and match with score value one less than this score
+    StacOrSLiC As Double            ' STAC Score or SLiC Score (Spatially Localized Confidence score)
+    DelScore As Double               ' Similar to DelCN, difference in SLiC score between top match and match with score value one less than this score
+    UniquenessProbability As Double ' UP Score from STAC
     MassDiffPPM As Double           ' Mass difference between AMT and given UMC or given point
     MultiAMTHitCount As Long        ' The number of Unique MT tag hits for each UMC; only applies to AMT's (in other words, ignores Internal Standard)
 End Type
@@ -1009,6 +1010,8 @@ Public Type udtAutoToleranceRefinementType
     RefineMassCalibrationOverridePPM As Double          ' If this value is non-zero, and RefineMassCalibration = True, then the data will be shifted by this amount, regardless of where the peak is in the mass error plot
     RefineDBSearchMassTolerance As Boolean
     RefineDBSearchNETTolerance As Boolean
+    
+    UseRefinementWhenUsingSTAC As Boolean               ' Typically should be false
 End Type
 
 Public Type udtAutoAnalysisSearchModeOptionsType
@@ -1161,18 +1164,22 @@ Public Type udtAutoAnalysisFilterPrefsType
     RestrictGANETRange As Boolean
     RestrictGANETRangeMin As Double
     RestrictGANETRangeMax As Double
-    
+     
     RestrictToEvenScanNumbersOnly As Boolean           ' Only one of these options can be set to True at any given time; setting both to false means no restriction
     RestrictToOddScanNumbersOnly As Boolean
     
-    MaximumDataCountEnabled As Boolean                 ' This filter is only applied at the time the data is loaded into memory
+    MaximumDataCountEnabled As Boolean                  ' This filter is only applied at the time the data is loaded into memory
     MaximumDataCountToLoad As Long
 
-    TotalIntensityPercentageFilterEnabled As Boolean   ' This filter is only applied at the time the data is loaded into memory
+    TotalIntensityPercentageFilterEnabled As Boolean    ' This filter is only applied at the time the data is loaded into memory
     TotalIntensityPercentageFilter As Single
 
-    AutoMapDataPointsMassTolerancePPM As Single        ' This setting is only used when we load _LCMSFeatures.txt files and we need to auto-map the data points to the features
+    AutoMapDataPointsMassTolerancePPM As Single         ' This setting is only used when we load _LCMSFeatures.txt files and we need to auto-map the data points to the features
     LCMSFeaturePointsLoadMode As plmPointsLoadModeConstants
+
+    FilterLCMSFeatures As Boolean                       ' This setting is only used when we load _LCMSFeatures.txt files
+    LCMSFeatureAbuMin As Double
+    IMSConformerScoreMin As Double
 End Type
 
 Public Type udtAutoAnalysisCachedDataType
@@ -1261,6 +1268,7 @@ Public Type udtPreferencesExpandedType
     UsePEKBasedERValues As Boolean          ' Can only be set in the .Ini file; when True, then stores PEK-based ER data in IsoData(i).ExpressionRatio when reading the PEK file
     UseMassTagsWithNullMass As Boolean      ' Can only be set in the .Ini file
     UseMassTagsWithNullNET As Boolean
+    UseSTAC As Boolean
     
     IReportAutoAddMonoPlus4AndMinus4Data As Boolean
 

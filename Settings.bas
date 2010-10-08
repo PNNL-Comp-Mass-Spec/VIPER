@@ -11,6 +11,10 @@ Public Const DEFAULT_TOLERANCE_REFINEMENT_MW_TOL As Double = 25
 Public Const DEFAULT_TOLERANCE_REFINEMENT_MW_TOL_TYPE As Integer = gltPPM
 Public Const DEFAULT_TOLERANCE_REFINEMENT_NET_TOL As Double = 0.05
 
+Public Const DEFAULT_MW_TOL As Double = 6
+Public Const DEFAULT_TOL_TYPE As Integer = gltPPM
+Public Const DEFAULT_NET_TOL As Double = 0.025
+
 Private Const RECENT_DB_CONNECTIONS_MAX_COUNT As Integer = 25
 Private Const RECENT_DB_CONNECTIONS_SECTION_NAME As String = "RecentDBConnections"
 Private Const RECENT_DB_CONNECTIONS_KEY_COUNT_NAME As String = "ConnectionCount"
@@ -877,6 +881,7 @@ On Error GoTo LoadSettingsFileHandler
         .UsePEKBasedERValues = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UsePEKBasedERValues", .UsePEKBasedERValues)
         .UseMassTagsWithNullMass = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseMassTagsWithNullMass", .UseMassTagsWithNullMass)
         .UseMassTagsWithNullNET = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseMassTagsWithNullNET", .UseMassTagsWithNullNET)
+        .UseSTAC = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseSTAC", .UseSTAC)
         
         .IReportAutoAddMonoPlus4AndMinus4Data = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data)
         
@@ -1257,6 +1262,8 @@ On Error GoTo LoadSettingsFileHandler
             .RefineMassCalibrationOverridePPM = GetIniFileSettingDbl(IniStuff, "AutoToleranceRefinement", "RefineMassCalibrationOverridePPM", .RefineMassCalibrationOverridePPM)
             .RefineDBSearchMassTolerance = GetIniFileSettingBln(IniStuff, "AutoToleranceRefinement", "RefineDBSearchMassTolerance", .RefineDBSearchMassTolerance)
             .RefineDBSearchNETTolerance = GetIniFileSettingBln(IniStuff, "AutoToleranceRefinement", "RefineDBSearchNETTolerance", .RefineDBSearchNETTolerance)
+            
+            .UseRefinementWhenUsingSTAC = GetIniFileSettingBln(IniStuff, "AutoToleranceRefinement", "UseRefinementWhenUsingSTAC", .UseRefinementWhenUsingSTAC)
         End With
         
         With .AutoAnalysisOptions
@@ -1466,6 +1473,10 @@ On Error GoTo LoadSettingsFileHandler
             
             .AutoMapDataPointsMassTolerancePPM = GetIniFileSettingSng(IniStuff, "AutoAnalysisFilterPrefs", "AutoMapDataPointsMassTolerancePPM", .AutoMapDataPointsMassTolerancePPM)
             .LCMSFeaturePointsLoadMode = GetIniFileSettingInt(IniStuff, "AutoAnalysisFilterPrefs", "LCMSFeaturePointsLoadMode", CInt(.LCMSFeaturePointsLoadMode))
+        
+            .FilterLCMSFeatures = GetIniFileSettingBln(IniStuff, "AutoAnalysisFilterPrefs", "FilterLCMSFeatures", .FilterLCMSFeatures)
+            .LCMSFeatureAbuMin = GetIniFileSettingDbl(IniStuff, "AutoAnalysisFilterPrefs", "LCMSFeatureAbuMin", .LCMSFeatureAbuMin)
+            .IMSConformerScoreMin = GetIniFileSettingDbl(IniStuff, "AutoAnalysisFilterPrefs", "IMSConformerScoreMin", .IMSConformerScoreMin)
         End With
         
         ' Now attempt to load the database connection info
@@ -1991,6 +2002,7 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UsePEKBasedERValues", .UsePEKBasedERValues
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullMass", .UseMassTagsWithNullMass
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullNET", .UseMassTagsWithNullNET
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseSTAC", .UseSTAC
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseUMCConglomerateNET", .UseUMCConglomerateNET
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "NetAdjustmentUsesN15AMTMasses", .NetAdjustmentUsesN15AMTMasses
@@ -2368,6 +2380,8 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RefineMassCalibrationOverridePPM", .RefineMassCalibrationOverridePPM
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "RefineDBSearchMassTolerance", .RefineDBSearchMassTolerance
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "RefineDBSearchNETTolerance", .RefineDBSearchNETTolerance
+        
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseRefinementWhenUsingSTAC", .UseRefinementWhenUsingSTAC
     End With
     IniStuff.WriteSection "AutoToleranceRefinement", sKeys(), sVals(), iKVCount
     
@@ -2535,6 +2549,9 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "AutoMapDataPointsMassTolerancePPM", .AutoMapDataPointsMassTolerancePPM
         AddKeyValueSettingInt sKeys, sVals, iKVCount, "LCMSFeaturePointsLoadMode", CInt(.LCMSFeaturePointsLoadMode)
     
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "FilterLCMSFeatures", .FilterLCMSFeatures
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "LCMSFeatureAbuMin", .LCMSFeatureAbuMin
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "IMSConformerScoreMin", .IMSConformerScoreMin
     End With
     IniStuff.WriteSection "AutoAnalysisFilterPrefs", sKeys(), sVals(), iKVCount
     
@@ -3381,6 +3398,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
             .UsePEKBasedERValues = False
             .UseMassTagsWithNullMass = False
             .UseMassTagsWithNullNET = False
+            .UseSTAC = True
             
             .IReportAutoAddMonoPlus4AndMinus4Data = True
             
@@ -3782,6 +3800,10 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 
                 .AutoMapDataPointsMassTolerancePPM = 5
                 .LCMSFeaturePointsLoadMode = plmLoadMappedPointsOnly
+            
+                .FilterLCMSFeatures = True
+                .LCMSFeatureAbuMin = 0
+                .IMSConformerScoreMin = 0.75
             End With
         End If
         
@@ -3862,6 +3884,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .RefineMassCalibrationOverridePPM = 0
                     .RefineDBSearchMassTolerance = True
                     .RefineDBSearchNETTolerance = True
+                    .UseRefinementWhenUsingSTAC = False
                 End With
                 
                 Erase .AutoAnalysisSearchMode()

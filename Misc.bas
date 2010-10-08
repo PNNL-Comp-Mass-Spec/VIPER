@@ -77,7 +77,7 @@ Public Const NoHarvest = "Not found."
 
 ''Public Const ThisApp = "2DGelLand"          ' Registry App constant.
 ''Public Const OptionsKey = "Options"         ' Registry Key constant.
-Public Const RawDataTmpFile = "Oneum.txt"   ' name of Temp file with raw data
+Public Const RawDataTmpFile = "Oneum.txt"      ' name of Temp file with raw data
 
 Public Const glFGTU = "VIPER"
 
@@ -1438,7 +1438,10 @@ With udtUMCDef
 
     .OddEvenProcessingMode = oepUMCOddEvenProcessingMode.oepProcessAll
     .RequireMatchingIsotopeTag = True
-    .AdditionalValue2 = 0
+    
+    .OnePointPerLCMSFeature = False
+    .LoadedPredefinedLCMSFeatures = False
+    
     .AdditionalValue3 = 0
     .AdditionalValue4 = 0
     .AdditionalValue5 = 0
@@ -1500,11 +1503,11 @@ With udtAMTDef
     .SearchScope = glSc_All
     .SearchFlag = glAMT_CONFIRM_PPM     'search among all AMTs confirmed with good precision
     .MWField = mftMWMono
-    .MWTol = 6
+    .MWTol = DEFAULT_MW_TOL
     .NETorRT = glAMT_NET
     .Formula = ConstructNETFormulaWithDefaults(udtUMCNetAdjDef)
-    .TolType = gltPPM
-    .NETTol = 0.025
+    .TolType = DEFAULT_TOL_TYPE
+    .NETTol = DEFAULT_NET_TOL
     .MassTag = -1
     .MaxMassTags = 5
     .SkipReferenced = False

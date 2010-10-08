@@ -1971,7 +1971,7 @@ On Error GoTo err_QueryUnload
 
 If Me.Tag <= 0 Then Exit Sub       'for forms created from the unique mw count don't ask user to save
 If GelStatus(nMyIndex).Dirty Then  'something changed
-   sFileName = Me.Caption
+   sFileName = GelStatus(nMyIndex).GelFilePathFull
    sMsg = "File [" & sFileName & "] has changed."
    sMsg = sMsg & vbCrLf & "Do you want to save the changes?"
    nResponse = MsgBox(sMsg, vbYesNoCancel + vbExclamation, MDIForm1.Caption)
@@ -1981,8 +1981,8 @@ If GelStatus(nMyIndex).Dirty Then  'something changed
    Case 6   'User chose Yes; save and unload
         If Left(Me.Caption, 8) = "Untitled" Then 'never saved before
            sFileName = ""
-        Else  'form caption has file name
-           sFileName = Me.Caption
+        Else  'form caption has file name, but it might be abbreviated; use GelStatus()
+           sFileName = GelStatus(nMyIndex).GelFilePathFull
         End If
         ' MonroeMod
         blnSuccess = SaveFileAsInit(mFileSaveMode)
@@ -2989,7 +2989,7 @@ If (Left(Me.Caption, 8) = "Untitled") Or (Len(Me.Caption) <= 0) Then
    mFileSaveMode = fsUnknown
     SaveFileAsWrapper "", True, True, False, True
 Else
-   sFileName = Me.Caption
+   sFileName = GelStatus(nMyIndex).GelFilePathFull
     ' MonroeMod
     Select Case mFileSaveMode
     Case fsNoExtended
@@ -3824,7 +3824,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
         strExport(0) = strExport(0) & strSepChar & "UMC Indices"
         
         If blnIncludeAMTMassDetails Then
-            strExport(0) = strExport(0) & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "MassDiff (ppm)"
+            strExport(0) = strExport(0) & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "MassDiff (ppm)" & strSepChar & "STAC Score"
         Else
             strExport(0) = strExport(0) & strSepChar & "DB Matches"
         End If
@@ -3964,8 +3964,8 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                         
                         
                         With udtCurrIDMatchStats(0)
-                            ' "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "MassDiff (ppm)"
-                            strExport(lngExportCount) = strExport(lngExportCount) & .IDIndex & strSepChar & dblAMTMW & strSepChar & dblAMTNet & strSepChar & dblAMTNetStDev & strSepChar & .SLiCScore & strSepChar & .MassDiffPPM
+                            ' "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "MassDiff (ppm)" & strSepChar & "Uniqueness Probability"
+                            strExport(lngExportCount) = strExport(lngExportCount) & .IDIndex & strSepChar & dblAMTMW & strSepChar & dblAMTNet & strSepChar & dblAMTNetStDev & strSepChar & Round(.StacOrSLiC, 4) & strSepChar & Round(.MassDiffPPM, 4) & strSepChar & Round(.UniquenessProbability, 4)
                         End With
                         
                     Else
@@ -4302,7 +4302,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     
     If ((GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA) Then
         blnIMSData = True
-        strLineOut = strLineOut & "IMS_Drift_Time" & strSepChar
+        strLineOut = strLineOut & "IMS_Drift_Time" & strSepChar & "IMS_Conformation_Fit_Score" & strSepChar
     End If
     
     If blnContainsIsotopeTags Then
@@ -4314,7 +4314,15 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     End If
 
     strLineOut = strLineOut & "PairIndex" & strSepChar & "PairMemberType" & strSepChar & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
-    strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar & "Peptide"
+    strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar
+    
+    If GelData(nMyIndex).MostRecentSearchUsedSTAC Then
+        strLineOut = strLineOut & "STAC Score" & strSepChar & "DelSTAC" & strSepChar & "Uniqueness Probability" & strSepChar
+    Else
+        strLineOut = strLineOut & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar
+    End If
+    
+    strLineOut = strLineOut & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar & "Peptide"
     
     With GelP_D_L(nMyIndex)
         If blnPairsPresent And .SearchDef.IReportEROptions.Enabled And .SearchDef.ComputeERScanByScan Then
@@ -4353,8 +4361,12 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 lngScanClassRep = (.MinScan + .MaxScan) / 2
             End Select
             
-            Debug.Assert ClsStat(lngUMCIndexOriginal, ustScanStart) = .MinScan
-            Debug.Assert ClsStat(lngUMCIndexOriginal, ustScanEnd) = .MaxScan
+            ' The following assertions will not be true when we loaded predefined LC-MS features and we only kept one point per feature
+            ' Can use the following check to skip these assertions when not worth checking
+            If .ClassCount >= .ClassCountPredefinedLCMSFeatures Then
+                Debug.Assert ClsStat(lngUMCIndexOriginal, ustScanStart) = .MinScan
+                Debug.Assert ClsStat(lngUMCIndexOriginal, ustScanEnd) = .MaxScan
+            End If
         
             dblGANETClassRep = ScanToGANET(nMyIndex, lngScanClassRep)
             
@@ -4369,12 +4381,19 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 strLineOut = strLineOut & strMinMaxCharges
                 strLineOut = strLineOut & Round(MonoMassToMZ(.ClassMW, .ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge), 6) & strSepChar
             Else
-                strLineOut = strLineOut & 0 & strSepChar
+                strLineOut = strLineOut & GelData(nMyIndex).IsoData(.ClassRepInd).Charge & strSepChar
                 strLineOut = strLineOut & strMinMaxCharges
-                strLineOut = strLineOut & Round(MonoMassToMZ(.ClassMW, CInt(GelData(nMyIndex).IsoData(.ClassRepInd).Charge)), 6) & strSepChar
+                strLineOut = strLineOut & Round(MonoMassToMZ(.ClassMW, GelData(nMyIndex).IsoData(.ClassRepInd).Charge), 6) & strSepChar
             End If
         
-            strLineOut = strLineOut & .ClassCount & strSepChar
+            If .ClassCountPredefinedLCMSFeatures > .ClassCount Then
+                ' Use the class-count value stored in .ClassCountPredefinedLCMSFeatures
+                ' This value gets populated when we read in features from a _LCMSFeatures.txt file
+                strLineOut = strLineOut & .ClassCountPredefinedLCMSFeatures & strSepChar
+            Else
+                strLineOut = strLineOut & .ClassCount & strSepChar
+            End If
+            
             
             ' Record UMCMemberCountUsedForAbu
             If GelUMC(nMyIndex).def.UMCClassStatsUseStatsFromMostAbuChargeState Then
@@ -4393,7 +4412,14 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                                     
             
             If blnIMSData Then
-                strLineOut = strLineOut & Round(ClsStat(lngUMCIndexOriginal, ustDriftTime), 3) & strSepChar
+                ' Note that the LC-MS Feature's central drift time will not necessarily be the same as the drift time of the class rep
+                ' Favor using the LC-MS Feature's .DriftTime
+                If .DriftTime = 0 Then
+                    strLineOut = strLineOut & Round(ClsStat(lngUMCIndexOriginal, ustDriftTime), 3) & strSepChar
+                Else
+                    strLineOut = strLineOut & Round(.DriftTime, 3) & strSepChar
+                End If
+                strLineOut = strLineOut & Round(.ClassScore, 4) & strSepChar
             End If
             
             If blnContainsIsotopeTags Then
@@ -4472,14 +4498,24 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             strPeptideSequence = ""
         End If
         
-        strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).IDIndex & strSepChar & Round(dblAMTMW, 6) & strSepChar & Round(dblAMTNet, 4) & strSepChar & Round(dblAMTNetStDev, 4)
-        strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).SLiCScore
-        strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).DelSLiC
-        strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).MemberHitCount
-        strLineOutEnd = strLineOutEnd & strSepChar & udtUMCsInView(lngUMCIndex).IDIsInternalStd
-        strLineOutEnd = strLineOutEnd & strSepChar & Round(sngPeptideProphetProbability, 5)
-        strLineOutEnd = strLineOutEnd & strSepChar & strPeptideSequence
-
+        strLineOutEnd = strLineOutEnd & _
+                        udtUMCsInView(lngUMCIndex).IDIndex & strSepChar & _
+                        Round(dblAMTMW, 6) & strSepChar & _
+                        Round(dblAMTNet, 4) & strSepChar & _
+                        Round(dblAMTNetStDev, 4) & strSepChar & _
+                        Round(udtUMCsInView(lngUMCIndex).StacOrSLiC, 4) & strSepChar & _
+                        Round(udtUMCsInView(lngUMCIndex).DelScore, 4)
+        
+        If GelData(nMyIndex).MostRecentSearchUsedSTAC Then
+            strLineOutEnd = strLineOutEnd & strSepChar & Round(udtUMCsInView(lngUMCIndex).UniquenessProbability, 4)
+        End If
+        
+        strLineOutEnd = strLineOutEnd & strSepChar & _
+                        udtUMCsInView(lngUMCIndex).MemberHitCount & strSepChar & _
+                        udtUMCsInView(lngUMCIndex).IDIsInternalStd & strSepChar & _
+                        Round(sngPeptideProphetProbability, 5) & strSepChar & _
+                        strPeptideSequence
+                        
         lngPairIndex = -1
         lngPairMatchCount = 0
         ReDim udtPairMatchStats(0)
@@ -4571,7 +4607,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
 
 CopyAllUMCsInViewErrorHandler:
     Debug.Assert False
-    
+
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox "Error occurred in CopyAllUMCsInView:" & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
     Else
@@ -4641,7 +4677,7 @@ Private Function SaveFileAsInit(eFileSaveMode As fsFileSaveModeConstants, Option
     If (Left(Me.Caption, 8) = "Untitled") Or Len(Me.Caption) = 0 Then
         sSaveFileName = ""
     Else
-        sSaveFileName = Me.Caption
+        sSaveFileName = GelStatus(nMyIndex).GelFilePathFull
     End If
     
     eFileSaveModeSaved = mFileSaveMode

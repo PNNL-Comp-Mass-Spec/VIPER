@@ -257,7 +257,12 @@ On Error GoTo BinaryLoadDataErrorHandler
         
         If blnUMCDataLoaded Then
             ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-            UpdateUMCStatArrays lngGelIndex, True, False
+            
+            ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
+            Dim blnComputeClassMassAndAbundance As Boolean
+            blnComputeClassMassAndAbundance = True
+            
+            UpdateUMCStatArrays lngGelIndex, blnComputeClassMassAndAbundance, False
         End If
     
     End If
@@ -2804,8 +2809,6 @@ Private Sub InitializeAdditionalUMCDefVariables(ByRef CurrentUMCDef As UMCDefini
     With CurrentUMCDef
         .OddEvenProcessingMode = oepUMCOddEvenProcessingMode.oepProcessAll
         .RequireMatchingIsotopeTag = True
-        .AdditionalValue2 = 0
-        .AdditionalValue3 = 0
         .AdditionalValue4 = 0
         .AdditionalValue5 = 0
         .AdditionalValue6 = 0

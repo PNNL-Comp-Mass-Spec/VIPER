@@ -119,6 +119,8 @@ Public Enum glFilters
     fltIsoCom = 13                  'isotopic composition
     fltIsoMZ = 14                   ' filter by m/z
     fltEvenOddScanNumber = 15       ' if .DataFilter(fltEvenOddScanNumber, 2) = 1, show only odd scan numbers; if 2, show only even numbers
+    fltLCMSFeatureAbundance = 16
+    fltIMSConformerScore = 17
 End Enum
 
 Public Enum UMCDrawType

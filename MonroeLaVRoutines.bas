@@ -2087,7 +2087,12 @@ Public Function ExtractInputFilePath(ByVal lngGelIndex As Long) As String
     
 End Function
 
-Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, ByVal blnFindInternalStdRefs As Boolean, ByRef lngCurrIDCnt As Long, ByRef udtCurrIDMatchStats() As udtUMCMassTagMatchStats, ByVal blnIncludeInheritedMatchesInMemberHitCountStat As Boolean)
+Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
+                                      ByVal blnFindInternalStdRefs As Boolean, _
+                                      ByRef lngCurrIDCnt As Long, _
+                                      ByRef udtCurrIDMatchStats() As udtUMCMassTagMatchStats, _
+                                      ByVal blnIncludeInheritedMatchesInMemberHitCountStat As Boolean)
+                                     
     ' Note that udtCuHrrIDMatchStats() is a 0-based array
 
     Dim strRefMark As String, strRefIDEnd As String
@@ -2096,8 +2101,9 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, ByVal blnF
     
     Dim lngMatchID As Long, lngCharLoc As Long
 
-    Dim strSLiCScore As String
+    Dim strStacOrSLiC As String
     Dim strDelSLiC As String
+    Dim strUPScore As String
     
     Dim blnInheritedMatch As Boolean
     
@@ -2158,17 +2164,22 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, ByVal blnF
                         udtCurrIDMatchStats(lngCurrIDCnt).MemberHitCount = 0
                     End If
                     
+                    strStacOrSLiC = Trim(GetIDFromString(strDBMatchSingle, MTSLiCMark, MTSLiCEnd))
+                    If IsNumeric(strStacOrSLiC) Then
+                        udtCurrIDMatchStats(lngCurrIDCnt).StacOrSLiC = val(strStacOrSLiC)
+                    End If
+                    
+                    strDelSLiC = Trim(GetIDFromString(strDBMatchSingle, MTDelSLiCMark, MTDelSLiCEnd))
+                    If IsNumeric(strDelSLiC) Then
+                        udtCurrIDMatchStats(lngCurrIDCnt).DelScore = val(strDelSLiC)
+                    End If
+                    
+                    strUPScore = Trim(GetIDFromString(strDBMatchSingle, MTUPMark, MTUpEND))
+                    If IsNumeric(strUPScore) Then
+                        udtCurrIDMatchStats(lngCurrIDCnt).UniquenessProbability = val(strUPScore)
+                    End If
+                    
                     If Not blnFindInternalStdRefs Then
-                        strSLiCScore = Trim(GetIDFromString(strDBMatchSingle, MTSLiCMark, MTSLiCEnd))
-                        If IsNumeric(strSLiCScore) Then
-                            udtCurrIDMatchStats(lngCurrIDCnt).SLiCScore = val(strSLiCScore)
-                        End If
-                        
-                        strDelSLiC = Trim(GetIDFromString(strDBMatchSingle, MTDelSLiCMark, MTDelSLiCEnd))
-                        If IsNumeric(strDelSLiC) Then
-                            udtCurrIDMatchStats(lngCurrIDCnt).DelSLiC = val(strDelSLiC)
-                        End If
-                        
                         strMassDiffPPM = Trim(GetIDFromString(strDBMatchSingle, MWErrMark, MWErrEnd))
                         If IsNumeric(strMassDiffPPM) Then
                             udtCurrIDMatchStats(lngCurrIDCnt).MassDiffPPM = val(strMassDiffPPM)
@@ -2203,16 +2214,19 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
         ReDim udtCurrIDMatchStats(0)
         
         For lngMemberIndex = 0 To .ClassCount - 1
-            Select Case .ClassMType(lngMemberIndex)
-            Case gldtCS
-                strDBMatchList = GelData(lngGelIndex).CSData(.ClassMInd(lngMemberIndex)).MTID
-            Case gldtIS
-                strDBMatchList = GelData(lngGelIndex).IsoData(.ClassMInd(lngMemberIndex)).MTID
-            Case Else
-                ' This shouldn't happen; ignore it
-                Debug.Assert False
-            End Select
-            ExtractMTHitsFromMatchList strDBMatchList, blnFindInternalStdRefs, lngCurrIDCnt, udtCurrIDMatchStats(), blnIncludeInheritedMatchesInMemberHitCountStat
+            If lngMemberIndex <= UBound(.ClassMType) Then
+                Select Case .ClassMType(lngMemberIndex)
+                Case gldtCS
+                    strDBMatchList = GelData(lngGelIndex).CSData(.ClassMInd(lngMemberIndex)).MTID
+                Case gldtIS
+                    strDBMatchList = GelData(lngGelIndex).IsoData(.ClassMInd(lngMemberIndex)).MTID
+                Case Else
+                    ' This shouldn't happen; ignore it
+                    strDBMatchList = ""
+                    Debug.Assert False
+                End Select
+                ExtractMTHitsFromMatchList strDBMatchList, blnFindInternalStdRefs, lngCurrIDCnt, udtCurrIDMatchStats(), blnIncludeInheritedMatchesInMemberHitCountStat
+            End If
         Next lngMemberIndex
         
         If lngCurrIDCnt = 0 And Not blnFindInternalStdRefs Then
@@ -2236,14 +2250,16 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
                     udtUMCList(lngUMCListCount).IDIndex = 0
                     udtUMCList(lngUMCListCount).MemberHitCount = 0
                     udtUMCList(lngUMCListCount).MultiAMTHitCount = 0
-                    udtUMCList(lngUMCListCount).SLiCScore = 0
-                    udtUMCList(lngUMCListCount).DelSLiC = 0
+                    udtUMCList(lngUMCListCount).StacOrSLiC = 0
+                    udtUMCList(lngUMCListCount).DelScore = 0
+                    udtUMCList(lngUMCListCount).UniquenessProbability = 0
                 Else
                                        
                     udtUMCList(lngUMCListCount).IDIndex = udtCurrIDMatchStats(lngMatchIndex).IDIndex
                     udtUMCList(lngUMCListCount).MemberHitCount = udtCurrIDMatchStats(lngMatchIndex).MemberHitCount
-                    udtUMCList(lngUMCListCount).SLiCScore = udtCurrIDMatchStats(lngMatchIndex).SLiCScore
-                    udtUMCList(lngUMCListCount).DelSLiC = udtCurrIDMatchStats(lngMatchIndex).DelSLiC
+                    udtUMCList(lngUMCListCount).StacOrSLiC = udtCurrIDMatchStats(lngMatchIndex).StacOrSLiC
+                    udtUMCList(lngUMCListCount).DelScore = udtCurrIDMatchStats(lngMatchIndex).DelScore
+                    udtUMCList(lngUMCListCount).UniquenessProbability = udtCurrIDMatchStats(lngMatchIndex).UniquenessProbability
                     
                     If blnFindInternalStdRefs Then
                         udtUMCList(lngUMCListCount).MultiAMTHitCount = 0
@@ -5422,40 +5438,43 @@ On Error GoTo UpdateIonToUMCIndicesErrorHandler
             For lngUMCIndex = 0 To .UMCCnt - 1
                 With .UMCs(lngUMCIndex)
                     For lngMemberIndex = 0 To .ClassCount - 1
-                        lngIonIndex = .ClassMInd(lngMemberIndex)
-                        
-                        Select Case .ClassMType(lngMemberIndex)
-                        Case glCSType
-                            If lngIonIndex <= lngCSLines Then
-                                lngNewUMCCount = GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCCount + 1
-                                If lngNewUMCCount = 1 Then
-                                    ReDim GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCs(0)
-                                Else
-                                    ReDim Preserve GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCs(lngNewUMCCount - 1)
-                                End If
+                        If lngMemberIndex <= UBound(.ClassMInd) Then
                             
-                                GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCs(lngNewUMCCount - 1) = lngUMCIndex
-                                GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCCount = lngNewUMCCount
-                            Else
-                                ' Invalid index; ignore it
-                                Debug.Assert False
-                            End If
-                        Case glIsoType
-                            If lngIonIndex <= lngIsoLines Then
-                                lngNewUMCCount = GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCCount + 1
-                                If lngNewUMCCount = 1 Then
-                                    ReDim GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCs(0)
-                                Else
-                                    ReDim Preserve GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCs(lngNewUMCCount - 1)
-                                End If
+                            lngIonIndex = .ClassMInd(lngMemberIndex)
+                            
+                            Select Case .ClassMType(lngMemberIndex)
+                            Case glCSType
+                                If lngIonIndex <= lngCSLines Then
+                                    lngNewUMCCount = GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCCount + 1
+                                    If lngNewUMCCount = 1 Then
+                                        ReDim GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCs(0)
+                                    Else
+                                        ReDim Preserve GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCs(lngNewUMCCount - 1)
+                                    End If
                                 
-                                GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCs(lngNewUMCCount - 1) = lngUMCIndex
-                                GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCCount = lngNewUMCCount
-                            Else
-                                ' Invalid index; ignore it
-                                Debug.Assert False
-                            End If
-                        End Select
+                                    GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCs(lngNewUMCCount - 1) = lngUMCIndex
+                                    GelDataLookupArrays(lngGelIndex).CSUMCs(lngIonIndex).UMCCount = lngNewUMCCount
+                                Else
+                                    ' Invalid index; ignore it
+                                    Debug.Assert False
+                                End If
+                            Case glIsoType
+                                If lngIonIndex <= lngIsoLines Then
+                                    lngNewUMCCount = GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCCount + 1
+                                    If lngNewUMCCount = 1 Then
+                                        ReDim GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCs(0)
+                                    Else
+                                        ReDim Preserve GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCs(lngNewUMCCount - 1)
+                                    End If
+                                    
+                                    GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCs(lngNewUMCCount - 1) = lngUMCIndex
+                                    GelDataLookupArrays(lngGelIndex).IsoUMCs(lngIonIndex).UMCCount = lngNewUMCCount
+                                Else
+                                    ' Invalid index; ignore it
+                                    Debug.Assert False
+                                End If
+                            End Select
+                        End If
                     Next lngMemberIndex
                 End With
                 

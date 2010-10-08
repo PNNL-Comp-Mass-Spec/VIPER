@@ -821,6 +821,9 @@ If mgCnt > 0 Then    'something already identified
    eResponse = MsgBox("Pairs identification found. If you continue current findings will be lost. Continue?", vbOKCancel, glFGTU)
    If eResponse <> vbOK Then Exit Sub
 End If
+
+GelData(CallerID).MostRecentSearchUsedSTAC = False
+
 'number of pairs might change so better check every time
 PCount = GelP_D_L(CallerID).PCnt
 samtDef.Formula = Trim$(txtNETFormula.Text)
@@ -1197,13 +1200,13 @@ Dim SP As String                    'pair part of line
 Dim sID As String                   'ID part of line
 'extract pairs information
 With GelP_D_L(CallerID).Pairs(PairInd)
-  SP = .P1 & glARG_SEP & ClsStat(.P1, ustClassMW) _
-        & glARG_SEP & ClsStat(.P1, ustClassIntensity) & glARG_SEP _
-        & ClsStat(.P1, ustScanStart) & glARG_SEP & ClsStat(.P1, ustScanEnd) _
-        & glARG_SEP & .P2 & glARG_SEP & ClsStat(.P2, ustClassMW) _
-        & glARG_SEP & ClsStat(.P2, ustClassIntensity) & glARG_SEP _
-        & .P2DltCnt & glARG_SEP & ClsStat(.P2, ustScanStart) _
-        & glARG_SEP & ClsStat(.P2, ustScanEnd) & glARG_SEP _
+  SP = .p1 & glARG_SEP & ClsStat(.p1, ustClassMW) _
+        & glARG_SEP & ClsStat(.p1, ustClassIntensity) & glARG_SEP _
+        & ClsStat(.p1, ustScanStart) & glARG_SEP & ClsStat(.p1, ustScanEnd) _
+        & glARG_SEP & .p2 & glARG_SEP & ClsStat(.p2, ustClassMW) _
+        & glARG_SEP & ClsStat(.p2, ustClassIntensity) & glARG_SEP _
+        & .P2DltCnt & glARG_SEP & ClsStat(.p2, ustScanStart) _
+        & glARG_SEP & ClsStat(.p2, ustScanEnd) & glARG_SEP _
         & .ER & glARG_SEP & .ERStDev & glARG_SEP & .ERChargeStateBasisCount & glARG_SEP & .ERMemberBasisCount & glARG_SEP
 End With
 If PIDCnt(PairInd) < 0 Then         'error during pair identification
@@ -1568,7 +1571,7 @@ Dim PairScore() As Double   'score for each identification
 
 On Error GoTo err_DoThePair_Dlt_Mod
 'couple of shortcut variables
-ClsInd1 = GelP_D_L(CallerID).Pairs(PairInd).P1
+ClsInd1 = GelP_D_L(CallerID).Pairs(PairInd).p1
 DltCnt = GelP_D_L(CallerID).Pairs(PairInd).P2DltCnt
 PairIDCnt = 0
 ReDim PairIDInd(100)     'should be more than enough; do not allow for
@@ -1660,7 +1663,7 @@ Dim PairScore() As Double   'score for each identification
 
 On Error GoTo err_DoThePair_Dlt_NotMod
 'couple of shortcut variables
-ClsInd1 = GelP_D_L(CallerID).Pairs(PairInd).P1
+ClsInd1 = GelP_D_L(CallerID).Pairs(PairInd).p1
 DltCnt = GelP_D_L(CallerID).Pairs(PairInd).P2DltCnt
 PairIDCnt = 0
 ReDim PairIDInd(100)     'should be more than enough; do not allow for
@@ -1751,7 +1754,7 @@ Dim PairScore() As Double
 
 On Error GoTo err_DoThePair_Lbl_Mod
 With GelP_D_L(CallerID).Pairs(PairInd)
-   ClsInd1 = .P1
+   ClsInd1 = .p1
    LLblCnt = .P1LblCnt
    HLblCnt = .P2LblCnt
 End With
@@ -1832,7 +1835,7 @@ Dim PairScore() As Double
 
 On Error GoTo err_DoThePair_Lbl_NotMod
 With GelP_D_L(CallerID).Pairs(PairInd)
-   ClsInd1 = .P1
+   ClsInd1 = .p1
    LLblCnt = .P1LblCnt
    HLblCnt = .P2LblCnt
 End With

@@ -540,56 +540,60 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          _ExtentY        =   7911
          _Version        =   393216
          Style           =   1
-         Tab             =   2
+         Tab             =   1
          TabHeight       =   520
          BackColor       =   16777215
          TabCaption(0)   =   "Mass Calibration Refinement"
          TabPicture(0)   =   "frmErrorDistribution2D.frx":017A
          Tab(0).ControlEnabled=   0   'False
-         Tab(0).Control(0)=   "lblMassCalibrationRefinementDescription"
-         Tab(0).Control(1)=   "lblMassCalibrationRefinementUnits(2)"
-         Tab(0).Control(2)=   "lblMassCalibrationAdjustment"
-         Tab(0).Control(3)=   "lblMassCalibrationRefinementUnits(1)"
-         Tab(0).Control(4)=   "lblMassCalibrationOverallAdjustment"
-         Tab(0).Control(5)=   "cmdMassCalibrationRefinementStart"
-         Tab(0).Control(6)=   "fraMassCalibrationRefinement"
-         Tab(0).Control(7)=   "cmdMassCalibrationManual"
-         Tab(0).Control(8)=   "txtMassCalibrationNewIncrementalAdjustment"
-         Tab(0).Control(9)=   "txtMassCalibrationOverallAdjustment"
-         Tab(0).Control(10)=   "cmdMassCalibrationRevert"
-         Tab(0).Control(11)=   "cmdRecomputeHistograms(0)"
-         Tab(0).Control(12)=   "cmdAbortProcessing(0)"
-         Tab(0).Control(13)=   "cmdResetToDefaults"
+         Tab(0).Control(0)=   "cmdResetToDefaults"
+         Tab(0).Control(1)=   "cmdAbortProcessing(0)"
+         Tab(0).Control(2)=   "cmdRecomputeHistograms(0)"
+         Tab(0).Control(3)=   "cmdMassCalibrationRevert"
+         Tab(0).Control(4)=   "txtMassCalibrationOverallAdjustment"
+         Tab(0).Control(5)=   "txtMassCalibrationNewIncrementalAdjustment"
+         Tab(0).Control(6)=   "cmdMassCalibrationManual"
+         Tab(0).Control(7)=   "fraMassCalibrationRefinement"
+         Tab(0).Control(8)=   "cmdMassCalibrationRefinementStart"
+         Tab(0).Control(9)=   "lblMassCalibrationOverallAdjustment"
+         Tab(0).Control(10)=   "lblMassCalibrationRefinementUnits(1)"
+         Tab(0).Control(11)=   "lblMassCalibrationAdjustment"
+         Tab(0).Control(12)=   "lblMassCalibrationRefinementUnits(2)"
+         Tab(0).Control(13)=   "lblMassCalibrationRefinementDescription"
          Tab(0).ControlCount=   14
          TabCaption(1)   =   "Tolerance Refinement"
          TabPicture(1)   =   "frmErrorDistribution2D.frx":0196
-         Tab(1).ControlEnabled=   0   'False
+         Tab(1).ControlEnabled=   -1  'True
          Tab(1).Control(0)=   "cmdMassToleranceRefinementStart"
+         Tab(1).Control(0).Enabled=   0   'False
          Tab(1).Control(1)=   "fraToleranceRefinementMass"
+         Tab(1).Control(1).Enabled=   0   'False
          Tab(1).Control(2)=   "fraToleranceRefinementGANET"
+         Tab(1).Control(2).Enabled=   0   'False
          Tab(1).Control(3)=   "cmdNETToleranceRefinementStart"
+         Tab(1).Control(3).Enabled=   0   'False
          Tab(1).Control(4)=   "cmdAbortProcessing(1)"
+         Tab(1).Control(4).Enabled=   0   'False
          Tab(1).Control(5)=   "cboToleranceRefinementMethod"
+         Tab(1).Control(5).Enabled=   0   'False
          Tab(1).Control(6)=   "fraExpecationMaximizationOptions"
+         Tab(1).Control(6).Enabled=   0   'False
          Tab(1).Control(7)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
+         Tab(1).Control(7).Enabled=   0   'False
          Tab(1).ControlCount=   8
          TabCaption(2)   =   "Pairwise Diffs"
          TabPicture(2)   =   "frmErrorDistribution2D.frx":01B2
-         Tab(2).ControlEnabled=   -1  'True
-         Tab(2).Control(0)=   "lblPairwiseDifferencesOverview"
-         Tab(2).Control(0).Enabled=   0   'False
-         Tab(2).Control(1)=   "fraPairwiseDifferences"
-         Tab(2).Control(1).Enabled=   0   'False
-         Tab(2).Control(2)=   "cmdRecomputeHistograms(1)"
-         Tab(2).Control(2).Enabled=   0   'False
-         Tab(2).Control(3)=   "cmdAbortProcessing(2)"
-         Tab(2).Control(3).Enabled=   0   'False
+         Tab(2).ControlEnabled=   0   'False
+         Tab(2).Control(0)=   "cmdAbortProcessing(2)"
+         Tab(2).Control(1)=   "cmdRecomputeHistograms(1)"
+         Tab(2).Control(2)=   "fraPairwiseDifferences"
+         Tab(2).Control(3)=   "lblPairwiseDifferencesOverview"
          Tab(2).ControlCount=   4
          Begin VB.CommandButton cmdAbortProcessing 
             Caption         =   "Abort Processing"
             Height          =   375
             Index           =   2
-            Left            =   480
+            Left            =   -74520
             TabIndex        =   128
             Top             =   3960
             Visible         =   0   'False
@@ -599,7 +603,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "&Recompute Histograms"
             Height          =   375
             Index           =   1
-            Left            =   480
+            Left            =   -74520
             TabIndex        =   129
             Top             =   3960
             Width           =   2055
@@ -607,7 +611,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.Frame fraPairwiseDifferences 
             Caption         =   "Pairwise LC-MS Feature Diffs"
             Height          =   2415
-            Left            =   120
+            Left            =   -74880
             TabIndex        =   110
             Top             =   480
             Width           =   4095
@@ -775,7 +779,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.CheckBox chkRefineDBSearchTolUseMinMaxIfOutOfRange 
             Caption         =   "Use min or max tol if out of range"
             Height          =   375
-            Left            =   -71280
+            Left            =   3720
             TabIndex        =   108
             Top             =   1920
             Value           =   1  'Checked
@@ -784,7 +788,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.Frame fraExpecationMaximizationOptions 
             Caption         =   "Expectation Maximization Options"
             Height          =   2055
-            Left            =   -74880
+            Left            =   120
             TabIndex        =   40
             Top             =   2330
             Width           =   3495
@@ -881,7 +885,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          End
          Begin VB.ComboBox cboToleranceRefinementMethod 
             Height          =   315
-            Left            =   -74880
+            Left            =   120
             Style           =   2  'Dropdown List
             TabIndex        =   39
             Top             =   1920
@@ -891,7 +895,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Abort Processing"
             Height          =   375
             Index           =   1
-            Left            =   -71280
+            Left            =   3720
             TabIndex        =   53
             Top             =   3960
             Visible         =   0   'False
@@ -954,7 +958,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.CommandButton cmdNETToleranceRefinementStart 
             Caption         =   "Start NET Tol Refinement"
             Height          =   615
-            Left            =   -71280
+            Left            =   3720
             TabIndex        =   52
             Top             =   3240
             Width           =   1575
@@ -1023,7 +1027,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.Frame fraToleranceRefinementGANET 
             Caption         =   "NET Tolerance Refinement"
             Height          =   1350
-            Left            =   -72240
+            Left            =   2760
             TabIndex        =   30
             Top             =   480
             Width           =   2535
@@ -1103,7 +1107,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.Frame fraToleranceRefinementMass 
             Caption         =   "Mass Tolerance Refinement"
             Height          =   1350
-            Left            =   -74880
+            Left            =   120
             TabIndex        =   21
             Top             =   480
             Width           =   2535
@@ -1183,7 +1187,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.CommandButton cmdMassToleranceRefinementStart 
             Caption         =   "Start Mass Tol Refinement"
             Height          =   615
-            Left            =   -71280
+            Left            =   3720
             TabIndex        =   51
             Top             =   2520
             Width           =   1575
@@ -1199,7 +1203,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.Label lblPairwiseDifferencesOverview 
             Caption         =   "Explanation goes here"
             Height          =   975
-            Left            =   120
+            Left            =   -74880
             TabIndex        =   127
             Top             =   3000
             Width           =   5235
@@ -1475,7 +1479,7 @@ On Error GoTo AddNewErrValuesErrorHandler
             If blnInternalStdMatch Then
             
                 ' Extract MT tag ID
-                strRefID = GetIDFromString(Refs(lngMatchIndex), INT_STD_MARK, AMTIDEnd)
+                strRefID = GetIDFromString(Refs(lngMatchIndex), INT_STD_MARK, INT_STD_IDEnd)
                 
                 ' Extract the recorded mass error (in ppm)
                 strPPMMassError = GetMWErrFromString(Refs(lngMatchIndex))
@@ -1606,7 +1610,7 @@ On Error GoTo AddNewErrValuesErrorHandler
                     ' AMTID or InternalStdID not found; user could be connected to a different database than that originally used for searching
                     ' Another possibility is that the GANET value for this MT tag was not null when the search was performed,
                     '  but now it is null
-                    ' Dispaly a message in the debug window every 0.5 second
+                    ' Dispaly a message in the debug window every 0.5 seconds
                     If (Now() - LastErrorDisplayTime) * 24# * 60# * 60# >= 0.5 Then
                         Debug.Print strRefID & " not found in currently loaded MT tags"
                         LastErrorDisplayTime = Now

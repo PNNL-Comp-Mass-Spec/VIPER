@@ -1,5 +1,18 @@
 VIPER Change Log
 
+Version 3.48 - Build 427; October 7, 2010
+	- Added option to match LC-MS Features to AMT Tags using STAC
+		- Can export STAC stats as a table or as a plot
+	- Added option to filter predefined LC-MS features by abundance or by Conformer Score when loading from disk
+	- Changed default PointLoadMode when reading predefined LC-MS Features to be "Load Mapped Points"
+		- Change made because the LCMSFeatureFinder that runs after Decon2LS is now only saving one point per feature (or a few points if there are multiple IMS conformers)
+	- Now exporting new information to the database
+		- Match_Score_Mode to T_Match_Making_Description
+		- Drift_Time to T_FTICR_UMC_Results
+		- Uniqueness_Probability to T_FTICR_UMC_ResultDetails
+	- Fixed bug when saving a .Gel file for data files loaded deep within a tree of subfolders
+	- Now deleting temporary files created when finding LC-MS Features
+
 Version 3.47 - Build 426; May 11, 2010
 	- Removed ability to use ICR-2LS to view spectra (hasn't worked in a few years)
 

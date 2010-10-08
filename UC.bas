@@ -179,16 +179,17 @@ Public Type UMCDefinition
 '    UMCMaxAbuEtPctBf As Double              'max abundance elution percentage before        (Not used)
 '    UMCMaxAbuEtPctAf As Double              'max abundance elution percentage after         (Not used)
     
-    OddEvenProcessingMode As Integer    ' Actually type oepUMCOddEvenProcessingMode; Added in August 2007
+    OddEvenProcessingMode As Integer        ' Actually type oepUMCOddEvenProcessingMode; Added in August 2007
     RequireMatchingIsotopeTag As Boolean    ' Added in September 2007
     
-    AdditionalValue2 As Long            ' 4 bytes; use for future expansion (name can be changed in the future)
-    AdditionalValue3 As Long            ' 4 bytes
-    AdditionalValue4 As Long            ' 4 bytes
-    AdditionalValue5 As Long            ' 4 bytes
-    AdditionalValue6 As Long            ' 4 bytes
-    AdditionalValue7 As Long            ' 4 bytes
-    AdditionalValue8 As Long            ' 4 bytes
+    OnePointPerLCMSFeature As Boolean       ' 2 bytes; (was part of AdditionalValue2, a long)
+    LoadedPredefinedLCMSFeatures As Boolean ' 2 bytes; (was part of AdditionalValue2, a long)
+    AdditionalValue3 As Long                ' 4 bytes
+    AdditionalValue4 As Long                ' 4 bytes
+    AdditionalValue5 As Long                ' 4 bytes
+    AdditionalValue6 As Long                ' 4 bytes
+    AdditionalValue7 As Long                ' 4 bytes
+    AdditionalValue8 As Long                ' 4 bytes
     
     UMCMinCnt As Long                       'min count
     UMCMaxCnt As Long                       'max count
@@ -713,7 +714,7 @@ End Function
 ''GelUMC(Ind).def = UMCDef
 ''
 ''frmCallingForm.Status "Computing UMC Statistics"
-''CalculateClasses Ind, False, frmCallingForm
+''CalculateClasses Ind, False, false, frmCallingForm
 ''
 ''With GelUMC(Ind)
 ''   'redimension classes array here
@@ -1476,38 +1477,40 @@ With GelUMC(Ind)
              lngScanEnd = lngScanStart
              
              For j = 0 To .ClassCount - 1
-                If .ClassMType(j) = gldtCS Then
-                  dblMW = GelData(Ind).CSData(.ClassMInd(j)).AverageMW
-                  dblAbu = GelData(Ind).CSData(.ClassMInd(j)).Abundance
-                  intCharge = GelData(Ind).CSData(.ClassMInd(j)).Charge
-                  dblFit = GelData(Ind).CSData(.ClassMInd(j)).MassStDev
-                  lngScanNumberCurrent = GelData(Ind).CSData(.ClassMInd(j)).ScanNumber
-                Else
-                  dblMW = GetIsoMass(GelData(Ind).IsoData(.ClassMInd(j)), ISF)
-                  dblAbu = GelData(Ind).IsoData(.ClassMInd(j)).Abundance
-                  intCharge = GelData(Ind).IsoData(.ClassMInd(j)).Charge
-                  dblFit = GelData(Ind).IsoData(.ClassMInd(j)).Fit
-                  lngScanNumberCurrent = GelData(Ind).IsoData(.ClassMInd(j)).ScanNumber
+                If j <= UBound(.ClassMType) Then
+                   If .ClassMType(j) = gldtCS Then
+                     dblMW = GelData(Ind).CSData(.ClassMInd(j)).AverageMW
+                     dblAbu = GelData(Ind).CSData(.ClassMInd(j)).Abundance
+                     intCharge = GelData(Ind).CSData(.ClassMInd(j)).Charge
+                     dblFit = GelData(Ind).CSData(.ClassMInd(j)).MassStDev
+                     lngScanNumberCurrent = GelData(Ind).CSData(.ClassMInd(j)).ScanNumber
+                   Else
+                     dblMW = GetIsoMass(GelData(Ind).IsoData(.ClassMInd(j)), ISF)
+                     dblAbu = GelData(Ind).IsoData(.ClassMInd(j)).Abundance
+                     intCharge = GelData(Ind).IsoData(.ClassMInd(j)).Charge
+                     dblFit = GelData(Ind).IsoData(.ClassMInd(j)).Fit
+                     lngScanNumberCurrent = GelData(Ind).IsoData(.ClassMInd(j)).ScanNumber
+                   End If
+                
+                   If dblMW < MassMin Then MassMin = dblMW
+                   If dblMW > MassMax Then MassMax = dblMW
+                   MassSum = MassSum + dblMW
+                   MassSumSq = MassSumSq + dblMW ^ 2
+                   
+                   If dblAbu < AbuMin Then AbuMin = dblAbu
+                   If dblAbu > AbuMax Then AbuMax = dblAbu
+                   
+                   If intCharge < ChargeMin Then ChargeMin = intCharge
+                   If intCharge > ChargeMax Then ChargeMax = intCharge
+                   
+                   If dblFit < FitMin Then FitMin = dblFit
+                   If dblFit > FitMax Then FitMax = dblFit
+                   FitSum = FitSum + dblFit
+                   FitSumSq = FitSumSq + dblFit ^ 2
+                   
+                   If lngScanNumberCurrent < lngScanStart Then lngScanStart = lngScanNumberCurrent
+                   If lngScanNumberCurrent > lngScanEnd Then lngScanEnd = lngScanNumberCurrent
                 End If
-             
-                If dblMW < MassMin Then MassMin = dblMW
-                If dblMW > MassMax Then MassMax = dblMW
-                MassSum = MassSum + dblMW
-                MassSumSq = MassSumSq + dblMW ^ 2
-                
-                If dblAbu < AbuMin Then AbuMin = dblAbu
-                If dblAbu > AbuMax Then AbuMax = dblAbu
-                
-                If intCharge < ChargeMin Then ChargeMin = intCharge
-                If intCharge > ChargeMax Then ChargeMax = intCharge
-                
-                If dblFit < FitMin Then FitMin = dblFit
-                If dblFit > FitMax Then FitMax = dblFit
-                FitSum = FitSum + dblFit
-                FitSumSq = FitSumSq + dblFit ^ 2
-                
-                If lngScanNumberCurrent < lngScanStart Then lngScanStart = lngScanNumberCurrent
-                If lngScanNumberCurrent > lngScanEnd Then lngScanEnd = lngScanNumberCurrent
              Next j
              
              ' Minimum and Maximum Mass
@@ -1593,6 +1596,7 @@ Exit Function
 
 err_UMCStatistics1:
 Debug.Assert False
+'Resume next
 UMCStatistics1 = -1
 GoTo exit_UMCStatistics1
 End Function
@@ -2803,20 +2807,21 @@ End Function
 
 Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                                  ByVal blnComputeClassMassAndAbundance As Boolean, _
-                                 Optional blnUseProgressForm As Boolean = False, _
+                                 ByVal blnUseProgressForm As Boolean, _
                                  Optional frmCallingForm As VB.Form) As Boolean
+
 '--------------------------------------------------------------------------------
 'Recalculates parameters of the unique mass classes; returns True on success
 '
-'Oct 2003: Expanded to find the statistics for each group of points within a UMC
+' Oct 2003: Expanded to find the statistics for each group of points within a UMC
 '  with the same charge state; optionally, use the stats for the "most abundant"
 '  charge-state based group for the UMC class mass and class abundance
 '
-'May 2004: Expanded to allow use of subset of members of UMC for computing mass and abundance stats, as
+' May 2004: Expanded to allow use of subset of members of UMC for computing mass and abundance stats, as
 '            specified by glbPreferencesExpanded.UMCAdvancedStatsOptions
 '          MinScan and MaxScan are still computed using the entire class
 '
-'August 2009: Added parameter blnComputeClassMassAndAbundance, which should be false if we read
+' August 2009: Added parameter blnComputeClassMassAndAbundance, which should be false if we read
 '             predefined LCMSFeature info using clsFileIOPredefinedLCMSFeatures
 '
 '--------------------------------------------------------------------------------
@@ -2868,7 +2873,15 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
     Dim blnComputeIsoStats As Boolean
     Dim UMCMemberIsoStats(IREPORT_TAG_TYPE_CONSTANT_COUNT - 1) As Long
     Dim eIReportTagType As irtIReportTagTypeConstants
-        
+    
+    Dim lngMinScan As Long
+    Dim lngMaxScan As Long
+    Dim dblMinMW As Double
+    Dim dblMaxMW As Double
+                        
+    Dim lngClassCount As Long
+    Dim lngFeatureCountNoMappedPoints As Long
+    
     On Error GoTo err_CalculateClasses
     
     If blnUseProgressForm Then
@@ -2918,6 +2931,11 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
     End If
     
     With GelUMC(lngGelIndex)
+        If .def.OnePointPerLCMSFeature Then
+            ' Make sure this is true
+            .def.LoadedPredefinedLCMSFeatures = True
+        End If
+        
         ISMWField = .def.MWField
         If .UMCCnt > 0 Then
            For i = 0 To .UMCCnt - 1
@@ -2939,12 +2957,27 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                    
                    If .ClassCount > 0 Then
                       
-                      .MinScan = glHugeLong:               .MaxScan = -glHugeLong
-                      .MinMW = glHugeDouble:               .MaxMW = -glHugeDouble
+                      lngClassCount = .ClassCount
+                      If lngClassCount > UBound(.ClassMType) + 1 Then
+                          ' .ClassCount is larger than the number of entries in .ClassMType()
+                          ' This likely indicates a bug when loading predefined LC-MS Features
+                          Debug.Assert False
+                          
+                          ' Update lngClassCount based on .ClassMType
+                          lngClassCount = UBound(.ClassMType) + 1
+                          If .ClassMType(0) = 0 Then
+                              ' This UMC actually doesn't have any members in memory
+                              lngClassCount = 0
+                          End If
+                      End If
                       
-                      lngMaxMemberIndex = .ClassCount - 1
+                      lngMinScan = glHugeLong:              lngMaxScan = -glHugeLong
+                      dblMinMW = glHugeDouble:              dblMaxMW = -glHugeDouble
+                      
+                      lngMaxMemberIndex = lngClassCount - 1
                       UMCMembersMaxIndex = lngMaxMemberIndex
                       Do While UMCMembersMaxIndex > UBound(UMCMembersMW)
+                          ' Expand these arrays
                           ReDim UMCMembersMW(UBound(UMCMembersMW) * 2)
                           ReDim UMCMembersAbu(UBound(UMCMembersMW))
                           ReDim UMCMembersScan(UBound(UMCMembersMW))
@@ -2980,10 +3013,12 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                                eIReportTagType = GelData(lngGelIndex).IsoData(.ClassMInd(j)).IReportTagType
                           End Select
                           
-                          If UMCMembersMW(j) < .MinMW Then .MinMW = UMCMembersMW(j)
-                          If UMCMembersMW(j) > .MaxMW Then .MaxMW = UMCMembersMW(j)
-                          If UMCMembersScan(j) < .MinScan Then .MinScan = UMCMembersScan(j)
-                          If UMCMembersScan(j) > .MaxScan Then .MaxScan = UMCMembersScan(j)
+                         
+                          If UMCMembersMW(j) < dblMinMW Then dblMinMW = UMCMembersMW(j)
+                          If UMCMembersMW(j) > dblMaxMW Then dblMaxMW = UMCMembersMW(j)
+                          If UMCMembersScan(j) < lngMinScan Then lngMinScan = UMCMembersScan(j)
+                          If UMCMembersScan(j) > lngMaxScan Then lngMaxScan = UMCMembersScan(j)
+                            
                           If UMCMembersCharge(j) >= 0 And UMCMembersCharge(j) <= MAX_CHARGE_STATE Then
                              ChargeStatePresent(UMCMembersCharge(j)) = ChargeStatePresent(UMCMembersCharge(j)) + 1
                           Else
@@ -3000,6 +3035,42 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                       Next j
                    End If
                End With
+               
+               If dblMinMW < glHugeDouble Then
+                    If (.UMCs(i).MinMW = 0 And .UMCs(i).MaxMW = 0) Or Not .def.LoadedPredefinedLCMSFeatures Then
+                        If (.UMCs(i).MinMW > 0 And dblMinMW = 0) Then
+                            ' Do not update .MinMW or MaxMW
+                        Else
+                            If .UMCs(i).MinMW <> dblMinMW Then
+                                .UMCs(i).MinMW = dblMinMW
+                            End If
+                            
+                            If .UMCs(i).MaxMW <> dblMaxMW Then
+                                .UMCs(i).MaxMW = dblMaxMW
+                            End If
+                        End If
+                    End If
+               End If
+                  
+               If lngMinScan < glHugeLong Then
+                    If (.UMCs(i).MinScan = 0 And .UMCs(i).MaxScan = 0) Or Not .def.LoadedPredefinedLCMSFeatures Then
+                        If .UMCs(i).MinScan > 0 And lngMinScan = 0 Then
+                            ' Do not update .MinScan or .MaxScan
+                        Else
+                            If .UMCs(i).MinScan <> lngMinScan Then
+                                ' 9/30/2010: How often does this happen??
+                                Debug.Assert False
+                                .UMCs(i).MinScan = lngMinScan
+                            End If
+                            
+                            If .UMCs(i).MaxScan <> lngMaxScan Then
+                                ' 9/30/2010: How often does this happen??
+                                Debug.Assert False
+                                .UMCs(i).MaxScan = lngMaxScan
+                            End If
+                        End If
+                    End If
+               End If
                
                ' Determine the number of charge states present
                intChargeStatesPresent = 0
@@ -3101,6 +3172,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
     
                     If .UMCs(i).ChargeStateCount <= 1 Then
                         ' The "Best" Charge State Index must be the only index: 0
+                        ' Note that IMS data will always have just one charge state
                         intBestIndex = 0
                     Else
                         ' Determine .ChargeStateStatsRepInd based on the value of .ChargeStateStatsRepType
@@ -3218,8 +3290,15 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                     '
                     ' Another case where this is possible is if predefined lC_MS features were loaded, but the user applied an Isotopic Fit filter or Abundance filter when loading the _Isos.csv file
                     
-                    'Debug.Assert False
+                    lngFeatureCountNoMappedPoints = lngFeatureCountNoMappedPoints + 1
+                    If lngFeatureCountNoMappedPoints < 5 Then
+                        ' Only stop the IDE the first 5 times this happens
+                        Debug.Assert False
+                    End If
+                    
                     If blnComputeClassMassAndAbundance Then
+                        ' Update the class values to be -1
+                        ' This is important in case we adjusted the mass value of all of the features; we wouldn't want the .ClassMW values to still be wrong for these UMCs
                         With .UMCs(i)
                             .ClassAbundance = -1
                             .ClassMW = -1

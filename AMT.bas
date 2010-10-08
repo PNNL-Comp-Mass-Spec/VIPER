@@ -52,6 +52,7 @@ Private Const DB_FIELD_TMASSTAGS_PeptideProphetProbability = "High_Peptide_Proph
 Private Const DB_FIELD_TMTNET_NET = "Avg_GANET"
 Private Const DB_FIELD_TMTNET_PNET = "PNET"
 Private Const DB_FIELD_TMTNET_STDEV = "StD_GANET"
+Private Const DB_FIELD_TMTNET_CNT_NET = "Cnt_GANET"
 
 Private Const DB_FIELD_TPROTEINS_Protein_ID As String = "Ref_ID"
 Private Const DB_FIELD_TPROTEINS_Protein_Name As String = "Reference"
@@ -102,9 +103,13 @@ Public Const INT_STD_IDEnd = "("
 
 Public Const MTSLiCMark = "(SLiC: "
 Public Const MTSLiCEnd = ")"
+Public Const MTSLiCMarkLength = 7
 
 Public Const MTDelSLiCMark = "(DelSLiC: "
 Public Const MTDelSLiCEnd = ")"
+
+Public Const MTUPMark = "(UP: "
+Public Const MTUpEND = ")"
 
 Public Const MTDltMark = "Dlt:"         'used both for labeling
 Public Const MTNCntMark = "(N:"         'used if N count is stored
@@ -175,8 +180,9 @@ Public Type udtUMCMassTagRawMatches
     MatchingMemberCount As Long
     StandardizedSquaredDistance As Double
     SLiCScoreNumerator As Double
-    SLiCScore As Double                     ' SLiC Score (Spatially Localized Confidence score)
-    DelSLiC As Double                       ' Similar to DelCN, difference in SLiC score between top match and match with score value one less than this score
+    StacOrSLiC As Double                    ' STAC Score or SLiC Score (Spatially Localized Confidence score)
+    DelScore As Double                      ' Similar to DelCN, difference in STAC or SLiC score between top match and match with score value one less than this score
+    UniquenessProbability As Double         ' Uniqueness Probability from STAC
     MassErr As Double                       ' Observed difference (error) between MT tag mass and UMC class mass (in Da)
     NETErr As Double                        ' Observed difference (error) between MT tag NET and UMC class NET
     IDIsInternalStd As Boolean
@@ -186,9 +192,10 @@ Public Type udtAMTDataType
     ID As Long                          'AMT ID
     flag As Integer                     'Status field
     MW As Double                        'Theoretical molecular weight
-    NET As Double                       'elution time
+    NET As Double                       'elution time (average NET)
     MSMSObsCount As Long                'number of observations by MS/MS
     NETStDev As Double                  'elution time standard deviation
+    NETCount As Long                    'number of values averaged together to compute the average NET value
     PNET As Single                      'Theoretical NET (from DB)  (previously, held retention time, in seconds)
     CNT_N As Integer                    'count of N atoms
     CNT_Cys As Integer                  'count of Cysteines
@@ -241,6 +248,7 @@ Private Type udtAMTFieldPresentType
     MW As Boolean
     NET As Boolean
     NETStDev As Boolean
+    NETCount As Boolean
     Status As Boolean
     RetentionTime As Boolean
     PNET As Boolean
@@ -490,19 +498,19 @@ If Not (dbAMT Is Nothing) Then Set dbAMT = Nothing
 End Sub
 
 Public Function ConstructAMTReference(ByVal MW As Double, _
-                                       ByVal NETRT As Double, _
-                                       ByVal Delta As Long, _
-                                       ByVal AMTMatchIndex As Long, _
-                                       ByVal dblAMTMass As Double, _
-                                       ByVal dblSLiCScore As Double, _
-                                       ByVal dblDelSLiCScore As Double) As String
-    
+                                      ByVal NETRT As Double, _
+                                      ByVal Delta As Long, _
+                                      ByVal AMTMatchIndex As Long, _
+                                      ByVal dblAMTMass As Double, _
+                                      ByVal dblStacOrSLiC As Double, _
+                                      ByVal dblDelSLiCScore As Double, _
+                                      ByVal dblUPScore As Double) As String
+                                      
     'returns AMT reference string based on MW and samtDef
     'this function is called from SearchAMT and similar functions
     
     Dim AMTRef As String
     Dim MWTolRef As Double
-    Dim sMWTolRef As String
     
     Dim blnStoreAbsoluteValueOfError As Boolean
     
@@ -520,16 +528,25 @@ Public Function ConstructAMTReference(ByVal MW As Double, _
     ' The following assertion will fail if we used a huge search tolerance
     'Debug.Assert Abs(MWTolRef) < 1
     
-    sMWTolRef = MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd
     'put AMT ID and actual errors
-    AMTRef = ""
-    AMTRef = AMTRef & AMTMark & Trim(AMTData(AMTMatchIndex).ID) & sMWTolRef
-    AMTRef = AMTRef & MTSLiCMark & Round(dblSLiCScore, 4) & MTSLiCEnd
-    AMTRef = AMTRef & MTDelSLiCMark & Round(dblDelSLiCScore, 4) & MTDelSLiCEnd
-    
-    If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(AMTMatchIndex).CNT_N & MTEndMark
+    If samtDef.SaveNCnt Then
+        AMTRef = AMTMark & Trim(AMTData(AMTMatchIndex).ID) & _
+                 MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd & _
+                 MTSLiCMark & Round(dblStacOrSLiC, 4) & MTSLiCEnd & _
+                 MTDelSLiCMark & Round(dblDelSLiCScore, 4) & MTDelSLiCEnd & _
+                 MTUPMark & Round(dblUPScore, 4) & MTUpEND & _
+                 MTNCntMark & AMTData(AMTMatchIndex).CNT_N & MTEndMark
+    Else
+          
+        AMTRef = AMTMark & Trim(AMTData(AMTMatchIndex).ID) & _
+                 MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd & _
+                 MTSLiCMark & Round(dblStacOrSLiC, 4) & MTSLiCEnd & _
+                 MTDelSLiCMark & Round(dblDelSLiCScore, 4) & MTDelSLiCEnd & _
+                 MTUPMark & Round(dblUPScore, 4) & MTUpEND
+    End If
+  
     If Delta > 0 Then AMTRef = AMTRef & MTDltMark & Delta
-    AMTRef = AMTRef & glARG_SEP & " "
+    
     'do statistics
     AMTHits(AMTMatchIndex) = AMTHits(AMTMatchIndex) + 1
     AMTMWErr(AMTMatchIndex) = AMTMWErr(AMTMatchIndex) + Abs(MWTolRef)
@@ -547,15 +564,16 @@ Public Function ConstructAMTReference(ByVal MW As Double, _
     If NETRT > AMTNETMax(AMTMatchIndex) Then AMTNETMax(AMTMatchIndex) = NETRT
 
 exit_ConstructAMTReference:
-    ConstructAMTReference = AMTRef
+    ConstructAMTReference = AMTRef & glARG_SEP & " "
 
 End Function
 
 Public Function ConstructInternalStdReference(ByVal MW As Double, _
-                                       ByVal NETRT As Double, _
-                                       ByVal InternalStdIndex As Long, _
-                                       ByVal dblSLiCScore As Double, _
-                                       ByVal dblDelSLiCScore As Double) As String
+                                              ByVal NETRT As Double, _
+                                              ByVal InternalStdIndex As Long, _
+                                              ByVal dblSLiCScore As Double, _
+                                              ByVal dblDelSLiCScore As Double, _
+                                              ByVal dblUPScore As Double) As String
     
     'returns InternalStd reference string based on MW and samtDef
     'this function is called from SearchAMT and similar functions
@@ -590,12 +608,12 @@ On Error GoTo exit_ConstructInternalStdReference
         sNETTolRef = NETErrMark & Format$(NETTolRef, "0.000") & NETErrEnd
         
         'put Internal Standard ID and actual errors
-        IntStdRef = ""
-        IntStdRef = IntStdRef & INT_STD_MARK & .SeqID & sMWTolRef & sNETTolRef
-        IntStdRef = IntStdRef & MTSLiCMark & Round(dblSLiCScore, 4) & MTSLiCEnd
-        IntStdRef = IntStdRef & MTDelSLiCMark & Round(dblDelSLiCScore, 4) & MTSLiCEnd
-        
-        IntStdRef = IntStdRef & glARG_SEP & " "
+        IntStdRef = INT_STD_MARK & .SeqID & sMWTolRef & sNETTolRef & _
+                    MTSLiCMark & Round(dblSLiCScore, 4) & MTSLiCEnd & _
+                    MTDelSLiCMark & Round(dblDelSLiCScore, 4) & MTSLiCEnd & _
+                    MTUPMark & Round(dblUPScore, 4) & MTUpEND & _
+                    glARG_SEP & " "
+                    
     End With
 
 exit_ConstructInternalStdReference:
@@ -870,6 +888,10 @@ On Error GoTo err_LegacyDBLoadAMTData
         If udtFieldPresent.NETStDev Then
             rsAMTSQL = rsAMTSQL & ", " & strNETTable & DB_FIELD_TMTNET_STDEV
         End If
+        
+        If udtFieldPresent.NETCount Then
+            rsAMTSQL = rsAMTSQL & ", " & strNETTable & DB_FIELD_TMTNET_CNT_NET
+        End If
                           
         If udtFieldPresent.MSMSObsCount Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_MSMSObsCount
         If udtFieldPresent.HighNormalizedScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_HighNormalizedScore
@@ -1021,6 +1043,13 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                 End If
             End If
             
+            If udtFieldPresent.NETCount Then
+               If Not IsNull(.Fields(DB_FIELD_TMTNET_CNT_NET).Value) Then
+                  AMTData(lngIndex).NETCount = CLng(.Fields(DB_FIELD_TMTNET_CNT_NET).Value)
+               End If
+            End If
+            
+            
             ' Correct for files that have PNET defined but not NET, or vice versa
             ' This program uses AMTData().NET by default; AMTData().PNET historically held the retention time, in seconds, but now holds Predicted NET
             ' If one is missing from the Access DB file, then we'll copy the value from the other column to the missing column
@@ -1058,7 +1087,7 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                   AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_TMASSTAGS_PeptideProphetProbability).Value)
                End If
             End If
-            
+                     
             blnSuccess = True
         Case dbgGeneration1000, dbgGeneration1, dbgGeneration0800, dbgGeneration0900
             
@@ -1138,6 +1167,7 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             If udtFieldPresent.MSMSObsCount Then
                If Not IsNull(.Fields(DB_FIELD_AMT_MSMSObsCount).Value) Then
                   AMTData(lngIndex).MSMSObsCount = CLng(.Fields(DB_FIELD_AMT_MSMSObsCount).Value)
+                  AMTData(lngIndex).NETCount = AMTData(lngIndex).MSMSObsCount
                End If
             End If
             
@@ -1199,6 +1229,7 @@ Private Function EnumerateLegacyAMTFields(ByVal strLegacyDBFilePath As String, B
         .MW = False
         .NET = False
         .NETStDev = False
+        .NETCount = False
         .Status = False
         .RetentionTime = False
         .PNET = False
@@ -1291,6 +1322,7 @@ On Error GoTo err_EnumerateLegacyAMTFields:
                     Case LCase(DB_FIELD_TMTNET_NET):     udtFieldPresent.NET = True
                     Case LCase(DB_FIELD_TMTNET_PNET):    udtFieldPresent.PNET = True
                     Case LCase(DB_FIELD_TMTNET_STDEV):   udtFieldPresent.NETStDev = True
+                    Case LCase(DB_FIELD_TMTNET_CNT_NET): udtFieldPresent.NETCount = True
                     Case Else
                         ' Unknown field; skip it
                     End Select
@@ -1621,13 +1653,20 @@ Case glScope.glSc_All
       If .CSLines > 0 Then
          For i = 1 To .CSLines
             If i Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Calling CleanAMTRef .CSData(" & i & ")"
-             CleanAMTRef .CSData(i).MTID
+               ' Old Method:
+               '' CleanAMTRef .CSData(i).MTID
+               .CSData(i).MTID = ""
          Next i
       End If
       If .IsoLines > 0 Then
          For i = 1 To .IsoLines
             If i Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Calling CleanAMTRef .IsoData(" & i & ")"
-             CleanAMTRef .IsoData(i).MTID
+            
+            ' Old Method:
+            '' CleanAMTRef .IsoData(i).MTID
+            
+            ' New Method:
+            .IsoData(i).MTID = ""
          Next i
       End If
   End With
@@ -1814,7 +1853,14 @@ SearchAMT = -1
 GoTo exit_SearchAMT
 End Function
 
-Public Sub SearchAMTComputeSLiCScores(ByRef lngCurrIDCnt As Long, ByRef udtCurrIDMatches() As udtUMCMassTagRawMatches, ByVal dblClassMass As Double, ByVal dblMWTolFinal As Double, ByVal dblNETTolFinal As Double, ByVal eSearchRegionShape As srsSearchRegionShapeConstants)
+Public Sub SearchAMTComputeSLiCScores(ByRef lngCurrIDCnt As Long, _
+                                      ByRef udtCurrIDMatches() As udtUMCMassTagRawMatches, _
+                                      ByVal dblClassMass As Double, _
+                                      ByVal dblMWTolFinal As Double, _
+                                      ByVal dblNETTolFinal As Double, _
+                                      ByVal eSearchRegionShape As srsSearchRegionShapeConstants, _
+                                      ByVal blnUsingPrecomputedSTACScores As Boolean, _
+                                      ByVal blnFilterUsingFinalTolerances As Boolean)
     Dim lngIndex As Long
     
     Dim dblMassStDevPPM As Double
@@ -1833,68 +1879,71 @@ Public Sub SearchAMTComputeSLiCScores(ByRef lngCurrIDCnt As Long, ByRef udtCurrI
     
 On Error GoTo ComputeSLiCScoresErrorHandler
     
-    dblMassStDevPPM = glbPreferencesExpanded.SLiCScoreOptions.MassPPMStDev
-    If dblMassStDevPPM <= 0 Then dblMassStDevPPM = 3
+    If Not blnUsingPrecomputedSTACScores Then
     
-    dblMassStDevAbs = PPMToMass(dblMassStDevPPM, dblClassMass)
-    If dblMassStDevAbs <= 0 Then
-        Debug.Assert False
-        LogErrors 0, "AMT.Bas->SearchAMTComputeSLiCScores", "dblMassStDevAbs was <= 0, which isn't allowed"
-        dblMassStDevAbs = 0.003
-    End If
-    
-    ' Compute the standarized squared distance and the numerator sum
-    dblNumeratorSum = 0
-    For lngIndex = 0 To lngCurrIDCnt - 1
+        dblMassStDevPPM = glbPreferencesExpanded.SLiCScoreOptions.MassPPMStDev
+        If dblMassStDevPPM <= 0 Then dblMassStDevPPM = 3
         
-        ' December 2005: .UseAMTNETStDev is now always forced to be false
-''        If glbPreferencesExpanded.SLiCScoreOptions.UseAMTNETStDev Then
-''            ' The NET StDev is computed by combining the default NETStDev value with the AMT's specific NETStDev
-''            ' The combining is done by "adding in quadrature", which means to square each number, add together, and take the square root
-''
-''            If udtCurrIDMatches(lngIndex).IDIsInternalStd Then
-''                ' Internal Standard match; Internal Standards do not have NETStDev values
-''                dblNETStDevCombined = glbPreferencesExpanded.SLiCScoreOptions.NETStDev
-''            Else
-''                ' MT tag match
-''                lngMassTagIndexOriginal = udtCurrIDMatches(lngIndex).IDIndexOriginal
-''                dblNETStDevCombined = Sqr(glbPreferencesExpanded.SLiCScoreOptions.NETStDev ^ 2 + AMTData(lngMassTagIndexOriginal).NETStDev ^ 2)
-''            End If
-''
-''        Else
-            ' Simply use the default NETStDev value
-            dblNETStDevCombined = glbPreferencesExpanded.SLiCScoreOptions.NETStDev
-''        End If
-        
-        If dblNETStDevCombined <= 0 Then
+        dblMassStDevAbs = PPMToMass(dblMassStDevPPM, dblClassMass)
+        If dblMassStDevAbs <= 0 Then
             Debug.Assert False
-            LogErrors 0, "AMT.Bas->SearchAMTComputeSLiCScores", "dblNETStDevCombined was <= 0, which isn't allowed"
-            dblNETStDevCombined = 0.025
+            LogErrors 0, "AMT.Bas->SearchAMTComputeSLiCScores", "dblMassStDevAbs was <= 0, which isn't allowed"
+            dblMassStDevAbs = 0.003
         End If
         
-        With udtCurrIDMatches(lngIndex)
-            .StandardizedSquaredDistance = .MassErr ^ 2 / dblMassStDevAbs ^ 2 + .NETErr ^ 2 / dblNETStDevCombined ^ 2
+        ' Compute the standarized squared distance and the numerator sum
+        dblNumeratorSum = 0
+        For lngIndex = 0 To lngCurrIDCnt - 1
             
-            .SLiCScoreNumerator = (1 / (dblMassStDevAbs * dblNETStDevCombined)) * Exp(-.StandardizedSquaredDistance / 2)
+            ' December 2005: .UseAMTNETStDev is now always forced to be false
+    ''        If glbPreferencesExpanded.SLiCScoreOptions.UseAMTNETStDev Then
+    ''            ' The NET StDev is computed by combining the default NETStDev value with the AMT's specific NETStDev
+    ''            ' The combining is done by "adding in quadrature", which means to square each number, add together, and take the square root
+    ''
+    ''            If udtCurrIDMatches(lngIndex).IDIsInternalStd Then
+    ''                ' Internal Standard match; Internal Standards do not have NETStDev values
+    ''                dblNETStDevCombined = glbPreferencesExpanded.SLiCScoreOptions.NETStDev
+    ''            Else
+    ''                ' MT tag match
+    ''                lngMassTagIndexOriginal = udtCurrIDMatches(lngIndex).IDIndexOriginal
+    ''                dblNETStDevCombined = Sqr(glbPreferencesExpanded.SLiCScoreOptions.NETStDev ^ 2 + AMTData(lngMassTagIndexOriginal).NETStDev ^ 2)
+    ''            End If
+    ''
+    ''        Else
+                ' Simply use the default NETStDev value
+                dblNETStDevCombined = glbPreferencesExpanded.SLiCScoreOptions.NETStDev
+    ''        End If
             
-            dblNumeratorSum = dblNumeratorSum + .SLiCScoreNumerator
-        End With
-    Next lngIndex
-    
-    ' Compute the match score for each match
-    For lngIndex = 0 To lngCurrIDCnt - 1
-        With udtCurrIDMatches(lngIndex)
-            If dblNumeratorSum > 0 Then
-                .SLiCScore = Round(.SLiCScoreNumerator / dblNumeratorSum, 5)
-            Else
-                .SLiCScore = 0
+            If dblNETStDevCombined <= 0 Then
+                Debug.Assert False
+                LogErrors 0, "AMT.Bas->SearchAMTComputeSLiCScores", "dblNETStDevCombined was <= 0, which isn't allowed"
+                dblNETStDevCombined = 0.025
             End If
-        End With
-    Next lngIndex
-    
+            
+            With udtCurrIDMatches(lngIndex)
+                .StandardizedSquaredDistance = .MassErr ^ 2 / dblMassStDevAbs ^ 2 + .NETErr ^ 2 / dblNETStDevCombined ^ 2
+                
+                .SLiCScoreNumerator = (1 / (dblMassStDevAbs * dblNETStDevCombined)) * Exp(-.StandardizedSquaredDistance / 2)
+                
+                dblNumeratorSum = dblNumeratorSum + .SLiCScoreNumerator
+            End With
+        Next lngIndex
+        
+        ' Compute the match score for each match
+        For lngIndex = 0 To lngCurrIDCnt - 1
+            With udtCurrIDMatches(lngIndex)
+                If dblNumeratorSum > 0 Then
+                    .StacOrSLiC = Round(.SLiCScoreNumerator / dblNumeratorSum, 5)
+                Else
+                    .StacOrSLiC = 0
+                End If
+            End With
+        Next lngIndex
+        
+    End If
     
     If lngCurrIDCnt > 1 Then
-        ' Sort by SLiCScore descending (need a custom sort routine since a UDT)
+        ' Sort by SLiCScore descending (need a custom sort routine since udtCurrIDMatches is a UDT)
         ShellSortCurrIDMatches lngCurrIDCnt, udtCurrIDMatches
     End If
     
@@ -1908,30 +1957,33 @@ On Error GoTo ComputeSLiCScoresErrorHandler
         '  distinct from other matches (DelSLiC > threshold)
         
         If lngCurrIDCnt > 1 Then
-            udtCurrIDMatches(0).DelSLiC = (udtCurrIDMatches(0).SLiCScore - udtCurrIDMatches(1).SLiCScore)
+            udtCurrIDMatches(0).DelScore = (udtCurrIDMatches(0).StacOrSLiC - udtCurrIDMatches(1).StacOrSLiC)
             
             For lngIndex = 1 To lngCurrIDCnt - 1
-                udtCurrIDMatches(lngIndex).DelSLiC = 0
+                udtCurrIDMatches(lngIndex).DelScore = 0
             Next lngIndex
         Else
-            udtCurrIDMatches(0).DelSLiC = 1
+            udtCurrIDMatches(0).DelScore = 1
         End If
         
-        ' Now filter the list using the tighter tolerances:
-        '   MWTol is dblMWTolFinal and NET Tol is dblNETTolFinal
-        ' Since we're shrinking the array, we can copy in place
-        '
-        ' When testing whether to keep the match or not, we're testing whether the match is
-        '  in the ellipse or in the rectangle bounded by dblMWTolFinal and dblNETTolFinal
-        ' Note that these are half-widths of the ellipse or rectangle
-        lngNewIDCount = 0
-        For lngIndex = 0 To lngCurrIDCnt - 1
-            If TestPointInRegion(udtCurrIDMatches(lngIndex).NETErr, udtCurrIDMatches(lngIndex).MassErr, dblNETTolFinal, dblMWTolFinal, eSearchRegionShape) Then
-                udtCurrIDMatches(lngNewIDCount) = udtCurrIDMatches(lngIndex)
-                lngNewIDCount = lngNewIDCount + 1
-            End If
-        Next lngIndex
-           
+        If blnFilterUsingFinalTolerances Then
+            ' Now filter the list using the tighter tolerances:
+            '   MWTol is dblMWTolFinal and NET Tol is dblNETTolFinal
+            ' Since we're shrinking the array, we can copy in place
+            '
+            ' When testing whether to keep the match or not, we're testing whether the match is
+            '  in the ellipse or in the rectangle bounded by dblMWTolFinal and dblNETTolFinal
+            ' Note that these are half-widths of the ellipse or rectangle
+            lngNewIDCount = 0
+            For lngIndex = 0 To lngCurrIDCnt - 1
+                If TestPointInRegion(udtCurrIDMatches(lngIndex).NETErr, udtCurrIDMatches(lngIndex).MassErr, dblNETTolFinal, dblMWTolFinal, eSearchRegionShape) Then
+                    udtCurrIDMatches(lngNewIDCount) = udtCurrIDMatches(lngIndex)
+                    lngNewIDCount = lngNewIDCount + 1
+                End If
+            Next lngIndex
+        Else
+            lngNewIDCount = lngCurrIDCnt
+        End If
     End If
  
     If lngNewIDCount = 0 Then
@@ -1950,7 +2002,10 @@ ComputeSLiCScoresErrorHandler:
     
 End Sub
 
-Public Sub SearchAMTDefineTolerances(ByVal lngGelIndex As Long, ByVal UMCIndex As Long, ByRef udtAMTDef As SearchAMTDefinition, ByRef dblClassMass As Double, ByRef MWTolAbsBroad As Double, ByRef NETTolBroad As Double, ByRef MWTolAbsFinal As Double, ByRef NETTolFinal As Double)
+Public Sub SearchAMTDefineTolerances(ByVal lngGelIndex As Long, ByVal UMCIndex As Long, _
+                                     ByRef udtAMTDef As SearchAMTDefinition, ByRef dblClassMass As Double, _
+                                     ByRef MWTolAbsBroad As Double, ByRef NETTolBroad As Double, _
+                                     ByRef MWTolAbsFinal As Double, ByRef NETTolFinal As Double)
 
     Const STDEV_SCALING_FACTOR As Integer = 2
     
@@ -2045,7 +2100,7 @@ On Error GoTo ShellSortCurrIDMatchesErrorHandler
             udtCompareVal = udtCurrIDMatches(lngIndex)
             For lngIndexCompare = lngIndex - lngIncrement To lngLowIndex Step -lngIncrement
                 ' Use <= to sort ascending; Use > to sort descending
-                If udtCurrIDMatches(lngIndexCompare).SLiCScore > udtCompareVal.SLiCScore Then Exit For
+                If udtCurrIDMatches(lngIndexCompare).StacOrSLiC > udtCompareVal.StacOrSLiC Then Exit For
                 udtCurrIDMatches(lngIndexCompare + lngIncrement) = udtCurrIDMatches(lngIndexCompare)
             Next lngIndexCompare
             udtCurrIDMatches(lngIndexCompare + lngIncrement) = udtCompareVal
@@ -2422,6 +2477,7 @@ Public Sub InitializeAMTDataEntry(ByRef udtAMTDataPoint As udtAMTDataType, Optio
     udtAMTDataPoint.NET = 0
     udtAMTDataPoint.MSMSObsCount = 1
     udtAMTDataPoint.NETStDev = 0
+    udtAMTDataPoint.NETCount = 0
     udtAMTDataPoint.PNET = NET_VALUE_IF_NULL
     udtAMTDataPoint.CNT_N = -1
     udtAMTDataPoint.CNT_Cys = -1
@@ -2460,6 +2516,7 @@ If Not IsNull(S) Then
           AMTRef = GetAMTRefFromString(sTmp, 1)
           If Len(AMTRef) > 0 Then
              Remove1stSubstring sTmp, AMTRef
+             If Len(sTmp) = 0 Then Done = True
           Else
              Done = True
           End If
@@ -2759,7 +2816,7 @@ Public Function GetSLiCFromString(ByVal S As String) As String
 Dim Pos1 As Integer, Pos2 As Integer
 Pos1 = InStr(1, S, MTSLiCMark)
 If Pos1 > 0 Then
-   Pos1 = Pos1 + Len(MTSLiCMark)
+   Pos1 = Pos1 + MTSLiCMarkLength
    Pos2 = InStr(Pos1, S, MTSLiCEnd)
    If Pos2 > 0 Then GetSLiCFromString = Mid$(S, Pos1, Pos2 - Pos1)
 Else

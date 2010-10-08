@@ -8,18 +8,79 @@ Begin VB.Form frmFileLoadOptions
    LinkTopic       =   "Form1"
    ScaleHeight     =   6855
    ScaleWidth      =   7470
+   Begin VB.Frame fraFilterLCMSFeatures 
+      Caption         =   "LC-MS Feature Filters"
+      Height          =   1095
+      Left            =   3600
+      TabIndex        =   39
+      Top             =   3960
+      Width           =   3615
+      Begin VB.TextBox txtLCMSFeatureAbuMin 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   2400
+         TabIndex        =   43
+         Text            =   "0"
+         Top             =   240
+         Width           =   975
+      End
+      Begin VB.TextBox txtIMSConformerScoreMin 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   2400
+         TabIndex        =   45
+         Text            =   "0.75"
+         Top             =   675
+         Width           =   975
+      End
+      Begin VB.OptionButton optFilterLCMSFeatures 
+         Caption         =   "On"
+         Height          =   255
+         Index           =   1
+         Left            =   120
+         TabIndex        =   40
+         Top             =   240
+         Width           =   855
+      End
+      Begin VB.OptionButton optFilterLCMSFeatures 
+         Caption         =   "Off"
+         Height          =   255
+         Index           =   0
+         Left            =   120
+         TabIndex        =   41
+         Top             =   480
+         Value           =   -1  'True
+         Width           =   855
+      End
+      Begin VB.Label Label2 
+         Caption         =   "Min Abundance"
+         Height          =   255
+         Left            =   960
+         TabIndex        =   42
+         Top             =   240
+         Width           =   1215
+      End
+      Begin VB.Label lblIMSConformerScoreMin 
+         Caption         =   "Min Conformer Score"
+         Height          =   375
+         Left            =   960
+         TabIndex        =   44
+         Top             =   600
+         Width           =   1215
+      End
+   End
    Begin VB.Frame fraPredefinedLCMSFeatureOptions 
       Caption         =   "Predefined LC-MS Feature Options"
       Height          =   2055
       Left            =   120
       TabIndex        =   32
-      Top             =   4680
+      Top             =   4560
       Width           =   3375
       Begin VB.CheckBox chkSplitUMCsByExaminingAbundance 
          Caption         =   "Split LC-MS features after loading"
          Height          =   255
          Left            =   120
-         TabIndex        =   43
+         TabIndex        =   38
          Top             =   1680
          Width           =   3015
       End
@@ -29,7 +90,7 @@ Begin VB.Form frmFileLoadOptions
          Left            =   120
          List            =   "frmFileLoadOptions.frx":0002
          Style           =   2  'Dropdown List
-         TabIndex        =   41
+         TabIndex        =   37
          Top             =   1200
          Width           =   3000
       End
@@ -47,7 +108,7 @@ Begin VB.Form frmFileLoadOptions
          Height          =   255
          Index           =   3
          Left            =   120
-         TabIndex        =   42
+         TabIndex        =   36
          Top             =   960
          Width           =   2175
       End
@@ -74,7 +135,7 @@ Begin VB.Form frmFileLoadOptions
       Height          =   1215
       Left            =   120
       TabIndex        =   28
-      Top             =   3360
+      Top             =   3240
       Width           =   3375
       Begin VB.OptionButton optEvenOddScanFilter 
          Caption         =   "Only load odd-numbered scans"
@@ -109,8 +170,8 @@ Begin VB.Form frmFileLoadOptions
       Caption         =   "Set to &Defaults"
       Height          =   375
       Left            =   5640
-      TabIndex        =   39
-      Top             =   4440
+      TabIndex        =   49
+      Top             =   5760
       Width           =   1575
    End
    Begin VB.Frame fraOptionFrame 
@@ -196,8 +257,8 @@ Begin VB.Form frmFileLoadOptions
       Caption         =   "MS Level Filter"
       Height          =   1215
       Left            =   3600
-      TabIndex        =   36
-      Top             =   3885
+      TabIndex        =   46
+      Top             =   5205
       Width           =   1455
       Begin VB.ListBox lstMSLevelFilter 
          Height          =   840
@@ -205,7 +266,7 @@ Begin VB.Form frmFileLoadOptions
          Left            =   120
          List            =   "frmFileLoadOptions.frx":0006
          MultiSelect     =   2  'Extended
-         TabIndex        =   37
+         TabIndex        =   47
          Top             =   240
          Width           =   1215
       End
@@ -215,7 +276,7 @@ Begin VB.Form frmFileLoadOptions
       Height          =   1095
       Left            =   120
       TabIndex        =   15
-      Top             =   2160
+      Top             =   2040
       Width           =   3375
       Begin VB.OptionButton optCSandIsoDataFilterMode 
          Caption         =   "Only load Isotopic data"
@@ -250,21 +311,21 @@ Begin VB.Form frmFileLoadOptions
       Caption         =   "&Cancel"
       Height          =   375
       Left            =   5640
-      TabIndex        =   40
-      Top             =   4920
+      TabIndex        =   50
+      Top             =   6240
       Width           =   1575
    End
    Begin VB.CommandButton cmdLoad 
       Caption         =   "&Load"
       Height          =   375
       Left            =   5640
-      TabIndex        =   38
-      Top             =   3960
+      TabIndex        =   48
+      Top             =   5280
       Width           =   1575
    End
    Begin VB.Frame fraIsoFitFilter 
       Caption         =   "Isotopic Fit Filter"
-      Height          =   975
+      Height          =   855
       Left            =   120
       TabIndex        =   3
       Top             =   1080
@@ -416,43 +477,54 @@ Public Property Get AutoMapDataPointsMassTolerancePPM() As Single
     End If
 End Property
 
+Public Property Let FilterLCMSFeatures(blnEnable As Boolean)
+    If blnEnable Then
+        optFilterLCMSFeatures(1).Value = True
+    Else
+        optFilterLCMSFeatures(0).Value = True
+    End If
+End Property
+Public Property Get FilterLCMSFeatures() As Boolean
+    FilterLCMSFeatures = optFilterLCMSFeatures(1).Value
+End Property
+
 Public Property Let FilterOnIsoFit(blnEnable As Boolean)
     If blnEnable Then
-        optIsoFitFilter(1).value = True
+        optIsoFitFilter(1).Value = True
     Else
-        optIsoFitFilter(0).value = True
+        optIsoFitFilter(0).Value = True
     End If
 End Property
 Public Property Get FilterOnIsoFit() As Boolean
-    FilterOnIsoFit = optIsoFitFilter(1).value
+    FilterOnIsoFit = optIsoFitFilter(1).Value
 End Property
 
 Public Property Let FilterOnAbundance(blnEnable As Boolean)
     If blnEnable Then
-        optAbuFilter(1).value = True
+        optAbuFilter(1).Value = True
     Else
-        optAbuFilter(0).value = True
+        optAbuFilter(0).Value = True
     End If
 End Property
 Public Property Get FilterOnAbundance() As Boolean
-    FilterOnAbundance = optAbuFilter(1).value
+    FilterOnAbundance = optAbuFilter(1).Value
 End Property
 
 Public Property Let DataFilterMode(eDataFilterMode As dfmCSandIsoDataFilterModeConstants)
 Select Case eDataFilterMode
 Case dfmCSandIsoDataFilterModeConstants.dfmLoadCSDataOnly
-    optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadCSDataOnly).value = True
+    optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadCSDataOnly).Value = True
 Case dfmCSandIsoDataFilterModeConstants.dfmLoadIsoDataOnly
-    optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadIsoDataOnly).value = True
+    optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadIsoDataOnly).Value = True
 Case Else
     ' Includes dfmCSandIsoDataFilterModeConstants.dfmLoadAllData
-    optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadAllData).value = True
+    optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadAllData).Value = True
 End Select
 End Property
 Public Property Get DataFilterMode() As dfmCSandIsoDataFilterModeConstants
-    If optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadCSDataOnly).value = True Then
+    If optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadCSDataOnly).Value = True Then
         DataFilterMode = dfmCSandIsoDataFilterModeConstants.dfmLoadCSDataOnly
-    ElseIf optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadIsoDataOnly).value = True Then
+    ElseIf optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadIsoDataOnly).Value = True Then
         DataFilterMode = dfmCSandIsoDataFilterModeConstants.dfmLoadIsoDataOnly
     Else
         DataFilterMode = dfmCSandIsoDataFilterModeConstants.dfmLoadAllData
@@ -462,18 +534,18 @@ End Property
 Public Property Let EvenOddScanFilterMode(eEvenOddScanFilterMode As eosEvenOddScanFilterModeConstants)
 Select Case eEvenOddScanFilterMode
 Case eosEvenOddScanFilterModeConstants.eosLoadOddScansOnly
-    optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadOddScansOnly).value = True
+    optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadOddScansOnly).Value = True
 Case eosEvenOddScanFilterModeConstants.eosLoadEvenScansOnly
-    optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadEvenScansOnly).value = True
+    optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadEvenScansOnly).Value = True
 Case Else
     ' Includes eosEvenOddScanFilterModeConstants.eosLoadAllScans
-    optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadAllScans).value = True
+    optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadAllScans).Value = True
 End Select
 End Property
 Public Property Get EvenOddScanFilterMode() As eosEvenOddScanFilterModeConstants
-    If optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadOddScansOnly).value = True Then
+    If optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadOddScansOnly).Value = True Then
         EvenOddScanFilterMode = eosEvenOddScanFilterModeConstants.eosLoadOddScansOnly
-    ElseIf optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadEvenScansOnly).value = True Then
+    ElseIf optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadEvenScansOnly).Value = True Then
         EvenOddScanFilterMode = eosEvenOddScanFilterModeConstants.eosLoadEvenScansOnly
     Else
         EvenOddScanFilterMode = eosEvenOddScanFilterModeConstants.eosLoadAllScans
@@ -502,8 +574,30 @@ Public Property Get AbuFilterMin() As Double
     End If
 End Property
 
+Public Property Let IMSConformerScoreMin(dblValue As Double)
+    txtIMSConformerScoreMin.Text = dblValue
+End Property
+Public Property Get IMSConformerScoreMin() As Double
+    If IsNumeric(txtIMSConformerScoreMin) Then
+        IMSConformerScoreMin = txtIMSConformerScoreMin
+    Else
+        IMSConformerScoreMin = 0.75
+    End If
+End Property
+
+Public Property Let LCMSFeatureAbuMin(dblValue As Double)
+    txtLCMSFeatureAbuMin = dblValue
+End Property
+Public Property Get LCMSFeatureAbuMin() As Double
+    If IsNumeric(txtLCMSFeatureAbuMin) Then
+        LCMSFeatureAbuMin = txtLCMSFeatureAbuMin
+    Else
+        LCMSFeatureAbuMin = 0
+    End If
+End Property
+
 Public Property Let IsoFitMax(dblValue As Double)
-    txtIsoFitMaxValue = dblValue
+    txtIsoFitMaxValue.Text = dblValue
 End Property
 Public Property Get IsoFitMax() As Double
     If IsNumeric(txtIsoFitMaxValue) Then
@@ -520,8 +614,8 @@ Public Property Get LCMSFeaturePointsLoadMode() As Integer
     LCMSFeaturePointsLoadMode = cboLCMSFeaturePointsLoadMode.ListIndex
 End Property
 
-Public Property Let LCMSFeatureSplitUMCsByExaminingAbundance(value As Boolean)
-    SetCheckBox chkSplitUMCsByExaminingAbundance, value
+Public Property Let LCMSFeatureSplitUMCsByExaminingAbundance(Value As Boolean)
+    SetCheckBox chkSplitUMCsByExaminingAbundance, Value
 End Property
 Public Property Get LCMSFeatureSplitUMCsByExaminingAbundance() As Boolean
     LCMSFeatureSplitUMCsByExaminingAbundance = cChkBox(chkSplitUMCsByExaminingAbundance)
@@ -531,15 +625,15 @@ Public Property Get LoadCancelled() As Boolean
     LoadCancelled = mLoadCancelled
 End Property
 
-Public Property Let MaximumDataCountEnabled(value As Boolean)
-    SetCheckBox chkMaximumDataCountEnabled, value
+Public Property Let MaximumDataCountEnabled(Value As Boolean)
+    SetCheckBox chkMaximumDataCountEnabled, Value
 End Property
 Public Property Get MaximumDataCountEnabled() As Boolean
     MaximumDataCountEnabled = cChkBox(chkMaximumDataCountEnabled)
 End Property
 
-Public Property Let MaximumDataCountToLoad(value As Long)
-    txtMaximumDataCountToLoad.Text = value
+Public Property Let MaximumDataCountToLoad(Value As Long)
+    txtMaximumDataCountToLoad.Text = Value
 End Property
 Public Property Get MaximumDataCountToLoad() As Long
     If IsNumeric(txtMaximumDataCountToLoad) Then
@@ -549,15 +643,15 @@ Public Property Get MaximumDataCountToLoad() As Long
     End If
 End Property
 
-Public Property Let TotalIntensityPercentageFilterEnabled(value As Boolean)
-    SetCheckBox chkTotalIntensityPercentageFilterEnabled, value
+Public Property Let TotalIntensityPercentageFilterEnabled(Value As Boolean)
+    SetCheckBox chkTotalIntensityPercentageFilterEnabled, Value
 End Property
 Public Property Get TotalIntensityPercentageFilterEnabled() As Boolean
     TotalIntensityPercentageFilterEnabled = cChkBox(chkTotalIntensityPercentageFilterEnabled)
 End Property
 
-Public Property Let TotalIntensityPercentageFilter(value As Single)
-    txtTotalIntensityPercentageFilter.Text = value
+Public Property Let TotalIntensityPercentageFilter(Value As Single)
+    txtTotalIntensityPercentageFilter.Text = Value
 End Property
 Public Property Get TotalIntensityPercentageFilter() As Single
     If IsNumeric(txtTotalIntensityPercentageFilter) Then
@@ -649,6 +743,7 @@ Private Sub EnableDisableControls()
         blnEnableAbundanceFilters = False
         blnEnableDatacountFilters = False
         blnEnableLCMSFeatureFilters = False
+
     End Select
 
     optCSandIsoDataFilterMode(0).Enabled = blnEnableDataTypeFilter
@@ -663,22 +758,27 @@ Private Sub EnableDisableControls()
     optEvenOddScanFilter(1).Enabled = blnEnableDreamsFilters
     optEvenOddScanFilter(2).Enabled = blnEnableDreamsFilters
     If Not blnEnableDreamsFilters Then
-        optEvenOddScanFilter(0).value = True
+        optEvenOddScanFilter(0).Value = True
     End If
 
     optAbuFilter(0).Enabled = blnEnableAbundanceFilters
     optAbuFilter(1).Enabled = blnEnableAbundanceFilters
     If Not blnEnableAbundanceFilters Then
-        optAbuFilter(0).value = True
+        optAbuFilter(0).Value = True
     End If
     
     chkMaximumDataCountEnabled.Enabled = blnEnableDatacountFilters
     chkTotalIntensityPercentageFilterEnabled.Enabled = blnEnableDatacountFilters
     If Not blnEnableDatacountFilters Then
-        chkMaximumDataCountEnabled.value = vbUnchecked
-        chkTotalIntensityPercentageFilterEnabled.value = vbUnchecked
+        chkMaximumDataCountEnabled.Value = vbUnchecked
+        chkTotalIntensityPercentageFilterEnabled.Value = vbUnchecked
     End If
     
+    optFilterLCMSFeatures(0).Enabled = blnEnableLCMSFeatureFilters
+    optFilterLCMSFeatures(1).Enabled = blnEnableLCMSFeatureFilters
+    txtIMSConformerScoreMin.Enabled = blnEnableLCMSFeatureFilters
+    txtLCMSFeatureAbuMin.Enabled = blnEnableLCMSFeatureFilters
+        
     lstMSLevelFilter.Enabled = blnEnableMSLevelFilter
     If Not blnEnableMSLevelFilter Then
         lstMSLevelFilter.Selected(0) = True
@@ -708,28 +808,33 @@ Private Sub ResetToDefaults()
     
     Me.FilterOnIsoFit = True
     Me.FilterOnAbundance = False
+    Me.FilterLCMSFeatures = True
     
     Me.AbuFilterMin = 0
     Me.AbuFilterMax = 1E+15
     
     Me.IsoFitMax = 0.15
     
-    chkMaximumDataCountEnabled.value = vbChecked
+    optFilterLCMSFeatures(1).Value = True
+    Me.LCMSFeatureAbuMin = 0
+    Me.IMSConformerScoreMin = 0.75
+    
+    chkMaximumDataCountEnabled.Value = vbChecked
     Me.txtMaximumDataCountToLoad = DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD
     
-    chkTotalIntensityPercentageFilterEnabled.value = vbUnchecked
+    chkTotalIntensityPercentageFilterEnabled.Value = vbUnchecked
     Me.txtTotalIntensityPercentageFilter.Text = DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD
     
     mLoadCancelled = False
     
-    optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadAllData).value = True
+    optCSandIsoDataFilterMode(dfmCSandIsoDataFilterModeConstants.dfmLoadAllData).Value = True
     
     If Len(lblFilePath.Caption) = 0 Then
-        optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadAllScans).value = True
+        optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadAllScans).Value = True
     ElseIf InStr(LCase(lblFilePath.Caption), "dreams") > 0 Then
-        optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadEvenScansOnly).value = True
+        optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadEvenScansOnly).Value = True
     Else
-        optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadAllScans).value = True
+        optEvenOddScanFilter(eosEvenOddScanFilterModeConstants.eosLoadAllScans).Value = True
     End If
     
     With lstMSLevelFilter
@@ -743,14 +848,14 @@ Private Sub ResetToDefaults()
     
     With cboLCMSFeaturePointsLoadMode
         .Clear
-        .AddItem ("Load All Points")
-        .AddItem ("Load Mapped Points Only")
-        .AddItem ("Load 1 Point Per LC-MS Feature")
+        .AddItem ("Load All Points")                    ' 0
+        .AddItem ("Load Mapped Points Only")            ' 1
+        .AddItem ("Load 1 Point Per LC-MS Feature")     ' 2
         .ListIndex = 1
     End With
     
     txtAutoMapDataPointsMassTolerancePPM.Text = "5"
-    chkSplitUMCsByExaminingAbundance.value = vbUnchecked
+    chkSplitUMCsByExaminingAbundance.Value = vbUnchecked
     
     ' Call SetFileType to set file-type specific filters
     SetFileType mFileType
@@ -776,9 +881,9 @@ Public Sub SetFilePath(strFilePath As String)
         mFileSize = FileLen(strFilePath)
     
         If mFileSize > FILE_SIZE_THRESHOLD_BYTES Then
-            optIsoFitFilter(1).value = True
+            optIsoFitFilter(1).Value = True
         Else
-            optIsoFitFilter(1).value = False
+            optIsoFitFilter(1).Value = False
         End If
         
         lblFileSize = Round(mFileSize / 1024 / 1024, 1) & " MB"
@@ -843,7 +948,7 @@ End Sub
 Private Sub txtAbuFilterMin_Change()
     If IsNumeric(txtAbuFilterMin) Then
         If val(txtAbuFilterMin) > 0 Then
-            optAbuFilter(1).value = True
+            optAbuFilter(1).Value = True
         End If
     End If
 End Sub
@@ -856,12 +961,28 @@ Private Sub txtAbuFilterMin_LostFocus()
     ValidateDualTextBoxes txtAbuFilterMin, txtAbuFilterMax, True, 0, 1E+200, 1
 End Sub
 
+Private Sub txtIMSConformerScoreMin_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtIMSConformerScoreMin, KeyAscii, True, True, True, False, True, False, False, False, False, True
+End Sub
+
+Private Sub txtIMSConformerScoreMin_LostFocus()
+    ValidateTextboxValueDbl txtIMSConformerScoreMin, 0, 1, 0.75
+End Sub
+
 Private Sub txtIsoFitMaxValue_KeyPress(KeyAscii As Integer)
     TextBoxKeyPressHandler txtIsoFitMaxValue, KeyAscii, True, True, True, False, True, False, False, False, False, True
 End Sub
 
 Private Sub txtIsoFitMaxValue_LostFocus()
     ValidateTextboxValueDbl txtIsoFitMaxValue, 0, 1, 0.15
+End Sub
+
+Private Sub txtLCMSFeatureAbuMin_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtLCMSFeatureAbuMin, KeyAscii, True, True, True, False, True, False, False, False, False, True
+End Sub
+
+Private Sub txtLCMSFeatureAbuMin_LostFocus()
+    ValidateTextboxValueDbl txtLCMSFeatureAbuMin, 0, 1E+200, 0
 End Sub
 
 Private Sub txtMaximumDataCountToLoad_KeyPress(KeyAscii As Integer)

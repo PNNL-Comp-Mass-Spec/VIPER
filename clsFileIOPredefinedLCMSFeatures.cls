@@ -44,6 +44,10 @@ Private Const LCMSFEATURES_COLUMN_MONO_MASS_CALIBRATED As String = "monoisotopic
 Private Const LCMSFEATURES_COLUMN_ABUNDANCE As String = "abundance"
 Private Const LCMSFEATURES_COLUMN_CLASS_REP_MZ As String = "class_rep_mz"
 Private Const LCMSFEATURES_COLUMN_CLASS_REP_CHARGE As String = "class_rep_charge"
+Private Const LCMSFEATURES_COLUMN_CHARGE_MAX As String = "charge_max"
+Private Const LCMSFEATURES_COLUMN_DRIFT_TIME As String = "drift_time"
+Private Const LCMSFEATURES_COLUMN_CONFORMATION_FIT_SCORE As String = "conformation_fit_score"
+Private Const LCMSFEATURES_COLUMN_AVERAGE_ISOTOPIC_FIT As String = "average_isotopic_fit"
 
 Private Const LCMSFEATURES_COLUMN_AVERAGE_MONO_MASS As String = "average_mono_mass"
 Private Const LCMSFEATURES_COLUMN_UMC_MW_MIN As String = "umc_mw_min"
@@ -55,7 +59,7 @@ Private Const PEAK_MAP_COLUMN_FEATURE_INDEX As String = "feature_index"
 Private Const PEAK_MAP_COLUMN_PEAK_INDEX As String = "peak_index"
 Private Const PEAK_MAP_COLUMN_FILTERED_PEAK_INDEX As String = "filtered_peak_index"
 
-Private Const LCMSFEATURES_FILE_COLUMN_COUNT As Integer = 14
+Private Const LCMSFEATURES_FILE_COLUMN_COUNT As Integer = 16
 Private Enum LCMSFeaturesFileColumnConstants
     FeatureIndex = 0
     Scan = 1
@@ -71,6 +75,8 @@ Private Enum LCMSFeaturesFileColumnConstants
     MWMin = 11
     MWMax = 12
     MemberCount = 13
+    DriftTime = 14
+    ConformationFitScore = 15
 End Enum
 
 Private Const PEAK_MAP_FILE_COLUMN_COUNT As Integer = 3
@@ -85,6 +91,7 @@ Private mGelIndex As Integer
 Private mAutoMapDataPointsMassTolerancePPM As Double
 
 ' The following are parallel arrays
+' They are used to determine the indices of data in GelData().IsoData() that map to each feature
 Private mFeatureToPeakMapCount As Long
 Private mFeatureToPeakMapFeatureIdx() As Long
 Private mFeatureToPeakMapPeakIdx() As Long          ' These indices are the index values in GelData().IsoData() -- note that .IsoData() is a 1-based array
@@ -161,7 +168,7 @@ End Property
 Public Property Let HashMapOfPointsKept(ByRef objHashMap As clsParallelLngArrays)
     Set mHashMapOfPointsKept = objHashMap
 End Property
-
+        
 Public Property Let ProgressForm(ByRef objForm As frmProgress)
     Set mProgressForm = objForm
 End Property
@@ -179,7 +186,7 @@ End Sub
 
 ' Functions
 
-Private Function AddFeatureMembersToUMCs() As Boolean
+Private Function AddFeatureMembersToUMCs(ByRef objLCMSFeatureIndexMap As clsParallelLngArrays) As Boolean
     
     ' Be sure to call SortFeatureMapMembers before calling this function because this function
     '  assumes that the data in mFeatureToPeakMapFeatureIdx and mFeatureToPeakMapPeakIdx
@@ -190,7 +197,8 @@ Private Function AddFeatureMembersToUMCs() As Boolean
     Dim lngIndexEnd As Long
     Dim lngPeakIndexCount As Long
     
-    Dim lngFeatureIndexCurrent
+    Dim lngFeatureIndexOriginal As Long
+    Dim lngFeatureIndexInVIPER As Long
     
     Dim lngDataPointsMapped As Long
     Dim lngFeaturesProcessed As Long
@@ -208,8 +216,13 @@ Private Function AddFeatureMembersToUMCs() As Boolean
     Dim dblMass As Double
     Dim dblMinMass As Double
     Dim dblMaxMass As Double
+    Dim dblMassDiff As Double
     
+    Dim blnMatchFound As Boolean
     Dim blnSuccess As Boolean
+    
+    Dim lngFeatureCountNoMappedPoints As Long
+    Dim lngMassDiffWarningCount As Long
     
 On Error GoTo AddFeatureMembersToUMCsErrorHandler
 
@@ -222,11 +235,11 @@ On Error GoTo AddFeatureMembersToUMCsErrorHandler
     lngIndexStart = 0
     Do While lngIndexStart < mFeatureToPeakMapCount
     
-        lngFeatureIndexCurrent = mFeatureToPeakMapFeatureIdx(lngIndexStart)
+        lngFeatureIndexOriginal = mFeatureToPeakMapFeatureIdx(lngIndexStart)
         lngIndexEnd = lngIndexStart
                 
         Do While lngIndexEnd + 1 < mFeatureToPeakMapCount
-            If mFeatureToPeakMapFeatureIdx(lngIndexEnd + 1) = lngFeatureIndexCurrent Then
+            If mFeatureToPeakMapFeatureIdx(lngIndexEnd + 1) = lngFeatureIndexOriginal Then
                 lngIndexEnd = lngIndexEnd + 1
             Else
                 Exit Do
@@ -240,113 +253,152 @@ On Error GoTo AddFeatureMembersToUMCsErrorHandler
             Debug.Assert False
         Else
             
-            ' Determine the class rep index (i.e. the feature with the highest intensity)
+            ' Dereference lngFeatureIndexOriginal to lngFeatureIndexInVIPER using objLCMSFeatureIndexMap
+            lngFeatureIndexInVIPER = objLCMSFeatureIndexMap.GetItemForKey(lngFeatureIndexOriginal, blnMatchFound)
             
-            lngClassRepIndexPointer = lngIndexStart
-            If Not GetIsoDataInfo(mFeatureToPeakMapPeakIdx(lngClassRepIndexPointer), lngScan, dblMass, dblAbundance) Then
-                ' mFeatureToPeakMapPeakIdx() did not point to a valid index in GelData().IsoData()
-                ' This is possible if data was filtered when loading the _isos.csv file
-                Debug.Assert False
-            End If
+            If Not blnMatchFound Then
+                ' Could not dereference feature
+                ' This will happen if we filtered the features by abundance or conformer fit score
+                lngClassRepIndexPointer = 0
+            Else
             
-            dblBestAbundance = dblAbundance
-            dblClassAbundance = dblAbundance
-            
-            lngMinScan = lngScan
-            lngMaxScan = lngScan
-            
-            dblMinMass = dblMass
-            dblMaxMass = dblMass
-            
-            For lngIndex = lngIndexStart + 1 To lngIndexEnd
+                ' Determine the class rep index (i.e. the feature with the highest intensity)
                 
-                If Not GetIsoDataInfo(mFeatureToPeakMapPeakIdx(lngIndex), lngScan, dblMass, dblAbundance) Then
-                    ' lngClassRepIndexPointer did not point to a valid index in GelData().IsoData()
+                lngClassRepIndexPointer = lngIndexStart
+                If Not GetIsoDataInfo(mFeatureToPeakMapPeakIdx(lngClassRepIndexPointer), lngScan, dblMass, dblAbundance) Then
+                    ' mFeatureToPeakMapPeakIdx() did not point to a valid index in GelData().IsoData()
                     ' This is possible if data was filtered when loading the _isos.csv file
                     Debug.Assert False
-                Else
-                    If dblAbundance > dblBestAbundance Then
-                        dblBestAbundance = dblAbundance
-                        lngClassRepIndexPointer = lngIndex
-                    End If
-                    
-                    dblClassAbundance = dblClassAbundance + dblBestAbundance
-                    
-                    If lngScan < lngMinScan Then lngMinScan = lngScan
-                    If lngScan > lngMaxScan Then lngMaxScan = lngScan
-                    
-                    If dblMass < dblMinMass Then dblMinMass = dblMass
-                    If dblMass > dblMaxMass Then dblMaxMass = dblMass
-                
                 End If
+                              
+                dblBestAbundance = dblAbundance
+                dblClassAbundance = dblAbundance
                 
-            Next lngIndex
-            
-            With GelUMC(mGelIndex).UMCs(lngFeatureIndexCurrent)
-                .ClassRepInd = mFeatureToPeakMapPeakIdx(lngClassRepIndexPointer)
-                .ClassRepType = gldtIS
-                .ClassCount = lngPeakIndexCount               ' This is the expected count; the actual count could be lower due to filtering when loading the _isos.csv file
-                ReDim .ClassMInd(lngPeakIndexCount - 1)       ' members of the UMC(including representative)         (0-based array); index of the member in GelData
-                ReDim .ClassMType(lngPeakIndexCount - 1)      ' type of member: gldtCS or gldtIS
+                lngMinScan = lngScan
+                lngMaxScan = lngScan
                 
-                lngPeakIndexCount = 0
-                For lngIndex = lngIndexStart To lngIndexEnd
-                    If mFeatureToPeakMapPeakIdx(lngIndex) > 0 Then
-                        .ClassMInd(lngPeakIndexCount) = mFeatureToPeakMapPeakIdx(lngIndex)
-                        .ClassMType(lngPeakIndexCount) = gldtIS
-                        lngPeakIndexCount = lngPeakIndexCount + 1
-                    End If
-                Next lngIndex
-                lngDataPointsMapped = lngDataPointsMapped + lngPeakIndexCount
-                
-                ' Possibly update .ClassCount
-                If lngPeakIndexCount < .ClassCount Then
-                    .ClassCount = lngPeakIndexCount
+                dblMinMass = dblMass
+                dblMaxMass = dblMass
                     
-                    If .ClassCount = 0 Then
-                        ReDim Preserve .ClassMInd(0)
-                        ReDim Preserve .ClassMType(0)
-                        .ClassMInd(0) = 0
-                        .ClassMType(0) = gldtIS
+                For lngIndex = lngIndexStart + 1 To lngIndexEnd
+                    
+                    If Not GetIsoDataInfo(mFeatureToPeakMapPeakIdx(lngIndex), lngScan, dblMass, dblAbundance) Then
+                        ' mFeatureToPeakMapPeakIdx() did not point to a valid index in GelData().IsoData()
+                        ' This is possible if data was filtered when loading the _isos.csv file
+                        Debug.Assert False
                     Else
-                        ReDim Preserve .ClassMInd(.ClassCount - 1)
-                        ReDim Preserve .ClassMType(.ClassCount - 1)
+                        If dblAbundance > dblBestAbundance Then
+                            dblBestAbundance = dblAbundance
+                            lngClassRepIndexPointer = lngIndex
+                        End If
+                        
+                        dblClassAbundance = dblClassAbundance + dblBestAbundance
+                        
+                        If lngIndex = lngIndexStart + 1 Then
+                            If lngMinScan = 0 And dblMinMass = 0 Then
+                                ' The data point at index lngIndexStart didn't resolve to any valid, loaded data
+                                ' Update the min/max scan variables
+                                lngMinScan = lngScan
+                                lngMaxScan = lngScan
+                                
+                                dblMinMass = dblMass
+                                dblMaxMass = dblMass
+                            End If
+                        End If
+                        
+                        If lngScan < lngMinScan And lngScan > 0 Then lngMinScan = lngScan
+                        If lngScan > lngMaxScan Then lngMaxScan = lngScan
+                        
+                        If dblMass < dblMinMass And dblMass > 0 Then dblMinMass = dblMass
+                        If dblMass > dblMaxMass Then dblMaxMass = dblMass
+                    
                     End If
                     
-                End If
+                Next lngIndex
+                    
+                ' Now associate the data points with the LC-MS Feature
+                With GelUMC(mGelIndex).UMCs(lngFeatureIndexInVIPER)
+                    
+                    .ClassRepInd = mFeatureToPeakMapPeakIdx(lngClassRepIndexPointer)
+                    .ClassRepType = gldtIS
+                    .ClassCount = lngPeakIndexCount               ' This is the expected count; the actual count could be lower due to filtering when loading the _isos.csv file; we'll update lngPeakIndexCount in the following for loop with the actual count
+                    ReDim .ClassMInd(lngPeakIndexCount - 1)       ' members of the UMC(including representative)         (0-based array); index of the member in GelData
+                    ReDim .ClassMType(lngPeakIndexCount - 1)      ' type of member: gldtCS or gldtIS
+                    
+                    lngPeakIndexCount = 0
+                    For lngIndex = lngIndexStart To lngIndexEnd
+                        If mFeatureToPeakMapPeakIdx(lngIndex) > 0 Then
+                            
+                            ' Unless something really wacky is going on, the mass difference between the feature and
+                            '  each member data point should be less than 5 Da
+                            dblMassDiff = .ClassMW - GelData(mGelIndex).IsoData(mFeatureToPeakMapPeakIdx(lngIndex)).MonoisotopicMW
+                            
+                            If Abs(dblMassDiff) >= 5 Then
+                                lngMassDiffWarningCount = lngMassDiffWarningCount + 1
+                                If lngMassDiffWarningCount < 5 Then
+                                    Debug.Assert False
+                                End If
+                            End If
+                            
+                            .ClassMInd(lngPeakIndexCount) = mFeatureToPeakMapPeakIdx(lngIndex)
+                            .ClassMType(lngPeakIndexCount) = gldtIS
+                            lngPeakIndexCount = lngPeakIndexCount + 1
+                        End If
+                    Next lngIndex
+                    lngDataPointsMapped = lngDataPointsMapped + lngPeakIndexCount
+                    
+                    ' Update .ClassCount if lngPeakIndexCount is less than .ClassCount
+                    ' Note that .ClassCountPredefinedLCMSFeatures tracks the original value in .ClassCount
+                    If lngPeakIndexCount < .ClassCount Then
+                        .ClassCount = lngPeakIndexCount
+                        
+                        If .ClassCount = 0 Then
+                            ReDim Preserve .ClassMInd(0)
+                            ReDim Preserve .ClassMType(0)
+                            .ClassMInd(0) = 0
+                            .ClassMType(0) = 0
+                        Else
+                            ReDim Preserve .ClassMInd(.ClassCount - 1)
+                            ReDim Preserve .ClassMType(.ClassCount - 1)
+                        End If
+                        
+                    End If
+                    
+                    ' Only update .ClassAbundance if it is 0
+                    ' The reason is that the .ClassAbundance value loaded from disk will be much more accurate (and much higher) if we only loaded one point per LC-MS Feature
+                    If .ClassAbundance = 0 Then
+                        .ClassAbundance = dblClassAbundance
+                    End If
+                    
+                    ' Do not update Class mass data
+                    '.ClassMW
+                    '.ClassMWStD
+                    '.ClassMassCorrectionDa
+                    
+                    ' Do not update these items
+                    '.ClassScore
+                    '.ClassNET
+                    '.ClassStatusBits
+                    
+                    ' Only update .MinScan, .MaxScan, .MinMass, or .MaxMass if the actual values are less than or greater than the recorded values
+                    
+                    If lngMinScan < .MinScan And lngMinScan > 0 Then .MinScan = lngMinScan
+                    If lngMaxScan > .MaxScan Then .MaxScan = lngMaxScan
+                    
+                    If dblMinMass < .MinMW And dblMinMass > 0 Then .MinMW = dblMinMass
+                    If dblMaxMass > .MaxMW Then .MaxMW = dblMaxMass
+                    
+                    ' Leave the .ChargeStateStats values unchanged
+                    '.ChargeStateStatsRepInd
+                    '.ChargeStateCount
+                    
+                    ' Leave the .PercentMembersIReport values unchanged
+                    '.PercentMembersIReportMonoPlus4
+                    '.PercentMembersIReportMonoMinus4
+                    
+                End With
                 
-                ' Only update .ClassAbundance if it is 0
-                If .ClassAbundance = 0 Then
-                    .ClassAbundance = dblClassAbundance
-                End If
-                
-                ' Do not update Class mass data
-                '.ClassMW
-                '.ClassMWStD
-                '.ClassMassCorrectionDa
-                
-                ' Do not update these items
-                '.ClassScore
-                '.ClassNET
-                '.ClassStatusBits
-                
-                ' Only update .MinScan, .MaxScan, .MinMass, or .MaxMass if the actual values are less than or greater than the recorded values
-                
-                If lngMinScan < .MinScan Then .MinScan = lngMinScan
-                If lngMaxScan > .MaxScan Then .MaxScan = lngMaxScan
-                
-                If dblMinMass < .MinMW Then .MinMW = dblMinMass
-                If dblMaxMass > .MaxMW Then .MaxMW = dblMaxMass
-                
-                ' Leave the .ChargeStateStats values unchanged
-                '.ChargeStateStatsRepInd
-                '.ChargeStateCount
-                
-                ' Leave the .PercentMembersIReport values unchanged
-                '.PercentMembersIReportMonoPlus4
-                '.PercentMembersIReportMonoMinus4
-                
-            End With
+            End If
             
             lngFeaturesProcessed = lngFeaturesProcessed + 1
 
@@ -354,6 +406,27 @@ On Error GoTo AddFeatureMembersToUMCsErrorHandler
         
         lngIndexStart = lngIndexEnd + 1
     Loop
+    
+    ' Now step through the UMCs and look for any with  UBound(.ClassMType) = 0 and .ClassMType(0) = 0
+    ' These are features that were loaded into memory, but have no mapped points
+    ' Need to change .ClassCount to 0 for these features
+    ' Change .ClassCount to 0 for these features
+    For lngIndex = 0 To GelUMC(mGelIndex).UMCCnt - 1
+        If UBound(GelUMC(mGelIndex).UMCs(lngIndex).ClassMType) = 0 Then
+            If GelUMC(mGelIndex).UMCs(lngIndex).ClassMType(0) = 0 Then
+                ' This feature doesn't have any mapped points
+                ' This code won't normally be reached
+                
+                lngFeatureCountNoMappedPoints = lngFeatureCountNoMappedPoints + 1
+                If lngFeatureCountNoMappedPoints < 5 Then
+                    ' Only stop the IDE the first 5 times this happens
+                    Debug.Assert False
+                End If
+                
+                GelUMC(mGelIndex).UMCs(lngIndex).ClassCount = 0
+            End If
+        End If
+    Next lngIndex
     
     AddToAnalysisHistory mGelIndex, "Mapped " & Format(lngDataPointsMapped, "0,000") & " data points to " & Format(lngFeaturesProcessed, "0,000") & " LC-MS Features"
 
@@ -531,11 +604,14 @@ End Function
 
 Public Function CacheFeatureToPeakMapIndices(ByVal lngGelIndex As Long, _
                                              ByVal strLCMSFeatureToPeakMapFilePath As String, _
-                                             ByRef objPointsToKeep As clsParallelLngArrays) As Long
+                                             ByRef objPointsToKeep As clsParallelLngArrays, _
+                                             ByRef objFeatureToScanMap As clsParallelLngArrays) As Long
 
     '-------------------------------------------------------------------------
     ' Reads the LCMSFeatureToPeakMap file and populates a hash table
     ' with a mapping from peak index to feature index
+    '
+    ' Only keeps points with an entry in objFeatureToScanMap
     '
     'Returns 0 if data successfuly loaded,
     '-6 for file not found or invalid file,
@@ -558,6 +634,9 @@ Public Function CacheFeatureToPeakMapIndices(ByVal lngGelIndex As Long, _
     
     Dim lngDataLineCount As Long
     
+    Dim lngFeatureIndexCurrent As Long
+    Dim blnFeaturePassesFilters As Boolean
+    
     Dim blnColumnsDefined As Boolean
     Dim blnDataLine As Boolean
     Dim blnMissingColumns As Boolean
@@ -574,13 +653,16 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
     Else
         objPointsToKeep.Clear
     End If
-    
+ 
     If Not fso.FileExists(strLCMSFeatureToPeakMapFilePath) Then
         mErrorMessage = "File not found: " & strLCMSFeatureToPeakMapFilePath
         CacheFeatureToPeakMapIndices = -6
         Exit Function
     End If
-    
+        
+    ' Make sure objFeatureToScanMap is sorted
+    objFeatureToScanMap.SortNow
+       
     ReDim intColumnMapping(PEAK_MAP_FILE_COLUMN_COUNT - 1)
 
     ' Set the column mappings to -1 (not present) for now
@@ -598,6 +680,8 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
     End If
     
     lngDataLineCount = 0
+    lngFeatureIndexCurrent = -1
+    blnFeaturePassesFilters = True
     
     Set tsInFile = fso.OpenTextFile(strLCMSFeatureToPeakMapFilePath, ForReading, False)
     Do While Not tsInFile.AtEndOfStream
@@ -608,10 +692,11 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
         strLineIn = Trim(strLineIn)
         lngTotalBytesRead = lngTotalBytesRead + Len(strLineIn) + 2          ' Add 2 bytes to account for CrLf at end of line
         
-        If mFeatureToPeakMapCount Mod 500 = 0 Then
+        If lngDataLineCount Mod 500 = 0 Then
             mProgressPctComplete = lngTotalBytesRead / CSng(lngByteCountTotal) * 100
             If Not mProgressForm Is Nothing Then
                 mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, False
+                If KeyPressAbortProcess > 1 Then Exit Do
             End If
         End If
                 
@@ -686,18 +771,34 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
             ' Extract out the peak index and feature index that it is mapped to
             
             If mReadingFilteredIsosFile Then
+                ' The filtered peak index column will often be blank
+                ' Check for this using Len(strData(2))
                 lngPeakIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FilteredPeakIndex), -1)
             Else
                 lngPeakIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.PeakIndex), -1)
             End If
             
-            lngFeatureIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex), -1)
+            If lngPeakIndex >= 0 Then
+                lngFeatureIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeatureToPeakMapFileColumnConstants.FeatureIndex), -1)
+            End If
             
             If lngFeatureIndex >= 0 And lngPeakIndex >= 0 Then
                 ' Add 1 to keep indexing in sync with VIPER data structures
                 lngPeakIndex = lngPeakIndex + 1
+    
+                If lngFeatureIndex <> lngFeatureIndexCurrent Then
+                    ' Update lngFeatureIndexCurrent and see if it is present in objFeatureToScanMap
+                    lngFeatureIndexCurrent = lngFeatureIndex
+                    If objFeatureToScanMap.Exists(lngFeatureIndex) Then
+                        blnFeaturePassesFilters = True
+                    Else
+                        blnFeaturePassesFilters = False
+                    End If
+                End If
                 
-                objPointsToKeep.add lngPeakIndex, lngFeatureIndex
+                If blnFeaturePassesFilters Then
+                    objPointsToKeep.add lngPeakIndex, lngFeatureIndex
+                End If
             End If
         
             lngDataLineCount = lngDataLineCount + 1
@@ -714,12 +815,9 @@ On Error GoTo CacheFeatureToPeakMapIndicesErrorHandler
         AddToAnalysisHistory lngGelIndex, "Loaded feature to peak map information for " & Format(objPointsToKeep.Count, "0,000") & " data points"
     End If
     
-    If Not mProgressForm Is Nothing Then
-        mProgressForm.UpdateCurrentSubTask "Sorting cached features"
-    End If
-     
-    ' Sort the data in objPointsToKeep
-    objPointsToKeep.SortNow
+    ' Note: Do not sort the data in objPointsToKeep
+    ' We want to leave it sorted by the order that was in the _LCMSFeatureToPeakMap file for now, since
+    ' we plan to copy the data and place in objPointsToKeepSortedByPeak later
     
     CacheFeatureToPeakMapIndices = 0
     Exit Function
@@ -736,13 +834,18 @@ CacheFeatureToPeakMapIndicesErrorHandler:
     CacheFeatureToPeakMapIndices = lngReturnValue
 End Function
 
-Public Function CacheScanCenterForLCMSFeatures(ByVal lngGelIndex As Long, _
-                                               ByVal strLCMSFeaturesFilePath As String, _
-                                               ByRef objFeatureToScanMap As clsParallelLngArrays) As Long
+Public Function CachePredefinedLCMSFeatures(ByVal lngGelIndex As Long, _
+                                            ByVal strLCMSFeaturesFilePath As String, _
+                                            ByRef objFeatureToScanMap As clsParallelLngArrays, _
+                                            ByVal dblLCMSFeatureAbuMin As Double, _
+                                            ByVal dblIMSConformerScoreMin As Double) As Long
                                             
     '-------------------------------------------------------------------------
     ' Reads the LCMSFeature file and populates a hash table
     ' with a mapping from feature index to scan number of the center of the feature
+    '
+    ' If blnFilterFeatures = True, then will filter out features with:
+    '   abundance < dblLCMSAbundanceMin or conformation score < dblIMSConformerScoreMin
     '
     'Returns 0 if data successfuly loaded,
     '-6 for file not found or invalid file,
@@ -766,19 +869,31 @@ Public Function CacheScanCenterForLCMSFeatures(ByVal lngGelIndex As Long, _
     Dim blnColumnsDefined As Boolean
     Dim blnDataLine As Boolean
     
+    Dim blnFilterFeatures As Boolean
+    Dim blnValidFeature As Boolean
+    
     Dim strData() As String
     Dim strColumnHeader As String
 
     Dim intColumnMapping() As Integer
     
+    Dim dblAbundance As Double
+    Dim dblConformerScore As Double
+            
 On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
     
     Set objFeatureToScanMap = New clsParallelLngArrays
     
     If Not fso.FileExists(strLCMSFeaturesFilePath) Then
         mErrorMessage = "File not found: " & strLCMSFeaturesFilePath
-        CacheScanCenterForLCMSFeatures = -6
+        CachePredefinedLCMSFeatures = -6
         Exit Function
+    End If
+    
+    If dblLCMSFeatureAbuMin > 0 Or dblIMSConformerScoreMin > 0 Then
+        blnFilterFeatures = True
+    Else
+        blnFilterFeatures = False
     End If
     
     ReDim intColumnMapping(LCMSFEATURES_FILE_COLUMN_COUNT - 1)
@@ -792,7 +907,7 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
     lngTotalBytesRead = 0
     lngByteCountTotal = FileLen(strLCMSFeaturesFilePath)
     
-    mProgressDescription = "Caching scan centers for LC-MS features"
+    mProgressDescription = "Caching and filtering LC-MS features"
     If Not mProgressForm Is Nothing Then
         mProgressForm.InitializeSubtask mProgressDescription, 0, 100
     End If
@@ -827,6 +942,9 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
                     intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex) = LCMSFeaturesFileColumnConstants.FeatureIndex
                     intColumnMapping(LCMSFeaturesFileColumnConstants.Scan) = LCMSFeaturesFileColumnConstants.Scan
                     
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance) = LCMSFeaturesFileColumnConstants.Abundance
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore) = LCMSFeaturesFileColumnConstants.ConformationFitScore
+                    
                     blnDataLine = True
                     blnColumnsDefined = True
                 Else
@@ -840,6 +958,9 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
                         Select Case strColumnHeader
                         Case LCMSFEATURES_COLUMN_FEATURE_INDEX:         intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex) = lngIndex
                         Case LCMSFEATURES_COLUMN_SCAN:                  intColumnMapping(LCMSFeaturesFileColumnConstants.Scan) = lngIndex
+                        Case LCMSFEATURES_COLUMN_ABUNDANCE:             intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance) = lngIndex
+                        Case LCMSFEATURES_COLUMN_CONFORMATION_FIT_SCORE
+                            intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore) = lngIndex
                         Case Else
                             ' Ignore this column; either it's unknown or we don't need it in this function
                         End Select
@@ -872,9 +993,24 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
             ' Extract out the Feature index and central scan
             lngFeatureIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex), -1)
             lngScanCenter = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Scan), 0)
+            dblAbundance = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance), 0)
+            dblConformerScore = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore), 0)
             
             If lngFeatureIndex >= 0 Then
-                objFeatureToScanMap.add lngFeatureIndex, lngScanCenter
+                
+                blnValidFeature = True
+                If blnFilterFeatures Then
+                    If dblLCMSFeatureAbuMin > 0 And dblAbundance < dblLCMSFeatureAbuMin Then
+                        blnValidFeature = False
+                    ElseIf dblIMSConformerScoreMin > 0 And dblConformerScore < dblIMSConformerScoreMin Then
+                        blnValidFeature = False
+                    End If
+                End If
+                
+                If blnValidFeature Then
+                    objFeatureToScanMap.add lngFeatureIndex, lngScanCenter
+                End If
+                
             End If
         
         End If
@@ -886,19 +1022,19 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
     ' Sort the data in objFeatureToScanMap
     objFeatureToScanMap.SortNow
     
-    CacheScanCenterForLCMSFeatures = 0
+    CachePredefinedLCMSFeatures = 0
     Exit Function
 
 CacheScanCenterForLCMSFeaturesErrorHandler:
     Debug.Assert False
     lngReturnValue = Err.Number
-    LogErrors Err.Number, "CacheScanCenterForLCMSFeatures"
+    LogErrors Err.Number, "CachePredefinedLCMSFeatures"
     
     On Error Resume Next
     tsInFile.Close
     
     If lngReturnValue = 0 Then lngReturnValue = -10
-    CacheScanCenterForLCMSFeatures = lngReturnValue
+    CachePredefinedLCMSFeatures = lngReturnValue
 End Function
 
 Public Sub ClearFeatureToPeakMapping()
@@ -906,13 +1042,18 @@ Public Sub ClearFeatureToPeakMapping()
 End Sub
 
 ' Copies data from objPeakToFeatureMapping to the local arrays
+' During the copy, will update the PeakIndex value using mHashMapOfPointsKept, which has a mapping from the peak index in the data file to the peak index in VIPER's memory space
 ' In objPeakToFeatureMapping:
 '  Key is PeakIndex
 '  Value is FeatureIndex
+' Ideally, the data will already be sorted by FeatureIndex (since that's the order the data is written to the _LCMSFeatureToPeakMap.txt file)
 Public Sub DefineFeatureToPeakMapping(ByRef objPeakToFeatureMapping As clsParallelLngArrays)
     Dim lngIndex As Long
     Dim lngCachedCount As Long
     
+    Dim lngFeatureIndex As Long
+    
+    Dim lngPeakIndex As Long
     Dim lngPeakIndexNew As Long
     Dim blnMatchFound As Boolean
     
@@ -943,17 +1084,22 @@ Public Sub DefineFeatureToPeakMapping(ByRef objPeakToFeatureMapping As clsParall
     ' Copy the data from objPeakToFeatureMapping to the FeatureToPeakMap arrays
     For lngIndex = 0 To lngCachedCount - 1
     
-        mFeatureToPeakMapFeatureIdx(lngIndex) = objPeakToFeatureMapping.ValueByIndex(lngIndex)
-    
-        mFeatureToPeakMapPeakIdx(lngIndex) = objPeakToFeatureMapping.KeyByIndex(lngIndex)
+        lngPeakIndex = objPeakToFeatureMapping.KeyByIndex(lngIndex)
         
         ' Update the peak index using mHashMapOfPointsKept
-        lngPeakIndexNew = mHashMapOfPointsKept.GetItemForKey(mFeatureToPeakMapPeakIdx(lngIndex), blnMatchFound)
+        lngPeakIndexNew = mHashMapOfPointsKept.GetItemForKey(lngPeakIndex, blnMatchFound)
+        
         If blnMatchFound Then
-            mFeatureToPeakMapPeakIdx(lngIndex) = lngPeakIndexNew
+            
+            ''' Temp Debug
+            ''Debug.Assert lngPeakIndexNew <> 50599
+            
+            lngFeatureIndex = objPeakToFeatureMapping.ValueByIndex(lngIndex)
+            mFeatureToPeakMapFeatureIdx(mFeatureToPeakMapCount) = lngFeatureIndex
+            mFeatureToPeakMapPeakIdx(mFeatureToPeakMapCount) = lngPeakIndexNew
+            mFeatureToPeakMapCount = mFeatureToPeakMapCount + 1
         Else
-            ' Index not in mHashMapOfPointsKept; change it to 0
-            mFeatureToPeakMapPeakIdx(lngIndex) = 0
+            ' Index not in mHashMapOfPointsKept; skip this mapping
         End If
         
         If lngIndex Mod 1000 = 0 Then
@@ -965,8 +1111,15 @@ Public Sub DefineFeatureToPeakMapping(ByRef objPeakToFeatureMapping As clsParall
         End If
     Next lngIndex
 
-    mFeatureToPeakMapCount = lngCachedCount
-
+    ' Shrink the arrays
+    If mFeatureToPeakMapCount > 0 Then
+        ReDim Preserve mFeatureToPeakMapFeatureIdx(mFeatureToPeakMapCount - 1)
+        ReDim Preserve mFeatureToPeakMapPeakIdx(mFeatureToPeakMapCount - 1)
+    Else
+        ReDim Preserve mFeatureToPeakMapFeatureIdx(0)
+        ReDim Preserve mFeatureToPeakMapPeakIdx(0)
+    End If
+    
     mCachedFeatureToPeakMapDefined = True
     
 End Sub
@@ -1029,7 +1182,7 @@ Private Function GetColumnValueDbl(ByRef strData() As String, ByVal intColumnInd
     
 GetColumnValueErrorHandler:
     Debug.Assert False
-    GetColumnValueDbl = 0
+    GetColumnValueDbl = dblDefaultValue
     
 End Function
 
@@ -1037,7 +1190,7 @@ Private Function GetColumnValueLng(ByRef strData() As String, ByVal intColumnInd
     
     On Error GoTo GetColumnValueErrorHandler
     
-    If intColumnIndex >= 0 Then
+    If intColumnIndex >= 0 And Len(strData(intColumnIndex)) > 0 Then
         GetColumnValueLng = CLng(strData(intColumnIndex))
     Else
         GetColumnValueLng = lngDefaultValue
@@ -1047,7 +1200,7 @@ Private Function GetColumnValueLng(ByRef strData() As String, ByVal intColumnInd
     
 GetColumnValueErrorHandler:
     Debug.Assert False
-    GetColumnValueLng = 0
+    GetColumnValueLng = lngDefaultValue
     
 End Function
 
@@ -1069,6 +1222,10 @@ Private Function GetDefaultLCMSFeatureColumnHeaders(ByVal blnRequiredColumnsOnly
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_ABUNDANCE
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_CLASS_REP_MZ
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_CLASS_REP_CHARGE
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_CHARGE_MAX
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_DRIFT_TIME
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_CONFORMATION_FIT_SCORE
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_AVERAGE_ISOTOPIC_FIT
     End If
     
     GetDefaultLCMSFeatureColumnHeaders = strHeaders
@@ -1197,7 +1354,9 @@ End Function
 
 Public Function LoadLCMSFeatureFiles(ByVal strLCMSFeaturesFilePath As String, _
                                      ByVal strLCMSFeatureToPeakMapFilePath As String, _
-                                     ByVal lngGelIndex As Long) As Long
+                                     ByVal lngGelIndex As Long, _
+                                     ByVal dblIMSConformerScoreMin As Double, _
+                                     ByVal dblLCMSFeatureAbuMin As Double) As Long
                                      
     '-------------------------------------------------------------------------
     'Returns 0 if data successfuly loaded, -2 if data set is too large,
@@ -1288,7 +1447,10 @@ On Error GoTo LoadLCMSFeatureFilesErrorHandler
     mProgressPctComplete = 0 / CSng(lngByteCountTotal) * 100
     
     ' Read the LCMSFeature file
-    lngReturnValue = ReadLCMSFeaturesFile(fso, strLCMSFeaturesFilePath, objLCMSFeatureIndexMap, lngByteCountTotal, lngTotalBytesRead)
+    lngReturnValue = ReadLCMSFeaturesFile(fso, strLCMSFeaturesFilePath, _
+                                          objLCMSFeatureIndexMap, _
+                                          lngByteCountTotal, lngTotalBytesRead, _
+                                          dblLCMSFeatureAbuMin, dblIMSConformerScoreMin)
        
     If lngReturnValue = 0 Then
         If blnLoadFeatureToMapFile Then
@@ -1331,11 +1493,25 @@ On Error GoTo LoadLCMSFeatureFilesErrorHandler
             End If
             
             ' Now update GelUMC() with the data in mFeatureToPeakMap
-            blnSuccess = AddFeatureMembersToUMCs()
+            blnSuccess = AddFeatureMembersToUMCs(objLCMSFeatureIndexMap)
+        
+            ' Override some settings in the UMC Def
+            GelUMC(mGelIndex).def.UMCClassStatsUseStatsFromMostAbuChargeState = False
+       
+            GelUMC(mGelIndex).def.LoadedPredefinedLCMSFeatures = True
+            
+            If mPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+                GelUMC(mGelIndex).def.OnePointPerLCMSFeature = True
+            Else
+                GelUMC(mGelIndex).def.OnePointPerLCMSFeature = False
+            End If
         
             ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-            UpdateUMCStatArrays mGelIndex, False, False
-        
+            Dim blnComputeClassMassAndAbundance As Boolean
+            blnComputeClassMassAndAbundance = False
+    
+            UpdateUMCStatArrays mGelIndex, blnComputeClassMassAndAbundance, False
+
         End If
         
     End If
@@ -1357,7 +1533,9 @@ Private Function ReadLCMSFeaturesFile(ByRef fso As FileSystemObject, _
                                       ByVal strLCMSFeaturesFilePath As String, _
                                       ByRef objLCMSFeatureIndexMap As clsParallelLngArrays, _
                                       ByVal lngByteCountTotal As Long, _
-                                      ByRef lngTotalBytesRead As Long) As Long
+                                      ByRef lngTotalBytesRead As Long, _
+                                      ByVal dblLCMSFeatureAbuMin As Double, _
+                                      ByVal dblIMSConformerScoreMin As Double) As Long
                                       
     ' Returns 0 if no error, the error number if an error
 
@@ -1371,6 +1549,7 @@ Private Function ReadLCMSFeaturesFile(ByRef fso As FileSystemObject, _
     
     Dim blnColumnsDefined As Boolean
     Dim blnDataLine As Boolean
+    Dim blnKeepUMC As Boolean
     
     Dim strData() As String
     Dim strColumnHeader As String
@@ -1381,6 +1560,7 @@ Private Function ReadLCMSFeaturesFile(ByRef fso As FileSystemObject, _
     Dim lngScanCenter As Long
     Dim dblMonoisotopicMass As Double
     Dim dblClassAbundance As Double
+    Dim dblIMSConformerScore As Double
     
     Dim blnSuccess As Boolean
     
@@ -1439,6 +1619,12 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                     intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepMZ) = LCMSFeaturesFileColumnConstants.ClassRepMZ
                     intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepCharge) = LCMSFeaturesFileColumnConstants.ClassRepCharge
                     
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.MWMin) = LCMSFeaturesFileColumnConstants.MWMin
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.MWMax) = LCMSFeaturesFileColumnConstants.MWMax
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.MemberCount) = LCMSFeaturesFileColumnConstants.MemberCount
+                    
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.DriftTime) = LCMSFeaturesFileColumnConstants.DriftTime
+                    intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore) = LCMSFeaturesFileColumnConstants.ConformationFitScore
 
                     ' Column headers were not present
                      AddToAnalysisHistory mGelIndex, "LCMSFeatures file " & fso.GetFileName(strLCMSFeaturesFilePath) & " did not contain column headers; using the default headers (" & GetDefaultLCMSFeatureColumnHeaders(False) & ")"
@@ -1470,10 +1656,21 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                         Case LCMSFEATURES_COLUMN_UMC_MEMBER_COUNT:      intColumnMapping(LCMSFeaturesFileColumnConstants.MemberCount) = lngIndex
 
                         Case LCMSFEATURES_COLUMN_AVERAGE_MONO_MASS:
-                            ' Ingore this column
+                            ' Ignore this column
                         Case LCMSFEATURES_COLUMN_ABUNDANCE_MAX:
-                            ' Ingore this column
+                            ' Ignore this column
+                        Case LCMSFEATURES_COLUMN_CHARGE_MAX
+                            ' Ignore this column
+                            
+                        Case LCMSFEATURES_COLUMN_DRIFT_TIME
+                            intColumnMapping(LCMSFeaturesFileColumnConstants.DriftTime) = lngIndex
+                            
+                        Case LCMSFEATURES_COLUMN_CONFORMATION_FIT_SCORE
+                            intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore) = lngIndex
                         
+                        Case LCMSFEATURES_COLUMN_AVERAGE_ISOTOPIC_FIT
+                            ' Ignore this column
+                            
                         Case Else
                             ' Unknown column header; ignore it, but post an entry to the analysis history
                             If Len(strUnknownColumnList) > 0 Then
@@ -1523,57 +1720,81 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                 lngScanCenter = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Scan), 0)
                 dblMonoisotopicMass = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMass), 0)
                 dblClassAbundance = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance), 0)
+                dblIMSConformerScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore), 0)
                 
-                If GelUMC(mGelIndex).UMCCnt >= UBound(GelUMC(mGelIndex).UMCs) Then
-                    ' Reserve more room in .UMCs()
-                    blnSuccess = ManageClasses(mGelIndex, UMCMngAdd)
+                blnKeepUMC = True
+                If dblLCMSFeatureAbuMin > 0 And dblClassAbundance < dblLCMSFeatureAbuMin Then
+                    blnKeepUMC = False
                 End If
-                
-                ' Define the new .UMC
-                With GelUMC(mGelIndex).UMCs(GelUMC(mGelIndex).UMCCnt)
+    
+                If dblIMSConformerScoreMin > 0 And dblIMSConformerScore < dblIMSConformerScoreMin Then
+                    blnKeepUMC = False
+                End If
+    
+                If blnKeepUMC Then
+    
+                    If GelUMC(mGelIndex).UMCCnt >= UBound(GelUMC(mGelIndex).UMCs) Then
+                        ' Reserve more room in .UMCs()
+                        blnSuccess = ManageClasses(mGelIndex, UMCMngAdd)
+                    End If
                     
-                    .ClassRepInd = 0
-                    .ClassRepType = gldtIS
-                    .ClassCount = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MemberCount), 0)
-                    
-                    ReDim .ClassMInd(0)         ' members of the UMC(including representative)         (0-based array); index of the member in GelData
-                    ReDim .ClassMType(0)        ' type of member: gldtCS or gldtIS
-                    .ClassAbundance = dblClassAbundance
-                    
-                    .ClassMW = dblMonoisotopicMass
-                    .ClassMWStD = 0
-                    .ClassMassCorrectionDa = 0
-                    
-                    .ClassScore = 0
-                    .ClassNET = 0
-                    .ClassStatusBits = 0
-                    
-                    .MinScan = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ScanStart), lngScanCenter)
-                    .MaxScan = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ScanEnd), lngScanCenter)
-                    
-                    .MinMW = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MWMin), 0)
-                    .MaxMW = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MWMax), 0)
-                                        
-                    .ChargeStateStatsRepInd = 0
-                    .ChargeStateCount = 0
-                    ReDim .ChargeStateBasedStats(0)
-                    With .ChargeStateBasedStats(0)
-                        .Charge = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepCharge), 0)
-                        .Count = 1
-                        .Mass = dblMonoisotopicMass
-                        .MassStD = 0
-                        .Abundance = dblClassAbundance
-                        .GroupRepIndex = 0          ' Index of the group representative; pointer to .ClassMInd() and .ClassMType() arrays, NOT a direct pointer to GelData
+                    ' Define the new .UMC
+                    With GelUMC(mGelIndex).UMCs(GelUMC(mGelIndex).UMCCnt)
+                        
+                        .ClassRepInd = 0
+                        .ClassRepType = gldtIS
+                        .ClassCount = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MemberCount), 0)
+                        
+                        If .ClassCount > 32767 Then
+                            ' This is a 32-bit integer; cap the class count at 32767
+                            .ClassCountPredefinedLCMSFeatures = 32767
+                        Else
+                            .ClassCountPredefinedLCMSFeatures = .ClassCount
+                        End If
+                        
+                        
+                        ReDim .ClassMInd(0)         ' members of the UMC(including representative)         (0-based array); index of the member in GelData
+                        ReDim .ClassMType(0)        ' type of member: gldtCS or gldtIS
+                        .ClassAbundance = dblClassAbundance
+                        
+                        .ClassMW = dblMonoisotopicMass
+                        .ClassMWStD = 0
+                        .ClassMassCorrectionDa = 0
+                        
+                        .ClassScore = dblIMSConformerScore
+                        .ClassNET = 0
+                        .ClassStatusBits = 0
+                        
+                        .MinScan = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ScanStart), lngScanCenter)
+                        .MaxScan = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ScanEnd), lngScanCenter)
+                        
+                        .MinMW = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MWMin), 0)
+                        .MaxMW = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MWMax), 0)
+    
+                        .DriftTime = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.DriftTime), 0)
+                        
+                        .ChargeStateStatsRepInd = 0
+                        .ChargeStateCount = 0
+                        ReDim .ChargeStateBasedStats(0)
+                        With .ChargeStateBasedStats(0)
+                            .Charge = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepCharge), 0)
+                            .Count = 1
+                            .Mass = dblMonoisotopicMass
+                            .MassStD = 0
+                            .Abundance = dblClassAbundance
+                            .GroupRepIndex = 0          ' Index of the group representative; pointer to .ClassMInd() and .ClassMType() arrays, NOT a direct pointer to GelData
+                        End With
+                        
+                        .PercentMembersIReportMonoPlus4 = 0
+                        .PercentMembersIReportMonoMinus4 = 0
                     End With
                     
-                    .PercentMembersIReportMonoPlus4 = 0
-                    .PercentMembersIReportMonoMinus4 = 0
-                End With
-                
-                ' Store the mapping between Index in the LCMSFeatures file and Index in VIPER
-                objLCMSFeatureIndexMap.add lngFeatureIndex, GelUMC(mGelIndex).UMCCnt
-                
-                GelUMC(mGelIndex).UMCCnt = GelUMC(mGelIndex).UMCCnt + 1
+                    ' Store the mapping between Index in the LCMSFeatures file and Index in VIPER
+                    objLCMSFeatureIndexMap.add lngFeatureIndex, GelUMC(mGelIndex).UMCCnt
+                    
+                    GelUMC(mGelIndex).UMCCnt = GelUMC(mGelIndex).UMCCnt + 1
+                    
+                End If
             End If
         End If
     
@@ -1827,7 +2048,7 @@ ReadLCMSFeatureToPeakMapFileErrorHandler:
 
 End Function
 
-
+' Sorts the data in mFeatureToPeakMapFeatureIdx and mFeatureToPeakMapPeakIdx
 Private Sub SortFeatureMapMembers()
 
     Dim lngIndex As Long
@@ -1841,6 +2062,8 @@ Private Sub SortFeatureMapMembers()
     Dim lngNewFeatureToPeakMapCount As Long
     Dim lngNewPeakIndexCount As Long
     
+    Dim blnSortRequired As Boolean
+    
     ' Makes sure the peak indices associated with each Feature Index are sorted (and have no duplicates)
     
 On Error GoTo SortFeatureMapMembersErrorHandler
@@ -1851,8 +2074,19 @@ On Error GoTo SortFeatureMapMembersErrorHandler
         Exit Sub
     End If
     
-    ' First sort by feature index
-    ShellSortLongWithParallelLong mFeatureToPeakMapFeatureIdx, mFeatureToPeakMapPeakIdx, 0, mFeatureToPeakMapCount - 1
+    ' First check whether a sort is even required
+    blnSortRequired = False
+    For lngIndex = 0 To mFeatureToPeakMapCount - 2
+        If mFeatureToPeakMapFeatureIdx(lngIndex) > mFeatureToPeakMapFeatureIdx(lngIndex + 1) Then
+            blnSortRequired = True
+            Exit For
+        End If
+    Next lngIndex
+    
+    If blnSortRequired Then
+        ' Sort by feature index
+        ShellSortLongWithParallelLong mFeatureToPeakMapFeatureIdx, mFeatureToPeakMapPeakIdx, 0, mFeatureToPeakMapCount - 1
+    End If
     
     ' Reserve space in lngPeakIndicesForFeature
     lngPeakIndexCount = 0
@@ -1879,6 +2113,18 @@ On Error GoTo SortFeatureMapMembersErrorHandler
             End If
         Loop
     
+        ' Now see if a sort is required or if duplicate values exist or if any of the entries have mFeatureToPeakMapPeakIdx(lngIndex) = 0
+        blnSortRequired = False
+        For lngIndex = lngIndexStart To lngIndexEnd - 1
+            If mFeatureToPeakMapPeakIdx(lngIndex) = 0 Then
+                blnSortRequired = True
+                Exit For
+            ElseIf mFeatureToPeakMapPeakIdx(lngIndex) >= mFeatureToPeakMapPeakIdx(lngIndex + 1) Then
+                blnSortRequired = True
+                Exit For
+            End If
+        Next lngIndex
+        
         ' Make sure lngPeakIndicesForFeature has enough room for this feature's peaks
         If lngIndexEnd - lngIndexStart + 1 > UBound(lngPeakIndicesForFeature) Then
             ReDim lngPeakIndicesForFeature(lngIndexEnd - lngIndexStart)
@@ -1886,26 +2132,32 @@ On Error GoTo SortFeatureMapMembersErrorHandler
         
         lngPeakIndexCount = 0
         For lngIndex = lngIndexStart To lngIndexEnd
-            lngPeakIndicesForFeature(lngPeakIndexCount) = mFeatureToPeakMapPeakIdx(lngIndex)
-            lngPeakIndexCount = lngPeakIndexCount + 1
-        Next lngIndex
-        
-        ' Now sort mFeatureToPeakMapPeakIdx
-        ShellSortLong lngPeakIndicesForFeature, 0, lngPeakIndexCount - 1
-        
-        ' Remove any duplicates in mFeatureToPeakMapPeakIdx by copying in place
-        lngNewPeakIndexCount = 1
-        For lngIndex = 1 To lngPeakIndexCount - 1
-            If lngPeakIndicesForFeature(lngIndex) <> lngPeakIndicesForFeature(lngIndex - 1) Then
-                ' Peak index is new; keep it
-                ' Only need to copy if lngNewPeakIndexCount is not equal to lngIndex, and this will only happen if we found (and removed) a duplicate
-                If lngNewPeakIndexCount <> lngIndex Then
-                    lngPeakIndicesForFeature(lngNewPeakIndexCount) = lngPeakIndicesForFeature(lngIndex)
-                End If
-                lngNewPeakIndexCount = lngNewPeakIndexCount + 1
+            If mFeatureToPeakMapPeakIdx(lngIndex) > 0 Then
+                lngPeakIndicesForFeature(lngPeakIndexCount) = mFeatureToPeakMapPeakIdx(lngIndex)
+                lngPeakIndexCount = lngPeakIndexCount + 1
             End If
         Next lngIndex
-        lngPeakIndexCount = lngNewPeakIndexCount
+        
+        If blnSortRequired Then
+    
+            ' Now sort mFeatureToPeakMapPeakIdx
+            ShellSortLong lngPeakIndicesForFeature, 0, lngPeakIndexCount - 1
+            
+            ' Remove any duplicates in mFeatureToPeakMapPeakIdx by copying in place
+            lngNewPeakIndexCount = 1
+            For lngIndex = 1 To lngPeakIndexCount - 1
+                If lngPeakIndicesForFeature(lngIndex) <> lngPeakIndicesForFeature(lngIndex - 1) Then
+                    ' Peak index is new; keep it
+                    ' Only need to copy if lngNewPeakIndexCount is not equal to lngIndex, and this will only happen if we found (and removed) a duplicate
+                    If lngNewPeakIndexCount <> lngIndex Then
+                        lngPeakIndicesForFeature(lngNewPeakIndexCount) = lngPeakIndicesForFeature(lngIndex)
+                    End If
+                    lngNewPeakIndexCount = lngNewPeakIndexCount + 1
+                End If
+            Next lngIndex
+            lngPeakIndexCount = lngNewPeakIndexCount
+            
+        End If
         
         ' Now copy the data back into mFeatureToPeakMapFeatureIdx and mFeatureToPeakMapPeakIdx
         For lngIndex = 0 To lngPeakIndexCount - 1
@@ -1917,7 +2169,7 @@ On Error GoTo SortFeatureMapMembersErrorHandler
         lngIndexStart = lngIndexEnd + 1
     Loop
     
-    ' Update mFeatureToPeakMapCount to match the new count (they will differe only if duplicates were removed)
+    ' Update mFeatureToPeakMapCount to match the new count (they will differ only if duplicates were removed)
     mFeatureToPeakMapCount = lngNewFeatureToPeakMapCount
     
     Exit Sub

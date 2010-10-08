@@ -185,7 +185,7 @@ Private Function GetColumnValueDbl(ByRef strData() As String, ByVal intColumnInd
     
 GetColumnValueErrorHandler:
     Debug.Assert False
-    GetColumnValueDbl = 0
+    GetColumnValueDbl = dblDefaultValue
     
 End Function
 
@@ -203,7 +203,7 @@ Private Function GetColumnValueLng(ByRef strData() As String, ByVal intColumnInd
     
 GetColumnValueErrorHandler:
     Debug.Assert False
-    GetColumnValueLng = 0
+    GetColumnValueLng = lngDefaultValue
     
 End Function
 
@@ -228,7 +228,7 @@ Private Function GetColumnValueSng(ByRef strData() As String, ByVal intColumnInd
     
 GetColumnValueErrorHandler:
     Debug.Assert False
-    GetColumnValueSng = 0
+    GetColumnValueSng = sngDefaultValue
     
 End Function
 
@@ -296,6 +296,73 @@ Private Function StringTrimEnd(ByVal strText As String, ByVal strTextToTrim As S
     StringTrimEnd = strTrimmedText
 End Function
 
+''Private Sub FilterLCMSFeatures(ByVal lngGelIndex As Long, _
+''                               ByVal dblLCMSFeatureAbuMin As Double, _
+''                               ByVal dblIMSConformerScoreMin As Double)
+''
+''    Dim i As Long
+''    Dim lngUMCCountNew As Long
+''    Dim lngCountRemoved As Long
+''
+''    Dim blnKeepUMC As Boolean
+''
+''On Error GoTo FilterLCMSFeaturesErrorHandler
+''
+''
+''    lngCountRemoved = 0
+''
+''    With GelUMC(lngGelIndex)
+''
+''        lngUMCCountNew = 0
+''        For i = 0 To .UMCCnt - 1
+''
+''            blnKeepUMC = True
+''            If dblLCMSFeatureAbuMin > 0 And .UMCs(i).ClassAbundance < dblLCMSFeatureAbuMin Then
+''                blnKeepUMC = False
+''            End If
+''
+''            If dblIMSConformerScoreMin > 0 And .UMCs(i).ClassScore < dblIMSConformerScoreMin Then
+''                blnKeepUMC = False
+''            End If
+''
+''            If blnKeepUMC Then
+''                If lngUMCCountNew <> i Then
+''                    .UMCs(lngUMCCountNew) = .UMCs(i)
+''                End If
+''                lngUMCCountNew = lngUMCCountNew + 1
+''            Else
+''                Erase .UMCs(i).ClassMInd
+''                Erase .UMCs(i).ClassMType
+''                .UMCs(i).ClassCount = 0
+''                lngCountRemoved = lngCountRemoved + 1
+''            End If
+''        Next i
+''
+''        If lngUMCCountNew <> .UMCCnt Then
+''            If lngUMCCountNew > 0 Then
+''                ReDim Preserve .UMCs(lngUMCCountNew - 1)
+''            Else
+''                ReDim Preserve .UMCs(0)
+''            End If
+''            .UMCCnt = lngUMCCountNew
+''        End If
+''
+''    End With
+''
+''    ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
+''    Dim blnComputeClassMassAndAbundance As Boolean
+''    blnComputeClassMassAndAbundance = False
+''
+''    UpdateUMCStatArrays mGelIndex, blnComputeClassMassAndAbundance, False
+''
+''    Exit Sub
+''
+''FilterLCMSFeaturesErrorHandler:
+''    Debug.Assert False
+''    LogErrors Err.Number, "FilterLCMSFeatures"
+''
+''End Sub
+    
 Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean, blnIncludeIMSFileHeaders As Boolean) As String
     Dim strHeaders As String
     
@@ -394,7 +461,10 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
                            ByVal blnLoadPredefinedLCMSFeatures As Boolean, _
                            ByVal sngAutoMapDataPointsMassTolerancePPM As Single, _
                            ByRef strErrorMessage, _
-                           ByVal plmPointsLoadMode As Integer) As Long
+                           ByVal plmPointsLoadMode As Integer, _
+                           ByVal dblLCMSFeatureAbuMin As Double, _
+                           ByVal dblIMSConformerScoreMin As Double) As Long
+                           
     '-------------------------------------------------------------------------
     'Returns 0 if data successfuly loaded, -2 if data set is too large,
     '-3 if problems with scan numbers, -4 if no data found, -5 if user cancels load,
@@ -432,6 +502,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     
     Dim lngCharLoc As Long
     Dim lngReturnValue As Long
+    Dim lngIndex As Long
     
     Dim dblScansFileByteCount As Double
     Dim dblByteCountTotal As Double
@@ -442,10 +513,13 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
     ' This HashTable will only be used if loading LCMS Features
     Dim objFeatureToScanMap As clsParallelLngArrays
 
-    ' This HashTable will only be used if loading LCMS Features and the point load mode is plmLoadOnePointPerLCMSFeature
-    '  Key is PeakIndex
-    '  Value is FeatureIndex
-    Dim objPointsToKeep As clsParallelLngArrays
+    ' These two object variables will only be used if loading LCMS Features and the point load mode is plmLoadOnePointPerLCMSFeature
+    ' Data is loaded from disk into objPointsToKeepSortedByFeature
+    ' We then copy the data into objPointsToKeepSortedByPeak and then sort objPointsToKeepSortedByPeak
+    '   Key is PeakIndex
+    '   Value is FeatureIndex
+    Dim objPointsToKeepSortedByFeature As clsParallelLngArrays
+    Dim objPointsToKeepSortedByPeak As clsParallelLngArrays
     
     ' This HashTable maps the the line number of the data point in the input file with the index in GelData(mGelIndex).IsoData() that the data point is stored
     Dim objHashMapOfPointsKept As clsParallelLngArrays
@@ -509,7 +583,8 @@ On Error GoTo LoadNewCSVErrorHandler
     
     ' Initialize the hash tables
     Set objHashMapOfPointsKept = New clsParallelLngArrays
-    Set objPointsToKeep = New clsParallelLngArrays
+    Set objPointsToKeepSortedByFeature = New clsParallelLngArrays
+    Set objPointsToKeepSortedByPeak = New clsParallelLngArrays
     Set objFeatureToScanMap = New clsParallelLngArrays
 
     If mLoadPredefinedLCMSFeatures Then
@@ -622,33 +697,62 @@ On Error GoTo LoadNewCSVErrorHandler
         
         objReadLCMSFeatures.ReadingFilteredIsosFile = blnLoadingFilteredIsosFile
         
-        frmProgress.UpdateCurrentSubTask "Caching peak to feature mapping data"
-        
         strMessage = "Loading predefined LCMS Features; PointsLoadMode = " & plmPointsLoadMode
         strMessage = strMessage & " (" & GetLCMSFeaturePointLoadModeText(plmPointsLoadMode) & ")"
         AddToAnalysisHistory mGelIndex, strMessage
         
-        lngReturnValue = objReadLCMSFeatures.CacheFeatureToPeakMapIndices(lngGelIndex, strLCMSFeatureToPeakMapFilePath, objPointsToKeep)
+        ' First read and filter the predefined LC-MS Features
+        ' By doing this first, we can filter the data when reading the feature to peak map indices to skip LC-MS features that have been filtered out by abundance or IMS Conformer score
+        ' What we're actually caching is the feature index and the scan center for each LC-MS feature that passes filters
+        frmProgress.UpdateCurrentSubTask "Caching the LC-MS Features"
         
+        lngReturnValue = objReadLCMSFeatures.CachePredefinedLCMSFeatures( _
+                            lngGelIndex, _
+                            strLCMSFeaturesFilePath, _
+                            objFeatureToScanMap, _
+                            dblLCMSFeatureAbuMin, _
+                            dblIMSConformerScoreMin)
+    
         If lngReturnValue = 0 Then
-            AddToAnalysisHistory mGelIndex, "Parsed FeatureToPeakMap file; cached " & Format(objPointsToKeep.Count, "0,000") & " peaks"
+            AddToAnalysisHistory mGelIndex, "Parsed LCMSFeatures file; cached scan center for " & Format(objFeatureToScanMap.Count, "0,000") & " features"
+        Else
+            AddToAnalysisHistory mGelIndex, "Error " & lngReturnValue & " returned by CachePredefinedLCMSFeatures for file " & strLCMSFeaturesFilePath
+        End If
+        
+        ' Now read and cache the feature to peak map indices
+        frmProgress.UpdateCurrentSubTask "Caching peak to feature mapping data"
+        
+        lngReturnValue = objReadLCMSFeatures.CacheFeatureToPeakMapIndices( _
+                            lngGelIndex, _
+                            strLCMSFeatureToPeakMapFilePath, _
+                            objPointsToKeepSortedByFeature, _
+                            objFeatureToScanMap)
+              
+        If lngReturnValue = 0 Then
+            AddToAnalysisHistory mGelIndex, "Parsed FeatureToPeakMap file; cached " & Format(objPointsToKeepSortedByFeature.Count, "0,000") & " peaks"
         Else
             AddToAnalysisHistory mGelIndex, "Error " & lngReturnValue & " returned by CacheFeatureToPeakMapIndices for file " & strLCMSFeatureToPeakMapFilePath
         End If
         
-        If lngReturnValue = 0 And plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+        If objPointsToKeepSortedByFeature.Count > 0 Then
+            ' Now populate objPointsToKeepSortedByPeak
+            mSubtaskMessage = "Duplicating peak to feature map info"
+            frmProgress.UpdateCurrentSubTask mSubtaskMessage
+            frmProgress.InitializeSubtask mSubtaskMessage, 0, objPointsToKeepSortedByFeature.Count
             
-            frmProgress.UpdateCurrentSubTask "Caching the scan center for each LC-MS Feature"
+            For lngIndex = 0 To objPointsToKeepSortedByFeature.Count - 1
+                objPointsToKeepSortedByPeak.add objPointsToKeepSortedByFeature.KeyByIndex(lngIndex), objPointsToKeepSortedByFeature.ValueByIndex(lngIndex)
+                If lngIndex Mod 1000 = 0 Then
+                    frmProgress.UpdateSubtaskProgressBar lngIndex, False
+                End If
+            Next lngIndex
             
-            lngReturnValue = objReadLCMSFeatures.CacheScanCenterForLCMSFeatures(lngGelIndex, strLCMSFeaturesFilePath, objFeatureToScanMap)
-        
-            If lngReturnValue = 0 Then
-                AddToAnalysisHistory mGelIndex, "Parsed LCMSFeatures file; cached scan center for " & Format(objFeatureToScanMap.Count, "0,000") & " features"
-            Else
-                AddToAnalysisHistory mGelIndex, "Error " & lngReturnValue & " returned by CacheScanCenterForLCMSFeatures for file " & strLCMSFeaturesFilePath
-            End If
-        
+            ' Now sort objPointsToKeepSortedByPeak by Peak Index
+            frmProgress.UpdateCurrentSubTask "Sorting peak to feature mapping by Peak Index (source data was sorted by Feature Index)"
+            
+            objPointsToKeepSortedByPeak.SortNow
         End If
+        
     End If
     
     If lngReturnValue = 0 Then
@@ -659,7 +763,7 @@ On Error GoTo LoadNewCSVErrorHandler
                                          blnValidScansFile, blnFilePrescanEnabled, _
                                          plmPointsLoadMode, _
                                          objFeatureToScanMap, _
-                                         objPointsToKeep, _
+                                         objPointsToKeepSortedByPeak, _
                                          objHashMapOfPointsKept)
     
         If lngReturnValue = 0 Then
@@ -672,8 +776,10 @@ On Error GoTo LoadNewCSVErrorHandler
                                     strLCMSFeatureToPeakMapFilePath, _
                                     sngAutoMapDataPointsMassTolerancePPM, _
                                     plmPointsLoadMode, _
-                                    objPointsToKeep, _
-                                    objHashMapOfPointsKept)
+                                    objPointsToKeepSortedByFeature, _
+                                    objHashMapOfPointsKept, _
+                                    dblIMSConformerScoreMin, _
+                                    dblLCMSFeatureAbuMin)
             End If
         End If
     End If
@@ -689,7 +795,12 @@ On Error GoTo LoadNewCSVErrorHandler
             AddToAnalysisHistory mGelIndex, strMessage
             
             Set objSplitUMCs = New clsSplitUMCsByAbundance
-            blnSuccess = UpdateUMCStatArrays(mGelIndex, True, False, frmProgress)
+            
+            ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
+            Dim blnComputeClassMassAndAbundance As Boolean
+            blnComputeClassMassAndAbundance = True
+                    
+            blnSuccess = UpdateUMCStatArrays(mGelIndex, blnComputeClassMassAndAbundance, False, frmProgress)
             
             objSplitUMCs.ExamineUMCs mGelIndex, frmProgress, GelUMC(mGelIndex).def.OddEvenProcessingMode, False, False
             Set objSplitUMCs = Nothing
@@ -818,6 +929,14 @@ On Error GoTo ReadCSVIsosFileErrorHandler
             mSubtaskMessage = "Pre-scanning Isotopic CSV file to determine data to load"
         Else
             mSubtaskMessage = "Reading Isotopic CSV file"
+            
+            If mLoadPredefinedLCMSFeatures Then
+                If plmPointsLoadMode = plmLoadMappedPointsOnly Then
+                    mSubtaskMessage = mSubtaskMessage & " (only loading data mapped to LC-MS Features)"
+                ElseIf plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
+                    mSubtaskMessage = mSubtaskMessage & " (only loading one data point per LC-MS Feature)"
+                End If
+            End If
         End If
         
         frmProgress.InitializeSubtask mSubtaskMessage, 0, 100
@@ -1090,10 +1209,13 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
     Dim lngIndex As Long
     Dim lngScanNumber As Long
     Dim lngFeatureIndex As Long
+    Dim lngFeatureIndexCount As Long
+    Dim lngFeatureIndexList() As Long
     
     Dim blnColumnsDefined As Boolean
     Dim blnDataLine As Boolean
     Dim blnValidDataPoint As Boolean
+    Dim blnScanNumbersMatch As Boolean
     Dim blnStoreDataPoint As Boolean
     
     Dim strData() As String
@@ -1136,6 +1258,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
     lngIsoDataCurrentScanNum = -100
     lngIsoDataCurrentScanCount = 0
     ReDim udtIsoDataCurrentScan(10000)
+    ReDim lngFeatureIndexList(100)
     
     Set tsInFile = fso.OpenTextFile(strIsosFilePath, ForReading, False)
     Do While Not tsInFile.AtEndOfStream
@@ -1143,7 +1266,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
         strLineIn = tsInFile.ReadLine
         dblTotalBytesRead = dblTotalBytesRead + Len(strLineIn) + 2          ' Add 2 bytes to account for CrLf at end of line
         
-        If lngLinesRead Mod 100 = 0 Then
+        If lngLinesRead Mod 500 = 0 Then
             If dblByteCountTotal > 0 Then
                 frmProgress.UpdateSubtaskProgressBar CSng(dblTotalBytesRead / dblByteCountTotal * 100#), True
             Else
@@ -1230,7 +1353,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                             End If
                             strUnknownColumnList = strUnknownColumnList & Trim(strData(lngIndex))
                             
-                            If Trim(strData(lngIndex)) <> "orig_intensity" And Trim(strData(lngIndex)) <> "TIA_orig_intensity" Then
+                            If Trim(strData(lngIndex)) <> "orig_intensity" And Trim(strData(lngIndex)) <> "TIA_orig_intensity" And Trim(strData(lngIndex)) <> "flag" Then
                                 Debug.Assert False
                             End If
                         End Select
@@ -1271,65 +1394,90 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                 ' Loading LC-MS Features
                 ' Check now whether or not to retain this data piont
                 ' If not, then there is no point in continuing the parse strLineIn
+                             
+                ' In IMS data, a given data point can map to more than one feature
+                ' Thus, we need to call .GetItemsForKey() to get a list of all of the features that a point maps to; stored in lngFeatureIndexList()
+                lngFeatureIndexCount = objPointsToKeep.GetItemsForKey(lngCurrentDataLine, lngFeatureIndexList)
                 
-                lngFeatureIndex = objPointsToKeep.GetItemForKey(lngCurrentDataLine, blnMatchFound)
-                If Not blnMatchFound Then
+                If lngFeatureIndexCount = 0 Then
                     ' Data point doesn't exist in the _LCMSFeatureToPeakMap.txt file
                     ' Do not load this point
                     blnValidDataPoint = False
                 Else
+                    lngFeatureIndex = lngFeatureIndexList(0)
+                                      
                     If plmPointsLoadMode = plmLoadOnePointPerLCMSFeature Then
-                        lngFeatureCentralScan = objFeatureToScanMap.GetItemForKey(lngFeatureIndex, blnMatchFound)
-                        
-                        If Not blnMatchFound Then
-                            ' objFeatureToScanMap doesn't contain lngFeatureIndex; this is unexpected
-                            Debug.Assert False
-                            blnValidDataPoint = False
+                    
+                        ' Parse out the scan number of this data piont
+                        If intColumnMapping(IsosFileColumnConstants.ScanNumber) < 0 Then
+                            ' Can't determine scan number since the ScanNumber header wasn't present in the input file
+                            lngScanNumber = -1
                         Else
-                            ' Parse out the scan number of this feature
-                            If intColumnMapping(IsosFileColumnConstants.ScanNumber) < 0 Then
-                                ' Can't determine scan number since the ScanNumber header wasn't present in the input file
-                                lngScanNumber = -1
+                            strData = Split(strLineIn, ",", intColumnMapping(IsosFileColumnConstants.ScanNumber) + 2)
+                            
+                            If UBound(strData) >= 0 Then
+                                lngScanNumber = GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.ScanNumber), -1)
                             Else
-                                strData = Split(strLineIn, ",", intColumnMapping(IsosFileColumnConstants.ScanNumber) + 2)
-                                
-                                If UBound(strData) >= 0 Then
-                                    lngScanNumber = GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.ScanNumber), -1)
-                                Else
-                                    lngScanNumber = -1
-                                End If
-                            End If
-                            
-                            If lngScanNumber <> lngIsoDataCurrentScanNum Then
-                                ' This is a new scan number
-                                ' We need to process the data in GelData(mGelIndex).IsoData() and udtIsoDataCurrentScan()
-                                '  to remove the extra data points for each feature
-                                ' The goal is to only retain the highest abundance data point for each charge state for each feature
-                                
-                                If True Then
-                                ReadCSVIsosFilePostFilterPreviousScan lngIsoDataCurrentScanCount, _
-                                                                      udtIsoDataCurrentScan, _
-                                                                      objHashMapOfPointsKept, _
-                                                                      mValidDataPointCount, _
-                                                                      lngIsoDataCurrentScanNum
-                                End If
-                                
-                                ' Clear udtIsoDataCurrentScan() and update lngIsoDataCurrentScanNum
-                                lngIsoDataCurrentScanCount = 0
-                                lngIsoDataCurrentScanNum = lngScanNumber
-                            End If
-                            
-                            If lngScanNumber <> lngFeatureCentralScan Then
-                                ' This data point's scan number is not the same as the central scan number for this point's LC-MS feature
-                                ' Do not load this point
-                                blnValidDataPoint = False
+                                lngScanNumber = -1
                             End If
                         End If
-                    End If
+                        
+                        If lngScanNumber <> lngIsoDataCurrentScanNum Then
+                            ' This is a new scan number (or, for IMS data, a new frame number)
+                            
+                            ' We need to process the data in GelData(mGelIndex).IsoData() and udtIsoDataCurrentScan()
+                            '  to remove the extra data points for each feature
+                            ' The goal is to only retain the highest abundance data point for each charge state for each feature
+                            
+                            If True Then
+                                ReadCSVIsosFilePostFilterPreviousScan lngIsoDataCurrentScanCount, _
+                                                                  udtIsoDataCurrentScan, _
+                                                                  objHashMapOfPointsKept, _
+                                                                  mValidDataPointCount, _
+                                                                  lngIsoDataCurrentScanNum
+                            End If
+                            
+                            ' Clear udtIsoDataCurrentScan() and update lngIsoDataCurrentScanNum
+                            lngIsoDataCurrentScanCount = 0
+                            lngIsoDataCurrentScanNum = lngScanNumber
+                        End If
+                          
+                        ' Compare this data point's scan number to the central scan number of each mapped LC-MS Feature
+                        blnScanNumbersMatch = False
+                        
+                        For lngIndex = 0 To lngFeatureIndexCount - 1
+                            lngFeatureIndex = lngFeatureIndexList(lngIndex)
+                                            
+                            lngFeatureCentralScan = objFeatureToScanMap.GetItemForKey(lngFeatureIndex, blnMatchFound)
+                            
+                            If Not blnMatchFound Then
+                                ' objFeatureToScanMap doesn't contain lngFeatureIndex; this is unexpected
+                                Debug.Assert False
+                            Else
+                                If lngScanNumber = lngFeatureCentralScan Then
+                                    blnScanNumbersMatch = True
+                                    Exit For
+                                End If
+                            End If
+                        Next lngIndex
+                        
+                        If Not blnScanNumbersMatch Then
+                            ' This data point's scan number did not match to the central scan number of any of its mapped LC-MS features
+                            ' Do not load this point
+                            blnValidDataPoint = False
+                        End If
+                        
+                     End If
                 End If
             End If
                         
             If blnValidDataPoint Then
+                
+''  ' Temp debug
+'If lngFeatureIndex = 0 Then
+'    Debug.Assert False
+'    Debug.Print lngFeatureIndex & "; " & lngCurrentDataLine - 1
+'End If
                 
                 strData = Split(strLineIn, ",")
                 
@@ -1345,6 +1493,8 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     sngAbundance = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.Abundance), 0)
                     intCharge = CInt(GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.Charge), 1))
                     
+                    Debug.Assert intCharge > 0
+
                     blnValidDataPoint = True
                     
                     If Not blnIgnoreAllFiltersAndLoadAllData Then
@@ -1439,7 +1589,12 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                         sngMonoMinus4Intensities(.IsoLines) = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance), 0)
                                     End If
                                 End With
-                                
+
+''  ' Temp debug
+'If lngFeatureIndex = 0 Then
+'    Debug.Print lngFeatureIndex & " " & lngCurrentDataLine - 1 & " " & GelData(1).IsoLines & " " & GelData(1).IsoData(GelData(1).IsoLines).MonoisotopicMW
+'End If
+
                                 ' Keep track of the mapping between the line number of the data point in the input file
                                 ' and the index value in GelData(mGelIndex).IsoData() where this data point has been stored
                                 objHashMapOfPointsKept.add lngCurrentDataLine, GelData(mGelIndex).IsoLines
@@ -1492,8 +1647,10 @@ ReadCSVIsosFileWorkErrorHandler:
     lngReturnValue = Err.Number
     LogErrors Err.Number, "ReadCSVIsosFileWork"
     
-    On Error Resume Next
-    tsInFile.Close
+    If Not tsInFile Is Nothing Then
+        On Error Resume Next
+        tsInFile.Close
+    End If
     
     ReadCSVIsosFileWork = lngReturnValue
 End Function
@@ -1877,8 +2034,10 @@ Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
                                       ByVal strLCMSFeatureToPeakMapFilePath As String, _
                                       ByVal sngAutoMapDataPointsMassTolerancePPM As Single, _
                                       ByVal plmPointsLoadMode As Integer, _
-                                      ByRef objPointsToKeep As clsParallelLngArrays, _
-                                      ByRef objHashMapOfPointsKept As clsParallelLngArrays) As Long
+                                      ByRef objPointsToKeepSortedByFeature As clsParallelLngArrays, _
+                                      ByRef objHashMapOfPointsKept As clsParallelLngArrays, _
+                                      ByVal dblIMSConformerScoreMin As Double, _
+                                      ByVal dblLCMSFeatureAbuMin As Double) As Long
 
     Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
     Dim lngReturnCode As Long
@@ -1896,18 +2055,32 @@ Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
     ' Pass object objHashMapOfPointsKept to objReadLCMSFeatures
     objReadLCMSFeatures.HashMapOfPointsKept = objHashMapOfPointsKept
     
-    If objPointsToKeep Is Nothing Then
+    If objPointsToKeepSortedByFeature Is Nothing Then
         objReadLCMSFeatures.ClearFeatureToPeakMapping
     Else
-        If objPointsToKeep.Count > 0 Then
-            objReadLCMSFeatures.DefineFeatureToPeakMapping objPointsToKeep
+        If objPointsToKeepSortedByFeature.Count > 0 Then
+            objReadLCMSFeatures.DefineFeatureToPeakMapping objPointsToKeepSortedByFeature
         Else
             objReadLCMSFeatures.ClearFeatureToPeakMapping
         End If
     End If
     
-    lngReturnCode = objReadLCMSFeatures.LoadLCMSFeatureFiles(strLCMSFeaturesFilePath, strLCMSFeatureToPeakMapFilePath, mGelIndex)
-    
+    ' Note that dblIMSConformerScoreMin and dblLCMSFeatureAbuMin are used to filter the LC-MS Features
+    lngReturnCode = objReadLCMSFeatures.LoadLCMSFeatureFiles( _
+                                                strLCMSFeaturesFilePath, _
+                                                strLCMSFeatureToPeakMapFilePath, _
+                                                mGelIndex, _
+                                                dblIMSConformerScoreMin, _
+                                                dblLCMSFeatureAbuMin)
+
+''    ' Old code; no longer needed since we filter in .LoadLCMSFeatureFiles
+''
+''    If dblIMSConformerScoreMin > 0 Or dblLCMSFeatureAbuMin > 0 Then
+''        ' Need to filter the LCMSFeatures
+''        ' We can only do this now, after the features are loaded, due to the cross referencing between the files
+''        FilterLCMSFeatures mGelIndex, dblLCMSFeatureAbuMin, dblIMSConformerScoreMin
+''    End If
+
     ReadLCMSFeatureFiles = lngReturnCode
     
 End Function

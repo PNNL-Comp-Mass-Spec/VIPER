@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
 Begin VB.Form frmUMCSimple 
    BackColor       =   &H00FF8080&
    BorderStyle     =   3  'Fixed Dialog
@@ -224,14 +224,14 @@ Begin VB.Form frmUMCSimple
       TabCaption(1)   =   "Auto Refine Options"
       TabPicture(1)   =   "frmUMCSimple.frx":0059
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "fraOptionFrame(2)"
-      Tab(1).Control(1)=   "fraSplitUMCsOptions"
+      Tab(1).Control(0)=   "fraSplitUMCsOptions"
+      Tab(1).Control(1)=   "fraOptionFrame(2)"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "Adv Class Stats"
       TabPicture(2)   =   "frmUMCSimple.frx":0075
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraClassAbundanceTopX"
-      Tab(2).Control(1)=   "fraClassMassTopX"
+      Tab(2).Control(0)=   "fraClassMassTopX"
+      Tab(2).Control(1)=   "fraClassAbundanceTopX"
       Tab(2).ControlCount=   2
       Begin VB.CheckBox chkRequireMatchingIsotopeTag 
          Caption         =   "Require matching isotope label tag (e.g. N14 or N15)"
@@ -1632,7 +1632,12 @@ On Error GoTo UMCSearchErrorHandler
        
        If Not blnUMCIndicesUpdated Then
            ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-           If Not UpdateUMCStatArrays(CallerID, True, False, Me) Then GoTo ExitIfFailed
+                
+            ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
+            Dim blnComputeClassMassAndAbundance As Boolean
+            blnComputeClassMassAndAbundance = True
+                   
+           If Not UpdateUMCStatArrays(CallerID, blnComputeClassMassAndAbundance, False, Me) Then GoTo ExitIfFailed
        End If
        
        ' Note: we need to update GelSearchDef before calling SplitUMCsByAbundance

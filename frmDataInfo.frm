@@ -1,10 +1,10 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.Ocx"
 Begin VB.Form frmDataInfo 
    Caption         =   "Data Info"
    ClientHeight    =   3615
    ClientLeft      =   165
-   ClientTop       =   840
+   ClientTop       =   855
    ClientWidth     =   8265
    Icon            =   "frmDataInfo.frx":0000
    LinkTopic       =   "Form1"
@@ -21,6 +21,7 @@ Begin VB.Form frmDataInfo
       _ExtentX        =   13573
       _ExtentY        =   6376
       _Version        =   393217
+      Enabled         =   -1  'True
       ScrollBars      =   3
       TextRTF         =   $"frmDataInfo.frx":030A
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
@@ -92,11 +93,22 @@ Attribute VB_Exposed = False
 'last modified: 07/02/2002 nt
 '---------------------------------------------------------------
 Option Explicit
-Dim TmpFile As String
 
-Dim NameFromCaption As String   'another name to suggest name
+Private mSourceFilePath As String
 
-Dim CallerID
+Private mTmpFile As String
+
+Private mNameFromCaption As String   'another name to suggest name
+
+Private CallerID
+
+Public Property Let SourceFilePath(ByVal value As String)
+    mSourceFilePath = value
+End Property
+
+Public Property Get SourceFilePath() As String
+    SourceFilePath = mSourceFilePath
+End Property
 
 Private Sub CopyAll()
     
@@ -118,7 +130,7 @@ End Sub
 
 Private Sub Form_Activate()
 On Error Resume Next
-NameFromCaption = Trim$(Me.Caption)
+mNameFromCaption = Trim$(Me.Caption)
 CallerID = Me.Tag
 If Len(CallerID) > 0 Then
    If IsNumeric(CallerID) Then
@@ -172,15 +184,21 @@ If Len(CallerID) > 0 Then
         Me.Caption = "UMC - MT tags Association"
       Case "ANALYSIS_HISTORY"
         Me.Caption = "Analysis History Log"
+      Case "STAC_Stats"
+        Me.Caption = "STAC Match Stats"
       End Select
-      TmpFile = GetTempFolder() & RawDataTmpFile
-      rtbData.loadFile TmpFile, rtfText
+      If Me.SourceFilePath = "" Then
+          mTmpFile = GetTempFolder() & RawDataTmpFile
+      Else
+          mTmpFile = Me.SourceFilePath
+      End If
+      rtbData.loadFile mTmpFile, rtfText
       mnuFileSaveText.Enabled = True
    End If
 Else
    Me.Caption = "Data Info - GEL File"
-   TmpFile = GetTempFolder() & RawDataTmpFile
-   rtbData.loadFile TmpFile, rtfText
+   mTmpFile = GetTempFolder() & RawDataTmpFile
+   rtbData.loadFile mTmpFile, rtfText
    mnuFileSaveText.Enabled = True
 End If
 End Sub
@@ -200,7 +218,7 @@ End Sub
 Private Sub Form_Unload(Cancel As Integer)
 On Error Resume Next
 If (Not IsNumeric(CallerID)) Then  'don't kill PEK/CSV/mzXML/mzData file
-   Kill TmpFile
+   Kill mTmpFile
 End If
 End Sub
 
@@ -231,8 +249,8 @@ Private Sub mnuFileSaveText_Click()
 Dim sFN As String
 Dim sSuggestedFN As String
 On Error GoTo err_mnuFileSaveText
-If Len(NameFromCaption) > 0 Then
-   sSuggestedFN = NameFromCaption
+If Len(mNameFromCaption) > 0 Then
+   sSuggestedFN = mNameFromCaption
 Else
    sSuggestedFN = SuggestionByName(Me.Tag, "txt")
 End If
@@ -280,7 +298,7 @@ sTmp = sTmp & vbCrLf & "Close file and try to open again."
 GetNoInfo = sTmp
 End Function
 
-Private Sub rtbData_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub rtbData_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
     If Button = vbRightButton Then
         Me.PopupMenu mnuEdit
     End If

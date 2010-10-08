@@ -43,11 +43,17 @@ Private Sub AdjustAMTRefMwErrValues(ByRef strAMTRef As String, dblPPMAdjust As D
 
 End Sub
 
-Public Function MassCalibrationApplyBulkAdjustment(ByVal lngGelIndex As Long, ByVal dblIncrementalShift As Double, ByVal eMassType As glMassToleranceConstants, Optional ByVal blnMakeLogEntry As Boolean = True, Optional ByVal sngBinSizeUsedDuringAutoCalibration As Single = 0, Optional ByRef frmCallingForm As VB.Form) As Boolean
+Public Function MassCalibrationApplyBulkAdjustment(ByVal lngGelIndex As Long, _
+                                                   ByVal dblIncrementalShift As Double, _
+                                                   ByVal eMassType As glMassToleranceConstants, _
+                                                   Optional ByVal blnMakeLogEntry As Boolean = True, _
+                                                   Optional ByVal sngBinSizeUsedDuringAutoCalibration As Single = 0, _
+                                                   Optional ByRef frmCallingForm As VB.Form) As Boolean
     ' Returns True if successful, False if not
     ' If called during Auto calibration, sngBinSizeUsedDuringAutoCalibration is sent so that it may be recorded in the analysis history
     
     Dim lngIndex As Long
+    Dim i As Long
     Dim dblMassShiftPPM As Double
     
     Dim blnProceed As Boolean, blnSuccess As Boolean
@@ -89,8 +95,18 @@ On Error GoTo ApplyMassCalibrationAdjustmentErrorHandler
     End If
     
     If blnProceed Then
+    
+        ' Now update the .MinMW and .MaxMW values associated with each UMC
+        ' This step will actually only be performed if GelUMC().def.LoadedPredefinedLCMSFeatures = True
+        MassCalibrationUpdateUMCMinMax lngGelIndex
+    
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
-        blnSuccess = UpdateUMCStatArrays(lngGelIndex, True, False, frmCallingForm)
+        
+        ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
+        Dim blnComputeClassMassAndAbundance As Boolean
+        blnComputeClassMassAndAbundance = True
+        
+        blnSuccess = UpdateUMCStatArrays(lngGelIndex, blnComputeClassMassAndAbundance, False, frmCallingForm)
         Debug.Assert blnSuccess
         
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
@@ -159,6 +175,7 @@ Public Function MassCalibrationRevertToOriginal(ByVal lngGelIndex As Long, Optio
     
     Dim eResponse As VbMsgBoxResult
     Dim lngIndex As Long
+    Dim i As Long
     
     Dim blnDataUpdated As Boolean
     Dim blnSuccess As Boolean
@@ -212,6 +229,23 @@ On Error GoTo MassCalibrationRevertToOriginalErrorHandler
         Next lngIndex
     End With
     
+    If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures Then
+        ' Need to update the .MinMW and .MaxMW values for each UMC
+        ' We will not update .ClassMW since UpdateUMCStatArrays will call CalculateClasses, and CalculateClasses will re-compute .ClassMW using the ClassRep
+        
+        For i = 0 To GelUMC(lngGelIndex).UMCCnt - 1
+            With GelUMC(lngGelIndex).UMCs(i)
+                If .MassShiftCount > 0 Then
+                    .MinMW = MassCalibrationRevertAdjustmentOnePoint(.MinMW, .MassShiftOverallPPM)
+                    .MaxMW = MassCalibrationRevertAdjustmentOnePoint(.MaxMW, .MassShiftOverallPPM)
+                    .MassShiftOverallPPM = 0
+                    .MassShiftCount = 0
+                End If
+            End With
+        Next i
+        
+    End If
+    
     With GelSearchDef(lngGelIndex).MassCalibrationInfo
         If blnMakeLogEntry And blnDataUpdated Then
             AddToAnalysisHistory lngGelIndex, "Previous mass calibration adjustments have been reversed; Prior Adjustment Count = " & Trim(.AdjustmentHistoryCount)
@@ -224,7 +258,12 @@ On Error GoTo MassCalibrationRevertToOriginalErrorHandler
     
     If blnDataUpdated Then
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
-        blnSuccess = UpdateUMCStatArrays(lngGelIndex, True, False, frmCallingForm)
+        
+        ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
+        Dim blnComputeClassMassAndAbundance As Boolean
+        blnComputeClassMassAndAbundance = True
+        
+        blnSuccess = UpdateUMCStatArrays(lngGelIndex, blnComputeClassMassAndAbundance, False, frmCallingForm)
         Debug.Assert blnSuccess
     End If
     
@@ -312,5 +351,94 @@ Public Function MassCalibrationUpdateHistory(ByVal lngGelIndex As Long, ByVal db
     End With
 
     MassCalibrationUpdateHistory = blnProceed
+    
+End Function
+
+Public Function MassCalibrationUpdateUMCMinMax(ByVal lngGelIndex As Long) As Boolean
+
+    ' Returns True if successful, False if not
+    
+    Dim i As Long
+    Dim lngClassMIndexPointer As Long
+    Dim lngClassRepInd As Long
+    Dim lngClassRepType As Long
+    
+    Dim dblMassShiftPPM As Double
+    Dim bytMassShiftCount As Byte
+    
+On Error GoTo MassCalibrationUpdateUMCMinMaxErrorHandler
+
+    If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures Then
+        ' Need to update the .MinMW and .MaxMW values for each UMC
+        ' We will not update .ClassMW since UpdateUMCStatArrays will call CalculateClasses, and CalculateClasses will re-compute .ClassMW using the ClassRep
+        
+        With GelUMC(lngGelIndex)
+            
+            For i = 0 To .UMCCnt - 1
+                If .def.UMCClassStatsUseStatsFromMostAbuChargeState Then
+                    With .UMCs(i)
+                        ' Obtain the class rep info from the best charge state group
+                        lngClassMIndexPointer = .ChargeStateBasedStats(.ChargeStateStatsRepInd).GroupRepIndex
+                        If lngClassMIndexPointer < 0 Then
+                            lngClassRepInd = .ClassRepInd
+                            lngClassRepType = .ClassRepType
+                        Else
+                            lngClassRepInd = .ClassMInd(lngClassMIndexPointer)
+                            lngClassRepType = .ClassMType(lngClassMIndexPointer)
+                        End If
+                    End With
+                Else
+                    lngClassRepInd = .UMCs(i).ClassRepInd
+                    lngClassRepType = .UMCs(i).ClassRepType
+                End If
+                
+                If lngClassRepInd < 0 Then
+                    dblMassShiftPPM = 0
+                Else
+                    ' Lookup the overall mass shift currently applied to this point
+                    Select Case lngClassRepType
+                        Case glCSType
+                            dblMassShiftPPM = GelData(lngGelIndex).CSData(lngClassRepInd).MassShiftOverallPPM
+                            bytMassShiftCount = GelData(lngGelIndex).CSData(lngClassRepInd).MassShiftCount
+                        Case glIsoType
+                            dblMassShiftPPM = GelData(lngGelIndex).IsoData(lngClassRepInd).MassShiftOverallPPM
+                            bytMassShiftCount = GelData(lngGelIndex).IsoData(lngClassRepInd).MassShiftCount
+                        Case Else
+                            dblMassShiftPPM = 0
+                    End Select
+                End If
+                
+                With .UMCs(i)
+                
+                    ' Revert any adjustments already applied to .MinMW and .MaxMW
+                    If .MassShiftCount > 0 Then
+                        .MinMW = MassCalibrationRevertAdjustmentOnePoint(.MinMW, .MassShiftOverallPPM)
+                        .MaxMW = MassCalibrationRevertAdjustmentOnePoint(.MaxMW, .MassShiftOverallPPM)
+                        .MassShiftOverallPPM = 0
+                        .MassShiftCount = 0
+                    End If
+                    
+                    ' Apply the new mass shift
+                    If dblMassShiftPPM <> 0 Then
+                        .MinMW = MassCalibrationApplyAdjustmentOnePointWork(.MinMW, dblMassShiftPPM)
+                        .MaxMW = MassCalibrationApplyAdjustmentOnePointWork(.MaxMW, dblMassShiftPPM)
+                    
+                        .MassShiftOverallPPM = dblMassShiftPPM
+                        .MassShiftCount = bytMassShiftCount
+                    End If
+                End With
+               
+            Next i
+        End With
+    End If
+    
+    MassCalibrationUpdateUMCMinMax = True
+    Exit Function
+    
+MassCalibrationUpdateUMCMinMaxErrorHandler:
+    Debug.Print "Error in MassCalibrationUpdateUMCMinMax: " & Err.Description
+    Debug.Assert False
+    LogErrors Err.Number, "MassCalibrationUpdateUMCMinMax"
+    MassCalibrationUpdateUMCMinMax = False
     
 End Function

@@ -287,22 +287,22 @@ With GelP_D_L(Ind)
   Case ectER_RAT
     For i = 0 To .PCnt - 1
         .Pairs(i).ER = objDltLblPairsUMC.ComputeRatioER( _
-                            GelData(Ind).IsoData(.Pairs(i).P1).Abundance, _
-                            GelData(Ind).IsoData(.Pairs(i).P2).Abundance)
+                            GelData(Ind).IsoData(.Pairs(i).p1).Abundance, _
+                            GelData(Ind).IsoData(.Pairs(i).p2).Abundance)
         .Pairs(i).ERMemberBasisCount = 1
     Next i
   Case ectER_LOG
     For i = 0 To .PCnt - 1
         .Pairs(i).ER = objDltLblPairsUMC.ComputeLogER( _
-                            GelData(Ind).IsoData(.Pairs(i).P1).Abundance, _
-                            GelData(Ind).IsoData(.Pairs(i).P2).Abundance)
+                            GelData(Ind).IsoData(.Pairs(i).p1).Abundance, _
+                            GelData(Ind).IsoData(.Pairs(i).p2).Abundance)
         .Pairs(i).ERMemberBasisCount = 1
     Next i
   Case ectER_ALT
     For i = 0 To .PCnt - 1
         .Pairs(i).ER = objDltLblPairsUMC.ComputeAltER( _
-                            GelData(Ind).IsoData(.Pairs(i).P1).Abundance, _
-                            GelData(Ind).IsoData(.Pairs(i).P2).Abundance)
+                            GelData(Ind).IsoData(.Pairs(i).p1).Abundance, _
+                            GelData(Ind).IsoData(.Pairs(i).p2).Abundance)
         .Pairs(i).ERMemberBasisCount = 1
     Next i
   End Select
@@ -585,10 +585,10 @@ On Error GoTo PairsSearchMarkAmbiguousPairsWithHitsOnlyErrorHandler
             ' Determine which pairs have hits
             For lngIndex = 0 To .PCnt - 1
                 With .Pairs(lngIndex)
-                    If IsAMTReferencedByUMC(GelUMC(lngGelIndex).UMCs(.P1), lngGelIndex) Then
+                    If IsAMTReferencedByUMC(GelUMC(lngGelIndex).UMCs(.p1), lngGelIndex) Then
                         blnPairHasUMCWithHit(lngIndex) = True
                     Else
-                        If IsAMTReferencedByUMC(GelUMC(lngGelIndex).UMCs(.P2), lngGelIndex) Then
+                        If IsAMTReferencedByUMC(GelUMC(lngGelIndex).UMCs(.p2), lngGelIndex) Then
                             blnPairHasUMCWithHit(lngIndex) = True
                         End If
                     End If
@@ -778,12 +778,12 @@ With GelP_D_L(Ind)
       For i = 0 To .PCnt - 1
         With .Pairs(i)
             If .STATE = PState Or Abs(PState) <> 1 Then
-              LPart = .P1 & strSepChar & Round(GetIsoMass(GelData(Ind).IsoData(.P1), GelData(Ind).Preferences.IsoDataField), 6) & strSepChar _
-                       & GelData(Ind).IsoData(.P1).Abundance & strSepChar _
-                       & GelData(Ind).IsoData(.P1).ScanNumber & strSepChar & .P1LblCnt
-              HPart = .P2 & strSepChar & Round(GetIsoMass(GelData(Ind).IsoData(.P2), GelData(Ind).Preferences.IsoDataField), 6) & strSepChar _
-                       & GelData(Ind).IsoData(.P2).Abundance & strSepChar _
-                       & GelData(Ind).IsoData(.P2).ScanNumber & strSepChar & .P2LblCnt & strSepChar & .P2DltCnt
+              LPart = .p1 & strSepChar & Round(GetIsoMass(GelData(Ind).IsoData(.p1), GelData(Ind).Preferences.IsoDataField), 6) & strSepChar _
+                       & GelData(Ind).IsoData(.p1).Abundance & strSepChar _
+                       & GelData(Ind).IsoData(.p1).ScanNumber & strSepChar & .P1LblCnt
+              HPart = .p2 & strSepChar & Round(GetIsoMass(GelData(Ind).IsoData(.p2), GelData(Ind).Preferences.IsoDataField), 6) & strSepChar _
+                       & GelData(Ind).IsoData(.p2).Abundance & strSepChar _
+                       & GelData(Ind).IsoData(.p2).ScanNumber & strSepChar & .P2LblCnt & strSepChar & .P2DltCnt
               sLine = LPart & strSepChar & HPart & strSepChar & .ER
               ts.WriteLine sLine
             End If
@@ -948,33 +948,33 @@ Private Sub ReportDltLblPairs_UMC(ByVal Ind As Long, _
                         
                         ' First the light member
                         ' New method, grabbing values directly from GelUMC().UMCs()
-                        sLine = sLine & i & strSepChar & .P1 & strSepChar & Round(GelUMC(Ind).UMCs(.P1).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.P1).ClassAbundance & strSepChar
-                        sLine = sLine & .P1LblCnt & strSepChar & GelUMC(Ind).UMCs(.P1).MinScan & strSepChar & GelUMC(Ind).UMCs(.P1).MaxScan & strSepChar
+                        sLine = sLine & i & strSepChar & .p1 & strSepChar & Round(GelUMC(Ind).UMCs(.p1).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.p1).ClassAbundance & strSepChar
+                        sLine = sLine & .P1LblCnt & strSepChar & GelUMC(Ind).UMCs(.p1).MinScan & strSepChar & GelUMC(Ind).UMCs(.p1).MaxScan & strSepChar
                     
                         ' Record ChargeBasis and UMCMZForChargeBasis
                         If GelUMC(Ind).def.UMCClassStatsUseStatsFromMostAbuChargeState Then
-                            intChargeStateBasis = GelUMC(Ind).UMCs(.P1).ChargeStateBasedStats(GelUMC(Ind).UMCs(.P1).ChargeStateStatsRepInd).Charge
+                            intChargeStateBasis = GelUMC(Ind).UMCs(.p1).ChargeStateBasedStats(GelUMC(Ind).UMCs(.p1).ChargeStateStatsRepInd).Charge
                             sLine = sLine & Trim(intChargeStateBasis) & strSepChar
                         Else
-                            intChargeStateBasis = CInt(GelData(Ind).IsoData(GelUMC(Ind).UMCs(.P1).ClassRepInd).Charge)
+                            intChargeStateBasis = GelData(Ind).IsoData(GelUMC(Ind).UMCs(.p1).ClassRepInd).Charge
                             sLine = sLine & 0 & strSepChar
                         End If
-                        sLine = sLine & Round(MonoMassToMZ(GelUMC(Ind).UMCs(.P1).ClassMW, intChargeStateBasis), 6) & strSepChar
+                        sLine = sLine & Round(MonoMassToMZ(GelUMC(Ind).UMCs(.p1).ClassMW, intChargeStateBasis), 6) & strSepChar
                             
                         ' Now the heavy menber
-                        sLine = sLine & .P2 & strSepChar & Round(GelUMC(Ind).UMCs(.P2).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.P2).ClassAbundance & strSepChar
+                        sLine = sLine & .p2 & strSepChar & Round(GelUMC(Ind).UMCs(.p2).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.p2).ClassAbundance & strSepChar
                         sLine = sLine & .P2LblCnt & strSepChar & .P2DltCnt & strSepChar
-                        sLine = sLine & GelUMC(Ind).UMCs(.P2).MinScan & strSepChar & GelUMC(Ind).UMCs(.P2).MaxScan & strSepChar
+                        sLine = sLine & GelUMC(Ind).UMCs(.p2).MinScan & strSepChar & GelUMC(Ind).UMCs(.p2).MaxScan & strSepChar
                         
                         ' Record ChargeBasis and UMCMZForChargeBasis
                         If GelUMC(Ind).def.UMCClassStatsUseStatsFromMostAbuChargeState Then
-                            intChargeStateBasis = GelUMC(Ind).UMCs(.P2).ChargeStateBasedStats(GelUMC(Ind).UMCs(.P2).ChargeStateStatsRepInd).Charge
+                            intChargeStateBasis = GelUMC(Ind).UMCs(.p2).ChargeStateBasedStats(GelUMC(Ind).UMCs(.p2).ChargeStateStatsRepInd).Charge
                             sLine = sLine & Trim(intChargeStateBasis) & strSepChar
                         Else
-                            intChargeStateBasis = CInt(GelData(Ind).IsoData(GelUMC(Ind).UMCs(.P2).ClassRepInd).Charge)
+                            intChargeStateBasis = GelData(Ind).IsoData(GelUMC(Ind).UMCs(.p2).ClassRepInd).Charge
                             sLine = sLine & 0 & strSepChar
                         End If
-                        sLine = sLine & Round(MonoMassToMZ(GelUMC(Ind).UMCs(.P2).ClassMW, intChargeStateBasis), 6) & strSepChar
+                        sLine = sLine & Round(MonoMassToMZ(GelUMC(Ind).UMCs(.p2).ClassMW, intChargeStateBasis), 6) & strSepChar
                         
                         sLine = sLine & Round(.ER, 6) & strSepChar & Round(.ERStDev, 6) & strSepChar & .ERChargeStateBasisCount & strSepChar & .ERMemberBasisCount
                         
@@ -1169,16 +1169,16 @@ ClsCnt = GelUMC(Ind).UMCCnt
         With GelP_D_L(Ind)
             For i = 0 To .PCnt - 1
                 If Not .Pairs(i).STATE = glPAIR_Exc Then
-                   ClsLCnt(.Pairs(i).P1) = ClsLCnt(.Pairs(i).P1) + 1
-                   ClsHCnt(.Pairs(i).P2) = ClsHCnt(.Pairs(i).P2) + 1
+                   ClsLCnt(.Pairs(i).p1) = ClsLCnt(.Pairs(i).p1) + 1
+                   ClsHCnt(.Pairs(i).p2) = ClsHCnt(.Pairs(i).p2) + 1
                 End If
             Next i
         End With
         
         For i = 0 To GelP_D_L(Ind).PCnt - 1
            If Not GelP_D_L(Ind).Pairs(i).STATE = glPAIR_Exc Then
-              If ClsLCnt(GelP_D_L(Ind).Pairs(i).P1) = 1 And ClsHCnt(GelP_D_L(Ind).Pairs(i).P1) = 0 _
-                 And ClsLCnt(GelP_D_L(Ind).Pairs(i).P2) = 0 And ClsHCnt(GelP_D_L(Ind).Pairs(i).P2) = 1 Then
+              If ClsLCnt(GelP_D_L(Ind).Pairs(i).p1) = 1 And ClsHCnt(GelP_D_L(Ind).Pairs(i).p1) = 0 _
+                 And ClsLCnt(GelP_D_L(Ind).Pairs(i).p2) = 0 And ClsHCnt(GelP_D_L(Ind).Pairs(i).p2) = 1 Then
                  GelP_D_L(Ind).Pairs(i).STATE = glPAIR_Inc
                  IncPairsCnt = IncPairsCnt + 1
               Else
@@ -1188,10 +1188,10 @@ ClsCnt = GelUMC(Ind).UMCCnt
                     ' ToDo: Check this; decide whether or not to check for ClsHCnt() = 0
                     ' Debug.Assert False
                     
-                    If ClsLCnt(GelP_D_L(Ind).Pairs(i).P1) > 1 And ClsHCnt(GelP_D_L(Ind).Pairs(i).P1) = 0 Then
+                    If ClsLCnt(GelP_D_L(Ind).Pairs(i).p1) > 1 And ClsHCnt(GelP_D_L(Ind).Pairs(i).p1) = 0 Then
                     End If
                     
-                    If ClsLCnt(GelP_D_L(Ind).Pairs(i).P1) > 1 Then
+                    If ClsLCnt(GelP_D_L(Ind).Pairs(i).p1) > 1 Then
                         ' The light member of the pair is a member of several pairs, and it is the light member in all of them
                         ' Only keep one of the pairs that the light member is a member of
                         ' Choose the pair to keep based on the one with the largest sum of Light + Heavy
@@ -1201,7 +1201,7 @@ ClsCnt = GelUMC(Ind).UMCCnt
                             MatchingPairsCount = 0
                             ReDim MatchingPairs(0)
                             For j = 0 To .PCnt - 1
-                                If .Pairs(j).P1 = .Pairs(i).P1 Then
+                                If .Pairs(j).p1 = .Pairs(i).p1 Then
                                     ReDim Preserve MatchingPairs(MatchingPairsCount)
                                     MatchingPairs(MatchingPairsCount) = j
                                     MatchingPairsCount = MatchingPairsCount + 1
@@ -1220,7 +1220,7 @@ ClsCnt = GelUMC(Ind).UMCCnt
                         End If
                         
                     'ElseIf ClsLCnt(GelP_D_L(Ind).Pairs(i).P2) = 0 And ClsHCnt(GelP_D_L(Ind).Pairs(i).P1) > 1 Then
-                    ElseIf ClsHCnt(GelP_D_L(Ind).Pairs(i).P1) > 1 Then
+                    ElseIf ClsHCnt(GelP_D_L(Ind).Pairs(i).p1) > 1 Then
                         ' The heavy member of the pair is a member of several pairs, and it is the heavy member in all of them
                         ' Choose the pair to keep based on the one with the largest sum of Light + Heavy
                         ' However, since we perform database searching based on the light member's mass, we'll only examine those pairs that have the same
@@ -1230,16 +1230,16 @@ ClsCnt = GelUMC(Ind).UMCCnt
                         '  if they have the same spacing between the light and heavy members
                         With GelP_D_L(Ind)
                         
-                            dblMassDiff = Abs(GelUMC(Ind).UMCs(.Pairs(i).P2).ClassMW - GelUMC(Ind).UMCs(.Pairs(i).P1).ClassMW)
+                            dblMassDiff = Abs(GelUMC(Ind).UMCs(.Pairs(i).p2).ClassMW - GelUMC(Ind).UMCs(.Pairs(i).p1).ClassMW)
                             dblMassDiffMin = dblMassDiff - .SearchDef.DeltaMassTolerance * 2
                             dblMassDiffMax = dblMassDiff + .SearchDef.DeltaMassTolerance * 2
                             
                             MatchingPairsCount = 0
                             ReDim MatchingPairs(0)
                             For j = 0 To .PCnt - 1
-                                If .Pairs(j).P2 = .Pairs(i).P2 Then
+                                If .Pairs(j).p2 = .Pairs(i).p2 Then
                                     ' Make sure the mass difference is allowable
-                                    dblMassDiff = Abs(GelUMC(Ind).UMCs(.Pairs(j).P2).ClassMW - GelUMC(Ind).UMCs(.Pairs(j).P1).ClassMW)
+                                    dblMassDiff = Abs(GelUMC(Ind).UMCs(.Pairs(j).p2).ClassMW - GelUMC(Ind).UMCs(.Pairs(j).p1).ClassMW)
                                     
                                     If dblMassDiff >= dblMassDiffMin And dblMassDiff <= dblMassDiffMax Then
                                         ReDim Preserve MatchingPairs(MatchingPairsCount)
@@ -1286,12 +1286,12 @@ Private Sub ResolveDltLblPairsUMCFindBest(ByVal Ind As Long, MatchingPairs() As 
     Dim i As Long
     
     With GelP_D_L(Ind)
-        dblHighestSum = GelUMC(Ind).UMCs(.Pairs(0).P1).ClassAbundance + GelUMC(Ind).UMCs(.Pairs(0).P2).ClassAbundance
+        dblHighestSum = GelUMC(Ind).UMCs(.Pairs(0).p1).ClassAbundance + GelUMC(Ind).UMCs(.Pairs(0).p2).ClassAbundance
         IndexBestSum = 0
             
         ' Determine the pair with the highest sum of Light + Heavy
         For i = 1 To MatchingPairsCount - 1
-            dblCompareSum = GelUMC(Ind).UMCs(.Pairs(MatchingPairs(i)).P1).ClassAbundance + GelUMC(Ind).UMCs(.Pairs(MatchingPairs(i)).P2).ClassAbundance
+            dblCompareSum = GelUMC(Ind).UMCs(.Pairs(MatchingPairs(i)).p1).ClassAbundance + GelUMC(Ind).UMCs(.Pairs(MatchingPairs(i)).p2).ClassAbundance
             If dblCompareSum > dblHighestSum Then
                 dblHighestSum = dblCompareSum
                 IndexBestSum = i
@@ -1336,16 +1336,16 @@ With GelP_D_L(Ind)
        ReDim IsoHCnt(IsoCnt)
        For i = 0 To .PCnt - 1
            If Not .Pairs(i).STATE = glPAIR_Exc Then
-              IsoLCnt(.Pairs(i).P1) = IsoLCnt(.Pairs(i).P1) + 1
-              IsoHCnt(.Pairs(i).P2) = IsoHCnt(.Pairs(i).P2) + 1
+              IsoLCnt(.Pairs(i).p1) = IsoLCnt(.Pairs(i).p1) + 1
+              IsoHCnt(.Pairs(i).p2) = IsoHCnt(.Pairs(i).p2) + 1
            End If
        Next i
        'there could be more sophisticated ways to resolve
        'pairs to get higher number of resolved OK pairs
        For i = 0 To .PCnt - 1
            If Not .Pairs(i).STATE = glPAIR_Exc Then
-              If IsoLCnt(.Pairs(i).P1) = 1 And IsoHCnt(.Pairs(i).P1) = 0 _
-                 And IsoLCnt(.Pairs(i).P2) = 0 And IsoHCnt(.Pairs(i).P2) = 1 Then
+              If IsoLCnt(.Pairs(i).p1) = 1 And IsoHCnt(.Pairs(i).p1) = 0 _
+                 And IsoLCnt(.Pairs(i).p2) = 0 And IsoHCnt(.Pairs(i).p2) = 1 Then
                  .Pairs(i).STATE = glPAIR_Inc
                  IncPairsCnt = IncPairsCnt + 1
               Else
@@ -1443,7 +1443,7 @@ With GelP_D_L(Ind)
         ElseIf CurrER > glHugeOverExp Then
             CurrER = glHugeOverExp
         End If
-        With GelUMC(Ind).UMCs(.Pairs(i).P1)
+        With GelUMC(Ind).UMCs(.Pairs(i).p1)
             For j = 0 To .ClassCount - 1
                 CurrType = .ClassMType(j)
                 CurrInd = .ClassMInd(j)
@@ -1455,7 +1455,7 @@ With GelP_D_L(Ind)
                 End Select
             Next j
         End With
-        With GelUMC(Ind).UMCs(.Pairs(i).P2)
+        With GelUMC(Ind).UMCs(.Pairs(i).p2)
             For j = 0 To .ClassCount - 1
                 CurrType = .ClassMType(j)
                 CurrInd = .ClassMInd(j)
@@ -1494,8 +1494,8 @@ ResetERValues Ind
 ' Now copy the ER values from .Pairs(i).ER to .IsoData().ExpressionRatio
 With GelP_D_L(Ind)
     For i = 0 To .PCnt - 1
-        GelData(Ind).IsoData(.Pairs(i).P1).ExpressionRatio = .Pairs(i).ER
-        GelData(Ind).IsoData(.Pairs(i).P2).ExpressionRatio = .Pairs(i).ER
+        GelData(Ind).IsoData(.Pairs(i).p1).ExpressionRatio = .Pairs(i).ER
+        GelData(Ind).IsoData(.Pairs(i).p2).ExpressionRatio = .Pairs(i).ER
     Next i
 End With
 
@@ -1583,13 +1583,13 @@ Public Function UpdateUMCsPairingStatus(ByVal lngGelIndex As Long, ByRef eClsPai
                 With .Pairs(i)
                     If .STATE <> glPAIR_Exc Then
                         'light class
-                        Select Case eClsPaired(.P1)
+                        Select Case eClsPaired(.p1)
                         Case umcpNone
-                             eClsPaired(.P1) = umcpLightUnique
+                             eClsPaired(.p1) = umcpLightUnique
                         Case umcpLightUnique
-                             eClsPaired(.P1) = umcpLightMultiple
+                             eClsPaired(.p1) = umcpLightMultiple
                         Case umcpHeavyUnique, umcpHeavyMultiple
-                             eClsPaired(.P1) = umcpLightHeavyMix
+                             eClsPaired(.p1) = umcpLightHeavyMix
                         Case umcpLightMultiple, umcpLightHeavyMix
                              'no changes
                         Case Else
@@ -1598,13 +1598,13 @@ Public Function UpdateUMCsPairingStatus(ByVal lngGelIndex As Long, ByRef eClsPai
                         End Select
                         
                         'heavy class
-                        Select Case eClsPaired(.P2)
+                        Select Case eClsPaired(.p2)
                         Case umcpNone
-                             eClsPaired(.P2) = umcpHeavyUnique
+                             eClsPaired(.p2) = umcpHeavyUnique
                         Case umcpHeavyUnique
-                             eClsPaired(.P2) = umcpHeavyMultiple
+                             eClsPaired(.p2) = umcpHeavyMultiple
                         Case umcpLightUnique, umcpLightMultiple
-                             eClsPaired(.P2) = umcpLightHeavyMix
+                             eClsPaired(.p2) = umcpLightHeavyMix
                         Case umcpHeavyMultiple, umcpLightHeavyMix
                              'no changes
                         Case Else

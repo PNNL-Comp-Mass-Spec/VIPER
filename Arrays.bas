@@ -730,9 +730,13 @@ Public Sub Remove1stSubstring(ByRef S As String, ByVal SubS As String)
 Dim SubSPos As Long
 On Error GoTo err_RemoveSubString
 If (Len(S) > 0) And (Len(SubS) > 0) Then
-   SubSPos = InStr(1, S, SubS)
-   If SubSPos > 0 Then
-      S = Trim$(Left$(S, SubSPos - 1) & Right$(S, Len(S) - SubSPos - Len(SubS)))
+   If S = SubS Then
+      S = ""
+   Else
+      SubSPos = InStr(1, S, SubS)
+      If SubSPos > 0 Then
+         S = Trim$(Left$(S, SubSPos - 1) & Right$(S, Len(S) - SubSPos - Len(SubS)))
+      End If
    End If
 End If
 err_RemoveSubString:

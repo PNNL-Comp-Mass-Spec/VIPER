@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.Ocx"
 Begin VB.Form frmPRISMAutomation 
    Caption         =   "VIPER -- PRISM Automation"
    ClientHeight    =   6975
@@ -189,7 +189,6 @@ Begin VB.Form frmPRISMAutomation
       _ExtentX        =   11456
       _ExtentY        =   4471
       _Version        =   393217
-      Enabled         =   -1  'True
       ReadOnly        =   -1  'True
       ScrollBars      =   3
       TextRTF         =   $"frmPRISMAutomation.frx":0000
@@ -733,6 +732,8 @@ Private Sub QueryPRISM()
     Dim prmToolVersion As New ADODB.Parameter
     Dim prmMinimumPeptideProphetProbability As New ADODB.Parameter
     
+    Dim strMessage As String
+    
     ' Do not allow recursive calls to this sub
     ' If a recursive call does occur, make sure the Timer is disabled
     If blnWorking Then
@@ -960,12 +961,26 @@ On Error GoTo QueryPRISMErrorHandler
     ' Execute the SP
     cmdGetPMTask.Execute
 
+    If Not (IsNull(prmMessage.Value)) Then
+        strMessage = CStr(prmMessage)
+    Else
+        strMessage = ""
+    End If
+    
     If (IsNull(prmTaskAvailable.Value)) Then
         strLastGoodLocation = "Execute done: No available jobs"
+        If Len(strMessage) > 0 Then
+            strLastGoodLocation = strLastGoodLocation & vbCrLf & "  -> " & strMessage
+        End If
+        
         If mDebug Then AddToPrismAutoAnalysisLog strLastGoodLocation & vbCrLf
         lngAvailableJobID = -1
     ElseIf CLngSafe(prmTaskAvailable.Value) = 0 Then
         strLastGoodLocation = "Execute done: No available jobs"
+        If Len(strMessage) > 0 Then
+            strLastGoodLocation = strLastGoodLocation & vbCrLf & "  -> " & strMessage
+        End If
+        
         If mDebug Then AddToPrismAutoAnalysisLog strLastGoodLocation & vbCrLf
         lngAvailableJobID = -1
     Else

@@ -1381,19 +1381,19 @@ For lngPairInd = 0 To PCount - 1
             
             udtPutUMCMatchParams.MassTagID.Value = AMTData(lngMassTagIndexOriginal).ID
             udtPutUMCMatchParams.MatchingMemberCount.Value = mUMCMatchStats(lngMassTagIndexPointer).MemberHitCount
-            udtPutUMCMatchParams.MatchScore.Value = mUMCMatchStats(lngMassTagIndexPointer).SLiCScore
+            udtPutUMCMatchParams.MatchScore.Value = mUMCMatchStats(lngMassTagIndexPointer).StacOrSLiC
+            udtPutUMCMatchParams.DelMatchScore.Value = mUMCMatchStats(lngMassTagIndexPointer).DelScore
+            udtPutUMCMatchParams.UniquenessProbability.Value = CSng(mUMCMatchStats(lngMassTagIndexPointer).UniquenessProbability)
             
             strMassMods = MOD_TKN_PAIR_LIGHT
             If Len(mMTMods(mMTInd(mUMCMatchStats(lngMassTagIndexPointer).IDIndex))) > 0 Then
                 strMassMods = strMassMods & " " & Trim(mMTMods(mMTInd(mUMCMatchStats(lngMassTagIndexPointer).IDIndex)))
-                udtPutUMCMatchParams.MassTagModMass.Value = mMTMWN14(mUMCMatchStats(lngMassTagIndexPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW
+                udtPutUMCMatchParams.MassTagModMass.Value = CSng(mMTMWN14(mUMCMatchStats(lngMassTagIndexPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW)
             Else
                 udtPutUMCMatchParams.MassTagModMass.Value = 0
             End If
             If Len(strMassMods) > PUT_UMC_MATCH_MAX_MODSTRING_LENGTH Then strMassMods = Left(strMassMods, PUT_UMC_MATCH_MAX_MODSTRING_LENGTH)
             udtPutUMCMatchParams.MassTagMods.Value = strMassMods
-            
-            udtPutUMCMatchParams.DelMatchScore.Value = mUMCMatchStats(lngMassTagIndexPointer).DelSLiC
             
             cmdPutNewUMCMatch.Execute
             MassTagExpCnt = MassTagExpCnt + 1
@@ -2017,8 +2017,9 @@ Private Sub RecordSearchResultsInData()
     
     Dim AMTRef As String
     Dim dblAMTMass As Double
-    Dim dblSLiCScore As Double
+    Dim dblStacOrSLiC As Double
     Dim dblDelSLiC As Double
+    Dim dblUPScore As Double
     
     Dim CurrMW As Double, AbsMWErr As Double
     Dim CurrScan As Long
@@ -2050,8 +2051,9 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
             lngMassTagIndexOriginal = mMTOrInd(mMTInd(mUMCMatchStats(lngIndex).IDIndex))
             
             dblAMTMass = mMTMWN14(mUMCMatchStats(lngIndex).IDIndex)
-            dblSLiCScore = mUMCMatchStats(lngIndex).SLiCScore
-            dblDelSLiC = mUMCMatchStats(lngIndex).DelSLiC
+            dblStacOrSLiC = mUMCMatchStats(lngIndex).StacOrSLiC
+            dblDelSLiC = mUMCMatchStats(lngIndex).DelScore
+            dblUPScore = mUMCMatchStats(lngIndex).UniquenessProbability
             
             For lngMemberIndex = 0 To GelUMC(CallerID).UMCs(lngUMCIndexOriginal).ClassCount - 1
                 lngIonIndexOriginal = GelUMC(CallerID).UMCs(lngUMCIndexOriginal).ClassMInd(lngMemberIndex)
@@ -2070,7 +2072,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                        Debug.Assert False
                     End Select
                     
-                    AMTRef = ConstructAMTReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(.CSData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblAMTMass, dblSLiCScore, dblDelSLiC)
+                    AMTRef = ConstructAMTReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(.CSData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblAMTMass, dblStacOrSLiC, dblDelSLiC, dblUPScore)
                     If Len(.CSData(lngIonIndexOriginal).MTID) = 0 Then
                         blnAddAMTRef = True
                     ElseIf InStr(.CSData(lngIonIndexOriginal).MTID, AMTRef) <= 0 Then
@@ -2102,7 +2104,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                        Debug.Assert False
                     End Select
 
-                    AMTRef = ConstructAMTReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblAMTMass, dblSLiCScore, dblDelSLiC)
+                    AMTRef = ConstructAMTReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblAMTMass, dblStacOrSLiC, dblDelSLiC, 0)
                     If Len(.IsoData(lngIonIndexOriginal).MTID) = 0 Then
                         blnAddAMTRef = True
                     ElseIf InStr(.IsoData(lngIonIndexOriginal).MTID, AMTRef) <= 0 Then
@@ -2162,6 +2164,9 @@ Dim NETTolFinal As Double
 
 Dim dblClassMass As Double
 
+Dim blnUsingPrecomputedSLiCScores As Boolean
+Dim blnFilterUsingFinalTolerances As Boolean
+
 On Error GoTo err_SearchPairSingleMass
 
 'couple of shortcut variables
@@ -2181,8 +2186,12 @@ If ManageCurrID(MNG_RESET) Then
         mCurrIDMatches(lngIndex).IDIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
     Next lngIndex
     
+
+    blnUsingPrecomputedSLiCScores = False
+    blnFilterUsingFinalTolerances = True
+    
     ' Next compute the Match Scores
-    SearchAMTComputeSLiCScores mCurrIDCnt, mCurrIDMatches, dblClassMass, MWTolAbsFinal, NETTolFinal, mSearchRegionShape
+    SearchAMTComputeSLiCScores mCurrIDCnt, mCurrIDMatches, dblClassMass, MWTolAbsFinal, NETTolFinal, mSearchRegionShape, blnUsingPrecomputedSLiCScores, blnFilterUsingFinalTolerances
     
     '-----------------------------------------------------------------
     'all identifications for PairInd are collected; now order them in
@@ -2213,8 +2222,8 @@ If ManageCurrID(MNG_RESET) Then
                      .PairIndex = PairInd
                      .IDIndex = mCurrIDMatches(lngIndex).IDInd
                      .MemberHitCount = mCurrIDMatches(lngIndex).MatchingMemberCount
-                     .SLiCScore = mCurrIDMatches(lngIndex).SLiCScore
-                     .DelSLiC = mCurrIDMatches(lngIndex).DelSLiC
+                     .StacOrSLiC = mCurrIDMatches(lngIndex).StacOrSLiC
+                     .DelScore = mCurrIDMatches(lngIndex).DelScore
                      .MultiAMTHitCount = mCurrIDCnt
                      .IDIsInternalStd = False
                    End With
@@ -2293,10 +2302,12 @@ Private Sub SearchPairConglomerateMassAMT(ByRef udtTestUMC As udtUMCType, ByVal 
                                 
                                 mCurrIDMatches(mCurrIDCnt).IDInd = FastSearchMatchInd
                                 mCurrIDMatches(mCurrIDCnt).MatchingMemberCount = 0
-                                mCurrIDMatches(mCurrIDCnt).SLiCScore = -1    ' Set this to -1 for now
+                                mCurrIDMatches(mCurrIDCnt).StacOrSLiC = -1    ' Set this to -1 for now
                                 mCurrIDMatches(mCurrIDCnt).MassErr = .ClassMW - dblMassTagMass
                                 mCurrIDMatches(mCurrIDCnt).NETErr = dblNETDifference
                                 mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = False
+                                mCurrIDMatches(mCurrIDCnt).UniquenessProbability = 0
+                                
                                 mCurrIDCnt = mCurrIDCnt + 1
                                 
                                 blnFirstMatchFound = True
@@ -2324,10 +2335,12 @@ Private Sub SearchPairConglomerateMassAMT(ByRef udtTestUMC As udtUMCType, ByVal 
                                         
                                         mCurrIDMatches(mCurrIDCnt).IDInd = FastSearchMatchInd
                                         mCurrIDMatches(mCurrIDCnt).MatchingMemberCount = 0
-                                        mCurrIDMatches(mCurrIDCnt).SLiCScore = -1    ' Set this to -1 for now
+                                        mCurrIDMatches(mCurrIDCnt).StacOrSLiC = -1    ' Set this to -1 for now
                                         mCurrIDMatches(mCurrIDCnt).MassErr = dblCurrMW - dblMassTagMass
                                         mCurrIDMatches(mCurrIDCnt).NETErr = dblNETDifference
                                         mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = False
+                                        mCurrIDMatches(mCurrIDCnt).UniquenessProbability = 0
+                                        
                                         mCurrIDCnt = mCurrIDCnt + 1
                                         
                                         blnFirstMatchFound = True
@@ -2619,8 +2632,8 @@ Public Function ShowOrSavePairsAndIDs(Optional strOutputFilePath As String = "",
                         dblGANETError = dblLightNETClassRep - mMTNET(lngMassTagIndexPointer)
                        
                         strIDInfo = strIDInfo & strSepChar & mUMCMatchStats(lngMatchIndex).MemberHitCount & strSepChar & Round(dblMassErrorPPM, 4) & strSepChar & Round(dblGANETError, NET_PRECISION)
-                        strIDInfo = strIDInfo & strSepChar & Round(mUMCMatchStats(lngMatchIndex).SLiCScore, 4)
-                        strIDInfo = strIDInfo & strSepChar & Round(mUMCMatchStats(lngMatchIndex).DelSLiC, 4)
+                        strIDInfo = strIDInfo & strSepChar & Round(mUMCMatchStats(lngMatchIndex).StacOrSLiC, 4)
+                        strIDInfo = strIDInfo & strSepChar & Round(mUMCMatchStats(lngMatchIndex).DelScore, 4)
                         strIDInfo = strIDInfo & strSepChar & Round(AMTData(lngMassTagIndexOriginal).PeptideProphetProbability, 5)
                         strIDInfo = strIDInfo & strSepChar & AMTData(lngMassTagIndexOriginal).Sequence
                         strIDInfo = strIDInfo & strSepChar & AMTData(lngMassTagIndexOriginal).CNT_N
@@ -2746,6 +2759,8 @@ End If
 
 mKeyPressAbortProcess = 0
 cmdSearch.Visible = False
+
+GelData(CallerID).MostRecentSearchUsedSTAC = False
 
 If mMatchStatsCount > 0 Then    'something already identified
    Call DestroyIDStructures

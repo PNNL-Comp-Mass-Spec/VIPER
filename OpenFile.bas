@@ -2214,6 +2214,7 @@ End Sub
 Private Sub InitializeGelDataStructures(ByVal lngGelIndex As Long)
         
     GelData(lngGelIndex).DataStatusBits = 0
+    GelData(lngGelIndex).MostRecentSearchUsedSTAC = False
         
     With GelStatus(lngGelIndex)
         .Deleted = False

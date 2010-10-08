@@ -16,8 +16,8 @@ Option Explicit
 Private Const INITIAL_LISTSIZE As Long = 10000
 
 Private mCount As Long
-Private mKeys() As Long
-Private mValues() As Long
+Private mKeys() As Long         ' 0-based array
+Private mValues() As Long       ' 0-based array
 
 ' These two variables are used in the Exists() function to
 ' quickly check if a key doesn't exist when the data isn't sorted
@@ -193,6 +193,7 @@ Private Function GetIndexForKey(ByVal Key As Long) As Long
 End Function
 
 ' Return the value associated with the given key
+' If Key is present multiple times in mKeys(), then will return a match at random
 Public Function GetItemForKey(ByVal Key As Long, ByRef blnMatchFound As Boolean) As Long
     Dim lngIndexMatch As Long
    
@@ -207,6 +208,55 @@ Public Function GetItemForKey(ByVal Key As Long, ByRef blnMatchFound As Boolean)
     End If
 End Function
 
+' Returns all of the values associated with the given key
+' You must initialize lngItems() before calling this function
+' lngItems() will be increased in length if needed (but never shrunk)
+Public Function GetItemsForKey(ByVal Key As Long, ByRef lngItems() As Long) As Long
+    Dim lngIndex As Long
+    Dim lngIndexMatchStart As Long
+    Dim lngIndexMatchEnd As Long
+    Dim lngMatchCount As Long
+    
+    lngMatchCount = 0
+    lngIndexMatchStart = GetIndexForKey(Key)
+    
+    If lngIndexMatchStart >= 0 Then
+        lngIndexMatchEnd = lngIndexMatchStart
+        
+        ' Decrement lngIndexMatchStart if needed
+        Do While lngIndexMatchStart > 0
+            If mKeys(lngIndexMatchStart - 1) = Key Then
+                lngIndexMatchStart = lngIndexMatchStart - 1
+            Else
+                Exit Do
+            End If
+        Loop
+        
+        ' Increment lngIndexMatchEnd if needed
+        Do While lngIndexMatchEnd < mCount - 1
+            If mKeys(lngIndexMatchEnd + 1) = Key Then
+                lngIndexMatchEnd = lngIndexMatchEnd + 1
+            Else
+                Exit Do
+            End If
+        Loop
+        
+        lngMatchCount = lngIndexMatchEnd - lngIndexMatchStart + 1
+        
+        If lngMatchCount > UBound(lngItems) + 1 Then
+             ReDim lngItems(lngMatchCount - 1)
+        End If
+        
+        For lngIndex = lngIndexMatchStart To lngIndexMatchEnd
+            lngItems(lngIndex - lngIndexMatchStart) = mValues(lngIndex)
+        Next lngIndex
+               
+        GetItemsForKey = lngMatchCount
+    Else
+        GetItemsForKey = 0
+    End If
+    
+End Function
 ' Removes the specified key
 Public Sub Remove(ByVal Key As Long)
     Dim lngIndexMatch As Long
@@ -359,6 +409,7 @@ On Error GoTo ShellSortErrorHandler
             lngParallelArray(lngIndexCompare + lngIncrement) = lngSwap
         Next lngIndex
         lngIncrement = lngIncrement \ 3
+        DoEvents
     Loop
     
     Exit Sub

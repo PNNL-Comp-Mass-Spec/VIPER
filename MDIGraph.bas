@@ -516,7 +516,7 @@ Public Type DocumentData           'file format for Certificate = glCERT2004_Mod
   DataStatusBits As Long     ' DataStatusBits is used to hold various isotopic data indicator bits (thus, it is a bit bucket)
   
   DataFilter(1 To MAX_FILTER_COUNT, 2) As Variant             ' Second dimension is (x,0) = True to enable filter, (x,1) = filter value or filter minimum value, (x,2) = filter maximum value (if required)
-                                                              ' Array memberes from 12 to MAX_FILTER_COUNT=20 are reserved for future use
+                                                              ' Array members from 12 to MAX_FILTER_COUNT=20 are reserved for future use
   
   CustomNETsDefined As Boolean          ' True when a custom NET is defined
   ScanInfo() As udtScanInfoType         ' Updated for this version; lists all MS scan numbers and times, in increasing order; 1-based array for historical reasons
@@ -524,10 +524,11 @@ Public Type DocumentData           'file format for Certificate = glCERT2004_Mod
   CSData() As udtIsotopicDataType       ' Updated for this version; 1-based array
   IsoData() As udtIsotopicDataType      ' Updated for this version; 1-based array
   
-  AdditionalValue1 As Long          ' Use for future expansion (name can be changed in the future)
-  AdditionalValue2 As Long          ' Use for future expansion (name can be changed in the future)
-  AdditionalValue3 As Single        ' Use for future expansion (name can be changed in the future)
-  AdditionalValue4 As Single        ' Use for future expansion (name can be changed in the future)
+  MostRecentSearchUsedSTAC As Boolean   ' True if we used STAC in the most recent search; Was part of AdditionalValue1 (which was a long)
+  AdditionalValue1 As Integer       ' Use for future expansion (name can be changed in the future); 2 bytes
+  AdditionalValue2 As Long          ' Use for future expansion (name can be changed in the future); 4 bytes
+  AdditionalValue3 As Single        ' Use for future expansion (name can be changed in the future); 4 bytes
+  AdditionalValue4 As Single        ' Use for future expansion (name can be changed in the future); 4 bytes
   
   OtherInfo As String
 End Type
@@ -686,13 +687,13 @@ Public Type udtUMCType
   ClassMWStD As Double          ' class standard deviation; -1 if not applicable
   ClassMassCorrectionDa As Double   ' New for this version; Positive or negative value to add to ClassMW to fine-tune the mass
   
-  ClassScore As Double          ' Unused; Reserve for future expansion
+  ClassScore As Double          ' Only used for IMS data: holds the ConformationFitScore
   ClassNET As Double            ' Unused; currently using NET of the class representative
   ClassStatusBits As Double     ' ClassStatusBits is used to hold various UMC Indicator Bits (thus, it is a bit bucket)
                                 
   'Following data is useful for faster drawing of Unique Mass Classes
   'It is also used in CalcDltLblPairsERWork
-  'It is populated in CalculateClasses
+  'It is populated in CalculateClasses or in ReadLCMSFeaturesFile
   MinScan As Long               ' Minimum scan number in class (across all members)
   MaxScan As Long               ' Maximum scan number in class (across all members)
   MinMW As Double
@@ -706,11 +707,15 @@ Public Type udtUMCType
   PercentMembersIReportMonoPlus4 As Byte       ' % of the data in the UMC that was added due to MonoPlus4 data (was previously part of AdditionalValue1, a long)
   PercentMembersIReportMonoMinus4 As Byte      ' % of the data in the UMC that was added due to MonoMinus4 data (was previously part of AdditionalValue1, a long)
   
-  DriftTime As Single                   ' 4 bytes (previously part of AdditionalValue1 and AdditionalValue2)
+  DriftTime As Single                           ' 4 bytes (previously part of AdditionalValue1 and AdditionalValue2)
   
-  AdditionalValue2 As Integer       ' New for this version; use for future expansion (name can be changed in the future); 2 bytes
-  AdditionalValue3 As Single        ' New for this version; use for future expansion (name can be changed in the future); 4 bytes
-  AdditionalValue4 As Single        ' New for this version; use for future expansion (name can be changed in the future); 4 bytes
+  ClassCountPredefinedLCMSFeatures As Integer       ' Stores the original .ClassCount value when reading features from a _LCMSFeatures.txt file (was previously AdditionalValue2, a 2-byte integer)
+  
+  MassShiftOverallPPM As Single   ' overall mass correction applied to this point (in ppm); if multiple adjustments are applied, this will track the overall adjustment applied (was previously AdditionalValue3, a single)
+  MassShiftCount As Byte          ' Number of mass corrections applied (maximum value is 255)
+  
+  AdditionalValue3 As Byte        ' Use for future expansion (name can be changed in the future); 1 byte
+  AdditionalValue4 As Integer     ' Use for future expansion (name can be changed in the future); 2 bytes
   
   OtherInfo As String
 End Type
@@ -719,7 +724,7 @@ End Type
 'This corresponds to FileInfoVersions(fioGelUMC) version 4
 Public Type UMCListType
   def As UMCDefinition          'save definition of this count
-  UMCCnt As Long                'number of classes
+  UMCCnt As Long                'number of classes (data in .UMCs() ranges from index 0 to index .UMCCnt-1)
   UMCs() As udtUMCType          'actual classes                                           (0-based array)
   
   MassCorrectionValuesDefined As Boolean        ' New for this version; True when custom mass correction values are defined for the LC-MS Features
@@ -1606,6 +1611,10 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
     Dim strSuffixToCheck As String
     Dim strInputFileNameNoPath As String
     
+    Dim strMayContainText As String
+    Dim strFilterText As String
+    Dim blnAddedMayContainText As Boolean
+
     On Error GoTo err_LoadNewData
     
     strErrorMessage = ""
@@ -1696,7 +1705,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
         
         objLoadOptionsForm.AutoMapDataPointsMassTolerancePPM = .AutoMapDataPointsMassTolerancePPM
         objLoadOptionsForm.LCMSFeaturePointsLoadMode = .LCMSFeaturePointsLoadMode
-        
+               
         If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             ' Auto analysis; use whatever setting is defined in glbPreferencesExpanded
             objLoadOptionsForm.LCMSFeatureSplitUMCsByExaminingAbundance = glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance
@@ -1723,6 +1732,10 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 objLoadOptionsForm.EvenOddScanFilterMode = eosLoadAllScans
             End If
         End If
+                 
+        objLoadOptionsForm.FilterLCMSFeatures = .FilterLCMSFeatures
+        objLoadOptionsForm.LCMSFeatureAbuMin = .LCMSFeatureAbuMin
+        objLoadOptionsForm.IMSConformerScoreMin = .IMSConformerScoreMin
     End With
     
     ' Only show the LoadOptions form if interacting with the user
@@ -1738,6 +1751,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
         eDataFilterMode = dfmLoadAllData
         
         If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            ' Auto analysis: update just a few of the values in udtFilterPrefs
             With udtFilterPrefs
                 If .RestrictToOddScanNumbersOnly Then
                     eScanFilterMode = eosEvenOddScanFilterModeConstants.eosLoadOddScansOnly
@@ -1752,8 +1766,17 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 Else
                     .ExcludeIsoByFitMaxVal = 100
                 End If
+                
+                If .FilterLCMSFeatures Then
+                    .LCMSFeatureAbuMin = objLoadOptionsForm.LCMSFeatureAbuMin
+                    .IMSConformerScoreMin = objLoadOptionsForm.IMSConformerScoreMin
+                Else
+                    .LCMSFeatureAbuMin = 0
+                    .IMSConformerScoreMin = 0
+                End If
             End With
         Else
+            ' Manual analysis: Update all of the values in udtFilterPrefs
             With udtFilterPrefs
                 .ExcludeIsoByFit = objLoadOptionsForm.FilterOnIsoFit
                 If .ExcludeIsoByFit Then
@@ -1770,6 +1793,15 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 .RestrictCSByAbundance = .RestrictIsoByAbundance
                 .RestrictCSAbundanceMin = .RestrictIsoAbundanceMin
                 .RestrictCSAbundanceMax = .RestrictIsoAbundanceMax
+                                
+                .FilterLCMSFeatures = objLoadOptionsForm.FilterLCMSFeatures
+                If .FilterLCMSFeatures Then
+                    .LCMSFeatureAbuMin = objLoadOptionsForm.LCMSFeatureAbuMin
+                    .IMSConformerScoreMin = objLoadOptionsForm.IMSConformerScoreMin
+                Else
+                    .LCMSFeatureAbuMin = 0
+                    .IMSConformerScoreMin = 0
+                End If
                 
                 .MaximumDataCountEnabled = objLoadOptionsForm.MaximumDataCountEnabled
                 If .MaximumDataCountEnabled Then
@@ -1810,6 +1842,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
             ' Copy values from udtFilterPrefs to glbPreferencesExpanded.AutoAnalysisFilterPrefs
             With glbPreferencesExpanded.AutoAnalysisFilterPrefs
                 ' Note: I'm purposely not updating .ExcludeIsoByFit and .ExcludeIsoByFitMaxVal if the user customized them
+                ' The reason is that if we're not filtering by iso fit, then we store 100 in .ExcludeIsoByFitMaxVal
                 
                 .RestrictIsoByAbundance = udtFilterPrefs.RestrictIsoByAbundance
                 .RestrictIsoAbundanceMin = udtFilterPrefs.RestrictIsoAbundanceMin
@@ -1818,7 +1851,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 .RestrictCSByAbundance = udtFilterPrefs.RestrictCSByAbundance
                 .RestrictCSAbundanceMin = udtFilterPrefs.RestrictCSAbundanceMin
                 .RestrictCSAbundanceMax = udtFilterPrefs.RestrictCSAbundanceMax
-                
+
                 .MaximumDataCountEnabled = udtFilterPrefs.MaximumDataCountEnabled
                 .MaximumDataCountToLoad = udtFilterPrefs.MaximumDataCountToLoad
                 
@@ -1827,6 +1860,12 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 
                 .AutoMapDataPointsMassTolerancePPM = udtFilterPrefs.AutoMapDataPointsMassTolerancePPM
                 .LCMSFeaturePointsLoadMode = udtFilterPrefs.LCMSFeaturePointsLoadMode
+                
+                .FilterLCMSFeatures = udtFilterPrefs.FilterLCMSFeatures
+                If udtFilterPrefs.FilterLCMSFeatures Then
+                    .LCMSFeatureAbuMin = udtFilterPrefs.LCMSFeatureAbuMin
+                    .IMSConformerScoreMin = udtFilterPrefs.IMSConformerScoreMin
+                End If
                 
                 .RestrictToOddScanNumbersOnly = udtFilterPrefs.RestrictToOddScanNumbersOnly
                 .RestrictToEvenScanNumbersOnly = udtFilterPrefs.RestrictToEvenScanNumbersOnly
@@ -1842,6 +1881,9 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
         '  and thus I'm forced to pass individual variables into the functions
         Select Case eFileType
         Case ifmInputFileModeConstants.ifmPEKFile
+            ' Override this to false to avoid erroneous log messages
+            udtFilterPrefs.FilterLCMSFeatures = False
+            
             With udtFilterPrefs
                 intReturnCode = LoadNewPEK(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
                                            .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
@@ -1855,6 +1897,19 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
             End If
             
         Case ifmInputFileModeConstants.ifmCSVFile
+            If blnLoadPredefinedLCMSFeatures Then
+                If udtFilterPrefs.LCMSFeaturePointsLoadMode >= plmLoadMappedPointsOnly Then
+                    ' Override these to false to avoid erroneous log messages
+                    udtFilterPrefs.ExcludeIsoByFit = False
+                    udtFilterPrefs.RestrictIsoByAbundance = False
+                    udtFilterPrefs.TotalIntensityPercentageFilterEnabled = False
+                End If
+            Else
+                ' Override this to false to avoid erroneous log messages
+                udtFilterPrefs.FilterLCMSFeatures = False
+            End If
+    
+
             With udtFilterPrefs
                 intReturnCode = LoadNewCSV(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
                                            .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
@@ -1864,10 +1919,15 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                                            blnLoadPredefinedLCMSFeatures, _
                                            .AutoMapDataPointsMassTolerancePPM, _
                                            strErrorMessage, _
-                                           .LCMSFeaturePointsLoadMode)
+                                           .LCMSFeaturePointsLoadMode, _
+                                           .LCMSFeatureAbuMin, _
+                                           .IMSConformerScoreMin)
             End With
             
         Case ifmInputFileModeConstants.ifmmzXMLFile, ifmInputFileModeConstants.ifmmzXMLFileWithXMLExtension
+            ' Override this to false to avoid erroneous log messages
+            udtFilterPrefs.FilterLCMSFeatures = False
+            
             Set objMZXMLFileReader = New clsFileIOMZXml
             With udtFilterPrefs
                 intReturnCode = objMZXMLFileReader.LoadNewMZXML(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
@@ -1883,6 +1943,9 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
             End If
             
         Case ifmInputFileModeConstants.ifmmzDataFile, ifmInputFileModeConstants.ifmmzDataFileWithXMLExtension
+            ' Override this to false to avoid erroneous log messages
+            udtFilterPrefs.FilterLCMSFeatures = False
+            
             Set objmzDataFileReader = New clsFileIOMZData
             With udtFilterPrefs
                 intReturnCode = objmzDataFileReader.LoadNewMZData(strInputFilePath, lngGelIndex, .ExcludeIsoByFitMaxVal, _
@@ -1916,32 +1979,81 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 End With
             End If
         
+            strMayContainText = vbCrLf & strFileExtension & " file may contain more data than was loaded: "
+            blnAddedMayContainText = False
+            
             If udtFilterPrefs.ExcludeIsoByFit Then
                 With GelData(lngGelIndex)
-                    .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Only loaded isotopic data with calculated fit better than " & udtFilterPrefs.ExcludeIsoByFitMaxVal
+                    If blnAddedMayContainText Then
+                        .Comment = .Comment & "; "
+                    Else
+                        blnAddedMayContainText = True
+                        .Comment = .Comment & strMayContainText
+                    End If
+                    strFilterText = "Only loaded isotopic data with calculated fit better than " & udtFilterPrefs.ExcludeIsoByFitMaxVal
+                    .Comment = .Comment & strFilterText
                     .DataFilter(fltIsoFit, 0) = True
                     .DataFilter(fltIsoFit, 1) = udtFilterPrefs.ExcludeIsoByFitMaxVal
-                    AddToAnalysisHistory lngGelIndex, "File Loaded; Only isotopic data with calculated fit better than " & udtFilterPrefs.ExcludeIsoByFitMaxVal & " loaded (at user request)."
+                    AddToAnalysisHistory lngGelIndex, "File Loaded; " & strFilterText & " (at user request)."
                 End With
             End If
         
             If udtFilterPrefs.RestrictIsoByAbundance Then
                 With GelData(lngGelIndex)
-                    .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Only loaded isotopic data with abundance between " & Trim(udtFilterPrefs.RestrictIsoAbundanceMin) & " and " & Trim(udtFilterPrefs.RestrictIsoAbundanceMax) & " counts"
+                    If blnAddedMayContainText Then
+                        .Comment = .Comment & "; "
+                    Else
+                        blnAddedMayContainText = True
+                        .Comment = .Comment & strMayContainText
+                    End If
+                    strFilterText = "Only loaded isotopic data with abundance between " & Trim(udtFilterPrefs.RestrictIsoAbundanceMin) & " and " & Trim(udtFilterPrefs.RestrictIsoAbundanceMax) & " counts"
+                    .Comment = .Comment & strFilterText
                     .DataFilter(fltIsoAbu, 0) = True
                     .DataFilter(fltIsoAbu, 1) = udtFilterPrefs.RestrictIsoAbundanceMin
                     .DataFilter(fltIsoAbu, 2) = udtFilterPrefs.RestrictIsoAbundanceMax
-                    AddToAnalysisHistory lngGelIndex, "File Loaded; Only isotopic data with abundance between " & Trim(objLoadOptionsForm.AbuFilterMin) & " and " & Trim(objLoadOptionsForm.AbuFilterMax) & " counts loaded (at user request)."
+                    AddToAnalysisHistory lngGelIndex, "File Loaded; " & strFilterText & " (at user request)."
                 End With
             End If
             
             If udtFilterPrefs.TotalIntensityPercentageFilterEnabled Then
                 With GelData(lngGelIndex)
-                    .Comment = .Comment & vbCrLf & strFileExtension & " file may contain more data than was loaded. Applied cumulative sum intensity filter, retaining " & Trim(udtFilterPrefs.TotalIntensityPercentageFilter) & "% of the total intensity for each charge state"
-                    AddToAnalysisHistory lngGelIndex, "File Loaded; Applied cumulative sum intensity filter, retaining " & Trim(udtFilterPrefs.TotalIntensityPercentageFilter) & "% of the total intensity for each charge state (at user request)."
+                    If blnAddedMayContainText Then
+                        .Comment = .Comment & "; "
+                    Else
+                        blnAddedMayContainText = True
+                        .Comment = .Comment & strMayContainText
+                    End If
+                    strFilterText = "Applied cumulative sum intensity filter, retaining " & Trim(udtFilterPrefs.TotalIntensityPercentageFilter) & "% of the total intensity for each charge state"
+                    .Comment = .Comment & strFilterText
+                    AddToAnalysisHistory lngGelIndex, "File Loaded; " & strFilterText & " (at user request)."
                 End With
             End If
-                        
+
+            If udtFilterPrefs.FilterLCMSFeatures Then
+                With GelData(lngGelIndex)
+                    If blnAddedMayContainText Then
+                        .Comment = .Comment & "; "
+                    Else
+                        blnAddedMayContainText = True
+                        .Comment = .Comment & strMayContainText
+                    End If
+                    strFilterText = "Filtered LC-MS Features, retaining those with class abundance >= " & Trim(udtFilterPrefs.LCMSFeatureAbuMin) & " and IMS Conformer Score >= " & Trim(udtFilterPrefs.IMSConformerScoreMin)
+                    .Comment = .Comment & strFilterText
+                    
+                    If udtFilterPrefs.LCMSFeatureAbuMin > 0 Then
+                        .DataFilter(fltLCMSFeatureAbundance, 0) = True
+                        .DataFilter(fltLCMSFeatureAbundance, 1) = udtFilterPrefs.LCMSFeatureAbuMin
+                    End If
+                    
+                    If udtFilterPrefs.IMSConformerScoreMin > 0 Then
+                        .DataFilter(fltIMSConformerScore, 0) = True
+                        .DataFilter(fltIMSConformerScore, 1) = udtFilterPrefs.IMSConformerScoreMin
+                    End If
+
+                    AddToAnalysisHistory lngGelIndex, "File Loaded; " & strFilterText & " (at user request)."
+                End With
+            End If
+                
             AddToAnalysisHistory lngGelIndex, "File Loaded; data point count = " & CStr(GelData(lngGelIndex).IsoLines)
             
         End If

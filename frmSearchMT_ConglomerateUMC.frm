@@ -1,21 +1,452 @@
 VERSION 5.00
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl.OCX"
+Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Begin VB.Form frmSearchMT_ConglomerateUMC 
    BackColor       =   &H00FFFFFF&
    Caption         =   "Search MT tag DB - Single LC-MS Feature Mass"
-   ClientHeight    =   6915
+   ClientHeight    =   7155
    ClientLeft      =   60
    ClientTop       =   630
-   ClientWidth     =   7815
+   ClientWidth     =   14025
    LinkTopic       =   "Form1"
-   ScaleHeight     =   6915
-   ScaleWidth      =   7815
+   ScaleHeight     =   7155
+   ScaleWidth      =   14025
    StartUpPosition =   1  'CenterOwner
+   Begin VB.Frame fraSTACPlotOptions 
+      BackColor       =   &H00FFFFFF&
+      Caption         =   "STAC Plot Options"
+      Height          =   1095
+      Left            =   11880
+      TabIndex        =   64
+      Top             =   1800
+      Width           =   2055
+      Begin VB.CheckBox chkSTACPlotY2Gridlines 
+         BackColor       =   &H00FFFFFF&
+         Caption         =   "FDR Gridlines"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   67
+         Top             =   720
+         Value           =   1  'Checked
+         Width           =   1815
+      End
+      Begin VB.CheckBox chkSTACPlotY1Gridlines 
+         BackColor       =   &H00FFFFFF&
+         Caption         =   "Matches Gridlines"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   66
+         Top             =   480
+         Width           =   1815
+      End
+      Begin VB.CheckBox chkSTACPlotXGridlines 
+         BackColor       =   &H00FFFFFF&
+         Caption         =   "Vertical Gridlines"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   65
+         Top             =   240
+         Value           =   1  'Checked
+         Width           =   1815
+      End
+   End
+   Begin VB.CommandButton cmdZoomOutSTACPlot 
+      Caption         =   "&Zoom Out"
+      Height          =   375
+      Left            =   11880
+      TabIndex        =   68
+      Top             =   3000
+      Width           =   1335
+   End
+   Begin VB.CommandButton cmdCopySTACSTats 
+      Caption         =   "Copy Stats"
+      Height          =   375
+      Left            =   11880
+      TabIndex        =   63
+      Top             =   360
+      Width           =   1335
+   End
+   Begin CWUIControlsLib.CWGraph ctlSTACStats 
+      Height          =   3255
+      Left            =   7800
+      TabIndex        =   62
+      Top             =   3480
+      Width           =   4095
+      _Version        =   393218
+      _ExtentX        =   7223
+      _ExtentY        =   5741
+      _StockProps     =   71
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "MS Sans Serif"
+         Size            =   9.75
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Reset_0         =   0   'False
+      CompatibleVers_0=   393218
+      Graph_0         =   1
+      ClassName_1     =   "CCWGraphFrame"
+      opts_1          =   62
+      C[0]_1          =   16777215
+      C[1]_1          =   16777215
+      Event_1         =   2
+      ClassName_2     =   "CCWGFPlotEvent"
+      Owner_2         =   1
+      Plots_1         =   3
+      ClassName_3     =   "CCWDataPlots"
+      Array_3         =   2
+      Editor_3        =   4
+      ClassName_4     =   "CCWGFPlotArrayEditor"
+      Owner_4         =   1
+      Array[0]_3      =   5
+      ClassName_5     =   "CCWDataPlot"
+      opts_5          =   4194367
+      Name_5          =   "Matches"
+      C[0]_5          =   16711680
+      C[1]_5          =   0
+      C[2]_5          =   16711680
+      C[3]_5          =   16776960
+      Event_5         =   2
+      X_5             =   6
+      ClassName_6     =   "CCWAxis"
+      opts_6          =   575
+      Name_6          =   "STAC Threshold"
+      Orientation_6   =   2944
+      format_6        =   7
+      ClassName_7     =   "CCWFormat"
+      Scale_6         =   8
+      ClassName_8     =   "CCWScale"
+      opts_8          =   90112
+      rMin_8          =   43
+      rMax_8          =   210
+      dMax_8          =   1
+      discInterval_8  =   1
+      Radial_6        =   0
+      Enum_6          =   9
+      ClassName_9     =   "CCWEnum"
+      Editor_9        =   10
+      ClassName_10    =   "CCWEnumArrayEditor"
+      Owner_10        =   6
+      Font_6          =   0
+      tickopts_6      =   2711
+      major_6         =   0.5
+      minor_6         =   0.25
+      Caption_6       =   11
+      ClassName_11    =   "CCWDrawObj"
+      opts_11         =   62
+      C[0]_11         =   -2147483640
+      Image_11        =   12
+      ClassName_12    =   "CCWTextImage"
+      font_12         =   0
+      Animator_11     =   0
+      Blinker_11      =   0
+      Y_5             =   13
+      ClassName_13    =   "CCWAxis"
+      opts_13         =   1599
+      Name_13         =   "Matches"
+      C[3]_13         =   8421504
+      Orientation_13  =   2067
+      format_13       =   14
+      ClassName_14    =   "CCWFormat"
+      Format_14       =   "."
+      Scale_13        =   15
+      ClassName_15    =   "CCWScale"
+      opts_15         =   122880
+      rMin_15         =   28
+      rMax_15         =   187
+      dMax_15         =   10
+      discInterval_15 =   1
+      Radial_13       =   0
+      Enum_13         =   16
+      ClassName_16    =   "CCWEnum"
+      Editor_16       =   17
+      ClassName_17    =   "CCWEnumArrayEditor"
+      Owner_17        =   13
+      Font_13         =   0
+      tickopts_13     =   2743
+      major_13        =   2
+      minor_13        =   1
+      Caption_13      =   18
+      ClassName_18    =   "CCWDrawObj"
+      opts_18         =   62
+      C[0]_18         =   16711680
+      Image_18        =   19
+      ClassName_19    =   "CCWTextImage"
+      szText_19       =   "Matches"
+      font_19         =   0
+      Animator_18     =   0
+      Blinker_18      =   0
+      PointStyle_5    =   2
+      LineStyle_5     =   1
+      LineWidth_5     =   2
+      BasePlot_5      =   0
+      DefaultXInc_5   =   1
+      DefaultPlotPerRow_5=   -1  'True
+      Array[1]_3      =   20
+      ClassName_20    =   "CCWDataPlot"
+      opts_20         =   4194367
+      Name_20         =   "FDR"
+      C[0]_20         =   255
+      C[1]_20         =   0
+      C[2]_20         =   16711680
+      C[3]_20         =   16776960
+      Event_20        =   2
+      X_20            =   6
+      Y_20            =   21
+      ClassName_21    =   "CCWAxis"
+      opts_21         =   575
+      Name_21         =   "FDR"
+      Orientation_21  =   2172
+      format_21       =   22
+      ClassName_22    =   "CCWFormat"
+      Format_22       =   "%*100"
+      Scale_21        =   23
+      ClassName_23    =   "CCWScale"
+      opts_23         =   90112
+      rMin_23         =   28
+      rMax_23         =   187
+      dMax_23         =   1
+      discInterval_23 =   1
+      Radial_21       =   0
+      Enum_21         =   24
+      ClassName_24    =   "CCWEnum"
+      Editor_24       =   25
+      ClassName_25    =   "CCWEnumArrayEditor"
+      Owner_25        =   21
+      Font_21         =   0
+      tickopts_21     =   2711
+      major_21        =   0.2
+      minor_21        =   0.1
+      Caption_21      =   26
+      ClassName_26    =   "CCWDrawObj"
+      opts_26         =   62
+      C[0]_26         =   255
+      Image_26        =   27
+      ClassName_27    =   "CCWTextImage"
+      szText_27       =   "FDR"
+      style_27        =   74772712
+      font_27         =   0
+      Animator_26     =   0
+      Blinker_26      =   0
+      PointStyle_20   =   10
+      LineStyle_20    =   1
+      LineWidth_20    =   2
+      BasePlot_20     =   0
+      DefaultXInc_20  =   1
+      DefaultPlotPerRow_20=   -1  'True
+      Axes_1          =   28
+      ClassName_28    =   "CCWAxes"
+      Array_28        =   3
+      Editor_28       =   29
+      ClassName_29    =   "CCWGFAxisArrayEditor"
+      Owner_29        =   1
+      Array[0]_28     =   6
+      Array[1]_28     =   13
+      Array[2]_28     =   21
+      DefaultPlot_1   =   30
+      ClassName_30    =   "CCWDataPlot"
+      opts_30         =   4194367
+      Name_30         =   "[Template]"
+      C[0]_30         =   65280
+      C[1]_30         =   255
+      C[2]_30         =   16711680
+      C[3]_30         =   16776960
+      Event_30        =   2
+      X_30            =   6
+      Y_30            =   13
+      PointStyle_30   =   16
+      LineWidth_30    =   1
+      BasePlot_30     =   0
+      DefaultXInc_30  =   1
+      DefaultPlotPerRow_30=   -1  'True
+      Cursors_1       =   31
+      ClassName_31    =   "CCWCursors"
+      Editor_31       =   32
+      ClassName_32    =   "CCWGFCursorArrayEditor"
+      Owner_32        =   1
+      TrackMode_1     =   10
+      GraphBackground_1=   0
+      GraphFrame_1    =   33
+      ClassName_33    =   "CCWDrawObj"
+      opts_33         =   62
+      C[0]_33         =   16777215
+      C[1]_33         =   16777215
+      Image_33        =   34
+      ClassName_34    =   "CCWPictImage"
+      opts_34         =   1280
+      Rows_34         =   1
+      Cols_34         =   1
+      F_34            =   16777215
+      B_34            =   16777215
+      ColorReplaceWith_34=   8421504
+      ColorReplace_34 =   8421504
+      Tolerance_34    =   2
+      Animator_33     =   0
+      Blinker_33      =   0
+      PlotFrame_1     =   35
+      ClassName_35    =   "CCWDrawObj"
+      opts_35         =   62
+      C[0]_35         =   16777215
+      C[1]_35         =   16777215
+      Image_35        =   36
+      ClassName_36    =   "CCWPictImage"
+      opts_36         =   1280
+      Rows_36         =   1
+      Cols_36         =   1
+      Pict_36         =   1
+      F_36            =   16777215
+      B_36            =   16777215
+      ColorReplaceWith_36=   8421504
+      ColorReplace_36 =   8421504
+      Tolerance_36    =   2
+      Animator_35     =   0
+      Blinker_35      =   0
+      Caption_1       =   37
+      ClassName_37    =   "CCWDrawObj"
+      opts_37         =   62
+      C[0]_37         =   -2147483640
+      Image_37        =   38
+      ClassName_38    =   "CCWTextImage"
+      szText_38       =   "STAC Stats"
+      font_38         =   0
+      Animator_37     =   0
+      Blinker_37      =   0
+      DefaultXInc_1   =   1
+      DefaultPlotPerRow_1=   -1  'True
+      Bindings_1      =   39
+      ClassName_39    =   "CCWBindingHolderArray"
+      Editor_39       =   40
+      ClassName_40    =   "CCWBindingHolderArrayEditor"
+      Owner_40        =   1
+      Annotations_1   =   41
+      ClassName_41    =   "CCWAnnotations"
+      Editor_41       =   42
+      ClassName_42    =   "CCWAnnotationArrayEditor"
+      Owner_42        =   1
+      AnnotationTemplate_1=   43
+      ClassName_43    =   "CCWAnnotation"
+      opts_43         =   63
+      Name_43         =   "[Template]"
+      Plot_43         =   44
+      ClassName_44    =   "CCWDataPlot"
+      opts_44         =   4194367
+      Name_44         =   "[Template]"
+      C[0]_44         =   65280
+      C[1]_44         =   255
+      C[2]_44         =   16711680
+      C[3]_44         =   16776960
+      Event_44        =   2
+      X_44            =   6
+      Y_44            =   13
+      LineStyle_44    =   1
+      LineWidth_44    =   1
+      BasePlot_44     =   0
+      DefaultXInc_44  =   1
+      DefaultPlotPerRow_44=   -1  'True
+      Text_43         =   "[Template]"
+      TextXPoint_43   =   6.7
+      TextYPoint_43   =   6.7
+      TextColor_43    =   16777215
+      TextFont_43     =   45
+      ClassName_45    =   "CCWFont"
+      bFont_45        =   -1  'True
+      BeginProperty Font_45 {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "MS Sans Serif"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShapeXPoints_43 =   46
+      ClassName_46    =   "CDataBuffer"
+      Type_46         =   5
+      m_cDims;_46     =   1
+      m_cElts_46      =   1
+      Element[0]_46   =   3.3
+      ShapeYPoints_43 =   47
+      ClassName_47    =   "CDataBuffer"
+      Type_47         =   5
+      m_cDims;_47     =   1
+      m_cElts_47      =   1
+      Element[0]_47   =   3.3
+      ShapeFillColor_43=   16777215
+      ShapeLineColor_43=   16777215
+      ShapeLineWidth_43=   1
+      ShapeLineStyle_43=   1
+      ShapePointStyle_43=   10
+      ShapeImage_43   =   48
+      ClassName_48    =   "CCWDrawObj"
+      opts_48         =   62
+      Image_48        =   49
+      ClassName_49    =   "CCWPictImage"
+      opts_49         =   1280
+      Rows_49         =   1
+      Cols_49         =   1
+      Pict_49         =   7
+      F_49            =   -2147483633
+      B_49            =   -2147483633
+      ColorReplaceWith_49=   8421504
+      ColorReplace_49 =   8421504
+      Tolerance_49    =   2
+      Animator_48     =   0
+      Blinker_48      =   0
+      ArrowVisible_43 =   -1  'True
+      ArrowColor_43   =   16777215
+      ArrowWidth_43   =   1
+      ArrowLineStyle_43=   1
+      ArrowHeadStyle_43=   1
+   End
+   Begin MSComctlLib.ListView lvwSTACStats 
+      Height          =   3015
+      Left            =   7800
+      TabIndex        =   61
+      Top             =   360
+      Width           =   3975
+      _ExtentX        =   7011
+      _ExtentY        =   5318
+      View            =   3
+      LabelEdit       =   1
+      MultiSelect     =   -1  'True
+      LabelWrap       =   -1  'True
+      HideSelection   =   0   'False
+      FullRowSelect   =   -1  'True
+      _Version        =   393217
+      ForeColor       =   -2147483640
+      BackColor       =   -2147483643
+      BorderStyle     =   1
+      Appearance      =   1
+      NumItems        =   0
+   End
+   Begin VB.CheckBox chkSTACUsesPriorProbability 
+      BackColor       =   &H00FFFFFF&
+      Caption         =   "Use Prior Prob"
+      Height          =   255
+      Left            =   6240
+      TabIndex        =   7
+      Top             =   360
+      Value           =   1  'Checked
+      Width           =   1335
+   End
+   Begin VB.CheckBox chkUseSTAC 
+      BackColor       =   &H00FFFFFF&
+      Caption         =   "Use STAC"
+      Height          =   255
+      Left            =   5040
+      TabIndex        =   6
+      Top             =   360
+      Value           =   1  'Checked
+      Width           =   1335
+   End
    Begin VB.CommandButton cmdSetDefaultsForToleranceRefinement 
-      Cancel          =   -1  'True
       Caption         =   "Set to Tolerance Refinement Defaults"
       Height          =   495
       Left            =   5640
-      TabIndex        =   57
+      TabIndex        =   19
       Top             =   2280
       Width           =   1695
    End
@@ -23,7 +454,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Alignment       =   1  'Right Justify
       Height          =   285
       Left            =   3000
-      TabIndex        =   14
+      TabIndex        =   17
       Text            =   "0"
       Top             =   2640
       Width           =   615
@@ -32,7 +463,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Set to Defaults"
       Height          =   375
       Left            =   5640
-      TabIndex        =   55
+      TabIndex        =   18
       Top             =   1800
       Width           =   1695
    End
@@ -40,7 +471,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Height          =   285
       Left            =   60
       Locked          =   -1  'True
-      TabIndex        =   54
+      TabIndex        =   59
       Top             =   6525
       Width           =   7455
    End
@@ -48,7 +479,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Alignment       =   1  'Right Justify
       Height          =   285
       Left            =   3000
-      TabIndex        =   12
+      TabIndex        =   15
       Text            =   "0"
       Top             =   2340
       Width           =   615
@@ -57,7 +488,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Height          =   315
       Left            =   4200
       Style           =   2  'Dropdown List
-      TabIndex        =   53
+      TabIndex        =   9
       Top             =   1200
       Width           =   3255
    End
@@ -65,7 +496,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Alignment       =   1  'Right Justify
       Height          =   285
       Left            =   3000
-      TabIndex        =   10
+      TabIndex        =   13
       Text            =   "0"
       Top             =   2040
       Width           =   615
@@ -74,7 +505,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Height          =   315
       Left            =   2520
       Style           =   2  'Dropdown List
-      TabIndex        =   8
+      TabIndex        =   11
       Top             =   1680
       Width           =   2415
    End
@@ -82,8 +513,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       BackColor       =   &H00FFFFFF&
       Caption         =   "Update data in current file with results of search"
       Height          =   495
-      Left            =   4200
-      TabIndex        =   6
+      Left            =   5040
+      TabIndex        =   8
       Top             =   600
       Value           =   1  'Checked
       Width           =   2535
@@ -110,14 +541,14 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Modifications"
       Height          =   1575
       Left            =   0
-      TabIndex        =   29
+      TabIndex        =   35
       Top             =   4560
       Width           =   7575
       Begin VB.TextBox txtDecoySearchNETWobble 
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   5640
-         TabIndex        =   46
+         TabIndex        =   52
          Text            =   "0.1"
          Top             =   1080
          Width           =   615
@@ -126,7 +557,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   315
          Left            =   3120
          Style           =   2  'Dropdown List
-         TabIndex        =   37
+         TabIndex        =   43
          ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0000
          Top             =   480
          Width           =   1095
@@ -135,7 +566,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   3120
-         TabIndex        =   39
+         TabIndex        =   45
          Text            =   "0"
          Top             =   1080
          Width           =   855
@@ -147,7 +578,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   855
          Index           =   47
          Left            =   6600
-         TabIndex        =   47
+         TabIndex        =   53
          Top             =   360
          Width           =   795
          Begin VB.OptionButton optN 
@@ -156,7 +587,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   0
             Left            =   120
-            TabIndex        =   49
+            TabIndex        =   55
             Top             =   240
             Value           =   -1  'True
             Width           =   700
@@ -167,7 +598,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   1
             Left            =   120
-            TabIndex        =   50
+            TabIndex        =   56
             Top             =   525
             Width           =   700
          End
@@ -177,7 +608,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   103
             Left            =   120
-            TabIndex        =   48
+            TabIndex        =   54
             Top             =   0
             Width           =   600
          End
@@ -189,7 +620,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   750
          Index           =   49
          Left            =   4480
-         TabIndex        =   40
+         TabIndex        =   46
          Top             =   240
          Width           =   1920
          Begin VB.OptionButton optDBSearchModType 
@@ -198,7 +629,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   2
             Left            =   1080
-            TabIndex        =   44
+            TabIndex        =   50
             ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":00D7
             Top             =   360
             Width           =   975
@@ -209,7 +640,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   1
             Left            =   120
-            TabIndex        =   43
+            TabIndex        =   49
             ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0174
             Top             =   480
             Value           =   -1  'True
@@ -221,7 +652,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   0
             Left            =   120
-            TabIndex        =   42
+            TabIndex        =   48
             ToolTipText     =   "Changes the mass of all loaded AMTs, adding the value specified by the modification mass"
             Top             =   240
             Width           =   750
@@ -232,7 +663,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   100
             Left            =   120
-            TabIndex        =   41
+            TabIndex        =   47
             Top             =   0
             Width           =   900
          End
@@ -241,7 +672,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   1680
-         TabIndex        =   35
+         TabIndex        =   41
          Text            =   "57.0215"
          Top             =   960
          Width           =   855
@@ -251,7 +682,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Alkylation"
          Height          =   255
          Left            =   1560
-         TabIndex        =   33
+         TabIndex        =   39
          ToolTipText     =   "Check to add the alkylation mass correction below to all MT Tag masses (added to each cys residue)"
          Top             =   360
          Width           =   1095
@@ -261,7 +692,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "ICAT d8"
          Height          =   255
          Left            =   240
-         TabIndex        =   32
+         TabIndex        =   38
          Top             =   1080
          Width           =   975
       End
@@ -270,7 +701,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "ICAT d0"
          Height          =   255
          Left            =   240
-         TabIndex        =   31
+         TabIndex        =   37
          Top             =   720
          Width           =   975
       End
@@ -279,7 +710,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "PEO"
          Height          =   255
          Left            =   240
-         TabIndex        =   30
+         TabIndex        =   36
          Top             =   360
          Width           =   855
       End
@@ -288,7 +719,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Decoy NET Wobble"
          Height          =   375
          Left            =   4560
-         TabIndex        =   45
+         TabIndex        =   51
          Top             =   1080
          Width           =   1095
       End
@@ -297,7 +728,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Residue to modify:"
          Height          =   255
          Left            =   3000
-         TabIndex        =   36
+         TabIndex        =   42
          Top             =   240
          Width           =   1335
       End
@@ -313,7 +744,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Mass (Da):"
          Height          =   255
          Left            =   3000
-         TabIndex        =   38
+         TabIndex        =   44
          Top             =   840
          Width           =   1095
       End
@@ -343,7 +774,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Alkylation mass:"
          Height          =   255
          Left            =   1560
-         TabIndex        =   34
+         TabIndex        =   40
          Top             =   720
          Width           =   1335
       End
@@ -353,7 +784,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "NET  Calculation"
       Height          =   1455
       Left            =   0
-      TabIndex        =   15
+      TabIndex        =   20
       Top             =   3000
       Width           =   5175
       Begin VB.CheckBox chkDisableCustomNETs 
@@ -362,7 +793,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          ForeColor       =   &H80000008&
          Height          =   255
          Left            =   2640
-         TabIndex        =   18
+         TabIndex        =   23
          Top             =   600
          Width           =   2400
       End
@@ -371,7 +802,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Use Class NET of LC-MS Features"
          Height          =   375
          Left            =   2640
-         TabIndex        =   21
+         TabIndex        =   26
          ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0206
          Top             =   180
          Width           =   1965
@@ -380,7 +811,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   4320
-         TabIndex        =   23
+         TabIndex        =   28
          Text            =   "0.1"
          Top             =   1020
          Width           =   615
@@ -391,7 +822,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Index           =   1
          Left            =   120
-         TabIndex        =   17
+         TabIndex        =   22
          ToolTipText     =   "Use Predicted NET values for the MT tags"
          Top             =   480
          Width           =   2500
@@ -402,7 +833,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Index           =   0
          Left            =   120
-         TabIndex        =   16
+         TabIndex        =   21
          ToolTipText     =   "Use NET calculated from all peptide observations for each MT tag"
          Top             =   240
          Value           =   -1  'True
@@ -411,7 +842,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Begin VB.TextBox txtNETFormula 
          Height          =   285
          Left            =   120
-         TabIndex        =   20
+         TabIndex        =   25
          Text            =   "(FN-MinFN)/(MaxFN-MinFN)"
          Top             =   1020
          Width           =   2775
@@ -421,7 +852,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "NET T&olerance"
          Height          =   255
          Left            =   3000
-         TabIndex        =   22
+         TabIndex        =   27
          ToolTipText     =   "Normalized Elution Time Tolerance (if blank NET will not be considered in search)"
          Top             =   1035
          Width           =   1335
@@ -431,7 +862,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Formula  F(FN, MinFN, MaxFN)"
          Height          =   255
          Left            =   120
-         TabIndex        =   19
+         TabIndex        =   24
          Top             =   810
          Width           =   2415
       End
@@ -441,14 +872,14 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Molecular Mass Tolerance"
       Height          =   1455
       Left            =   5280
-      TabIndex        =   24
+      TabIndex        =   29
       Top             =   3000
       Width           =   2175
       Begin VB.ComboBox cboSearchRegionShape 
          Height          =   315
          Left            =   120
          Style           =   2  'Dropdown List
-         TabIndex        =   56
+         TabIndex        =   34
          Top             =   1080
          Width           =   1935
       End
@@ -458,7 +889,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Index           =   1
          Left            =   1080
-         TabIndex        =   28
+         TabIndex        =   33
          Top             =   720
          Width           =   855
       End
@@ -468,7 +899,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Index           =   0
          Left            =   1080
-         TabIndex        =   27
+         TabIndex        =   32
          Top             =   360
          Value           =   -1  'True
          Width           =   855
@@ -477,7 +908,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   160
-         TabIndex        =   26
+         TabIndex        =   31
          Text            =   "10"
          Top             =   640
          Width           =   735
@@ -488,7 +919,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Tolerance"
          Height          =   255
          Left            =   160
-         TabIndex        =   25
+         TabIndex        =   30
          Top             =   360
          Width           =   855
       End
@@ -501,13 +932,31 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Top             =   960
       Width           =   1815
    End
+   Begin VB.Label lblSTACStats 
+      BackStyle       =   0  'Transparent
+      Caption         =   "STAC Search Stats"
+      Height          =   255
+      Left            =   7800
+      TabIndex        =   60
+      Top             =   120
+      Width           =   2295
+   End
+   Begin VB.Label lblMTStatus 
+      BackStyle       =   0  'Transparent
+      Caption         =   "Loading..."
+      Height          =   255
+      Left            =   1200
+      TabIndex        =   1
+      Top             =   120
+      Width           =   6015
+   End
    Begin VB.Label lblDescription 
       BackStyle       =   0  'Transparent
       Caption         =   "Minimum Peptide Prophet Probability"
       Height          =   255
       Index           =   1
       Left            =   120
-      TabIndex        =   13
+      TabIndex        =   16
       Top             =   2655
       Width           =   2865
    End
@@ -517,7 +966,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Height          =   255
       Index           =   0
       Left            =   120
-      TabIndex        =   11
+      TabIndex        =   14
       Top             =   2360
       Width           =   2505
    End
@@ -527,7 +976,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Height          =   255
       Index           =   134
       Left            =   120
-      TabIndex        =   9
+      TabIndex        =   12
       Top             =   2060
       Width           =   2145
    End
@@ -536,7 +985,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Internal Standard Search Mode:"
       Height          =   255
       Left            =   120
-      TabIndex        =   7
+      TabIndex        =   10
       Top             =   1725
       Width           =   2415
    End
@@ -555,7 +1004,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Generic NET"
       Height          =   255
       Left            =   5280
-      TabIndex        =   52
+      TabIndex        =   58
       Top             =   6240
       Width           =   2175
    End
@@ -563,18 +1012,9 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       BackStyle       =   0  'Transparent
       Height          =   255
       Left            =   120
-      TabIndex        =   51
+      TabIndex        =   57
       Top             =   6240
       Width           =   4935
-   End
-   Begin VB.Label lblMTStatus 
-      BackStyle       =   0  'Transparent
-      Caption         =   "Loading..."
-      Height          =   255
-      Left            =   1200
-      TabIndex        =   1
-      Top             =   120
-      Width           =   6015
    End
    Begin VB.Label Label1 
       BackStyle       =   0  'Transparent
@@ -654,6 +1094,35 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "E&xit"
       End
    End
+   Begin VB.Menu mnuEdit 
+      Caption         =   "&Edit"
+      Begin VB.Menu mnuEditCopySTACStats 
+         Caption         =   "&Copy STAC Stats"
+         Shortcut        =   ^C
+      End
+      Begin VB.Menu mnuEditCopySTACPlot 
+         Caption         =   "&Copy STAC Plot to Clipboard"
+         Shortcut        =   ^P
+      End
+      Begin VB.Menu mnuEditSepBar1 
+         Caption         =   "-"
+      End
+      Begin VB.Menu mnuEditSaveSTACPlot 
+         Caption         =   "Save STAC Plot"
+         Begin VB.Menu mnuEditSaveSTACPlotAsEMF 
+            Caption         =   "as &EMF"
+         End
+         Begin VB.Menu mnuEditSaveSTACPlotAsPNG 
+            Caption         =   "as &PNG"
+         End
+      End
+      Begin VB.Menu mnuEditSepBar2 
+         Caption         =   "-"
+      End
+      Begin VB.Menu mnuEditSetToDefaults 
+         Caption         =   "Set to &Defaults"
+      End
+   End
    Begin VB.Menu mnuMT 
       Caption         =   "&MT Tags"
       Begin VB.Menu mnuMTLoadMT 
@@ -703,39 +1172,43 @@ Attribute VB_Exposed = False
 '---------------------------------------------------------------
 Option Explicit
 
-Private Const NET_PRECISION = 5
+Private Const NET_PRECISION As Integer = 5
 
-Const MOD_TKN_NONE = "none"
-Const MOD_TKN_PEO = "PEO"
-Const MOD_TKN_ICAT_D0 = "ICAT_D0"
-Const MOD_TKN_ICAT_D8 = "ICAT_D8"
-Const MOD_TKN_ALK = "ALK"
-Const MOD_TKN_N14 = "N14"
-Const MOD_TKN_N15 = "N15"
-Const MOD_TKN_RES_MOD = "RES_MOD"
-Const MOD_TKN_MT_MOD = "MT_MOD"
+Const MOD_TKN_NONE As String = "none"
+Const MOD_TKN_PEO As String = "PEO"
+Const MOD_TKN_ICAT_D0 As String = "ICAT_D0"
+Const MOD_TKN_ICAT_D8 As String = "ICAT_D8"
+Const MOD_TKN_ALK As String = "ALK"
+Const MOD_TKN_N14 As String = "N14"
+Const MOD_TKN_N15 As String = "N15"
+Const MOD_TKN_RES_MOD As String = "RES_MOD"
+Const MOD_TKN_MT_MOD As String = "MT_MOD"
 
-Const SEARCH_N14 = 0
-Const SEARCH_N15 = 1
+Const SEARCH_N14 As Integer = 0
+Const SEARCH_N15 As Integer = 1
 
-Const MODS_FIXED = 0
-Const MODS_DYNAMIC = 1
-Const MODS_DECOY = 2
+Const MODS_FIXED As Integer = 0
+Const MODS_DYNAMIC As Integer = 1
+Const MODS_DECOY As Integer = 2
 
-Const SEARCH_ALL = 0
-Const SEARCH_PAIRED = 1
-Const SEARCH_NON_PAIRED = 2
-Const SEARCH_PAIRED_PLUS_NON_PAIRED = 3
+Const SEARCH_ALL As Integer = 0
+Const SEARCH_PAIRED As Integer = 1
+Const SEARCH_NON_PAIRED As Integer = 2
+Const SEARCH_PAIRED_PLUS_NON_PAIRED As Integer = 3
 
 'if called with any positive number add that many points
-Const MNG_RESET = 0
-Const MNG_ERASE = -1
-Const MNG_TRIM = -2
-Const MNG_ADD_START_SIZE = -3
+Const MNG_RESET As Integer = 0
+Const MNG_ERASE As Integer = -1
+Const MNG_TRIM As Integer = -2
+Const MNG_ADD_START_SIZE As Integer = -3
 
-Const MNG_START_SIZE = 500
+Const MNG_START_SIZE As Long = 500
 
-Const NET_WOBBLE_SEED = 1000
+Const NET_WOBBLE_SEED As Long = 1000
+
+Private Const STAC_APP_NAME As String = "STAC.exe"
+Private Const TEMP_FILE_FLAG As String = "FILE"
+Private Const TEMP_FOLDER_FLAG As String = "FOLDER"
 
 'in this case CallerID is a public property
 Public CallerID As Long
@@ -768,7 +1241,7 @@ Private mSearchRegionShape As srsSearchRegionShapeConstants
 Private LastSearchTypeN14N15 As Long
 Private NTypeStr As String
 
-'following arrays are parallel to the LC-MS Features
+'following arrays are parallel to the LC-MS Features in GelUMC()
 Private ClsCnt As Long              'this is not actually neccessary except
 Private ClsStat() As Double         'to create nice reports; necessary to use this since we report the Min/Max Charge stats and Average Fit stats
 Private eClsPaired() As umcpUMCPairMembershipConstants      ' Keeps track of whether UMC is member of 1 or more pairs
@@ -782,8 +1255,18 @@ Private mSearchUsedCustomNETs As Boolean
 
 ' The following hold match stats for each individual UMC
 Private mCurrIDCnt As Long
-Private mCurrIDMatches() As udtUMCMassTagRawMatches          ' 0-based array
+Private mCurrIDMatches() As udtUMCMassTagRawMatches         ' 0-based array
 
+Private mSTACStatsCount As Long
+Private mSTACStats() As udtSTACStats                        ' 0-based array
+
+Private mSTACTempFolderPath As String
+Private mSTACSessionID As String
+Private mTempFilesToDelete As Dictionary
+    
+Private mSTACAMTFilePath As String
+Private mSTACUMCFilePath As String
+    
 'Expression Evaluator variables for elution time calculation
 Private MyExprEva As ExprEvaluator
 Private VarVals() As Long
@@ -811,6 +1294,20 @@ Private mMDTypeSaved As Long
 Private mKeyPressAbortProcess As Integer
 
 Private objMTDBNameLookupClass As mtdbMTNames
+
+Private Enum eSearchModeConstants
+    eSearchModeAll = 0
+    eSearchModePaired = 1
+    eSearchModePairedPlusUnpaired = 2
+    eSearchModeNonPaired = 3
+End Enum
+
+Private Type udtSTACStats
+    STACCuttoff As Double
+    Matches As Long
+    Errors As Double
+    FDR As Double
+End Type
 '
 
 Public Property Get SearchRegionShape() As srsSearchRegionShapeConstants
@@ -821,40 +1318,90 @@ Public Property Let SearchRegionShape(Value As srsSearchRegionShapeConstants)
     mSearchRegionShape = Value
 End Property
 
-Private Function AddCurrIDsToAllIDs(ClsInd As Long) As Boolean
-'---------------------------------------------------------------------------
-'returns True if successful; adds current identifications to list of all IDs
-'---------------------------------------------------------------------------
-Dim lngIndex As Long, lngTargetIndex As Long
-Dim lngAMTHitCount As Long
+Public Property Get UpdateGelDataWithSearchResults() As Boolean
+    UpdateGelDataWithSearchResults = cChkBox(chkUpdateGelDataWithSearchResults)
+End Property
+Public Property Let UpdateGelDataWithSearchResults(ByVal Value As Boolean)
+    SetCheckBox chkUpdateGelDataWithSearchResults, Value
+End Property
 
-On Error GoTo err_AddCurrIDsToAllIDs
-mMatchStatsCount = mMatchStatsCount + mCurrIDCnt
-ReDim Preserve mUMCMatchStats(mMatchStatsCount - 1)
-
-' Count the number of non Internal Standard matches
-lngAMTHitCount = 0
-For lngIndex = 0 To mCurrIDCnt - 1
-    If Not mCurrIDMatches(lngIndex).IDIsInternalStd Then
-        lngAMTHitCount = lngAMTHitCount + 1
+Public Property Get UseSTAC() As Boolean
+    UseSTAC = cChkBox(chkUseSTAC)
+End Property
+Public Property Let UseSTAC(ByVal Value As Boolean)
+    If cChkBox(chkUseSTAC) <> Value Then
+        SetCheckBox chkUseSTAC, Value
     End If
-Next lngIndex
-
-For lngIndex = 0 To mCurrIDCnt - 1
-    lngTargetIndex = (mMatchStatsCount - mCurrIDCnt) + lngIndex
-    With mUMCMatchStats(lngTargetIndex)
-        .UMCIndex = ClsInd
-        .IDIndex = mCurrIDMatches(lngIndex).IDInd
-        .MemberHitCount = mCurrIDMatches(lngIndex).MatchingMemberCount
-        .SLiCScore = mCurrIDMatches(lngIndex).SLiCScore
-        .DelSLiC = mCurrIDMatches(lngIndex).DelSLiC
-        .IDIsInternalStd = mCurrIDMatches(lngIndex).IDIsInternalStd
-        .MultiAMTHitCount = lngAMTHitCount
-    End With
-Next lngIndex
-AddCurrIDsToAllIDs = True
+    glbPreferencesExpanded.UseSTAC = Value
+End Property
+Private Function AddCurrIDsToAllIDs(ClsInd As Long) As Boolean
+    '---------------------------------------------------------------------------
+    'returns True if successful; adds current identifications to list of all IDs
+    '---------------------------------------------------------------------------
+    Dim lngIndex As Long, lngTargetIndex As Long
+    Dim lngAMTHitCount As Long
+    
+    On Error GoTo err_AddCurrIDsToAllIDs
+    mMatchStatsCount = mMatchStatsCount + mCurrIDCnt
+    
+    If mMatchStatsCount > UBound(mUMCMatchStats) Then
+        ' Reserve more room in mUMCMatchStats
+        ReDim Preserve mUMCMatchStats(UBound(mUMCMatchStats) * 2)
+    End If
+    
+    ' Count the number of non Internal Standard matches
+    lngAMTHitCount = 0
+    For lngIndex = 0 To mCurrIDCnt - 1
+        If Not mCurrIDMatches(lngIndex).IDIsInternalStd Then
+            lngAMTHitCount = lngAMTHitCount + 1
+        End If
+    Next lngIndex
+    
+    For lngIndex = 0 To mCurrIDCnt - 1
+        lngTargetIndex = (mMatchStatsCount - mCurrIDCnt) + lngIndex
+        With mUMCMatchStats(lngTargetIndex)
+            .UMCIndex = ClsInd
+            .IDIndex = mCurrIDMatches(lngIndex).IDInd
+            .MemberHitCount = mCurrIDMatches(lngIndex).MatchingMemberCount
+            .StacOrSLiC = mCurrIDMatches(lngIndex).StacOrSLiC
+            .DelScore = mCurrIDMatches(lngIndex).DelScore
+            .UniquenessProbability = mCurrIDMatches(lngIndex).UniquenessProbability
+            .IDIsInternalStd = mCurrIDMatches(lngIndex).IDIsInternalStd
+            .MultiAMTHitCount = lngAMTHitCount
+        End With
+    Next lngIndex
+    
+    AddCurrIDsToAllIDs = True
+    
+    Exit Function
+    
 err_AddCurrIDsToAllIDs:
+    ' Error updating UMC with new matches
+    Debug.Assert False
+    
 End Function
+
+Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False)
+    
+    If blnSizeForSTACPlotSave Then
+        Me.width = 15000
+        Me.Height = 10000
+    Else
+        If Me.UseSTAC And mSTACStatsCount > 0 Then
+            If Me.width < 14150 Then
+                Me.width = 14150
+            End If
+            
+            If Me.Height < 9000 Then
+                Me.Height = 9000
+            End If
+        Else
+            Me.width = 7800
+            Me.Height = 7800
+        End If
+    End If
+    
+End Sub
 
 Private Sub CheckNETEquationStatus()
     If RobustNETValuesEnabled() Then
@@ -872,6 +1419,11 @@ Private Sub CheckNETEquationStatus()
         End If
     End If
 End Sub
+
+Private Function CheckVsMinimum(ByVal lngValue As Long, Optional ByVal lngMinimum As Long = 0) As Long
+    If lngValue < lngMinimum Then lngValue = lngMinimum
+    CheckVsMinimum = lngValue
+End Function
 
 Private Function CountMassTagsInUMCMatchStats() As Long
     ' Returns the number of items in mUMCMatchStats() with .IDIsInternalStd = False
@@ -906,11 +1458,45 @@ Public Function DeleteExcludedPairsWrapper()
     UpdateUMCsPairingStatusNow
 End Function
 
+Private Sub DeleteTempFiles()
+
+    Dim lngIndex As Long
+    Dim objKeys() As Variant
+    
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo DeleteTempFilesErrorHandler
+    
+    If mTempFilesToDelete.Count > 0 Then
+        objKeys = mTempFilesToDelete.Keys
+        For lngIndex = 0 To mTempFilesToDelete.Count - 1
+            If CStr(mTempFilesToDelete.Item(objKeys(lngIndex))) = TEMP_FOLDER_FLAG Then
+                ' This is a folder
+                If fso.FolderExists(objKeys(lngIndex)) Then
+                    fso.DeleteFolder objKeys(lngIndex), True
+                End If
+            Else
+                ' This is a file
+                If fso.FileExists(objKeys(lngIndex)) Then
+                    fso.DeleteFile objKeys(lngIndex)
+                End If
+            End If
+        Next lngIndex
+    End If
+    
+    Exit Sub
+
+DeleteTempFilesErrorHandler:
+    Debug.Assert False
+    Resume Next
+    
+End Sub
+
 Private Sub DestroyIDStructures()
-On Error Resume Next
-mMatchStatsCount = 0
-Erase mUMCMatchStats
-Call ManageCurrID(MNG_ERASE)
+    On Error Resume Next
+    mMatchStatsCount = 0
+    Erase mUMCMatchStats
+    Call ManageCurrID(MNG_ERASE)
 End Sub
 
 Private Sub DestroySearchStructures()
@@ -931,14 +1517,7 @@ Private Sub DisplayCurrentSearchTolerances()
     With samtDef
         txtMWTol.Text = .MWTol
     
-        Select Case .TolType
-        Case gltPPM
-          optTolType(0).Value = True
-        Case gltABS
-          optTolType(1).Value = True
-        Case Else
-          Debug.Assert False
-        End Select
+        SetTolType .TolType
         
         'NETTol is used both for NET and RT
         If .NETTol >= 0 Then
@@ -1034,6 +1613,15 @@ Private Sub EnableDisableControls()
     Else
         txtDecoySearchNETWobble.Enabled = False
     End If
+    
+    If Me.UseSTAC Then
+        chkSTACUsesPriorProbability.Enabled = True
+    Else
+        chkSTACUsesPriorProbability.Enabled = False
+    End If
+    
+    AutoSizeForm
+
 End Sub
 
 Private Sub EnableDisableNETFormulaControls()
@@ -1081,6 +1669,7 @@ Public Function ExportMTDBbyUMC(Optional blnUpdateGANETForAnalysisInDB As Boolea
     Dim blnExportUMCsWithNoMatches As Boolean
     
     lngMDID = -1
+    mKeyPressAbortProcess = 0
     cmdSearchAllUMCs.Visible = False
     cmdRemoveAMTMatchesFromUMCs.Visible = False
         
@@ -1786,9 +2375,10 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
 
         udtPutUMCInternalStdMatchParams.SeqID.Value = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).SeqID
         udtPutUMCInternalStdMatchParams.MatchingMemberCount.Value = mUMCMatchStats(lngPointer).MemberHitCount
-        udtPutUMCInternalStdMatchParams.MatchScore.Value = mUMCMatchStats(lngPointer).SLiCScore
+        udtPutUMCInternalStdMatchParams.MatchScore.Value = mUMCMatchStats(lngPointer).StacOrSLiC
         udtPutUMCInternalStdMatchParams.ExpectedNET.Value = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).NET
-        udtPutUMCInternalStdMatchParams.DelMatchScore.Value = mUMCMatchStats(lngPointer).DelSLiC
+        udtPutUMCInternalStdMatchParams.DelMatchScore.Value = mUMCMatchStats(lngPointer).DelScore
+        udtPutUMCInternalStdMatchParams.UniquenessProbability.Value = CSng(mUMCMatchStats(lngPointer).UniquenessProbability)
         
         cmdPutNewUMCInternalStdMatch.Execute
         
@@ -1800,28 +2390,29 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
     
         udtPutUMCMatchParams.MassTagID.Value = AMTData(lngMassTagIndexOriginal).ID
         udtPutUMCMatchParams.MatchingMemberCount.Value = mUMCMatchStats(lngPointer).MemberHitCount
-        udtPutUMCMatchParams.MatchScore.Value = mUMCMatchStats(lngPointer).SLiCScore
+        udtPutUMCMatchParams.MatchScore.Value = mUMCMatchStats(lngPointer).StacOrSLiC
         
         strMassMods = NTypeStr
         If Len(mMTMods(lngMassTagIndexPointer)) > 0 Then
             strMassMods = strMassMods & " " & Trim(mMTMods(lngMassTagIndexPointer))
             If NTypeStr = MOD_TKN_N14 Then
-                udtPutUMCMatchParams.MassTagModMass.Value = mMTMWN14(mUMCMatchStats(lngPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW
+                udtPutUMCMatchParams.MassTagModMass.Value = CSng(mMTMWN14(mUMCMatchStats(lngPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW)
             Else
-                udtPutUMCMatchParams.MassTagModMass.Value = mMTMWN15(mUMCMatchStats(lngPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW
+                udtPutUMCMatchParams.MassTagModMass.Value = CSng(mMTMWN15(mUMCMatchStats(lngPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW)
             End If
         Else
             If NTypeStr = MOD_TKN_N14 Then
                 udtPutUMCMatchParams.MassTagModMass.Value = 0
             Else
-                udtPutUMCMatchParams.MassTagModMass.Value = glN14N15_DELTA * AMTData(lngMassTagIndexOriginal).CNT_N
+                udtPutUMCMatchParams.MassTagModMass.Value = CSng(glN14N15_DELTA * AMTData(lngMassTagIndexOriginal).CNT_N)
             End If
         End If
         
         If Len(strMassMods) > PUT_UMC_MATCH_MAX_MODSTRING_LENGTH Then strMassMods = Left(strMassMods, PUT_UMC_MATCH_MAX_MODSTRING_LENGTH)
         udtPutUMCMatchParams.MassTagMods.Value = strMassMods
         
-        udtPutUMCMatchParams.DelMatchScore.Value = mUMCMatchStats(lngPointer).DelSLiC
+        udtPutUMCMatchParams.DelMatchScore.Value = mUMCMatchStats(lngPointer).DelScore
+        udtPutUMCMatchParams.UniquenessProbability.Value = CSng(mUMCMatchStats(lngPointer).UniquenessProbability)
         
         cmdPutNewUMCMatch.Execute
     
@@ -1906,6 +2497,24 @@ Private Function GetDBSearchModeType() As Byte
         ' Assume mode MODS_FIXED mods
         GetDBSearchModeType = 0
     End If
+End Function
+
+Private Function GetTempReportFilePath() As String
+    
+    Dim strTempReportFilePath As String
+    
+    If mSTACSessionID = "" Then
+        mSTACSessionID = "_" & CLng(Timer()) & "_" & CLng(Rnd(1) * 100000)
+    End If
+
+    strTempReportFilePath = GetTempFolder() & "VIPER_Report " & mSTACSessionID
+    
+    If Not mTempFilesToDelete.Exists(strTempReportFilePath) Then
+        mTempFilesToDelete.add strTempReportFilePath, TEMP_FILE_FLAG
+    End If
+
+    GetTempReportFilePath = strTempReportFilePath
+    
 End Function
 
 Private Function GetTokenValue(ByVal S As String, ByVal t As String) As Long
@@ -2100,6 +2709,20 @@ End If
 Me.MousePointer = vbDefault
 End Sub
 
+Private Sub InitializeSTACStatsListView()
+
+    lvwSTACStats.View = lvwReport
+
+    lvwSTACStats.ColumnHeaders.Clear
+    
+    lvwSTACStats.ColumnHeaders.add , , "Cutoff", 800
+    lvwSTACStats.ColumnHeaders.add , , "Matches", 900
+    lvwSTACStats.ColumnHeaders.add , , "Errors", 900
+    lvwSTACStats.ColumnHeaders.add , , "FDR %", 800
+    
+    
+End Sub
+
 Private Function IsValidMatch(dblCurrMW As Double, AbsMWErr As Double, CurrScan As Long, dblMatchNET As Double, dblMatchMass As Double) As Boolean
     ' Checks if dblCurrMW is within tolerance of the given MT tag
     ' Also checks if the NET equivalent of CurrScan is within tolerance of the NET value for the given MT tag
@@ -2164,7 +2787,10 @@ Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
     
     cmdSearchAllUMCs.Enabled = False
     
-    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, False, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
+    Dim blnLoadMTStats As Boolean
+    blnLoadMTStats = False
+    
+    If ConfirmMassTagsAndInternalStdsLoaded(Me, CallerID, True, True, blnLoadMTStats, blnForceReload, 0, blnAMTsWereLoaded, blnDBConnectionError) Then
         lblMTStatus.Caption = ConstructMTStatusText(True)
     
         If Not CreateNewMTSearchObject() Then
@@ -2195,6 +2821,434 @@ Private Sub LoadMTDB(Optional blnForceReload As Boolean = False)
     
 End Sub
 
+Private Function LoadSTACLogFile(ByRef fso As FileSystemObject, _
+                                 ByVal strSTACLogFilePath As String) As Boolean
+
+    Dim ts As TextStream
+    
+    Dim lngErrorCount As Long
+    
+    Dim strLineIn As String
+    Dim strMessage As String
+    
+On Error GoTo LoadSTACLogFileErrorHandler
+
+    ' Read the log messages from STAC
+     
+    If fso.FileExists(strSTACLogFilePath) Then
+        
+        Set ts = fso.OpenTextFile(strSTACLogFilePath, ForReading, False)
+    
+        lngErrorCount = 0
+    
+        Do While Not ts.AtEndOfStream
+            strLineIn = ts.ReadLine
+            
+            If Len(strLineIn) >= 5 Then
+                If UCase(Left(strLineIn, 5)) = "ERROR" Then
+                    Debug.Assert False
+                    
+                    If lngErrorCount = 0 Then
+                        AddToAnalysisHistory CallerID, "STAC log file contains error messages:"
+                    End If
+                    
+                    AddToAnalysisHistory CallerID, "  " & strLineIn
+                    
+                    lngErrorCount = lngErrorCount + 1
+                End If
+            End If
+        Loop
+    
+        ts.Close
+        
+    End If
+    
+    LoadSTACLogFile = True
+    Exit Function
+
+LoadSTACLogFileErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->LoadSTACLogFile"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error loading STAC results: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    
+    LoadSTACLogFile = False
+    
+End Function
+
+Private Function LoadSTACResults(ByRef fso As FileSystemObject, _
+                                 ByVal eSearchMode As eSearchModeConstants, _
+                                 ByVal strSTACDataFilePath As String) As Boolean
+
+    Dim ts As TextStream
+    
+    Dim lngLinesRead As Long
+    
+    Dim strLineIn As String
+    Dim strMessage As String
+    
+    Dim strSplitLine() As String
+   
+    Dim lngUMCIndexSaved As Long
+    
+    Dim blnValidData As Boolean
+    
+    Dim lngMassTagID As Long
+    Dim lngUMCIndex As Long
+    Dim dblSTACScore As Double
+    Dim dblMassError As Double
+    Dim dblNETError As Double
+    Dim dblUP As Double
+    
+    Dim lngMemberIndex As Long
+    Dim lngInternalStdIndexOriginal As Long
+    Dim lngMassTagIndexPointer As Long
+    Dim lngMassTagIndexOriginal As Long
+                        
+    Dim dblCurrMW As Double
+    Dim dblMatchMass As Double
+    Dim dblMatchNET As Double
+    Dim dblNETTol As Double
+    Dim dblNETDifference As Double
+    
+    Dim MWTolAbsBroad As Double
+    Dim NETTolBroad As Double
+    Dim MWTolAbsFinal As Double
+    Dim NETTolFinal As Double
+    
+On Error GoTo LoadSTACResultsErrorHandler
+
+    If Not ManageCurrID(MNG_RESET) Then
+        ' Report Memory Management Error
+        Debug.Assert False
+        UpdateStatus "Error managing memory."
+    End If
+    
+    Set ts = fso.OpenTextFile(strSTACDataFilePath, ForReading, False)
+   
+    lngUMCIndexSaved = -1
+    
+    Do While Not ts.AtEndOfStream
+        strLineIn = ts.ReadLine
+        
+        If Len(strLineIn) > 0 Then
+            strSplitLine = Split(strLineIn, ",")
+             
+            If UBound(strSplitLine) >= 5 Then
+                blnValidData = LoadSTACResultsParseLine(strSplitLine, _
+                                                        lngMassTagID, _
+                                                        lngUMCIndex, _
+                                                        dblSTACScore, _
+                                                        dblMassError, _
+                                                        dblNETError, _
+                                                        dblUP)
+                
+                If blnValidData Then
+                                   
+                    If lngUMCIndex <> lngUMCIndexSaved Then
+                    
+                        ' Process the data for the previous feature
+                        
+                        LoadSTACResultsUpdateUMC lngUMCIndexSaved
+                    
+                        lngUMCIndexSaved = lngUMCIndex
+                
+                        mCurrIDCnt = 0
+                        
+                        ' Define the tolerances to use for the current UMC
+                        SearchAMTDefineTolerances CallerID, lngUMCIndex, samtDef, GelUMC(CallerID).UMCs(lngUMCIndex).ClassMW, MWTolAbsBroad, NETTolBroad, MWTolAbsFinal, NETTolFinal
+
+                    End If
+                
+                    
+                    If mCurrIDCnt > UBound(mCurrIDMatches) Then ManageCurrID (MNG_ADD_START_SIZE)
+                                            
+                    If lngMassTagID >= mMTCnt Then
+                        ' Note: Need to subtract mMTCnt from .IDInd to get the correct location in mInternalStdIndexPointers()
+                        mCurrIDMatches(mCurrIDCnt).IDInd = lngMassTagID - mMTCnt
+                        mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = True
+                    Else
+                        mCurrIDMatches(mCurrIDCnt).IDInd = lngMassTagID
+                        mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = False
+                    End If
+                    
+                    mCurrIDMatches(mCurrIDCnt).MatchingMemberCount = 0
+                    mCurrIDMatches(mCurrIDCnt).StacOrSLiC = dblSTACScore
+                    mCurrIDMatches(mCurrIDCnt).MassErr = dblMassError
+                    mCurrIDMatches(mCurrIDCnt).NETErr = dblNETError
+                    mCurrIDMatches(mCurrIDCnt).UniquenessProbability = dblUP
+                    
+                    If mCurrIDMatches(mCurrIDCnt).IDIsInternalStd Then
+                        lngInternalStdIndexOriginal = mInternalStdIndexPointers(mCurrIDMatches(mCurrIDCnt).IDInd)
+                        dblMatchMass = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).MonoisotopicMass
+                        dblMatchNET = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).NET
+                    Else
+                        mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = False
+                        
+                        lngMassTagIndexPointer = mMTInd(mCurrIDMatches(mCurrIDCnt).IDInd)
+                        lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
+                        
+                        If LastSearchTypeN14N15 = SEARCH_N14 Then
+                            ' N14
+                            dblMatchMass = mMTMWN14(mCurrIDMatches(mCurrIDCnt).IDInd)
+                        Else
+                            ' N15
+                            dblMatchMass = mMTMWN15(mCurrIDMatches(mCurrIDCnt).IDInd)
+                        End If
+                        dblMatchNET = AMTData(lngMassTagIndexOriginal).NET
+                        
+                        ' Unless something wacky is going on, the difference in mass between the UMC and the MT Tag should be less than 1 Da
+                        Debug.Assert Abs(GelUMC(CallerID).UMCs(lngUMCIndex).ClassMW - dblMatchMass) < 1
+                    End If
+                    
+                    mCurrIDCnt = mCurrIDCnt + 1
+  
+  
+                    With GelUMC(CallerID).UMCs(lngUMCIndex)
+                        ' Compare the mass of this AMT Tag to each member of the UMC
+                        For lngMemberIndex = 0 To .ClassCount - 1
+                            If SearchUMCTestNET(CInt(.ClassMType(lngMemberIndex)), .ClassMInd(lngMemberIndex), dblMatchNET, NETTolFinal, dblNETDifference) Then
+                                
+                                Select Case .ClassMType(lngMemberIndex)
+                                Case glCSType
+                                     dblCurrMW = GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).AverageMW
+                                Case glIsoType
+                                     dblCurrMW = GetIsoMass(GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)), samtDef.MWField)
+                                End Select
+                                
+                                ' See if the member is within mass tolerance
+                                If Abs(dblMatchMass - dblCurrMW) <= MWTolAbsFinal Then
+                                    ' Yes, within both mass and NET tolerance; increment mCurrIDMatches().MatchingMemberCount
+                                    mCurrIDMatches(mCurrIDCnt - 1).MatchingMemberCount = mCurrIDMatches(mCurrIDCnt - 1).MatchingMemberCount + 1
+                                End If
+                             End If
+                        Next lngMemberIndex
+                    End With
+
+                   
+                End If
+            End If
+        End If
+    
+        If lngLinesRead Mod 250 = 0 Then
+            UpdateStatus "Reading STAC Results: " & lngLinesRead
+        End If
+        
+        lngLinesRead = lngLinesRead + 1
+    Loop
+
+    ' Process the last UMC
+    LoadSTACResultsUpdateUMC lngUMCIndexSaved
+    
+    ts.Close
+  
+    LoadSTACResults = True
+    Exit Function
+
+LoadSTACResultsErrorHandler:
+    Debug.Assert False
+    'Resume
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->LoadSTACResults"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error loading STAC results: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    
+    LoadSTACResults = False
+    
+End Function
+
+Private Function LoadSTACStats(ByRef fso As FileSystemObject, _
+                               ByVal eSearchMode As eSearchModeConstants, _
+                               ByVal strSTACFDRFilePath As String) As Boolean
+
+    Dim ts As TextStream
+    
+    Dim lngLinesRead As Long
+    
+    Dim strLineIn As String
+    Dim strMessage As String
+    
+    Dim strSplitLine() As String
+    
+    Dim dblCutoff As Double
+    Dim lngMatches As Long
+    Dim dblErrors As Double
+    Dim dblFDR As Double
+
+    Dim blnValidData As Boolean
+    
+    Dim lstNewItem As MSComctlLib.ListItem
+    
+On Error GoTo LoadSTACStatsErrorHandler
+    
+    UpdateStatus "Reading STAC FDR stats"
+    
+    lvwSTACStats.ListItems.Clear
+    
+    mSTACStatsCount = 0
+    ReDim mSTACStats(50)
+    
+    Set ts = fso.OpenTextFile(strSTACFDRFilePath, ForReading, False)
+    
+    Do While Not ts.AtEndOfStream
+        strLineIn = ts.ReadLine
+        
+        If Len(strLineIn) > 0 Then
+            strSplitLine = Split(strLineIn, ",")
+             
+            If UBound(strSplitLine) >= 3 Then
+                blnValidData = LoadSTACStatsParseLine(strSplitLine, _
+                                                      dblCutoff, _
+                                                      lngMatches, _
+                                                      dblErrors, _
+                                                      dblFDR)
+                
+                If blnValidData Then
+                    With mSTACStats(mSTACStatsCount)
+                        .STACCuttoff = dblCutoff
+                        .Matches = lngMatches
+                        .Errors = dblErrors
+                        .FDR = dblFDR
+                    End With
+                    
+                    Set lstNewItem = lvwSTACStats.ListItems.add(, , Round(dblCutoff, 2))
+                            
+                    lstNewItem.SubItems(1) = lngMatches
+                    lstNewItem.SubItems(2) = Round(dblErrors, 1)
+                    lstNewItem.SubItems(3) = Round(dblFDR, 2)
+
+                    mSTACStatsCount = mSTACStatsCount + 1
+                End If
+            End If
+        End If
+    
+        lngLinesRead = lngLinesRead + 1
+    Loop
+    
+    ts.Close
+  
+    LoadSTACStats = True
+    Exit Function
+
+LoadSTACStatsErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->LoadSTACStats"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error loading STAC results: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    
+    LoadSTACStats = False
+    
+End Function
+
+Private Function LoadSTACResultsParseLine(ByRef strSplitLine() As String, _
+                                          ByRef lngMassTagID As Long, _
+                                          ByRef lngUMCIndex As Long, _
+                                          ByRef dblSTACScore As Double, _
+                                          ByRef dblMassError As Double, _
+                                          ByRef dblNETError As Double, _
+                                          ByRef dblUP As Double) As Boolean
+    
+    Dim blnValidData As Boolean
+    
+On Error GoTo LoadSTACResultsParseLineErrorHandler
+                
+    If IsNumeric(strSplitLine(0)) Then
+        ' Parse this line
+        ' Column order is:
+        ' MassTagID, FeatureID, STAC_Score, Mass_Error, NET_Error, UP
+        
+        lngMassTagID = CLng(strSplitLine(0))
+        lngUMCIndex = CLng(strSplitLine(1))
+        dblSTACScore = CDbl(strSplitLine(2))
+        dblMassError = CDbl(strSplitLine(3))
+        dblNETError = CDbl(strSplitLine(4))
+        dblUP = CDbl(strSplitLine(5))           ' Uniqueness probability (like SLiC)
+        
+        blnValidData = True
+        
+    Else
+        blnValidData = False
+    End If
+    
+    LoadSTACResultsParseLine = blnValidData
+    Exit Function
+    
+LoadSTACResultsParseLineErrorHandler:
+    Debug.Assert False
+    LoadSTACResultsParseLine = False
+        
+End Function
+
+Private Function LoadSTACStatsParseLine(ByRef strSplitLine() As String, _
+                                        ByRef dblCutoff As Double, _
+                                        ByRef lngMatches As Long, _
+                                        ByRef dblErrors As Double, _
+                                        ByRef dblFDR As Double) As Boolean
+    
+    Dim blnValidData As Boolean
+    
+On Error GoTo LoadSTACStatsParseLineErrorHandler
+                
+    If IsNumeric(strSplitLine(0)) Then
+        ' Parse this line
+        ' Column order is:
+        ' STAC Cutoff, Matches, Errors, FDR (%)
+        
+        dblCutoff = CDbl(strSplitLine(0))
+        lngMatches = CLng(strSplitLine(1))
+        dblErrors = CDbl(strSplitLine(2))
+        dblFDR = CDbl(strSplitLine(3))
+        
+        blnValidData = True
+    
+    Else
+        blnValidData = False
+    End If
+    
+    LoadSTACStatsParseLine = blnValidData
+    Exit Function
+    
+LoadSTACStatsParseLineErrorHandler:
+    Debug.Assert False
+    LoadSTACStatsParseLine = False
+        
+End Function
+
+Private Sub LoadSTACResultsUpdateUMC(ByVal lngUMCIndex As Long)
+
+    Dim lngIndex As Long
+    Dim lngMassTagIndexPointer As Long
+
+    Dim blnUsingPrecomputedSLiCScores As Boolean
+    Dim blnFilterUsingFinalTolerances As Boolean
+    
+    If mCurrIDCnt > 0 Then
+        ' Populate .IDIndexOriginal
+        For lngIndex = 0 To mCurrIDCnt - 1
+            If mCurrIDMatches(lngIndex).IDIsInternalStd Then
+                lngMassTagIndexPointer = mInternalStdIndexPointers(mCurrIDMatches(lngIndex).IDInd)
+                mCurrIDMatches(lngIndex).IDIndexOriginal = lngMassTagIndexPointer
+            Else
+                lngMassTagIndexPointer = mMTInd(mCurrIDMatches(lngIndex).IDInd)
+                mCurrIDMatches(lngIndex).IDIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
+            End If
+        Next lngIndex
+        
+        blnUsingPrecomputedSLiCScores = True
+        blnFilterUsingFinalTolerances = False
+        
+        ' Compute the DelSLiCScores using the already-loaded UP scores
+        SearchAMTComputeSLiCScores mCurrIDCnt, mCurrIDMatches, 0, 0, 0, srsSearchRegionShapeConstants.srsRectangular, blnUsingPrecomputedSLiCScores, blnFilterUsingFinalTolerances
+
+        If mCurrIDCnt > 0 Then
+            Call AddCurrIDsToAllIDs(lngUMCIndex)
+        End If
+    End If
+                        
+End Sub
+
 Private Function ManageCurrID(ByVal ManageType As Long) As Boolean
 On Error GoTo exit_ManageCurrID
 Select Case ManageType
@@ -2219,6 +3273,228 @@ Case Else
 End Select
 ManageCurrID = True
 exit_ManageCurrID:
+End Function
+
+Private Function PerformSearch(ByVal eSearchMode As eSearchModeConstants) As Long
+    ' Returns the number of hits
+    Dim strMessage As String
+    Dim blnCustomNETsAreAvailable As Boolean
+    Dim strSearchModeDescription As String
+    Dim eResponse As VbMsgBoxResult
+    
+    Dim blnWarnSearchTol As Boolean
+    Dim strSearchTolText As String
+    
+On Error GoTo PerformSearchErrorHandler
+    
+    If Me.UseSTAC Then
+    
+        Select Case samtDef.TolType
+        Case gltPPM
+             strSearchTolText = samtDef.MWTol & " ppm"
+        Case gltABS
+             strSearchTolText = samtDef.MWTol & " Da"
+        Case Else
+            Debug.Assert False
+            strSearchTolText = "??"
+        End Select
+    
+        blnWarnSearchTol = False
+        If samtDef.TolType = gltPPM Then
+            If samtDef.MWTol < DEFAULT_MW_TOL Then blnWarnSearchTol = True
+        Else
+            If MassToPPM(samtDef.MWTol, 1000) < DEFAULT_MW_TOL Then blnWarnSearchTol = True
+        End If
+            
+        If blnWarnSearchTol Then
+            strMessage = "Warning: Mass tolerance of " & strSearchTolText & " is less than the suggested minimum when using STAC (" & DEFAULT_MW_TOL & " ppm)."
+            
+            If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            Else
+                eResponse = MsgBox("You are strongly encouraged to use a mass tolerance of " & DEFAULT_MW_TOL & " ppm or more when using STAC.  Auto-update it now?", vbQuestion + vbYesNoCancel, glFGTU)
+                If eResponse = vbCancel Then
+                    PerformSearch = 0
+                    Exit Function
+                ElseIf eResponse = vbYes Then
+                    
+                    samtDef.TolType = gltPPM
+                    SetTolType samtDef.TolType
+                    
+                    txtMWTol.Text = DEFAULT_MW_TOL
+                    samtDef.MWTol = DEFAULT_MW_TOL
+                Else
+                    AddToAnalysisHistory CallerID, strMessage
+                End If
+            End If
+        End If
+    
+        If samtDef.NETTol < DEFAULT_NET_TOL Then
+            strMessage = "Warning: NET tolerance of " & samtDef.NETTol & " is less than the suggested minimum when using STAC (" & DEFAULT_NET_TOL & ")."
+            
+            eResponse = MsgBox("You are strongly encouraged to use a NET tolerance of " & DEFAULT_NET_TOL & " or more when using STAC.  Auto-update it now?", vbQuestion + vbYesNoCancel, glFGTU)
+            If eResponse = vbCancel Then
+                PerformSearch = 0
+                Exit Function
+            ElseIf eResponse = vbYes Then
+                txtNETTol.Text = DEFAULT_NET_TOL
+                samtDef.NETTol = DEFAULT_NET_TOL
+            Else
+                AddToAnalysisHistory CallerID, strMessage
+            End If
+        End If
+    
+    End If
+    
+    mKeyPressAbortProcess = 0
+    cmdSearchAllUMCs.Visible = False
+    cmdRemoveAMTMatchesFromUMCs.Visible = False
+    DoEvents
+    
+    If mMatchStatsCount > 0 Then    'something already identified
+       Call DestroyIDStructures
+    End If
+
+    ' Initialize mUMCMatchStats
+    ReDim mUMCMatchStats(100)
+    
+    Select Case eSearchMode
+        Case eSearchModeAll
+            SearchType = SEARCH_ALL
+            strSearchModeDescription = "all"
+
+        Case eSearchModePaired
+            SearchType = SEARCH_PAIRED
+            strSearchModeDescription = "paired"
+
+        Case eSearchModePairedPlusUnpaired
+            SearchType = SEARCH_PAIRED_PLUS_NON_PAIRED
+            strSearchModeDescription = "light pairs plus non-paired"
+
+        Case eSearchModeNonPaired
+            SearchType = SEARCH_NON_PAIRED
+            strSearchModeDescription = "non-paired"
+
+        Case Else
+            ' Unknown search mode
+            LogErrors 0, "ExportMTDBbyUMCToUMCResultsTable", "Unknown value for eSearchMode: " & eSearchMode
+            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                MsgBox "Unknown value for eSearchMode: " & eSearchMode, vbExclamation + vbOKOnly, glFGTU
+            End If
+
+            cmdSearchAllUMCs.Visible = True
+            cmdRemoveAMTMatchesFromUMCs.Visible = True
+            PerformSearch = 0
+            
+            Exit Function
+    End Select
+
+    samtDef.SearchScope = glScope.glSc_All
+    mSearchRegionShape = cboSearchRegionShape.ListIndex
+    
+    ' Note: PrepareMTArrays will update mSearchUsedCustomNETs based on .CustomNETsDefined
+    blnCustomNETsAreAvailable = GelData(CallerID).CustomNETsDefined
+    If cChkBox(chkDisableCustomNETs) Then
+        GelData(CallerID).CustomNETsDefined = False
+    End If
+    
+    CheckNETEquationStatus
+    eInternalStdSearchMode = cboInternalStdSearchMode.ListIndex
+    
+    Select Case glbPreferencesExpanded.AMTSearchResultsBehavior
+    Case asrbAutoRemoveExisting
+        RemoveAMTMatchesFromUMCs False
+        samtDef.SkipReferenced = False
+    Case asrbKeepExisting
+        samtDef.SkipReferenced = False
+    Case asrbKeepExistingAndSkip
+        samtDef.SkipReferenced = True
+    Case Else
+        Debug.Assert False
+        RemoveAMTMatchesFromUMCs False
+        samtDef.SkipReferenced = False
+    End Select
+    
+    If PrepareMTArrays() Then
+        mUMCCountSkippedSinceRefPresent = 0
+        txtUniqueMatchStats.Text = ""
+
+        mSTACStatsCount = 0
+        lvwSTACStats.ListItems.Clear
+        ctlSTACStats.Plots(1).ClearData
+        ctlSTACStats.Plots(2).ClearData
+    
+        If Me.UseSTAC Then
+            ' Search the UMCs using STAC
+            GelData(CallerID).MostRecentSearchUsedSTAC = True
+            SearchUMCsUsingSTAC eSearchMode
+        Else
+            ' Search the UMCs using VIPER
+            GelData(CallerID).MostRecentSearchUsedSTAC = False
+            SearchUMCsUsingVIPER eSearchMode
+        End If
+        
+        LastSearchTypeN14N15 = N14N15
+
+        Select Case eSearchMode
+            Case eSearchModePaired, eSearchModePairedPlusUnpaired
+                If GelAnalysis(CallerID).MD_Type = stNotDefined Or GelAnalysis(CallerID).MD_Type = stStandardIndividual Then
+                    ' Only update MD_Type if it is currently stStandardIndividual
+                    GelAnalysis(CallerID).MD_Type = stPairsO16O18
+                End If
+
+            Case Else
+                ' Includes eSearchModeAll and eSearchModeNonPaired
+
+                With GelSearchDef(CallerID).AMTSearchMassMods
+                    If .PEO Then
+                        GelAnalysis(CallerID).MD_Type = stLabeledPEO
+                    ElseIf .ICATd0 Then
+                        GelAnalysis(CallerID).MD_Type = stLabeledICATD0
+                    ElseIf .ICATd8 Then
+                        GelAnalysis(CallerID).MD_Type = stLabeledICATD8
+                    Else
+                        GelAnalysis(CallerID).MD_Type = stStandardIndividual
+                    End If
+                End With
+        End Select
+    
+        If mKeyPressAbortProcess <= 1 Then
+
+            strMessage = DisplayHitSummary(strSearchModeDescription)
+            
+            If Me.UpdateGelDataWithSearchResults Then
+                ' Store the search results in the gel data
+                If mMatchStatsCount > 0 Then RecordSearchResultsInData
+                UpdateStatus strMessage
+            End If
+        Else
+            UpdateStatus "Search aborted."
+        End If
+    Else
+       UpdateStatus "Error searching for matches"
+    End If
+    
+    AutoSizeForm
+    
+    GelData(CallerID).CustomNETsDefined = blnCustomNETsAreAvailable
+    cmdSearchAllUMCs.Visible = True
+    cmdRemoveAMTMatchesFromUMCs.Visible = True
+    DoEvents
+    
+    PerformSearch = mMatchStatsCount
+    Exit Function
+
+PerformSearchErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->PerformSearch"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "An error has occured during the search: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    
+    cmdSearchAllUMCs.Visible = True
+    cmdRemoveAMTMatchesFromUMCs.Visible = True
+    PerformSearch = 0
+
 End Function
 
 Private Sub PickParameters()
@@ -2276,6 +3552,21 @@ On Error GoTo PopulateComboBoxesErrorHandler
 PopulateComboBoxesErrorHandler:
     LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->PopulateComboBoxes"
 End Sub
+
+Private Sub PositionControls()
+        
+    ctlSTACStats.Height = CheckVsMinimum(Me.ScaleHeight - ctlSTACStats.Top - 75, 2500)
+    ctlSTACStats.width = CheckVsMinimum(Me.ScaleWidth - ctlSTACStats.Left - 75, 2500)
+
+End Sub
+
+Private Function PossiblyQuotePath(ByVal strPath As String) As String
+    If InStr(strPath, " ") > 0 Then
+        PossiblyQuotePath = """" & strPath & """"
+    Else
+        PossiblyQuotePath = strPath
+    End If
+End Function
 
 Private Function PrepareMTArrays() As Boolean
     '---------------------------------------------------------------
@@ -2378,6 +3669,10 @@ Private Function PrepareMTArrays() As Boolean
        UpdateStatus "Preparing arrays for search..."
        
        If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+            ' Call Rnd() with a negative number before calling Randomize() lngRandomNumberSeed in order to
+            '  guarantee that we get the same order of random numbers each time
+            Call Rnd(-1)
+            
            Randomize NET_WOBBLE_SEED
        End If
              
@@ -2794,8 +4089,9 @@ Private Sub RecordSearchResultsInData()
     Dim AMTorInternalStdRef As String
     Dim dblMatchMass As Double, dblMatchNET As Double
     Dim dblCurrMW As Double, AbsMWErr As Double
-    Dim dblSLiCScore As Double
-    Dim dblDelSLiC As Double
+    Dim dblStacOrSLiC As Double
+    Dim dblDelScore As Double
+    Dim dblUPScore As Double
     
     Dim CurrScan As Long
      
@@ -2810,7 +4106,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
 
     With GelData(CallerID)
         For lngIndex = 0 To mMatchStatsCount - 1
-            If lngIndex Mod 25 = 0 Then
+            If lngIndex Mod 50 = 0 Then
                 UpdateStatus "Storing results: " & LongToStringWithCommas(lngIndex) & " / " & LongToStringWithCommas(mMatchStatsCount)
                 If KeyPressAbortProcess > 1 Then Exit For
             End If
@@ -2835,8 +4131,9 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                 dblMatchNET = AMTData(lngMassTagIndexOriginal).NET
             End If
             
-            dblSLiCScore = mUMCMatchStats(lngIndex).SLiCScore
-            dblDelSLiC = mUMCMatchStats(lngIndex).DelSLiC
+            dblStacOrSLiC = mUMCMatchStats(lngIndex).StacOrSLiC
+            dblDelScore = mUMCMatchStats(lngIndex).DelScore
+            dblUPScore = mUMCMatchStats(lngIndex).UniquenessProbability
             
             ' Record the search results in each of the members of the UMC
             For lngMemberIndex = 0 To GelUMC(CallerID).UMCs(lngUMCIndexOriginal).ClassCount - 1
@@ -2857,9 +4154,9 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                     End Select
                     
                     If mUMCMatchStats(lngIndex).IDIsInternalStd Then
-                        AMTorInternalStdRef = ConstructInternalStdReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(CLng(.CSData(lngIonIndexOriginal).ScanNumber)), lngInternalStdIndexOriginal, dblSLiCScore, dblDelSLiC)
+                        AMTorInternalStdRef = ConstructInternalStdReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(CLng(.CSData(lngIonIndexOriginal).ScanNumber)), lngInternalStdIndexOriginal, dblStacOrSLiC, dblDelScore, dblUPScore)
                     Else
-                        AMTorInternalStdRef = ConstructAMTReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(CLng(.CSData(lngIonIndexOriginal).ScanNumber)), 0, lngMassTagIndexOriginal, dblMatchMass, dblSLiCScore, dblDelSLiC)
+                        AMTorInternalStdRef = ConstructAMTReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(CLng(.CSData(lngIonIndexOriginal).ScanNumber)), 0, lngMassTagIndexOriginal, dblMatchMass, dblStacOrSLiC, dblDelScore, dblUPScore)
                     End If
                     
                     If Len(.CSData(lngIonIndexOriginal).MTID) = 0 Then
@@ -2895,9 +4192,9 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                     End Select
 
                     If mUMCMatchStats(lngIndex).IDIsInternalStd Then
-                        AMTorInternalStdRef = ConstructInternalStdReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), lngInternalStdIndexOriginal, dblSLiCScore, dblDelSLiC)
+                        AMTorInternalStdRef = ConstructInternalStdReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), lngInternalStdIndexOriginal, dblStacOrSLiC, dblDelScore, dblUPScore)
                     Else
-                        AMTorInternalStdRef = ConstructAMTReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblMatchMass, dblSLiCScore, dblDelSLiC)
+                        AMTorInternalStdRef = ConstructAMTReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblMatchMass, dblStacOrSLiC, dblDelScore, dblUPScore)
                     End If
                     
                     ' Only add AMTorInternalStdRef if .MTID does not contain it
@@ -2915,9 +4212,10 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                         If Not IsValidMatch(dblCurrMW, AbsMWErr, CurrScan, dblMatchNET, dblMatchMass) Then
                             AMTorInternalStdRef = Trim(AMTorInternalStdRef)
                             If Right(AMTorInternalStdRef, 1) = glARG_SEP Then
-                                AMTorInternalStdRef = Left(AMTorInternalStdRef, Len(AMTorInternalStdRef) - 1)
+                                AMTorInternalStdRef = Left(AMTorInternalStdRef, Len(AMTorInternalStdRef) - 1) & AMTMatchInheritedMark & glARG_SEP
+                            Else
+                                AMTorInternalStdRef = AMTorInternalStdRef & AMTMatchInheritedMark & glARG_SEP
                             End If
-                            AMTorInternalStdRef = AMTorInternalStdRef & AMTMatchInheritedMark
                         End If
                         
                         InsertBefore .IsoData(lngIonIndexOriginal).MTID, AMTorInternalStdRef
@@ -2979,6 +4277,140 @@ Private Function RobustNETValuesEnabled() As Boolean
     End If
 End Function
 
+Public Function SaveSTACPlotToClipboardOrEMF(ByVal strFilePath As String, Optional ByVal blnSaveHQ As Boolean = False) As Boolean
+    SaveSTACPlotToClipboardOrEMF = SavePlotToClipboardOrEMF( _
+                ctlSTACStats, _
+                strFilePath, blnSaveHQ)
+End Function
+
+Public Function SaveSTACPlotToFile(ByVal ePicfileType As pftPictureFileTypeConstants) As Boolean
+   SaveSTACPlotToFile = SavePlotToFile( _
+                ctlSTACStats, _
+                ePicfileType)
+End Function
+
+Private Function SavePlotToClipboardOrEMF(ByRef ctlPlot As CWGraph, ByVal strFilePath As String, ByVal blnSaveHQ As Boolean) As Boolean
+    ' If strFilePath is empty then copies to the clipboard
+    ' Otherwise, saves to strFilePath
+        
+On Error GoTo SaveSTACPlotErrorHandler
+
+    TraceLog 5, "SavePlotToClipboardOrEMF", "Save " & ctlPlot.Name & " to: " & strFilePath
+
+    If Len(strFilePath) > 0 Then
+        ' Note: The .ControlImageEx function is only available in Measurement Studio v6.0 after you
+        '  download and install the patch from http://digital.ni.com/softlib.nsf/websearch/2AAC97491D073A6C86256EEF005374CE?opendocument&node=132060_US
+        ' After updating, the c:\windows\system32\cwui.ocx file should be 2,335,240 bytes with date 7/24/2004 2:20 am
+        ' Also, make sure the installer does not install an out-of-date cwui.ocx file in the c:\program files\viper folder
+        If blnSaveHQ Then
+            SavePicture ctlPlot.ControlImageEx(400, 400), strFilePath
+        Else
+            SavePicture ctlPlot.ControlImageEx(ctlPlot.width / 15, ctlPlot.Height / 15), strFilePath
+        End If
+    Else
+        Clipboard.Clear
+        Clipboard.SetData ctlPlot.ControlImage, vbCFMetafile
+    End If
+
+    SavePlotToClipboardOrEMF = True
+    Exit Function
+    
+SaveSTACPlotErrorHandler:
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        If Len(strFilePath) > 0 Then
+            MsgBox "Error saving residuals plot from " & ctlPlot.Name & " to " & strFilePath & ": " & Err.Description, vbExclamation + vbOKOnly, "Error"
+        Else
+            MsgBox "Error copying residuals plot from " & ctlPlot.Name & " to clipboard: " & Err.Description, vbExclamation + vbOKOnly, "Error"
+        End If
+    Else
+        Debug.Assert False
+        LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.SavePlotToClipboardOrEMF"
+    End If
+ 
+    SavePlotToClipboardOrEMF = False
+
+End Function
+
+Private Function SavePlotToFile(ByRef ctlPlot As CWGraph, ByVal ePicfileType As pftPictureFileTypeConstants) As Boolean
+    Const SAVE_HQ As Boolean = False
+    Dim strFilePath As String
+    Dim blnSuccess As Boolean
+    
+On Error GoTo SavePlotToFileErrorHandler
+
+    Select Case ePicfileType
+    Case pftPictureFileTypeConstants.pftEMF, pftPictureFileTypeConstants.pftWMF
+        ' Saving EMF file
+        strFilePath = SelectFile(Me.hwnd, "Save picture as EMF ...", , True, "*.emf", "EMF Files (*.emf)|*.emf|All Files (*.*)|*.*", 1)
+
+        If Len(strFilePath) > 0 Then
+            strFilePath = FileExtensionForce(strFilePath, "emf")
+            blnSuccess = SavePlotToClipboardOrEMF(ctlPlot, strFilePath, SAVE_HQ)
+        End If
+    Case Else
+        ' Includes pftPictureFileTypeConstants.pftPNG
+        ' Saving PNG file
+        strFilePath = SelectFile(Me.hwnd, "Save picture as PNG ...", , True, "*.png", "PNG Files (*.png)|*.png|All Files (*.*)|*.*", 1)
+        
+        If Len(strFilePath) > 0 Then
+            strFilePath = FileExtensionForce(strFilePath, "png")
+            blnSuccess = SaveSTACPlotToPNG(strFilePath)
+        End If
+    End Select
+
+    SavePlotToFile = blnSuccess
+  Exit Function
+    
+SavePlotToFileErrorHandler:
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error saving residuals plot to " & strFilePath & ": " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    Else
+        Debug.Assert False
+        LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.SavePlotToFile"
+    End If
+    SavePlotToFile = False
+End Function
+
+Public Function SaveSTACPlotToPNG(ByVal strFilePath As String) As Boolean
+    Dim strEmfFilePath As String, strWorkingFilePath As String
+    Dim blnSuccess As Boolean
+    Dim lngReturn As Long
+    Dim objRemoteSaveFileHandler As New clsRemoteSaveFileHandler
+    
+On Error GoTo SaveSTACPlotToPNGErrorHandler
+
+    strFilePath = FileExtensionForce(strFilePath, "png")
+    strWorkingFilePath = objRemoteSaveFileHandler.GetTempFilePath(strFilePath, False)
+    strEmfFilePath = FileExtensionForce(strWorkingFilePath, "emf")
+    
+    blnSuccess = SavePlotToClipboardOrEMF(ctlSTACStats, strEmfFilePath, True)
+      
+    If blnSuccess Then
+        lngReturn = ConvertEmfToPng(strEmfFilePath, strWorkingFilePath, ctlSTACStats.width / Screen.TwipsPerPixelX, ctlSTACStats.Height / Screen.TwipsPerPixelY)
+        If lngReturn = 0 Then
+            blnSuccess = objRemoteSaveFileHandler.MoveTempFileToFinalDestination()
+        Else
+            objRemoteSaveFileHandler.DeleteTempFile
+            blnSuccess = False
+        End If
+    End If
+    
+    SaveSTACPlotToPNG = blnSuccess
+    Exit Function
+
+SaveSTACPlotToPNGErrorHandler:
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error saving residuals plot from " & ctlSTACStats.Name & " to " & strFilePath & ": " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    Else
+        Debug.Assert False
+        LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.SaveSTACPlotToPNG"
+    End If
+    SaveSTACPlotToPNG = False
+    
+End Function
+
+
+
 Private Function SearchUMCSingleMass(ByVal ClassInd As Long) As Long
 '-----------------------------------------------------------------------------
 'returns number of hits found for UMC with index ClassInd; -1 in case of error;
@@ -2998,7 +4430,11 @@ Dim blnProceed As Boolean
 Dim lngIndex As Long
 Dim lngMassTagIndexPointer As Long
 
+' MassTagHitCount holds the number of matching MT tags, excluding Internal Standards
 Dim MassTagHitCount As Long
+
+Dim blnUsingPrecomputedSLiCScores As Boolean
+Dim blnFilterUsingFinalTolerances As Boolean
 
 On Error GoTo err_SearchUMCSingleMass
 
@@ -3030,8 +4466,7 @@ If ManageCurrID(MNG_RESET) Then
             blnProceed = Not IsAMTReferencedByUMC(.UMCs(ClassInd), CallerID)
         End If
     End With
-    
-    
+        
     If blnProceed Then
         If eInternalStdSearchMode <> issmFindOnlyInternalStandards Then
             ' Search for the MT tags using broad tolerances
@@ -3061,68 +4496,17 @@ If ManageCurrID(MNG_RESET) Then
             End If
         Next lngIndex
         
+        blnUsingPrecomputedSLiCScores = False
+        blnFilterUsingFinalTolerances = True
         
         ' Next compute the Match Scores
-        SearchAMTComputeSLiCScores mCurrIDCnt, mCurrIDMatches, dblClassMass, MWTolAbsFinal, NETTolFinal, mSearchRegionShape
+        SearchAMTComputeSLiCScores mCurrIDCnt, mCurrIDMatches, dblClassMass, MWTolAbsFinal, NETTolFinal, mSearchRegionShape, blnUsingPrecomputedSLiCScores, blnFilterUsingFinalTolerances
         
         If mCurrIDCnt > 0 Then
-            If ManageCurrID(MNG_TRIM) Then
-                Call AddCurrIDsToAllIDs(ClassInd)
-            End If
+            Call AddCurrIDsToAllIDs(ClassInd)
         End If
     End If
      
-    
-''    If eInternalStdSearchMode <> issmFindOnlyInternalStandards Then
-''        ' Search for MT tags
-''        If blnProceed Then
-''            ' First search for the MT tags using broad tolerances
-''            SearchUMCSingleMassAMT GelUMC(CallerID).UMCs(ClassInd), MWTolAbsBroad, NETTolBroad
-''
-''            ' Populate .IDIndexOriginal
-''            For lngIndex = 0 To mCurrIDCnt - 1
-''                lngMassTagIndexPointer = mMTInd(mCurrIDMatches(lngIndex).IDInd)
-''                mCurrIDMatches(lngIndex).IDIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
-''            Next lngIndex
-''
-''            ' Next compute the Match Scores
-''            SearchAMTComputeSLiCScores mCurrIDCnt, mCurrIDMatches, dblClassMass, MWTolAbsFinal, NETTolFinal
-''        End If
-''
-''        If mCurrIDCnt > 0 Then
-''            If ManageCurrID(MNG_TRIM) Then
-''                Call AddCurrIDsToAllIDs(ClassInd, False)
-''            End If
-''            MassTagHitCount = mCurrIDCnt
-''        Else
-''            Call ManageCurrID(MNG_ERASE)
-''        End If
-''    End If
-''
-''    If eInternalStdSearchMode <> issmFindOnlyMassTags Then
-''        If ManageCurrID(MNG_RESET) Then
-''            ' Search for Internal Standards
-''            ' First search for standards using broad tolerances
-''            SearchUMCSingleMassInternalStd GelUMC(CallerID).UMCs(ClassInd), MWTolAbsBroad, NETTolBroad
-''
-''            ' Populate .IDIndexOriginal
-''            For lngIndex = 0 To mCurrIDCnt - 1
-''                lngMassTagIndexPointer = mMTInd(mCurrIDMatches(lngIndex).IDInd)
-''                mCurrIDMatches(lngIndex).IDIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
-''            Next lngIndex
-''
-''            ' Next compute the Match Scores
-''            SearchAMTComputeSLiCScores mCurrIDCnt, mCurrIDMatches, dblClassMass, MWTolAbsFinal, samtDef.NETTol
-''
-''            If mCurrIDCnt > 0 Then
-''                If ManageCurrID(MNG_TRIM) Then
-''                    Call AddCurrIDsToAllIDs(ClassInd, True)
-''                End If
-''            Else
-''                Call ManageCurrID(MNG_ERASE)
-''            End If
-''        End If
-''    End If
 Else
     UpdateStatus "Error managing memory."
     MassTagHitCount = -1
@@ -3133,7 +4517,8 @@ SearchUMCSingleMass = MassTagHitCount
 Exit Function
 
 err_SearchUMCSingleMass:
-SearchUMCSingleMass = -1
+    Debug.Assert False
+    SearchUMCSingleMass = -1
 End Function
 
 Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTol As Double, ByVal dblNETTol As Double)
@@ -3235,10 +4620,12 @@ Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal 
                 
                 mCurrIDMatches(mCurrIDCnt).IDInd = FastSearchMatchInd
                 mCurrIDMatches(mCurrIDCnt).MatchingMemberCount = 0
-                mCurrIDMatches(mCurrIDCnt).SLiCScore = -1             ' Set this to -1 for now
+                mCurrIDMatches(mCurrIDCnt).StacOrSLiC = -1             ' Set this to -1 for now
                 mCurrIDMatches(mCurrIDCnt).MassErr = .ClassMW - dblMassTagMass
                 mCurrIDMatches(mCurrIDCnt).NETErr = dblNETDifference
                 mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = blnIsInternalStdMatch
+                mCurrIDMatches(mCurrIDCnt).UniquenessProbability = 0
+                
                 mCurrIDCnt = mCurrIDCnt + 1
                 
                 blnFirstMatchFound = True
@@ -3263,11 +4650,14 @@ Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal 
                         
                         mCurrIDMatches(mCurrIDCnt).IDInd = FastSearchMatchInd
                         mCurrIDMatches(mCurrIDCnt).MatchingMemberCount = 0
-                        mCurrIDMatches(mCurrIDCnt).SLiCScore = -1    ' Set this to -1 for now
+                        mCurrIDMatches(mCurrIDCnt).StacOrSLiC = -1    ' Set this to -1 for now
                         mCurrIDMatches(mCurrIDCnt).MassErr = .ClassMW - dblMassTagMass
                         mCurrIDMatches(mCurrIDCnt).NETErr = dblNETDifference
                         mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = blnIsInternalStdMatch
+                        mCurrIDMatches(mCurrIDCnt).UniquenessProbability = 0
+                        
                         mCurrIDCnt = mCurrIDCnt + 1
+                        
                         blnFirstMatchFound = True
                     End If
 
@@ -3281,6 +4671,488 @@ Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal 
         End If
     End With
 
+End Sub
+
+Private Function SearchUMCsUsingSTAC(ByVal eSearchMode As eSearchModeConstants) As Boolean
+    
+    Const DEFAULT_MAXIMUM_PROCESSING_TIME_MINUTES As Single = 60
+    
+    Const APP_MONITOR_INTERVAL_MSEC As Integer = 100
+    Const STATUS_UPDATE_INTERVAL_MSEC As Integer = 500
+    
+    Dim fso As New FileSystemObject
+    Dim blnSuccess As Boolean
+    
+    Dim strSTACProgramPath As String
+    Dim strSTACOuputFolder As String
+    Dim strArguments As String
+    Dim strCurDirSaved As String
+    
+    Dim strPPMTol As String
+    Dim strMessage As String
+    Dim strStatusBase As String
+    
+    Dim objProgRunner As clsProgRunner
+    Dim dtProcessingStartTime As Date
+    
+    Dim lngIteration As Long
+    Dim lngStatusUpdateIterationCount As Long
+    
+    Dim sngProcessingTimeSeconds As Single
+    Dim sngMaxProcessingTimeMinutes As Single
+    Dim blnAbortProcessing As Boolean
+    
+    On Error GoTo SearchUMCsUsingSTACErrorHandler
+    
+    sngMaxProcessingTimeMinutes = DEFAULT_MAXIMUM_PROCESSING_TIME_MINUTES
+    If sngMaxProcessingTimeMinutes < 1 Then sngMaxProcessingTimeMinutes = 1
+    If sngMaxProcessingTimeMinutes > 300 Then sngMaxProcessingTimeMinutes = 300
+    
+    
+    ' Write out the AMTs and UMCs that we're searching against
+    blnSuccess = SearchUMCsUsingSTACExportData(fso, eSearchMode)
+    
+    If blnSuccess Then
+        ' Make sure the STAC .exe exists
+        strSTACProgramPath = fso.BuildPath(App.Path, STAC_APP_NAME)
+        If Not fso.FileExists(strSTACProgramPath) Then
+            strMessage = STAC_APP_NAME & " app not found, unable to continue: " & vbCrLf & strSTACProgramPath
+            If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                AddToAnalysisHistory CallerID, strMessage
+            Else
+                MsgBox strMessage, vbExclamation + vbOKOnly, "File Not Found"
+            End If
+            
+            SearchUMCsUsingSTAC = False
+            Exit Function
+        End If
+        
+        
+        ' Create the STAC Output folder
+        ' We're including mSTACSessionID in the name in case multiple copies of VIPER are running
+        strSTACOuputFolder = fso.BuildPath(mSTACTempFolderPath, "STAC_Output" & mSTACSessionID)
+        
+        If Not mTempFilesToDelete.Exists(strSTACOuputFolder) Then
+            mTempFilesToDelete.add strSTACOuputFolder, TEMP_FOLDER_FLAG
+        End If
+
+        If Not fso.FolderExists(strSTACOuputFolder) Then
+            fso.CreateFolder strSTACOuputFolder
+        End If
+        
+        ' Construct the command line arguments
+        strArguments = ""
+        strArguments = strArguments & " -m " & PossiblyQuotePath(mSTACAMTFilePath)
+        strArguments = strArguments & " -u " & PossiblyQuotePath(mSTACUMCFilePath)
+        strArguments = strArguments & " -odir " & PossiblyQuotePath(strSTACOuputFolder)
+        
+        If cChkBox(chkSTACUsesPriorProbability) Then
+            strArguments = strArguments & " -useP T"
+        Else
+            strArguments = strArguments & " -useP F"
+        End If
+        
+        
+        Select Case samtDef.TolType
+        Case gltPPM
+            strPPMTol = samtDef.MWTol
+        Case gltABS
+            ' User specified tolerance in Daltons
+            ' Convert to the PPM amount that would apply to a 1000 Da peptide
+            strPPMTol = samtDef.MWTol / (1000 / 1000000#)
+        Case Else
+           Debug.Assert False
+           strPPMTol = 15
+        End Select
+        
+        strArguments = strArguments & " -ppm " & strPPMTol
+        strArguments = strArguments & " -NET " & samtDef.NETTol
+                        
+        strMessage = "Calling " & STAC_APP_NAME & " using" & strArguments
+        AddToAnalysisHistory CallerID, strMessage
+        
+        strStatusBase = "Calling " & STAC_APP_NAME & " to search the LC-MS Features"
+        UpdateStatus strStatusBase
+        
+        Set objProgRunner = New clsProgRunner
+        dtProcessingStartTime = Now()
+        
+        If objProgRunner.StartProgram(strSTACProgramPath, strArguments, vbNormalNoFocus) Then
+        
+            lngStatusUpdateIterationCount = CInt(STATUS_UPDATE_INTERVAL_MSEC / CSng(APP_MONITOR_INTERVAL_MSEC))
+            If lngStatusUpdateIterationCount < 1 Then lngStatusUpdateIterationCount = 1
+            
+            Do While objProgRunner.AppRunning
+                Sleep APP_MONITOR_INTERVAL_MSEC
+                
+                sngProcessingTimeSeconds = (Now - dtProcessingStartTime) * 86400#
+                If sngProcessingTimeSeconds / 60# >= sngMaxProcessingTimeMinutes Then
+                    blnAbortProcessing = True
+                    strMessage = "Peak Matching using STAC aborted because over " & Trim(sngMaxProcessingTimeMinutes) & " minutes has elapsed."
+                ElseIf mKeyPressAbortProcess = 2 Then
+                    blnAbortProcessing = True
+                    strMessage = "Peak Matching using STAC was manually aborted by the user after " & Trim(sngProcessingTimeSeconds) & " seconds of processing."
+                End If
+                
+                If blnAbortProcessing Then
+                    objProgRunner.AbortProcessing
+                    DoEvents
+                    
+                    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                       MsgBox strMessage, vbOKOnly, glFGTU
+                    Else
+                       Debug.Assert False
+                       LogErrors Err.Number, "frmSearchMT->SearchUMCsUsingSTAC", strMessage
+                       AddToAnalysisHistory CallerID, strMessage
+                    End If
+                    
+                    UpdateStatus strMessage
+                    Exit Do
+                End If
+                
+                If lngIteration Mod lngStatusUpdateIterationCount = 0 Then
+                    UpdateStatus strStatusBase & ": " & Round(sngProcessingTimeSeconds, 1) & " seconds elapsed"
+                End If
+                
+                DoEvents
+                lngIteration = lngIteration + 1
+                            
+            Loop
+           
+            blnSuccess = Not blnAbortProcessing
+            
+            If blnSuccess Then
+                ' Load the results
+                blnSuccess = SearchUMCsUsingSTACLoadResults(fso, strSTACOuputFolder, eSearchMode)
+            End If
+        End If
+
+    End If
+    
+    SearchUMCsUsingSTAC = blnSuccess
+    Exit Function
+
+SearchUMCsUsingSTACErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->SearchUMCsUsingSTAC"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "An error has occured during search using STAC: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    SearchUMCsUsingSTAC = False
+    
+End Function
+
+Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
+                                               ByVal eSearchMode As eSearchModeConstants) As Boolean
+    ' Write out the AMTs and UMCs that we're searching against
+    
+    Dim ts As TextStream
+    
+    Dim i As Long
+    Dim dblMass As Double
+    Dim dblNET As Double
+    
+    Dim lngInternalStdID As Long
+    Dim sngInternalStdPepProphetProbability As Single
+    Dim lngInternalStdNETCount As Integer
+    Dim lngScanClassRep As Long
+
+    Dim blnSearchThisUMC As Boolean
+                  
+    On Error GoTo SearchUMCsUsingSTACExportDataErrorHandler
+    
+    ' Get the temp folder path
+    mSTACTempFolderPath = GetTemporaryDir
+    
+    ' Generate a Uniquifier in case two copies of VIPER are running at once
+    If mSTACSessionID = "" Then
+        mSTACSessionID = "_" & CLng(Timer()) & "_" & CLng(Rnd(1) * 100000)
+    End If
+    
+    mSTACAMTFilePath = fso.BuildPath(mSTACTempFolderPath, "STAC_AMT_DB" & mSTACSessionID & ".txt")
+    mSTACUMCFilePath = fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & ".txt")
+    
+    If Not mTempFilesToDelete.Exists(mSTACAMTFilePath) Then
+        mTempFilesToDelete.add mSTACAMTFilePath, TEMP_FILE_FLAG
+    End If
+        
+    If Not mTempFilesToDelete.Exists(mSTACUMCFilePath) Then
+        mTempFilesToDelete.add mSTACUMCFilePath, TEMP_FILE_FLAG
+    End If
+        
+    ' Write out the AMTs in the mMT arrays
+    
+    Set ts = fso.OpenTextFile(mSTACAMTFilePath, ForWriting, True)
+
+    ' Write the header line
+    ts.WriteLine ("Mass_Tag_ID" & vbTab & _
+                  "Monoisotopic_Mass" & vbTab & _
+                  "Avg_GANET" & vbTab & _
+                  "High_Peptide_Prophet_Probability" & vbTab & _
+                  "Cnt_GANET")
+
+    If eInternalStdSearchMode <> issmFindOnlyInternalStandards Then
+        ' Write out the AMTs
+        For i = 0 To mMTCnt - 1
+            
+            If N14N15 = SEARCH_N15 Then
+                ' Write out the N15-based mass
+                dblMass = mMTMWN15(mMTInd(i))
+            Else
+                ' Write out the N14-based mass
+                dblMass = mMTMWN14(mMTInd(i))
+            End If
+    
+            
+            ' Note that the Mass_Tag_ID column will not have the real mass tag ID values
+            ' Instead, it contains the index value in mMTInd()
+            ' This is necessary in case we're using dynamic mods
+    
+            ' Also, depending on the mass tag DB, .PeptideProphetProbability might contain
+            ' probability values based on MSGF instead of Peptide Prophet
+            With AMTData(mMTOrInd(mMTInd(i)))
+                ts.WriteLine (mMTInd(i) & vbTab & _
+                              dblMass & vbTab & _
+                              mMTNET(mMTInd(i)) & vbTab & _
+                              .PeptideProphetProbability & vbTab & _
+                              .NETCount)
+                
+            End With
+        Next i
+    End If
+    
+    If eInternalStdSearchMode <> issmFindOnlyMassTags Then
+        ' Write out the internal standards
+        ' The value written to the Mass_Tag_ID column is mMTCnt plus i
+        ' That way, when we read the results, any results with an ID value >= mMTCnt must be internal standards
+        
+        For i = 0 To UMCInternalStandards.Count - 1
+            dblMass = UMCInternalStandards.InternalStandards(mInternalStdIndexPointers(i)).MonoisotopicMass
+            dblNET = UMCInternalStandards.InternalStandards(mInternalStdIndexPointers(i)).NET
+
+            ' Using fixed values for probability and Cnt_GANET
+            sngInternalStdPepProphetProbability = 0.99
+            lngInternalStdNETCount = 100
+
+            ts.WriteLine (CStr(mMTCnt + i) & vbTab & _
+                          dblMass & vbTab & _
+                          dblNET & vbTab & _
+                          sngInternalStdPepProphetProbability & vbTab & _
+                          lngInternalStdNETCount)
+        Next i
+    End If
+    
+    ts.Close
+
+    
+    ' Write out the UMCs
+   
+    Set ts = fso.OpenTextFile(mSTACUMCFilePath, ForWriting, True)
+   
+    ' Write out the header line
+    ts.WriteLine ("UMCIndex" & vbTab & "NETClassRep" & vbTab & "UMCMonoMW")
+    
+    For i = 0 To ClsCnt - 1
+         
+         Select Case eSearchMode
+             Case eSearchModeAll, eSearchModePairedPlusUnpaired
+                blnSearchThisUMC = True
+                
+             Case eSearchModePaired
+                 If eClsPaired(i) <> umcpNone Then
+                     blnSearchThisUMC = True
+                 Else
+                     blnSearchThisUMC = False
+                 End If
+                 
+             Case eSearchModeNonPaired
+                 If eClsPaired(i) = umcpNone Then
+                     blnSearchThisUMC = True
+                 Else
+                     blnSearchThisUMC = False
+                 End If
+                 
+             Case Else
+                 blnSearchThisUMC = True
+         End Select
+         
+         If blnSearchThisUMC Then
+             If SearchType = SEARCH_PAIRED Or SearchType = SEARCH_PAIRED_PLUS_NON_PAIRED Then
+                 Select Case N14N15
+                 Case SEARCH_N14     'don't search if this class is found only as heavy member
+                     If eClsPaired(i) = umcpHeavyUnique Or _
+                        eClsPaired(i) = umcpHeavyMultiple Then
+                         blnSearchThisUMC = False
+                     End If
+                 Case SEARCH_N15     'don't search if this class is found only as light member
+                     If eClsPaired(i) = umcpLightUnique Or _
+                        eClsPaired(i) = umcpLightMultiple Then
+                         blnSearchThisUMC = False
+                     End If
+                 End Select
+             End If
+     
+             If blnSearchThisUMC Then
+                 With GelUMC(CallerID)
+                     If samtDef.SkipReferenced Then
+                         ' Skip this UMC if one or more of its members have an AMT match defined
+                         blnSearchThisUMC = Not IsAMTReferencedByUMC(.UMCs(i), CallerID)
+                     End If
+                 End With
+             End If
+     
+             If blnSearchThisUMC Then
+                                     
+                  lngScanClassRep = -1
+                  Select Case GelUMC(CallerID).UMCs(i).ClassRepType
+                  Case glCSType
+                      lngScanClassRep = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(i).ClassRepInd).ScanNumber
+                  Case glIsoType
+                      lngScanClassRep = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(i).ClassRepInd).ScanNumber
+                  End Select
+                  
+                  If lngScanClassRep >= 0 Then
+                    dblNET = ConvertScanToNET(lngScanClassRep)
+                    
+                    ' GelUMC(CallerID).UMCs(i).ClassNET will likely be non-zero
+                    ' But, if it's not, we could compare it to dblNET
+                    If GelUMC(CallerID).UMCs(i).ClassNET <> 0 Then
+                         Debug.Assert Math.Abs(GelUMC(CallerID).UMCs(i).ClassNET - dblNET) < 0.01
+                    End If
+                    
+                    
+                    ts.WriteLine (i & vbTab & _
+                               dblNET & vbTab & _
+                               GelUMC(CallerID).UMCs(i).ClassMW)
+                  End If
+             End If
+         End If
+    Next i
+     
+    ts.Close
+    
+    
+    SearchUMCsUsingSTACExportData = True
+    Exit Function
+
+SearchUMCsUsingSTACExportDataErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->SearchUMCsUsingSTACExportData"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "An error has occured while exporting data for STAC to use: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    SearchUMCsUsingSTACExportData = False
+    
+End Function
+
+Private Function SearchUMCsUsingSTACLoadResults(ByRef fso As FileSystemObject, _
+                                                ByVal strSTACOuputFolder As String, _
+                                                ByVal eSearchMode As eSearchModeConstants) As Boolean
+
+    Dim ts As TextStream
+
+    Dim strSTACLogFilePath As String
+    Dim strSTACDataFilePath As String
+    Dim strSTACFDRFilePath As String
+    
+    Dim strMessage As String
+    
+    Dim blnLoadResults As Boolean
+    Dim blnSuccess As Boolean
+    
+On Error GoTo SearchUMCsUsingSTACLoadResultsErrorHandler
+    
+    ' Find the matches for each UMC (data in the STAC result file is already sorted by FeatureID)
+    
+    strSTACLogFilePath = "STAC_UMCs" & mSTACSessionID & "_Log.txt"
+    strSTACDataFilePath = "STAC_UMCs" & mSTACSessionID & "_STAC.csv"
+    strSTACFDRFilePath = "STAC_UMCs" & mSTACSessionID & "_FDR.csv"
+    
+    strSTACLogFilePath = fso.BuildPath(strSTACOuputFolder, strSTACLogFilePath)
+    strSTACDataFilePath = fso.BuildPath(strSTACOuputFolder, strSTACDataFilePath)
+    strSTACFDRFilePath = fso.BuildPath(strSTACOuputFolder, strSTACFDRFilePath)
+    
+    If Not fso.FileExists(strSTACDataFilePath) Then
+        strMessage = "STAC results file not found: " & strSTACDataFilePath
+        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox strMessage, vbExclamation + vbOKOnly, "Error"
+        End If
+        blnLoadResults = False
+    Else
+        blnLoadResults = True
+    End If
+    
+    ' Look for the STAC log file; load and parse the contents
+    blnSuccess = LoadSTACLogFile(fso, strSTACLogFilePath)
+
+    If blnLoadResults Then
+        ' Load the STAC peak matching results
+        blnSuccess = LoadSTACResults(fso, eSearchMode, strSTACDataFilePath)
+            
+        ' Load the STAC FDR stats
+        blnSuccess = LoadSTACStats(fso, eSearchMode, strSTACFDRFilePath)
+        
+        ' Update the STAC FDR Plot
+        If blnSuccess Then
+            UpdateSTACPlot
+            AutoSizeForm
+        End If
+    Else
+        blnSuccess = False
+    End If
+  
+    SearchUMCsUsingSTACLoadResults = blnSuccess
+    Exit Function
+
+SearchUMCsUsingSTACLoadResultsErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->SearchUMCsUsingSTACLoadResults"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "An error has occured while reading the results from STAC: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    SearchUMCsUsingSTACLoadResults = False
+    
+End Function
+
+Private Sub SearchUMCsUsingVIPER(ByVal eSearchMode As eSearchModeConstants)
+    Dim i As Long
+    Dim lngHitCount As Long
+    Dim blnSearchThisUMC As Boolean
+    
+    For i = 0 To ClsCnt - 1
+        If i Mod 25 = 0 Then
+           UpdateStatus "Searching: " & Trim(i) & " / " & Trim(ClsCnt)
+           If mKeyPressAbortProcess > 1 Then Exit For
+        End If
+
+        Select Case eSearchMode
+            Case eSearchModeAll, eSearchModePairedPlusUnpaired
+               blnSearchThisUMC = True
+               
+            Case eSearchModePaired
+                If eClsPaired(i) <> umcpNone Then
+                    blnSearchThisUMC = True
+                Else
+                    blnSearchThisUMC = False
+                End If
+                
+            Case eSearchModeNonPaired
+                If eClsPaired(i) = umcpNone Then
+                    blnSearchThisUMC = True
+                Else
+                    blnSearchThisUMC = False
+                End If
+                
+            Case Else
+                blnSearchThisUMC = True
+        End Select
+        
+        If blnSearchThisUMC Then
+            lngHitCount = SearchUMCSingleMass(i)
+            If lngHitCount = -2 Then mUMCCountSkippedSinceRefPresent = mUMCCountSkippedSinceRefPresent + 1
+        End If
+    Next i
+ 
 End Sub
 
 Private Function SearchUMCTestCharge(eMemberType As glDistType, lngMemberIndex As Long, udtInternalStd As udtInternalStandardEntryType) As Boolean
@@ -3365,20 +5237,32 @@ Public Sub SetDBSearchNType(blnUseN15 As Boolean)
     End If
 End Sub
 
-Private Sub SetDefaultOptions(blnUseToleranceRefinementSettings As Boolean)
+Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean)
 
     Dim udtSearchDef As SearchAMTDefinition
     SetDefaultSearchAMTDef udtSearchDef, UMCNetAdjDef
     
+    Me.UpdateGelDataWithSearchResults = True
+    
     If blnUseToleranceRefinementSettings Then
+        Me.UseSTAC = False
+    
         With udtSearchDef
             .MWTol = DEFAULT_TOLERANCE_REFINEMENT_MW_TOL
             .TolType = DEFAULT_TOLERANCE_REFINEMENT_MW_TOL_TYPE
             .NETTol = DEFAULT_TOLERANCE_REFINEMENT_NET_TOL
         End With
+    
+    Else
+        Me.UseSTAC = True
+    
+        With udtSearchDef
+            .MWTol = DEFAULT_MW_TOL
+            .TolType = DEFAULT_TOL_TYPE
+            .NETTol = DEFAULT_NET_TOL
+        End With
     End If
     
-    SetCheckBox chkUpdateGelDataWithSearchResults, True
     cboAMTSearchResultsBehavior.ListIndex = asrbAMTSearchResultsBehaviorConstants.asrbAutoRemoveExisting
     
     If blnUseToleranceRefinementSettings Then
@@ -3401,7 +5285,7 @@ Private Sub SetDefaultOptions(blnUseToleranceRefinementSettings As Boolean)
     SetCheckBox chkUseUMCConglomerateNET, True
     SetCheckBox chkDisableCustomNETs, False
     
-    optTolType(udtSearchDef.TolType).Value = True
+    SetTolType udtSearchDef.TolType
     txtMWTol.Text = udtSearchDef.MWTol
     
     txtNETTol = udtSearchDef.NETTol
@@ -3421,6 +5305,10 @@ Private Sub SetDefaultOptions(blnUseToleranceRefinementSettings As Boolean)
     SetETMode etGANET
 
     PickParameters
+    
+    SetCheckBox chkSTACPlotXGridlines, True
+    SetCheckBox chkSTACPlotY1Gridlines, False
+    SetCheckBox chkSTACPlotY2Gridlines, True
     
 End Sub
 
@@ -3508,7 +5396,22 @@ Public Sub SetMinimumPeptideProphetProbability(sngMinimumPeptideProphetProbabili
     txtDBSearchMinimumPeptideProphetProbability = sngMinimumPeptideProphetProbability
 End Sub
 
+Private Sub SetTolType(ByVal eTolType As Integer)
+
+    Select Case eTolType
+    Case gltPPM
+        optTolType(0).Value = True
+    Case gltABS
+        optTolType(1).Value = True
+    Case Else
+        Debug.Assert False
+        optTolType(0).Value = True
+    End Select
+
+End Sub
+
 Private Sub ShowErrorDistribution2DForm()
+    
     frmErrorDistribution2DLoadedData.CallerID = CallerID
     frmErrorDistribution2DLoadedData.Show vbModal
     
@@ -3619,8 +5522,12 @@ Private Function ShowOrSaveResultsByIon(Optional strOutputFilePath As String = "
     
     Me.MousePointer = vbHourglass
     
+    mKeyPressAbortProcess = 0
+    cmdSearchAllUMCs.Visible = False
+    cmdRemoveAMTMatchesFromUMCs.Visible = False
+    
     'temporary file for results output
-    fname = GetTempFolder() & RawDataTmpFile
+    fname = GetTempReportFilePath()
     If Len(strOutputFilePath) > 0 Then fname = strOutputFilePath
     Set ts = fso.OpenTextFile(fname, ForWriting, True)
     
@@ -3635,7 +5542,7 @@ Private Function ShowOrSaveResultsByIon(Optional strOutputFilePath As String = "
     End If
     
     ts.WriteLine strLineOut
-    
+
     With GelData(CallerID)
       If .CSLines > 0 Then ts.WriteLine "Charge State Data Block"
       For i = 1 To .CSLines
@@ -3699,9 +5606,14 @@ Private Function ShowOrSaveResultsByIon(Optional strOutputFilePath As String = "
     
     UpdateStatus ""
     
+    cmdSearchAllUMCs.Visible = True
+    cmdRemoveAMTMatchesFromUMCs.Visible = True
+            
     If blnDisplayResults Then
        frmDataInfo.Tag = "EXP"
+       frmDataInfo.SourceFilePath = fname
        frmDataInfo.Show vbModal
+       frmDataInfo.SourceFilePath = ""
     Else
         ' MonroeMod
         AddToAnalysisHistory CallerID, "Exported " & lngExportCount & " search results to text file: " & fname
@@ -3718,6 +5630,10 @@ ShowOrSaveResultsCleanup:
     Set objMTIndFastSearch = Nothing
     Set objORFNameFastSearch = Nothing
     
+    Me.MousePointer = vbDefault
+    cmdSearchAllUMCs.Visible = True
+    cmdRemoveAMTMatchesFromUMCs.Visible = True
+    
     Exit Function
     
 err_ShowOrSaveResultsByIon:
@@ -3726,6 +5642,100 @@ err_ShowOrSaveResultsByIon:
     LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.ShowOrSaveResultsByIon"
     Resume ShowOrSaveResultsCleanup
 
+End Function
+
+Public Function ShowOrSaveSTACStats(ByVal blnCopyToClipboard As Boolean, _
+                                    Optional strOutputFilePath As String = "", _
+                                    Optional blnDisplayResults As Boolean = True) As Long
+                                    
+    '-------------------------------------
+    ' Show the STAC Stats
+    '
+    ' If blnCopyToClipboard = True, then ignores strOutputFilePath and blnDisplayResults
+    ' Returns 0 if no error, the error number if an error
+    '-------------------------------------
+    
+    Dim fso As New FileSystemObject
+    Dim ts As TextStream
+    Dim fname As String
+    
+    Dim strSepChar As String
+    Dim strLineOut As String
+    Dim strClipboardText As String
+    
+    Dim lngIndex As Long
+     
+On Error GoTo ShowOrSaveSTACStatsErrorHandler
+    
+    If blnCopyToClipboard Then
+        blnDisplayResults = False
+    Else
+        'temporary file for results output
+        fname = GetTempReportFilePath()
+        
+        If Len(strOutputFilePath) > 0 Then fname = strOutputFilePath
+        Set ts = fso.OpenTextFile(fname, ForWriting, True)
+    End If
+    
+    strSepChar = LookupDefaultSeparationCharacter()
+    strClipboardText = ""
+    
+    ' Write the header line
+    strLineOut = "STAC Cutoff" & strSepChar & "Matches" & strSepChar & "Errors" & strSepChar & "FDR (%)"
+
+    If blnCopyToClipboard Then
+        strClipboardText = strClipboardText & strLineOut & vbCrLf
+    Else
+        ts.WriteLine strLineOut
+    End If
+        
+    For lngIndex = 0 To mSTACStatsCount - 1
+       
+        With mSTACStats(lngIndex)
+            strLineOut = Round(.STACCuttoff, 2) & strSepChar & .Matches & strSepChar & Round(.Errors, 1) & strSepChar & Round(.FDR, 2)
+        End With
+        
+        If blnCopyToClipboard Then
+            strClipboardText = strClipboardText & strLineOut & vbCrLf
+        Else
+            ts.WriteLine strLineOut
+        End If
+        
+    Next lngIndex
+    
+    If blnCopyToClipboard Then
+        On Error Resume Next
+        
+        Clipboard.Clear
+        Clipboard.SetText strClipboardText, vbCFText
+    Else
+    
+        ts.Close
+        
+        If Len(strOutputFilePath) > 0 Then
+            AddToAnalysisHistory CallerID, "Saved STAC Stats to disk: " & strOutputFilePath
+        End If
+        
+        If blnDisplayResults Then
+             frmDataInfo.Tag = "STAC_Stats"
+             frmDataInfo.SourceFilePath = fname
+             frmDataInfo.Show vbModal
+             frmDataInfo.SourceFilePath = ""
+        End If
+         
+         
+        Set ts = Nothing
+        Set fso = Nothing
+    End If
+
+Exit Function
+
+ShowOrSaveSTACStatsErrorHandler:
+    Debug.Assert False
+    
+    ShowOrSaveSTACStats = Err.Number
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.ShowOrSaveSTACStats"
+    Set fso = Nothing
 End Function
 
 Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = "", Optional blnDisplayResults As Boolean = True, Optional ByVal blnIncludeORFInfo As Boolean = True) As Long
@@ -3739,6 +5749,7 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     '-------------------------------------
     Dim fso As New FileSystemObject
     Dim ts As TextStream
+    Dim fname As String
     
     Dim strLineOut As String
     Dim strLineOutMiddle As String
@@ -3746,7 +5757,6 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     Dim strLineOutEndAddnl As String
     
     Dim strMinMaxCharges As String
-    Dim fname As String
     Dim mgInd As Long
     Dim lngUMCIndexOriginal As Long                     'absolute index of UMC
     Dim lngMassTagIndexPointer As Long                  'absolute index in mMT... arrays
@@ -3798,11 +5808,16 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     End If
     
     UpdateStatus "Preparing results: 0 / " & Trim(mMatchStatsCount)
-    mKeyPressAbortProcess = 0
+    
     Me.MousePointer = vbHourglass
     
+    mKeyPressAbortProcess = 0
+    cmdSearchAllUMCs.Visible = False
+    cmdRemoveAMTMatchesFromUMCs.Visible = False
+    
     'temporary file for results output
-    fname = GetTempFolder() & RawDataTmpFile
+    fname = GetTempReportFilePath()
+    
     If Len(strOutputFilePath) > 0 Then fname = strOutputFilePath
     Set ts = fso.OpenTextFile(fname, ForWriting, True)
     
@@ -3818,12 +5833,21 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     
     strSepChar = LookupDefaultSeparationCharacter()
     
-    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; PairMemberType; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
+    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; PairMemberType; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; Uniqueness_Probability; IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar & "PairMemberType" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar
-    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar & "Peptide" & strSepChar
+    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar
+    
+    If GelData(CallerID).MostRecentSearchUsedSTAC Then
+        strLineOut = strLineOut & "STAC_Score" & strSepChar & "Del_STAC" & strSepChar & "Uniqueness Probability" & strSepChar
+    Else
+        strLineOut = strLineOut & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar
+    End If
+         
+    strLineOut = strLineOut & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar & "Peptide" & strSepChar
+    
     strLineOut = strLineOut & "TIC_from_Raw_Data" & strSepChar & "Deisotoping_Peak_Count"
     
     With GelP_D_L(CallerID)
@@ -3886,7 +5910,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             Else
                 strLineOut = strLineOut & 0 & strSepChar
                 strLineOut = strLineOut & strMinMaxCharges
-                strLineOut = strLineOut & Round(MonoMassToMZ(.ClassMW, CInt(GelData(CallerID).IsoData(.ClassRepInd).Charge)), 6) & strSepChar
+                strLineOut = strLineOut & Round(MonoMassToMZ(.ClassMW, GelData(CallerID).IsoData(.ClassRepInd).Charge), 6) & strSepChar
             End If
             
             strLineOut = strLineOut & .ClassCount & strSepChar
@@ -3926,8 +5950,13 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
         End If
         
         strLineOutEnd = strLineOutEnd & strSepChar & mUMCMatchStats(mgInd).MemberHitCount & strSepChar & Round(dblMassErrorPPM, 4) & strSepChar & Round(dblGANETError, NET_PRECISION)
-        strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).SLiCScore, 4)
-        strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).DelSLiC, 4)
+        strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).StacOrSLiC, 4)
+        strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).DelScore, 4)
+        
+        If GelData(CallerID).MostRecentSearchUsedSTAC Then
+            strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).UniquenessProbability, 4)
+        End If
+
         strLineOutEnd = strLineOutEnd & strSepChar & mUMCMatchStats(mgInd).IDIsInternalStd
         strLineOutEnd = strLineOutEnd & strSepChar & Round(sngPeptideProphetProbability, 5)
         strLineOutEnd = strLineOutEnd & strSepChar & strPeptideSequence
@@ -4021,9 +6050,15 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     
     Me.MousePointer = vbDefault
     UpdateStatus ""
+    
+    cmdSearchAllUMCs.Visible = True
+    cmdRemoveAMTMatchesFromUMCs.Visible = True
+    
     If blnDisplayResults Then
          frmDataInfo.Tag = "UMC_MTID"
+         frmDataInfo.SourceFilePath = fname
          frmDataInfo.Show vbModal
+         frmDataInfo.SourceFilePath = ""
     End If
     
     Set ts = Nothing
@@ -4037,6 +6072,11 @@ ShowOrSaveResultsByUMCErrorHandler:
     ShowOrSaveResultsByUMC = Err.Number
     LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.ShowOrSaveResultsByUMC"
     Set fso = Nothing
+    
+    Me.MousePointer = vbDefault
+    cmdSearchAllUMCs.Visible = True
+    cmdRemoveAMTMatchesFromUMCs.Visible = True
+
 End Function
 
 Private Sub StartExportResultsToDBbyUMC()
@@ -4075,312 +6115,23 @@ ExportResultsToDBErrorHandler:
 End Sub
 
 Public Function StartSearchAll() As Long
-' Returns the number of hits
-Dim i As Long
-Dim strMessage As String
-Dim lngHitCount As Long
-Dim blnCustomNETsAreAvailable As Boolean
-
-On Error Resume Next
-
-mKeyPressAbortProcess = 0
-cmdSearchAllUMCs.Visible = False
-cmdRemoveAMTMatchesFromUMCs.Visible = False
-DoEvents
-
-If mMatchStatsCount > 0 Then    'something already identified
-   Call DestroyIDStructures
-End If
-SearchType = SEARCH_ALL
-samtDef.SearchScope = glScope.glSc_All
-mSearchRegionShape = cboSearchRegionShape.ListIndex
-
-' Note: PrepareMTArrays will update mSearchUsedCustomNETs based on .CustomNETsDefined
-blnCustomNETsAreAvailable = GelData(CallerID).CustomNETsDefined
-If cChkBox(chkDisableCustomNETs) Then
-    GelData(CallerID).CustomNETsDefined = False
-End If
-
-CheckNETEquationStatus
-eInternalStdSearchMode = cboInternalStdSearchMode.ListIndex
-
-Select Case glbPreferencesExpanded.AMTSearchResultsBehavior
-Case asrbAutoRemoveExisting
-    RemoveAMTMatchesFromUMCs False
-    samtDef.SkipReferenced = False
-Case asrbKeepExisting
-    samtDef.SkipReferenced = False
-Case asrbKeepExistingAndSkip
-    samtDef.SkipReferenced = True
-Case Else
-    Debug.Assert False
-    RemoveAMTMatchesFromUMCs False
-    samtDef.SkipReferenced = False
-End Select
-
-If PrepareMTArrays() Then
-    mUMCCountSkippedSinceRefPresent = 0
-    txtUniqueMatchStats.Text = ""
-    For i = 0 To ClsCnt - 1
-        If i Mod 25 = 0 Then
-           UpdateStatus "Searching: " & Trim(i) & " / " & Trim(ClsCnt)
-           If mKeyPressAbortProcess > 1 Then Exit For
-        End If
-        lngHitCount = SearchUMCSingleMass(i)
-        If lngHitCount = -2 Then mUMCCountSkippedSinceRefPresent = mUMCCountSkippedSinceRefPresent + 1
-    Next i
-    LastSearchTypeN14N15 = N14N15
-    
-    
-    With GelSearchDef(CallerID).AMTSearchMassMods
-        If .PEO Then
-            GelAnalysis(CallerID).MD_Type = stLabeledPEO
-        ElseIf .ICATd0 Then
-            GelAnalysis(CallerID).MD_Type = stLabeledICATD0
-        ElseIf .ICATd8 Then
-            GelAnalysis(CallerID).MD_Type = stLabeledICATD8
-        Else
-            GelAnalysis(CallerID).MD_Type = stStandardIndividual
-        End If
-    End With
-
-    If mKeyPressAbortProcess <= 1 Then
-        strMessage = DisplayHitSummary("all")
-        
-        If chkUpdateGelDataWithSearchResults Then
-            ' Store the search results in the gel data
-            If mMatchStatsCount > 0 Then RecordSearchResultsInData
-            UpdateStatus strMessage
-        End If
-    Else
-        UpdateStatus "Search aborted."
-    End If
-Else
-   UpdateStatus "Error searching for matches"
-End If
-
-GelData(CallerID).CustomNETsDefined = blnCustomNETsAreAvailable
-cmdSearchAllUMCs.Visible = True
-cmdRemoveAMTMatchesFromUMCs.Visible = True
-DoEvents
-
-StartSearchAll = mMatchStatsCount
+    ' Returns the number of hits
+    StartSearchAll = PerformSearch(eSearchModeAll)
 End Function
 
 Public Function StartSearchPaired() As Long
-' Returns the number of hits
-Dim i As Long
-Dim strMessage As String
-Dim lngHitCount As Long
-Dim blnCustomNETsAreAvailable As Boolean
-
-On Error Resume Next
-
-mKeyPressAbortProcess = 0
-cmdSearchAllUMCs.Visible = False
-cmdRemoveAMTMatchesFromUMCs.Visible = False
-If mMatchStatsCount > 0 Then    'something already identified
-   Call DestroyIDStructures
-End If
-SearchType = SEARCH_PAIRED
-samtDef.SearchScope = glScope.glSc_All
-mSearchRegionShape = cboSearchRegionShape.ListIndex
-
-' Note: PrepareMTArrays will update mSearchUsedCustomNETs based on .CustomNETsDefined
-blnCustomNETsAreAvailable = GelData(CallerID).CustomNETsDefined
-If cChkBox(chkDisableCustomNETs) Then
-    GelData(CallerID).CustomNETsDefined = False
-End If
-
-CheckNETEquationStatus
-eInternalStdSearchMode = cboInternalStdSearchMode.ListIndex
-
-If PrepareMTArrays() Then
-    mUMCCountSkippedSinceRefPresent = 0
-    For i = 0 To ClsCnt - 1
-        If i Mod 25 = 0 Then
-           UpdateStatus "Searching: " & Trim(i) & " / " & Trim(ClsCnt)
-           If mKeyPressAbortProcess > 1 Then Exit For
-        End If
-        If eClsPaired(i) <> umcpNone Then
-           lngHitCount = SearchUMCSingleMass(i)
-           If lngHitCount = -2 Then mUMCCountSkippedSinceRefPresent = mUMCCountSkippedSinceRefPresent + 1
-        End If
-    Next i
-    LastSearchTypeN14N15 = N14N15
-    
-    If GelAnalysis(CallerID).MD_Type = stNotDefined Or GelAnalysis(CallerID).MD_Type = stStandardIndividual Then
-        ' Only update MD_Type if it is currently stStandardIndividual
-        GelAnalysis(CallerID).MD_Type = stPairsO16O18
-    End If
-
-    If mKeyPressAbortProcess <= 1 Then
-        strMessage = DisplayHitSummary("paired")
-        
-        If chkUpdateGelDataWithSearchResults Then
-            ' Store the search results in the gel data
-            If mMatchStatsCount > 0 Then RecordSearchResultsInData
-            UpdateStatus strMessage
-        End If
-    Else
-        UpdateStatus "Search aborted."
-    End If
-Else
-   UpdateStatus "Error searching for matches"
-End If
-
-GelData(CallerID).CustomNETsDefined = blnCustomNETsAreAvailable
-cmdSearchAllUMCs.Visible = True
-cmdRemoveAMTMatchesFromUMCs.Visible = True
-
-StartSearchPaired = mMatchStatsCount
+    ' Returns the number of hits
+    StartSearchPaired = PerformSearch(eSearchModePaired)
 End Function
 
 Public Function StartSearchLightPairsPlusNonPaired() As Long
-' Returns the number of hits
-Dim i As Long
-Dim strMessage As String
-Dim lngHitCount As Long
-Dim blnCustomNETsAreAvailable As Boolean
-
-On Error Resume Next
-
-' Force N14N15 to be SEARCH_N14
-SetDBSearchNType False
-
-mKeyPressAbortProcess = 0
-cmdSearchAllUMCs.Visible = False
-cmdRemoveAMTMatchesFromUMCs.Visible = False
-If mMatchStatsCount > 0 Then    'something already identified
-   Call DestroyIDStructures
-End If
-SearchType = SEARCH_PAIRED_PLUS_NON_PAIRED
-samtDef.SearchScope = glScope.glSc_All
-mSearchRegionShape = cboSearchRegionShape.ListIndex
-
-' Note: PrepareMTArrays will update mSearchUsedCustomNETs based on .CustomNETsDefined
-blnCustomNETsAreAvailable = GelData(CallerID).CustomNETsDefined
-If cChkBox(chkDisableCustomNETs) Then
-    GelData(CallerID).CustomNETsDefined = False
-End If
-
-CheckNETEquationStatus
-eInternalStdSearchMode = cboInternalStdSearchMode.ListIndex
-
-If PrepareMTArrays() Then
-    mUMCCountSkippedSinceRefPresent = 0
-    For i = 0 To ClsCnt - 1
-        If i Mod 25 = 0 Then
-           UpdateStatus "Searching: " & Trim(i) & " / " & Trim(ClsCnt)
-           If mKeyPressAbortProcess > 1 Then Exit For
-        End If
-        lngHitCount = SearchUMCSingleMass(i)
-        If lngHitCount = -2 Then mUMCCountSkippedSinceRefPresent = mUMCCountSkippedSinceRefPresent + 1
-    Next i
-    LastSearchTypeN14N15 = N14N15
-    
-    If GelAnalysis(CallerID).MD_Type = stNotDefined Or GelAnalysis(CallerID).MD_Type = stStandardIndividual Then
-        ' Only update MD_Type if it is currently stStandardIndividual
-        GelAnalysis(CallerID).MD_Type = stPairsO16O18
-    End If
-
-    If mKeyPressAbortProcess <= 1 Then
-        strMessage = DisplayHitSummary("light pairs plus non-paired")
-        
-        If chkUpdateGelDataWithSearchResults Then
-            ' Store the search results in the gel data
-            If mMatchStatsCount > 0 Then RecordSearchResultsInData
-            UpdateStatus strMessage
-        End If
-    Else
-        UpdateStatus "Search aborted."
-    End If
-Else
-   UpdateStatus "Error searching for matches"
-End If
-
-GelData(CallerID).CustomNETsDefined = blnCustomNETsAreAvailable
-cmdSearchAllUMCs.Visible = True
-cmdRemoveAMTMatchesFromUMCs.Visible = True
-
-StartSearchLightPairsPlusNonPaired = mMatchStatsCount
-
+    ' Returns the number of hits
+    StartSearchLightPairsPlusNonPaired = PerformSearch(eSearchModePairedPlusUnpaired)
 End Function
 
 Public Function StartSearchNonPaired() As Long
-' Returns the number of hits
-Dim i As Long
-Dim strMessage As String
-Dim lngHitCount As Long
-Dim blnCustomNETsAreAvailable As Boolean
-
-On Error Resume Next
-
-mKeyPressAbortProcess = 0
-cmdSearchAllUMCs.Visible = False
-cmdRemoveAMTMatchesFromUMCs.Visible = False
-If mMatchStatsCount > 0 Then    'something already identified
-   Call DestroyIDStructures
-End If
-SearchType = SEARCH_NON_PAIRED
-samtDef.SearchScope = glScope.glSc_All
-mSearchRegionShape = cboSearchRegionShape.ListIndex
-
-' Note: PrepareMTArrays will update mSearchUsedCustomNETs based on .CustomNETsDefined
-blnCustomNETsAreAvailable = GelData(CallerID).CustomNETsDefined
-If cChkBox(chkDisableCustomNETs) Then
-    GelData(CallerID).CustomNETsDefined = False
-End If
-
-CheckNETEquationStatus
-eInternalStdSearchMode = cboInternalStdSearchMode.ListIndex
-
-If PrepareMTArrays() Then
-    mUMCCountSkippedSinceRefPresent = 0
-    For i = 0 To ClsCnt - 1
-        If i Mod 25 = 0 Then
-           UpdateStatus "Searching: " & Trim(i) & " / " & Trim(ClsCnt)
-           If mKeyPressAbortProcess > 1 Then Exit For
-        End If
-        If eClsPaired(i) = umcpNone Then
-           lngHitCount = SearchUMCSingleMass(i)
-           If lngHitCount = -2 Then mUMCCountSkippedSinceRefPresent = mUMCCountSkippedSinceRefPresent + 1
-        End If
-    Next i
-    LastSearchTypeN14N15 = N14N15
-    
-    With GelSearchDef(CallerID).AMTSearchMassMods
-        If .PEO Then
-            GelAnalysis(CallerID).MD_Type = stLabeledPEO
-        ElseIf .ICATd0 Then
-            GelAnalysis(CallerID).MD_Type = stLabeledICATD0
-        ElseIf .ICATd8 Then
-            GelAnalysis(CallerID).MD_Type = stLabeledICATD8
-        Else
-            GelAnalysis(CallerID).MD_Type = stStandardIndividual
-        End If
-    End With
-        
-    If mKeyPressAbortProcess <= 1 Then
-        strMessage = DisplayHitSummary("non-paired")
-        
-        If chkUpdateGelDataWithSearchResults Then
-            ' Store the search results in the gel data
-            If mMatchStatsCount > 0 Then RecordSearchResultsInData
-            UpdateStatus strMessage
-        End If
-    Else
-        UpdateStatus "Search aborted."
-    End If
-Else
-   UpdateStatus "Error searching for matches"
-End If
-
-GelData(CallerID).CustomNETsDefined = blnCustomNETsAreAvailable
-cmdSearchAllUMCs.Visible = True
-cmdRemoveAMTMatchesFromUMCs.Visible = True
-
-StartSearchNonPaired = mMatchStatsCount
+    ' Returns the number of hits
+    StartSearchNonPaired = PerformSearch(eSearchModeNonPaired)
 End Function
 
 Private Sub UpdateUMCsPairingStatusNow()
@@ -4388,9 +6139,90 @@ Private Sub UpdateUMCsPairingStatusNow()
     blnSuccess = UpdateUMCsPairingStatus(CallerID, eClsPaired())
 End Sub
 
+Private Sub UpdateSTACPlot()
+
+    ' 2D array of doubles with X values in the first dimension and Y values in the second dimension
+    Dim varMatches() As Variant
+    Dim varFDR() As Variant
+    
+    Dim lngIndex As Long
+    Dim lngTargetIndex As Long
+    
+On Error GoTo UpdateSTACPlotErrorHandler
+    
+    ctlSTACStats.ClearData
+    
+    If mSTACStatsCount <= 0 Then
+        Exit Sub
+    End If
+        
+    ReDim varMatches(1, mSTACStatsCount - 1)
+    ReDim varFDR(1, mSTACStatsCount - 1)
+     
+    For lngIndex = mSTACStatsCount - 1 To 0 Step -1
+        lngTargetIndex = mSTACStatsCount - 1 - lngIndex
+        varMatches(0, lngTargetIndex) = mSTACStats(lngIndex).STACCuttoff
+        varMatches(1, lngTargetIndex) = mSTACStats(lngIndex).Matches
+        
+        varFDR(0, lngTargetIndex) = mSTACStats(lngIndex).STACCuttoff
+        varFDR(1, lngTargetIndex) = mSTACStats(lngIndex).FDR / 100#
+    Next lngIndex
+    
+    ctlSTACStats.Plots(1).PlotXY varMatches
+    
+    ctlSTACStats.Plots(2).PlotXY varFDR
+    
+    
+    UpdateSTACPlotLayout
+        
+    ZoomOutSTACPlot
+    
+    Exit Sub
+    
+UpdateSTACPlotErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.UpdateSTACPlot"
+        
+End Sub
+
+Private Sub UpdateSTACPlotLayout()
+
+    ctlSTACStats.Caption = "STAC Stats"
+    
+    ctlSTACStats.Axes(1).Caption = "STAC Threshold"
+    ctlSTACStats.Axes(2).Caption = "Matches"
+    ctlSTACStats.Axes(3).Caption = "FDR"
+    
+  
+    ctlSTACStats.Axes(1).Ticks.MajorGrid = cChkBox(chkSTACPlotXGridlines)
+    ctlSTACStats.Axes(1).Ticks.MajorGridColor = vbBlack
+    
+    ' Do not show the gridlines for the left y axis (matches)
+    ctlSTACStats.Axes(2).Ticks.MajorGrid = cChkBox(chkSTACPlotY1Gridlines)
+    ctlSTACStats.Axes(2).Ticks.MajorGridColor = vbBlack
+    
+    ' Show the gridlines for the right y axis (FDR)
+    ctlSTACStats.Axes(3).Ticks.MajorGrid = cChkBox(chkSTACPlotY2Gridlines)
+    ctlSTACStats.Axes(3).Ticks.MajorGridColor = vbBlack
+        
+        
+    With ctlSTACStats.Plots(1)
+        .LineStyle = cwLineSolid
+        .LineWidth = 2
+        .PointStyle = cwPointNone
+    End With
+    
+    With ctlSTACStats.Plots(2)
+        .LineStyle = cwLineSolid
+        .LineWidth = 2
+        .PointStyle = cwPointNone
+    End With
+    
+End Sub
+
 Private Sub UpdateStatus(ByVal Msg As String)
-lblStatus.Caption = Msg
-DoEvents
+    lblStatus.Caption = Msg
+    DoEvents
 End Sub
 
 Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, dblIonMass As Double, AMTRefs() As String, AMTRefsCnt As Long, objAMTIDFastSearch As FastSearchArrayLong, objMTOrIndFastSearch As FastSearchArrayLong, objMTIndFastSearch As FastSearchArrayLong, ByRef lngExportCount, blnIncludeORFInfo As Boolean, objORFNameFastSearch As FastSearchArrayLong, Optional strSepChar As String = glARG_SEP)
@@ -4416,7 +6248,7 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
     Dim dblAMTMass As Double
     Dim dblBestAMTMass As Double, dblBestAMTMassDiff As Double
     Dim strBestAMTMods As String, strBestSequence As String
-    
+   
     ' AMTRefsCnt is the number of AMTs that this ion matched (aka MultiMassTagHitCount)
     strBaseMatchInfo = strLineOutPrefix & strSepChar & AMTRefsCnt
     For lngAMTRefIndex = 1 To AMTRefsCnt         'extract MT tag ID
@@ -4534,6 +6366,27 @@ Private Sub WriteORFResults(ts As TextStream, strLineOutPrefix As String, lngMas
 
 End Sub
 
+Private Sub ZoomOutSTACPlot()
+        
+    ' Set the range of the X axis to be 0 to 1
+    With ctlSTACStats.Plots(1).XAxis
+        .AutoScale = False
+        .Minimum = 0
+        .Maximum = 1
+    End With
+    
+    With ctlSTACStats.Plots(1).YAxis
+        .AutoScale = True
+        .AutoScaleNow
+    End With
+
+    With ctlSTACStats.Plots(2).YAxis
+        .Minimum = 0
+        .Maximum = 1
+    End With
+
+End Sub
+
 Private Sub cboAMTSearchResultsBehavior_Click()
     On Error Resume Next
     If Not bLoading Then
@@ -4561,6 +6414,23 @@ Private Sub chkDisableCustomNETs_Click()
     EnableDisableNETFormulaControls
 End Sub
 
+Private Sub chkSTACPlotXGridlines_Click()
+    UpdateSTACPlotLayout
+End Sub
+
+Private Sub chkSTACPlotY1Gridlines_Click()
+    UpdateSTACPlotLayout
+End Sub
+
+Private Sub chkSTACPlotY2Gridlines_Click()
+    UpdateSTACPlotLayout
+End Sub
+
+Private Sub chkUseSTAC_Click()
+    Me.UseSTAC = cChkBox(chkUseSTAC)
+    EnableDisableControls
+End Sub
+
 Private Sub chkUseUMCConglomerateNET_Click()
     glbPreferencesExpanded.UseUMCConglomerateNET = cChkBox(chkUseUMCConglomerateNET)
 End Sub
@@ -4568,6 +6438,10 @@ End Sub
 Private Sub cmdCancel_Click()
     mKeyPressAbortProcess = 2
     KeyPressAbortProcess = 2
+End Sub
+
+Private Sub cmdCopySTACSTats_Click()
+    ShowOrSaveSTACStats True
 End Sub
 
 Private Sub cmdRemoveAMTMatchesFromUMCs_Click()
@@ -4586,155 +6460,195 @@ Private Sub cmdSetDefaultsForToleranceRefinement_Click()
     SetDefaultOptions True
 End Sub
 
+Private Sub cmdZoomOutSTACPlot_Click()
+    ZoomOutSTACPlot
+End Sub
+
 Private Sub Form_Activate()
     InitializeSearch
 End Sub
 
 Private Sub Form_Load()
-'----------------------------------------------------
-'load search settings and initializes controls
-'----------------------------------------------------
-
-Dim intIndex As Integer
-
-On Error GoTo FormLoadErrorHandler
-
-bLoading = True
-If IsWinLoaded(TrackerCaption) Then Unload frmTracker
-If CallerID >= 1 And CallerID <= UBound(GelBody) Then samtDef = GelSearchDef(CallerID).AMTSearchOnUMCs
-
-If APP_BUILD_DISABLE_LCMSWARP Then
-    chkDisableCustomNETs.Visible = False
-End If
-
-ShowHidePNNLMenus
-
-EnableDisableControls
-
-'set current Search Definition values
-DisplayCurrentSearchTolerances
-
-With samtDef
-    If glbPreferencesExpanded.AMTSearchResultsBehavior = asrbKeepExistingAndSkip Then
-        .SkipReferenced = True
+    '----------------------------------------------------
+    'load search settings and initializes controls
+    '----------------------------------------------------
+    
+    Dim intIndex As Integer
+    
+    On Error GoTo FormLoadErrorHandler
+    
+    bLoading = True
+    If IsWinLoaded(TrackerCaption) Then Unload frmTracker
+    If CallerID >= 1 And CallerID <= UBound(GelBody) Then samtDef = GelSearchDef(CallerID).AMTSearchOnUMCs
+    
+    If APP_BUILD_DISABLE_LCMSWARP Then
+        chkDisableCustomNETs.Visible = False
+    End If
+    
+    mSTACSessionID = ""
+    Set mTempFilesToDelete = New Dictionary
+    
+    ShowHidePNNLMenus
+    
+    EnableDisableControls
+    
+    'set current Search Definition values
+    DisplayCurrentSearchTolerances
+    
+    With samtDef
+        If glbPreferencesExpanded.AMTSearchResultsBehavior = asrbKeepExistingAndSkip Then
+            .SkipReferenced = True
+        Else
+            .SkipReferenced = False
+        End If
+        
+        optNETorRT(.NETorRT).Value = True
+        
+        'save old value and set search on "search all"
+        OldSearchFlag = .SearchFlag
+        .SearchFlag = 0         'search all
+        
+        mnuET(etGANET).Checked = True
+    End With
+    
+    Me.UseSTAC = glbPreferencesExpanded.UseSTAC
+    
+    With GelSearchDef(CallerID).AMTSearchMassMods
+        SetCheckBox chkPEO, .PEO
+        SetCheckBox chkICATLt, .ICATd0
+        SetCheckBox chkICATHv, .ICATd8
+        SetCheckBox chkAlkylation, .Alkylation
+        txtAlkylationMWCorrection = .AlkylationMass
+        
+        PopulateComboBoxes
+        
+        cboResidueToModify.ListIndex = 0
+        If Len(.ResidueToModify) >= 1 Then
+            For intIndex = 0 To cboResidueToModify.ListCount - 1
+                If UCase(cboResidueToModify.List(intIndex)) = UCase(.ResidueToModify) Then
+                    cboResidueToModify.ListIndex = intIndex
+                    Exit For
+                End If
+            Next intIndex
+        End If
+        txtResidueToModifyMass = Round(.ResidueMassModification, 5)
+        
+        SetAlkylationMWCorrection .AlkylationMass
+        SetDBSearchModType .ModMode
+        
+        SetDBSearchNType .N15InsteadOfN14
+    End With
+    
+    With glbPreferencesExpanded
+        cboAMTSearchResultsBehavior.ListIndex = .AMTSearchResultsBehavior
+        SetCheckBox chkUseUMCConglomerateNET, .UseUMCConglomerateNET
+    End With
+    
+    With glbPreferencesExpanded.MTSConnectionInfo
+        ExpAnalysisSPName = .spPutAnalysis
+        'ExpPeakSPName = .spPutPeak
+        ExpUmcSPName = .spPutUMC
+        ExpUMCMemberSPName = .spPutUMCMember
+        ExpUmcMatchSPName = .spPutUMCMatch
+        ExpUmcInternalStdMatchSPName = .spPutUMCInternalStdMatch
+        ExpUMCCSStats = .spPutUMCCSStats
+        ExpQuantitationDescription = .spAddQuantitationDescription
+    End With
+    
+    If Not GelAnalysis(CallerID) Is Nothing Then
+        mMDTypeSaved = GelAnalysis(CallerID).MD_Type
     Else
-        .SkipReferenced = False
+        mMDTypeSaved = stNotDefined
     End If
     
-    optNETorRT(.NETorRT).Value = True
-    
-    'save old value and set search on "search all"
-    OldSearchFlag = .SearchFlag
-    .SearchFlag = 0         'search all
-    
-    mnuET(etGANET).Checked = True
-End With
-
-With GelSearchDef(CallerID).AMTSearchMassMods
-    SetCheckBox chkPEO, .PEO
-    SetCheckBox chkICATLt, .ICATd0
-    SetCheckBox chkICATHv, .ICATd8
-    SetCheckBox chkAlkylation, .Alkylation
-    txtAlkylationMWCorrection = .AlkylationMass
-    
-    PopulateComboBoxes
-    
-    cboResidueToModify.ListIndex = 0
-    If Len(.ResidueToModify) >= 1 Then
-        For intIndex = 0 To cboResidueToModify.ListCount - 1
-            If UCase(cboResidueToModify.List(intIndex)) = UCase(.ResidueToModify) Then
-                cboResidueToModify.ListIndex = intIndex
-                Exit For
-            End If
-        Next intIndex
+    If Len(ExpUmcSPName) = 0 Then
+        ExpUmcSPName = "AddFTICRUmc"
     End If
-    txtResidueToModifyMass = Round(.ResidueMassModification, 5)
+    Debug.Assert ExpUmcSPName = "AddFTICRUmc"
     
-    SetAlkylationMWCorrection .AlkylationMass
-    SetDBSearchModType .ModMode
+    If Len(ExpUmcMatchSPName) = 0 Then
+        ExpUmcMatchSPName = "AddFTICRUmcMatch"
+    End If
+    Debug.Assert ExpUmcMatchSPName = "AddFTICRUmcMatch"
     
-    SetDBSearchNType .N15InsteadOfN14
-End With
-
-With glbPreferencesExpanded
-    cboAMTSearchResultsBehavior.ListIndex = .AMTSearchResultsBehavior
-    SetCheckBox chkUseUMCConglomerateNET, .UseUMCConglomerateNET
-End With
-
-With glbPreferencesExpanded.MTSConnectionInfo
-    ExpAnalysisSPName = .spPutAnalysis
-    'ExpPeakSPName = .spPutPeak
-    ExpUmcSPName = .spPutUMC
-    ExpUMCMemberSPName = .spPutUMCMember
-    ExpUmcMatchSPName = .spPutUMCMatch
-    ExpUmcInternalStdMatchSPName = .spPutUMCInternalStdMatch
-    ExpUMCCSStats = .spPutUMCCSStats
-    ExpQuantitationDescription = .spAddQuantitationDescription
-End With
-
-If Not GelAnalysis(CallerID) Is Nothing Then
-    mMDTypeSaved = GelAnalysis(CallerID).MD_Type
-Else
-    mMDTypeSaved = stNotDefined
-End If
-
-If Len(ExpUmcSPName) = 0 Then
-    ExpUmcSPName = "AddFTICRUmc"
-End If
-Debug.Assert ExpUmcSPName = "AddFTICRUmc"
-
-If Len(ExpUmcMatchSPName) = 0 Then
-    ExpUmcMatchSPName = "AddFTICRUmcMatch"
-End If
-Debug.Assert ExpUmcMatchSPName = "AddFTICRUmcMatch"
-
-If Len(ExpUmcInternalStdMatchSPName) = 0 Then
-    ExpUmcInternalStdMatchSPName = "AddFTICRUmcInternalStdMatch"
-End If
-Debug.Assert ExpUmcInternalStdMatchSPName = "AddFTICRUmcInternalStdMatch"
-
-If Len(ExpUMCCSStats) = 0 Then
-    ExpUMCCSStats = "AddFTICRUmcCSStats"
-End If
-Debug.Assert ExpUMCCSStats = "AddFTICRUmcCSStats"
-
-If Len(ExpQuantitationDescription) = 0 Then
-    ExpQuantitationDescription = "AddQuantitationDescription"
-End If
-Debug.Assert ExpQuantitationDescription = "AddQuantitationDescription"
-
-If Len(ExpAnalysisSPName) = 0 Then
-    ExpAnalysisSPName = "AddMatchMaking"
-End If
-Debug.Assert ExpAnalysisSPName = "AddMatchMaking"
-
-' September 2004: Unused Variable
-''If Len(ExpPeakSPName) = 0 Then
-''    ExpPeakSPName = "AddFTICRPeak"
-''End If
-''Debug.Assert ExpPeakSPName = "AddFTICRPeak"
-
-' Possibly add a checkmark to the mnuFReportIncludeORFs menu
-mnuFReportIncludeORFs.Checked = glbPreferencesExpanded.AutoAnalysisOptions.IncludeORFNameInTextFileOutput
-Exit Sub
+    If Len(ExpUmcInternalStdMatchSPName) = 0 Then
+        ExpUmcInternalStdMatchSPName = "AddFTICRUmcInternalStdMatch"
+    End If
+    Debug.Assert ExpUmcInternalStdMatchSPName = "AddFTICRUmcInternalStdMatch"
+    
+    If Len(ExpUMCCSStats) = 0 Then
+        ExpUMCCSStats = "AddFTICRUmcCSStats"
+    End If
+    Debug.Assert ExpUMCCSStats = "AddFTICRUmcCSStats"
+    
+    If Len(ExpQuantitationDescription) = 0 Then
+        ExpQuantitationDescription = "AddQuantitationDescription"
+    End If
+    Debug.Assert ExpQuantitationDescription = "AddQuantitationDescription"
+    
+    If Len(ExpAnalysisSPName) = 0 Then
+        ExpAnalysisSPName = "AddMatchMaking"
+    End If
+    Debug.Assert ExpAnalysisSPName = "AddMatchMaking"
+    
+    ' September 2004: Unused Variable
+    ''If Len(ExpPeakSPName) = 0 Then
+    ''    ExpPeakSPName = "AddFTICRPeak"
+    ''End If
+    ''Debug.Assert ExpPeakSPName = "AddFTICRPeak"
+    
+    ' Possibly add a checkmark to the mnuFReportIncludeORFs menu
+    mnuFReportIncludeORFs.Checked = glbPreferencesExpanded.AutoAnalysisOptions.IncludeORFNameInTextFileOutput
+    
+    InitializeSTACStatsListView
+    
+    Exit Sub
 
 FormLoadErrorHandler:
-LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.Form_Load"
-Resume Next
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC.Form_Load"
+    Resume Next
 
 End Sub
 
+Private Sub Form_Resize()
+    PositionControls
+End Sub
+
 Private Sub Form_Unload(Cancel As Integer)
-' Restore .SearchFlag using the saved value
-samtDef.SearchFlag = OldSearchFlag
-If Not objMTDBNameLookupClass Is Nothing Then
-    objMTDBNameLookupClass.DeleteData
-    Set objMTDBNameLookupClass = Nothing
-End If
-' Restore .MD_Type from mMDTypeSaved
-If Not GelAnalysis(CallerID) Is Nothing Then
-    GelAnalysis(CallerID).MD_Type = mMDTypeSaved
-End If
+    ' Restore .SearchFlag using the saved value
+    samtDef.SearchFlag = OldSearchFlag
+    
+    If Not objMTDBNameLookupClass Is Nothing Then
+        objMTDBNameLookupClass.DeleteData
+        Set objMTDBNameLookupClass = Nothing
+    End If
+    
+    ' Restore .MD_Type from mMDTypeSaved
+    If Not GelAnalysis(CallerID) Is Nothing Then
+        GelAnalysis(CallerID).MD_Type = mMDTypeSaved
+    End If
+    
+    DeleteTempFiles
+End Sub
+
+Private Sub mnuEditCopySTACPlot_Click()
+    SaveSTACPlotToClipboardOrEMF ""
+End Sub
+
+Private Sub mnuEditCopySTACStats_Click()
+    ShowOrSaveSTACStats True
+End Sub
+
+Private Sub mnuEditSaveSTACPlotAsEMF_Click()
+    SaveSTACPlotToFile pftEMF
+End Sub
+
+Private Sub mnuEditSaveSTACPlotAsPNG_Click()
+    SaveSTACPlotToFile pftPNG
+End Sub
+
+Private Sub mnuEditSetToDefaults_Click()
+    SetDefaultOptions False
 End Sub
 
 Private Sub mnuET_Click(Index As Integer)
@@ -4778,7 +6692,7 @@ Private Sub mnuFMassCalAndToleranceRefinement_Click()
 End Sub
 
 Private Sub mnuFReportByIon_Click()
-ShowOrSaveResultsByIon "", True, mnuFReportIncludeORFs.Checked
+    ShowOrSaveResultsByIon "", True, mnuFReportIncludeORFs.Checked
 End Sub
 
 Private Sub mnuFReportByUMC_Click()

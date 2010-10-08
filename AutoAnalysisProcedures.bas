@@ -206,6 +206,11 @@ Public Sub ApplyAutoAnalysisFilter(FilterPrefs As udtAutoAnalysisFilterPrefsType
             .DataFilter(fltEvenOddScanNumber, 1) = 0
         End If
 
+        .DataFilter(fltLCMSFeatureAbundance, 0) = False
+        .DataFilter(fltLCMSFeatureAbundance, 1) = 0
+        
+        .DataFilter(fltIMSConformerScore, 0) = False
+        .DataFilter(fltIMSConformerScore, 1) = 0
     End With
     
     If blnAddCommentsToAnalysisHistory Then
@@ -2809,6 +2814,11 @@ On Error GoTo LoadInputFileErrorHandler
                         End If
                     End If
                     
+                    strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "FilterLCMSFeatures", "True", udtAutoParams.FilePaths.IniFilePath)
+                    .FilterLCMSFeatures = CBoolSafe(strKeyValue)
+                    .LCMSFeatureAbuMin = 0
+                    .IMSConformerScoreMin = 0.75
+                
                     If .ExcludeIsoByFit Then
                         strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "ExcludeIsoByFitMaxVal", Trim(.ExcludeIsoByFitMaxVal), udtAutoParams.FilePaths.IniFilePath)
                         If IsNumeric(strKeyValue) Then
@@ -2816,6 +2826,19 @@ On Error GoTo LoadInputFileErrorHandler
                             If .ExcludeIsoByFitMaxVal > 100 Then
                                 .ExcludeIsoByFitMaxVal = 100
                             End If
+                        End If
+                    End If
+                    
+                    If .FilterLCMSFeatures Then
+                        strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "LCMSFeatureAbuMin", Trim(.LCMSFeatureAbuMin), udtAutoParams.FilePaths.IniFilePath)
+                        If IsNumeric(strKeyValue) Then
+                            .LCMSFeatureAbuMin = val(strKeyValue)
+                        End If
+                        
+                        strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "IMSConformerScoreMin", Trim(.IMSConformerScoreMin), udtAutoParams.FilePaths.IniFilePath)
+                        If IsNumeric(strKeyValue) Then
+                            .IMSConformerScoreMin = val(strKeyValue)
+                            If .IMSConformerScoreMin < 0 Then .IMSConformerScoreMin = 0
                         End If
                     End If
                     
@@ -2859,7 +2882,7 @@ On Error GoTo LoadInputFileErrorHandler
                     If IsNumeric(strKeyValue) Then
                         .LCMSFeaturePointsLoadMode = val(strKeyValue)
                     End If
-                
+                                  
                 End With
                 
                 With .AutoAnalysisOptions
@@ -2933,6 +2956,10 @@ On Error GoTo LoadInputFileErrorHandler
                     
                     .AutoMapDataPointsMassTolerancePPM = 5
                     .LCMSFeaturePointsLoadMode = plmLoadMappedPointsOnly
+                    
+                    .FilterLCMSFeatures = True
+                    .LCMSFeatureAbuMin = 0
+                    .IMSConformerScoreMin = 0.75
                 End With
                 
                 .AutoAnalysisOptions.GenerateMonoPlus4IsoLabelingFile = False
@@ -3889,8 +3916,12 @@ On Error GoTo RemovePairMemberHitsErrorHandler
         strMessage = strMessage & "; New LC-MS Feature count = " & Trim(lngNewUMCCount)
         AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage & strMessageSuffix
                     
+        ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
+        Dim blnComputeClassMassAndAbundance As Boolean
+        blnComputeClassMassAndAbundance = True
+        
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
-        UpdateUMCStatArrays udtWorkingParams.GelIndex, True, False
+        UpdateUMCStatArrays udtWorkingParams.GelIndex, blnComputeClassMassAndAbundance, False
         
         ' Now that we have removed some LC-MS Features, we need to remove any pairs that used those LC-MS Features
         With GelP_D_L(udtWorkingParams.GelIndex)
@@ -4815,7 +4846,11 @@ SaveUMCsToDiskErrorHandler:
     
 End Sub
 
-Private Sub AutoAnalysisSearchDatabase(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject, Optional blnToleranceRefinementSearch As Boolean = False, Optional blnInternalStdOnlySearch As Boolean = False)
+Private Sub AutoAnalysisSearchDatabase(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, _
+                                       ByRef udtAutoParams As udtAutoAnalysisParametersType, _
+                                       ByRef fso As FileSystemObject, _
+                                       Optional ByVal blnToleranceRefinementSearch As Boolean = False, _
+                                       Optional ByVal blnInternalStdOnlySearch As Boolean = False)
     
     Dim dblGANETSlope As Double, dblGANETIntercept As Double
     Dim dblGelMassMin As Double, dblGelMassMax As Double
@@ -4823,6 +4858,8 @@ Private Sub AutoAnalysisSearchDatabase(ByRef udtWorkingParams As udtAutoAnalysis
     Dim strMessage As String
     Dim strResultsFileName As String, strResultsFilePath As String
     Dim strPairsFilePath As String
+    Dim strSTACFilePath As String
+        
     Dim strErrorDescription As String
     Dim strIniFileName As String
     
@@ -4899,10 +4936,13 @@ On Error GoTo SearchDatabaseErrorHandler
         samtDef.SkipReferenced = False
         
         glbPreferencesExpanded.AMTSearchResultsBehavior = asrbAutoRemoveExisting
-        
+ 
         With glbPreferencesExpanded.PairSearchOptions
             intLastPairsBasedSearchModeIndex = -1
-            If .AutoAnalysisRemovePairMemberHitsAfterDBSearch And Not blnToleranceRefinementSearch And Not blnInternalStdOnlySearch Then
+            If .AutoAnalysisRemovePairMemberHitsAfterDBSearch And _
+               Not blnToleranceRefinementSearch And _
+               Not blnInternalStdOnlySearch Then
+               
                 ' Need to find the index of the last pairs-based search mode
                 
                 With glbPreferencesExpanded.AutoAnalysisOptions
@@ -5049,7 +5089,7 @@ On Error GoTo SearchDatabaseErrorHandler
                     .Show vbModeless
                     .InitializeSearch
                     
-                    .chkUpdateGelDataWithSearchResults = vbChecked
+                    .UpdateGelDataWithSearchResults = True
                     .SetInternalStandardSearchMode eInternalStdSearchMode
                     
                     .SetMinimumHighNormalizedScore sngMTMinimumHighNormalizedScore
@@ -5058,8 +5098,10 @@ On Error GoTo SearchDatabaseErrorHandler
                     
                     If blnToleranceRefinementSearch Then
                         .SearchRegionShape = glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.DBSearchRegionShape
+                        .UseSTAC = False
                     Else
                         .SearchRegionShape = glbPreferencesExpanded.AutoAnalysisOptions.DBSearchRegionShape
+                        .UseSTAC = glbPreferencesExpanded.UseSTAC
                     End If
                     
                     If eDBSearchMode = dbsmConglomerateUMCsPaired Then
@@ -5098,6 +5140,23 @@ On Error GoTo SearchDatabaseErrorHandler
                             End If
                         End If
                         
+                        If glbPreferencesExpanded.UseSTAC Then
+                            ' Save the STAC stats as a tab-delimited file
+                            strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC_FDR.txt"
+                            strSTACFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strSTACFilePath)
+                            .ShowOrSaveSTACStats False, strSTACFilePath, False
+                            
+                            ' Save the STAC plot
+                            strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC.png"
+                            strSTACFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strSTACFilePath)
+                            
+                            ' Enlarge the form
+                            .AutoSizeForm True
+                            
+                            ' Save the plot
+                            .SaveSTACPlotToPNG strSTACFilePath
+                        End If
+                        
                         ' Possibly export the results to a text file
                         If glbPreferencesExpanded.AutoAnalysisOptions.AutoAnalysisSearchMode(intAutoSearchIndex).WriteResultsToTextFile Then
                             lngExportDataToDiskErrorCode = .ShowOrSaveResultsByUMC(strResultsFilePath, False, glbPreferencesExpanded.AutoAnalysisOptions.IncludeORFNameInTextFileOutput)
@@ -5110,6 +5169,7 @@ On Error GoTo SearchDatabaseErrorHandler
                         End If
                     End If
                 End With
+                
                 Unload frmSearchMT_ConglomerateUMC
             
                 If eDBSearchMode = dbsmExportUMCsOnly Then
@@ -5299,6 +5359,7 @@ Private Sub AutoAnalysisToleranceRefinement(ByRef udtWorkingParams As udtAutoAna
     Dim udtAutoAnalysisOptionsSaved As udtAutoAnalysisOptionsType
     Dim udtAMTDefSaved As SearchAMTDefinition
     Dim sngSLiCSaved As Single
+    Dim blnUseStacSaved As Boolean
     
     Dim blnSuccess As Boolean, blnValidPeakFound As Boolean
     
@@ -5378,6 +5439,12 @@ On Error GoTo AutoAnalysisToleranceRefinementErrorHandler
         sngSLiCSaved = .MinimumSLiC
         .MinimumSLiC = 0
     End With
+ 
+    ' 1d. Save the current value for .UseSTAC then force .UseStac to False
+    With glbPreferencesExpanded
+        blnUseStacSaved = .UseSTAC
+        .UseSTAC = False
+    End With
     
     If udtWorkingParams.NETDefined Then
         ' 2. Call AutoAnalysisSearchDatabase
@@ -5385,7 +5452,7 @@ On Error GoTo AutoAnalysisToleranceRefinementErrorHandler
         AutoAnalysisSearchDatabase udtWorkingParams, udtAutoParams, fso, True
     End If
 
-    ' Initialize frmErrorDistribution2DLoadedData (since we need it whether or not dtWorkingParams.NETDefined is True)
+    ' Initialize frmErrorDistribution2DLoadedData (since we need it whether or not udtWorkingParams.NETDefined is True)
     With frmErrorDistribution2DLoadedData
         .CallerID = udtWorkingParams.GelIndex
         ' Note: Must use vbModeless to prevent App from waiting for form to close
@@ -5779,7 +5846,10 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
     ' 5d. Restore .MinimumSLiC
     glbPreferencesExpanded.RefineMSDataOptions.MinimumPeakHeight = sngSLiCSaved
     
-    ' 5e. Write the latest AnalysisHistory information to the log
+    ' 5e. Restore .UseSTAC
+    glbPreferencesExpanded.UseSTAC = blnUseStacSaved
+    
+    ' 5f. Write the latest AnalysisHistory information to the log
     AutoAnalysisAppendLatestHistoryToLog udtAutoParams, udtWorkingParams
 
     If Not blnSuccess Then
@@ -6184,23 +6254,45 @@ AutoGenerateQCPlotsErrorHandler:
     glbPreferencesExpanded.AutoAnalysisStatus.Enabled = blnAutoAnalysisEnabled
 End Sub
 
-Private Function CheckAutoToleranceRefinementEnabled(ByRef udtAutoToleranceRefinement As udtAutoToleranceRefinementType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByVal blnLogWarnings As Boolean) As Boolean
+Private Function CheckAutoToleranceRefinementEnabled(ByRef udtAutoToleranceRefinement As udtAutoToleranceRefinementType, _
+                                                     ByRef udtAutoParams As udtAutoAnalysisParametersType, _
+                                                     ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, _
+                                                     ByVal blnLogWarnings As Boolean) As Boolean
 
     Dim blnPerformRefinement As Boolean
 
     With udtAutoToleranceRefinement
+        
+        If glbPreferencesExpanded.UseSTAC Then
+            ' Override the tolerance refinement options to False, unless .UseRefinementWhenUsingSTAC is true
+            If Not .UseRefinementWhenUsingSTAC Then
+            
+                If .RefineDBSearchMassTolerance Or .RefineDBSearchNETTolerance Then
+                    .RefineDBSearchMassTolerance = False
+                    .RefineDBSearchNETTolerance = False
+                    
+                    If blnLogWarnings Then
+                        AutoAnalysisLog udtAutoParams, udtWorkingParams, "Note: Mass and NET Tolerance Refinement has been disabled because we are peak matching using STAC.  To override, set UseRefinementWhenUsingSTAC=True in the parameter file"
+                    End If
+                End If
+            End If
+        End If
+    
         If .RefineMassCalibration Or .RefineDBSearchMassTolerance Or .RefineDBSearchNETTolerance Then
             blnPerformRefinement = True
         Else
             blnPerformRefinement = False
         End If
+        
         If glbPreferencesExpanded.AutoAnalysisOptions.AutoAnalysisSearchModeCount < 1 Then
             If blnLogWarnings Then
                 AutoAnalysisLog udtAutoParams, udtWorkingParams, "Warning - Tolerance Refinement is enabled, but no database search modes are defined; skipping tolerance refinement"
                 udtWorkingParams.WarningBits = udtWorkingParams.WarningBits Or TOLERANCE_REFINEMENT_WARNING_PEAK_NOT_FOUND_BIT
             End If
             blnPerformRefinement = False
-        Else
+        End If
+        
+        If blnPerformRefinement Then
             If LookupDBSearchModeIndex(glbPreferencesExpanded.AutoAnalysisOptions.AutoAnalysisSearchMode(0).SearchMode) = dbsmExportUMCsOnly Then
                 If blnLogWarnings Then
                     AutoAnalysisLog udtAutoParams, udtWorkingParams, "Warning - Tolerance Refinement is enabled, but the database search mode is Export UMCs Only; skipping tolerance refinement"
@@ -6209,6 +6301,7 @@ Private Function CheckAutoToleranceRefinementEnabled(ByRef udtAutoToleranceRefin
                 blnPerformRefinement = False
             End If
         End If
+           
     End With
 
     CheckAutoToleranceRefinementEnabled = blnPerformRefinement
