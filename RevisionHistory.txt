@@ -1,5 +1,23 @@
 VIPER Change Log
 
+Version 3.48 - Build 429; October 11, 2010
+	- Updated to new version of STAC
+		- New columns in the STAC FDR.csv file
+		- New stats in the STAC Log file
+	- Update STAC Trends plot to include both unfiltered and filtered matches, along with FDR
+		- Can toggle between unfiltered FDR and UP-Filtered FDR
+	- Now computing FDR threshold value for each identification
+		- Values gets stored in T_FTICR_UMC_ResultDetails or T_FTICR_UMC_InternalStdDetails
+	- Now storing the mass and NET tolerances determined by STAC in columns MD_MMA_TolerancePPM and MD_NET_Tolerance in table T_Match_Making_Description
+
+Version 3.48 - Build 428; October 8, 2010
+	- Now including the STAC Trends plot in the Index.html file
+	- Now populating T_Match_Making_FDR in the database
+	- Added parameters to the AutoToleranceRefinement section of the .Ini file
+		- UseRefinementWhenUsingSTAC, defaults to False
+		- RefinedTolMassMultiplierWhenUsingSTAC, defaults to 3 (only used if UseRefinementWhenUsingSTAC=True)
+		- RefinedTolNETMultiplierWhenUsingSTAC, defaults to 1  (only used if UseRefinementWhenUsingSTAC=True)
+
 Version 3.48 - Build 427; October 7, 2010
 	- Added option to match LC-MS Features to AMT Tags using STAC
 		- Can export STAC stats as a table or as a plot

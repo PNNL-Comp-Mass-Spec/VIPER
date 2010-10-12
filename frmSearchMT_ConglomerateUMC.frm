@@ -4,29 +4,39 @@ Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Begin VB.Form frmSearchMT_ConglomerateUMC 
    BackColor       =   &H00FFFFFF&
    Caption         =   "Search MT tag DB - Single LC-MS Feature Mass"
-   ClientHeight    =   7155
+   ClientHeight    =   7185
    ClientLeft      =   60
    ClientTop       =   630
    ClientWidth     =   14025
    LinkTopic       =   "Form1"
-   ScaleHeight     =   7155
+   ScaleHeight     =   7185
    ScaleWidth      =   14025
    StartUpPosition =   1  'CenterOwner
    Begin VB.Frame fraSTACPlotOptions 
       BackColor       =   &H00FFFFFF&
       Caption         =   "STAC Plot Options"
-      Height          =   1095
+      Height          =   1455
       Left            =   11880
       TabIndex        =   64
-      Top             =   1800
+      Top             =   1320
       Width           =   2055
+      Begin VB.CheckBox chkPlotUPFilteredFDR 
+         BackColor       =   &H00FFFFFF&
+         Caption         =   "&UP Filtered FDR"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   65
+         Top             =   240
+         Value           =   1  'Checked
+         Width           =   1815
+      End
       Begin VB.CheckBox chkSTACPlotY2Gridlines 
          BackColor       =   &H00FFFFFF&
          Caption         =   "FDR Gridlines"
          Height          =   255
          Left            =   120
-         TabIndex        =   67
-         Top             =   720
+         TabIndex        =   68
+         Top             =   1080
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -35,8 +45,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Matches Gridlines"
          Height          =   255
          Left            =   120
-         TabIndex        =   66
-         Top             =   480
+         TabIndex        =   67
+         Top             =   840
          Width           =   1815
       End
       Begin VB.CheckBox chkSTACPlotXGridlines 
@@ -44,8 +54,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Vertical Gridlines"
          Height          =   255
          Left            =   120
-         TabIndex        =   65
-         Top             =   240
+         TabIndex        =   66
+         Top             =   600
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -54,7 +64,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "&Zoom Out"
       Height          =   375
       Left            =   11880
-      TabIndex        =   68
+      TabIndex        =   69
       Top             =   3000
       Width           =   1335
    End
@@ -97,7 +107,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Owner_2         =   1
       Plots_1         =   3
       ClassName_3     =   "CCWDataPlots"
-      Array_3         =   2
+      Array_3         =   3
       Editor_3        =   4
       ClassName_4     =   "CCWGFPlotArrayEditor"
       Owner_4         =   1
@@ -188,172 +198,189 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Array[1]_3      =   20
       ClassName_20    =   "CCWDataPlot"
       opts_20         =   4194367
-      Name_20         =   "FDR"
-      C[0]_20         =   255
+      Name_20         =   "UpFilteredMatches"
+      C[0]_20         =   41984
       C[1]_20         =   0
       C[2]_20         =   16711680
       C[3]_20         =   16776960
       Event_20        =   2
       X_20            =   6
-      Y_20            =   21
-      ClassName_21    =   "CCWAxis"
-      opts_21         =   575
-      Name_21         =   "FDR"
-      Orientation_21  =   2172
-      format_21       =   22
-      ClassName_22    =   "CCWFormat"
-      Format_22       =   "%*100"
-      Scale_21        =   23
-      ClassName_23    =   "CCWScale"
-      opts_23         =   90112
-      rMin_23         =   28
-      rMax_23         =   187
-      dMax_23         =   1
-      discInterval_23 =   1
-      Radial_21       =   0
-      Enum_21         =   24
-      ClassName_24    =   "CCWEnum"
-      Editor_24       =   25
-      ClassName_25    =   "CCWEnumArrayEditor"
-      Owner_25        =   21
-      Font_21         =   0
-      tickopts_21     =   2711
-      major_21        =   0.2
-      minor_21        =   0.1
-      Caption_21      =   26
-      ClassName_26    =   "CCWDrawObj"
-      opts_26         =   62
-      C[0]_26         =   255
-      Image_26        =   27
-      ClassName_27    =   "CCWTextImage"
-      szText_27       =   "FDR"
-      style_27        =   74772712
-      font_27         =   0
-      Animator_26     =   0
-      Blinker_26      =   0
-      PointStyle_20   =   10
+      Y_20            =   13
+      PointStyle_20   =   16
       LineStyle_20    =   1
       LineWidth_20    =   2
       BasePlot_20     =   0
       DefaultXInc_20  =   1
       DefaultPlotPerRow_20=   -1  'True
-      Axes_1          =   28
-      ClassName_28    =   "CCWAxes"
-      Array_28        =   3
-      Editor_28       =   29
-      ClassName_29    =   "CCWGFAxisArrayEditor"
-      Owner_29        =   1
-      Array[0]_28     =   6
-      Array[1]_28     =   13
-      Array[2]_28     =   21
-      DefaultPlot_1   =   30
-      ClassName_30    =   "CCWDataPlot"
-      opts_30         =   4194367
-      Name_30         =   "[Template]"
-      C[0]_30         =   65280
-      C[1]_30         =   255
-      C[2]_30         =   16711680
-      C[3]_30         =   16776960
-      Event_30        =   2
-      X_30            =   6
-      Y_30            =   13
-      PointStyle_30   =   16
-      LineWidth_30    =   1
-      BasePlot_30     =   0
-      DefaultXInc_30  =   1
-      DefaultPlotPerRow_30=   -1  'True
-      Cursors_1       =   31
-      ClassName_31    =   "CCWCursors"
-      Editor_31       =   32
-      ClassName_32    =   "CCWGFCursorArrayEditor"
-      Owner_32        =   1
+      Array[2]_3      =   21
+      ClassName_21    =   "CCWDataPlot"
+      opts_21         =   4194367
+      Name_21         =   "FDR"
+      C[0]_21         =   255
+      C[1]_21         =   0
+      C[2]_21         =   16711680
+      C[3]_21         =   16776960
+      Event_21        =   2
+      X_21            =   6
+      Y_21            =   22
+      ClassName_22    =   "CCWAxis"
+      opts_22         =   575
+      Name_22         =   "FDR"
+      Orientation_22  =   2172
+      format_22       =   23
+      ClassName_23    =   "CCWFormat"
+      Format_23       =   "%*100"
+      Scale_22        =   24
+      ClassName_24    =   "CCWScale"
+      opts_24         =   90112
+      rMin_24         =   28
+      rMax_24         =   187
+      dMax_24         =   1
+      discInterval_24 =   1
+      Radial_22       =   0
+      Enum_22         =   25
+      ClassName_25    =   "CCWEnum"
+      Editor_25       =   26
+      ClassName_26    =   "CCWEnumArrayEditor"
+      Owner_26        =   22
+      Font_22         =   0
+      tickopts_22     =   2711
+      major_22        =   0.2
+      minor_22        =   0.1
+      Caption_22      =   27
+      ClassName_27    =   "CCWDrawObj"
+      opts_27         =   62
+      C[0]_27         =   255
+      Image_27        =   28
+      ClassName_28    =   "CCWTextImage"
+      szText_28       =   "FDR"
+      style_28        =   74772712
+      font_28         =   0
+      Animator_27     =   0
+      Blinker_27      =   0
+      PointStyle_21   =   10
+      LineStyle_21    =   1
+      LineWidth_21    =   2
+      BasePlot_21     =   0
+      DefaultXInc_21  =   1
+      DefaultPlotPerRow_21=   -1  'True
+      Axes_1          =   29
+      ClassName_29    =   "CCWAxes"
+      Array_29        =   3
+      Editor_29       =   30
+      ClassName_30    =   "CCWGFAxisArrayEditor"
+      Owner_30        =   1
+      Array[0]_29     =   6
+      Array[1]_29     =   13
+      Array[2]_29     =   22
+      DefaultPlot_1   =   31
+      ClassName_31    =   "CCWDataPlot"
+      opts_31         =   4194367
+      Name_31         =   "[Template]"
+      C[0]_31         =   65280
+      C[1]_31         =   255
+      C[2]_31         =   16711680
+      C[3]_31         =   16776960
+      Event_31        =   2
+      X_31            =   6
+      Y_31            =   13
+      PointStyle_31   =   16
+      LineWidth_31    =   1
+      BasePlot_31     =   0
+      DefaultXInc_31  =   1
+      DefaultPlotPerRow_31=   -1  'True
+      Cursors_1       =   32
+      ClassName_32    =   "CCWCursors"
+      Editor_32       =   33
+      ClassName_33    =   "CCWGFCursorArrayEditor"
+      Owner_33        =   1
       TrackMode_1     =   10
       GraphBackground_1=   0
-      GraphFrame_1    =   33
-      ClassName_33    =   "CCWDrawObj"
-      opts_33         =   62
-      C[0]_33         =   16777215
-      C[1]_33         =   16777215
-      Image_33        =   34
-      ClassName_34    =   "CCWPictImage"
-      opts_34         =   1280
-      Rows_34         =   1
-      Cols_34         =   1
-      F_34            =   16777215
-      B_34            =   16777215
-      ColorReplaceWith_34=   8421504
-      ColorReplace_34 =   8421504
-      Tolerance_34    =   2
-      Animator_33     =   0
-      Blinker_33      =   0
-      PlotFrame_1     =   35
-      ClassName_35    =   "CCWDrawObj"
-      opts_35         =   62
-      C[0]_35         =   16777215
-      C[1]_35         =   16777215
-      Image_35        =   36
-      ClassName_36    =   "CCWPictImage"
-      opts_36         =   1280
-      Rows_36         =   1
-      Cols_36         =   1
-      Pict_36         =   1
-      F_36            =   16777215
-      B_36            =   16777215
-      ColorReplaceWith_36=   8421504
-      ColorReplace_36 =   8421504
-      Tolerance_36    =   2
-      Animator_35     =   0
-      Blinker_35      =   0
-      Caption_1       =   37
-      ClassName_37    =   "CCWDrawObj"
-      opts_37         =   62
-      C[0]_37         =   -2147483640
-      Image_37        =   38
-      ClassName_38    =   "CCWTextImage"
-      szText_38       =   "STAC Stats"
-      font_38         =   0
-      Animator_37     =   0
-      Blinker_37      =   0
+      GraphFrame_1    =   34
+      ClassName_34    =   "CCWDrawObj"
+      opts_34         =   62
+      C[0]_34         =   16777215
+      C[1]_34         =   16777215
+      Image_34        =   35
+      ClassName_35    =   "CCWPictImage"
+      opts_35         =   1280
+      Rows_35         =   1
+      Cols_35         =   1
+      F_35            =   16777215
+      B_35            =   16777215
+      ColorReplaceWith_35=   8421504
+      ColorReplace_35 =   8421504
+      Tolerance_35    =   2
+      Animator_34     =   0
+      Blinker_34      =   0
+      PlotFrame_1     =   36
+      ClassName_36    =   "CCWDrawObj"
+      opts_36         =   62
+      C[0]_36         =   16777215
+      C[1]_36         =   16777215
+      Image_36        =   37
+      ClassName_37    =   "CCWPictImage"
+      opts_37         =   1280
+      Rows_37         =   1
+      Cols_37         =   1
+      Pict_37         =   1
+      F_37            =   16777215
+      B_37            =   16777215
+      ColorReplaceWith_37=   8421504
+      ColorReplace_37 =   8421504
+      Tolerance_37    =   2
+      Animator_36     =   0
+      Blinker_36      =   0
+      Caption_1       =   38
+      ClassName_38    =   "CCWDrawObj"
+      opts_38         =   62
+      C[0]_38         =   -2147483640
+      Image_38        =   39
+      ClassName_39    =   "CCWTextImage"
+      szText_39       =   "STAC Stats"
+      font_39         =   0
+      Animator_38     =   0
+      Blinker_38      =   0
       DefaultXInc_1   =   1
       DefaultPlotPerRow_1=   -1  'True
-      Bindings_1      =   39
-      ClassName_39    =   "CCWBindingHolderArray"
-      Editor_39       =   40
-      ClassName_40    =   "CCWBindingHolderArrayEditor"
-      Owner_40        =   1
-      Annotations_1   =   41
-      ClassName_41    =   "CCWAnnotations"
-      Editor_41       =   42
-      ClassName_42    =   "CCWAnnotationArrayEditor"
-      Owner_42        =   1
-      AnnotationTemplate_1=   43
-      ClassName_43    =   "CCWAnnotation"
-      opts_43         =   63
-      Name_43         =   "[Template]"
-      Plot_43         =   44
-      ClassName_44    =   "CCWDataPlot"
-      opts_44         =   4194367
+      Bindings_1      =   40
+      ClassName_40    =   "CCWBindingHolderArray"
+      Editor_40       =   41
+      ClassName_41    =   "CCWBindingHolderArrayEditor"
+      Owner_41        =   1
+      Annotations_1   =   42
+      ClassName_42    =   "CCWAnnotations"
+      Editor_42       =   43
+      ClassName_43    =   "CCWAnnotationArrayEditor"
+      Owner_43        =   1
+      AnnotationTemplate_1=   44
+      ClassName_44    =   "CCWAnnotation"
+      opts_44         =   63
       Name_44         =   "[Template]"
-      C[0]_44         =   65280
-      C[1]_44         =   255
-      C[2]_44         =   16711680
-      C[3]_44         =   16776960
-      Event_44        =   2
-      X_44            =   6
-      Y_44            =   13
-      LineStyle_44    =   1
-      LineWidth_44    =   1
-      BasePlot_44     =   0
-      DefaultXInc_44  =   1
-      DefaultPlotPerRow_44=   -1  'True
-      Text_43         =   "[Template]"
-      TextXPoint_43   =   6.7
-      TextYPoint_43   =   6.7
-      TextColor_43    =   16777215
-      TextFont_43     =   45
-      ClassName_45    =   "CCWFont"
-      bFont_45        =   -1  'True
-      BeginProperty Font_45 {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+      Plot_44         =   45
+      ClassName_45    =   "CCWDataPlot"
+      opts_45         =   4194367
+      Name_45         =   "[Template]"
+      C[0]_45         =   65280
+      C[1]_45         =   255
+      C[2]_45         =   16711680
+      C[3]_45         =   16776960
+      Event_45        =   2
+      X_45            =   6
+      Y_45            =   13
+      LineStyle_45    =   1
+      LineWidth_45    =   1
+      BasePlot_45     =   0
+      DefaultXInc_45  =   1
+      DefaultPlotPerRow_45=   -1  'True
+      Text_44         =   "[Template]"
+      TextXPoint_44   =   6.7
+      TextYPoint_44   =   6.7
+      TextColor_44    =   16777215
+      TextFont_44     =   46
+      ClassName_46    =   "CCWFont"
+      bFont_46        =   -1  'True
+      BeginProperty Font_46 {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "MS Sans Serif"
          Size            =   8.25
          Charset         =   0
@@ -362,44 +389,44 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      ShapeXPoints_43 =   46
-      ClassName_46    =   "CDataBuffer"
-      Type_46         =   5
-      m_cDims;_46     =   1
-      m_cElts_46      =   1
-      Element[0]_46   =   3.3
-      ShapeYPoints_43 =   47
+      ShapeXPoints_44 =   47
       ClassName_47    =   "CDataBuffer"
       Type_47         =   5
       m_cDims;_47     =   1
       m_cElts_47      =   1
       Element[0]_47   =   3.3
-      ShapeFillColor_43=   16777215
-      ShapeLineColor_43=   16777215
-      ShapeLineWidth_43=   1
-      ShapeLineStyle_43=   1
-      ShapePointStyle_43=   10
-      ShapeImage_43   =   48
-      ClassName_48    =   "CCWDrawObj"
-      opts_48         =   62
-      Image_48        =   49
-      ClassName_49    =   "CCWPictImage"
-      opts_49         =   1280
-      Rows_49         =   1
-      Cols_49         =   1
-      Pict_49         =   7
-      F_49            =   -2147483633
-      B_49            =   -2147483633
-      ColorReplaceWith_49=   8421504
-      ColorReplace_49 =   8421504
-      Tolerance_49    =   2
-      Animator_48     =   0
-      Blinker_48      =   0
-      ArrowVisible_43 =   -1  'True
-      ArrowColor_43   =   16777215
-      ArrowWidth_43   =   1
-      ArrowLineStyle_43=   1
-      ArrowHeadStyle_43=   1
+      ShapeYPoints_44 =   48
+      ClassName_48    =   "CDataBuffer"
+      Type_48         =   5
+      m_cDims;_48     =   1
+      m_cElts_48      =   1
+      Element[0]_48   =   3.3
+      ShapeFillColor_44=   16777215
+      ShapeLineColor_44=   16777215
+      ShapeLineWidth_44=   1
+      ShapeLineStyle_44=   1
+      ShapePointStyle_44=   10
+      ShapeImage_44   =   49
+      ClassName_49    =   "CCWDrawObj"
+      opts_49         =   62
+      Image_49        =   50
+      ClassName_50    =   "CCWPictImage"
+      opts_50         =   1280
+      Rows_50         =   1
+      Cols_50         =   1
+      Pict_50         =   7
+      F_50            =   -2147483633
+      B_50            =   -2147483633
+      ColorReplaceWith_50=   8421504
+      ColorReplace_50 =   8421504
+      Tolerance_50    =   2
+      Animator_49     =   0
+      Blinker_49      =   0
+      ArrowVisible_44 =   -1  'True
+      ArrowColor_44   =   16777215
+      ArrowWidth_44   =   1
+      ArrowLineStyle_44=   1
+      ArrowHeadStyle_44=   1
    End
    Begin MSComctlLib.ListView lvwSTACStats 
       Height          =   3015
@@ -468,9 +495,10 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Width           =   1695
    End
    Begin VB.TextBox txtUniqueMatchStats 
-      Height          =   285
+      Height          =   525
       Left            =   60
       Locked          =   -1  'True
+      MultiLine       =   -1  'True
       TabIndex        =   59
       Top             =   6525
       Width           =   7455
@@ -1257,8 +1285,9 @@ Private mSearchUsedCustomNETs As Boolean
 Private mCurrIDCnt As Long
 Private mCurrIDMatches() As udtUMCMassTagRawMatches         ' 0-based array
 
-Private mSTACStatsCount As Long
-Private mSTACStats() As udtSTACStats                        ' 0-based array
+' The following is populated after the search finishes
+' It tracks the number of UMCs matched, plus the unique number of AMTs matched at different FDR levels
+Private mSearchSummaryStats As udtSearchSummaryStatsType
 
 Private mSTACTempFolderPath As String
 Private mSTACSessionID As String
@@ -1266,7 +1295,8 @@ Private mTempFilesToDelete As Dictionary
     
 Private mSTACAMTFilePath As String
 Private mSTACUMCFilePath As String
-    
+Private mMaxPlottedFDR As Double
+
 'Expression Evaluator variables for elution time calculation
 Private MyExprEva As ExprEvaluator
 Private VarVals() As Long
@@ -1280,6 +1310,7 @@ Private ExpUMCMemberSPName As String            ' Stored procedure AddFTICRUmcMe
 Private ExpUmcMatchSPName As String             ' Stored procedure AddFTICRUmcMatch
 Private ExpUmcInternalStdMatchSPName As String  ' Stored procedure AddFTICRUmcInternalStdMatch
 Private ExpUMCCSStats As String                 ' Stored procedure AddFTICRUmcCSStats
+Private ExpStoreSTACStats As String             ' Stored procedure AddMatchMakingFDR
 Private ExpQuantitationDescription As String    ' Stored procedure AddQuantitationDescription
 
 Private mUMCCountSkippedSinceRefPresent As Long
@@ -1301,14 +1332,14 @@ Private Enum eSearchModeConstants
     eSearchModePairedPlusUnpaired = 2
     eSearchModeNonPaired = 3
 End Enum
-
-Private Type udtSTACStats
-    STACCuttoff As Double
-    Matches As Long
-    Errors As Double
-    FDR As Double
-End Type
 '
+
+Public Property Get PlotUPFilteredFDR() As Boolean
+    PlotUPFilteredFDR = cChkBox(chkPlotUPFilteredFDR)
+End Property
+Public Property Let PlotUPFilteredFDR(Value As Boolean)
+    SetCheckBox chkPlotUPFilteredFDR, Value
+End Property
 
 Public Property Get SearchRegionShape() As srsSearchRegionShapeConstants
     SearchRegionShape = mSearchRegionShape
@@ -1325,6 +1356,16 @@ Public Property Let UpdateGelDataWithSearchResults(ByVal Value As Boolean)
     SetCheckBox chkUpdateGelDataWithSearchResults, Value
 End Property
 
+Public Property Get STACUsesPriorProbability() As Boolean
+    STACUsesPriorProbability = cChkBox(chkSTACUsesPriorProbability)
+End Property
+Public Property Let STACUsesPriorProbability(ByVal Value As Boolean)
+    If cChkBox(chkSTACUsesPriorProbability) <> Value Then
+        SetCheckBox chkSTACUsesPriorProbability, Value
+    End If
+    glbPreferencesExpanded.STACUsesPriorProbability = Value
+End Property
+
 Public Property Get UseSTAC() As Boolean
     UseSTAC = cChkBox(chkUseSTAC)
 End Property
@@ -1334,6 +1375,7 @@ Public Property Let UseSTAC(ByVal Value As Boolean)
     End If
     glbPreferencesExpanded.UseSTAC = Value
 End Property
+
 Private Function AddCurrIDsToAllIDs(ClsInd As Long) As Boolean
     '---------------------------------------------------------------------------
     'returns True if successful; adds current identifications to list of all IDs
@@ -1366,6 +1408,7 @@ Private Function AddCurrIDsToAllIDs(ClsInd As Long) As Boolean
             .StacOrSLiC = mCurrIDMatches(lngIndex).StacOrSLiC
             .DelScore = mCurrIDMatches(lngIndex).DelScore
             .UniquenessProbability = mCurrIDMatches(lngIndex).UniquenessProbability
+            .FDRThreshold = 1
             .IDIsInternalStd = mCurrIDMatches(lngIndex).IDIsInternalStd
             .MultiAMTHitCount = lngAMTHitCount
         End With
@@ -1387,7 +1430,7 @@ Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False
         Me.width = 15000
         Me.Height = 10000
     Else
-        If Me.UseSTAC And mSTACStatsCount > 0 Then
+        If Me.UseSTAC And STACStatsCount > 0 Then
             If Me.width < 14150 Then
                 Me.width = 14150
             End If
@@ -1397,7 +1440,7 @@ Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False
             End If
         Else
             Me.width = 7800
-            Me.Height = 7800
+            Me.Height = 8000
         End If
     End If
     
@@ -1425,6 +1468,94 @@ Private Function CheckVsMinimum(ByVal lngValue As Long, Optional ByVal lngMinimu
     CheckVsMinimum = lngValue
 End Function
 
+Private Function ComputePeptideLevelSTACFDR() As Boolean
+
+    Dim lngIndex As Long
+    
+    Dim lngPointerArray() As Long
+    Dim dblSTACScores() As Double
+    Dim dblFDR() As Double
+    
+    Dim dblRunningSum As Double
+    Dim lngRunningCount As Long
+    
+    Dim objQSDbl As QSDouble
+    Dim objQSLong As QSLongWithDouble
+    
+    Dim blnSuccess As Boolean
+    
+On Error GoTo ComputePeptideLevelSTACFDRErrorHandler
+    
+    If mMatchStatsCount > 0 Then
+        
+        ReDim lngPointerArray(mMatchStatsCount - 1)
+        ReDim dblSTACScores(mMatchStatsCount - 1)
+        ReDim dblFDR(mMatchStatsCount - 1)
+        
+        ' Populate two parallel arrays
+        
+        For lngIndex = 0 To mMatchStatsCount - 1
+            lngPointerArray(lngIndex) = lngIndex
+            dblSTACScores(lngIndex) = mUMCMatchStats(lngIndex).StacOrSLiC
+        Next lngIndex
+        
+        ' Sort dblSTACScores() and sort lngPointerArray() in parallel
+        
+        Set objQSDbl = New QSDouble
+        blnSuccess = objQSDbl.QSDesc(dblSTACScores, lngPointerArray)
+                
+        ' Now step through the data and compute the FDR values
+        ' FDR = (CountToThisPoint - RunningSTACSum) / CountToThisPoint
+        
+        dblRunningSum = 0
+        For lngIndex = 0 To mMatchStatsCount - 1
+            dblRunningSum = dblRunningSum + dblSTACScores(lngIndex)
+            lngRunningCount = lngIndex + 1
+            dblFDR(lngIndex) = (lngRunningCount - dblRunningSum) / lngRunningCount
+        Next lngIndex
+        
+        ' Now step through the data and assign the same FDR for contiguous data with the same STAC scores
+        For lngIndex = mMatchStatsCount - 1 To 1 Step -1
+            If dblSTACScores(lngIndex) = dblSTACScores(lngIndex - 1) Then
+                dblFDR(lngIndex - 1) = dblFDR(lngIndex)
+            End If
+        Next lngIndex
+        
+        ' Now re-sort by lngPointerArray()
+        
+        Set objQSLong = New QSLongWithDouble
+        blnSuccess = objQSLong.QSAsc(lngPointerArray, dblFDR)
+        
+        ' Finally, store the FDR values
+        ' We're also counting the number of features that pass each threshold
+        For lngIndex = 0 To mMatchStatsCount - 1
+            mUMCMatchStats(lngIndex).FDRThreshold = dblFDR(lngIndex)
+        Next lngIndex
+        
+        ' Count the number of features passing each FDR threshold
+        For lngIndex = 0 To mMatchStatsCount - 1
+        Next lngIndex
+    End If
+    
+    ComputePeptideLevelSTACFDR = True
+    Exit Function
+
+ComputePeptideLevelSTACFDRErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "ComputePeptideLevelSTACFDR"
+    
+End Function
+
+Private Function ConvertScanToNET(lngScanNumber As Long) As Double
+
+    If mUsingDefaultGANET Then
+        ConvertScanToNET = ScanToGANET(CallerID, lngScanNumber)
+    Else
+        ConvertScanToNET = Elution(lngScanNumber, MinFN, MaxFN)
+    End If
+
+End Function
+
 Private Function CountMassTagsInUMCMatchStats() As Long
     ' Returns the number of items in mUMCMatchStats() with .IDIsInternalStd = False
     
@@ -1437,16 +1568,6 @@ Private Function CountMassTagsInUMCMatchStats() As Long
     Next lngIndex
     
     CountMassTagsInUMCMatchStats = lngMassTagHitCount
-
-End Function
-
-Private Function ConvertScanToNET(lngScanNumber As Long) As Double
-
-    If mUsingDefaultGANET Then
-        ConvertScanToNET = ScanToGANET(CallerID, lngScanNumber)
-    Else
-        ConvertScanToNET = Elution(lngScanNumber, MinFN, MaxFN)
-    End If
 
 End Function
 
@@ -1536,9 +1657,6 @@ Private Function DisplayHitSummary(strSearchScope As String) As String
     Dim strSearchItems As String
     Dim strModMassDescription As String
     
-    Dim lngUniqueUMCCount As Long
-    Dim lngUniquePMTTagCount As Long
-    Dim lngUniqueInternalStdCount As Long
     Dim sngUMCMatchPercentage As Single
     
     strMessage = "Hits: " & LongToStringWithCommas(mMatchStatsCount)
@@ -1570,24 +1688,30 @@ Private Function DisplayHitSummary(strSearchScope As String) As String
         AddToAnalysisHistory CallerID, strModMassDescription
     End If
 
-    GenerateUniqueMatchStats lngUniqueUMCCount, lngUniquePMTTagCount, lngUniqueInternalStdCount
+    ' Re-compute the match stats
+    GenerateUniqueMatchStats
+    
     If GelUMC(CallerID).UMCCnt > 0 Then
-        sngUMCMatchPercentage = lngUniqueUMCCount / CSng(GelUMC(CallerID).UMCCnt) * 100#
+        sngUMCMatchPercentage = mSearchSummaryStats.UMCCountWithHits / CSng(GelUMC(CallerID).UMCCnt) * 100#
     Else
         sngUMCMatchPercentage = 0
     End If
     
-    strStats = "LC-MS Features with match = " & LongToStringWithCommas(lngUniqueUMCCount) & " (" & Trim(Round(sngUMCMatchPercentage, 0)) & "%)"
+    strStats = "LC-MS Features with match = " & LongToStringWithCommas(mSearchSummaryStats.UMCCountWithHits) & " (" & Trim(Round(sngUMCMatchPercentage, 0)) & "%)"
     If eInternalStdSearchMode <> issmFindOnlyInternalStandards Then
-        strStats = strStats & "; Unique MT tags matched = " & LongToStringWithCommas(lngUniquePMTTagCount) & " / " & LongToStringWithCommas(mMTCnt)
+        strStats = strStats & "; Unique MT tags matched = " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount) & " / " & LongToStringWithCommas(mMTCnt)
         If mMTCnt > AMTCnt Then
             strStats = strStats & " (" & LongToStringWithCommas(AMTCnt) & " source MT tags)"
         End If
     End If
     
     If eInternalStdSearchMode <> issmFindOnlyMassTags Then
-        strStats = strStats & "; Unique Int Stds = " & LongToStringWithCommas(lngUniqueInternalStdCount) & " / " & LongToStringWithCommas(UMCInternalStandards.Count)
+        strStats = strStats & "; Unique Int Stds = " & LongToStringWithCommas(mSearchSummaryStats.UniqueIntStdCount) & " / " & LongToStringWithCommas(UMCInternalStandards.Count)
     End If
+    
+    strStats = strStats & "; Unique AMT count, 1% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount1PctFDR) & ";  " & _
+                          "5% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount5PctFDR) & ";  " & _
+                          "10% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount10PctFDR)
     
     txtUniqueMatchStats.Text = strStats
     
@@ -1621,7 +1745,6 @@ Private Sub EnableDisableControls()
     End If
     
     AutoSizeForm
-
 End Sub
 
 Private Sub EnableDisableNETFormulaControls()
@@ -1687,7 +1810,7 @@ Public Function ExportMTDBbyUMC(Optional blnUpdateGANETForAnalysisInDB As Boolea
     ''strStatus = ExportMTDBbyUMCToPeakResultsTable(lngMDID, blnUpdateGANETForAnalysisInDB, lngErrorNumber)
     
     ' Note: The following function call will create a new entry in T_Match_Making_Description
-    strStatus = strStatus & vbCrLf & ExportMTDBbyUMCToUMCResultsTable(lngMDID, True, blnUpdateGANETForAnalysisInDB, blnExportUMCMembers, lngErrorNumber, blnAddQuantitationEntry, blnExportUMCsWithNoMatches, strIniFileName)
+    strStatus = ExportMTDBbyUMCToUMCResultsTable(lngMDID, blnUpdateGANETForAnalysisInDB, blnExportUMCMembers, lngErrorNumber, blnAddQuantitationEntry, blnExportUMCsWithNoMatches, strIniFileName)
     
     cmdSearchAllUMCs.Visible = True
     cmdRemoveAMTMatchesFromUMCs.Visible = True
@@ -1972,152 +2095,167 @@ End Function
 ''
 ''End Function
 
-Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optional blnCreateNewEntryInMMDTable As Boolean = False, Optional blnUpdateGANETForAnalysisInDB As Boolean = True, Optional ByVal blnExportUMCMembers As Boolean = False, Optional ByRef lngErrorNumber As Long, Optional ByVal blnAddQuantitationDescriptionEntry As Boolean = True, Optional ByVal blnExportUMCsWithNoMatches As Boolean = True, Optional ByVal strIniFileName As String = "") As String
-'---------------------------------------------------
-'This function will export data to the T_FTICR_UMC_Results table, T_FTICR_UMC_ResultDetails table,
-'  and T_FTICR_UMC_InternalStandardDetails table
-'
-'It will create a new entry in T_Match_Making_Description if blnCreateNewEntryInMMDTable = True
-'If blnAddQuantitationDescriptionEntry = True, then calls ExportMTDBAddQuantitationDescriptionEntry
-'  to create a new entry in T_Quantitation_Description and T_Quantitation_MDIDs
-'
-'Returns a status message
-'lngErrorNumber will contain the error number, if an error occurs
-'---------------------------------------------------
-Dim lngPointer As Long, lngUMCIndex As Long
-Dim lngUMCIndexCompare As Long
-Dim lngUMCIndexOriginal As Long
-Dim lngUMCIndexOriginalLastStored As Long
-
-Dim lngUMCIndexOriginalPairOther As Long
-Dim lngPeakFPRType As Long
-
-Dim lngPairIndex As Long
-
-Dim objP1IndFastSearch As FastSearchArrayLong
-Dim objP2IndFastSearch As FastSearchArrayLong
-Dim blnPairsPresent As Boolean
-Dim blnReturnAllPairInstances As Boolean
-Dim blnFavorHeavy As Boolean
-
-Dim lngPairMatchCount As Long, lngPairMatchIndex As Long
-Dim udtPairMatchStats() As udtPairMatchStatsType
-Dim lngUMCResultsIDReturn() As Long
-
-Dim blnContinueCompare As Boolean
-
-Dim lngInternalStdMatchCount As Long
-Dim MassTagExpCnt As Long
-Dim InternalStdExpCnt As Long
-Dim strCaptionSaved As String
-Dim strExportStatus As String
-
-'ADO objects for stored procedure adding Match Making row
-Dim cnNew As New ADODB.Connection
-
-Dim sngDBSchemaVersion As Single
-
-'ADO objects for stored procedure that adds FTICR UMC rows
-Dim cmdPutNewUMC As New ADODB.Command
-Dim udtPutUMCParams As udtPutUMCParamsListType
+Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optional blnUpdateGANETForAnalysisInDB As Boolean = True, Optional ByVal blnExportUMCMembers As Boolean = False, Optional ByRef lngErrorNumber As Long, Optional ByVal blnAddQuantitationDescriptionEntry As Boolean = True, Optional ByVal blnExportUMCsWithNoMatches As Boolean = True, Optional ByVal strIniFileName As String = "") As String
+    '---------------------------------------------------
+    'This function will export data to the T_FTICR_UMC_Results table, T_FTICR_UMC_ResultDetails table,
+    '  and T_FTICR_UMC_InternalStandardDetails table
+    '
+    'It will create a new entry in T_Match_Making_Description
+    'If blnAddQuantitationDescriptionEntry = True, then calls ExportMTDBAddQuantitationDescriptionEntry
+    '  to create a new entry in T_Quantitation_Description and T_Quantitation_MDIDs
+    '
+    'Returns a status message
+    'lngErrorNumber will contain the error number, if an error occurs
+    '---------------------------------------------------
+    Dim lngPointer As Long, lngUMCIndex As Long
+    Dim lngUMCIndexCompare As Long
+    Dim lngUMCIndexOriginal As Long
+    Dim lngUMCIndexOriginalLastStored As Long
     
-'ADO objects for stored procedure that adds FTICR UMC member rows
-Dim cmdPutNewUMCMember As New ADODB.Command
-Dim udtPutUMCMemberParams As udtPutUMCMemberParamsListType
+    Dim lngUMCIndexOriginalPairOther As Long
+    Dim lngPeakFPRType As Long
     
-'ADO objects for stored procedure adding FTICR UMC Details
-Dim cmdPutNewUMCMatch As New ADODB.Command
-Dim udtPutUMCMatchParams As udtPutUMCMatchParamsListType
-
-'ADO objects for stored procedure adding FTICR UMC Internal Standard Details
-Dim cmdPutNewUMCInternalStdMatch As New ADODB.Command
-Dim udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType
-
-'ADO objects for stored procedure adding FTICR UMC CS Stats
-Dim cmdPutNewUMCCSStats As New ADODB.Command
-Dim udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType
-
-Dim blnUMCMatchFound() As Boolean       ' 0-based array, used to keep track of whether or not the UMC matched any MT tags or Internal Standards
-
-On Error GoTo err_ExportMTDBbyUMC
-
-strCaptionSaved = Me.Caption
-
-' Connect to the database
-Me.Caption = "Connecting to the database"
-If Not EstablishConnection(cnNew, GelAnalysis(CallerID).MTDB.cn.ConnectionString, False) Then
-    Debug.Assert False
-    lngErrorNumber = -1
-    Me.Caption = strCaptionSaved
-    ExportMTDBbyUMCToUMCResultsTable = "Error: Unable to establish a connection to the database"
-    Exit Function
-End If
-
-' Lookup the DB Schema Version
-sngDBSchemaVersion = LookupDBSchemaVersion(cnNew)
-
-If sngDBSchemaVersion < 2 Then
-    ' Force UMC Member export to be false
-    blnExportUMCMembers = False
-End If
-
-If blnCreateNewEntryInMMDTable Then
-    'first write new analysis in T_Match_Making_Description table
-    lngErrorNumber = AddEntryToMatchMakingDescriptionTable(cnNew, lngMDID, ExpAnalysisSPName, CallerID, CountMassTagsInUMCMatchStats(), mSearchUsedCustomNETs, True, strIniFileName)
-Else
-    lngErrorNumber = 0
-End If
-
-If lngErrorNumber <> 0 Then
-    Debug.Assert False
-    GoTo err_Cleanup
-End If
-
-If blnCreateNewEntryInMMDTable Or mMatchStatsCount > 0 Or blnExportUMCsWithNoMatches Then
-    ' MonroeMod
-    AddToAnalysisHistory CallerID, "Exported LC-MS Feature Identification results (single UMC mass) to UMC Results table in database (" & ExtractDBNameFromConnectionString(GelAnalysis(CallerID).MTDB.cn.ConnectionString) & "); MMD_ID = " & lngMDID
-    If blnCreateNewEntryInMMDTable Then
+    Dim lngPairIndex As Long
+    
+    Dim objP1IndFastSearch As FastSearchArrayLong
+    Dim objP2IndFastSearch As FastSearchArrayLong
+    Dim blnPairsPresent As Boolean
+    Dim blnReturnAllPairInstances As Boolean
+    Dim blnFavorHeavy As Boolean
+    
+    Dim lngPairMatchCount As Long, lngPairMatchIndex As Long
+    Dim udtPairMatchStats() As udtPairMatchStatsType
+    Dim lngUMCResultsIDReturn() As Long
+    Dim lngMatchHitCount As Long
+    
+    Dim blnContinueCompare As Boolean
+    
+    Dim lngInternalStdMatchCount As Long
+    Dim MassTagExpCnt As Long
+    Dim InternalStdExpCnt As Long
+    Dim strCaptionSaved As String
+    Dim strExportStatus As String
+    
+    'ADO objects for stored procedure adding Match Making row
+    Dim cnNew As New ADODB.Connection
+    
+    Dim sngDBSchemaVersion As Single
+    
+    'ADO objects for stored procedure that adds FTICR UMC rows
+    Dim cmdPutNewUMC As New ADODB.Command
+    Dim udtPutUMCParams As udtPutUMCParamsListType
+        
+    'ADO objects for stored procedure that adds FTICR UMC member rows
+    Dim cmdPutNewUMCMember As New ADODB.Command
+    Dim udtPutUMCMemberParams As udtPutUMCMemberParamsListType
+        
+    'ADO objects for stored procedure adding FTICR UMC Details
+    Dim cmdPutNewUMCMatch As New ADODB.Command
+    Dim udtPutUMCMatchParams As udtPutUMCMatchParamsListType
+    
+    'ADO objects for stored procedure adding FTICR UMC Internal Standard Details
+    Dim cmdPutNewUMCInternalStdMatch As New ADODB.Command
+    Dim udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType
+    
+    'ADO objects for stored procedure adding FTICR UMC CS Stats
+    Dim cmdPutNewUMCCSStats As New ADODB.Command
+    Dim udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType
+    
+    Dim blnUMCMatchFound() As Boolean       ' 0-based array, used to keep track of whether or not the UMC matched any MT tags or Internal Standards
+    Dim blnSetStateToOK As Boolean
+    Dim blnOverrideMassNETTolerance As Boolean
+    
+    On Error GoTo err_ExportMTDBbyUMC
+    
+    strCaptionSaved = Me.Caption
+    
+    ' Connect to the database
+    Me.Caption = "Connecting to the database"
+    If Not EstablishConnection(cnNew, GelAnalysis(CallerID).MTDB.cn.ConnectionString, False) Then
+        Debug.Assert False
+        lngErrorNumber = -1
+        Me.Caption = strCaptionSaved
+        ExportMTDBbyUMCToUMCResultsTable = "Error: Unable to establish a connection to the database"
+        Exit Function
+    End If
+    
+    ' Lookup the DB Schema Version
+    sngDBSchemaVersion = LookupDBSchemaVersion(cnNew)
+    
+    If sngDBSchemaVersion < 2 Then
+        ' Force UMC Member export to be false
+        blnExportUMCMembers = False
+    End If
+    
+    ' First write new analysis in T_Match_Making_Description table
+    blnSetStateToOK = True
+    blnOverrideMassNETTolerance = GelData(CallerID).MostRecentSearchUsedSTAC
+    lngMatchHitCount = CountMassTagsInUMCMatchStats()
+    
+    lngErrorNumber = AddEntryToMatchMakingDescriptionTableEx(cnNew, lngMDID, ExpAnalysisSPName, CallerID, _
+                                                             lngMatchHitCount, mSearchUsedCustomNETs, _
+                                                             blnSetStateToOK, strIniFileName, _
+                                                             blnOverrideMassNETTolerance, _
+                                                             mSearchSummaryStats.MassToleranceFromSTAC, _
+                                                             mSearchSummaryStats.NETToleranceFromSTAC)
+    
+    If lngErrorNumber <> 0 Then
+        Debug.Assert False
+        GoTo err_Cleanup
+    End If
+    
+    If mMatchStatsCount > 0 Or blnExportUMCsWithNoMatches Then
+        ' MonroeMod
+        AddToAnalysisHistory CallerID, "Exported LC-MS Feature Identification results (single UMC mass) to UMC Results table in database (" & ExtractDBNameFromConnectionString(GelAnalysis(CallerID).MTDB.cn.ConnectionString) & "); MMD_ID = " & lngMDID
         AddToAnalysisHistory CallerID, "Export to MMD table details: Reference Job = " & GelAnalysis(CallerID).MD_Reference_Job & "; MD_File = " & GelAnalysis(CallerID).MD_file
     End If
-End If
-
-'nothing to export
-If mMatchStatsCount <= 0 And Not blnExportUMCsWithNoMatches Then
-    cnNew.Close
-    Me.Caption = strCaptionSaved
-    Exit Function
-End If
-
-' Initialize cmdPutNewUMC and all of the params in udtPutUMCParams
-ExportMTDBInitializePutNewUMCParams cnNew, cmdPutNewUMC, udtPutUMCParams, lngMDID, ExpUmcSPName
-
-' Initialize the variables for accessing the AddFTICRUmcMember SP
-ExportMTDBInitializePutNewUMCMemberParams cnNew, cmdPutNewUMCMember, udtPutUMCMemberParams, ExpUMCMemberSPName
-
-' Initialize the variables for accessing the AddFTICRUmcMatch SP
-ExportMTDBInitializePutUMCMatchParams cnNew, cmdPutNewUMCMatch, udtPutUMCMatchParams, ExpUmcMatchSPName
-
-' Initialize the variables for accessing the AddFTICRUmcInternalStdMatch SP
-ExportMTDBInitializePutUMCInternalStdMatchParams cnNew, cmdPutNewUMCInternalStdMatch, udtPutUMCInternalStdMatchParams, ExpUmcInternalStdMatchSPName
-
-' Initialize the variables for accessing the AddFTICRUmcCSStats SP
-ExportMTDBInitializePutUMCCSStatsParams cnNew, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, ExpUMCCSStats
-
-' Initialize the PairIndex lookup objects
-blnPairsPresent = PairIndexLookupInitialize(CallerID, objP1IndFastSearch, objP2IndFastSearch)
-
-Select Case LastSearchTypeN14N15
-Case SEARCH_N14
-     NTypeStr = MOD_TKN_N14
-Case SEARCH_N15
-     NTypeStr = MOD_TKN_N15
-End Select
-
-Me.Caption = "Exporting LC-MS Features to DB: 0 / " & Trim(mMatchStatsCount)
-
-'now export data
-MassTagExpCnt = 0
-InternalStdExpCnt = 0
+    
+    'nothing to export
+    If mMatchStatsCount <= 0 And Not blnExportUMCsWithNoMatches Then
+        cnNew.Close
+        Me.Caption = strCaptionSaved
+        Exit Function
+    End If
+    
+    ' Initialize cmdPutNewUMC and all of the params in udtPutUMCParams
+    ExportMTDBInitializePutNewUMCParams cnNew, cmdPutNewUMC, udtPutUMCParams, lngMDID, ExpUmcSPName
+    
+    ' Initialize the variables for accessing the AddFTICRUmcMember SP
+    ExportMTDBInitializePutNewUMCMemberParams cnNew, cmdPutNewUMCMember, udtPutUMCMemberParams, ExpUMCMemberSPName
+    
+    ' Initialize the variables for accessing the AddFTICRUmcMatch SP
+    ExportMTDBInitializePutUMCMatchParams cnNew, cmdPutNewUMCMatch, udtPutUMCMatchParams, ExpUmcMatchSPName
+    
+    ' Initialize the variables for accessing the AddFTICRUmcInternalStdMatch SP
+    ExportMTDBInitializePutUMCInternalStdMatchParams cnNew, cmdPutNewUMCInternalStdMatch, udtPutUMCInternalStdMatchParams, ExpUmcInternalStdMatchSPName
+    
+    ' Initialize the variables for accessing the AddFTICRUmcCSStats SP
+    ExportMTDBInitializePutUMCCSStatsParams cnNew, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, ExpUMCCSStats
+    
+    
+    ' Initialize the PairIndex lookup objects
+    blnPairsPresent = PairIndexLookupInitialize(CallerID, objP1IndFastSearch, objP2IndFastSearch)
+    
+    Select Case LastSearchTypeN14N15
+    Case SEARCH_N14
+         NTypeStr = MOD_TKN_N14
+    Case SEARCH_N15
+         NTypeStr = MOD_TKN_N15
+    End Select
+    
+    
+    If GelData(CallerID).MostRecentSearchUsedSTAC Then
+        ' Populate T_Match_Making_FDR
+        Me.Caption = "Exporting STAC Stats to DB"
+        ExportMTDBStoreSTACStats cnNew, lngMDID
+    End If
+     
+    
+    Me.Caption = "Exporting LC-MS Features to DB: 0 / " & Trim(mMatchStatsCount)
+    
+    'now export data
+    MassTagExpCnt = 0
+    InternalStdExpCnt = 0
 
     ' Step through the UMC hits and export information on each hit
     ' mUMCMatchStats() will contain multiple entries for each UMC if the UMC matched multiple MT tags
@@ -2312,33 +2450,33 @@ InternalStdExpCnt = 0
         End With
     End If
 
-' MonroeMod
-AddToAnalysisHistory CallerID, "Export to LC-MS Feature Results table details: MT tags Match Count = " & MassTagExpCnt & "; Internal Std Match Count = " & InternalStdExpCnt
-
-Me.Caption = strCaptionSaved
-
-strExportStatus = MassTagExpCnt & " associations between MT tags and LC-MS Features exported (" & Trim(InternalStdExpCnt) & " Internal Standards)."
-Set cmdPutNewUMC.ActiveConnection = Nothing
-Set cmdPutNewUMCMatch.ActiveConnection = Nothing
-cnNew.Close
-
-If blnUpdateGANETForAnalysisInDB Then
-    ' Export the the GANET Slope, Intercept, and Fit to the database
-    With GelAnalysis(CallerID)
-        strExportStatus = strExportStatus & vbCrLf & ExportGANETtoMTDB(CallerID, .GANET_Slope, .GANET_Intercept, .GANET_Fit)
-    End With
-End If
-
-If blnAddQuantitationDescriptionEntry Then
-    If lngErrorNumber = 0 And lngMDID >= 0 And (MassTagExpCnt > 0 Or InternalStdExpCnt > 0) Then
-        ExportMTDBAddQuantitationDescriptionEntry Me, CallerID, ExpQuantitationDescription, lngMDID, lngErrorNumber, strIniFileName, 1, 1, 1, Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled
+    ' MonroeMod
+    AddToAnalysisHistory CallerID, "Export to LC-MS Feature Results table details: MT tags Match Count = " & MassTagExpCnt & "; Internal Std Match Count = " & InternalStdExpCnt
+    
+    Me.Caption = strCaptionSaved
+    
+    strExportStatus = MassTagExpCnt & " associations between MT tags and LC-MS Features exported (" & Trim(InternalStdExpCnt) & " Internal Standards)."
+    Set cmdPutNewUMC.ActiveConnection = Nothing
+    Set cmdPutNewUMCMatch.ActiveConnection = Nothing
+    cnNew.Close
+    
+    If blnUpdateGANETForAnalysisInDB Then
+        ' Export the the GANET Slope, Intercept, and Fit to the database
+        With GelAnalysis(CallerID)
+            strExportStatus = strExportStatus & vbCrLf & ExportGANETtoMTDB(CallerID, .GANET_Slope, .GANET_Intercept, .GANET_Fit)
+        End With
     End If
-End If
-
-ExportMTDBbyUMCToUMCResultsTable = strExportStatus
-lngErrorNumber = 0
-Set objP1IndFastSearch = Nothing
-Set objP2IndFastSearch = Nothing
+    
+    If blnAddQuantitationDescriptionEntry Then
+        If lngErrorNumber = 0 And lngMDID >= 0 And (MassTagExpCnt > 0 Or InternalStdExpCnt > 0) Then
+            ExportMTDBAddQuantitationDescriptionEntry Me, CallerID, ExpQuantitationDescription, lngMDID, lngErrorNumber, strIniFileName, 1, 1, 1, Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled
+        End If
+    End If
+    
+    ExportMTDBbyUMCToUMCResultsTable = strExportStatus
+    lngErrorNumber = 0
+    Set objP1IndFastSearch = Nothing
+    Set objP2IndFastSearch = Nothing
 
 Exit Function
 
@@ -2379,6 +2517,7 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
         udtPutUMCInternalStdMatchParams.ExpectedNET.Value = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).NET
         udtPutUMCInternalStdMatchParams.DelMatchScore.Value = mUMCMatchStats(lngPointer).DelScore
         udtPutUMCInternalStdMatchParams.UniquenessProbability.Value = CSng(mUMCMatchStats(lngPointer).UniquenessProbability)
+        udtPutUMCInternalStdMatchParams.FDRThreshold.Value = CSng(mUMCMatchStats(lngPointer).FDRThreshold)
         
         cmdPutNewUMCInternalStdMatch.Execute
         
@@ -2413,6 +2552,7 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
         
         udtPutUMCMatchParams.DelMatchScore.Value = mUMCMatchStats(lngPointer).DelScore
         udtPutUMCMatchParams.UniquenessProbability.Value = CSng(mUMCMatchStats(lngPointer).UniquenessProbability)
+        udtPutUMCMatchParams.FDRThreshold.Value = CSng(mUMCMatchStats(lngPointer).FDRThreshold)
         
         cmdPutNewUMCMatch.Execute
     
@@ -2420,9 +2560,66 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
 
 End Function
 
-Private Sub GenerateUniqueMatchStats(ByRef lngUniqueUMCCount As Long, ByRef lngUniquePMTTagCount As Long, ByRef lngUniqueInternalStdCount As Long)
+ 
+Private Sub ExportMTDBStoreSTACStats(ByRef cnNew As ADODB.Connection, ByVal lngMDID As Long)
+
+    ' Adds new rows to the T_Match_Making_FDR table
+ 
+    Dim cmdStoreSTACStats As New ADODB.Command
+    Dim udtStoreSTACStatsParams As udtStoreSTACStatsParamsListType
+    
+    Dim lngIndex As Long
+    
+     ' Initialize the variables for accessing the AddMatchMakingFDR SP
+    ExportMTDBInitializeStoreSTACStats cnNew, cmdStoreSTACStats, udtStoreSTACStatsParams, ExpStoreSTACStats
+
+
+On Error GoTo AddMatchMakingFDRRowErrorHandler
+
+
+    udtStoreSTACStatsParams.MDID = lngMDID
+    
+    For lngIndex = 0 To STACStatsCount - 1
+            
+        ' Note: Dividing the FDR values by 100 prior to storing in the DB
+        
+        With STACStats(lngIndex)
+            udtStoreSTACStatsParams.STACCutoff = .STACCuttoff
+            udtStoreSTACStatsParams.Matches = .Matches
+            udtStoreSTACStatsParams.Errors = .Errors
+            udtStoreSTACStatsParams.FDR = .FDR / 100#
+            
+            udtStoreSTACStatsParams.UPFilteredMatches = .UP_Filtered_Matches
+            udtStoreSTACStatsParams.UPFilteredErrors = .UP_Filtered_Errors
+            udtStoreSTACStatsParams.UPFilteredFDR = .UP_Filtered_FDR / 100#
+            
+        End With
+        
+        cmdStoreSTACStats.Execute
+        
+    Next lngIndex
+
+    Exit Sub
+
+AddMatchMakingFDRRowErrorHandler:
+    ' Error populating or executing cmdStoreSTACStats
+    
+    Debug.Assert False
+    
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->ExportMTDBStoreSTACStats"
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error storing STAC results in the database: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
+    End If
+    
+End Sub
+
+Private Sub GenerateUniqueMatchStats()
     ' Determine the number of LC-MS Features with at least one match,
     ' the unique number of MT tags matched, and the unique number of Internal Standards matched
+    
+    Dim htMTHitList1Pct As Dictionary
+    Dim htMTHitList5Pct As Dictionary
+    Dim htMTHitList10Pct As Dictionary
     
     Dim blnUMCHasMatch() As Boolean
     Dim blnPMTTagMatched() As Boolean
@@ -2433,12 +2630,37 @@ Private Sub GenerateUniqueMatchStats(ByRef lngUniqueUMCCount As Long, ByRef lngU
     Dim lngInternalStdIndexOriginal As Long
     Dim lngMassTagIndexPointer As Long
     Dim lngMassTagIndexOriginal As Long
+     
+On Error GoTo GenerateUniqueMatchStatsErrorHandler
+
+    With mSearchSummaryStats
+        .UMCCountWithHits = 0
+        .UniqueMTCount = 0
+        .UniqueIntStdCount = 0
+        .UniqueMTCount1PctFDR = 0
+        .UniqueMTCount5PctFDR = 0
+        .UniqueMTCount10PctFDR = 0
+        
+        ' Don't clear .MassToleranceFromSTAC or .NETToleranceFromSTAC; they've already been populated
+    End With
     
     ReDim blnUMCHasMatch(GelUMC(CallerID).UMCCnt - 1) As Boolean
+    
     ReDim blnPMTTagMatched(AMTCnt) As Boolean
     If UMCInternalStandards.Count > 0 Then
         ReDim blnInternalStdMatched(UMCInternalStandards.Count - 1) As Boolean
+    Else
+        ReDim blnInternalStdMatched(0)
     End If
+    
+     ' The following are populated with features passing a given FDR Threshold
+    Set htMTHitList1Pct = New Dictionary
+    Set htMTHitList5Pct = New Dictionary
+    Set htMTHitList10Pct = New Dictionary
+    
+    htMTHitList1Pct.RemoveAll
+    htMTHitList5Pct.RemoveAll
+    htMTHitList10Pct.RemoveAll
     
     For lngIndex = 0 To mMatchStatsCount - 1
         lngUMCIndexOriginal = mUMCMatchStats(lngIndex).UMCIndex
@@ -2466,25 +2688,56 @@ Private Sub GenerateUniqueMatchStats(ByRef lngUniqueUMCCount As Long, ByRef lngU
                 ' Invalid MT tag index
                 Debug.Assert False
             End If
+       
+            If mUMCMatchStats(lngIndex).FDRThreshold <= 0.1 Then
+                If Not htMTHitList10Pct.Exists(lngMassTagIndexOriginal) Then
+                    htMTHitList10Pct.add lngMassTagIndexOriginal, 1
+                End If
+                
+                If mUMCMatchStats(lngIndex).FDRThreshold <= 0.05 Then
+                    If Not htMTHitList5Pct.Exists(lngMassTagIndexOriginal) Then
+                        htMTHitList5Pct.add lngMassTagIndexOriginal, 1
+                    End If
+                       
+                    If mUMCMatchStats(lngIndex).FDRThreshold <= 0.01 Then
+                        If Not htMTHitList1Pct.Exists(lngMassTagIndexOriginal) Then
+                            htMTHitList1Pct.add lngMassTagIndexOriginal, 1
+                        End If
+                    End If
+                End If
+            End If
+            
         End If
     Next lngIndex
     
-    lngUniqueUMCCount = 0
-    For lngIndex = 0 To UBound(blnUMCHasMatch)
-        If blnUMCHasMatch(lngIndex) Then lngUniqueUMCCount = lngUniqueUMCCount + 1
-    Next lngIndex
-    
-    lngUniquePMTTagCount = 0
-    For lngIndex = 0 To UBound(blnPMTTagMatched)
-        If blnPMTTagMatched(lngIndex) Then lngUniquePMTTagCount = lngUniquePMTTagCount + 1
-    Next lngIndex
-    
-    lngUniqueInternalStdCount = 0
-    If UMCInternalStandards.Count > 0 Then
-        For lngIndex = 0 To UBound(blnInternalStdMatched)
-            If blnInternalStdMatched(lngIndex) Then lngUniqueInternalStdCount = lngUniqueInternalStdCount + 1
+    With mSearchSummaryStats
+        .UMCCountWithHits = 0
+        For lngIndex = 0 To UBound(blnUMCHasMatch)
+            If blnUMCHasMatch(lngIndex) Then .UMCCountWithHits = .UMCCountWithHits + 1
         Next lngIndex
-    End If
+        
+        .UniqueMTCount = 0
+        For lngIndex = 0 To UBound(blnPMTTagMatched)
+            If blnPMTTagMatched(lngIndex) Then .UniqueMTCount = .UniqueMTCount + 1
+        Next lngIndex
+        
+        .UniqueIntStdCount = 0
+        If UMCInternalStandards.Count > 0 Then
+            For lngIndex = 0 To UBound(blnInternalStdMatched)
+                If blnInternalStdMatched(lngIndex) Then .UniqueIntStdCount = .UniqueIntStdCount + 1
+            Next lngIndex
+        End If
+        
+        .UniqueMTCount1PctFDR = htMTHitList1Pct.Count
+        .UniqueMTCount5PctFDR = htMTHitList5Pct.Count
+        .UniqueMTCount10PctFDR = htMTHitList10Pct.Count
+    End With
+    
+    Exit Sub
+
+GenerateUniqueMatchStatsErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "GenerateUniqueMatchStats"
     
 End Sub
 
@@ -2516,6 +2769,28 @@ Private Function GetTempReportFilePath() As String
     GetTempReportFilePath = strTempReportFilePath
     
 End Function
+
+Public Sub GetSummaryStats(ByRef UMCCountWithHits As Long, _
+                           ByRef UniqueMTCount As Long, _
+                           ByRef UniqueIntStdCount As Long, _
+                           ByRef UniqueMTCount1PctFDR As Long, _
+                           ByRef UniqueMTCount5PctFDR As Long, _
+                           ByRef UniqueMTCount10PctFDR As Long, _
+                           ByRef MassToleranceFromSTAC As Double, _
+                           ByRef NETToleranceFromSTAC As Double)
+                            
+    With mSearchSummaryStats
+        UMCCountWithHits = .UMCCountWithHits
+        UniqueMTCount = .UniqueMTCount
+        UniqueIntStdCount = .UniqueIntStdCount
+        UniqueMTCount1PctFDR = .UniqueMTCount1PctFDR
+        UniqueMTCount5PctFDR = .UniqueMTCount5PctFDR
+        UniqueMTCount10PctFDR = .UniqueMTCount10PctFDR
+        MassToleranceFromSTAC = .MassToleranceFromSTAC
+        NETToleranceFromSTAC = .NETToleranceFromSTAC
+    End With
+    
+End Sub
 
 Private Function GetTokenValue(ByVal S As String, ByVal t As String) As Long
 '---------------------------------------------------------------------------
@@ -2716,10 +2991,14 @@ Private Sub InitializeSTACStatsListView()
     lvwSTACStats.ColumnHeaders.Clear
     
     lvwSTACStats.ColumnHeaders.add , , "Cutoff", 800
+    
     lvwSTACStats.ColumnHeaders.add , , "Matches", 900
     lvwSTACStats.ColumnHeaders.add , , "Errors", 900
     lvwSTACStats.ColumnHeaders.add , , "FDR %", 800
     
+    lvwSTACStats.ColumnHeaders.add , , "Matches, UP>0.5", 1100
+    lvwSTACStats.ColumnHeaders.add , , "Errors, UP>0.5", 1100
+    lvwSTACStats.ColumnHeaders.add , , "FDR %, UP>0.5", 1000
     
 End Sub
 
@@ -2830,7 +3109,8 @@ Private Function LoadSTACLogFile(ByRef fso As FileSystemObject, _
     
     Dim strLineIn As String
     Dim strMessage As String
-    
+   Dim dblValue As Double
+   
 On Error GoTo LoadSTACLogFileErrorHandler
 
     ' Read the log messages from STAC
@@ -2844,19 +3124,29 @@ On Error GoTo LoadSTACLogFileErrorHandler
         Do While Not ts.AtEndOfStream
             strLineIn = ts.ReadLine
             
-            If Len(strLineIn) >= 5 Then
-                If UCase(Left(strLineIn, 5)) = "ERROR" Then
-                    Debug.Assert False
+            If StartsWith(strLineIn, "Error") Then
+                Debug.Assert False
                     
-                    If lngErrorCount = 0 Then
-                        AddToAnalysisHistory CallerID, "STAC log file contains error messages:"
-                    End If
-                    
-                    AddToAnalysisHistory CallerID, "  " & strLineIn
-                    
-                    lngErrorCount = lngErrorCount + 1
+                If lngErrorCount = 0 Then
+                    AddToAnalysisHistory CallerID, "STAC log file contains error messages:"
                 End If
+                
+                AddToAnalysisHistory CallerID, "  " & strLineIn
+                
+                lngErrorCount = lngErrorCount + 1
+                
+            ElseIf StartsWith(strLineIn, "ToleranceNET") Then
+                If LoadSTACLogFileGetValue(strLineIn, dblValue) Then
+                    mSearchSummaryStats.NETToleranceFromSTAC = dblValue
+                End If
+                
+            ElseIf StartsWith(strLineIn, "ToleranceMassPPM") Then
+                If LoadSTACLogFileGetValue(strLineIn, dblValue) Then
+                    mSearchSummaryStats.MassToleranceFromSTAC = dblValue
+                End If
+                
             End If
+            
         Loop
     
         ts.Close
@@ -2877,8 +3167,32 @@ LoadSTACLogFileErrorHandler:
     
 End Function
 
+Private Function LoadSTACLogFileGetValue(ByVal strText As String, ByRef dblValue As Double) As Boolean
+    Dim strSplitLine() As String
+    
+On Error GoTo LoadSTACLogFileGetValueErrorHandler
+    strSplitLine = Split(strText, ":")
+    
+    If UBound(strSplitLine) > 0 Then
+        If IsNumeric(strSplitLine(1)) Then
+            dblValue = CDbl(strSplitLine(1))
+            LoadSTACLogFileGetValue = True
+        Else
+            LoadSTACLogFileGetValue = False
+        End If
+    Else
+        LoadSTACLogFileGetValue = False
+    End If
+    
+    Exit Function
+    
+LoadSTACLogFileGetValueErrorHandler:
+    Debug.Assert False
+    LoadSTACLogFileGetValue = False
+
+End Function
+
 Private Function LoadSTACResults(ByRef fso As FileSystemObject, _
-                                 ByVal eSearchMode As eSearchModeConstants, _
                                  ByVal strSTACDataFilePath As String) As Boolean
 
     Dim ts As TextStream
@@ -2978,7 +3292,7 @@ On Error GoTo LoadSTACResultsErrorHandler
                     mCurrIDMatches(mCurrIDCnt).MassErr = dblMassError
                     mCurrIDMatches(mCurrIDCnt).NETErr = dblNETError
                     mCurrIDMatches(mCurrIDCnt).UniquenessProbability = dblUP
-                    
+
                     If mCurrIDMatches(mCurrIDCnt).IDIsInternalStd Then
                         lngInternalStdIndexOriginal = mInternalStdIndexPointers(mCurrIDMatches(mCurrIDCnt).IDInd)
                         dblMatchMass = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).MonoisotopicMass
@@ -3059,7 +3373,6 @@ LoadSTACResultsErrorHandler:
 End Function
 
 Private Function LoadSTACStats(ByRef fso As FileSystemObject, _
-                               ByVal eSearchMode As eSearchModeConstants, _
                                ByVal strSTACFDRFilePath As String) As Boolean
 
     Dim ts As TextStream
@@ -3072,10 +3385,15 @@ Private Function LoadSTACStats(ByRef fso As FileSystemObject, _
     Dim strSplitLine() As String
     
     Dim dblCutoff As Double
+    
     Dim lngMatches As Long
     Dim dblErrors As Double
     Dim dblFDR As Double
 
+    Dim lngUPFilteredMatches As Long
+    Dim dblUPFilteredErrors As Double
+    Dim dblUPFilteredFDR As Double
+    
     Dim blnValidData As Boolean
     
     Dim lstNewItem As MSComctlLib.ListItem
@@ -3086,8 +3404,8 @@ On Error GoTo LoadSTACStatsErrorHandler
     
     lvwSTACStats.ListItems.Clear
     
-    mSTACStatsCount = 0
-    ReDim mSTACStats(50)
+    STACStatsCount = 0
+    ReDim STACStats(50)
     
     Set ts = fso.OpenTextFile(strSTACFDRFilePath, ForReading, False)
     
@@ -3102,14 +3420,20 @@ On Error GoTo LoadSTACStatsErrorHandler
                                                       dblCutoff, _
                                                       lngMatches, _
                                                       dblErrors, _
-                                                      dblFDR)
+                                                      dblFDR, _
+                                                      lngUPFilteredMatches, _
+                                                      dblUPFilteredErrors, _
+                                                      dblUPFilteredFDR)
                 
                 If blnValidData Then
-                    With mSTACStats(mSTACStatsCount)
+                    With STACStats(STACStatsCount)
                         .STACCuttoff = dblCutoff
                         .Matches = lngMatches
                         .Errors = dblErrors
                         .FDR = dblFDR
+                        .UP_Filtered_Matches = lngUPFilteredMatches
+                        .UP_Filtered_Errors = dblUPFilteredErrors
+                        .UP_Filtered_FDR = dblUPFilteredFDR
                     End With
                     
                     Set lstNewItem = lvwSTACStats.ListItems.add(, , Round(dblCutoff, 2))
@@ -3118,7 +3442,11 @@ On Error GoTo LoadSTACStatsErrorHandler
                     lstNewItem.SubItems(2) = Round(dblErrors, 1)
                     lstNewItem.SubItems(3) = Round(dblFDR, 2)
 
-                    mSTACStatsCount = mSTACStatsCount + 1
+                    lstNewItem.SubItems(4) = lngUPFilteredMatches
+                    lstNewItem.SubItems(5) = Round(dblUPFilteredErrors, 1)
+                    lstNewItem.SubItems(6) = Round(dblUPFilteredFDR, 2)
+
+                    STACStatsCount = STACStatsCount + 1
                 End If
             End If
         End If
@@ -3185,7 +3513,10 @@ Private Function LoadSTACStatsParseLine(ByRef strSplitLine() As String, _
                                         ByRef dblCutoff As Double, _
                                         ByRef lngMatches As Long, _
                                         ByRef dblErrors As Double, _
-                                        ByRef dblFDR As Double) As Boolean
+                                        ByRef dblFDR As Double, _
+                                        ByRef lngUPFilteredMatches As Long, _
+                                        ByRef dblUPFilteredErrors As Double, _
+                                        ByRef dblUPFilteredFDR As Double) As Boolean
     
     Dim blnValidData As Boolean
     
@@ -3200,6 +3531,10 @@ On Error GoTo LoadSTACStatsParseLineErrorHandler
         lngMatches = CLng(strSplitLine(1))
         dblErrors = CDbl(strSplitLine(2))
         dblFDR = CDbl(strSplitLine(3))
+          
+        lngUPFilteredMatches = CLng(strSplitLine(4))
+        dblUPFilteredErrors = CDbl(strSplitLine(5))
+        dblUPFilteredFDR = CDbl(strSplitLine(6))
         
         blnValidData = True
     
@@ -3357,6 +3692,17 @@ On Error GoTo PerformSearchErrorHandler
     ' Initialize mUMCMatchStats
     ReDim mUMCMatchStats(100)
     
+    With mSearchSummaryStats
+        .UMCCountWithHits = 0
+        .UniqueMTCount = 0
+        .UniqueIntStdCount = 0
+        .UniqueMTCount1PctFDR = 0
+        .UniqueMTCount5PctFDR = 0
+        .UniqueMTCount10PctFDR = 0
+        .MassToleranceFromSTAC = 0
+        .NETToleranceFromSTAC = 0
+    End With
+
     Select Case eSearchMode
         Case eSearchModeAll
             SearchType = SEARCH_ALL
@@ -3418,10 +3764,9 @@ On Error GoTo PerformSearchErrorHandler
         mUMCCountSkippedSinceRefPresent = 0
         txtUniqueMatchStats.Text = ""
 
-        mSTACStatsCount = 0
+        STACStatsCount = 0
         lvwSTACStats.ListItems.Clear
-        ctlSTACStats.Plots(1).ClearData
-        ctlSTACStats.Plots(2).ClearData
+        ctlSTACStats.ClearData
     
         If Me.UseSTAC Then
             ' Search the UMCs using STAC
@@ -3432,7 +3777,7 @@ On Error GoTo PerformSearchErrorHandler
             GelData(CallerID).MostRecentSearchUsedSTAC = False
             SearchUMCsUsingVIPER eSearchMode
         End If
-        
+
         LastSearchTypeN14N15 = N14N15
 
         Select Case eSearchMode
@@ -3555,9 +3900,18 @@ End Sub
 
 Private Sub PositionControls()
         
+    Dim lngNewValue As Long
+    
     ctlSTACStats.Height = CheckVsMinimum(Me.ScaleHeight - ctlSTACStats.Top - 75, 2500)
     ctlSTACStats.width = CheckVsMinimum(Me.ScaleWidth - ctlSTACStats.Left - 75, 2500)
 
+    fraSTACPlotOptions.Left = CheckVsMinimum(Me.ScaleWidth - fraSTACPlotOptions.width - 25, 8500)
+    
+    cmdCopySTACSTats.Left = fraSTACPlotOptions.Left
+    cmdZoomOutSTACPlot.Left = fraSTACPlotOptions.Left
+    
+    lvwSTACStats.width = CheckVsMinimum(fraSTACPlotOptions.Left - lvwSTACStats.Left - 50, 500)
+    
 End Sub
 
 Private Function PossiblyQuotePath(ByVal strPath As String) As String
@@ -4625,7 +4979,7 @@ Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal 
                 mCurrIDMatches(mCurrIDCnt).NETErr = dblNETDifference
                 mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = blnIsInternalStdMatch
                 mCurrIDMatches(mCurrIDCnt).UniquenessProbability = 0
-                
+
                 mCurrIDCnt = mCurrIDCnt + 1
                 
                 blnFirstMatchFound = True
@@ -5087,16 +5441,19 @@ On Error GoTo SearchUMCsUsingSTACLoadResultsErrorHandler
 
     If blnLoadResults Then
         ' Load the STAC peak matching results
-        blnSuccess = LoadSTACResults(fso, eSearchMode, strSTACDataFilePath)
+        blnSuccess = LoadSTACResults(fso, strSTACDataFilePath)
             
         ' Load the STAC FDR stats
-        blnSuccess = LoadSTACStats(fso, eSearchMode, strSTACFDRFilePath)
+        blnSuccess = LoadSTACStats(fso, strSTACFDRFilePath)
         
         ' Update the STAC FDR Plot
         If blnSuccess Then
             UpdateSTACPlot
             AutoSizeForm
         End If
+    
+        ' Compute the peptide-level FDR values
+        blnSuccess = ComputePeptideLevelSTACFDR()
     Else
         blnSuccess = False
     End If
@@ -5263,6 +5620,8 @@ Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean
         End With
     End If
     
+    Me.STACUsesPriorProbability = True
+    
     cboAMTSearchResultsBehavior.ListIndex = asrbAMTSearchResultsBehaviorConstants.asrbAutoRemoveExisting
     
     If blnUseToleranceRefinementSettings Then
@@ -5305,6 +5664,8 @@ Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean
     SetETMode etGANET
 
     PickParameters
+    
+    SetCheckBox chkPlotUPFilteredFDR, True
     
     SetCheckBox chkSTACPlotXGridlines, True
     SetCheckBox chkSTACPlotY1Gridlines, False
@@ -5681,7 +6042,8 @@ On Error GoTo ShowOrSaveSTACStatsErrorHandler
     strClipboardText = ""
     
     ' Write the header line
-    strLineOut = "STAC Cutoff" & strSepChar & "Matches" & strSepChar & "Errors" & strSepChar & "FDR (%)"
+    strLineOut = "STAC Cutoff" & strSepChar & "Matches" & strSepChar & "Errors" & strSepChar & "FDR" & strSepChar
+    strLineOut = strLineOut & "Matches, UP>0.5" & strSepChar & "Errors, UP>0.5" & strSepChar & "FDR, UP>0.5"
 
     If blnCopyToClipboard Then
         strClipboardText = strClipboardText & strLineOut & vbCrLf
@@ -5689,10 +6051,11 @@ On Error GoTo ShowOrSaveSTACStatsErrorHandler
         ts.WriteLine strLineOut
     End If
         
-    For lngIndex = 0 To mSTACStatsCount - 1
+    For lngIndex = 0 To STACStatsCount - 1
        
-        With mSTACStats(lngIndex)
-            strLineOut = Round(.STACCuttoff, 2) & strSepChar & .Matches & strSepChar & Round(.Errors, 1) & strSepChar & Round(.FDR, 2)
+        With STACStats(lngIndex)
+            strLineOut = Round(.STACCuttoff, 2) & strSepChar & .Matches & strSepChar & Round(.Errors, 1) & strSepChar & Format(.FDR / 100#, "0.000%") & strSepChar
+            strLineOut = strLineOut & .UP_Filtered_Matches & strSepChar & Round(.UP_Filtered_Errors, 1) & strSepChar & Format(.UP_Filtered_FDR / 100#, "0.000%")
         End With
         
         If blnCopyToClipboard Then
@@ -5833,7 +6196,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     
     strSepChar = LookupDefaultSeparationCharacter()
     
-    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; PairMemberType; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; Uniqueness_Probability; IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
+    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; PairMemberType; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; Uniqueness_Probability; FDR_Threshold, IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar & "PairMemberType" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
@@ -5841,7 +6204,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar
     
     If GelData(CallerID).MostRecentSearchUsedSTAC Then
-        strLineOut = strLineOut & "STAC_Score" & strSepChar & "Del_STAC" & strSepChar & "Uniqueness Probability" & strSepChar
+        strLineOut = strLineOut & "STAC_Score" & strSepChar & "Del_STAC" & strSepChar & "Uniqueness Probability" & strSepChar & "FDR Threshold" & strSepChar
     Else
         strLineOut = strLineOut & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar
     End If
@@ -5955,6 +6318,7 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
         
         If GelData(CallerID).MostRecentSearchUsedSTAC Then
             strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).UniquenessProbability, 4)
+            strLineOutEnd = strLineOutEnd & strSepChar & Format(mUMCMatchStats(mgInd).FDRThreshold, "0.000%")
         End If
 
         strLineOutEnd = strLineOutEnd & strSepChar & mUMCMatchStats(mgInd).IDIsInternalStd
@@ -6134,6 +6498,28 @@ Public Function StartSearchNonPaired() As Long
     StartSearchNonPaired = PerformSearch(eSearchModeNonPaired)
 End Function
 
+Private Function StartsWith(ByVal strText As String, ByVal strTextToFind As String) As Boolean
+
+    Dim blnMatched As Boolean
+    Dim lngStrLen As Long
+    
+On Error GoTo StartsWithErrorHandler
+    lngStrLen = Len(strTextToFind)
+    
+    If Len(strText) >= lngStrLen Then
+        If UCase(Left(strText, lngStrLen)) = UCase(strTextToFind) Then
+            blnMatched = True
+        End If
+    End If
+
+    StartsWith = blnMatched
+    Exit Function
+
+StartsWithErrorHandler:
+    Debug.Assert False
+    StartsWith = False
+    
+End Function
 Private Sub UpdateUMCsPairingStatusNow()
     Dim blnSuccess As Boolean
     blnSuccess = UpdateUMCsPairingStatus(CallerID, eClsPaired())
@@ -6143,35 +6529,71 @@ Private Sub UpdateSTACPlot()
 
     ' 2D array of doubles with X values in the first dimension and Y values in the second dimension
     Dim varMatches() As Variant
+    Dim varMatchesFiltered() As Variant
     Dim varFDR() As Variant
     
     Dim lngIndex As Long
     Dim lngTargetIndex As Long
+    Dim lngEndIndex As Long
+    
+    Dim blnUPFilteredFDR As Boolean
     
 On Error GoTo UpdateSTACPlotErrorHandler
     
     ctlSTACStats.ClearData
     
-    If mSTACStatsCount <= 0 Then
+    If STACStatsCount <= 0 Then
         Exit Sub
     End If
+    
+    blnUPFilteredFDR = Me.PlotUPFilteredFDR
+    
+    ' Find the first non-zero Matches entry in STACStats()
+    For lngIndex = 0 To STACStatsCount - 1
+        lngEndIndex = lngIndex
+        If STACStats(lngIndex).Matches > 0 Then Exit For
+    Next lngIndex
+    
+    If lngEndIndex >= STACStatsCount - 1 Then
+        lngEndIndex = 0
+    End If
+    
+    ReDim varMatches(1, STACStatsCount - (lngEndIndex + 1))
+    ReDim varMatchesFiltered(1, STACStatsCount - (lngEndIndex + 1))
+    ReDim varFDR(1, STACStatsCount - (lngEndIndex + 1))
+    mMaxPlottedFDR = 0
+    
+    For lngIndex = STACStatsCount - 1 To lngEndIndex Step -1
+        lngTargetIndex = STACStatsCount - 1 - lngIndex
         
-    ReDim varMatches(1, mSTACStatsCount - 1)
-    ReDim varFDR(1, mSTACStatsCount - 1)
-     
-    For lngIndex = mSTACStatsCount - 1 To 0 Step -1
-        lngTargetIndex = mSTACStatsCount - 1 - lngIndex
-        varMatches(0, lngTargetIndex) = mSTACStats(lngIndex).STACCuttoff
-        varMatches(1, lngTargetIndex) = mSTACStats(lngIndex).Matches
+        varMatches(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
+        varMatches(1, lngTargetIndex) = STACStats(lngIndex).Matches
         
-        varFDR(0, lngTargetIndex) = mSTACStats(lngIndex).STACCuttoff
-        varFDR(1, lngTargetIndex) = mSTACStats(lngIndex).FDR / 100#
+        varMatchesFiltered(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
+        varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_Matches
+
+        varFDR(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
+        If blnUPFilteredFDR Then
+            varFDR(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_FDR / 100#
+        Else
+            varFDR(1, lngTargetIndex) = STACStats(lngIndex).FDR / 100#
+        End If
+        
+        If varFDR(1, lngTargetIndex) = 0 And lngTargetIndex > 0 Then
+            ' When the reported FDR is 0, use the previous value
+            Debug.Assert False
+            varFDR(1, lngTargetIndex) = varFDR(1, lngTargetIndex - 1)
+        End If
+        
+        If varFDR(1, lngTargetIndex) > mMaxPlottedFDR Then
+            mMaxPlottedFDR = varFDR(1, lngTargetIndex)
+        End If
+        
     Next lngIndex
     
     ctlSTACStats.Plots(1).PlotXY varMatches
-    
-    ctlSTACStats.Plots(2).PlotXY varFDR
-    
+    ctlSTACStats.Plots(2).PlotXY varMatchesFiltered
+    ctlSTACStats.Plots(3).PlotXY varFDR
     
     UpdateSTACPlotLayout
         
@@ -6186,12 +6608,21 @@ UpdateSTACPlotErrorHandler:
 End Sub
 
 Private Sub UpdateSTACPlotLayout()
-
-    ctlSTACStats.Caption = "STAC Stats"
+    
+    Dim strCaption As String
+    
+    strCaption = "STAC Trends -- Red=FDR, Blue=Matches, Green=UP Filtered Matches"
+    
+    ctlSTACStats.Caption = strCaption
     
     ctlSTACStats.Axes(1).Caption = "STAC Threshold"
     ctlSTACStats.Axes(2).Caption = "Matches"
-    ctlSTACStats.Axes(3).Caption = "FDR"
+    
+    If cChkBox(chkPlotUPFilteredFDR) Then
+        ctlSTACStats.Axes(3).Caption = "FDR, UP > 0.5"
+    Else
+        ctlSTACStats.Axes(3).Caption = "FDR"
+    End If
     
   
     ctlSTACStats.Axes(1).Ticks.MajorGrid = cChkBox(chkSTACPlotXGridlines)
@@ -6200,24 +6631,32 @@ Private Sub UpdateSTACPlotLayout()
     ' Do not show the gridlines for the left y axis (matches)
     ctlSTACStats.Axes(2).Ticks.MajorGrid = cChkBox(chkSTACPlotY1Gridlines)
     ctlSTACStats.Axes(2).Ticks.MajorGridColor = vbBlack
-    
+        
     ' Show the gridlines for the right y axis (FDR)
     ctlSTACStats.Axes(3).Ticks.MajorGrid = cChkBox(chkSTACPlotY2Gridlines)
     ctlSTACStats.Axes(3).Ticks.MajorGridColor = vbBlack
-        
-        
+    
+    ' Matches
     With ctlSTACStats.Plots(1)
         .LineStyle = cwLineSolid
         .LineWidth = 2
         .PointStyle = cwPointNone
     End With
     
+    ' Matches, UP > 0.5
     With ctlSTACStats.Plots(2)
         .LineStyle = cwLineSolid
         .LineWidth = 2
         .PointStyle = cwPointNone
     End With
     
+    ' FDR
+    With ctlSTACStats.Plots(3)
+        .LineStyle = cwLineSolid
+        .LineWidth = 2
+        .PointStyle = cwPointNone
+    End With
+
 End Sub
 
 Private Sub UpdateStatus(ByVal Msg As String)
@@ -6367,6 +6806,26 @@ Private Sub WriteORFResults(ts As TextStream, strLineOutPrefix As String, lngMas
 End Sub
 
 Private Sub ZoomOutSTACPlot()
+    
+    Static intRecursionDepth As Integer
+    
+On Error GoTo ZoomOutSTACPlotErrorHandler
+    
+    Dim varYData As Variant
+    Dim lngIndex As Long
+    
+    If False Then
+        Debug.Print Me.width, Me.Height
+        Me.AutoSizeForm True
+    End If
+    
+    If False Then
+        intRecursionDepth = intRecursionDepth + 1
+        If intRecursionDepth <= 1 Then
+            UpdateSTACPlot
+        End If
+        intRecursionDepth = intRecursionDepth - 1
+    End If
         
     ' Set the range of the X axis to be 0 to 1
     With ctlSTACStats.Plots(1).XAxis
@@ -6375,15 +6834,36 @@ Private Sub ZoomOutSTACPlot()
         .Maximum = 1
     End With
     
+    ' Auto-scale the left Y-Axis
     With ctlSTACStats.Plots(1).YAxis
         .AutoScale = True
         .AutoScaleNow
     End With
-
-    With ctlSTACStats.Plots(2).YAxis
+    
+    With ctlSTACStats.Plots(3).YAxis
+        .AutoScale = False
         .Minimum = 0
-        .Maximum = 1
+        
+        ' Scale the right Y-Axis based on mMaxPlottedFDR
+        If mMaxPlottedFDR <= 0.1 Then
+            .Maximum = 0.1
+        ElseIf mMaxPlottedFDR <= 0.2 Then
+            .Maximum = 0.2
+        ElseIf mMaxPlottedFDR <= 0.3 Then
+            .Maximum = 0.3
+        ElseIf mMaxPlottedFDR <= 0.5 Then
+            .Maximum = 0.5
+        ElseIf mMaxPlottedFDR <= 0.75 Then
+            .Maximum = 0.75
+        Else
+            .Maximum = 1
+        End If
     End With
+
+    Exit Sub
+
+ZoomOutSTACPlotErrorHandler:
+    Debug.Assert False
 
 End Sub
 
@@ -6414,6 +6894,10 @@ Private Sub chkDisableCustomNETs_Click()
     EnableDisableNETFormulaControls
 End Sub
 
+Private Sub chkPlotUPFilteredFDR_Click()
+    UpdateSTACPlot
+End Sub
+
 Private Sub chkSTACPlotXGridlines_Click()
     UpdateSTACPlotLayout
 End Sub
@@ -6424,6 +6908,10 @@ End Sub
 
 Private Sub chkSTACPlotY2Gridlines_Click()
     UpdateSTACPlotLayout
+End Sub
+
+Private Sub chkSTACUsesPriorProbability_Click()
+    Me.STACUsesPriorProbability = cChkBox(chkSTACUsesPriorProbability)
 End Sub
 
 Private Sub chkUseSTAC_Click()
@@ -6512,6 +7000,7 @@ Private Sub Form_Load()
     End With
     
     Me.UseSTAC = glbPreferencesExpanded.UseSTAC
+    Me.STACUsesPriorProbability = glbPreferencesExpanded.STACUsesPriorProbability
     
     With GelSearchDef(CallerID).AMTSearchMassMods
         SetCheckBox chkPEO, .PEO
@@ -6552,6 +7041,7 @@ Private Sub Form_Load()
         ExpUmcMatchSPName = .spPutUMCMatch
         ExpUmcInternalStdMatchSPName = .spPutUMCInternalStdMatch
         ExpUMCCSStats = .spPutUMCCSStats
+        ExpStoreSTACStats = .spPutSTACStats
         ExpQuantitationDescription = .spAddQuantitationDescription
     End With
     
@@ -6580,6 +7070,11 @@ Private Sub Form_Load()
         ExpUMCCSStats = "AddFTICRUmcCSStats"
     End If
     Debug.Assert ExpUMCCSStats = "AddFTICRUmcCSStats"
+    
+    If Len(ExpStoreSTACStats) = 0 Then
+        ExpStoreSTACStats = "AddMatchMakingFDR"
+    End If
+    Debug.Assert ExpStoreSTACStats = "AddMatchMakingFDR"
     
     If Len(ExpQuantitationDescription) = 0 Then
         ExpQuantitationDescription = "AddQuantitationDescription"

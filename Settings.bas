@@ -882,6 +882,7 @@ On Error GoTo LoadSettingsFileHandler
         .UseMassTagsWithNullMass = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseMassTagsWithNullMass", .UseMassTagsWithNullMass)
         .UseMassTagsWithNullNET = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseMassTagsWithNullNET", .UseMassTagsWithNullNET)
         .UseSTAC = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseSTAC", .UseSTAC)
+        .STACUsesPriorProbability = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "STACUsesPriorProbability", .STACUsesPriorProbability)
         
         .IReportAutoAddMonoPlus4AndMinus4Data = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data)
         
@@ -1264,6 +1265,8 @@ On Error GoTo LoadSettingsFileHandler
             .RefineDBSearchNETTolerance = GetIniFileSettingBln(IniStuff, "AutoToleranceRefinement", "RefineDBSearchNETTolerance", .RefineDBSearchNETTolerance)
             
             .UseRefinementWhenUsingSTAC = GetIniFileSettingBln(IniStuff, "AutoToleranceRefinement", "UseRefinementWhenUsingSTAC", .UseRefinementWhenUsingSTAC)
+            .RefinedTolMassMultiplierWhenUsingSTAC = GetIniFileSettingSng(IniStuff, "AutoToleranceRefinement", "RefinedTolMassMultiplierWhenUsingSTAC", .RefinedTolMassMultiplierWhenUsingSTAC)
+            .RefinedTolNETMultiplierWhenUsingSTAC = GetIniFileSettingSng(IniStuff, "AutoToleranceRefinement", "RefinedTolNETMultiplierWhenUsingSTAC", .RefinedTolNETMultiplierWhenUsingSTAC)
         End With
         
         With .AutoAnalysisOptions
@@ -2003,6 +2006,7 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullMass", .UseMassTagsWithNullMass
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullNET", .UseMassTagsWithNullNET
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseSTAC", .UseSTAC
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "STACUsesPriorProbability", .STACUsesPriorProbability
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseUMCConglomerateNET", .UseUMCConglomerateNET
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "NetAdjustmentUsesN15AMTMasses", .NetAdjustmentUsesN15AMTMasses
@@ -2380,8 +2384,10 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingDbl sKeys, sVals, iKVCount, "RefineMassCalibrationOverridePPM", .RefineMassCalibrationOverridePPM
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "RefineDBSearchMassTolerance", .RefineDBSearchMassTolerance
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "RefineDBSearchNETTolerance", .RefineDBSearchNETTolerance
-        
+                
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseRefinementWhenUsingSTAC", .UseRefinementWhenUsingSTAC
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RefinedTolMassMultiplierWhenUsingSTAC", .RefinedTolMassMultiplierWhenUsingSTAC
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "RefinedTolNETMultiplierWhenUsingSTAC", .RefinedTolNETMultiplierWhenUsingSTAC
     End With
     IniStuff.WriteSection "AutoToleranceRefinement", sKeys(), sVals(), iKVCount
     
@@ -2639,6 +2645,7 @@ On Error GoTo SaveSettingsFileHandler
             AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCMatch", .spPutUMCMatch
             AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCInternalStdMatch", .spPutUMCInternalStdMatch
             AddKeyValueSetting sKeys, sVals, iKVCount, "spPutUMCCSStats", .spPutUMCCSStats
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spPutSTACStats", .spPutSTACStats
             AddKeyValueSetting sKeys, sVals, iKVCount, "spEditGANET", .spEditGANET
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetORFs", .spGetORFs
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetORFSeq", .spGetORFSeq
@@ -3398,7 +3405,9 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
             .UsePEKBasedERValues = False
             .UseMassTagsWithNullMass = False
             .UseMassTagsWithNullNET = False
+            
             .UseSTAC = True
+            .STACUsesPriorProbability = True
             
             .IReportAutoAddMonoPlus4AndMinus4Data = True
             
@@ -3884,7 +3893,10 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .RefineMassCalibrationOverridePPM = 0
                     .RefineDBSearchMassTolerance = True
                     .RefineDBSearchNETTolerance = True
+                    
                     .UseRefinementWhenUsingSTAC = False
+                    .RefinedTolMassMultiplierWhenUsingSTAC = 3
+                    .RefinedTolNETMultiplierWhenUsingSTAC = 1
                 End With
                 
                 Erase .AutoAnalysisSearchMode()
@@ -3952,6 +3964,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .spPutUMCMatch = "AddFTICRUmcMatch"
                     .spPutUMCInternalStdMatch = "AddFTICRUmcInternalStdMatch"
                     .spPutUMCCSStats = "AddFTICRUmcCSStats"
+                    .spPutSTACStats = "AddMatchMakingFDR"
                     
                     .spEditGANET = "EditFAD_GANET"
                     .spGetORFs = "srvGetORFs"

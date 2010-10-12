@@ -69,6 +69,7 @@ Public Type udtPutUMCMatchParamsListType
     MassTagModMass As ADODB.Parameter
     DelMatchScore As ADODB.Parameter
     UniquenessProbability As ADODB.Parameter
+    FDRThreshold As ADODB.Parameter                             ' Value between 0 and 1
 End Type
 
 Public Type udtPutUMCInternalStdMatchParamsListType
@@ -80,6 +81,7 @@ Public Type udtPutUMCInternalStdMatchParamsListType
     ExpectedNET As ADODB.Parameter
     DelMatchScore As ADODB.Parameter
     UniquenessProbability As ADODB.Parameter
+    FDRThreshold As ADODB.Parameter
 End Type
 
 Public Type udtPutUMCCSStatsParamsListType
@@ -92,6 +94,17 @@ Public Type udtPutUMCCSStatsParamsListType
     DriftTime As ADODB.Parameter
 End Type
 
+Public Type udtStoreSTACStatsParamsListType
+    MDID As ADODB.Parameter
+    STACCutoff As ADODB.Parameter
+    Matches As ADODB.Parameter
+    Errors As ADODB.Parameter
+    FDR As ADODB.Parameter
+    UPFilteredMatches As ADODB.Parameter
+    UPFilteredErrors As ADODB.Parameter
+    UPFilteredFDR As ADODB.Parameter
+End Type
+
 Private Const MASS_PRECISION = 6
 Private Const FIT_PRECISION = 3
 Private Const NET_PRECISION = 5
@@ -101,9 +114,40 @@ Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Conne
                                                       ByVal ExpAnalysisSPName As String, _
                                                       ByVal lngGelIndex As Long, _
                                                       ByVal lngMatchHitCount As Long, _
+                                                      ByVal blnUsedCustomNETs As Boolean) As Long
+                                                      
+    Dim blnSetStateToOK As Boolean
+    Dim strIniFileName As String
+    Dim blnOverrideMassNETTolerance As Boolean
+    
+    blnSetStateToOK = True
+    strIniFileName = ""
+    blnOverrideMassNETTolerance = False
+    
+    AddEntryToMatchMakingDescriptionTable = AddEntryToMatchMakingDescriptionTableEx( _
+                                                cnNew, _
+                                                lngMDID, _
+                                                ExpAnalysisSPName, _
+                                                lngGelIndex, _
+                                                lngMatchHitCount, _
+                                                blnUsedCustomNETs, _
+                                                blnSetStateToOK, _
+                                                strIniFileName, _
+                                                blnOverrideMassNETTolerance, 0, 0)
+End Function
+
+
+Public Function AddEntryToMatchMakingDescriptionTableEx(ByRef cnNew As ADODB.Connection, _
+                                                      ByRef lngMDID As Long, _
+                                                      ByVal ExpAnalysisSPName As String, _
+                                                      ByVal lngGelIndex As Long, _
+                                                      ByVal lngMatchHitCount As Long, _
                                                       ByVal blnUsedCustomNETs As Boolean, _
-                                                      Optional ByVal blnSetStateToOK As Boolean = True, _
-                                                      Optional ByVal strIniFileName As String = "") As Long
+                                                      ByVal blnSetStateToOK As Boolean, _
+                                                      ByVal strIniFileName As String, _
+                                                      ByVal blnOverrideMassNETTolerance As Boolean, _
+                                                      ByVal dblMWToleranceOverride As Double, _
+                                                      ByVal dblNETToleranceOverride As Double) As Long
                                                       
     ' Returns 0 if success, the error number if an error
     
@@ -154,6 +198,7 @@ Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Conne
     
     Dim prmMinimumPeptideProphetProbability As New ADODB.Parameter  ' Minimum Peptide Prophet Probability for MT tags loaded from database
     Dim prmMatchScoreMode As New ADODB.Parameter                ' 0 if .UseStac = False; 1 if .UseStac = True
+    Dim prmSTACUsedPriorProbability As New ADODB.Parameter      ' 1 if we used prior probabilities when searching with STAC
     
     Dim strEntryInAnalysisHistory As String, lngValueFromAnalysisHistory As Long
     Dim strNetAdjUMCsWithDBHits As String
@@ -166,7 +211,7 @@ Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Conne
     
     Dim lngGelScanNumberMin As Long, lngGelScanNumberMax As Long
     Dim dblMassCalPPMShift As Double
-    Dim intMatchScoreMode As Integer
+    Dim intValueForDB As Integer
     
 On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
 
@@ -263,7 +308,12 @@ On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
     With prmMMATolerancePPM
         .precision = 9
         .NumericScale = 4
-        .Value = ValueToSqlDecimal(samtDef.MWTol, sdcSqlDecimal9x4)
+        If blnOverrideMassNETTolerance Then
+            .Value = ValueToSqlDecimal(dblMWToleranceOverride, sdcSqlDecimal9x4)
+        Else
+            .Value = ValueToSqlDecimal(samtDef.MWTol, sdcSqlDecimal9x4)
+        End If
+        
     End With
     cmdPutNewMM.Parameters.Append prmMMATolerancePPM
     
@@ -271,7 +321,11 @@ On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
     With prmNETTolerance
         .precision = 9
         .NumericScale = 5
-        .Value = ValueToSqlDecimal(samtDef.NETTol, sdcSqlDecimal9x5)
+        If blnOverrideMassNETTolerance Then
+            .Value = ValueToSqlDecimal(dblNETToleranceOverride, sdcSqlDecimal9x5)
+        Else
+            .Value = ValueToSqlDecimal(samtDef.NETTol, sdcSqlDecimal9x5)
+        End If
     End With
     cmdPutNewMM.Parameters.Append prmNETTolerance
     
@@ -411,22 +465,35 @@ On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
     Set prmMinimumPeptideProphetProbability = cmdPutNewMM.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamInput, , CurrMTFilteringOptions.MinimumPeptideProphetProbability)
     cmdPutNewMM.Parameters.Append prmMinimumPeptideProphetProbability
     
+    
     If GelData(lngGelIndex).MostRecentSearchUsedSTAC Then
         ' We used STAC for the search
-        intMatchScoreMode = 1
+        intValueForDB = 1
     Else
-        intMatchScoreMode = 0
+        intValueForDB = 0
     End If
     
-    Set prmMatchScoreMode = cmdPutNewMM.CreateParameter("MatchScoreMode", adTinyInt, adParamInput, , intMatchScoreMode)
+    Set prmMatchScoreMode = cmdPutNewMM.CreateParameter("MatchScoreMode", adTinyInt, adParamInput, , intValueForDB)
     cmdPutNewMM.Parameters.Append prmMatchScoreMode
+    
 
+    If GelData(lngGelIndex).MostRecentSearchUsedSTAC And glbPreferencesExpanded.STACUsesPriorProbability Then
+        ' STAC was used and Prior Probabilities were used
+        intValueForDB = 1
+    Else
+        intValueForDB = 0
+    End If
+    
+    Set prmSTACUsedPriorProbability = cmdPutNewMM.CreateParameter("STACUsesPriorProbability", adTinyInt, adParamInput, , intValueForDB)
+    cmdPutNewMM.Parameters.Append prmSTACUsedPriorProbability
+    
+    
     ' Call the SP
     cmdPutNewMM.Execute
     lngMDID = prmIDVal.Value
     Set cmdPutNewMM.ActiveConnection = Nothing
     
-    AddEntryToMatchMakingDescriptionTable = 0
+    AddEntryToMatchMakingDescriptionTableEx = 0
     Exit Function
 
 AddEntryToMatchMakingDescriptionTableErrorHandler:
@@ -436,12 +503,12 @@ AddEntryToMatchMakingDescriptionTableErrorHandler:
         MsgBox "Error making entry in Match Making Description (most likely the job number is not defined in T_FTICR_Analysis_Description): " & Err.Description, vbExclamation + vbOKOnly, glFGTU
     End If
     
-    LogErrors Err.Number, "AddEntryToMatchMakingDescription", Err.Description, lngGelIndex
+    LogErrors Err.Number, "AddEntryToMatchMakingDescriptionTableEx", Err.Description, lngGelIndex
     
     If lngErrorNumber = 0 Then
-        AddEntryToMatchMakingDescriptionTable = 50000
+        AddEntryToMatchMakingDescriptionTableEx = 50000
     Else
-        AddEntryToMatchMakingDescriptionTable = lngErrorNumber
+        AddEntryToMatchMakingDescriptionTableEx = lngErrorNumber
     End If
     
 End Function
@@ -661,6 +728,7 @@ With udtPutUMCMatchParams
     Set .MassTagModMass = New ADODB.Parameter
     Set .DelMatchScore = New ADODB.Parameter
     Set .UniquenessProbability = New ADODB.Parameter
+    Set .FDRThreshold = New ADODB.Parameter
     
     Set .UMCResultsID = cmdPutNewUMCMatch.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
     cmdPutNewUMCMatch.Parameters.Append .UMCResultsID
@@ -707,6 +775,9 @@ With udtPutUMCMatchParams
     Set .UniquenessProbability = cmdPutNewUMCMatch.CreateParameter("UniquenessProbability", adSingle, adParamInput, , 0)
     cmdPutNewUMCMatch.Parameters.Append .UniquenessProbability
     
+    Set .FDRThreshold = cmdPutNewUMCMatch.CreateParameter("FDRThreshold", adSingle, adParamInput, , 1)
+    cmdPutNewUMCMatch.Parameters.Append .FDRThreshold
+    
 End With
 
 End Sub
@@ -725,6 +796,7 @@ With udtPutUMCInternalStdMatchParams
     Set .ExpectedNET = New ADODB.Parameter
     Set .DelMatchScore = New ADODB.Parameter
     Set .UniquenessProbability = New ADODB.Parameter
+    Set .FDRThreshold = New ADODB.Parameter
     
     Set .UMCResultsID = cmPutNewUMCInternalStdMatch.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
     cmPutNewUMCInternalStdMatch.Parameters.Append .UMCResultsID
@@ -760,12 +832,18 @@ With udtPutUMCInternalStdMatchParams
     Set .UniquenessProbability = cmPutNewUMCInternalStdMatch.CreateParameter("UniquenessProbability", adSingle, adParamInput, , 0)
     cmPutNewUMCInternalStdMatch.Parameters.Append .UniquenessProbability
     
+    Set .FDRThreshold = cmPutNewUMCInternalStdMatch.CreateParameter("FDRThreshold", adSingle, adParamInput, , 1)
+    cmPutNewUMCInternalStdMatch.Parameters.Append .FDRThreshold
+    
 End With
 
 End Sub
 
 
-Public Sub ExportMTDBInitializePutUMCCSStatsParams(cnNew As ADODB.Connection, cmdPutNewUMCCSStat As ADODB.Command, udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType, strStoredProcName As String)
+Public Sub ExportMTDBInitializePutUMCCSStatsParams(cnNew As ADODB.Connection, _
+                                                   cmdPutNewUMCCSStat As ADODB.Command, _
+                                                   udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType, _
+                                                   strStoredProcName As String)
   
     ' Initialize the SP
     InitializeSPCommand cmdPutNewUMCCSStat, cnNew, strStoredProcName
@@ -799,6 +877,49 @@ Public Sub ExportMTDBInitializePutUMCCSStatsParams(cnNew As ADODB.Connection, cm
 
         Set .DriftTime = cmdPutNewUMCCSStat.CreateParameter("DriftTime", adSingle, adParamInput, , 0)
         cmdPutNewUMCCSStat.Parameters.Append .DriftTime
+        
+    End With
+
+End Sub
+
+Public Sub ExportMTDBInitializeStoreSTACStats(cnNew As ADODB.Connection, _
+                                              cmdStoreSTACStats As ADODB.Command, _
+                                              udtStoreSTACStatsParams As udtStoreSTACStatsParamsListType, _
+                                              strStoredProcName As String)
+  
+    ' Initialize the SP
+    InitializeSPCommand cmdStoreSTACStats, cnNew, strStoredProcName
+        
+    With udtStoreSTACStatsParams
+        Set .MDID = New ADODB.Parameter
+        Set .STACCutoff = New ADODB.Parameter
+        Set .Matches = New ADODB.Parameter
+        Set .Errors = New ADODB.Parameter
+        Set .FDR = New ADODB.Parameter
+       
+        Set .MDID = cmdStoreSTACStats.CreateParameter("MDID", adInteger, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .MDID
+        
+        Set .STACCutoff = cmdStoreSTACStats.CreateParameter("STAC_Cutoff", adSingle, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .STACCutoff
+       
+        Set .Matches = cmdStoreSTACStats.CreateParameter("Matches", adInteger, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .Matches
+        
+        Set .Errors = cmdStoreSTACStats.CreateParameter("Errors", adSingle, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .Errors
+        
+        Set .FDR = cmdStoreSTACStats.CreateParameter("FDR", adSingle, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .FDR
+        
+        Set .UPFilteredMatches = cmdStoreSTACStats.CreateParameter("UPFilteredMatches", adInteger, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .UPFilteredMatches
+        
+        Set .UPFilteredErrors = cmdStoreSTACStats.CreateParameter("UPFilteredErrors", adSingle, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .UPFilteredErrors
+        
+        Set .UPFilteredFDR = cmdStoreSTACStats.CreateParameter("UPFilteredFDR", adSingle, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .UPFilteredFDR
         
     End With
 

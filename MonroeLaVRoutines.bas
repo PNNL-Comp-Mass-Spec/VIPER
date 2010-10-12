@@ -1425,7 +1425,10 @@ End Function
 ''
 ''End Sub
 
-Public Function InitializeSPCommand(cmdSPCommand As ADODB.Command, cnnConnection As ADODB.Connection, strSPName As String) As Boolean
+Public Function InitializeSPCommand(cmdSPCommand As ADODB.Command, _
+                                    cnnConnection As ADODB.Connection, _
+                                    strSPName As String) As Boolean
+                                    
     ' Returns True if success, False if an error
     
 On Error GoTo InitializeSPCommandErrorHandler
@@ -2123,7 +2126,6 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
         strRefIDEnd = AMTIDEnd
     End If
 
-
     Do
         lngCharLoc = InStr(strDBMatchList, glARG_SEP)
         If lngCharLoc > 0 Then
@@ -2245,6 +2247,7 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
             
                 udtUMCList(lngUMCListCount).UMCIndex = lngUMCIndex
                 udtUMCList(lngUMCListCount).IDIsInternalStd = blnFindInternalStdRefs
+                udtUMCList(lngUMCListCount).FDRThreshold = 1
                  
                 If blnNoMatchesForCurrID Then
                     udtUMCList(lngUMCListCount).IDIndex = 0

@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "October 7, 2010"
+Public Const APP_BUILD_DATE As String = "October 11, 2010"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -246,7 +246,7 @@ Public Const MATCH_STATE_HIT = 6
 
 
 Public Type udtCollectionArrayType
-    Value As String
+    value As String
     Name As String
 End Type
 
@@ -894,8 +894,9 @@ Public Type udtUMCMassTagMatchStats
     AMTMods As String               ' Mods, if any (Like PEO, ICAT, etc.); only applies to AMT's
     MemberHitCount As Long          ' The number of members of a given UMC that matched the given MT tag or Internal Standard
     StacOrSLiC As Double            ' STAC Score or SLiC Score (Spatially Localized Confidence score)
-    DelScore As Double               ' Similar to DelCN, difference in SLiC score between top match and match with score value one less than this score
+    DelScore As Double              ' Similar to DelCN, difference in SLiC score between top match and match with score value one less than this score
     UniquenessProbability As Double ' UP Score from STAC
+    FDRThreshold As Double          ' When using STAC, this is the FDR Threshold that the given STAC score corresponds to
     MassDiffPPM As Double           ' Mass difference between AMT and given UMC or given point
     MultiAMTHitCount As Long        ' The number of Unique MT tag hits for each UMC; only applies to AMT's (in other words, ignores Internal Standard)
 End Type
@@ -1011,7 +1012,9 @@ Public Type udtAutoToleranceRefinementType
     RefineDBSearchMassTolerance As Boolean
     RefineDBSearchNETTolerance As Boolean
     
-    UseRefinementWhenUsingSTAC As Boolean               ' Typically should be false
+    UseRefinementWhenUsingSTAC As Boolean
+    RefinedTolMassMultiplierWhenUsingSTAC As Single     ' Only used if .UseRefinementWhenUsingSTAC = True and .UseStac = True; the refined mass tolerance is multiplied by this value; if this new value is > .AutoToleranceRefinement.DBSearchMWTol then it will be set to .AutoToleranceRefinement.DBSearchMWTol
+    RefinedTolNETMultiplierWhenUsingSTAC As Single      ' Only used if .UseRefinementWhenUsingSTAC = True and .UseStac = True; the refined NET tolerance is multiplied by this value; if this new value is > .AutoToleranceRefinement.DBSearchNETTol then it will be set to .AutoToleranceRefinement.DBSearchNETTol
 End Type
 
 Public Type udtAutoAnalysisSearchModeOptionsType
@@ -1231,7 +1234,8 @@ Public Type udtMTSConnectionInfoType
     spPutUMCMember As String
     spPutUMCMatch As String
     spPutUMCInternalStdMatch As String
-    spPutUMCCSStats  As String
+    spPutUMCCSStats As String
+    spPutSTACStats As String
     
     spEditGANET As String
     spGetORFs As String
@@ -1268,7 +1272,9 @@ Public Type udtPreferencesExpandedType
     UsePEKBasedERValues As Boolean          ' Can only be set in the .Ini file; when True, then stores PEK-based ER data in IsoData(i).ExpressionRatio when reading the PEK file
     UseMassTagsWithNullMass As Boolean      ' Can only be set in the .Ini file
     UseMassTagsWithNullNET As Boolean
+    
     UseSTAC As Boolean
+    STACUsesPriorProbability As Boolean
     
     IReportAutoAddMonoPlus4AndMinus4Data As Boolean
 

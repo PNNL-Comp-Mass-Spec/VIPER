@@ -263,6 +263,32 @@ Private Type udtAMTFieldPresentType
     ProteinPeptideMap As udtAMTFieldPresentProteinPeptideMapTblType
 End Type
 
+Public Type udtSTACStatsType
+    STACCuttoff As Double
+    Matches As Long                 ' Number of AMT Tags that the LC-MS Features Matched (non-unique count)
+    Errors As Double                ' Number of items in Matches that are estimated to be wrong
+    FDR As Double                   ' Number between 0 and 100 representing FDR; we divide by 100 when storing in the DB
+    UP_Filtered_Matches As Long     ' Number of AMT Tags that the LC-MS Features Matched (filtered on UP > 0.5)
+    UP_Filtered_Errors As Double    ' Number of items in Up_Filtered_Matches that are estimated to be wrong (filtered on UP > 0.5)
+    UP_Filtered_FDR As Double       ' Number between 0 and 100 representing FDR (filtered on UP > 0.5); we divide by 100 when storing in the DB
+End Type
+
+Public Type udtSearchSummaryStatsType
+    UMCCountWithHits As Long
+    UniqueMTCount As Long
+    UniqueIntStdCount As Long
+    
+    ' The FDR-based stats will be non-zero only if STAC was used
+    ' These values are only for AMT Tags; they do not include internal standards
+    UniqueMTCount1PctFDR As Long
+    UniqueMTCount5PctFDR As Long
+    UniqueMTCount10PctFDR As Long
+    
+    MassToleranceFromSTAC As Double     ' Half-width of the Mass error histogram at the base (at 2.5 StDev)
+    NETToleranceFromSTAC As Double      ' Half-width of the NET error histogram at the base (at 2.5 StDev)
+End Type
+
+
 'once open AMT database stays open for the duration of the application
 Public dbAMT As Database
 
@@ -302,6 +328,9 @@ Public AMTNETErr() As Double    'sum of absolute NET/RT errors (direction could 
 Public AMTNETMin() As Double    'min of NET/RT range
 Public AMTNETMax() As Double    'max of NET/RT range
 
+' Most recent stats from STAC
+Public STACStatsCount As Long
+Public STACStats() As udtSTACStatsType                        ' 0-based array
 
 'ORF arrays; for now everything I need is coming from MassTags database
 Public ORFCnt As Long               'ORF count
@@ -1638,6 +1667,77 @@ err_LegacyDBLoadProteinData:
 
     Resume exit_LegacyDBLoadProteinData
 
+End Function
+
+' dblFDR is the FDR to look for; it should be a value between 0 and 1
+Public Function LookupSTACCutoffForFDR(ByVal dblFDR As Double) As Double
+    Dim dblSTACCutoff As Double
+
+    Dim lngStartIndex As Long
+    Dim lngIndex As Long
+    Dim dblDiff As Double
+    
+    Dim lngBestIndex As Long
+    Dim dblBestDiff As Double
+    
+On Error GoTo LookupSTACCutoffForFDRErrorHandler
+    
+    dblSTACCutoff = 0
+    
+    If STACStatsCount > 0 Then
+        ' Find the closet match to dblFDR
+        
+        lngBestIndex = -1
+        dblBestDiff = 100
+        
+        ' Find the first entry in STACStats() with a positive value for Matches
+        For lngIndex = 0 To STACStatsCount - 1
+            lngStartIndex = lngIndex
+            If STACStats(lngIndex).Matches > 0 Then Exit For
+        Next lngIndex
+        
+        If dblFDR < STACStats(lngStartIndex).FDR / 100# Then
+            ' Desired FDR is lower than all of data in STACStats()
+            dblSTACCutoff = 1.1
+        Else
+            
+            For lngIndex = lngStartIndex To STACStatsCount - 1
+                dblDiff = Abs(STACStats(lngIndex).FDR / 100# - dblFDR)
+                
+                If dblDiff < dblBestDiff Then
+                    dblBestDiff = dblDiff
+                    lngBestIndex = lngIndex
+                End If
+            Next lngIndex
+            
+            If lngBestIndex >= 0 Then
+                
+                dblSTACCutoff = STACStats(lngBestIndex).STACCuttoff
+            
+                If dblBestDiff < dblFDR / 5 Then
+                    ' The best match is less than 5-fold smaller than dblFDR
+                    ' Take this as the best answer
+                
+                Else
+                    ' Need to interpolate between the two best differences (if possible)
+                    
+                    ' Possibly code this up ...
+                    Debug.Assert False
+                        
+                End If
+            End If
+        End If
+
+    End If
+
+    LookupSTACCutoffForFDR = dblSTACCutoff
+    Exit Function
+
+LookupSTACCutoffForFDRErrorHandler:
+    Debug.Print Err.Description
+    Debug.Assert False
+    
+    LookupSTACCutoffForFDR = dblSTACCutoff
 End Function
 
 Public Sub RemoveAMT(ByVal Ind As Long, ByVal Scope As Integer)

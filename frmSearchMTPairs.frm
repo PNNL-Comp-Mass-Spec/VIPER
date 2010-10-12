@@ -1303,7 +1303,7 @@ End If
 If blnCreateNewEntryInMMDTable Then
     TraceLog 5, "frmSearchMTPairs->ExportIDPairsToUMCResultsTable", "Call AddEntryToMatchMakingDescriptionTable"
     'first write new analysis in T_Match_Making_Description table
-    lngErrorNumber = AddEntryToMatchMakingDescriptionTable(cnNew, lngMDID, ExpAnalysisSPName, CallerID, mMatchStatsCount, GelData(CallerID).CustomNETsDefined, True, strIniFileName)
+    lngErrorNumber = AddEntryToMatchMakingDescriptionTableEx(cnNew, lngMDID, ExpAnalysisSPName, CallerID, mMatchStatsCount, GelData(CallerID).CustomNETsDefined, True, strIniFileName, False, 0, 0)
 Else
     lngErrorNumber = 0
 End If
@@ -2224,6 +2224,8 @@ If ManageCurrID(MNG_RESET) Then
                      .MemberHitCount = mCurrIDMatches(lngIndex).MatchingMemberCount
                      .StacOrSLiC = mCurrIDMatches(lngIndex).StacOrSLiC
                      .DelScore = mCurrIDMatches(lngIndex).DelScore
+                     .UniquenessProbability = 0
+                     .FDRThreshold = 1
                      .MultiAMTHitCount = mCurrIDCnt
                      .IDIsInternalStd = False
                    End With

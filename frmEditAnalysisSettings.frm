@@ -55,99 +55,99 @@ Begin VB.Form frmEditAnalysisSettings
       TabCaption(1)   =   "2. LC-MS Features"
       TabPicture(1)   =   "frmEditAnalysisSettings.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "lblDescription(115)"
-      Tab(1).Control(1)=   "lblDescription(63)"
-      Tab(1).Control(2)=   "lblDescription(64)"
-      Tab(1).Control(3)=   "lblDescription(58)"
-      Tab(1).Control(4)=   "lblDescription(61)"
-      Tab(1).Control(5)=   "cboUMCSearchMode"
-      Tab(1).Control(6)=   "fraUMCSearch200x"
-      Tab(1).Control(7)=   "cmbUMCMW"
-      Tab(1).Control(8)=   "cmbUMCAbu"
-      Tab(1).Control(9)=   "txtInterpolateMaxGapSize"
-      Tab(1).Control(10)=   "chkInterpolateMissingIons"
-      Tab(1).Control(11)=   "fraUMCIonNetOptions"
-      Tab(1).Control(12)=   "tbsUMCRefinementOptions"
-      Tab(1).Control(13)=   "chkUseMostAbuChargeStateStatsForClassStats"
-      Tab(1).Control(14)=   "cboChargeStateAbuType"
-      Tab(1).Control(15)=   "chkSkipFindUMCs"
+      Tab(1).Control(0)=   "chkSkipFindUMCs"
+      Tab(1).Control(1)=   "cboChargeStateAbuType"
+      Tab(1).Control(2)=   "chkUseMostAbuChargeStateStatsForClassStats"
+      Tab(1).Control(3)=   "tbsUMCRefinementOptions"
+      Tab(1).Control(4)=   "fraUMCIonNetOptions"
+      Tab(1).Control(5)=   "chkInterpolateMissingIons"
+      Tab(1).Control(6)=   "txtInterpolateMaxGapSize"
+      Tab(1).Control(7)=   "cmbUMCAbu"
+      Tab(1).Control(8)=   "cmbUMCMW"
+      Tab(1).Control(9)=   "fraUMCSearch200x"
+      Tab(1).Control(10)=   "cboUMCSearchMode"
+      Tab(1).Control(11)=   "lblDescription(61)"
+      Tab(1).Control(12)=   "lblDescription(58)"
+      Tab(1).Control(13)=   "lblDescription(64)"
+      Tab(1).Control(14)=   "lblDescription(63)"
+      Tab(1).Control(15)=   "lblDescription(115)"
       Tab(1).ControlCount=   16
       TabCaption(2)   =   "3. MT Tags"
       TabPicture(2)   =   "frmEditAnalysisSettings.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraOptionFrame(19)"
-      Tab(2).Control(1)=   "fraOptionFrame(44)"
-      Tab(2).Control(2)=   "cmdSelectOtherDB"
-      Tab(2).Control(3)=   "fraSelectingMassTags"
-      Tab(2).Control(4)=   "fraOptionFrame(16)"
-      Tab(2).Control(5)=   "lblDescription(121)"
+      Tab(2).Control(0)=   "lblDescription(121)"
+      Tab(2).Control(1)=   "fraOptionFrame(16)"
+      Tab(2).Control(2)=   "fraSelectingMassTags"
+      Tab(2).Control(3)=   "cmdSelectOtherDB"
+      Tab(2).Control(4)=   "fraOptionFrame(44)"
+      Tab(2).Control(5)=   "fraOptionFrame(19)"
       Tab(2).ControlCount=   6
       TabCaption(3)   =   "4. Pairs"
       TabPicture(3)   =   "frmEditAnalysisSettings.frx":0054
       Tab(3).ControlEnabled=   0   'False
-      Tab(3).Control(0)=   "lblDescription(16)"
-      Tab(3).Control(1)=   "cboPairsIdentificationMode"
-      Tab(3).Control(2)=   "fraOptionFrame(37)"
-      Tab(3).Control(3)=   "fraOptionFrame(38)"
-      Tab(3).Control(4)=   "fraOptionFrame(40)"
-      Tab(3).Control(5)=   "fraOptionFrame(41)"
-      Tab(3).Control(6)=   "fraOptionFrame(48)"
-      Tab(3).Control(7)=   "fraOptionFrame(52)"
-      Tab(3).Control(8)=   "fraOptionFrame(53)"
-      Tab(3).Control(9)=   "fraOptionFrame(56)"
+      Tab(3).Control(0)=   "fraOptionFrame(56)"
+      Tab(3).Control(1)=   "fraOptionFrame(53)"
+      Tab(3).Control(2)=   "fraOptionFrame(52)"
+      Tab(3).Control(3)=   "fraOptionFrame(48)"
+      Tab(3).Control(4)=   "fraOptionFrame(41)"
+      Tab(3).Control(5)=   "fraOptionFrame(40)"
+      Tab(3).Control(6)=   "fraOptionFrame(38)"
+      Tab(3).Control(7)=   "fraOptionFrame(37)"
+      Tab(3).Control(8)=   "cboPairsIdentificationMode"
+      Tab(3).Control(9)=   "lblDescription(16)"
       Tab(3).ControlCount=   10
       TabCaption(4)   =   "5. NET Adjustment"
       TabPicture(4)   =   "frmEditAnalysisSettings.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "pctOptionsInIniFile(4)"
-      Tab(4).Control(1)=   "pctOptionsInIniFile(3)"
-      Tab(4).Control(2)=   "cboRobustNETAdjustmentMode"
-      Tab(4).Control(3)=   "chkRobustNETEnabled"
-      Tab(4).Control(4)=   "fraOptionFrame(18)"
-      Tab(4).Control(5)=   "tbsNETOptions"
-      Tab(4).Control(6)=   "chkSkipGANETSlopeAndInterceptComputation"
-      Tab(4).Control(7)=   "lblDescription(156)"
+      Tab(4).Control(0)=   "lblDescription(156)"
+      Tab(4).Control(1)=   "chkSkipGANETSlopeAndInterceptComputation"
+      Tab(4).Control(2)=   "tbsNETOptions"
+      Tab(4).Control(3)=   "fraOptionFrame(18)"
+      Tab(4).Control(4)=   "chkRobustNETEnabled"
+      Tab(4).Control(5)=   "cboRobustNETAdjustmentMode"
+      Tab(4).Control(6)=   "pctOptionsInIniFile(3)"
+      Tab(4).Control(7)=   "pctOptionsInIniFile(4)"
       Tab(4).ControlCount=   8
       TabCaption(5)   =   "6. Refinement"
       TabPicture(5)   =   "frmEditAnalysisSettings.frx":008C
       Tab(5).ControlEnabled=   0   'False
-      Tab(5).Control(0)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
-      Tab(5).Control(1)=   "fraExpecationMaximizationOptions"
-      Tab(5).Control(2)=   "cboToleranceRefinementMethod"
-      Tab(5).Control(3)=   "chkRefineDBSearchNETTolerance"
-      Tab(5).Control(4)=   "chkRefineDBSearchMassTolerance"
-      Tab(5).Control(5)=   "fraToleranceRefinementPeakCriteria"
-      Tab(5).Control(6)=   "fraOptionFrame(2)"
-      Tab(5).Control(7)=   "fraOptionFrame(3)"
-      Tab(5).Control(8)=   "fraOptionFrame(0)"
-      Tab(5).Control(9)=   "fraOptionFrame(1)"
-      Tab(5).Control(10)=   "lblMassCalibrationRefinementDescription"
-      Tab(5).Control(11)=   "lblToleranceRefinementExplanation"
+      Tab(5).Control(0)=   "lblToleranceRefinementExplanation"
+      Tab(5).Control(1)=   "lblMassCalibrationRefinementDescription"
+      Tab(5).Control(2)=   "fraOptionFrame(1)"
+      Tab(5).Control(3)=   "fraOptionFrame(0)"
+      Tab(5).Control(4)=   "fraOptionFrame(3)"
+      Tab(5).Control(5)=   "fraOptionFrame(2)"
+      Tab(5).Control(6)=   "fraToleranceRefinementPeakCriteria"
+      Tab(5).Control(7)=   "chkRefineDBSearchMassTolerance"
+      Tab(5).Control(8)=   "chkRefineDBSearchNETTolerance"
+      Tab(5).Control(9)=   "cboToleranceRefinementMethod"
+      Tab(5).Control(10)=   "fraExpecationMaximizationOptions"
+      Tab(5).Control(11)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
       Tab(5).ControlCount=   12
       TabCaption(6)   =   "7. DB Search"
       TabPicture(6)   =   "frmEditAnalysisSettings.frx":00A8
       Tab(6).ControlEnabled=   0   'False
-      Tab(6).Control(0)=   "lblToleranceRefinementWarning"
-      Tab(6).Control(1)=   "lblDescription(70)"
-      Tab(6).Control(2)=   "fraOptionFrame(30)"
-      Tab(6).Control(3)=   "fraOptionFrame(26)"
-      Tab(6).Control(4)=   "cmdAddRemove(2)"
+      Tab(6).Control(0)=   "fraOptionFrame(31)"
+      Tab(6).Control(1)=   "fraOptionFrame(45)"
+      Tab(6).Control(2)=   "cboDBSearchMode"
+      Tab(6).Control(3)=   "lstDBSearchModes"
+      Tab(6).Control(4)=   "chkDoNotSaveOrExport"
       Tab(6).Control(5)=   "fraOptionFrame(29)"
-      Tab(6).Control(6)=   "chkDoNotSaveOrExport"
-      Tab(6).Control(7)=   "lstDBSearchModes"
-      Tab(6).Control(8)=   "cboDBSearchMode"
-      Tab(6).Control(9)=   "fraOptionFrame(45)"
-      Tab(6).Control(10)=   "fraOptionFrame(31)"
+      Tab(6).Control(6)=   "cmdAddRemove(2)"
+      Tab(6).Control(7)=   "fraOptionFrame(26)"
+      Tab(6).Control(8)=   "fraOptionFrame(30)"
+      Tab(6).Control(9)=   "lblDescription(70)"
+      Tab(6).Control(10)=   "lblToleranceRefinementWarning"
       Tab(6).ControlCount=   11
       TabCaption(7)   =   "8. Saving/Plotting"
       TabPicture(7)   =   "frmEditAnalysisSettings.frx":00C4
       Tab(7).ControlEnabled=   0   'False
-      Tab(7).Control(0)=   "pctOptionsInIniFile(1)"
-      Tab(7).Control(1)=   "pctOptionsInIniFile(0)"
-      Tab(7).Control(2)=   "fraOptionFrame(33)"
-      Tab(7).Control(3)=   "fraOptionFrame(32)"
-      Tab(7).Control(4)=   "lblDescription(136)"
-      Tab(7).Control(5)=   "lblSavingAndExportingStatus"
+      Tab(7).Control(0)=   "lblSavingAndExportingStatus"
+      Tab(7).Control(1)=   "lblDescription(136)"
+      Tab(7).Control(2)=   "fraOptionFrame(32)"
+      Tab(7).Control(3)=   "fraOptionFrame(33)"
+      Tab(7).Control(4)=   "pctOptionsInIniFile(0)"
+      Tab(7).Control(5)=   "pctOptionsInIniFile(1)"
       Tab(7).ControlCount=   6
       Begin VB.PictureBox pctOptionsInIniFile 
          Height          =   2800
@@ -4701,11 +4701,11 @@ Begin VB.Form frmEditAnalysisSettings
          TabCaption(2)   =   "MS Warp Options"
          TabPicture(2)   =   "frmEditAnalysisSettings.frx":6F02A
          Tab(2).ControlEnabled=   0   'False
-         Tab(2).Control(0)=   "cboMSWarpMassCalibrationType"
-         Tab(2).Control(1)=   "fraOptionFrame(35)"
+         Tab(2).Control(0)=   "lblDescription(160)"
+         Tab(2).Control(1)=   "lblDescription(155)"
          Tab(2).Control(2)=   "fraOptionFrame(34)"
-         Tab(2).Control(3)=   "lblDescription(155)"
-         Tab(2).Control(4)=   "lblDescription(160)"
+         Tab(2).Control(3)=   "fraOptionFrame(35)"
+         Tab(2).Control(4)=   "cboMSWarpMassCalibrationType"
          Tab(2).ControlCount=   5
          Begin VB.PictureBox pctOptionsInIniFile 
             Height          =   1125
@@ -5595,6 +5595,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             SetCheckBox chkUseMassTagsWithNullNET, .UseMassTagsWithNullNET
             
             ' Note: Skipping .UseSTAC
+            ' Note: Skipping .STACUsesPriorProbability
             ' Note: Skipping .IReportAutoAddMonoPlus4AndMinus4Data
             
             SetCheckBox chkUseUMCConglomerateNET, .UseUMCConglomerateNET
@@ -5856,6 +5857,8 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
                 SetCheckBox chkRefineDBSearchNETTolerance, .RefineDBSearchNETTolerance
                 
                 ' Ignore: .UseRefinementWhenUsingSTAC
+                ' Ignore: .RefinedTolMassMultiplierWhenUsingSTAC
+                ' Ignore: .RefinedTolNETMultiplierWhenUsingSTAC
             End With
             
             intDBSearchModeIndexSaved = lstDBSearchModes.ListIndex

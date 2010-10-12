@@ -71,6 +71,8 @@ Private Type udtAutoAnalysisWorkingParamsType
     NextHistoryIndexToCopy As Long                      ' Next entry in GelSearchDef().AnalysisHistory that needs to be copied to the log
     LoadedGelFile As Boolean
     NETDefined As Boolean
+    SearchSummaryStatsDefined As Boolean
+    SearchSummaryStats As udtSearchSummaryStatsType
 End Type
 
 
@@ -105,7 +107,12 @@ Private mRedirectedOutputFolderMessage As String
 ' mMemoryLog holds all of the data sent to AutoAnalysisLog
 Private mMemoryLog As String
 
-Private Sub AddNewOutputFileForHtml(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByVal strFileName As String, ByVal strDescription As String, ByVal intTableRow As Integer, ByVal intTableColumn As Integer, Optional ByVal intWidth As Integer = 450)
+Private Sub AddNewOutputFileForHtml(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, _
+                                    ByVal strFileName As String, _
+                                    ByVal strDescription As String, _
+                                    ByVal intTableRow As Integer, _
+                                    ByVal intTableColumn As Integer, _
+                                    Optional ByVal intWidth As Integer = 450)
 
     With udtWorkingParams
         .GraphicOutputFileInfoCount = .GraphicOutputFileInfoCount + 1
@@ -236,7 +243,10 @@ Public Sub ApplyAutoAnalysisFilter(FilterPrefs As udtAutoAnalysisFilterPrefsType
     
 End Sub
 
-Public Function AutoAnalysisStart(ByRef udtAutoParams As udtAutoAnalysisParametersType, Optional ByVal blnClearMemoryLog As Boolean = True, Optional ByRef blnPrintDebugInfo As Boolean = False) As Boolean
+Public Function AutoAnalysisStart(ByRef udtAutoParams As udtAutoAnalysisParametersType, _
+                                  Optional ByVal blnClearMemoryLog As Boolean = True, _
+                                  Optional ByRef blnPrintDebugInfo As Boolean = False) As Boolean
+                                  
     ' Automatically load and analyze a .PEK/.CSV/.mzXML/.mzData file
     ' If udtAutoParams.InputFilePath is blank and udtAutoParams.ShowMessages = True, then the user is shown an open file box
     ' If strOptionsIniFile is blank, then the currently enabled options are used (i.e. UMC searching, NET Adjustment, DB searching)
@@ -1262,7 +1272,11 @@ AutoAnalysisGenerateHTMLSubfolderListFileErrorHandler:
 
 End Sub
 
-Private Sub AutoAnalysisGenerateHTMLBrowsingFile(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject, Optional ByVal strVersionOverride As String = "", Optional ByVal strDateOverride As String = "")
+Private Sub AutoAnalysisGenerateHTMLBrowsingFile(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, _
+                                                 ByRef udtAutoParams As udtAutoAnalysisParametersType, _
+                                                 ByRef fso As FileSystemObject, _
+                                                 Optional ByVal strVersionOverride As String = "", _
+                                                 Optional ByVal strDateOverride As String = "")
 
     Const strQ As String = """"
     
@@ -1284,6 +1298,10 @@ Private Sub AutoAnalysisGenerateHTMLBrowsingFile(ByRef udtWorkingParams As udtAu
     Dim lngLCMSFeatureCount As Long
     Dim lngLCMSFeatureCountWithHits As Long
     Dim lngUniqueMassTagCount As Long
+    
+    Dim lngUniqueMTCount1PctFDR As Long
+    Dim lngUniqueMTCount5PctFDR As Long
+    Dim lngUniqueMTCount10PctFDR As Long
     
     Dim intPicFilesCount As Integer
     Dim strPicFiles() As String
@@ -1379,19 +1397,38 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
         End If
         
         If Not blnLookupStatsInDB Then
-            If udtWorkingParams.GelIndex > 0 Then
-                ' Examine the data in memory to determine the match stats
-                LookupMatchingUMCStats udtWorkingParams.GelIndex, lngLCMSFeatureCount, lngLCMSFeatureCountWithHits, lngUniqueMassTagCount
+            If udtWorkingParams.SearchSummaryStatsDefined Then
+                ' These values were cached after searching the data using frmSearchMT_ConglomerateUMC
+                With udtWorkingParams.SearchSummaryStats
+                    lngLCMSFeatureCount = GelUMC(udtWorkingParams.GelIndex).UMCCnt
+                    lngLCMSFeatureCountWithHits = .UMCCountWithHits
+                    lngUniqueMassTagCount = .UniqueMTCount
+                    lngUniqueMTCount1PctFDR = .UniqueMTCount1PctFDR
+                    lngUniqueMTCount5PctFDR = .UniqueMTCount5PctFDR
+                    lngUniqueMTCount10PctFDR = .UniqueMTCount10PctFDR
+                End With
             Else
-                ' Data is not in memory and task ID is undefined
-                ' Cannot obtain these values from anywhere
+                If udtWorkingParams.GelIndex > 0 Then
+                    ' Examine the data in memory to determine the match stats
+                    LookupMatchingUMCStats udtWorkingParams.GelIndex, _
+                                           lngLCMSFeatureCount, _
+                                           lngLCMSFeatureCountWithHits, _
+                                           lngUniqueMassTagCount, _
+                                           lngUniqueMTCount1PctFDR, _
+                                           lngUniqueMTCount5PctFDR, _
+                                           lngUniqueMTCount10PctFDR
+    
+                Else
+                    ' Data is not in memory and task ID is undefined
+                    ' Cannot obtain these values from anywhere
+                End If
             End If
         End If
         
         tsOutput.WriteLine "    <P>"
         tsOutput.WriteLine "        <TABLE>"
         
-        ReDim strRows(2)
+        ReDim strRows(3)
         
         strRightAlign = "<TD align=" & strQ & "right" & strQ & ">"
         strRows(0) = "<TD>Total LC-MS Feature count:" & strRightAlign & Trim(lngLCMSFeatureCount) & "<TD width=100>"
@@ -1410,6 +1447,15 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
             strRows(1) = strRows(1) & "<TD>NET error peak width:" & strRightAlign & Trim(.width) & "<TD>NET"
             strRows(2) = strRows(2) & "<TD>NET error peak height:" & strRightAlign & Trim(.Height) & "<TD>counts"
         End With
+        
+        ' Write out the STAC Stats
+        If GelData(udtWorkingParams.GelIndex).MostRecentSearchUsedSTAC Then
+            strRows(3) = "<TD>Unique AMT count, 1% FDR:" & strRightAlign & Trim(lngUniqueMTCount1PctFDR) & "<TD width=100>"
+            strRows(3) = strRows(3) & "<TD>Unique AMT count, 5% FDR:" & strRightAlign & Trim(lngUniqueMTCount5PctFDR) & "<TD width=100>"
+            strRows(3) = strRows(3) & "<TD>Unique AMT count, 10% FDR:" & strRightAlign & Trim(lngUniqueMTCount10PctFDR) & "<TD>"
+        Else
+            strRows(3) = "<TD>Search did not use STAC</TD>"
+        End If
         
         For intIndex = 0 To UBound(strRows)
             tsOutput.WriteLine "        <TR>" & strRows(intIndex) & "</TR>"
@@ -2137,6 +2183,7 @@ Private Sub AutoAnalysisInitializeWorkingParams(ByRef udtWorkingParams As udtAut
         .NextHistoryIndexToCopy = 0
         .LoadedGelFile = False
         .NETDefined = False
+        .SearchSummaryStatsDefined = False
     End With
 End Sub
 
@@ -4882,6 +4929,11 @@ Private Sub AutoAnalysisSearchDatabase(ByRef udtWorkingParams As udtAutoAnalysis
     Dim blnIdentifiedPairsOnly As Boolean, blnShowExcludedPairs As Boolean
     Dim blnExportNonMatchingUMCsSaved As Boolean, blnAddQuantitationEntrySaved As Boolean
     
+    Dim intSTACPlotIndex As Integer
+    Dim intTargetRow  As Integer
+    
+    Dim strPlotLabel As String
+    
 On Error GoTo SearchDatabaseErrorHandler
 
     If GelAnalysis(udtWorkingParams.GelIndex) Is Nothing Then
@@ -5008,6 +5060,8 @@ On Error GoTo SearchDatabaseErrorHandler
             RemoveAMT udtWorkingParams.GelIndex, glScope.glSc_All
             RemoveInternalStd udtWorkingParams.GelIndex, glScope.glSc_All
             
+            udtWorkingParams.SearchSummaryStatsDefined = False
+            
             ' Reset the Export Data Error Codes
             lngExportDataToDiskErrorCode = 0
             lngExportDataToDBErrorCode = 0
@@ -5122,7 +5176,22 @@ On Error GoTo SearchDatabaseErrorHandler
                         ' dbsmConglomerateUMCsWithNET
                         lngHitCount = .StartSearchAll()
                     End If
-                        
+                    
+                    udtWorkingParams.SearchSummaryStatsDefined = True
+                End With
+                
+                With udtWorkingParams.SearchSummaryStats
+                    frmSearchMT_ConglomerateUMC.GetSummaryStats .UMCCountWithHits, _
+                                                                .UniqueMTCount, _
+                                                                .UniqueIntStdCount, _
+                                                                .UniqueMTCount1PctFDR, _
+                                                                .UniqueMTCount5PctFDR, _
+                                                                .UniqueMTCount10PctFDR, _
+                                                                .MassToleranceFromSTAC, _
+                                                                .NETToleranceFromSTAC
+                End With
+                
+                With frmSearchMT_ConglomerateUMC
                     If Not glbPreferencesExpanded.AutoAnalysisOptions.DoNotSaveOrExport Then
                         If Not blnToleranceRefinementSearch And _
                           (eDBSearchMode = dbsmConglomerateUMCsPaired Or eDBSearchMode = dbsmConglomerateUMCsUnpaired Or eDBSearchMode = dbsmConglomerateUMCsLightPairsPlusUnpaired) Then
@@ -5141,20 +5210,42 @@ On Error GoTo SearchDatabaseErrorHandler
                         End If
                         
                         If glbPreferencesExpanded.UseSTAC Then
-                            ' Save the STAC stats as a tab-delimited file
-                            strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC_FDR.txt"
-                            strSTACFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strSTACFilePath)
-                            .ShowOrSaveSTACStats False, strSTACFilePath, False
-                            
-                            ' Save the STAC plot
-                            strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC.png"
-                            strSTACFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strSTACFilePath)
-                            
-                            ' Enlarge the form
+                        
+                             ' Save the STAC stats as a tab-delimited file
+                             strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC_FDR.txt"
+                             strSTACFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strSTACFilePath)
+                             .ShowOrSaveSTACStats False, strSTACFilePath, False
+                             
+                            ' Enlarge the form to make the plots look better
                             .AutoSizeForm True
-                            
-                            ' Save the plot
-                            .SaveSTACPlotToPNG strSTACFilePath
+                             
+                             ' Save two STAC plots; the first is unfiltered, the second is filtered on UP > 0.5
+                            For intSTACPlotIndex = 0 To 1
+                                
+                                If intSTACPlotIndex = 0 Then
+                                    .PlotUPFilteredFDR = False
+                                    strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC.png"
+                                    strPlotLabel = "STAC Trends"
+                                Else
+                                    .PlotUPFilteredFDR = True
+                                    strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC_UP.png"
+                                    strPlotLabel = "STAC Trends, FDR with UP > 0.5"
+                                End If
+                             
+                                ' Save the STAC plot
+                                strSTACFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strSTACFilePath)
+                                
+                                ' Create the PNG file
+                                .SaveSTACPlotToPNG strSTACFilePath
+                                
+                                If intSTACPlotIndex = 0 Then
+                                    intTargetRow = 4
+                                Else
+                                    intTargetRow = 1
+                                End If
+                                AddNewOutputFileForHtml udtWorkingParams, fso.GetFileName(strSTACFilePath), strPlotLabel, intTargetRow, 3, 350
+                                
+                            Next intSTACPlotIndex
                         End If
                         
                         ' Possibly export the results to a text file
@@ -5822,16 +5913,60 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
     ' 5a. Restore samtDef
     samtDef = udtAMTDefSaved
     
-    If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchMassTolerance Then
-        ' Update .MWTol to the refined mass tolerance
-        samtDef.MWTol = dblRefinedMassTol
-        samtDef.TolType = eRefinedTolType
-    End If
-    
-    If glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement.RefineDBSearchNETTolerance Then
-        ' Update .NETTol to the refined NET tolerance
-        samtDef.NETTol = dblRefinedNETTol
-    End If
+    With glbPreferencesExpanded.AutoAnalysisOptions.AutoToleranceRefinement
+        If .RefineDBSearchMassTolerance Then
+            ' Update .MWTol to the refined mass tolerance
+            
+            If blnUseStacSaved Then
+                ' STAC is enabled
+                ' Only update the tolerances if .UseRefinementWhenUsingSTAC = True
+                If .UseRefinementWhenUsingSTAC Then
+                    ' Update the auto-refined mass tolerance
+                    strMessage = "Updated refined mass tolerance from " & dblRefinedMassTol
+                    
+                    dblRefinedMassTol = dblRefinedMassTol * .RefinedTolMassMultiplierWhenUsingSTAC
+                    If dblRefinedMassTol > .DBSearchMWTol Then dblRefinedMassTol = .DBSearchMWTol
+                    
+                    strMessage = strMessage & " to " & dblRefinedMassTol & " using RefinedTolMassMultiplierWhenUsingSTAC = " & .RefinedTolMassMultiplierWhenUsingSTAC
+                Else
+                    ' Do not update the mass tolerance
+                    dblRefinedMassTol = samtDef.MWTol
+                    eRefinedTolType = samtDef.TolType
+                    strMessage = "Note: Mass Tolerance Refinement has been disabled because we are peak matching using STAC.  To override, set UseRefinementWhenUsingSTAC=True in the parameter file"
+                End If
+                AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage
+            End If
+            
+            samtDef.MWTol = dblRefinedMassTol
+            samtDef.TolType = eRefinedTolType
+        End If
+        
+        If .RefineDBSearchNETTolerance Then
+            ' Update .NETTol to the refined NET tolerance
+        
+            If blnUseStacSaved Then
+                ' STAC is enabled
+                ' Only update the tolerances if .UseRefinementWhenUsingSTAC = True
+                If .UseRefinementWhenUsingSTAC Then
+                    ' Update the auto-refined mass tolerance
+                    strMessage = "Updated refined NET tolerance from " & dblRefinedNETTol
+                    
+                    dblRefinedNETTol = dblRefinedNETTol * .RefinedTolNETMultiplierWhenUsingSTAC
+                    If dblRefinedNETTol > .DBSearchNETTol Then dblRefinedNETTol = .DBSearchNETTol
+                    
+                    strMessage = strMessage & " to " & dblRefinedNETTol & " using RefinedTolNETMultiplierWhenUsingSTAC = " & .RefinedTolNETMultiplierWhenUsingSTAC
+                    AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage
+                Else
+                    ' Do not update the NET tolerance
+                    dblRefinedNETTol = samtDef.NETTol
+                    strMessage = "Note: NET Tolerance Refinement has been disabled because we are peak matching using STAC.  To override, set UseRefinementWhenUsingSTAC=True in the parameter file"
+                End If
+                AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage
+            End If
+            
+            samtDef.NETTol = dblRefinedNETTol
+        End If
+    End With
     
     ' 5b. Copy samtDef to the other search definitions
     With GelSearchDef(udtWorkingParams.GelIndex)
@@ -6041,7 +6176,11 @@ Private Sub AutoAnalysisZoomOut(ByRef udtWorkingParams As udtAutoAnalysisWorking
     
 End Sub
 
-Public Sub AutoGenerateQCPlots(objCallingForm As Form, lngGelIndex As Long, Optional strFileNamePathBase As String = "", Optional blnShowMessages As Boolean = True)
+Public Sub AutoGenerateQCPlots(ByRef objCallingForm As Form, _
+                               ByVal lngGelIndex As Long, _
+                               Optional ByVal strFileNamePathBase As String = "", _
+                               Optional ByVal blnShowMessages As Boolean = True)
+                               
     ' Generates the various QC plots for the given Gel
     ' If strFileNamePathBase is blank, then prompts the user for the folder and base name to use
     ' If strFileNamePathBase only contains a folder name, then auto-assigns the base name
@@ -6084,6 +6223,7 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
         .GraphicOutputFileInfoCount = 0
         ReDim .GraphicOutputFileInfo(0)
         .TICPlotsStartRow = 4
+        .SearchSummaryStatsDefined = False
     End With
     
     ' Check whether Custom NETs exist or .UseRobustNETAdjustment is enabled
@@ -6262,21 +6402,6 @@ Private Function CheckAutoToleranceRefinementEnabled(ByRef udtAutoToleranceRefin
     Dim blnPerformRefinement As Boolean
 
     With udtAutoToleranceRefinement
-        
-        If glbPreferencesExpanded.UseSTAC Then
-            ' Override the tolerance refinement options to False, unless .UseRefinementWhenUsingSTAC is true
-            If Not .UseRefinementWhenUsingSTAC Then
-            
-                If .RefineDBSearchMassTolerance Or .RefineDBSearchNETTolerance Then
-                    .RefineDBSearchMassTolerance = False
-                    .RefineDBSearchNETTolerance = False
-                    
-                    If blnLogWarnings Then
-                        AutoAnalysisLog udtAutoParams, udtWorkingParams, "Note: Mass and NET Tolerance Refinement has been disabled because we are peak matching using STAC.  To override, set UseRefinementWhenUsingSTAC=True in the parameter file"
-                    End If
-                End If
-            End If
-        End If
     
         If .RefineMassCalibration Or .RefineDBSearchMassTolerance Or .RefineDBSearchNETTolerance Then
             blnPerformRefinement = True
@@ -6705,6 +6830,11 @@ On Error GoTo GenerateAutoAnalysisHtmlFileErrorHandler
                     AddNewOutputFileForHtml udtWorkingParams, strMatchingName, "Data With Matches", 1, 2
                 End If
                 
+                strTargetName = strBaseName & "STAC."
+                If GenerateAutoAnalysisFindFile(strFileNamesForFolder(), strTargetName, strMatchingName) Then
+                    AddNewOutputFileForHtml udtWorkingParams, strMatchingName, "STAC Trends", 1, 3
+                End If
+                
                 strTargetName = strBaseName & "NETAlignmentSurface."
                 If GenerateAutoAnalysisFindFile(strFileNamesForFolder(), strTargetName, strMatchingName) Then
                     AddNewOutputFileForHtml udtWorkingParams, strMatchingName, "NET Alignment Surface", 4, 1
@@ -6984,32 +7114,64 @@ Private Function LookupErrorBitDescription(lngErrorBits As Long) As String
     
 End Function
 
-Private Sub LookupMatchingUMCStats(ByVal lngGelIndex As Long, ByRef lngUMCCount As Long, ByRef lngUMCCountWithHits As Long, ByRef lngUniqueMassTagCount As Long)
+Private Sub LookupMatchingUMCStats(ByVal lngGelIndex As Long, _
+                                   ByRef lngUMCCount As Long, _
+                                   ByRef lngUMCCountWithHits As Long, _
+                                   ByRef lngUniqueMassTagCount As Long, _
+                                   ByRef lngUniqueMTCount1PctFDR As Long, _
+                                   ByRef lngUniqueMTCount5PctFDR As Long, _
+                                   ByRef lngUniqueMTCount10PctFDR As Long)
+                                   
     ' Step through the LC-MS Features for lngGelIndex and count the number with hits
     ' Also keep track of the number of unique MT tag hits
     ' Using a dictionary object as a hashtable
     
     Dim htMTHitList As Dictionary
+    
+    Dim htMTHitList1Pct As Dictionary
+    Dim htMTHitList5Pct As Dictionary
+    Dim htMTHitList10Pct As Dictionary
+    
     Dim lngUMCIndex As Long
     Dim lngMatchIndex As Long
+    Dim lngMassTagID As Long
     
     Dim udtUMCList() As udtUMCMassTagMatchStats
     Dim lngUMCListCount As Long
     Dim lngUMCListCountDimmed As Long
     
+    Dim dblSTACCuttoff1PctFDR As Double
+    Dim dblSTACCuttoff5PctFDR As Double
+    Dim dblSTACCuttoff10PctFDR As Double
+    
+    
 On Error GoTo LookupMatchingUMCStatsErrorHandler
 
+    lngUMCCountWithHits = 0
+    lngUniqueMassTagCount = 0
+    lngUniqueMTCount1PctFDR = 0
+    lngUniqueMTCount5PctFDR = 0
+    lngUniqueMTCount10PctFDR = 0
+    
+    dblSTACCuttoff1PctFDR = LookupSTACCutoffForFDR(0.01)
+    dblSTACCuttoff5PctFDR = LookupSTACCutoffForFDR(0.05)
+    dblSTACCuttoff10PctFDR = LookupSTACCutoffForFDR(0.1)
+    
     ' If there isn't data in memory, then the following will generate an error and jump to the error handler
     With GelUMC(lngGelIndex)
         lngUMCCount = .UMCCnt
-        lngUMCCountWithHits = 0
-        lngUniqueMassTagCount = 0
         
         lngUMCListCount = 0
         lngUMCListCountDimmed = 100
         ReDim udtUMCList(lngUMCListCountDimmed)
         
         Set htMTHitList = New Dictionary
+        
+        ' The following are populated with features passing a given STAC Score
+        Set htMTHitList1Pct = New Dictionary
+        Set htMTHitList5Pct = New Dictionary
+        Set htMTHitList10Pct = New Dictionary
+        
         htMTHitList.RemoveAll
         
         For lngUMCIndex = 0 To .UMCCnt - 1
@@ -7023,10 +7185,36 @@ On Error GoTo LookupMatchingUMCStatsErrorHandler
                     lngUMCCountWithHits = lngUMCCountWithHits + 1
                     
                     For lngMatchIndex = 0 To lngUMCListCount - 1
+                        
                         ' Note that udtUMCList(lngMatchIndex).IDIndex contains the actual MT tag ID
-                        If Not htMTHitList.Exists(udtUMCList(lngMatchIndex).IDIndex) Then
-                            htMTHitList.add udtUMCList(lngMatchIndex).IDIndex, 1
+                        ' (this isn't the case in other functions, but it should be the case here)
+                        lngMassTagID = udtUMCList(lngMatchIndex).IDIndex
+                        
+                        If Not htMTHitList.Exists(lngMassTagID) Then
+                            htMTHitList.add lngMassTagID, 1
                         End If
+                        
+                        If GelData(lngGelIndex).MostRecentSearchUsedSTAC Then
+                            If udtUMCList(lngMatchIndex).StacOrSLiC >= dblSTACCuttoff1PctFDR Then
+                                 If Not htMTHitList1Pct.Exists(lngMassTagID) Then
+                                    htMTHitList1Pct.add lngMassTagID, 1
+                                End If
+                            End If
+                            
+                            If udtUMCList(lngMatchIndex).StacOrSLiC >= dblSTACCuttoff5PctFDR Then
+                                 If Not htMTHitList5Pct.Exists(lngMassTagID) Then
+                                    htMTHitList5Pct.add lngMassTagID, 1
+                                End If
+                            End If
+                            
+                            If udtUMCList(lngMatchIndex).StacOrSLiC >= dblSTACCuttoff10PctFDR Then
+                                 If Not htMTHitList10Pct.Exists(lngMassTagID) Then
+                                    htMTHitList10Pct.add lngMassTagID, 1
+                                End If
+                            End If
+                            
+                        End If
+                        
                     Next lngMatchIndex
                     
                 End If
@@ -7034,6 +7222,12 @@ On Error GoTo LookupMatchingUMCStatsErrorHandler
         Next lngUMCIndex
         
         lngUniqueMassTagCount = htMTHitList.Count
+        
+        lngUniqueMTCount1PctFDR = htMTHitList1Pct.Count
+        lngUniqueMTCount5PctFDR = htMTHitList5Pct.Count
+        lngUniqueMTCount10PctFDR = htMTHitList10Pct.Count
+    
+    
     End With
     
     Exit Sub
