@@ -283,6 +283,8 @@ Public Type udtSearchSummaryStatsType
     UniqueMTCount1PctFDR As Long
     UniqueMTCount5PctFDR As Long
     UniqueMTCount10PctFDR As Long
+    UniqueMTCount25PctFDR As Long
+    UniqueMTCount50PctFDR As Long
     
     MassToleranceFromSTAC As Double     ' Half-width of the Mass error histogram at the base (at 2.5 StDev)
     NETToleranceFromSTAC As Double      ' Half-width of the NET error histogram at the base (at 2.5 StDev)

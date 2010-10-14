@@ -1302,6 +1302,8 @@ Private Sub AutoAnalysisGenerateHTMLBrowsingFile(ByRef udtWorkingParams As udtAu
     Dim lngUniqueMTCount1PctFDR As Long
     Dim lngUniqueMTCount5PctFDR As Long
     Dim lngUniqueMTCount10PctFDR As Long
+    Dim lngUniqueMTCount25PctFDR As Long
+    Dim lngUniqueMTCount50PctFDR As Long
     
     Dim intPicFilesCount As Integer
     Dim strPicFiles() As String
@@ -1406,6 +1408,8 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
                     lngUniqueMTCount1PctFDR = .UniqueMTCount1PctFDR
                     lngUniqueMTCount5PctFDR = .UniqueMTCount5PctFDR
                     lngUniqueMTCount10PctFDR = .UniqueMTCount10PctFDR
+                    lngUniqueMTCount25PctFDR = .UniqueMTCount25PctFDR
+                    lngUniqueMTCount50PctFDR = .UniqueMTCount50PctFDR
                 End With
             Else
                 If udtWorkingParams.GelIndex > 0 Then
@@ -1416,7 +1420,10 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
                                            lngUniqueMassTagCount, _
                                            lngUniqueMTCount1PctFDR, _
                                            lngUniqueMTCount5PctFDR, _
-                                           lngUniqueMTCount10PctFDR
+                                           lngUniqueMTCount10PctFDR, _
+                                           lngUniqueMTCount25PctFDR, _
+                                           lngUniqueMTCount50PctFDR
+
     
                 Else
                     ' Data is not in memory and task ID is undefined
@@ -5187,6 +5194,8 @@ On Error GoTo SearchDatabaseErrorHandler
                                                                 .UniqueMTCount1PctFDR, _
                                                                 .UniqueMTCount5PctFDR, _
                                                                 .UniqueMTCount10PctFDR, _
+                                                                .UniqueMTCount25PctFDR, _
+                                                                .UniqueMTCount50PctFDR, _
                                                                 .MassToleranceFromSTAC, _
                                                                 .NETToleranceFromSTAC
                 End With
@@ -7120,7 +7129,9 @@ Private Sub LookupMatchingUMCStats(ByVal lngGelIndex As Long, _
                                    ByRef lngUniqueMassTagCount As Long, _
                                    ByRef lngUniqueMTCount1PctFDR As Long, _
                                    ByRef lngUniqueMTCount5PctFDR As Long, _
-                                   ByRef lngUniqueMTCount10PctFDR As Long)
+                                   ByRef lngUniqueMTCount10PctFDR As Long, _
+                                   ByRef lngUniqueMTCount25PctFDR As Long, _
+                                   ByRef lngUniqueMTCount50PctFDR As Long)
                                    
     ' Step through the LC-MS Features for lngGelIndex and count the number with hits
     ' Also keep track of the number of unique MT tag hits
@@ -7131,6 +7142,8 @@ Private Sub LookupMatchingUMCStats(ByVal lngGelIndex As Long, _
     Dim htMTHitList1Pct As Dictionary
     Dim htMTHitList5Pct As Dictionary
     Dim htMTHitList10Pct As Dictionary
+    Dim htMTHitList25Pct As Dictionary
+    Dim htMTHitList50Pct As Dictionary
     
     Dim lngUMCIndex As Long
     Dim lngMatchIndex As Long
@@ -7143,6 +7156,8 @@ Private Sub LookupMatchingUMCStats(ByVal lngGelIndex As Long, _
     Dim dblSTACCuttoff1PctFDR As Double
     Dim dblSTACCuttoff5PctFDR As Double
     Dim dblSTACCuttoff10PctFDR As Double
+    Dim dblSTACCuttoff25PctFDR As Double
+    Dim dblSTACCuttoff50PctFDR As Double
     
     
 On Error GoTo LookupMatchingUMCStatsErrorHandler
@@ -7152,10 +7167,15 @@ On Error GoTo LookupMatchingUMCStatsErrorHandler
     lngUniqueMTCount1PctFDR = 0
     lngUniqueMTCount5PctFDR = 0
     lngUniqueMTCount10PctFDR = 0
+    lngUniqueMTCount25PctFDR = 0
+    lngUniqueMTCount50PctFDR = 0
+    
     
     dblSTACCuttoff1PctFDR = LookupSTACCutoffForFDR(0.01)
     dblSTACCuttoff5PctFDR = LookupSTACCutoffForFDR(0.05)
     dblSTACCuttoff10PctFDR = LookupSTACCutoffForFDR(0.1)
+    dblSTACCuttoff25PctFDR = LookupSTACCutoffForFDR(0.25)
+    dblSTACCuttoff50PctFDR = LookupSTACCutoffForFDR(0.5)
     
     ' If there isn't data in memory, then the following will generate an error and jump to the error handler
     With GelUMC(lngGelIndex)
@@ -7171,6 +7191,8 @@ On Error GoTo LookupMatchingUMCStatsErrorHandler
         Set htMTHitList1Pct = New Dictionary
         Set htMTHitList5Pct = New Dictionary
         Set htMTHitList10Pct = New Dictionary
+        Set htMTHitList25Pct = New Dictionary
+        Set htMTHitList50Pct = New Dictionary
         
         htMTHitList.RemoveAll
         
@@ -7213,6 +7235,17 @@ On Error GoTo LookupMatchingUMCStatsErrorHandler
                                 End If
                             End If
                             
+                            If udtUMCList(lngMatchIndex).StacOrSLiC >= dblSTACCuttoff25PctFDR Then
+                                 If Not htMTHitList25Pct.Exists(lngMassTagID) Then
+                                    htMTHitList25Pct.add lngMassTagID, 1
+                                End If
+                            End If
+                            
+                            If udtUMCList(lngMatchIndex).StacOrSLiC >= dblSTACCuttoff50PctFDR Then
+                                 If Not htMTHitList50Pct.Exists(lngMassTagID) Then
+                                    htMTHitList50Pct.add lngMassTagID, 1
+                                End If
+                            End If
                         End If
                         
                     Next lngMatchIndex
@@ -7226,7 +7259,8 @@ On Error GoTo LookupMatchingUMCStatsErrorHandler
         lngUniqueMTCount1PctFDR = htMTHitList1Pct.Count
         lngUniqueMTCount5PctFDR = htMTHitList5Pct.Count
         lngUniqueMTCount10PctFDR = htMTHitList10Pct.Count
-    
+        lngUniqueMTCount25PctFDR = htMTHitList25Pct.Count
+        lngUniqueMTCount50PctFDR = htMTHitList50Pct.Count
     
     End With
     

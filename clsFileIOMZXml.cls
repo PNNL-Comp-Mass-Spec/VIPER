@@ -19,7 +19,7 @@ Option Explicit
 ' Program started March 24, 2006
 '
 ' E-mail: matthew.monroe@pnl.gov or matt@alchemistmatt.com
-' Website: http://ncrr.pnl.gov/ or http://www.sysbio.org/resources/staff/
+' Website: http://omics.pnl.gov/ or http://www.sysbio.org/resources/staff/
 ' -------------------------------------------------------------------------------
 
 Private Const SCAN_INFO_DIM_CHUNK As Long = 10000

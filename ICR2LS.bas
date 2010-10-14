@@ -392,7 +392,7 @@ Public Sub InitICR2LS()
           strMessage = ""
           strMessage = strMessage & "Error creating ICR-2LS object. You will be unable to view raw mass spectra. "
           strMessage = strMessage & "Make sure that latest versions of both ICR-2LS and Viper are installed on this computer. "
-          strMessage = strMessage & "If inside PNNL, go to \\floyd\software\Viper\ and \\floyd\software\ICR-2LS\.  If outside PNNL, please visit http://ncrr.pnl.gov/software/"
+          strMessage = strMessage & "If inside PNNL, go to \\floyd\software\Viper\ and \\floyd\software\ICR-2LS\.  If outside PNNL, please visit http://omics.pnl.gov/software/"
           MsgBox strMessage, vbInformation + vbOKOnly, "Error"
        End If
        Err.Clear

@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' Code ported by Matthew Monroe from the Averagine.cpp file in
-' the Decon2LS application (written by Deep Jaitly and available at http://ncrr.pnl.gov/software/)
+' the Decon2LS application (written by Deep Jaitly and available at http://omics.pnl.gov/software/)
 
 Private Type udtAveragineElementInfoType
     Symbol As String        ' Single letter symbol

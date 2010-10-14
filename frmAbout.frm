@@ -233,7 +233,7 @@ Private Sub UpdateMessages()
     strMessage = strMessage & "Program written by Matthew Monroe, Nikola Tolic, Deep Jaitly, Kyle Littlefield, and Jason McCann for the Department of Energy (PNNL, Richland, WA) in 2000-2006" & vbCrLf & vbCrLf
     
     strMessage = strMessage & "E-mail: matthew.monroe@pnl.gov or matt@alchemistmatt.com" & vbCrLf
-    strMessage = strMessage & "Website: http://ncrr.pnl.gov/ or http://www.sysbio.org/resources/staff/" & vbCrLf & vbCrLf
+    strMessage = strMessage & "Website: http://omics.pnl.gov/ or http://www.sysbio.org/resources/staff/" & vbCrLf & vbCrLf
     
     If APP_BUILD_DISABLE_LCMSWARP Then
         strMessage = strMessage & "Linear NET Version" & vbCrLf & vbCrLf

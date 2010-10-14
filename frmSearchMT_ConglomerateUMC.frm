@@ -4,14 +4,23 @@ Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Begin VB.Form frmSearchMT_ConglomerateUMC 
    BackColor       =   &H00FFFFFF&
    Caption         =   "Search MT tag DB - Single LC-MS Feature Mass"
-   ClientHeight    =   7185
+   ClientHeight    =   7725
    ClientLeft      =   60
    ClientTop       =   630
    ClientWidth     =   14025
    LinkTopic       =   "Form1"
-   ScaleHeight     =   7185
+   ScaleHeight     =   7725
    ScaleWidth      =   14025
    StartUpPosition =   1  'CenterOwner
+   Begin VB.TextBox txtSTACMatchStats 
+      Height          =   525
+      Left            =   60
+      Locked          =   -1  'True
+      MultiLine       =   -1  'True
+      TabIndex        =   70
+      Top             =   7100
+      Width           =   7455
+   End
    Begin VB.Frame fraSTACPlotOptions 
       BackColor       =   &H00FFFFFF&
       Caption         =   "STAC Plot Options"
@@ -1441,6 +1450,7 @@ Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False
         Else
             Me.width = 7800
             Me.Height = 8000
+            txtSTACMatchStats.Visible = False
         End If
     End If
     
@@ -1654,6 +1664,8 @@ Private Function DisplayHitSummary(strSearchScope As String) As String
 
     Dim strMessage As String
     Dim strStats As String
+    Dim strSTACStats As String
+    
     Dim strSearchItems As String
     Dim strModMassDescription As String
     
@@ -1709,11 +1721,20 @@ Private Function DisplayHitSummary(strSearchScope As String) As String
         strStats = strStats & "; Unique Int Stds = " & LongToStringWithCommas(mSearchSummaryStats.UniqueIntStdCount) & " / " & LongToStringWithCommas(UMCInternalStandards.Count)
     End If
     
-    strStats = strStats & "; Unique AMT count, 1% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount1PctFDR) & ";  " & _
-                          "5% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount5PctFDR) & ";  " & _
-                          "10% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount10PctFDR)
+    strSTACStats = "Unique AMT count, 1% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount1PctFDR) & ";  " & _
+                   "5% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount5PctFDR) & ";  " & _
+                   "10% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount10PctFDR) & ";  " & _
+                   "25% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount25PctFDR)
     
     txtUniqueMatchStats.Text = strStats
+    
+    If Not txtSTACMatchStats.Visible Then
+        If GelData(CallerID).MostRecentSearchUsedSTAC Then
+            txtSTACMatchStats.Visible = True
+        End If
+    End If
+    
+    txtSTACMatchStats.Text = strSTACStats
     
     AddToAnalysisHistory CallerID, "Match stats: " & strStats
 
@@ -1740,8 +1761,10 @@ Private Sub EnableDisableControls()
     
     If Me.UseSTAC Then
         chkSTACUsesPriorProbability.Enabled = True
+        txtSTACMatchStats.Visible = True
     Else
         chkSTACUsesPriorProbability.Enabled = False
+        txtSTACMatchStats.Visible = False
     End If
     
     AutoSizeForm
@@ -2197,7 +2220,12 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                                                              blnSetStateToOK, strIniFileName, _
                                                              blnOverrideMassNETTolerance, _
                                                              mSearchSummaryStats.MassToleranceFromSTAC, _
-                                                             mSearchSummaryStats.NETToleranceFromSTAC)
+                                                             mSearchSummaryStats.NETToleranceFromSTAC, _
+                                                             mSearchSummaryStats.UniqueMTCount1PctFDR, _
+                                                             mSearchSummaryStats.UniqueMTCount5PctFDR, _
+                                                             mSearchSummaryStats.UniqueMTCount10PctFDR, _
+                                                             mSearchSummaryStats.UniqueMTCount25PctFDR, _
+                                                             mSearchSummaryStats.UniqueMTCount50PctFDR)
     
     If lngErrorNumber <> 0 Then
         Debug.Assert False
@@ -2620,6 +2648,8 @@ Private Sub GenerateUniqueMatchStats()
     Dim htMTHitList1Pct As Dictionary
     Dim htMTHitList5Pct As Dictionary
     Dim htMTHitList10Pct As Dictionary
+    Dim htMTHitList25Pct As Dictionary
+    Dim htMTHitList50Pct As Dictionary
     
     Dim blnUMCHasMatch() As Boolean
     Dim blnPMTTagMatched() As Boolean
@@ -2640,6 +2670,8 @@ On Error GoTo GenerateUniqueMatchStatsErrorHandler
         .UniqueMTCount1PctFDR = 0
         .UniqueMTCount5PctFDR = 0
         .UniqueMTCount10PctFDR = 0
+        .UniqueMTCount25PctFDR = 0
+        .UniqueMTCount50PctFDR = 0
         
         ' Don't clear .MassToleranceFromSTAC or .NETToleranceFromSTAC; they've already been populated
     End With
@@ -2657,10 +2689,14 @@ On Error GoTo GenerateUniqueMatchStatsErrorHandler
     Set htMTHitList1Pct = New Dictionary
     Set htMTHitList5Pct = New Dictionary
     Set htMTHitList10Pct = New Dictionary
+    Set htMTHitList25Pct = New Dictionary
+    Set htMTHitList50Pct = New Dictionary
     
     htMTHitList1Pct.RemoveAll
     htMTHitList5Pct.RemoveAll
     htMTHitList10Pct.RemoveAll
+    htMTHitList25Pct.RemoveAll
+    htMTHitList50Pct.RemoveAll
     
     For lngIndex = 0 To mMatchStatsCount - 1
         lngUMCIndexOriginal = mUMCMatchStats(lngIndex).UMCIndex
@@ -2689,19 +2725,31 @@ On Error GoTo GenerateUniqueMatchStatsErrorHandler
                 Debug.Assert False
             End If
        
-            If mUMCMatchStats(lngIndex).FDRThreshold <= 0.1 Then
-                If Not htMTHitList10Pct.Exists(lngMassTagIndexOriginal) Then
-                    htMTHitList10Pct.add lngMassTagIndexOriginal, 1
+            If mUMCMatchStats(lngIndex).FDRThreshold <= 0.5 Then
+                If Not htMTHitList50Pct.Exists(lngMassTagIndexOriginal) Then
+                    htMTHitList50Pct.add lngMassTagIndexOriginal, 1
                 End If
                 
-                If mUMCMatchStats(lngIndex).FDRThreshold <= 0.05 Then
-                    If Not htMTHitList5Pct.Exists(lngMassTagIndexOriginal) Then
-                        htMTHitList5Pct.add lngMassTagIndexOriginal, 1
-                    End If
-                       
-                    If mUMCMatchStats(lngIndex).FDRThreshold <= 0.01 Then
-                        If Not htMTHitList1Pct.Exists(lngMassTagIndexOriginal) Then
-                            htMTHitList1Pct.add lngMassTagIndexOriginal, 1
+                If mUMCMatchStats(lngIndex).FDRThreshold <= 0.25 Then
+                If Not htMTHitList25Pct.Exists(lngMassTagIndexOriginal) Then
+                    htMTHitList25Pct.add lngMassTagIndexOriginal, 1
+                End If
+                        
+                    If mUMCMatchStats(lngIndex).FDRThreshold <= 0.1 Then
+                        If Not htMTHitList10Pct.Exists(lngMassTagIndexOriginal) Then
+                            htMTHitList10Pct.add lngMassTagIndexOriginal, 1
+                        End If
+                        
+                        If mUMCMatchStats(lngIndex).FDRThreshold <= 0.05 Then
+                            If Not htMTHitList5Pct.Exists(lngMassTagIndexOriginal) Then
+                                htMTHitList5Pct.add lngMassTagIndexOriginal, 1
+                            End If
+                               
+                            If mUMCMatchStats(lngIndex).FDRThreshold <= 0.01 Then
+                                If Not htMTHitList1Pct.Exists(lngMassTagIndexOriginal) Then
+                                    htMTHitList1Pct.add lngMassTagIndexOriginal, 1
+                                End If
+                            End If
                         End If
                     End If
                 End If
@@ -2731,6 +2779,8 @@ On Error GoTo GenerateUniqueMatchStatsErrorHandler
         .UniqueMTCount1PctFDR = htMTHitList1Pct.Count
         .UniqueMTCount5PctFDR = htMTHitList5Pct.Count
         .UniqueMTCount10PctFDR = htMTHitList10Pct.Count
+        .UniqueMTCount25PctFDR = htMTHitList25Pct.Count
+        .UniqueMTCount50PctFDR = htMTHitList50Pct.Count
     End With
     
     Exit Sub
@@ -2776,6 +2826,8 @@ Public Sub GetSummaryStats(ByRef UMCCountWithHits As Long, _
                            ByRef UniqueMTCount1PctFDR As Long, _
                            ByRef UniqueMTCount5PctFDR As Long, _
                            ByRef UniqueMTCount10PctFDR As Long, _
+                           ByRef UniqueMTCount25PctFDR As Long, _
+                           ByRef UniqueMTCount50PctFDR As Long, _
                            ByRef MassToleranceFromSTAC As Double, _
                            ByRef NETToleranceFromSTAC As Double)
                             
@@ -2786,6 +2838,8 @@ Public Sub GetSummaryStats(ByRef UMCCountWithHits As Long, _
         UniqueMTCount1PctFDR = .UniqueMTCount1PctFDR
         UniqueMTCount5PctFDR = .UniqueMTCount5PctFDR
         UniqueMTCount10PctFDR = .UniqueMTCount10PctFDR
+        UniqueMTCount25PctFDR = .UniqueMTCount25PctFDR
+        UniqueMTCount50PctFDR = .UniqueMTCount50PctFDR
         MassToleranceFromSTAC = .MassToleranceFromSTAC
         NETToleranceFromSTAC = .NETToleranceFromSTAC
     End With
@@ -3699,6 +3753,8 @@ On Error GoTo PerformSearchErrorHandler
         .UniqueMTCount1PctFDR = 0
         .UniqueMTCount5PctFDR = 0
         .UniqueMTCount10PctFDR = 0
+        .UniqueMTCount25PctFDR = 0
+        .UniqueMTCount50PctFDR = 0
         .MassToleranceFromSTAC = 0
         .NETToleranceFromSTAC = 0
     End With
@@ -3763,6 +3819,7 @@ On Error GoTo PerformSearchErrorHandler
     If PrepareMTArrays() Then
         mUMCCountSkippedSinceRefPresent = 0
         txtUniqueMatchStats.Text = ""
+        txtSTACMatchStats.Text = ""
 
         STACStatsCount = 0
         lvwSTACStats.ListItems.Clear

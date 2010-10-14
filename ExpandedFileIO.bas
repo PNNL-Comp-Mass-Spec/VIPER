@@ -56,7 +56,7 @@ Public Function BinaryLoadData(ByVal strFilePath As String, ByVal lngGelIndex As
     ' strFilePath must point to a valid path
     ' Returns True if success, False if failure
     
-    Const FILE_FORMAT_ERROR_MESSAGE As String = "in the input file was saved using a newer (or unknown) file format and therefore cannot be loaded.  Please install the latest version of Viper, available inside PNNL at \\floyd\software\viper\ and outside PNNL at http://ncrr.pnl.gov/software/  For more information (inside PNNL), visit http://pogo/PASTNews/ or http://proteomics.emsl.pnl.gov/"
+    Const FILE_FORMAT_ERROR_MESSAGE As String = "in the input file was saved using a newer (or unknown) file format and therefore cannot be loaded.  Please install the latest version of Viper, available inside PNNL at \\floyd\software\viper\ and outside PNNL at http://omics.pnl.gov/software/  For more information (inside PNNL), visit http://pogo/PASTNews/ or http://proteomics.emsl.pnl.gov/"
 
     Dim InFileNum As Integer
     Dim intSectionID As Integer

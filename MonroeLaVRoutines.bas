@@ -4635,7 +4635,7 @@ On Error GoTo ParseCommandLineErrorHandler
         strMessage = strMessage & "This is version " & GetProgramVersion & " (" & APP_BUILD_DATE & ")" & vbCrLf & vbCrLf
         
         strMessage = strMessage & "E-mail: matthew.monroe@pnl.gov or matt@alchemistmatt.com" & vbCrLf
-        strMessage = strMessage & "Website: http://ncrr.pnl.gov/ or http://www.sysbio.org/resources/staff/" & vbCrLf & vbCrLf
+        strMessage = strMessage & "Website: http://omics.pnl.gov/ or http://www.sysbio.org/resources/staff/" & vbCrLf & vbCrLf
         
         strMessage = strMessage & "Licensed under the Apache License, Version 2.0; you may not use this file except in compliance with the License.  "
         strMessage = strMessage & "You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0" & vbCrLf & vbCrLf

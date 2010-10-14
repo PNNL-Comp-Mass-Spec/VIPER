@@ -1303,7 +1303,7 @@ End If
 If blnCreateNewEntryInMMDTable Then
     TraceLog 5, "frmSearchMTPairs->ExportIDPairsToUMCResultsTable", "Call AddEntryToMatchMakingDescriptionTable"
     'first write new analysis in T_Match_Making_Description table
-    lngErrorNumber = AddEntryToMatchMakingDescriptionTableEx(cnNew, lngMDID, ExpAnalysisSPName, CallerID, mMatchStatsCount, GelData(CallerID).CustomNETsDefined, True, strIniFileName, False, 0, 0)
+    lngErrorNumber = AddEntryToMatchMakingDescriptionTableEx(cnNew, lngMDID, ExpAnalysisSPName, CallerID, mMatchStatsCount, GelData(CallerID).CustomNETsDefined, True, strIniFileName, False, 0, 0, 0, 0, 0, 0, 0)
 Else
     lngErrorNumber = 0
 End If

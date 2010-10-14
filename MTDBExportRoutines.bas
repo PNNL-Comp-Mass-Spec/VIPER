@@ -120,9 +120,26 @@ Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Conne
     Dim strIniFileName As String
     Dim blnOverrideMassNETTolerance As Boolean
     
+    Dim MWToleranceOverride As Double
+    Dim NETToleranceOverride As Double
+    
+    Dim UniqueMTCount1PctFDR As Long
+    Dim UniqueMTCount5PctFDR As Long
+    Dim UniqueMTCount10PctFDR As Long
+    Dim UniqueMTCount25PctFDR As Long
+    Dim UniqueMTCount50PctFDR As Long
+    
     blnSetStateToOK = True
     strIniFileName = ""
     blnOverrideMassNETTolerance = False
+    
+    MWToleranceOverride = 0
+    NETToleranceOverride = 0
+    UniqueMTCount1PctFDR = 0
+    UniqueMTCount5PctFDR = 0
+    UniqueMTCount10PctFDR = 0
+    UniqueMTCount25PctFDR = 0
+    UniqueMTCount50PctFDR = 0
     
     AddEntryToMatchMakingDescriptionTable = AddEntryToMatchMakingDescriptionTableEx( _
                                                 cnNew, _
@@ -133,21 +150,33 @@ Public Function AddEntryToMatchMakingDescriptionTable(ByRef cnNew As ADODB.Conne
                                                 blnUsedCustomNETs, _
                                                 blnSetStateToOK, _
                                                 strIniFileName, _
-                                                blnOverrideMassNETTolerance, 0, 0)
+                                                blnOverrideMassNETTolerance, _
+                                                MWToleranceOverride, _
+                                                NETToleranceOverride, _
+                                                UniqueMTCount1PctFDR, _
+                                                UniqueMTCount5PctFDR, _
+                                                UniqueMTCount10PctFDR, _
+                                                UniqueMTCount25PctFDR, _
+                                                UniqueMTCount50PctFDR)
 End Function
 
 
 Public Function AddEntryToMatchMakingDescriptionTableEx(ByRef cnNew As ADODB.Connection, _
-                                                      ByRef lngMDID As Long, _
-                                                      ByVal ExpAnalysisSPName As String, _
-                                                      ByVal lngGelIndex As Long, _
-                                                      ByVal lngMatchHitCount As Long, _
-                                                      ByVal blnUsedCustomNETs As Boolean, _
-                                                      ByVal blnSetStateToOK As Boolean, _
-                                                      ByVal strIniFileName As String, _
-                                                      ByVal blnOverrideMassNETTolerance As Boolean, _
-                                                      ByVal dblMWToleranceOverride As Double, _
-                                                      ByVal dblNETToleranceOverride As Double) As Long
+                                                        ByRef lngMDID As Long, _
+                                                        ByVal ExpAnalysisSPName As String, _
+                                                        ByVal lngGelIndex As Long, _
+                                                        ByVal lngMatchHitCount As Long, _
+                                                        ByVal blnUsedCustomNETs As Boolean, _
+                                                        ByVal blnSetStateToOK As Boolean, _
+                                                        ByVal strIniFileName As String, _
+                                                        ByVal OverrideMassNETTolerance As Boolean, _
+                                                        ByVal MWToleranceOverride As Double, _
+                                                        ByVal NETToleranceOverride As Double, _
+                                                        ByVal UniqueMTCount1PctFDR As Long, _
+                                                        ByVal UniqueMTCount5PctFDR As Long, _
+                                                        ByVal UniqueMTCount10PctFDR As Long, _
+                                                        ByVal UniqueMTCount25PctFDR As Long, _
+                                                        ByVal UniqueMTCount50PctFDR As Long) As Long
                                                       
     ' Returns 0 if success, the error number if an error
     
@@ -199,6 +228,12 @@ Public Function AddEntryToMatchMakingDescriptionTableEx(ByRef cnNew As ADODB.Con
     Dim prmMinimumPeptideProphetProbability As New ADODB.Parameter  ' Minimum Peptide Prophet Probability for MT tags loaded from database
     Dim prmMatchScoreMode As New ADODB.Parameter                ' 0 if .UseStac = False; 1 if .UseStac = True
     Dim prmSTACUsedPriorProbability As New ADODB.Parameter      ' 1 if we used prior probabilities when searching with STAC
+    
+    Dim prmAMTCount1pctFDR As New ADODB.Parameter               ' Unique count of AMT tags with FDR <= 0.01
+    Dim prmAMTCount5pctFDR As New ADODB.Parameter               ' Unique count of AMT tags with FDR <= 0.05
+    Dim prmAMTCount10pctFDR As New ADODB.Parameter              ' Unique count of AMT tags with FDR <= 0.10
+    Dim prmAMTCount25pctFDR As New ADODB.Parameter              ' Unique count of AMT tags with FDR <= 0.25
+    Dim prmAMTCount50pctFDR As New ADODB.Parameter              ' Unique count of AMT tags with FDR <= 0.50
     
     Dim strEntryInAnalysisHistory As String, lngValueFromAnalysisHistory As Long
     Dim strNetAdjUMCsWithDBHits As String
@@ -308,8 +343,8 @@ On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
     With prmMMATolerancePPM
         .precision = 9
         .NumericScale = 4
-        If blnOverrideMassNETTolerance Then
-            .Value = ValueToSqlDecimal(dblMWToleranceOverride, sdcSqlDecimal9x4)
+        If OverrideMassNETTolerance Then
+            .Value = ValueToSqlDecimal(MWToleranceOverride, sdcSqlDecimal9x4)
         Else
             .Value = ValueToSqlDecimal(samtDef.MWTol, sdcSqlDecimal9x4)
         End If
@@ -321,8 +356,8 @@ On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
     With prmNETTolerance
         .precision = 9
         .NumericScale = 5
-        If blnOverrideMassNETTolerance Then
-            .Value = ValueToSqlDecimal(dblNETToleranceOverride, sdcSqlDecimal9x5)
+        If OverrideMassNETTolerance Then
+            .Value = ValueToSqlDecimal(NETToleranceOverride, sdcSqlDecimal9x5)
         Else
             .Value = ValueToSqlDecimal(samtDef.NETTol, sdcSqlDecimal9x5)
         End If
@@ -486,6 +521,22 @@ On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
     
     Set prmSTACUsedPriorProbability = cmdPutNewMM.CreateParameter("STACUsesPriorProbability", adTinyInt, adParamInput, , intValueForDB)
     cmdPutNewMM.Parameters.Append prmSTACUsedPriorProbability
+    
+    
+    Set prmAMTCount1pctFDR = cmdPutNewMM.CreateParameter("AMTCount1pctFDR", adInteger, adParamInput, , UniqueMTCount1PctFDR)
+    cmdPutNewMM.Parameters.Append prmAMTCount1pctFDR
+    
+    Set prmAMTCount5pctFDR = cmdPutNewMM.CreateParameter("AMTCount5pctFDR", adInteger, adParamInput, , UniqueMTCount5PctFDR)
+    cmdPutNewMM.Parameters.Append prmAMTCount5pctFDR
+    
+    Set prmAMTCount10pctFDR = cmdPutNewMM.CreateParameter("AMTCount10pctFDR", adInteger, adParamInput, , UniqueMTCount10PctFDR)
+    cmdPutNewMM.Parameters.Append prmAMTCount10pctFDR
+    
+    Set prmAMTCount25pctFDR = cmdPutNewMM.CreateParameter("AMTCount25pctFDR", adInteger, adParamInput, , UniqueMTCount25PctFDR)
+    cmdPutNewMM.Parameters.Append prmAMTCount25pctFDR
+    
+    Set prmAMTCount50pctFDR = cmdPutNewMM.CreateParameter("AMTCount50pctFDR", adInteger, adParamInput, , UniqueMTCount50PctFDR)
+    cmdPutNewMM.Parameters.Append prmAMTCount50pctFDR
     
     
     ' Call the SP

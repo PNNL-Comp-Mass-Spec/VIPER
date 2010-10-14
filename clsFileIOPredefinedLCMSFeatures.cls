@@ -19,7 +19,7 @@ Option Explicit
 ' Class created August 1, 2009
 '
 ' E-mail: matthew.monroe@pnl.gov or matt@alchemistmatt.com
-' Website: http://ncrr.pnl.gov/ or http://www.sysbio.org/resources/staff/
+' Website: http://omics.pnl.gov/ or http://www.sysbio.org/resources/staff/
 ' -------------------------------------------------------------------------------
 
 ' This class reads pre-defined LC/MS features from a text file, populating the data structures for the given Gel

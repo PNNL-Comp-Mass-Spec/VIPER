@@ -948,7 +948,7 @@ Private Sub mnuToolsGenerateIndexHtmlFiles_Click()
 End Sub
 
 Private Sub mnuV2DGelHelp_Click()
-    MsgBox "Please see the Powerpoint Help file (e.g. VIPER_HelpFile_v3.20.ppt).  If inside PNNL, you can find this file at \\floyd\software\VIPER\ .  If outside PNNL, please visit http://ncrr.pnl.gov/software/ for help on using this software.", vbInformation + vbOKOnly, glFGTU
+    MsgBox "Please see the Powerpoint Help file (e.g. VIPER_HelpFile_v3.20.ppt).  If inside PNNL, you can find this file at \\floyd\software\VIPER\ .  If outside PNNL, please visit http://omics.pnl.gov/software/ for help on using this software.", vbInformation + vbOKOnly, glFGTU
 End Sub
 
 Public Sub ProperToolbar(ByVal bAnyChild As Boolean)
