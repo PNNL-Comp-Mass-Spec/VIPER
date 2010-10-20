@@ -606,6 +606,8 @@ Public Function ConstructInternalStdReference(ByVal MW As Double, _
                                               ByVal dblDelSLiCScore As Double, _
                                               ByVal dblUPScore As Double) As String
     
+    Static lngAssertCount As Long
+    
     'returns InternalStd reference string based on MW and samtDef
     'this function is called from SearchAMT and similar functions
     
@@ -632,8 +634,17 @@ On Error GoTo exit_ConstructInternalStdReference
         
         NETTolRef = .NET - NETRT
 
-        ' The following assertion will fail if we used a huge search tolerance
-        Debug.Assert Abs(MWTolRef) < 1
+        If Abs(MWTolRef) >= 1 Then
+            ' MWTolRef will generally be less than 1, but if we used a huge search tolerance
+            ' then it could be larger than 1
+            lngAssertCount = lngAssertCount + 1
+            
+            If lngAssertCount <= 3 Then
+                ' Only stop the first 3 times this happens
+                Debug.Assert False
+            End If
+        End If
+        
         
         sMWTolRef = MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd
         sNETTolRef = NETErrMark & Format$(NETTolRef, "0.000") & NETErrEnd

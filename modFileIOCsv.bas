@@ -54,6 +54,10 @@ Private Const ISOS_COLUMN_MONO_MINUS4_ABUNDANCE As String = "mono_minus4_abundan
 Private Const ISOS_COLUMN_IMS_DRIFT_TIME As String = "drift_time"
 Private Const ISOS_COLUMN_IMS_CUMULATIVE_DRIFT_TIME As String = "cumulative_drift_time"
 
+Private Const ISOS_COLUMN_ORIG_INTENSITY As String = "orig_intensity"
+Private Const ISOS_COLUMN_TIA_ORIG_INTENSITY As String = "tia_orig_intensity"
+Private Const ISOS_COLUMN_FLAG As String = "flag"
+
 Private Const SCAN_INFO_DIM_CHUNK As Long = 10000
 Private Const ISO_DATA_DIM_CHUNK As Long = 25000
 
@@ -626,8 +630,13 @@ On Error GoTo LoadNewCSVErrorHandler
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             eResponse = MsgBox("CSV Scans file not found: " & vbCrLf & strScansFilePath & vbCrLf & "Load the Isos.csv file anyway?  If yes, then scan type will be assumed to be MS and scan time will be unknown.  Choose No or Cancel to abort.", vbExclamation + vbYesNoCancel + vbDefaultButton3, glFGTU)
         Else
-            AddToAnalysisHistory mGelIndex, "Error: CSV Scans file not found: " & strScansFilePath
-            eResponse = vbCancel
+            If Not mLoadPredefinedLCMSFeatures Then
+                AddToAnalysisHistory mGelIndex, "Error: CSV Scans file not found: " & strScansFilePath
+                eResponse = vbCancel
+            Else
+                ' We're loading predefined LCMSFeatures; it's OK that the file is missing.
+                eResponse = vbYes
+            End If
         End If
         
         If eResponse = vbCancel Or eResponse = vbNo Then
@@ -1346,16 +1355,18 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         Case ISOS_COLUMN_IMS_DRIFT_TIME: intColumnMapping(IsosFileColumnConstants.IMSDriftTime) = lngIndex
                         Case ISOS_COLUMN_IMS_CUMULATIVE_DRIFT_TIME
                             ' Ignore this column; VIPER does not track the IMS cumulative drift time
+                        Case ISOS_COLUMN_ORIG_INTENSITY
+                            ' Ignore this column
+                        Case ISOS_COLUMN_TIA_ORIG_INTENSITY
+                            ' Ignore this column
+                        Case ISOS_COLUMN_FLAG
+                            ' Ignore this column
                         Case Else
                             ' Unknown column header; ignore it, but post an entry to the analysis history
                             If Len(strUnknownColumnList) > 0 Then
                                 strUnknownColumnList = strUnknownColumnList & ", "
                             End If
                             strUnknownColumnList = strUnknownColumnList & Trim(strData(lngIndex))
-                            
-                            If Trim(strData(lngIndex)) <> "orig_intensity" And Trim(strData(lngIndex)) <> "TIA_orig_intensity" And Trim(strData(lngIndex)) <> "flag" Then
-                                Debug.Assert False
-                            End If
                         End Select
                         
                     Next lngIndex

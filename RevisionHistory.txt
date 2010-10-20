@@ -1,5 +1,12 @@
 VIPER Change Log
 
+Version 3.48 - Build 433; October 19, 2010
+	- Now ignoring _Isos.csv columns orig_intensity, TIA_orig_intensity, and flag
+
+Version 3.48 - Build 432; October 18, 2010
+	- No longer aborting an auto-analysis if the _scans.csv file is missing when reading a predefined _LCMSFeatures.txt file
+	- Recompiled due to new computer OS
+
 Version 3.48 - Build 431; October 13, 2010
 	- Now storing AMT_Count_25pct_FDR and AMT_Count_50pct_FDR in table T_Match_Making_Description
 	- Now displaying STAC FDR stats in a separate text box in the main Database Search window (frmSearchMT_ConglomerateUMC.frm)
