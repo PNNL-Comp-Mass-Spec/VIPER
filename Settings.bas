@@ -3812,7 +3812,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
             
                 .FilterLCMSFeatures = True
                 .LCMSFeatureAbuMin = 0
-                .IMSConformerScoreMin = 0.75
+                .IMSConformerScoreMin = 0.751
             End With
         End If
         

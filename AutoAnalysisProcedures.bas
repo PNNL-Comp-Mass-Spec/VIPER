@@ -2871,7 +2871,7 @@ On Error GoTo LoadInputFileErrorHandler
                     strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "FilterLCMSFeatures", "True", udtAutoParams.FilePaths.IniFilePath)
                     .FilterLCMSFeatures = CBoolSafe(strKeyValue)
                     .LCMSFeatureAbuMin = 0
-                    .IMSConformerScoreMin = 0.75
+                    .IMSConformerScoreMin = 0.751
                 
                     If .ExcludeIsoByFit Then
                         strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "ExcludeIsoByFitMaxVal", Trim(.ExcludeIsoByFitMaxVal), udtAutoParams.FilePaths.IniFilePath)
@@ -3013,7 +3013,7 @@ On Error GoTo LoadInputFileErrorHandler
                     
                     .FilterLCMSFeatures = True
                     .LCMSFeatureAbuMin = 0
-                    .IMSConformerScoreMin = 0.75
+                    .IMSConformerScoreMin = 0.751
                 End With
                 
                 .AutoAnalysisOptions.GenerateMonoPlus4IsoLabelingFile = False

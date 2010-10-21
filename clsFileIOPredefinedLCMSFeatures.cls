@@ -926,6 +926,7 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
             If Not mProgressForm Is Nothing Then
                 mProgressForm.UpdateSubtaskProgressBar mProgressPctComplete, False
             End If
+            If KeyPressAbortProcess > 1 Then Exit Do
         End If
         
         
@@ -994,7 +995,7 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
             lngFeatureIndex = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex), -1)
             lngScanCenter = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Scan), 0)
             dblAbundance = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance), 0)
-            dblConformerScore = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore), 0)
+            dblConformerScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore), 0)
             
             If lngFeatureIndex >= 0 Then
                 

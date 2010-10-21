@@ -1,5 +1,9 @@
 VIPER Change Log
 
+Version 3.48 - Build 434; October 20, 2010
+	- Fixed bug that was reading Conformation score as an integer instead of as a double
+	- Changed default minimum conformation score to 0.751 (instead of 0.75) due to oddity in the distribution of scores
+
 Version 3.48 - Build 433; October 19, 2010
 	- Now ignoring _Isos.csv columns orig_intensity, TIA_orig_intensity, and flag
 

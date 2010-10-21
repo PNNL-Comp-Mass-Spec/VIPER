@@ -581,7 +581,7 @@ Public Property Get IMSConformerScoreMin() As Double
     If IsNumeric(txtIMSConformerScoreMin) Then
         IMSConformerScoreMin = txtIMSConformerScoreMin
     Else
-        IMSConformerScoreMin = 0.75
+        IMSConformerScoreMin = 0.751
     End If
 End Property
 
@@ -817,7 +817,7 @@ Private Sub ResetToDefaults()
     
     optFilterLCMSFeatures(1).Value = True
     Me.LCMSFeatureAbuMin = 0
-    Me.IMSConformerScoreMin = 0.75
+    Me.IMSConformerScoreMin = 0.751
     
     chkMaximumDataCountEnabled.Value = vbChecked
     Me.txtMaximumDataCountToLoad = DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD
