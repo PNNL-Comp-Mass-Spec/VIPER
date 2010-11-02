@@ -1,5 +1,10 @@
 VIPER Change Log
 
+Version 3.48 - Build 435; November 1, 2010
+	- Now reading new columns written to the STAC _FDR.csv file
+		- "Unique AMT Tags" and "Unique AMT Tags (UP>0.5)"
+	- STAC plots now display Unique AMT Tag counts by default
+
 Version 3.48 - Build 434; October 20, 2010
 	- Fixed bug that was reading Conformation score as an integer instead of as a double
 	- Changed default minimum conformation score to 0.751 (instead of 0.75) due to oddity in the distribution of scores

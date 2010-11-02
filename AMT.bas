@@ -265,12 +265,14 @@ End Type
 
 Public Type udtSTACStatsType
     STACCuttoff As Double
+    UniqueAMTs As Long              ' Unique number of AMT tags matched (filtered on UP > 0.5)
+    FDR As Double                   ' Number between 0 and 100 representing FDR; we divide by 100 when storing in the DB
     Matches As Long                 ' Number of AMT Tags that the LC-MS Features Matched (non-unique count)
     Errors As Double                ' Number of items in Matches that are estimated to be wrong
-    FDR As Double                   ' Number between 0 and 100 representing FDR; we divide by 100 when storing in the DB
+    UP_Filtered_UniqueAMTs As Long  ' Unique number of AMT tags matched (filtered on UP > 0.5)
+    UP_Filtered_FDR As Double       ' Number between 0 and 100 representing FDR (filtered on UP > 0.5); we divide by 100 when storing in the DB
     UP_Filtered_Matches As Long     ' Number of AMT Tags that the LC-MS Features Matched (filtered on UP > 0.5)
     UP_Filtered_Errors As Double    ' Number of items in Up_Filtered_Matches that are estimated to be wrong (filtered on UP > 0.5)
-    UP_Filtered_FDR As Double       ' Number between 0 and 100 representing FDR (filtered on UP > 0.5); we divide by 100 when storing in the DB
 End Type
 
 Public Type udtSearchSummaryStatsType

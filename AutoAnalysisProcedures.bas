@@ -5231,6 +5231,8 @@ On Error GoTo SearchDatabaseErrorHandler
                              ' Save two STAC plots; the first is unfiltered, the second is filtered on UP > 0.5
                             For intSTACPlotIndex = 0 To 1
                                 
+                                .PlotUniqueAMTs = True
+                                
                                 If intSTACPlotIndex = 0 Then
                                     .PlotUPFilteredFDR = False
                                     strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC.png"

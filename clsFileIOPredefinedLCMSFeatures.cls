@@ -1191,8 +1191,12 @@ Private Function GetColumnValueLng(ByRef strData() As String, ByVal intColumnInd
     
     On Error GoTo GetColumnValueErrorHandler
     
-    If intColumnIndex >= 0 And Len(strData(intColumnIndex)) > 0 Then
-        GetColumnValueLng = CLng(strData(intColumnIndex))
+    If intColumnIndex >= 0 Then
+        If Len(strData(intColumnIndex)) > 0 Then
+            GetColumnValueLng = CLng(strData(intColumnIndex))
+        Else
+            GetColumnValueLng = lngDefaultValue
+        End If
     Else
         GetColumnValueLng = lngDefaultValue
     End If

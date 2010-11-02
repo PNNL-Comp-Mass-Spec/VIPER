@@ -164,6 +164,6 @@ clsAveragine = 0, 0, 0, 0, C
 clsFWHMComputation = 0, 0, 0, 0, C
 clsPointInPolygon = 0, 0, 0, 0, C
 frmExcludePolygonRegion = 66, 87, 895, 598, , 132, 174, 686, 685, C
-clsFileIOPredefinedLCMSFeatures = 0, 0, 0, 0, C
+clsFileIOPredefinedLCMSFeatures = 44, 44, 942, 505, 
 clsParallelLngArrays = 0, 0, 0, 0, C
 clsFilterDataArrayMaxCount = 0, 0, 0, 0, C

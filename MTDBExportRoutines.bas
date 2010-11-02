@@ -97,12 +97,14 @@ End Type
 Public Type udtStoreSTACStatsParamsListType
     MDID As ADODB.Parameter
     STACCutoff As ADODB.Parameter
+    UniqueAMTs As ADODB.Parameter
+    FDR As ADODB.Parameter
     Matches As ADODB.Parameter
     Errors As ADODB.Parameter
-    FDR As ADODB.Parameter
+    UPFilteredUniqueAMTs As ADODB.Parameter
+    UPFilteredFDR As ADODB.Parameter
     UPFilteredMatches As ADODB.Parameter
     UPFilteredErrors As ADODB.Parameter
-    UPFilteredFDR As ADODB.Parameter
 End Type
 
 Private Const MASS_PRECISION = 6
@@ -954,24 +956,30 @@ Public Sub ExportMTDBInitializeStoreSTACStats(cnNew As ADODB.Connection, _
         Set .STACCutoff = cmdStoreSTACStats.CreateParameter("STAC_Cutoff", adSingle, adParamInput, , 0)
         cmdStoreSTACStats.Parameters.Append .STACCutoff
        
+        Set .UniqueAMTs = cmdStoreSTACStats.CreateParameter("UniqueAMTs", adInteger, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .UniqueAMTs
+       
+        Set .FDR = cmdStoreSTACStats.CreateParameter("FDR", adSingle, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .FDR
+       
         Set .Matches = cmdStoreSTACStats.CreateParameter("Matches", adInteger, adParamInput, , 0)
         cmdStoreSTACStats.Parameters.Append .Matches
         
         Set .Errors = cmdStoreSTACStats.CreateParameter("Errors", adSingle, adParamInput, , 0)
         cmdStoreSTACStats.Parameters.Append .Errors
         
-        Set .FDR = cmdStoreSTACStats.CreateParameter("FDR", adSingle, adParamInput, , 0)
-        cmdStoreSTACStats.Parameters.Append .FDR
+        Set .UPFilteredUniqueAMTs = cmdStoreSTACStats.CreateParameter("UPFilteredUniqueAMTs", adInteger, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .UPFilteredUniqueAMTs
+        
+        Set .UPFilteredFDR = cmdStoreSTACStats.CreateParameter("UPFilteredFDR", adSingle, adParamInput, , 0)
+        cmdStoreSTACStats.Parameters.Append .UPFilteredFDR
         
         Set .UPFilteredMatches = cmdStoreSTACStats.CreateParameter("UPFilteredMatches", adInteger, adParamInput, , 0)
         cmdStoreSTACStats.Parameters.Append .UPFilteredMatches
         
         Set .UPFilteredErrors = cmdStoreSTACStats.CreateParameter("UPFilteredErrors", adSingle, adParamInput, , 0)
         cmdStoreSTACStats.Parameters.Append .UPFilteredErrors
-        
-        Set .UPFilteredFDR = cmdStoreSTACStats.CreateParameter("UPFilteredFDR", adSingle, adParamInput, , 0)
-        cmdStoreSTACStats.Parameters.Append .UPFilteredFDR
-        
+    
     End With
 
 End Sub

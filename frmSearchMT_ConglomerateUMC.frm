@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Begin VB.Form frmSearchMT_ConglomerateUMC 
    BackColor       =   &H00FFFFFF&
@@ -24,18 +24,28 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
    Begin VB.Frame fraSTACPlotOptions 
       BackColor       =   &H00FFFFFF&
       Caption         =   "STAC Plot Options"
-      Height          =   1455
+      Height          =   1695
       Left            =   11880
       TabIndex        =   64
-      Top             =   1320
+      Top             =   960
       Width           =   2055
+      Begin VB.CheckBox chkPlotUniqueAMTs 
+         BackColor       =   &H00FFFFFF&
+         Caption         =   "Unique AMTs"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   71
+         Top             =   240
+         Value           =   1  'Checked
+         Width           =   1815
+      End
       Begin VB.CheckBox chkPlotUPFilteredFDR 
          BackColor       =   &H00FFFFFF&
          Caption         =   "&UP Filtered FDR"
          Height          =   255
          Left            =   120
          TabIndex        =   65
-         Top             =   240
+         Top             =   480
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -45,7 +55,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Left            =   120
          TabIndex        =   68
-         Top             =   1080
+         Top             =   1320
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -55,7 +65,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Left            =   120
          TabIndex        =   67
-         Top             =   840
+         Top             =   1080
          Width           =   1815
       End
       Begin VB.CheckBox chkSTACPlotXGridlines 
@@ -64,7 +74,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   255
          Left            =   120
          TabIndex        =   66
-         Top             =   600
+         Top             =   840
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -1343,6 +1353,13 @@ Private Enum eSearchModeConstants
 End Enum
 '
 
+Public Property Get PlotUniqueAMTs() As Boolean
+    PlotUniqueAMTs = cChkBox(chkPlotUniqueAMTs)
+End Property
+Public Property Let PlotUniqueAMTs(Value As Boolean)
+    SetCheckBox chkPlotUniqueAMTs, Value
+End Property
+
 Public Property Get PlotUPFilteredFDR() As Boolean
     PlotUPFilteredFDR = cChkBox(chkPlotUPFilteredFDR)
 End Property
@@ -2613,13 +2630,16 @@ On Error GoTo AddMatchMakingFDRRowErrorHandler
         
         With STACStats(lngIndex)
             udtStoreSTACStatsParams.STACCutoff = .STACCuttoff
+            
+            udtStoreSTACStatsParams.UniqueAMTs = .UniqueAMTs
+            udtStoreSTACStatsParams.FDR = .FDR / 100#
             udtStoreSTACStatsParams.Matches = .Matches
             udtStoreSTACStatsParams.Errors = .Errors
-            udtStoreSTACStatsParams.FDR = .FDR / 100#
             
+            udtStoreSTACStatsParams.UPFilteredUniqueAMTs = .UP_Filtered_UniqueAMTs
+            udtStoreSTACStatsParams.UPFilteredFDR = .UP_Filtered_FDR / 100#
             udtStoreSTACStatsParams.UPFilteredMatches = .UP_Filtered_Matches
             udtStoreSTACStatsParams.UPFilteredErrors = .UP_Filtered_Errors
-            udtStoreSTACStatsParams.UPFilteredFDR = .UP_Filtered_FDR / 100#
             
         End With
         
@@ -3046,13 +3066,15 @@ Private Sub InitializeSTACStatsListView()
     
     lvwSTACStats.ColumnHeaders.add , , "Cutoff", 800
     
+    lvwSTACStats.ColumnHeaders.add , , "Unique AMTs", 1200
+    lvwSTACStats.ColumnHeaders.add , , "FDR %", 800
     lvwSTACStats.ColumnHeaders.add , , "Matches", 900
     lvwSTACStats.ColumnHeaders.add , , "Errors", 900
-    lvwSTACStats.ColumnHeaders.add , , "FDR %", 800
     
+    lvwSTACStats.ColumnHeaders.add , , "Unique AMTs, UP>0.5", 1400
+    lvwSTACStats.ColumnHeaders.add , , "FDR %, UP>0.5", 1000
     lvwSTACStats.ColumnHeaders.add , , "Matches, UP>0.5", 1100
     lvwSTACStats.ColumnHeaders.add , , "Errors, UP>0.5", 1100
-    lvwSTACStats.ColumnHeaders.add , , "FDR %, UP>0.5", 1000
     
 End Sub
 
@@ -3443,10 +3465,12 @@ Private Function LoadSTACStats(ByRef fso As FileSystemObject, _
     Dim lngMatches As Long
     Dim dblErrors As Double
     Dim dblFDR As Double
+    Dim lngUniqueAMTs As Long
 
     Dim lngUPFilteredMatches As Long
     Dim dblUPFilteredErrors As Double
     Dim dblUPFilteredFDR As Double
+    Dim lngUniqueAMTsUPFiltered As Long
     
     Dim blnValidData As Boolean
     
@@ -3472,33 +3496,39 @@ On Error GoTo LoadSTACStatsErrorHandler
             If UBound(strSplitLine) >= 3 Then
                 blnValidData = LoadSTACStatsParseLine(strSplitLine, _
                                                       dblCutoff, _
+                                                      lngUniqueAMTs, _
+                                                      dblFDR, _
                                                       lngMatches, _
                                                       dblErrors, _
-                                                      dblFDR, _
+                                                      lngUniqueAMTsUPFiltered, _
+                                                      dblUPFilteredFDR, _
                                                       lngUPFilteredMatches, _
-                                                      dblUPFilteredErrors, _
-                                                      dblUPFilteredFDR)
+                                                      dblUPFilteredErrors)
                 
                 If blnValidData Then
                     With STACStats(STACStatsCount)
                         .STACCuttoff = dblCutoff
+                        .UniqueAMTs = lngUniqueAMTs
+                        .FDR = dblFDR
                         .Matches = lngMatches
                         .Errors = dblErrors
-                        .FDR = dblFDR
+                        .UP_Filtered_UniqueAMTs = lngUniqueAMTsUPFiltered
+                        .UP_Filtered_FDR = dblUPFilteredFDR
                         .UP_Filtered_Matches = lngUPFilteredMatches
                         .UP_Filtered_Errors = dblUPFilteredErrors
-                        .UP_Filtered_FDR = dblUPFilteredFDR
                     End With
                     
                     Set lstNewItem = lvwSTACStats.ListItems.add(, , Round(dblCutoff, 2))
                             
-                    lstNewItem.SubItems(1) = lngMatches
-                    lstNewItem.SubItems(2) = Round(dblErrors, 1)
-                    lstNewItem.SubItems(3) = Round(dblFDR, 2)
+                    lstNewItem.SubItems(1) = lngUniqueAMTs
+                    lstNewItem.SubItems(2) = Round(dblFDR, 2)
+                    lstNewItem.SubItems(3) = lngMatches
+                    lstNewItem.SubItems(4) = Round(dblErrors, 1)
 
-                    lstNewItem.SubItems(4) = lngUPFilteredMatches
-                    lstNewItem.SubItems(5) = Round(dblUPFilteredErrors, 1)
+                    lstNewItem.SubItems(5) = lngUniqueAMTsUPFiltered
                     lstNewItem.SubItems(6) = Round(dblUPFilteredFDR, 2)
+                    lstNewItem.SubItems(7) = lngUPFilteredMatches
+                    lstNewItem.SubItems(8) = Round(dblUPFilteredErrors, 1)
 
                     STACStatsCount = STACStatsCount + 1
                 End If
@@ -3565,12 +3595,14 @@ End Function
 
 Private Function LoadSTACStatsParseLine(ByRef strSplitLine() As String, _
                                         ByRef dblCutoff As Double, _
+                                        ByRef lngUniqueAMTs As Long, _
+                                        ByRef dblFDR As Double, _
                                         ByRef lngMatches As Long, _
                                         ByRef dblErrors As Double, _
-                                        ByRef dblFDR As Double, _
+                                        ByRef lngUPFilteredUniqueAMTs As Long, _
+                                        ByRef dblUPFilteredFDR As Double, _
                                         ByRef lngUPFilteredMatches As Long, _
-                                        ByRef dblUPFilteredErrors As Double, _
-                                        ByRef dblUPFilteredFDR As Double) As Boolean
+                                        ByRef dblUPFilteredErrors As Double) As Boolean
     
     Dim blnValidData As Boolean
     
@@ -3579,7 +3611,7 @@ On Error GoTo LoadSTACStatsParseLineErrorHandler
     If IsNumeric(strSplitLine(0)) Then
         ' Parse this line
         ' Column order is:
-        ' STAC Cutoff, Matches, Errors, FDR (%)
+        ' STAC Cutoff, Matches Errors,FDR (%),Matches (UP>0.5),Errors (UP>0.5),FDR (%) (UP>0.5,Unique AMT Tags, Unique AMT Tags (UP>0.5)
         
         dblCutoff = CDbl(strSplitLine(0))
         lngMatches = CLng(strSplitLine(1))
@@ -3589,6 +3621,14 @@ On Error GoTo LoadSTACStatsParseLineErrorHandler
         lngUPFilteredMatches = CLng(strSplitLine(4))
         dblUPFilteredErrors = CDbl(strSplitLine(5))
         dblUPFilteredFDR = CDbl(strSplitLine(6))
+        
+        If UBound(strSplitLine) >= 8 Then
+            lngUniqueAMTs = CLng(strSplitLine(7))
+            lngUPFilteredUniqueAMTs = CLng(strSplitLine(8))
+        Else
+            lngUniqueAMTs = 0
+            lngUPFilteredUniqueAMTs = 0
+        End If
         
         blnValidData = True
     
@@ -5722,6 +5762,7 @@ Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean
 
     PickParameters
     
+    SetCheckBox chkPlotUniqueAMTs, True
     SetCheckBox chkPlotUPFilteredFDR, True
     
     SetCheckBox chkSTACPlotXGridlines, True
@@ -6099,8 +6140,17 @@ On Error GoTo ShowOrSaveSTACStatsErrorHandler
     strClipboardText = ""
     
     ' Write the header line
-    strLineOut = "STAC Cutoff" & strSepChar & "Matches" & strSepChar & "Errors" & strSepChar & "FDR" & strSepChar
-    strLineOut = strLineOut & "Matches, UP>0.5" & strSepChar & "Errors, UP>0.5" & strSepChar & "FDR, UP>0.5"
+    strLineOut = "STAC Cutoff" & strSepChar & _
+                 "UniqueAMTs" & strSepChar & _
+                 "FDR" & strSepChar & _
+                 "Matches" & strSepChar & _
+                 "Errors"
+
+    strLineOut = strLineOut & strSepChar & _
+                 "UniqueAMTs, UP>0.5" & strSepChar & _
+                 "FDR, UP>0.5" & strSepChar & _
+                 "Matches, UP>0.5" & strSepChar & _
+                 "Errors, UP>0.5"
 
     If blnCopyToClipboard Then
         strClipboardText = strClipboardText & strLineOut & vbCrLf
@@ -6111,8 +6161,17 @@ On Error GoTo ShowOrSaveSTACStatsErrorHandler
     For lngIndex = 0 To STACStatsCount - 1
        
         With STACStats(lngIndex)
-            strLineOut = Round(.STACCuttoff, 2) & strSepChar & .Matches & strSepChar & Round(.Errors, 1) & strSepChar & Format(.FDR / 100#, "0.000%") & strSepChar
-            strLineOut = strLineOut & .UP_Filtered_Matches & strSepChar & Round(.UP_Filtered_Errors, 1) & strSepChar & Format(.UP_Filtered_FDR / 100#, "0.000%")
+            strLineOut = Round(.STACCuttoff, 2) & strSepChar & _
+                         .UniqueAMTs & strSepChar & _
+                         Format(.FDR / 100#, "0.000%") & strSepChar & _
+                         .Matches & strSepChar & _
+                         Round(.Errors, 1)
+
+            strLineOut = strLineOut & strSepChar & _
+                         .UP_Filtered_UniqueAMTs & strSepChar & _
+                         Format(.UP_Filtered_FDR / 100#, "0.000%") & strSepChar & _
+                         .UP_Filtered_Matches & strSepChar & _
+                         Round(.UP_Filtered_Errors, 1)
         End With
         
         If blnCopyToClipboard Then
@@ -6593,6 +6652,7 @@ Private Sub UpdateSTACPlot()
     Dim lngTargetIndex As Long
     Dim lngEndIndex As Long
     
+    Dim blnUniqueAMTs As Boolean
     Dim blnUPFilteredFDR As Boolean
     
 On Error GoTo UpdateSTACPlotErrorHandler
@@ -6603,6 +6663,7 @@ On Error GoTo UpdateSTACPlotErrorHandler
         Exit Sub
     End If
     
+    blnUniqueAMTs = Me.PlotUniqueAMTs
     blnUPFilteredFDR = Me.PlotUPFilteredFDR
     
     ' Find the first non-zero Matches entry in STACStats()
@@ -6624,10 +6685,19 @@ On Error GoTo UpdateSTACPlotErrorHandler
         lngTargetIndex = STACStatsCount - 1 - lngIndex
         
         varMatches(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
-        varMatches(1, lngTargetIndex) = STACStats(lngIndex).Matches
+        If blnUniqueAMTs Then
+            varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueAMTs
+        Else
+            varMatches(1, lngTargetIndex) = STACStats(lngIndex).Matches
+        End If
+        
         
         varMatchesFiltered(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
-        varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_Matches
+        If blnUniqueAMTs Then
+            varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueAMTs
+        Else
+            varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_Matches
+        End If
 
         varFDR(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
         If blnUPFilteredFDR Then
@@ -6673,9 +6743,13 @@ Private Sub UpdateSTACPlotLayout()
     ctlSTACStats.Caption = strCaption
     
     ctlSTACStats.Axes(1).Caption = "STAC Threshold"
-    ctlSTACStats.Axes(2).Caption = "Matches"
+    If Me.PlotUniqueAMTs Then
+        ctlSTACStats.Axes(2).Caption = "Unique AMTs"
+    Else
+        ctlSTACStats.Axes(2).Caption = "Matches"
+    End If
     
-    If cChkBox(chkPlotUPFilteredFDR) Then
+    If Me.PlotUPFilteredFDR Then
         ctlSTACStats.Axes(3).Caption = "FDR, UP > 0.5"
     Else
         ctlSTACStats.Axes(3).Caption = "FDR"
@@ -6949,6 +7023,10 @@ End Sub
 
 Private Sub chkDisableCustomNETs_Click()
     EnableDisableNETFormulaControls
+End Sub
+
+Private Sub chkPlotUniqueAMTs_Click()
+    UpdateSTACPlot
 End Sub
 
 Private Sub chkPlotUPFilteredFDR_Click()
