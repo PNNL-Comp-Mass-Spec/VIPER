@@ -6392,7 +6392,13 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
                 strLineOut = strLineOut & Round(MonoMassToMZ(.ClassMW, GelData(CallerID).IsoData(.ClassRepInd).Charge), 6) & strSepChar
             End If
             
-            strLineOut = strLineOut & .ClassCount & strSepChar
+            If .ClassCountPredefinedLCMSFeatures > .ClassCount Then
+                ' Use the class-count value stored in .ClassCountPredefinedLCMSFeatures
+                ' This value gets populated when we read in features from a _LCMSFeatures.txt file
+                strLineOut = strLineOut & .ClassCountPredefinedLCMSFeatures & strSepChar
+            Else
+                strLineOut = strLineOut & .ClassCount & strSepChar
+            End If
             
             ' Record UMCMemberCountUsedForAbu
             If GelUMC(CallerID).def.UMCClassStatsUseStatsFromMostAbuChargeState Then

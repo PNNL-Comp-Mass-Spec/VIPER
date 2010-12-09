@@ -553,7 +553,7 @@ AddEntryToMatchMakingDescriptionTableErrorHandler:
     Debug.Assert False
     lngErrorNumber = Err.Number
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox "Error making entry in Match Making Description (most likely the job number is not defined in T_FTICR_Analysis_Description): " & Err.Description, vbExclamation + vbOKOnly, glFGTU
+        MsgBox "Error making entry in Match Making Description " & vbCrLf & "(most likely the job number is not defined in T_FTICR_Analysis_Description): " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, glFGTU
     End If
     
     LogErrors Err.Number, "AddEntryToMatchMakingDescriptionTableEx", Err.Description, lngGelIndex
@@ -1226,10 +1226,7 @@ On Error GoTo AddUMCCSStatsErrorHandler
                 End If
                 
                 If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures And GelUMC(lngGelIndex).def.OnePointPerLCMSFeature Then
-                
-                    ' Check this code for IMS data
-                    Debug.Assert False
-                
+                                
                     ' Loaded predefined LC-MS features and only loaded one point per feature
                     ' Favor the class-based drift time
                     If .DriftTime > 0 Then sngDriftTime = .DriftTime

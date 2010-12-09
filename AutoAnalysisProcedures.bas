@@ -2871,7 +2871,8 @@ On Error GoTo LoadInputFileErrorHandler
                     strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "FilterLCMSFeatures", "True", udtAutoParams.FilePaths.IniFilePath)
                     .FilterLCMSFeatures = CBoolSafe(strKeyValue)
                     .LCMSFeatureAbuMin = 0
-                    .IMSConformerScoreMin = 0.751
+                    .LCMSFeatureScanCountMin = DEFAULT_LCMS_FEATURE_SCAN_COUNT_MINIMUM
+                    .IMSConformerScoreMin = DEFAULT_IMS_CONFORMER_COMBINED_SCORE_MINIMUM
                 
                     If .ExcludeIsoByFit Then
                         strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "ExcludeIsoByFitMaxVal", Trim(.ExcludeIsoByFitMaxVal), udtAutoParams.FilePaths.IniFilePath)
@@ -2889,6 +2890,11 @@ On Error GoTo LoadInputFileErrorHandler
                             .LCMSFeatureAbuMin = val(strKeyValue)
                         End If
                         
+                        strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "LCMSFeatureScanCountMin", Trim(.LCMSFeatureScanCountMin), udtAutoParams.FilePaths.IniFilePath)
+                        If IsNumeric(strKeyValue) Then
+                            .LCMSFeatureScanCountMin = val(strKeyValue)
+                        End If
+                                                
                         strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "IMSConformerScoreMin", Trim(.IMSConformerScoreMin), udtAutoParams.FilePaths.IniFilePath)
                         If IsNumeric(strKeyValue) Then
                             .IMSConformerScoreMin = val(strKeyValue)
@@ -3013,7 +3019,8 @@ On Error GoTo LoadInputFileErrorHandler
                     
                     .FilterLCMSFeatures = True
                     .LCMSFeatureAbuMin = 0
-                    .IMSConformerScoreMin = 0.751
+                    .LCMSFeatureScanCountMin = DEFAULT_LCMS_FEATURE_SCAN_COUNT_MINIMUM
+                    .IMSConformerScoreMin = DEFAULT_IMS_CONFORMER_COMBINED_SCORE_MINIMUM
                 End With
                 
                 .AutoAnalysisOptions.GenerateMonoPlus4IsoLabelingFile = False

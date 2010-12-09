@@ -46,6 +46,9 @@ Public Const DEFAULT_GANET_BIN_SIZE As Single = 0.001
 Public Const DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD As Long = 400000
 Public Const DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD As Single = 90       ' Value between 0 and 100
 
+Public Const DEFAULT_LCMS_FEATURE_SCAN_COUNT_MINIMUM As Long = 2
+Public Const DEFAULT_IMS_CONFORMER_COMBINED_SCORE_MINIMUM As Double = 0
+
 Private Const ENTRY_NOT_FOUND = "<<NOT_FOUND>>"
 
 Private Sub AddKeyValueSetting(ByRef strKeys() As String, ByRef strValues() As String, ByRef intKeyValueCount As Integer, ByRef strKey As String, ByRef strValue As String, Optional ByVal blnResetList As Boolean)
@@ -1479,6 +1482,7 @@ On Error GoTo LoadSettingsFileHandler
         
             .FilterLCMSFeatures = GetIniFileSettingBln(IniStuff, "AutoAnalysisFilterPrefs", "FilterLCMSFeatures", .FilterLCMSFeatures)
             .LCMSFeatureAbuMin = GetIniFileSettingDbl(IniStuff, "AutoAnalysisFilterPrefs", "LCMSFeatureAbuMin", .LCMSFeatureAbuMin)
+            .LCMSFeatureScanCountMin = GetIniFileSettingLng(IniStuff, "AutoAnalysisFilterPrefs", "LCMSFeatureScanCountMin", .LCMSFeatureScanCountMin)
             .IMSConformerScoreMin = GetIniFileSettingDbl(IniStuff, "AutoAnalysisFilterPrefs", "IMSConformerScoreMin", .IMSConformerScoreMin)
         End With
         
@@ -2557,6 +2561,7 @@ On Error GoTo SaveSettingsFileHandler
     
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "FilterLCMSFeatures", .FilterLCMSFeatures
         AddKeyValueSettingDbl sKeys, sVals, iKVCount, "LCMSFeatureAbuMin", .LCMSFeatureAbuMin
+        AddKeyValueSettingLng sKeys, sVals, iKVCount, "LCMSFeatureScanCountMin", .LCMSFeatureScanCountMin
         AddKeyValueSettingDbl sKeys, sVals, iKVCount, "IMSConformerScoreMin", .IMSConformerScoreMin
     End With
     IniStuff.WriteSection "AutoAnalysisFilterPrefs", sKeys(), sVals(), iKVCount
@@ -3812,7 +3817,8 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
             
                 .FilterLCMSFeatures = True
                 .LCMSFeatureAbuMin = 0
-                .IMSConformerScoreMin = 0.751
+                .LCMSFeatureScanCountMin = DEFAULT_LCMS_FEATURE_SCAN_COUNT_MINIMUM
+                .IMSConformerScoreMin = DEFAULT_IMS_CONFORMER_COMBINED_SCORE_MINIMUM
             End With
         End If
         

@@ -55,8 +55,8 @@ End Enum
 
 Public Enum UMCRobustNETModeConstants
     UMCRobustNETIterative = 0
-    UMCRobustNETWarpTime = 1                ' Uses MSAlign
-    UMCRobustNETWarpTimeAndMass = 2         ' Uses MSAlign
+    UMCRobustNETWarpTime = 1                ' Uses MSAlign, aka LCMSWarp
+    UMCRobustNETWarpTimeAndMass = 2         ' Uses MSAlign, aka LCMSWarp
 End Enum
 
 Public Enum rmcUMCRobustNETWarpMassCalibrationType

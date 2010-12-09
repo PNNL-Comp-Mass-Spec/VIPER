@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "November 1, 2010"
+Public Const APP_BUILD_DATE As String = "December 9, 2010"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -1168,7 +1168,7 @@ Public Type udtAutoAnalysisFilterPrefsType
     RestrictGANETRangeMin As Double
     RestrictGANETRangeMax As Double
      
-    RestrictToEvenScanNumbersOnly As Boolean           ' Only one of these options can be set to True at any given time; setting both to false means no restriction
+    RestrictToEvenScanNumbersOnly As Boolean            ' Only one of these options can be set to True at any given time; setting both to false means no restriction
     RestrictToOddScanNumbersOnly As Boolean
     
     MaximumDataCountEnabled As Boolean                  ' This filter is only applied at the time the data is loaded into memory
@@ -1182,7 +1182,8 @@ Public Type udtAutoAnalysisFilterPrefsType
 
     FilterLCMSFeatures As Boolean                       ' This setting is only used when we load _LCMSFeatures.txt files
     LCMSFeatureAbuMin As Double
-    IMSConformerScoreMin As Double
+    LCMSFeatureScanCountMin As Long                     ' Number of LC Scans that the feature spans; ignored if <= 1 since ActualScanCount = Scan_End - Scan_Start + 1
+    IMSConformerScoreMin As Double                      ' Tested against column Combined_Score in the _LCMSFeatures.txt file; if that column is missing, then will post a warning and instead use column Conformation_Fit_Score
 End Type
 
 Public Type udtAutoAnalysisCachedDataType

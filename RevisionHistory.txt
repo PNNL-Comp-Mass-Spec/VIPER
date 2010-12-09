@@ -1,5 +1,16 @@
 VIPER Change Log
 
+Version 3.48 - Build 437; Decembr 9, 2010
+	- Now filtering predefined LC-MS Features for IMS data using the IMS Conformer Combined_Score column
+		- If the Combined_Score column is not present in the _LCMSFeatures.txt file, then will log a warning and instead use the Conformation_Fit_Score column
+	- Changed the default minimum IMS Conformer score to 0 (was previously 0.751)
+	- Added option to filter LC-MS Features by scan count (scan range), with a default of Scan Count >= 2
+
+Version 3.48 - Build 436; November 29, 2010
+	- Fixed bugs on the Save/Load/Edit Analysis Settings window
+		- Now updating the LCMSWarp Mass Calibration Type combobox when loading a .Ini file
+		- Added new error handler to inform the user if a value in the .Ini file is out-of-range for a given combobox
+
 Version 3.48 - Build 435; November 1, 2010
 	- Now reading new columns written to the STAC _FDR.csv file
 		- "Unique AMT Tags" and "Unique AMT Tags (UP>0.5)"

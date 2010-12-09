@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmEditAnalysisSettings 
    Caption         =   "Edit Analysis Settings"
    ClientHeight    =   9870
@@ -27,50 +27,42 @@ Begin VB.Form frmEditAnalysisSettings
       _Version        =   393216
       Style           =   1
       Tabs            =   8
+      Tab             =   4
       TabsPerRow      =   8
       TabHeight       =   520
       OLEDropMode     =   1
       TabCaption(0)   =   "1. Load and Filter"
       TabPicture(0)   =   "frmEditAnalysisSettings.frx":0000
-      Tab(0).ControlEnabled=   -1  'True
-      Tab(0).Control(0)=   "lblDescription(50)"
-      Tab(0).Control(0).Enabled=   0   'False
-      Tab(0).Control(1)=   "fraOptionFrame(4)"
-      Tab(0).Control(1).Enabled=   0   'False
-      Tab(0).Control(2)=   "fraOptionFrame(5)"
-      Tab(0).Control(2).Enabled=   0   'False
-      Tab(0).Control(3)=   "fraOptionFrame(6)"
-      Tab(0).Control(3).Enabled=   0   'False
+      Tab(0).ControlEnabled=   0   'False
+      Tab(0).Control(0)=   "fraOptionFrame(22)"
+      Tab(0).Control(1)=   "fraOptionFrame(8)"
+      Tab(0).Control(2)=   "fraOptionFrame(9)"
+      Tab(0).Control(3)=   "txtPEKFileExtensionPreferenceOrder"
       Tab(0).Control(4)=   "fraOptionFrame(7)"
-      Tab(0).Control(4).Enabled=   0   'False
-      Tab(0).Control(5)=   "txtPEKFileExtensionPreferenceOrder"
-      Tab(0).Control(5).Enabled=   0   'False
-      Tab(0).Control(6)=   "fraOptionFrame(9)"
-      Tab(0).Control(6).Enabled=   0   'False
-      Tab(0).Control(7)=   "fraOptionFrame(8)"
-      Tab(0).Control(7).Enabled=   0   'False
-      Tab(0).Control(8)=   "fraOptionFrame(22)"
-      Tab(0).Control(8).Enabled=   0   'False
+      Tab(0).Control(5)=   "fraOptionFrame(6)"
+      Tab(0).Control(6)=   "fraOptionFrame(5)"
+      Tab(0).Control(7)=   "fraOptionFrame(4)"
+      Tab(0).Control(8)=   "lblDescription(50)"
       Tab(0).ControlCount=   9
       TabCaption(1)   =   "2. LC-MS Features"
       TabPicture(1)   =   "frmEditAnalysisSettings.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "chkSkipFindUMCs"
-      Tab(1).Control(1)=   "cboChargeStateAbuType"
-      Tab(1).Control(2)=   "chkUseMostAbuChargeStateStatsForClassStats"
-      Tab(1).Control(3)=   "tbsUMCRefinementOptions"
-      Tab(1).Control(4)=   "fraUMCIonNetOptions"
-      Tab(1).Control(5)=   "chkInterpolateMissingIons"
-      Tab(1).Control(6)=   "txtInterpolateMaxGapSize"
-      Tab(1).Control(7)=   "cmbUMCAbu"
-      Tab(1).Control(8)=   "cmbUMCMW"
-      Tab(1).Control(9)=   "fraUMCSearch200x"
-      Tab(1).Control(10)=   "cboUMCSearchMode"
-      Tab(1).Control(11)=   "lblDescription(61)"
-      Tab(1).Control(12)=   "lblDescription(58)"
-      Tab(1).Control(13)=   "lblDescription(64)"
-      Tab(1).Control(14)=   "lblDescription(63)"
-      Tab(1).Control(15)=   "lblDescription(115)"
+      Tab(1).Control(0)=   "lblDescription(115)"
+      Tab(1).Control(1)=   "lblDescription(63)"
+      Tab(1).Control(2)=   "lblDescription(64)"
+      Tab(1).Control(3)=   "lblDescription(58)"
+      Tab(1).Control(4)=   "lblDescription(61)"
+      Tab(1).Control(5)=   "cboUMCSearchMode"
+      Tab(1).Control(6)=   "fraUMCSearch200x"
+      Tab(1).Control(7)=   "cmbUMCMW"
+      Tab(1).Control(8)=   "cmbUMCAbu"
+      Tab(1).Control(9)=   "txtInterpolateMaxGapSize"
+      Tab(1).Control(10)=   "chkInterpolateMissingIons"
+      Tab(1).Control(11)=   "fraUMCIonNetOptions"
+      Tab(1).Control(12)=   "tbsUMCRefinementOptions"
+      Tab(1).Control(13)=   "chkUseMostAbuChargeStateStatsForClassStats"
+      Tab(1).Control(14)=   "cboChargeStateAbuType"
+      Tab(1).Control(15)=   "chkSkipFindUMCs"
       Tab(1).ControlCount=   16
       TabCaption(2)   =   "3. MT Tags"
       TabPicture(2)   =   "frmEditAnalysisSettings.frx":0038
@@ -85,44 +77,52 @@ Begin VB.Form frmEditAnalysisSettings
       TabCaption(3)   =   "4. Pairs"
       TabPicture(3)   =   "frmEditAnalysisSettings.frx":0054
       Tab(3).ControlEnabled=   0   'False
-      Tab(3).Control(0)=   "fraOptionFrame(56)"
-      Tab(3).Control(1)=   "fraOptionFrame(53)"
-      Tab(3).Control(2)=   "fraOptionFrame(52)"
-      Tab(3).Control(3)=   "fraOptionFrame(48)"
-      Tab(3).Control(4)=   "fraOptionFrame(41)"
-      Tab(3).Control(5)=   "fraOptionFrame(40)"
-      Tab(3).Control(6)=   "fraOptionFrame(38)"
-      Tab(3).Control(7)=   "fraOptionFrame(37)"
-      Tab(3).Control(8)=   "cboPairsIdentificationMode"
-      Tab(3).Control(9)=   "lblDescription(16)"
+      Tab(3).Control(0)=   "lblDescription(16)"
+      Tab(3).Control(1)=   "cboPairsIdentificationMode"
+      Tab(3).Control(2)=   "fraOptionFrame(37)"
+      Tab(3).Control(3)=   "fraOptionFrame(38)"
+      Tab(3).Control(4)=   "fraOptionFrame(40)"
+      Tab(3).Control(5)=   "fraOptionFrame(41)"
+      Tab(3).Control(6)=   "fraOptionFrame(48)"
+      Tab(3).Control(7)=   "fraOptionFrame(52)"
+      Tab(3).Control(8)=   "fraOptionFrame(53)"
+      Tab(3).Control(9)=   "fraOptionFrame(56)"
       Tab(3).ControlCount=   10
       TabCaption(4)   =   "5. NET Adjustment"
       TabPicture(4)   =   "frmEditAnalysisSettings.frx":0070
-      Tab(4).ControlEnabled=   0   'False
+      Tab(4).ControlEnabled=   -1  'True
       Tab(4).Control(0)=   "lblDescription(156)"
+      Tab(4).Control(0).Enabled=   0   'False
       Tab(4).Control(1)=   "chkSkipGANETSlopeAndInterceptComputation"
+      Tab(4).Control(1).Enabled=   0   'False
       Tab(4).Control(2)=   "tbsNETOptions"
+      Tab(4).Control(2).Enabled=   0   'False
       Tab(4).Control(3)=   "fraOptionFrame(18)"
+      Tab(4).Control(3).Enabled=   0   'False
       Tab(4).Control(4)=   "chkRobustNETEnabled"
+      Tab(4).Control(4).Enabled=   0   'False
       Tab(4).Control(5)=   "cboRobustNETAdjustmentMode"
+      Tab(4).Control(5).Enabled=   0   'False
       Tab(4).Control(6)=   "pctOptionsInIniFile(3)"
+      Tab(4).Control(6).Enabled=   0   'False
       Tab(4).Control(7)=   "pctOptionsInIniFile(4)"
+      Tab(4).Control(7).Enabled=   0   'False
       Tab(4).ControlCount=   8
       TabCaption(5)   =   "6. Refinement"
       TabPicture(5)   =   "frmEditAnalysisSettings.frx":008C
       Tab(5).ControlEnabled=   0   'False
-      Tab(5).Control(0)=   "lblToleranceRefinementExplanation"
-      Tab(5).Control(1)=   "lblMassCalibrationRefinementDescription"
-      Tab(5).Control(2)=   "fraOptionFrame(1)"
-      Tab(5).Control(3)=   "fraOptionFrame(0)"
-      Tab(5).Control(4)=   "fraOptionFrame(3)"
-      Tab(5).Control(5)=   "fraOptionFrame(2)"
-      Tab(5).Control(6)=   "fraToleranceRefinementPeakCriteria"
-      Tab(5).Control(7)=   "chkRefineDBSearchMassTolerance"
-      Tab(5).Control(8)=   "chkRefineDBSearchNETTolerance"
-      Tab(5).Control(9)=   "cboToleranceRefinementMethod"
-      Tab(5).Control(10)=   "fraExpecationMaximizationOptions"
-      Tab(5).Control(11)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
+      Tab(5).Control(0)=   "chkRefineDBSearchTolUseMinMaxIfOutOfRange"
+      Tab(5).Control(1)=   "fraExpecationMaximizationOptions"
+      Tab(5).Control(2)=   "cboToleranceRefinementMethod"
+      Tab(5).Control(3)=   "chkRefineDBSearchNETTolerance"
+      Tab(5).Control(4)=   "chkRefineDBSearchMassTolerance"
+      Tab(5).Control(5)=   "fraToleranceRefinementPeakCriteria"
+      Tab(5).Control(6)=   "fraOptionFrame(2)"
+      Tab(5).Control(7)=   "fraOptionFrame(3)"
+      Tab(5).Control(8)=   "fraOptionFrame(0)"
+      Tab(5).Control(9)=   "fraOptionFrame(1)"
+      Tab(5).Control(10)=   "lblMassCalibrationRefinementDescription"
+      Tab(5).Control(11)=   "lblToleranceRefinementExplanation"
       Tab(5).ControlCount=   12
       TabCaption(6)   =   "7. DB Search"
       TabPicture(6)   =   "frmEditAnalysisSettings.frx":00A8
@@ -142,17 +142,17 @@ Begin VB.Form frmEditAnalysisSettings
       TabCaption(7)   =   "8. Saving/Plotting"
       TabPicture(7)   =   "frmEditAnalysisSettings.frx":00C4
       Tab(7).ControlEnabled=   0   'False
-      Tab(7).Control(0)=   "lblSavingAndExportingStatus"
-      Tab(7).Control(1)=   "lblDescription(136)"
-      Tab(7).Control(2)=   "fraOptionFrame(32)"
-      Tab(7).Control(3)=   "fraOptionFrame(33)"
-      Tab(7).Control(4)=   "pctOptionsInIniFile(0)"
-      Tab(7).Control(5)=   "pctOptionsInIniFile(1)"
+      Tab(7).Control(0)=   "pctOptionsInIniFile(1)"
+      Tab(7).Control(1)=   "pctOptionsInIniFile(0)"
+      Tab(7).Control(2)=   "fraOptionFrame(33)"
+      Tab(7).Control(3)=   "fraOptionFrame(32)"
+      Tab(7).Control(4)=   "lblDescription(136)"
+      Tab(7).Control(5)=   "lblSavingAndExportingStatus"
       Tab(7).ControlCount=   6
       Begin VB.PictureBox pctOptionsInIniFile 
          Height          =   2800
          Index           =   4
-         Left            =   -70850
+         Left            =   4150
          Picture         =   "frmEditAnalysisSettings.frx":00E0
          ScaleHeight     =   2745
          ScaleWidth      =   6885
@@ -163,7 +163,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.PictureBox pctOptionsInIniFile 
          Height          =   5055
          Index           =   3
-         Left            =   -74880
+         Left            =   120
          Picture         =   "frmEditAnalysisSettings.frx":15F52
          ScaleHeight     =   4995
          ScaleWidth      =   3855
@@ -306,7 +306,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Data Count Filter"
          Height          =   1065
          Index           =   22
-         Left            =   5040
+         Left            =   -69960
          TabIndex        =   56
          Top             =   4080
          Width           =   5895
@@ -372,7 +372,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.ComboBox cboRobustNETAdjustmentMode 
          Height          =   315
          ItemData        =   "frmEditAnalysisSettings.frx":2B1B8
-         Left            =   -68400
+         Left            =   6600
          List            =   "frmEditAnalysisSettings.frx":2B1BA
          Style           =   2  'Dropdown List
          TabIndex        =   329
@@ -410,7 +410,7 @@ Begin VB.Form frmEditAnalysisSettings
             Strikethrough   =   0   'False
          EndProperty
          Height          =   190
-         Left            =   -70800
+         Left            =   4200
          TabIndex        =   327
          Top             =   4230
          Width           =   2175
@@ -1203,7 +1203,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Search (Identification) Tolerances"
          Height          =   1720
          Index           =   18
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   293
          Top             =   840
          Width           =   3735
@@ -2587,18 +2587,17 @@ Begin VB.Form frmEditAnalysisSettings
          _ExtentY        =   5503
          _Version        =   393216
          Style           =   1
-         Tab             =   1
          TabHeight       =   520
          TabCaption(0)   =   "Auto-Refine Options"
          TabPicture(0)   =   "frmEditAnalysisSettings.frx":6EEBF
-         Tab(0).ControlEnabled=   0   'False
+         Tab(0).ControlEnabled=   -1  'True
          Tab(0).Control(0)=   "fraOptionFrame(10)"
+         Tab(0).Control(0).Enabled=   0   'False
          Tab(0).ControlCount=   1
          TabCaption(1)   =   "Split Features Options"
          TabPicture(1)   =   "frmEditAnalysisSettings.frx":6EEDB
-         Tab(1).ControlEnabled=   -1  'True
+         Tab(1).ControlEnabled=   0   'False
          Tab(1).Control(0)=   "fraOptionFrame(15)"
-         Tab(1).Control(0).Enabled=   0   'False
          Tab(1).ControlCount=   1
          TabCaption(2)   =   "Adv Class Stats"
          TabPicture(2)   =   "frmEditAnalysisSettings.frx":6EEF7
@@ -2608,7 +2607,7 @@ Begin VB.Form frmEditAnalysisSettings
          Begin VB.Frame fraOptionFrame 
             Height          =   2700
             Index           =   10
-            Left            =   -74880
+            Left            =   120
             TabIndex        =   539
             Top             =   320
             Width           =   4545
@@ -2951,7 +2950,7 @@ Begin VB.Form frmEditAnalysisSettings
             BorderStyle     =   0  'None
             Height          =   2340
             Index           =   15
-            Left            =   240
+            Left            =   -74760
             TabIndex        =   156
             Top             =   440
             Width           =   4260
@@ -4129,7 +4128,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "M/Z Range (isotopic data only)"
          Height          =   1180
          Index           =   8
-         Left            =   5040
+         Left            =   -69960
          TabIndex        =   50
          Top             =   2800
          Width           =   4335
@@ -4182,7 +4181,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Specialized filters"
          Height          =   1920
          Index           =   9
-         Left            =   5040
+         Left            =   -69960
          TabIndex        =   60
          Top             =   5300
          Width           =   5895
@@ -4252,7 +4251,7 @@ Begin VB.Form frmEditAnalysisSettings
       End
       Begin VB.TextBox txtPEKFileExtensionPreferenceOrder 
          Height          =   285
-         Left            =   3120
+         Left            =   -71880
          TabIndex        =   2
          Text            =   "_ic.csv, .csv, _ic.pek,_s.pek,.pek,DeCal.pek-3,.pek-3"
          Top             =   480
@@ -4262,7 +4261,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Isotopic data options"
          Height          =   1755
          Index           =   7
-         Left            =   5040
+         Left            =   -69960
          TabIndex        =   38
          Top             =   960
          Width           =   5865
@@ -4370,7 +4369,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Scan Range and NET Range"
          Height          =   1935
          Index           =   6
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   27
          Top             =   5400
          Width           =   4575
@@ -4467,7 +4466,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Abundance Range"
          Height          =   2175
          Index           =   5
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   15
          Top             =   3120
          Width           =   4575
@@ -4573,7 +4572,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Molecular Mass Range"
          Height          =   2055
          Index           =   4
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   3
          Top             =   960
          Width           =   4575
@@ -4677,7 +4676,7 @@ Begin VB.Form frmEditAnalysisSettings
       End
       Begin TabDlg.SSTab tbsNETOptions 
          Height          =   3405
-         Left            =   -70800
+         Left            =   4200
          TabIndex        =   302
          Top             =   480
          Width           =   6645
@@ -4685,7 +4684,7 @@ Begin VB.Form frmEditAnalysisSettings
          _ExtentY        =   6006
          _Version        =   393216
          Style           =   1
-         Tab             =   1
+         Tab             =   2
          TabHeight       =   520
          TabCaption(0)   =   "Robust NET Options"
          TabPicture(0)   =   "frmEditAnalysisSettings.frx":6EFF2
@@ -4694,23 +4693,27 @@ Begin VB.Form frmEditAnalysisSettings
          Tab(0).ControlCount=   1
          TabCaption(1)   =   "Charge Selection"
          TabPicture(1)   =   "frmEditAnalysisSettings.frx":6F00E
-         Tab(1).ControlEnabled=   -1  'True
+         Tab(1).ControlEnabled=   0   'False
          Tab(1).Control(0)=   "pctOptionsInIniFile(5)"
-         Tab(1).Control(0).Enabled=   0   'False
          Tab(1).ControlCount=   1
          TabCaption(2)   =   "MS Warp Options"
          TabPicture(2)   =   "frmEditAnalysisSettings.frx":6F02A
-         Tab(2).ControlEnabled=   0   'False
+         Tab(2).ControlEnabled=   -1  'True
          Tab(2).Control(0)=   "lblDescription(160)"
+         Tab(2).Control(0).Enabled=   0   'False
          Tab(2).Control(1)=   "lblDescription(155)"
+         Tab(2).Control(1).Enabled=   0   'False
          Tab(2).Control(2)=   "fraOptionFrame(34)"
+         Tab(2).Control(2).Enabled=   0   'False
          Tab(2).Control(3)=   "fraOptionFrame(35)"
+         Tab(2).Control(3).Enabled=   0   'False
          Tab(2).Control(4)=   "cboMSWarpMassCalibrationType"
+         Tab(2).Control(4).Enabled=   0   'False
          Tab(2).ControlCount=   5
          Begin VB.PictureBox pctOptionsInIniFile 
             Height          =   1125
             Index           =   5
-            Left            =   120
+            Left            =   -74880
             Picture         =   "frmEditAnalysisSettings.frx":6F046
             ScaleHeight     =   1065
             ScaleWidth      =   6255
@@ -4732,7 +4735,7 @@ Begin VB.Form frmEditAnalysisSettings
          Begin VB.ComboBox cboMSWarpMassCalibrationType 
             Height          =   315
             ItemData        =   "frmEditAnalysisSettings.frx":869FE
-            Left            =   -72960
+            Left            =   2040
             List            =   "frmEditAnalysisSettings.frx":86A00
             Style           =   2  'Dropdown List
             TabIndex        =   529
@@ -4743,7 +4746,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Mass Warp Options"
             Height          =   2175
             Index           =   35
-            Left            =   -71880
+            Left            =   3120
             TabIndex        =   315
             Top             =   600
             Width           =   2775
@@ -4847,7 +4850,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "NET Warp Options"
             Height          =   2175
             Index           =   34
-            Left            =   -74880
+            Left            =   120
             TabIndex        =   304
             Top             =   600
             Width           =   2775
@@ -4951,7 +4954,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Mass Calibration Type"
             Height          =   255
             Index           =   155
-            Left            =   -74760
+            Left            =   240
             TabIndex        =   326
             Top             =   2880
             Width           =   1665
@@ -4960,7 +4963,7 @@ Begin VB.Form frmEditAnalysisSettings
             Caption         =   "Note: Mass and NET tolerance values are set under Search Tolerances (at the left)"
             Height          =   255
             Index           =   160
-            Left            =   -74880
+            Left            =   120
             TabIndex        =   303
             Top             =   360
             Width           =   6345
@@ -4969,7 +4972,7 @@ Begin VB.Form frmEditAnalysisSettings
       Begin VB.CheckBox chkSkipGANETSlopeAndInterceptComputation 
          Caption         =   "Skip NET Slope and Intercept Computation"
          Height          =   255
-         Left            =   -74760
+         Left            =   240
          TabIndex        =   292
          Top             =   480
          Width           =   3735
@@ -4978,7 +4981,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Adjustment Mode"
          Height          =   240
          Index           =   156
-         Left            =   -68400
+         Left            =   6600
          TabIndex        =   328
          Top             =   3960
          Width           =   1695
@@ -5103,7 +5106,7 @@ Begin VB.Form frmEditAnalysisSettings
          Caption         =   "Input File extension preference order"
          Height          =   255
          Index           =   50
-         Left            =   240
+         Left            =   -74760
          TabIndex        =   1
          Top             =   480
          Width           =   2895
@@ -5633,7 +5636,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
                 txtSplitUMCsStdDevMultiplierForSplitting = Trim(.StdDevMultiplierForSplitting)
                 txtSplitUMCsPeakDetectIntensityThresholdPercentageOfMax = Trim(.PeakDetectIntensityThresholdPercentageOfMaximum)
                 txtSplitUMCsPeakPickingMinimumWidth = Trim(.PeakWidthPointsMinimum)
-                cboSplitUMCsScanGapBehavior.ListIndex = .ScanGapBehavior
+                SetComboBox cboSplitUMCsScanGapBehavior, .ScanGapBehavior, "Split UMC Scan Gap Behavior"
             End With
         
         End With
@@ -5660,9 +5663,9 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
         
         With .PrefsExpanded.PairSearchOptions
             Select Case LCase(.PairSearchMode)
-            Case LCase(AUTO_FIND_PAIRS_NONE): cboPairsIdentificationMode.ListIndex = pimNone
-            Case LCase(AUTO_FIND_PAIRS_DELTA): cboPairsIdentificationMode.ListIndex = pimDelta
-            Case LCase(AUTO_FIND_PAIRS_LABEL): cboPairsIdentificationMode.ListIndex = pimLabel
+            Case LCase(AUTO_FIND_PAIRS_NONE): SetComboBox cboPairsIdentificationMode, pimNone, "Pairs identification mode"
+            Case LCase(AUTO_FIND_PAIRS_DELTA): SetComboBox cboPairsIdentificationMode, pimDelta, "Pairs identification mode"
+            Case LCase(AUTO_FIND_PAIRS_LABEL): SetComboBox cboPairsIdentificationMode, pimLabel, "Pairs identification mode"
             End Select
             
             With .SearchDef
@@ -5705,7 +5708,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
                 If .RemoveOutlierERsMinimumDataPointCount < 2 Then .RemoveOutlierERsMinimumDataPointCount = 2
                 txtRemoveOutlierERsMinimumDataPointCount = .RemoveOutlierERsMinimumDataPointCount
                 
-                cboAverageERsWeightingMode.ListIndex = .AverageERsWeightingMode
+                SetComboBox cboAverageERsWeightingMode, .AverageERsWeightingMode, "Average ERs Weighting Mode"
                 
                 optERCalc(.ERCalcType).Value = True
             End With
@@ -5724,7 +5727,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             SetCheckBox chkPairsSaveTextFile, .AutoAnalysisSavePairsToTextFile
             SetCheckBox chkPairsSaveStatisticsTextFile, .AutoAnalysisSavePairsStatisticsToTextFile
             
-            cboPairsUMCsToUseForNETAdjustment.ListIndex = .NETAdjustmentPairedSearchUMCSelection
+            SetComboBox cboPairsUMCsToUseForNETAdjustment, .NETAdjustmentPairedSearchUMCSelection, "Paired UMCs to use for NET Adjustment"
             
         End With
         
@@ -5747,7 +5750,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             txtRefineDBSearchNETToleranceMinMax(1) = Trim(.NETToleranceMaximum)
             txtRefineDBSearchNETToleranceAdjustmentMultiplier = Trim(.NETToleranceAdjustmentMultiplier)
             
-            cboToleranceRefinementMethod.ListIndex = .ToleranceRefinementMethod
+            SetComboBox cboToleranceRefinementMethod, .ToleranceRefinementMethod, "Tolerance Refinement Method"
             SetCheckBox chkRefineDBSearchTolUseMinMaxIfOutOfRange, .UseMinMaxIfOutOfRange
             
             txtEMRefineMassErrorPeakToleranceEstimatePPM.Text = Trim(.EMMassErrorPeakToleranceEstimatePPM)
@@ -5778,7 +5781,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             
             ' Need to enable and set cboSavePictureGraphicFileType before setting chkSavePictureGraphic
             cboSavePictureGraphicFileType.Enabled = True
-            cboSavePictureGraphicFileType.ListIndex = .SavePictureGraphicFileType - 1
+            SetComboBox cboSavePictureGraphicFileType, .SavePictureGraphicFileType - 1, "Save Picture graphic file type"
             SetCheckBox chkSavePictureGraphic, .SavePictureGraphic
             
             txtPictureGraphicSizeWidthPixels = Trim(.SavePictureWidthPixels)
@@ -5810,11 +5813,11 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             If cboUMCSearchMode.ListCount >= 3 Then
                 If .UMCSearchMode = AUTO_ANALYSIS_UMCListType2002 Then
                     ' Obsolete search mode (July 2004)
-                    cboUMCSearchMode.ListIndex = usmUMC2002
+                    SetComboBox cboUMCSearchMode, usmUMC2002, "UMC Search Mode"
                 ElseIf .UMCSearchMode = AUTO_ANALYSIS_UMC2003 Then
-                    cboUMCSearchMode.ListIndex = usmUMC2003
+                    SetComboBox cboUMCSearchMode, usmUMC2003, "UMC Search Mode"
                 Else
-                    cboUMCSearchMode.ListIndex = usmUMCIonNet
+                    SetComboBox cboUMCSearchMode, usmUMCIonNet, "UMC Search Mode"
                 End If
             End If
             
@@ -5830,7 +5833,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             SetCheckBox chkAddQuantitationDescriptionEntry, .AddQuantitationDescriptionEntry
             SetCheckBox chkExportUMCsWithNoMatches, .ExportUMCsWithNoMatches
             
-            cboSearchRegionShape(1).ListIndex = .DBSearchRegionShape
+            SetComboBox cboSearchRegionShape(1), .DBSearchRegionShape, "DB Search region Shape"
             
             SetCheckBox chkUseLegacyDBForMTs, .UseLegacyDBForMTs
             
@@ -5844,7 +5847,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
                 txtAutoToleranceRefinementDBSearchMWTol = .DBSearchMWTol
                 txtAutoToleranceRefinementDBSearchNETTol = .DBSearchNETTol
                 
-                cboSearchRegionShape(0).ListIndex = .DBSearchRegionShape
+                SetComboBox cboSearchRegionShape(0), .DBSearchRegionShape, "DB Search region Shape for Tolerance Refinement"
                 
                 txtToleranceRefinementFilter(trfMinimumHighNormalizedScore) = .DBSearchMinimumHighNormalizedScore
                 txtToleranceRefinementFilter(trfMinimumDiscriminant) = .DBSearchMinimumHighDiscriminantScore
@@ -5874,7 +5877,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
                     lstDBSearchModes.ListIndex = 0
                 End If
                 
-                cboDBSearchMode.ListIndex = LookupDBSearchModeIndex(.AutoAnalysisSearchMode(0).SearchMode)
+                SetComboBox cboDBSearchMode, LookupDBSearchModeIndex(.AutoAnalysisSearchMode(0).SearchMode), "DB Search Mode"
             End If
             
         End With
@@ -5925,11 +5928,11 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             txtRestrictGANETRangeMinMax(1) = Trim(.RestrictGANETRangeMax)
             
             If .RestrictToEvenScanNumbersOnly Then
-                cboEvenOddScanNumber.ListIndex = eosEvenScans
+                SetComboBox cboEvenOddScanNumber, eosEvenScans, "Even Odd Scan Number Load Mode"
             ElseIf .RestrictToOddScanNumbersOnly Then
-                cboEvenOddScanNumber.ListIndex = eosOddScans
+                SetComboBox cboEvenOddScanNumber, eosOddScans, "Even Odd Scan Number Load Mode"
             Else
-                cboEvenOddScanNumber.ListIndex = eosAllScans
+                SetComboBox cboEvenOddScanNumber, eosAllScans, "Even Odd Scan Number Load Mode"
             End If
             
             txtMaximumDataCountToLoad = Trim(.MaximumDataCountToLoad)
@@ -5937,6 +5940,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             
             ' Note: Skipping .FilterLCMSFeatures
             ' Note: Skipping .LCMSFeatureAbuMin
+            ' Note: Skipping .LCMSFeatureScanCountMin
             ' Note: Skipping .IMSConformerScoreMin
 
         End With
@@ -5953,7 +5957,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
         With .UMCDef
             
             If .UMCType < cmbCountType.ListCount Then
-                cmbCountType.ListIndex = .UMCType
+                SetComboBox cmbCountType, .UMCType, "UMC creation mode"
             End If
             
             'Note: .DefScope is ignored here
@@ -5970,9 +5974,9 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             txtUMCSearchMassTol = Trim(.Tol)
             SetCheckBox chkAllowSharing, .UMCSharing
             SetCheckBox chkUMCDefRequireIdenticalCharge, .UMCUniCS
-            cmbUMCAbu.ListIndex = .ClassAbu
-            cmbUMCMW.ListIndex = .ClassMW
-            cboChargeStateAbuType.ListIndex = .ChargeStateStatsRepType
+            SetComboBox cmbUMCAbu, .ClassAbu, "UMC Class Abundance"
+            SetComboBox cmbUMCMW, .ClassMW, "UMC Class Mass"
+            SetComboBox cboChargeStateAbuType, .ChargeStateStatsRepType, "UMC Charge State Stats Rep Type"
             SetCheckBox chkUseMostAbuChargeStateStatsForClassStats, .UMCClassStatsUseStatsFromMostAbuChargeState
             
             txtHoleNum = Trim(.GapMaxCnt)
@@ -5998,23 +6002,24 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
         With .UMCIonNetDef
             txtRejectLongConnections.Text = .TooDistant
             txtNETType.Text = .NETType
-            cmbMetricType.ListIndex = .MetricType
+            SetComboBox cmbMetricType, .MetricType, "UMC Metric Type"
             For intIndex = 0 To .NetDim - 1
                 With .MetricData(intIndex)
                     SetCheckBox chkUse(intIndex), .Use
-                    cmbData(intIndex).ListIndex = .DataType
+                    SetComboBox cmbData(intIndex), .DataType, "UMC Metric Data Type"
+
                     ' Note: cmbConstraintUnits() is updated inside UpdateDynamicControls
-                    cmbConstraint(intIndex).ListIndex = .ConstraintType
+                    SetComboBox cmbConstraint(intIndex), .ConstraintType, "UMC Metric Constraint"
                     txtWeightingFactor(intIndex) = .WeightFactor
                     txtConstraint(intIndex) = .ConstraintValue
-                    cmbConstraintUnits(intIndex).ListIndex = .ConstraintUnits
+                    SetComboBox cmbConstraintUnits(intIndex), .ConstraintUnits, "UMC Constraint Units"
                 End With
             Next intIndex
         End With
         
         ' Additional UMCIonNet options
         With .PrefsExpanded.UMCIonNetOptions
-            cmbUMCRepresentative.ListIndex = .UMCRepresentative
+            SetComboBox cmbUMCRepresentative, .UMCRepresentative, "UMC Representative"
             SetCheckBox chkUMCIonNetMakeSingleMemberClasses, .MakeSingleMemberClasses
         End With
         
@@ -6071,7 +6076,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
                 End If
             End If
             
-            cboRobustNETAdjustmentMode.ListIndex = .RobustNETAdjustmentMode
+            SetComboBox cboRobustNETAdjustmentMode, .RobustNETAdjustmentMode, "Robust NET Adjstument Mode"
             
             If RobustNETWarpEnabled() Then
                 txtNetAdjInitialNETTol = Trim(.MSWarpOptions.NETTol)
@@ -6094,6 +6099,9 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             ' Note: Skipping: RobustNETMassShiftPPMIncrement
             
             With .MSWarpOptions
+            
+                SetComboBox cboMSWarpMassCalibrationType, .MassCalibrationType, "MS Warp Mass Calibration Type"
+                
                 txtRobustNETOption(rnoWarpNumberOfSections).Text = Trim(.NumberOfSections)
                 txtRobustNETOption(rnoWarpMaxDistortion).Text = Trim(.MaxDistortion)
                 txtRobustNETOption(rnoWarpContractionFactor).Text = Trim(.ContractionFactor)
@@ -6947,6 +6955,7 @@ Private Sub PopulateComboBoxes()
             .AddItem "Generic NET"
             .AddItem "Charge STATE"
             .AddItem "Log (Abundance)"
+            .AddItem "Drift Time"
         End With
     
         With cmbConstraint(intIndex)
@@ -7312,11 +7321,29 @@ Public Sub SetCallerID(lngCallerID As Long)
     mGelIndexInstantiatingForm = lngCallerID
     
     If mGelIndexInstantiatingForm > 0 And cboGelFileInMemoryToUse.ListCount >= mGelIndexInstantiatingForm Then
-        cboGelFileInMemoryToUse.ListIndex = mGelIndexInstantiatingForm - 1
+        SetComboBox cboGelFileInMemoryToUse, mGelIndexInstantiatingForm - 1, "Gel File in Memory"
         ReadFromSelectedGel
         mSettingsSaved = mCurrentSettings
     End If
     
+End Sub
+
+Private Sub SetComboBox(ByRef cboControl As ComboBox, ByVal intListIndex As Integer, ByVal strComboBoxDescription As String)
+
+    On Error GoTo SetComboBoxErrorHandler
+
+    cboControl.ListIndex = intListIndex
+
+    Exit Sub
+
+SetComboBoxErrorHandler:
+   
+    Dim strMessage As String
+    strMessage = "Error updating combo box '" & strComboBoxDescription & "' (" & cboControl.Name & ") to select item at index " & intListIndex & ": " & Err.Description
+    
+    Debug.Assert False
+    MsgBox strMessage, vbExclamation + vbOKOnly, "Error"
+
 End Sub
 
 Private Sub SetPairSearchDeltas(dblDeltaMass As Double, DeltaCountMin As Integer, DeltaCountMax As Integer, Optional DeltaStepSize As Long = 1)
@@ -7467,7 +7494,7 @@ On Error GoTo UpdateDynamicControlsErrorHandler
         Select Case cmbData(intIndex).ListIndex
         Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
             cmbConstraintUnits(intIndex).Visible = True
-            cmbConstraintUnits(intIndex).ListIndex = mCurrentSettings.UMCIonNetDef.MetricData(intIndex).ConstraintUnits
+            SetComboBox cmbConstraintUnits(intIndex), mCurrentSettings.UMCIonNetDef.MetricData(intIndex).ConstraintUnits, "UMC Metric Data Constraint Units"
             blnMassBasedDataDim = True
         Case Else
             cmbConstraintUnits(intIndex).Visible = False
@@ -7571,7 +7598,7 @@ On Error GoTo UpdateDynamicControlsErrorHandler
             SetCheckBox chkDBSearchExportToDB, .ExportResultsToDatabase
             SetCheckBox chkDBSearchWriteResultsToTextFile, .WriteResultsToTextFile
             txtDBSearchAlternateOutputFolderPath = .AlternateOutputFolderPath
-            cboInternalStdSearchMode.ListIndex = .InternalStdSearchMode
+            SetComboBox cboInternalStdSearchMode, .InternalStdSearchMode, "Internal standard search mode"
             
             txtDBSearchMinimumHighNormalizedScore = Trim(.DBSearchMinimumHighNormalizedScore)
             txtDBSearchMinimumHighDiscriminantScore = Trim(.DBSearchMinimumHighDiscriminantScore)
@@ -7610,12 +7637,12 @@ On Error GoTo UpdateDynamicControlsErrorHandler
                 If Len(.ResidueToModify) >= 1 Then
                     For intIndex = 0 To cboResidueToModify.ListCount - 1
                         If UCase(cboResidueToModify.List(intIndex)) = UCase(.ResidueToModify) Then
-                            cboResidueToModify.ListIndex = intIndex
+                            SetComboBox cboResidueToModify, intIndex, "Mass Mod Residue to modify"
                             Exit For
                         End If
                     Next intIndex
                 Else
-                    cboResidueToModify.ListIndex = 0
+                    SetComboBox cboResidueToModify, 0, "Mass Mod Residue to modify"
                 End If
                 mUpdatingModMassControls = False
                 txtResidueToModifyMass = Round(.ResidueMassModification, 5)
@@ -7820,9 +7847,9 @@ On Error GoTo ValidatePairsIdentificationModeErrorHandler
             
             If eResponse <> vbYes Then
                 If mCurrentSettings.PrefsExpanded.PairSearchOptions.PairSearchMode = AUTO_FIND_PAIRS_LABEL Then
-                    cboPairsIdentificationMode.ListIndex = pimLabel
+                    SetComboBox cboPairsIdentificationMode, pimLabel, "Pairs identification mode"
                 Else
-                    cboPairsIdentificationMode.ListIndex = pimDelta
+                    SetComboBox cboPairsIdentificationMode, pimDelta, "Pairs identification mode"
                 End If
                 blnPairFindingEnabled = True
             Else
@@ -8105,14 +8132,14 @@ On Error GoTo UMCSearchModeClickErrorHandler
     Case usmUMC2002
         ' Now Obsolete
         mCurrentSettings.PrefsExpanded.AutoAnalysisOptions.UMCSearchMode = AUTO_ANALYSIS_UMCListType2002
-        cboUMCSearchMode.ListIndex = usmUMC2002
+        SetComboBox cboUMCSearchMode, usmUMC2002, "UMC Search Mode"
     Case usmUMC2003
         mCurrentSettings.PrefsExpanded.AutoAnalysisOptions.UMCSearchMode = AUTO_ANALYSIS_UMC2003
-        cboUMCSearchMode.ListIndex = usmUMC2003
+        SetComboBox cboUMCSearchMode, usmUMC2003, "UMC Search Mode"
     Case Else
         ' Includes usmUMCIonNet
         mCurrentSettings.PrefsExpanded.AutoAnalysisOptions.UMCSearchMode = AUTO_ANALYSIS_UMCIonNet
-        cboUMCSearchMode.ListIndex = usmUMCIonNet
+        SetComboBox cboUMCSearchMode, usmUMCIonNet, "UMC Search Mode"
     End Select
     
     UpdateDynamicControls

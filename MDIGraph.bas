@@ -1735,6 +1735,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                  
         objLoadOptionsForm.FilterLCMSFeatures = .FilterLCMSFeatures
         objLoadOptionsForm.LCMSFeatureAbuMin = .LCMSFeatureAbuMin
+        objLoadOptionsForm.LCMSFeatureScanCountMin = .LCMSFeatureScanCountMin
         objLoadOptionsForm.IMSConformerScoreMin = .IMSConformerScoreMin
     End With
     
@@ -1769,9 +1770,11 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 
                 If .FilterLCMSFeatures Then
                     .LCMSFeatureAbuMin = objLoadOptionsForm.LCMSFeatureAbuMin
+                    .LCMSFeatureScanCountMin = objLoadOptionsForm.LCMSFeatureScanCountMin
                     .IMSConformerScoreMin = objLoadOptionsForm.IMSConformerScoreMin
                 Else
                     .LCMSFeatureAbuMin = 0
+                    .LCMSFeatureScanCountMin = 0
                     .IMSConformerScoreMin = 0
                 End If
             End With
@@ -1797,9 +1800,11 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 .FilterLCMSFeatures = objLoadOptionsForm.FilterLCMSFeatures
                 If .FilterLCMSFeatures Then
                     .LCMSFeatureAbuMin = objLoadOptionsForm.LCMSFeatureAbuMin
+                    .LCMSFeatureScanCountMin = objLoadOptionsForm.LCMSFeatureScanCountMin
                     .IMSConformerScoreMin = objLoadOptionsForm.IMSConformerScoreMin
                 Else
                     .LCMSFeatureAbuMin = 0
+                    .LCMSFeatureScanCountMin = 0
                     .IMSConformerScoreMin = 0
                 End If
                 
@@ -1864,6 +1869,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 .FilterLCMSFeatures = udtFilterPrefs.FilterLCMSFeatures
                 If udtFilterPrefs.FilterLCMSFeatures Then
                     .LCMSFeatureAbuMin = udtFilterPrefs.LCMSFeatureAbuMin
+                    .LCMSFeatureScanCountMin = udtFilterPrefs.LCMSFeatureScanCountMin
                     .IMSConformerScoreMin = udtFilterPrefs.IMSConformerScoreMin
                 End If
                 
@@ -1921,6 +1927,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                                            strErrorMessage, _
                                            .LCMSFeaturePointsLoadMode, _
                                            .LCMSFeatureAbuMin, _
+                                           .LCMSFeatureScanCountMin, _
                                            .IMSConformerScoreMin)
             End With
             
@@ -1992,8 +1999,8 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                     End If
                     strFilterText = "Only loaded isotopic data with calculated fit better than " & udtFilterPrefs.ExcludeIsoByFitMaxVal
                     .Comment = .Comment & strFilterText
-                    .DataFilter(fltIsoFit, 0) = True
-                    .DataFilter(fltIsoFit, 1) = udtFilterPrefs.ExcludeIsoByFitMaxVal
+                    .DataFilter(glFilters.fltIsoFit, 0) = True
+                    .DataFilter(glFilters.fltIsoFit, 1) = udtFilterPrefs.ExcludeIsoByFitMaxVal
                     AddToAnalysisHistory lngGelIndex, "File Loaded; " & strFilterText & " (at user request)."
                 End With
             End If
@@ -2008,9 +2015,9 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                     End If
                     strFilterText = "Only loaded isotopic data with abundance between " & Trim(udtFilterPrefs.RestrictIsoAbundanceMin) & " and " & Trim(udtFilterPrefs.RestrictIsoAbundanceMax) & " counts"
                     .Comment = .Comment & strFilterText
-                    .DataFilter(fltIsoAbu, 0) = True
-                    .DataFilter(fltIsoAbu, 1) = udtFilterPrefs.RestrictIsoAbundanceMin
-                    .DataFilter(fltIsoAbu, 2) = udtFilterPrefs.RestrictIsoAbundanceMax
+                    .DataFilter(glFilters.fltIsoAbu, 0) = True
+                    .DataFilter(glFilters.fltIsoAbu, 1) = udtFilterPrefs.RestrictIsoAbundanceMin
+                    .DataFilter(glFilters.fltIsoAbu, 2) = udtFilterPrefs.RestrictIsoAbundanceMax
                     AddToAnalysisHistory lngGelIndex, "File Loaded; " & strFilterText & " (at user request)."
                 End With
             End If
@@ -2037,17 +2044,26 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                         blnAddedMayContainText = True
                         .Comment = .Comment & strMayContainText
                     End If
-                    strFilterText = "Filtered LC-MS Features, retaining those with class abundance >= " & Trim(udtFilterPrefs.LCMSFeatureAbuMin) & " and IMS Conformer Score >= " & Trim(udtFilterPrefs.IMSConformerScoreMin)
+                    strFilterText = "Filtered LC-MS Features, retaining those with " & _
+                                    "Class abundance >= " & Trim(udtFilterPrefs.LCMSFeatureAbuMin) & ", " & _
+                                    "LC Scan Count >= " & Trim(udtFilterPrefs.LCMSFeatureScanCountMin) & ", and " & _
+                                    "IMS Conformer Combined_Score >= " & Trim(udtFilterPrefs.IMSConformerScoreMin)
+                                    
                     .Comment = .Comment & strFilterText
                     
                     If udtFilterPrefs.LCMSFeatureAbuMin > 0 Then
-                        .DataFilter(fltLCMSFeatureAbundance, 0) = True
-                        .DataFilter(fltLCMSFeatureAbundance, 1) = udtFilterPrefs.LCMSFeatureAbuMin
+                        .DataFilter(glFilters.fltLCMSFeatureAbundance, 0) = True
+                        .DataFilter(glFilters.fltLCMSFeatureAbundance, 1) = udtFilterPrefs.LCMSFeatureAbuMin
+                    End If
+                    
+                    If udtFilterPrefs.LCMSFeatureScanCountMin > 1 Then
+                        .DataFilter(glFilters.fltLCMSFeatureScanCountMin, 0) = True
+                        .DataFilter(glFilters.fltLCMSFeatureScanCountMin, 1) = udtFilterPrefs.LCMSFeatureScanCountMin
                     End If
                     
                     If udtFilterPrefs.IMSConformerScoreMin > 0 Then
-                        .DataFilter(fltIMSConformerScore, 0) = True
-                        .DataFilter(fltIMSConformerScore, 1) = udtFilterPrefs.IMSConformerScoreMin
+                        .DataFilter(glFilters.fltIMSConformerScore, 0) = True
+                        .DataFilter(glFilters.fltIMSConformerScore, 1) = udtFilterPrefs.IMSConformerScoreMin
                     End If
 
                     AddToAnalysisHistory lngGelIndex, "File Loaded; " & strFilterText & " (at user request)."

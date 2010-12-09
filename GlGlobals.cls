@@ -121,6 +121,7 @@ Public Enum glFilters
     fltEvenOddScanNumber = 15       ' if .DataFilter(fltEvenOddScanNumber, 2) = 1, show only odd scan numbers; if 2, show only even numbers
     fltLCMSFeatureAbundance = 16
     fltIMSConformerScore = 17
+    fltLCMSFeatureScanCountMin = 18
 End Enum
 
 Public Enum UMCDrawType

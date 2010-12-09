@@ -300,73 +300,6 @@ Private Function StringTrimEnd(ByVal strText As String, ByVal strTextToTrim As S
     StringTrimEnd = strTrimmedText
 End Function
 
-''Private Sub FilterLCMSFeatures(ByVal lngGelIndex As Long, _
-''                               ByVal dblLCMSFeatureAbuMin As Double, _
-''                               ByVal dblIMSConformerScoreMin As Double)
-''
-''    Dim i As Long
-''    Dim lngUMCCountNew As Long
-''    Dim lngCountRemoved As Long
-''
-''    Dim blnKeepUMC As Boolean
-''
-''On Error GoTo FilterLCMSFeaturesErrorHandler
-''
-''
-''    lngCountRemoved = 0
-''
-''    With GelUMC(lngGelIndex)
-''
-''        lngUMCCountNew = 0
-''        For i = 0 To .UMCCnt - 1
-''
-''            blnKeepUMC = True
-''            If dblLCMSFeatureAbuMin > 0 And .UMCs(i).ClassAbundance < dblLCMSFeatureAbuMin Then
-''                blnKeepUMC = False
-''            End If
-''
-''            If dblIMSConformerScoreMin > 0 And .UMCs(i).ClassScore < dblIMSConformerScoreMin Then
-''                blnKeepUMC = False
-''            End If
-''
-''            If blnKeepUMC Then
-''                If lngUMCCountNew <> i Then
-''                    .UMCs(lngUMCCountNew) = .UMCs(i)
-''                End If
-''                lngUMCCountNew = lngUMCCountNew + 1
-''            Else
-''                Erase .UMCs(i).ClassMInd
-''                Erase .UMCs(i).ClassMType
-''                .UMCs(i).ClassCount = 0
-''                lngCountRemoved = lngCountRemoved + 1
-''            End If
-''        Next i
-''
-''        If lngUMCCountNew <> .UMCCnt Then
-''            If lngUMCCountNew > 0 Then
-''                ReDim Preserve .UMCs(lngUMCCountNew - 1)
-''            Else
-''                ReDim Preserve .UMCs(0)
-''            End If
-''            .UMCCnt = lngUMCCountNew
-''        End If
-''
-''    End With
-''
-''    ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-''    Dim blnComputeClassMassAndAbundance As Boolean
-''    blnComputeClassMassAndAbundance = False
-''
-''    UpdateUMCStatArrays mGelIndex, blnComputeClassMassAndAbundance, False
-''
-''    Exit Sub
-''
-''FilterLCMSFeaturesErrorHandler:
-''    Debug.Assert False
-''    LogErrors Err.Number, "FilterLCMSFeatures"
-''
-''End Sub
-    
 Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean, blnIncludeIMSFileHeaders As Boolean) As String
     Dim strHeaders As String
     
@@ -467,6 +400,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
                            ByRef strErrorMessage, _
                            ByVal plmPointsLoadMode As Integer, _
                            ByVal dblLCMSFeatureAbuMin As Double, _
+                           ByVal lngLCMSFeatureScanCountMin As Long, _
                            ByVal dblIMSConformerScoreMin As Double) As Long
                            
     '-------------------------------------------------------------------------
@@ -720,6 +654,7 @@ On Error GoTo LoadNewCSVErrorHandler
                             strLCMSFeaturesFilePath, _
                             objFeatureToScanMap, _
                             dblLCMSFeatureAbuMin, _
+                            lngLCMSFeatureScanCountMin, _
                             dblIMSConformerScoreMin)
     
         If lngReturnValue = 0 Then
@@ -787,8 +722,9 @@ On Error GoTo LoadNewCSVErrorHandler
                                     plmPointsLoadMode, _
                                     objPointsToKeepSortedByFeature, _
                                     objHashMapOfPointsKept, _
-                                    dblIMSConformerScoreMin, _
-                                    dblLCMSFeatureAbuMin)
+                                    dblLCMSFeatureAbuMin, _
+                                    lngLCMSFeatureScanCountMin, _
+                                    dblIMSConformerScoreMin)
             End If
         End If
     End If
@@ -2047,8 +1983,9 @@ Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
                                       ByVal plmPointsLoadMode As Integer, _
                                       ByRef objPointsToKeepSortedByFeature As clsParallelLngArrays, _
                                       ByRef objHashMapOfPointsKept As clsParallelLngArrays, _
-                                      ByVal dblIMSConformerScoreMin As Double, _
-                                      ByVal dblLCMSFeatureAbuMin As Double) As Long
+                                      ByVal dblLCMSFeatureAbuMin As Double, _
+                                      ByVal lngLCMSFeatureScanCountMin As Long, _
+                                      ByVal dblIMSConformerScoreMin As Double) As Long
 
     Dim objReadLCMSFeatures As clsFileIOPredefinedLCMSFeatures
     Dim lngReturnCode As Long
@@ -2076,21 +2013,14 @@ Private Function ReadLCMSFeatureFiles(ByRef fso As FileSystemObject, _
         End If
     End If
     
-    ' Note that dblIMSConformerScoreMin and dblLCMSFeatureAbuMin are used to filter the LC-MS Features
+    ' Note that dblIMSConformerScoreMin, dblLCMSFeatureAbuMin, and lngLCMSFeatureScanCountMin are used to filter the LC-MS Features
     lngReturnCode = objReadLCMSFeatures.LoadLCMSFeatureFiles( _
                                                 strLCMSFeaturesFilePath, _
                                                 strLCMSFeatureToPeakMapFilePath, _
                                                 mGelIndex, _
-                                                dblIMSConformerScoreMin, _
-                                                dblLCMSFeatureAbuMin)
-
-''    ' Old code; no longer needed since we filter in .LoadLCMSFeatureFiles
-''
-''    If dblIMSConformerScoreMin > 0 Or dblLCMSFeatureAbuMin > 0 Then
-''        ' Need to filter the LCMSFeatures
-''        ' We can only do this now, after the features are loaded, due to the cross referencing between the files
-''        FilterLCMSFeatures mGelIndex, dblLCMSFeatureAbuMin, dblIMSConformerScoreMin
-''    End If
+                                                dblLCMSFeatureAbuMin, _
+                                                lngLCMSFeatureScanCountMin, _
+                                                dblIMSConformerScoreMin)
 
     ReadLCMSFeatureFiles = lngReturnCode
     
