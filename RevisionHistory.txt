@@ -1,6 +1,9 @@
 VIPER Change Log
 
-Version 3.48 - Build 437; Decembr 9, 2010
+Version 3.48 - Build 438; January 21, 2011
+	- Minor tweak to handle values of "Infinity" in GetColumnValueDbl()
+
+Version 3.48 - Build 437; December 9, 2010
 	- Now filtering predefined LC-MS Features for IMS data using the IMS Conformer Combined_Score column
 		- If the Combined_Score column is not present in the _LCMSFeatures.txt file, then will log a warning and instead use the Conformation_Fit_Score column
 	- Changed the default minimum IMS Conformer score to 0 (was previously 0.751)

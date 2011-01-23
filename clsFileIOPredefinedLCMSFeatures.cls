@@ -1262,7 +1262,17 @@ Private Function GetColumnValueDbl(ByRef strData() As String, ByVal intColumnInd
     Exit Function
     
 GetColumnValueErrorHandler:
-    Debug.Assert False
+    If intColumnIndex >= 0 Then
+        If strData(intColumnIndex) = "Infinity" Then
+            ' Ignore this error
+        Else
+            Debug.Assert False
+        End If
+    Else
+        Debug.Assert False
+    End If
+
+
     GetColumnValueDbl = dblDefaultValue
     
 End Function
