@@ -258,11 +258,18 @@ On Error GoTo BinaryLoadDataErrorHandler
         If blnUMCDataLoaded Then
             ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
             
-            ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
-            Dim blnComputeClassMassAndAbundance As Boolean
-            blnComputeClassMassAndAbundance = True
+            Dim blnComputeClassMass As Boolean
+            Dim blnComputeClassAbundance As Boolean
             
-            UpdateUMCStatArrays lngGelIndex, blnComputeClassMassAndAbundance, False
+            If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures Then
+                blnComputeClassMass = False
+                blnComputeClassAbundance = False
+            Else
+                blnComputeClassMass = True
+                blnComputeClassAbundance = True
+            End If
+        
+            UpdateUMCStatArrays lngGelIndex, blnComputeClassMass, blnComputeClassAbundance, False
         End If
     
     End If

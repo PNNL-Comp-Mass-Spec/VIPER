@@ -2902,6 +2902,12 @@ On Error GoTo LoadInputFileErrorHandler
                         End If
                     End If
                     
+                    strKeyValue = IniFileReadSingleSetting("UMCDef", "ClassAbu", "1", udtAutoParams.FilePaths.IniFilePath)
+                    If IsNumeric(strKeyValue) Then
+                        UMCDef.ClassAbu = CInt(strKeyValue)
+                    End If
+                    
+                    
                     strKeyValue = IniFileReadSingleSetting("AutoAnalysisFilterPrefs", "RestrictToEvenScanNumbersOnly", "False", udtAutoParams.FilePaths.IniFilePath)
                     .RestrictToEvenScanNumbersOnly = CBoolSafe(strKeyValue)
                     
@@ -2994,6 +3000,7 @@ On Error GoTo LoadInputFileErrorHandler
                 End If
                 
             Else
+                ' File not found; define the default filters
                 With .AutoAnalysisFilterPrefs
                     .ExcludeIsoByFit = False
                     .ExcludeIsoByFitMaxVal = 0.15
@@ -3977,12 +3984,19 @@ On Error GoTo RemovePairMemberHitsErrorHandler
         strMessage = strMessage & "; New LC-MS Feature count = " & Trim(lngNewUMCCount)
         AddToAnalysisHistory udtWorkingParams.GelIndex, strMessage & strMessageSuffix
                     
-        ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
-        Dim blnComputeClassMassAndAbundance As Boolean
-        blnComputeClassMassAndAbundance = True
+        Dim blnComputeClassMass As Boolean
+        Dim blnComputeClassAbundance As Boolean
+        
+        If GelUMC(udtWorkingParams.GelIndex).def.LoadedPredefinedLCMSFeatures Then
+            blnComputeClassMass = False
+            blnComputeClassAbundance = False
+        Else
+            blnComputeClassMass = True
+            blnComputeClassAbundance = True
+        End If
         
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
-        UpdateUMCStatArrays udtWorkingParams.GelIndex, blnComputeClassMassAndAbundance, False
+        UpdateUMCStatArrays udtWorkingParams.GelIndex, blnComputeClassMass, blnComputeClassAbundance, False
         
         ' Now that we have removed some LC-MS Features, we need to remove any pairs that used those LC-MS Features
         With GelP_D_L(udtWorkingParams.GelIndex)

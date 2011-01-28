@@ -1,12 +1,12 @@
 VERSION 5.00
 Begin VB.Form frmFileLoadOptions 
    Caption         =   "File Load Options"
-   ClientHeight    =   7095
+   ClientHeight    =   7335
    ClientLeft      =   60
    ClientTop       =   570
    ClientWidth     =   7470
    LinkTopic       =   "Form1"
-   ScaleHeight     =   7095
+   ScaleHeight     =   7335
    ScaleWidth      =   7470
    Begin VB.Frame fraFilterLCMSFeatures 
       Caption         =   "LC-MS Feature Filters"
@@ -88,24 +88,34 @@ Begin VB.Form frmFileLoadOptions
    End
    Begin VB.Frame fraPredefinedLCMSFeatureOptions 
       Caption         =   "Predefined LC-MS Feature Options"
-      Height          =   2055
+      Height          =   2655
       Left            =   120
       TabIndex        =   32
       Top             =   4560
       Width           =   3375
+      Begin VB.ComboBox cboLCMSFeatureClassAbundanceMode 
+         Height          =   315
+         ItemData        =   "frmFileLoadOptions.frx":0000
+         Left            =   120
+         List            =   "frmFileLoadOptions.frx":0002
+         Style           =   2  'Dropdown List
+         TabIndex        =   53
+         Top             =   2160
+         Width           =   3000
+      End
       Begin VB.CheckBox chkSplitUMCsByExaminingAbundance 
          Caption         =   "Split LC-MS features after loading"
          Height          =   255
          Left            =   120
          TabIndex        =   38
-         Top             =   1680
+         Top             =   1600
          Width           =   3015
       End
       Begin VB.ComboBox cboLCMSFeaturePointsLoadMode 
          Height          =   315
-         ItemData        =   "frmFileLoadOptions.frx":0000
+         ItemData        =   "frmFileLoadOptions.frx":0004
          Left            =   120
-         List            =   "frmFileLoadOptions.frx":0002
+         List            =   "frmFileLoadOptions.frx":0006
          Style           =   2  'Dropdown List
          TabIndex        =   37
          Top             =   1200
@@ -119,6 +129,15 @@ Begin VB.Form frmFileLoadOptions
          Text            =   "5"
          Top             =   360
          Width           =   495
+      End
+      Begin VB.Label lblDescription 
+         Caption         =   "Class Abundance Mode"
+         Height          =   255
+         Index           =   4
+         Left            =   120
+         TabIndex        =   54
+         Top             =   1920
+         Width           =   2175
       End
       Begin VB.Label lblDescription 
          Caption         =   "Choose which points to load:"
@@ -279,9 +298,9 @@ Begin VB.Form frmFileLoadOptions
       Width           =   1455
       Begin VB.ListBox lstMSLevelFilter 
          Height          =   840
-         ItemData        =   "frmFileLoadOptions.frx":0004
+         ItemData        =   "frmFileLoadOptions.frx":0008
          Left            =   120
-         List            =   "frmFileLoadOptions.frx":0006
+         List            =   "frmFileLoadOptions.frx":000A
          MultiSelect     =   2  'Extended
          TabIndex        =   49
          Top             =   240
@@ -635,6 +654,15 @@ Public Property Get IsoFitMax() As Double
     End If
 End Property
 
+' 0 means Abundance Sum
+' 1 means Abundance Max
+Public Property Let LCMSFeatureClassAbundanceMode(ByVal intValue As Integer)
+    cboLCMSFeatureClassAbundanceMode.ListIndex = intValue
+End Property
+Public Property Get LCMSFeatureClassAbundanceMode() As Integer
+    LCMSFeatureClassAbundanceMode = cboLCMSFeatureClassAbundanceMode.ListIndex
+End Property
+
 Public Property Let LCMSFeaturePointsLoadMode(ByVal intValue As Integer)
     cboLCMSFeaturePointsLoadMode.ListIndex = intValue
 End Property
@@ -884,6 +912,13 @@ Private Sub ResetToDefaults()
         .AddItem ("Load Mapped Points Only")            ' 1
         .AddItem ("Load 1 Point Per LC-MS Feature")     ' 2
         .ListIndex = 1
+    End With
+    
+    With cboLCMSFeatureClassAbundanceMode
+        .Clear
+        .AddItem ("Abundance Sum")
+        .AddItem ("Abundance Max")
+        .ListIndex = 0
     End With
     
     txtAutoMapDataPointsMassTolerancePPM.Text = "5"

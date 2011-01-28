@@ -96,17 +96,26 @@ On Error GoTo ApplyMassCalibrationAdjustmentErrorHandler
     
     If blnProceed Then
     
-        ' Now update the .MinMW and .MaxMW values associated with each UMC
+        ' Now update the .ClassMW, .MinMW, and .MaxMW values associated with each UMC
         ' This step will actually only be performed if GelUMC().def.LoadedPredefinedLCMSFeatures = True
-        MassCalibrationUpdateUMCMinMax lngGelIndex
+        MassCalibrationUpdateUMCClassStats lngGelIndex
     
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
+        ' However, if we loaded predefined LCMSFeatures, then the call to MassCalibrationUpdateUMCClassStats above
+        '  will have already updated the class rep mass
         
-        ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
-        Dim blnComputeClassMassAndAbundance As Boolean
-        blnComputeClassMassAndAbundance = True
+        Dim blnComputeClassMass As Boolean
+        Dim blnComputeClassAbundance As Boolean
         
-        blnSuccess = UpdateUMCStatArrays(lngGelIndex, blnComputeClassMassAndAbundance, False, frmCallingForm)
+        If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures Then
+            blnComputeClassMass = False
+            blnComputeClassAbundance = False
+        Else
+            blnComputeClassMass = True
+            blnComputeClassAbundance = True
+        End If
+                
+        blnSuccess = UpdateUMCStatArrays(lngGelIndex, blnComputeClassMass, blnComputeClassAbundance, False, frmCallingForm)
         Debug.Assert blnSuccess
         
         If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
@@ -230,12 +239,13 @@ On Error GoTo MassCalibrationRevertToOriginalErrorHandler
     End With
     
     If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures Then
-        ' Need to update the .MinMW and .MaxMW values for each UMC
-        ' We will not update .ClassMW since UpdateUMCStatArrays will call CalculateClasses, and CalculateClasses will re-compute .ClassMW using the ClassRep
+        ' We loaded predefined LCMSFeatures; need to undo the changes made by MassCalibrationUpdateUMCClassStats
+        ' Update the .ClassMW, .MinMW, and .MaxMW values for each UMC
         
         For i = 0 To GelUMC(lngGelIndex).UMCCnt - 1
             With GelUMC(lngGelIndex).UMCs(i)
                 If .MassShiftCount > 0 Then
+                    .ClassMW = MassCalibrationRevertAdjustmentOnePoint(.ClassMW, .MassShiftOverallPPM)
                     .MinMW = MassCalibrationRevertAdjustmentOnePoint(.MinMW, .MassShiftOverallPPM)
                     .MaxMW = MassCalibrationRevertAdjustmentOnePoint(.MaxMW, .MassShiftOverallPPM)
                     .MassShiftOverallPPM = 0
@@ -258,12 +268,21 @@ On Error GoTo MassCalibrationRevertToOriginalErrorHandler
     
     If blnDataUpdated Then
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
+        ' However, if we loaded predefined LCMSFeatures, then code earlier in this function
+        '  has already updated the class rep mass
         
-        ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
-        Dim blnComputeClassMassAndAbundance As Boolean
-        blnComputeClassMassAndAbundance = True
+        Dim blnComputeClassMass As Boolean
+        Dim blnComputeClassAbundance As Boolean
+                
+        If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures Then
+            blnComputeClassMass = False
+            blnComputeClassAbundance = False
+        Else
+            blnComputeClassMass = True
+            blnComputeClassAbundance = True
+        End If
         
-        blnSuccess = UpdateUMCStatArrays(lngGelIndex, blnComputeClassMassAndAbundance, False, frmCallingForm)
+        blnSuccess = UpdateUMCStatArrays(lngGelIndex, blnComputeClassMass, blnComputeClassAbundance, False, frmCallingForm)
         Debug.Assert blnSuccess
     End If
     
@@ -354,7 +373,7 @@ Public Function MassCalibrationUpdateHistory(ByVal lngGelIndex As Long, ByVal db
     
 End Function
 
-Public Function MassCalibrationUpdateUMCMinMax(ByVal lngGelIndex As Long) As Boolean
+Public Function MassCalibrationUpdateUMCClassStats(ByVal lngGelIndex As Long) As Boolean
 
     ' Returns True if successful, False if not
     
@@ -366,7 +385,7 @@ Public Function MassCalibrationUpdateUMCMinMax(ByVal lngGelIndex As Long) As Boo
     Dim dblMassShiftPPM As Double
     Dim bytMassShiftCount As Byte
     
-On Error GoTo MassCalibrationUpdateUMCMinMaxErrorHandler
+On Error GoTo MassCalibrationUpdateUMCClassStatsErrorHandler
 
     If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures Then
         ' Need to update the .MinMW and .MaxMW values for each UMC
@@ -410,8 +429,9 @@ On Error GoTo MassCalibrationUpdateUMCMinMaxErrorHandler
                 
                 With .UMCs(i)
                 
-                    ' Revert any adjustments already applied to .MinMW and .MaxMW
+                    ' Revert any adjustments already applied to .ClassMW, .MinMW, .MaxMW
                     If .MassShiftCount > 0 Then
+                        .ClassMW = MassCalibrationRevertAdjustmentOnePoint(.ClassMW, .MassShiftOverallPPM)
                         .MinMW = MassCalibrationRevertAdjustmentOnePoint(.MinMW, .MassShiftOverallPPM)
                         .MaxMW = MassCalibrationRevertAdjustmentOnePoint(.MaxMW, .MassShiftOverallPPM)
                         .MassShiftOverallPPM = 0
@@ -420,6 +440,7 @@ On Error GoTo MassCalibrationUpdateUMCMinMaxErrorHandler
                     
                     ' Apply the new mass shift
                     If dblMassShiftPPM <> 0 Then
+                        .ClassMW = MassCalibrationApplyAdjustmentOnePointWork(.ClassMW, dblMassShiftPPM)
                         .MinMW = MassCalibrationApplyAdjustmentOnePointWork(.MinMW, dblMassShiftPPM)
                         .MaxMW = MassCalibrationApplyAdjustmentOnePointWork(.MaxMW, dblMassShiftPPM)
                     
@@ -432,13 +453,13 @@ On Error GoTo MassCalibrationUpdateUMCMinMaxErrorHandler
         End With
     End If
     
-    MassCalibrationUpdateUMCMinMax = True
+    MassCalibrationUpdateUMCClassStats = True
     Exit Function
     
-MassCalibrationUpdateUMCMinMaxErrorHandler:
-    Debug.Print "Error in MassCalibrationUpdateUMCMinMax: " & Err.Description
+MassCalibrationUpdateUMCClassStatsErrorHandler:
+    Debug.Print "Error in MassCalibrationUpdateUMCClassStats: " & Err.Description
     Debug.Assert False
-    LogErrors Err.Number, "MassCalibrationUpdateUMCMinMax"
-    MassCalibrationUpdateUMCMinMax = False
+    LogErrors Err.Number, "MassCalibrationUpdateUMCClassStats"
+    MassCalibrationUpdateUMCClassStats = False
     
 End Function

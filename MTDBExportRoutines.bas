@@ -1073,7 +1073,13 @@ On Error GoTo AddUMCErrorHandler
         udtPutUMCParams.ExpressionRatio.Value = Round(udtPairMatchStats.ExpressionRatio, 6)
         
         ' The following should always be true:
-        Debug.Assert Round(ClsStat(lngUMCIndexOriginal, ustClassRepMW), MASS_PRECISION) = Round(udtPutUMCParams.MonoisotopicMassMaxAbu.Value, MASS_PRECISION)
+        If Round(ClsStat(lngUMCIndexOriginal, ustClassRepMW), MASS_PRECISION) <> Round(udtPutUMCParams.MonoisotopicMassMaxAbu.Value, MASS_PRECISION) Then
+            If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures Then
+                Debug.Assert False
+            Else
+                Debug.Assert False
+            End If
+        End If
     
         udtPutUMCParams.ClassAbundance.Value = .ClassAbundance
         
@@ -1225,7 +1231,8 @@ On Error GoTo AddUMCCSStatsErrorHandler
                     sngDriftTime = 0
                 End If
                 
-                If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures And GelUMC(lngGelIndex).def.OnePointPerLCMSFeature Then
+                If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures And _
+                   GelUMC(lngGelIndex).def.OnePointPerLCMSFeature Then
                                 
                     ' Loaded predefined LC-MS features and only loaded one point per feature
                     ' Favor the class-based drift time

@@ -4,7 +4,7 @@ Begin VB.Form frmVisUMC
    Caption         =   "UMC Editor"
    ClientHeight    =   9480
    ClientLeft      =   150
-   ClientTop       =   840
+   ClientTop       =   720
    ClientWidth     =   13005
    Icon            =   "frmVisUMC.frx":0000
    LinkTopic       =   "Form1"
@@ -1432,10 +1432,12 @@ If NeedToSave Then
       ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
       
       ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
-      Dim blnComputeClassMassAndAbundance As Boolean
-      blnComputeClassMassAndAbundance = True
+        Dim blnComputeClassMass As Boolean
+        Dim blnComputeClassAbundance As Boolean
+        blnComputeClassMass = True
+        blnComputeClassAbundance = True
               
-      UpdateUMCStatArrays CallerID, blnComputeClassMassAndAbundance, False, Me
+      UpdateUMCStatArrays CallerID, blnComputeClassMass, blnComputeClassAbundance, False, Me
       
       GelP_D_L(CallerID).SyncWithUMC = PairsUMCInSync
       AddToAnalysisHistory CallerID, mChangeList, False

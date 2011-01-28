@@ -1,13 +1,13 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Object = "{C02A7541-5364-11D2-9373-00A02411EBE6}#1.6#0"; "cw3dgrph.ocx"
 Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Begin VB.Form frmMSAlign 
    BackColor       =   &H00FFFFFF&
    Caption         =   "LCMSWarp"
    ClientHeight    =   10410
-   ClientLeft      =   165
-   ClientTop       =   855
+   ClientLeft      =   225
+   ClientTop       =   795
    ClientWidth     =   14340
    LinkTopic       =   "MS Align"
    MinButton       =   0   'False
@@ -2196,8 +2196,8 @@ Begin VB.Form frmMSAlign
          TabIndex        =   113
          Top             =   360
          Width           =   5055
-         _extentx        =   8916
-         _extenty        =   2566
+         _ExtentX        =   8916
+         _ExtentY        =   2566
       End
       Begin VB.CheckBox chkSurfaceShowsZScore 
          BackColor       =   &H00FFFFFF&
@@ -2333,8 +2333,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   3.47911606649768E-287
-         DataMax_5       =   3.47911606649768E-287
+         DataMin_5       =   8.12373994823405E-247
+         DataMax_5       =   8.12373994823405E-247
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2400,8 +2400,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   3.49621162261253E-287
-         DataMax_14      =   3.49621162261253E-287
+         DataMin_14      =   7.2872490313501E-297
+         DataMax_14      =   7.2872490313501E-297
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2469,8 +2469,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   3.54048370169544E-287
-         DataMax_23      =   3.54048370169544E-287
+         DataMin_23      =   7.29485512984267E-297
+         DataMax_23      =   7.29485512984267E-297
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -6281,9 +6281,9 @@ On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
                 Next lngIndex
             End If
             
-            ' Now update the .MinMW and .MaxMW values associated with each UMC
+            ' Now update the .ClassMW, .MinMW, and .MaxMW values associated with each UMC
             ' This step will actually only be performed if GelUMC().def.LoadedPredefinedLCMSFeatures = True
-            MassCalibrationUpdateUMCMinMax CallerID
+            MassCalibrationUpdateUMCClassStats CallerID
         End If
     End With
 
@@ -6306,10 +6306,18 @@ On Error GoTo RecalibrateMassesUsingWarpedDataErrorHandler
         UpdateStatus "Updating mass calibration: 100% done; now recomputing LC-MS Feature stats"
         
         ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
-        Dim blnComputeClassMassAndAbundance As Boolean
-        blnComputeClassMassAndAbundance = True
+        Dim blnComputeClassMass As Boolean
+        Dim blnComputeClassAbundance As Boolean
         
-        blnSuccess = CalculateClasses(CallerID, blnComputeClassMassAndAbundance, False, Me)
+        If GelUMC(CallerID).def.LoadedPredefinedLCMSFeatures Then
+            blnComputeClassMass = False
+            blnComputeClassAbundance = False
+        Else
+            blnComputeClassMass = True
+            blnComputeClassAbundance = True
+        End If
+        
+        blnSuccess = CalculateClasses(CallerID, blnComputeClassMass, blnComputeClassAbundance, False, Me)
 
         ' Update mLocalFeatures
         PopulateLocalFeaturesArray False

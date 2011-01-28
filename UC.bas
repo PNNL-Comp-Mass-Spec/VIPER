@@ -2806,7 +2806,8 @@ exit_ManageClasses:
 End Function
 
 Public Function CalculateClasses(ByVal lngGelIndex As Long, _
-                                 ByVal blnComputeClassMassAndAbundance As Boolean, _
+                                 ByVal blnComputeClassMass As Boolean, _
+                                 ByVal blnComputeClassAbundance As Boolean, _
                                  ByVal blnUseProgressForm As Boolean, _
                                  Optional frmCallingForm As VB.Form) As Boolean
 
@@ -2823,6 +2824,11 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
 '
 ' August 2009: Added parameter blnComputeClassMassAndAbundance, which should be false if we read
 '             predefined LCMSFeature info using clsFileIOPredefinedLCMSFeatures
+'
+' January 2011: Replaced blnComputeClassMassAndAbundance with blnComputeClassMass and blnComputeClassAbundance
+'               These will typically be false when reading predefined LCMSFeature info using clsFileIOPredefinedLCMSFeatures
+'               However, if we re-compute mass values using LCMSWarp, then we need to set blnComputeClassMass to True but leave blnComputeClassAbundance as false
+'
 '
 '--------------------------------------------------------------------------------
 
@@ -3229,14 +3235,19 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                     End If
                     .UMCs(i).ChargeStateStatsRepInd = intBestIndex
     
-                    If blnComputeClassMassAndAbundance Then
+                    If blnComputeClassMass Or blnComputeClassAbundance Then
                         
                         ' Populate .ClassMW, .ClassMWStD, and .ClassAbundance
                         If .def.UMCClassStatsUseStatsFromMostAbuChargeState Then
                             With .UMCs(i)
-                                .ClassMW = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Mass
-                                .ClassMWStD = .ChargeStateBasedStats(.ChargeStateStatsRepInd).MassStD
-                                .ClassAbundance = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Abundance
+                                If blnComputeClassMass Then
+                                    .ClassMW = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Mass
+                                    .ClassMWStD = .ChargeStateBasedStats(.ChargeStateStatsRepInd).MassStD
+                                End If
+                                
+                                If blnComputeClassAbundance Then
+                                    .ClassAbundance = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Abundance
+                                End If
                                 
                                 ' Update .ClassRepInd and .ClassRepType to contain the ClassRep values for
                                 '   for the class rep of the best charge state group
@@ -3262,9 +3273,14 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                             CalculateClassesComputeStats lngGelIndex, .def, UMCMembersMaxIndex, UMCMembersMW(), UMCMembersAbu(), UMCMembersScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
                             
                             With .UMCs(i)
-                                .ClassMW = dblConglomerateMW
-                                .ClassMWStD = dblConglomerateMWStD
-                                .ClassAbundance = dblConglomerateAbu
+                                If blnComputeClassMass Then
+                                    .ClassMW = dblConglomerateMW
+                                    .ClassMWStD = dblConglomerateMWStD
+                                End If
+                                
+                                If blnComputeClassAbundance Then
+                                    .ClassAbundance = dblConglomerateAbu
+                                End If
                             End With
                         End If
                     End If
@@ -3296,15 +3312,20 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                         Debug.Assert False
                     End If
                     
-                    If blnComputeClassMassAndAbundance Then
+                    If blnComputeClassMass Or blnComputeClassAbundance Then
                         ' Update the class values to be -1
                         ' This is important in case we adjusted the mass value of all of the features; we wouldn't want the .ClassMW values to still be wrong for these UMCs
                         With .UMCs(i)
-                            .ClassAbundance = -1
-                            .ClassMW = -1
-                            .ClassMWStD = -1
-                            .MinScan = -1
-                            .MaxScan = -1
+                            If blnComputeClassMass Then
+                                .ClassMW = -1
+                                .ClassMWStD = -1
+                                .MinScan = -1
+                                .MaxScan = -1
+                            End If
+                            
+                            If blnComputeClassAbundance Then
+                                .ClassAbundance = -1
+                            End If
                         End With
                     End If
                End If

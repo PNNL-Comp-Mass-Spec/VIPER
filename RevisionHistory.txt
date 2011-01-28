@@ -1,5 +1,14 @@
 VIPER Change Log
 
+Version 3.48 - Build 349; January 27, 2011
+	- Disabled splitting of LC-MS features by abundance when reading _LCMSFeatures.txt files
+	- Fixed bug that was changing LC-MS Feature class mass values to the mass value of the most abundant member of a feature at inappropriate times:
+		- After applying a mass calibration adjustment (either when using LCMSWarp or when using Tolerance Refinement)
+		- After loading saved data from a .Gel file
+	- Now reading the Max_Abundance column from _LCMSFeatures.txt files
+		- By default, storing the summed abundance value (Abundance column) as the UMC Class Abundance
+		- However, if the ClassAbu setting in the UMCDef section of the .Ini file is UMCClassAbundanceConstants.UMCAbuMax (4), then will store the Max_Abundance value as the UMC Class Abundance
+
 Version 3.48 - Build 438; January 21, 2011
 	- Minor tweak to handle values of "Infinity" in GetColumnValueDbl()
 

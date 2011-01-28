@@ -5627,7 +5627,8 @@ UpdateNetAdjRangeStatsErrorHandler:
 End Sub
 
 Public Function UpdateUMCStatArrays(ByVal lngGelIndex As Long, _
-                                    ByVal blnComputeClassMassAndAbundance As Boolean, _
+                                    ByVal blnComputeClassMass As Boolean, _
+                                    ByVal blnComputeClassAbundance As Boolean, _
                                     Optional ByVal blnUseProgressForm As Boolean = False, _
                                     Optional ByRef frmCallingForm As VB.Form) As Boolean
     ' Returns True if success, False otherwise
@@ -5636,7 +5637,7 @@ Public Function UpdateUMCStatArrays(ByVal lngGelIndex As Long, _
     
     If Not glAbortUMCProcessing Then
         ' Update the UMC Classes info
-        blnSuccess = CalculateClasses(lngGelIndex, blnComputeClassMassAndAbundance, blnUseProgressForm, frmCallingForm)
+        blnSuccess = CalculateClasses(lngGelIndex, blnComputeClassMass, blnComputeClassAbundance, blnUseProgressForm, frmCallingForm)
     End If
     
     If blnSuccess And Not glAbortUMCProcessing Then

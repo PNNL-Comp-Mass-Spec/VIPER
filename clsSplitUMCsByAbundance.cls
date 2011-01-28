@@ -380,10 +380,12 @@ On Error GoTo SplitUMCsByAbundanceErrorHandler
         ' Need to recompute the UMC Statistic arrays and store the updated Class Representative Mass
         
         ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
-        Dim blnComputeClassMassAndAbundance As Boolean
-        blnComputeClassMassAndAbundance = True
+        Dim blnComputeClassMass As Boolean
+        Dim blnComputeClassAbundance As Boolean
+        blnComputeClassMass = True
+        blnComputeClassAbundance = True
     
-        blnSuccess = UpdateUMCStatArrays(lngGelIndex, blnComputeClassMassAndAbundance, False, frmCallingForm)
+        blnSuccess = UpdateUMCStatArrays(lngGelIndex, blnComputeClassMass, blnComputeClassAbundance, False, frmCallingForm)
         Debug.Assert blnSuccess
     
         frmCallingForm.Caption = strCaptionSaved

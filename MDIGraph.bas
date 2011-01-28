@@ -1651,7 +1651,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                     eFileType = ifmCSVFile
                     blnLoadPredefinedLCMSFeatures = True
                 
-                    ' Update strInputFilePath to be the Decon2LS _filtered_isos.csv file or the _isos.csv file
+                    ' Update strInputFilePath to be the Decon2LS _filtered_isos.csv file or the _isos.csv file, whichever exists
                     strPathTest = Left(strInputFilePath, Len(strInputFilePath) - Len(strSuffixToCheck)) & CSV_FILTERED_ISOS_FILE_SUFFIX
                     If fso.FileExists(strPathTest) Then
                         strInputFilePath = strPathTest
@@ -1705,7 +1705,13 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
         
         objLoadOptionsForm.AutoMapDataPointsMassTolerancePPM = .AutoMapDataPointsMassTolerancePPM
         objLoadOptionsForm.LCMSFeaturePointsLoadMode = .LCMSFeaturePointsLoadMode
-               
+        
+        If UMCDef.ClassAbu = UMCClassAbundanceConstants.UMCAbuMax Then
+            objLoadOptionsForm.LCMSFeatureClassAbundanceMode = 1
+        Else
+            objLoadOptionsForm.LCMSFeatureClassAbundanceMode = 0
+        End If
+                
         If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
             ' Auto analysis; use whatever setting is defined in glbPreferencesExpanded
             objLoadOptionsForm.LCMSFeatureSplitUMCsByExaminingAbundance = glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance
@@ -1877,6 +1883,15 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                 .RestrictToEvenScanNumbersOnly = udtFilterPrefs.RestrictToEvenScanNumbersOnly
             End With
 
+        End If
+        
+        If blnLoadPredefinedLCMSFeatures Then
+            ' Update the class abundance mode in UMCDef
+            If objLoadOptionsForm.LCMSFeatureClassAbundanceMode = 1 Then
+                UMCDef.ClassAbu = UMCClassAbundanceConstants.UMCAbuMax
+            Else
+                UMCDef.ClassAbu = UMCClassAbundanceConstants.UMCAbuSum
+            End If
         End If
         
         Screen.MousePointer = vbHourglass

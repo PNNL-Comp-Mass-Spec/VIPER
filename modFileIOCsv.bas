@@ -54,9 +54,13 @@ Private Const ISOS_COLUMN_MONO_MINUS4_ABUNDANCE As String = "mono_minus4_abundan
 Private Const ISOS_COLUMN_IMS_DRIFT_TIME As String = "drift_time"
 Private Const ISOS_COLUMN_IMS_CUMULATIVE_DRIFT_TIME As String = "cumulative_drift_time"
 
+' Extra IMS columns that we don't read
 Private Const ISOS_COLUMN_ORIG_INTENSITY As String = "orig_intensity"
 Private Const ISOS_COLUMN_TIA_ORIG_INTENSITY As String = "tia_orig_intensity"
+
+' Added to _Isos files in January 2011
 Private Const ISOS_COLUMN_FLAG As String = "flag"
+Private Const ISOS_COLUMN_INTERFERENCE_SCORE As String = "interference_score"
 
 Private Const SCAN_INFO_DIM_CHUNK As Long = 10000
 Private Const ISO_DATA_DIM_CHUNK As Long = 25000
@@ -78,7 +82,7 @@ Private Enum ScanFileColumnConstants
     IMSFramePressureBack = 12               ' Only present in IMS datafiles
 End Enum
 
-Private Const ISOS_FILE_COLUMN_COUNT As Integer = 15
+Private Const ISOS_FILE_COLUMN_COUNT As Integer = 16
 Private Enum IsosFileColumnConstants
     ScanNumber = 0
     Charge = 1
@@ -94,7 +98,8 @@ Private Enum IsosFileColumnConstants
     MonoPlus2Abundance = 11
     MonoPlus4Abundance = 12
     MonoMinus4Abundance = 13
-    IMSDriftTime = 14               ' Only present in IMS datafiles
+    IMSDriftTime = 14               ' Only present in IMS data files
+    InterferenceScore = 15
 End Enum
 
 Private Enum rmReadModeConstants
@@ -332,8 +337,10 @@ Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean, 
         
         If blnIncludeIMSFileHeaders Then
             strHeaders = strHeaders & ", " & ISOS_COLUMN_IMS_DRIFT_TIME
-            strHeaders = strHeaders & ", " & ISOS_COLUMN_IMS_CUMULATIVE_DRIFT_TIME
         End If
+        
+        strHeaders = strHeaders & ", " & ISOS_COLUMN_FLAG
+        strHeaders = strHeaders & ", " & ISOS_COLUMN_INTERFERENCE_SCORE
     End If
 
     GetDefaultIsosColumnHeaders = strHeaders
@@ -728,31 +735,7 @@ On Error GoTo LoadNewCSVErrorHandler
             End If
         End If
     End If
-    
-    If lngReturnValue = 0 Then
-        If (glbPreferencesExpanded.UMCAutoRefineOptions.SplitUMCsByAbundance And _
-            mLoadPredefinedLCMSFeatures And _
-            plmPointsLoadMode < plmLoadOnePointPerLCMSFeature) Then
-            
-            frmProgress.UpdateCurrentSubTask "Splitting loaded LC-MS Features"
-            
-            strMessage = "Splitting loaded LC-MS Features since SplitUMCsByAbundance=True"
-            AddToAnalysisHistory mGelIndex, strMessage
-            
-            Set objSplitUMCs = New clsSplitUMCsByAbundance
-            
-            ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
-            Dim blnComputeClassMassAndAbundance As Boolean
-            blnComputeClassMassAndAbundance = True
-                    
-            blnSuccess = UpdateUMCStatArrays(mGelIndex, blnComputeClassMassAndAbundance, False, frmProgress)
-            
-            objSplitUMCs.ExamineUMCs mGelIndex, frmProgress, GelUMC(mGelIndex).def.OddEvenProcessingMode, False, False
-            Set objSplitUMCs = Nothing
-        
-        End If
-    End If
-    
+     
     LoadNewCSV = lngReturnValue
     Exit Function
 
@@ -1169,6 +1152,7 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
     Dim sngFit As Single
     Dim sngAbundance As Single
     Dim intCharge As Integer
+    Dim sngInterferenceScore As Single
     
     Dim strUnknownColumnList As String
     Dim strMessage As String
@@ -1253,6 +1237,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance) = IsosFileColumnConstants.MonoPlus4Abundance
                     intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance) = IsosFileColumnConstants.MonoMinus4Abundance
                     intColumnMapping(IsosFileColumnConstants.IMSDriftTime) = IsosFileColumnConstants.IMSDriftTime
+                    intColumnMapping(IsosFileColumnConstants.InterferenceScore) = IsosFileColumnConstants.InterferenceScore
 
                     ' Column headers were not present
                      AddToAnalysisHistory mGelIndex, "Isos file " & fso.GetFileName(strIsosFilePath) & " did not contain column headers; using the default headers (" & GetDefaultIsosColumnHeaders(False, False) & ")"
@@ -1271,7 +1256,7 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         Select Case strColumnHeader
                         Case ISOS_COLUMN_SCAN_NUM_A, ISOS_COLUMN_SCAN_NUM_B: intColumnMapping(IsosFileColumnConstants.ScanNumber) = lngIndex
                         Case ISOS_COLUMN_FRAME_NUM
-                            ' We treat IMS frame number as if its the primary scan number
+                            ' We treat IMS frame number as if it is the primary scan number
                             intColumnMapping(IsosFileColumnConstants.ScanNumber) = lngIndex
                         Case ISOS_COLUMN_IMS_SCAN_NUM
                             ' Ignore this column; VIPER does not track the IMS scan number
@@ -1297,6 +1282,8 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                             ' Ignore this column
                         Case ISOS_COLUMN_FLAG
                             ' Ignore this column
+                        Case ISOS_COLUMN_INTERFERENCE_SCORE
+                            intColumnMapping(IsosFileColumnConstants.InterferenceScore) = lngIndex
                         Case Else
                             ' Unknown column header; ignore it, but post an entry to the analysis history
                             If Len(strUnknownColumnList) > 0 Then
@@ -1529,6 +1516,9 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                         .IntensityMono = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoAbundance), 0)
                                         .IntensityMonoPlus2 = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance), 0)
                                         .IMSDriftTime = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.IMSDriftTime), 0)
+                                        
+                                        ' We'll read the interference score, but not store it
+                                        sngInterferenceScore = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.InterferenceScore), 0)
                                     End With
                                 
                                     If mReadMode <> rmReadModeConstants.rmPrescanData Then

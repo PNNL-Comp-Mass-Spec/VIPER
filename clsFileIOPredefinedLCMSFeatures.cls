@@ -33,20 +33,30 @@ Private Const COLUMN_HEADER_UNKNOWN_WARNING As String = "Warning: unknown column
 Private Const COLUMN_HEADER_MISSING_WARNING As String = "Warning: expected important column headers"
 
 
+' Note: These should all be lowercase string values
 Private Const LCMSFEATURES_COLUMN_FEATURE_INDEX As String = "feature_index"
 Private Const LCMSFEATURES_COLUMN_ORIGINAL_INDEX As String = "original_index"
 Private Const LCMSFEATURES_COLUMN_SCAN As String = "scan"
 Private Const LCMSFEATURES_COLUMN_SCAN_START As String = "scan_start"
 Private Const LCMSFEATURES_COLUMN_SCAN_END As String = "scan_end"
-Private Const LCMSFEATURES_COLUMN_SCAN_ALIGNED As String = "scan_aligned"
+Private Const LCMSFEATURES_COLUMN_SCAN_ALIGNED As String = "scan_aligned"       ' Old column
 Private Const LCMSFEATURES_COLUMN_NET As String = "net"
+    
+Private Const LCMSFEATURES_COLUMN_IMS_SCAN As String = "ims_scan"
+Private Const LCMSFEATURES_COLUMN_IMS_SCAN_START As String = "ims_scan_start"
+Private Const LCMSFEATURES_COLUMN_IMS_SCAN_END As String = "ims_scan_end"
+Private Const LCMSFEATURES_COLUMN_AVG_INTERFERENCE_SCORE As String = "avg_interference_score"
+Private Const LCMSFEATURES_COLUMN_DECON2LS_FIT_SCORE As String = "decon2ls_fit_score"
+
 Private Const LCMSFEATURES_COLUMN_MONO_MASS As String = "monoisotopic_mass"
 Private Const LCMSFEATURES_COLUMN_MONO_MASS_CALIBRATED As String = "monoisotopic_mass_calibrated"
+Private Const LCMSFEATURES_COLUMN_MAX_ABUNDANCE As String = "max_abundance"
 Private Const LCMSFEATURES_COLUMN_ABUNDANCE As String = "abundance"
 Private Const LCMSFEATURES_COLUMN_CLASS_REP_MZ As String = "class_rep_mz"
 Private Const LCMSFEATURES_COLUMN_CLASS_REP_CHARGE As String = "class_rep_charge"
 Private Const LCMSFEATURES_COLUMN_CHARGE_MAX As String = "charge_max"
 Private Const LCMSFEATURES_COLUMN_DRIFT_TIME As String = "drift_time"
+
 Private Const LCMSFEATURES_COLUMN_CONFORMATION_FIT_SCORE As String = "conformation_fit_score"
 Private Const LCMSFEATURES_COLUMN_LC_FIT_SCORE As String = "lc_fit_score"
 Private Const LCMSFEATURES_COLUMN_AVERAGE_ISOTOPIC_FIT As String = "average_isotopic_fit"
@@ -57,13 +67,12 @@ Private Const LCMSFEATURES_COLUMN_AVERAGE_MONO_MASS As String = "average_mono_ma
 Private Const LCMSFEATURES_COLUMN_UMC_MW_MIN As String = "umc_mw_min"
 Private Const LCMSFEATURES_COLUMN_UMC_MW_MAX As String = "umc_mw_max"
 Private Const LCMSFEATURES_COLUMN_UMC_MEMBER_COUNT As String = "umc_member_count"
-Private Const LCMSFEATURES_COLUMN_ABUNDANCE_MAX As String = "max_abundance"
 
 Private Const PEAK_MAP_COLUMN_FEATURE_INDEX As String = "feature_index"
 Private Const PEAK_MAP_COLUMN_PEAK_INDEX As String = "peak_index"
 Private Const PEAK_MAP_COLUMN_FILTERED_PEAK_INDEX As String = "filtered_peak_index"
 
-Private Const LCMSFEATURES_FILE_COLUMN_COUNT As Integer = 20
+Private Const LCMSFEATURES_FILE_COLUMN_COUNT As Integer = 23
 Private Enum LCMSFeaturesFileColumnConstants
     FeatureIndex = 0
     Scan = 1
@@ -85,6 +94,9 @@ Private Enum LCMSFeaturesFileColumnConstants
     AverageIsotopicFit = 17
     MembersPercentage = 18
     CombinedScore = 19
+    InterferenceScore = 20
+    DeconToolsFitScore = 21
+    MaxAbundance = 22
 End Enum
 
 Private Const PEAK_MAP_FILE_COLUMN_COUNT As Integer = 3
@@ -909,6 +921,7 @@ Public Function CachePredefinedLCMSFeatures(ByVal lngGelIndex As Long, _
     Dim dblAvgIsotopicFit As Double
     Dim dblMembersPercentage As Double
     Dim dblCombinedScore As Double
+    Dim dblInterferenceScore As Double
     
     Dim dblConformerScoreToFilterOn As Double
 
@@ -972,21 +985,20 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
                 ' If the line starts with text, then assume this is the column header line
                 
                 If IsNumeric(Left(strLineIn, 1)) Then
-                    ' Use the default column mappings
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex) = LCMSFeaturesFileColumnConstants.FeatureIndex
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.ScanStart) = LCMSFeaturesFileColumnConstants.ScanStart
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.ScanEnd) = LCMSFeaturesFileColumnConstants.ScanEnd
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.Scan) = LCMSFeaturesFileColumnConstants.Scan
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance) = LCMSFeaturesFileColumnConstants.Abundance
-                    
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore) = LCMSFeaturesFileColumnConstants.ConformationFitScore
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.LCFitScore) = LCMSFeaturesFileColumnConstants.LCFitScore
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.AverageIsotopicFit) = LCMSFeaturesFileColumnConstants.AverageIsotopicFit
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.MembersPercentage) = LCMSFeaturesFileColumnConstants.MembersPercentage
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.CombinedScore) = LCMSFeaturesFileColumnConstants.CombinedScore
+                    ' The header line is missing
+                    ' Due to the variability of columns in LCMSFeature files we cannot assume a default column ordering and thus need to throw an error
     
-                    blnDataLine = True
-                    blnColumnsDefined = True
+                    strMessage = "Header line not found in the LCMSFeatures.txt file; unable to determine column order: " & strLCMSFeaturesFilePath
+                    If mShowDialogBoxes Then
+                        MsgBox strMessage, vbExclamation + vbOKOnly, glFGTU
+                    End If
+                    AddToAnalysisHistory lngGelIndex, strMessage
+                    
+                    tsInFile.Close
+                    
+                    CachePredefinedLCMSFeatures = -6
+                    Exit Function
+                    
                 Else
                     ' Define the column mappings
                     strData = Split(strLineIn, vbTab)
@@ -1015,7 +1027,10 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
                             
                         Case LCMSFEATURES_COLUMN_COMBINED_SCORE
                             intColumnMapping(LCMSFeaturesFileColumnConstants.CombinedScore) = lngIndex
-                            
+                        
+                        Case LCMSFEATURES_COLUMN_AVG_INTERFERENCE_SCORE
+                            intColumnMapping(LCMSFeaturesFileColumnConstants.InterferenceScore) = lngIndex
+                        
                         Case Else
                             ' Ignore this column; either it's unknown or we don't need it in this function
                         End Select
@@ -1059,6 +1074,7 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
             dblAvgIsotopicFit = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.AverageIsotopicFit), 0)
             dblMembersPercentage = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MembersPercentage), 0)
             dblCombinedScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.CombinedScore), 0)
+            dblInterferenceScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.InterferenceScore), 0)
             
             If intColumnMapping(LCMSFeaturesFileColumnConstants.CombinedScore) >= 0 Then
                 ' Filter using Combined_Score
@@ -1307,13 +1323,18 @@ Private Function GetDefaultLCMSFeatureColumnHeaders(ByVal blnRequiredColumnsOnly
     If Not blnRequiredColumnsOnly Then
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_SCAN_START
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_SCAN_END
-        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_SCAN_ALIGNED
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_NET
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_IMS_SCAN
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_IMS_SCAN_START
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_IMS_SCAN_END
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_AVG_INTERFERENCE_SCORE
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_DECON2LS_FIT_SCORE
     End If
     
     strHeaders = strHeaders & LCMSFEATURES_COLUMN_MONO_MASS
     If Not blnRequiredColumnsOnly Then
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_MONO_MASS_CALIBRATED
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_MAX_ABUNDANCE
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_ABUNDANCE
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_CLASS_REP_MZ
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_CLASS_REP_CHARGE
@@ -1327,6 +1348,7 @@ Private Function GetDefaultLCMSFeatureColumnHeaders(ByVal blnRequiredColumnsOnly
     End If
     
     GetDefaultLCMSFeatureColumnHeaders = strHeaders
+    
 End Function
 
 Private Function GetDefaultLCMSFeatureToPeakMapColumnHeaders() As String
@@ -1518,7 +1540,7 @@ On Error GoTo LoadLCMSFeatureFilesErrorHandler
     End If
        
     ' Initialize GelUMC().Def using UMCDef
-    
+    ' Note that LoadNewData will have set UMCDef.ClassAbu based on the option chosen by the user on frmFileLoadOptions (or specified in the .Ini file)
     GelUMC(mGelIndex).def = UMCDef
     
     ' Make sure some of the settings are up-to-date
@@ -1529,7 +1551,14 @@ On Error GoTo LoadLCMSFeatureFilesErrorHandler
         .TolType = glMassToleranceConstants.gltPPM
         .Tol = mAutoMapDataPointsMassTolerancePPM
         .UMCSharing = False
-        .ClassAbu = UMCClassAbundanceConstants.UMCAbuSum
+        
+        ' Class abundance type can be AbundanceMax or AbundanceSum
+        ' If the type is not .UMCAbuMax, then force to .UMCAbuSum
+        If .ClassAbu <> UMCClassAbundanceConstants.UMCAbuMax Then
+            '
+            .ClassAbu = UMCClassAbundanceConstants.UMCAbuSum
+        End If
+        
         .OddEvenProcessingMode = oepUMCOddEvenProcessingMode.oepProcessAll
     End With
     
@@ -1608,10 +1637,12 @@ On Error GoTo LoadLCMSFeatureFilesErrorHandler
             End If
         
             ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
-            Dim blnComputeClassMassAndAbundance As Boolean
-            blnComputeClassMassAndAbundance = False
+            Dim blnComputeClassMass As Boolean
+            Dim blnComputeClassAbundance As Boolean
+            blnComputeClassMass = False
+            blnComputeClassAbundance = False
     
-            UpdateUMCStatArrays mGelIndex, blnComputeClassMassAndAbundance, False
+            UpdateUMCStatArrays mGelIndex, blnComputeClassMass, blnComputeClassAbundance, False
 
         End If
         
@@ -1669,12 +1700,14 @@ Private Function ReadLCMSFeaturesFile(ByRef fso As FileSystemObject, _
     
     Dim dblMonoisotopicMass As Double
     Dim dblClassAbundance As Double
+    Dim dblClassAbundanceMax As Double
     
     Dim dblIMSConformerScore As Double
     Dim dblLCFitScore As Double
     Dim dblAvgIsotopicFit As Double
     Dim dblMembersPercentage As Double
     Dim dblCombinedScore As Double
+    Dim dblInterferenceScore As Double
     
     Dim dblConformerScoreToFilterOn As Double
     
@@ -1725,36 +1758,20 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                 ' If the line starts with text, then assume this is the column header line
                 
                 If IsNumeric(Left(strLineIn, 1)) Then
-                    ' Use the default column mappings
-
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.FeatureIndex) = LCMSFeaturesFileColumnConstants.FeatureIndex
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.ScanStart) = LCMSFeaturesFileColumnConstants.ScanStart
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.ScanEnd) = LCMSFeaturesFileColumnConstants.ScanEnd
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.Scan) = LCMSFeaturesFileColumnConstants.Scan
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.NET) = LCMSFeaturesFileColumnConstants.NET
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMass) = LCMSFeaturesFileColumnConstants.MonoisotopicMass
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMassCalibrated) = LCMSFeaturesFileColumnConstants.MonoisotopicMassCalibrated
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance) = LCMSFeaturesFileColumnConstants.Abundance
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepMZ) = LCMSFeaturesFileColumnConstants.ClassRepMZ
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepCharge) = LCMSFeaturesFileColumnConstants.ClassRepCharge
+                    ' The header line is missing
+                    ' Due to the variability of columns in LCMSFeature files we cannot assume a default column ordering and thus need to throw an error
                     
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.MWMin) = LCMSFeaturesFileColumnConstants.MWMin
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.MWMax) = LCMSFeaturesFileColumnConstants.MWMax
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.MemberCount) = LCMSFeaturesFileColumnConstants.MemberCount
+                    strMessage = "Header line not found in the LCMSFeatures.txt file; unable to determine column order: " & strLCMSFeaturesFilePath
+                    If mShowDialogBoxes Then
+                        MsgBox strMessage, vbExclamation + vbOKOnly, glFGTU
+                    End If
+                    AddToAnalysisHistory mGelIndex, strMessage
                     
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.DriftTime) = LCMSFeaturesFileColumnConstants.DriftTime
+                    tsInFile.Close
+                    
+                    ReadLCMSFeaturesFile = -6
+                    Exit Function
 
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore) = LCMSFeaturesFileColumnConstants.ConformationFitScore
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.LCFitScore) = LCMSFeaturesFileColumnConstants.LCFitScore
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.AverageIsotopicFit) = LCMSFeaturesFileColumnConstants.AverageIsotopicFit
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.MembersPercentage) = LCMSFeaturesFileColumnConstants.MembersPercentage
-                    intColumnMapping(LCMSFeaturesFileColumnConstants.CombinedScore) = LCMSFeaturesFileColumnConstants.CombinedScore
-
-                    ' Column headers were not present
-                     AddToAnalysisHistory mGelIndex, "LCMSFeatures file " & fso.GetFileName(strLCMSFeaturesFilePath) & " did not contain column headers; using the default headers (" & GetDefaultLCMSFeatureColumnHeaders(False) & ")"
-
-                    blnDataLine = True
-                    blnColumnsDefined = True
                 Else
                     ' Define the column mappings
                     strData = Split(strLineIn, vbTab)
@@ -1772,9 +1789,23 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                         Case LCMSFEATURES_COLUMN_SCAN_END:              intColumnMapping(LCMSFeaturesFileColumnConstants.ScanEnd) = lngIndex
                         Case LCMSFEATURES_COLUMN_SCAN_ALIGNED
                             ' Legacy column, ignore it; shouldn't even be present anymore
+                            
+                        Case LCMSFEATURES_COLUMN_IMS_SCAN
+                            ' Ignore this column
+                        Case LCMSFEATURES_COLUMN_IMS_SCAN_START
+                            ' Ignore this column
+                        Case LCMSFEATURES_COLUMN_IMS_SCAN_END
+                            ' Ignore this column
+                        Case LCMSFEATURES_COLUMN_AVG_INTERFERENCE_SCORE
+                            intColumnMapping(LCMSFeaturesFileColumnConstants.InterferenceScore) = lngIndex
+                            
+                        Case LCMSFEATURES_COLUMN_DECON2LS_FIT_SCORE
+                            intColumnMapping(LCMSFeaturesFileColumnConstants.DeconToolsFitScore) = lngIndex
+                        
                         Case LCMSFEATURES_COLUMN_NET:                   intColumnMapping(LCMSFeaturesFileColumnConstants.NET) = lngIndex
                         Case LCMSFEATURES_COLUMN_MONO_MASS:             intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMass) = lngIndex
                         Case LCMSFEATURES_COLUMN_MONO_MASS_CALIBRATED:  intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMassCalibrated) = lngIndex
+                        Case LCMSFEATURES_COLUMN_MAX_ABUNDANCE:         intColumnMapping(LCMSFeaturesFileColumnConstants.MaxAbundance) = lngIndex
                         Case LCMSFEATURES_COLUMN_ABUNDANCE:             intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance) = lngIndex
                         Case LCMSFEATURES_COLUMN_CLASS_REP_MZ:          intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepMZ) = lngIndex
                         Case LCMSFEATURES_COLUMN_CLASS_REP_CHARGE:      intColumnMapping(LCMSFeaturesFileColumnConstants.ClassRepCharge) = lngIndex
@@ -1783,8 +1814,6 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                         Case LCMSFEATURES_COLUMN_UMC_MEMBER_COUNT:      intColumnMapping(LCMSFeaturesFileColumnConstants.MemberCount) = lngIndex
 
                         Case LCMSFEATURES_COLUMN_AVERAGE_MONO_MASS:
-                            ' Ignore this column
-                        Case LCMSFEATURES_COLUMN_ABUNDANCE_MAX:
                             ' Ignore this column
                         Case LCMSFEATURES_COLUMN_CHARGE_MAX
                             ' Ignore this column
@@ -1858,12 +1887,13 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                 lngScanCenter = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Scan), 0)
                 dblMonoisotopicMass = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MonoisotopicMass), 0)
                 dblClassAbundance = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance), 0)
-                
+                dblClassAbundanceMax = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MaxAbundance), 0)
                 dblIMSConformerScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore), 0)
                 dblLCFitScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.LCFitScore), 0)
                 dblAvgIsotopicFit = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.AverageIsotopicFit), 0)
                 dblMembersPercentage = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MembersPercentage), 0)
                 dblCombinedScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.CombinedScore), 0)
+                dblInterferenceScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.InterferenceScore), 0)
                 
                 If intColumnMapping(LCMSFeaturesFileColumnConstants.CombinedScore) >= 0 Then
                     ' Filter using Combined_Score
@@ -1917,7 +1947,12 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                         
                         ReDim .ClassMInd(0)         ' members of the UMC(including representative)         (0-based array); index of the member in GelData
                         ReDim .ClassMType(0)        ' type of member: gldtCS or gldtIS
-                        .ClassAbundance = dblClassAbundance
+                        
+                        If GelUMC(mGelIndex).def.ClassAbu = UMCClassAbundanceConstants.UMCAbuMax Then
+                            .ClassAbundance = dblClassAbundanceMax
+                        Else
+                            .ClassAbundance = dblClassAbundance
+                        End If
                         
                         .ClassMW = dblMonoisotopicMass
                         .ClassMWStD = 0
@@ -1943,7 +1978,13 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                             .Count = 1
                             .Mass = dblMonoisotopicMass
                             .MassStD = 0
-                            .Abundance = dblClassAbundance
+                            
+                            If GelUMC(mGelIndex).def.ClassAbu = UMCClassAbundanceConstants.UMCAbuMax Then
+                                .Abundance = dblClassAbundanceMax
+                            Else
+                                .Abundance = dblClassAbundance
+                            End If
+                            
                             .GroupRepIndex = 0          ' Index of the group representative; pointer to .ClassMInd() and .ClassMType() arrays, NOT a direct pointer to GelData
                         End With
                         

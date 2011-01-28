@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "tabctl32.ocx"
+Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmUMCSimple 
    BackColor       =   &H00FF8080&
    BorderStyle     =   3  'Fixed Dialog
@@ -1634,10 +1634,12 @@ On Error GoTo UMCSearchErrorHandler
            ' The following calls CalculateClasses, UpdateIonToUMCIndices, and InitDrawUMC
                 
             ' Note: If we loaded predefined LCMSFeatures, then this call will replace the pre-computed values with new values
-            Dim blnComputeClassMassAndAbundance As Boolean
-            blnComputeClassMassAndAbundance = True
+            Dim blnComputeClassMass As Boolean
+            Dim blnComputeClassAbundance As Boolean
+            blnComputeClassMass = True
+            blnComputeClassAbundance = True
                    
-           If Not UpdateUMCStatArrays(CallerID, blnComputeClassMassAndAbundance, False, Me) Then GoTo ExitIfFailed
+           If Not UpdateUMCStatArrays(CallerID, blnComputeClassMass, blnComputeClassAbundance, False, Me) Then GoTo ExitIfFailed
        End If
        
        ' Note: we need to update GelSearchDef before calling SplitUMCsByAbundance
