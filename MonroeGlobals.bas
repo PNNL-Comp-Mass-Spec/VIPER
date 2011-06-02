@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "January 27, 2011"
+Public Const APP_BUILD_DATE As String = "April 7, 2011"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -919,7 +919,7 @@ End Type
 
 Public Type udtErrorPlottingPeakCacheType
     Center As Double
-    width As Double
+    width As Double             ' Peak width at the base
     Height As Long
     SignalToNoise As Double
     SingleValidPeak As Boolean

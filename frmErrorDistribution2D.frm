@@ -546,20 +546,20 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabCaption(0)   =   "Mass Calibration Refinement"
          TabPicture(0)   =   "frmErrorDistribution2D.frx":017A
          Tab(0).ControlEnabled=   0   'False
-         Tab(0).Control(0)=   "lblMassCalibrationRefinementDescription"
-         Tab(0).Control(1)=   "lblMassCalibrationRefinementUnits(2)"
-         Tab(0).Control(2)=   "lblMassCalibrationAdjustment"
-         Tab(0).Control(3)=   "lblMassCalibrationRefinementUnits(1)"
-         Tab(0).Control(4)=   "lblMassCalibrationOverallAdjustment"
-         Tab(0).Control(5)=   "cmdMassCalibrationRefinementStart"
-         Tab(0).Control(6)=   "fraMassCalibrationRefinement"
-         Tab(0).Control(7)=   "cmdMassCalibrationManual"
-         Tab(0).Control(8)=   "txtMassCalibrationNewIncrementalAdjustment"
-         Tab(0).Control(9)=   "txtMassCalibrationOverallAdjustment"
-         Tab(0).Control(10)=   "cmdMassCalibrationRevert"
-         Tab(0).Control(11)=   "cmdRecomputeHistograms(0)"
-         Tab(0).Control(12)=   "cmdAbortProcessing(0)"
-         Tab(0).Control(13)=   "cmdResetToDefaults"
+         Tab(0).Control(0)=   "cmdResetToDefaults"
+         Tab(0).Control(1)=   "cmdAbortProcessing(0)"
+         Tab(0).Control(2)=   "cmdRecomputeHistograms(0)"
+         Tab(0).Control(3)=   "cmdMassCalibrationRevert"
+         Tab(0).Control(4)=   "txtMassCalibrationOverallAdjustment"
+         Tab(0).Control(5)=   "txtMassCalibrationNewIncrementalAdjustment"
+         Tab(0).Control(6)=   "cmdMassCalibrationManual"
+         Tab(0).Control(7)=   "fraMassCalibrationRefinement"
+         Tab(0).Control(8)=   "cmdMassCalibrationRefinementStart"
+         Tab(0).Control(9)=   "lblMassCalibrationOverallAdjustment"
+         Tab(0).Control(10)=   "lblMassCalibrationRefinementUnits(1)"
+         Tab(0).Control(11)=   "lblMassCalibrationAdjustment"
+         Tab(0).Control(12)=   "lblMassCalibrationRefinementUnits(2)"
+         Tab(0).Control(13)=   "lblMassCalibrationRefinementDescription"
          Tab(0).ControlCount=   14
          TabCaption(1)   =   "Tolerance Refinement"
          TabPicture(1)   =   "frmErrorDistribution2D.frx":0196
@@ -584,10 +584,10 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabCaption(2)   =   "Pairwise Diffs"
          TabPicture(2)   =   "frmErrorDistribution2D.frx":01B2
          Tab(2).ControlEnabled=   0   'False
-         Tab(2).Control(0)=   "lblPairwiseDifferencesOverview"
-         Tab(2).Control(1)=   "fraPairwiseDifferences"
-         Tab(2).Control(2)=   "cmdRecomputeHistograms(1)"
-         Tab(2).Control(3)=   "cmdAbortProcessing(2)"
+         Tab(2).Control(0)=   "cmdAbortProcessing(2)"
+         Tab(2).Control(1)=   "cmdRecomputeHistograms(1)"
+         Tab(2).Control(2)=   "fraPairwiseDifferences"
+         Tab(2).Control(3)=   "lblPairwiseDifferencesOverview"
          Tab(2).ControlCount=   4
          Begin VB.CommandButton cmdAbortProcessing 
             Caption         =   "Abort Processing"
@@ -2488,7 +2488,9 @@ Private Sub DisplayErrorPlotPeakStats()
     
     Dim strUnits As String
     
-    Dim dblPeakCenter As Double, dblPeakWidth As Double, dblPeakHeight As Double
+    Dim dblPeakCenter As Double
+    Dim dblPeakWidth As Double      ' Peak width at the base
+    Dim dblPeakHeight As Double
     Dim sngSignalToNoise As Single
     
     Dim strRelativeRisk As String
@@ -2546,7 +2548,7 @@ On Error GoTo DisplayErrorPlotPeakStatsErrorHandler
         
             With mMassCalErrorPeakCached
                 .Center = MassToPPM(dblPeakCenter, 1000)
-                .width = MassToPPM(dblPeakWidth, 1000)
+                .width = MassToPPM(dblPeakWidth, 1000)      ' Peak width at the base
                 .Height = dblPeakHeight
                 ' .SignalToNoise = sngSignalToNoise
                 .SingleValidPeak = blnSingleGoodPeakFound
@@ -2566,7 +2568,7 @@ On Error GoTo DisplayErrorPlotPeakStatsErrorHandler
         
             With mMassCalErrorPeakCached
                 .Center = dblPeakCenter
-                .width = dblPeakWidth
+                .width = dblPeakWidth                   ' Peak width at the base
                 .Height = dblPeakHeight
                 .SignalToNoise = sngSignalToNoise
                 .SingleValidPeak = blnSingleGoodPeakFound
@@ -2611,7 +2613,7 @@ On Error GoTo DisplayErrorPlotPeakStatsErrorHandler
     
         With mNETTolErrorPeakCached
             .Center = dblPeakCenter
-            .width = dblPeakWidth
+            .width = dblPeakWidth           ' Peak width at the base
             .Height = dblPeakHeight
             .SignalToNoise = sngSignalToNoise
             .SingleValidPeak = blnSingleGoodPeakFound
@@ -3394,7 +3396,9 @@ Private Function RefineMassCalibrationWork(ByVal lngGelIndex As Long, ByRef udtB
     ' Looks for a peak in udtBinnedErrorData, populating udtPeak with the peak stats
     ' If a valid peak is found, then considers shifting the data to move the peak to be centered at 0
     
-    Dim dblPeakCenter As Double, dblPeakWidth As Double, dblPeakHeight As Double
+    Dim dblPeakCenter As Double
+    Dim dblPeakWidth As Double      ' Peak width at the base
+    Dim dblPeakHeight As Double
     Dim sngSignalToNoise As Single
     Dim sngBinSize As Single
     

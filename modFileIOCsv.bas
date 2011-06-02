@@ -1494,6 +1494,16 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                     End If
                     
                                     If .IsoLines > UBound(.IsoData) Then
+                                        If .IsoLines >= 2200000 Then
+                                            ' Maximum array length reached; if we try to ReDim more memory, we'll get error 438
+                                            ' Must abort loading any new data
+                                            
+                                            AddToAnalysisHistory mGelIndex, "Error: Maximum number of supported Isotopic Data points has been loaded (2200000); aborting load"
+                                            Debug.Assert False
+                                            
+                                            Exit Do
+                                        End If
+                                        
                                         ReDim Preserve .IsoData(UBound(.IsoData) + ISO_DATA_DIM_CHUNK)
                                         
                                         If mReadMode <> rmReadModeConstants.rmPrescanData Then
@@ -1583,6 +1593,9 @@ ReadCSVIsosFileWorkErrorHandler:
     Debug.Assert False
     lngReturnValue = Err.Number
     LogErrors Err.Number, "ReadCSVIsosFileWork"
+    
+    If Err.Number = 438 Then
+    End If
     
     If Not tsInFile Is Nothing Then
         On Error Resume Next

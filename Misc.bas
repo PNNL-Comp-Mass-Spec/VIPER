@@ -834,21 +834,29 @@ Private Function LinearNETAlignmentUMCSelectionFilterCheck(ByVal lngGelIndex As 
     With GelUMC(lngGelIndex).UMCs(lngUMCIndex)
         ' Filter out all mass classes with insufficient membership
         If UMCNetAdjDef.MinUMCCount > 1 Then
-            If .ClassCount < UMCNetAdjDef.MinUMCCount Then
-                blnValidUMC = False
+            If GelUMC(lngGelIndex).def.LoadedPredefinedLCMSFeatures Then
+                If .ClassCountPredefinedLCMSFeatures < UMCNetAdjDef.MinUMCCount Then
+                    blnValidUMC = False
+                End If
+            Else
+                If .ClassCount < UMCNetAdjDef.MinUMCCount Then
+                    blnValidUMC = False
+                End If
             End If
         End If
         
         ' Filter out all mass classes with insufficient scan coverage
-        If UMCNetAdjDef.MinScanRange > 1 Then
+        If UMCNetAdjDef.MinScanRange > 1 And blnValidUMC Then
             If (.MaxScan - .MinScan + 1) < UMCNetAdjDef.MinScanRange Then
                 blnValidUMC = False
             End If
         End If
         
-        ' Filter out LC-MS Features that are not of the correct charge state
-        If Not LinearNETAlignmentIsOKChargeState(.ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge) Then
-            blnValidUMC = False
+        If blnValidUMC Then
+            ' Filter out LC-MS Features that are not of the correct charge state
+            If Not LinearNETAlignmentIsOKChargeState(.ChargeStateBasedStats(.ChargeStateStatsRepInd).Charge) Then
+                blnValidUMC = False
+            End If
         End If
     End With
 

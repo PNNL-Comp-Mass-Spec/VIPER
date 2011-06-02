@@ -5336,6 +5336,10 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
     Set ts = fso.OpenTextFile(mSTACAMTFilePath, ForWriting, True)
 
     ' Write the header line
+    
+    ' Note: STAC uses Cnt_GANET (number of datasets a peptide is observed in) while
+    '       LCMSWarp uses MSMS Observation Count (MSMSObsCount)
+    
     ts.WriteLine ("Mass_Tag_ID" & vbTab & _
                   "Monoisotopic_Mass" & vbTab & _
                   "Avg_GANET" & vbTab & _

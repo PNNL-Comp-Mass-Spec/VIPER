@@ -56,6 +56,7 @@ Private Const LCMSFEATURES_COLUMN_CLASS_REP_MZ As String = "class_rep_mz"
 Private Const LCMSFEATURES_COLUMN_CLASS_REP_CHARGE As String = "class_rep_charge"
 Private Const LCMSFEATURES_COLUMN_CHARGE_MAX As String = "charge_max"
 Private Const LCMSFEATURES_COLUMN_DRIFT_TIME As String = "drift_time"
+Private Const LCMSFEATURES_COLUMN_DRIFT_TIME_UNCORRECTED As String = "drift_time_uncorrected"
 
 Private Const LCMSFEATURES_COLUMN_CONFORMATION_FIT_SCORE As String = "conformation_fit_score"
 Private Const LCMSFEATURES_COLUMN_LC_FIT_SCORE As String = "lc_fit_score"
@@ -1340,6 +1341,7 @@ Private Function GetDefaultLCMSFeatureColumnHeaders(ByVal blnRequiredColumnsOnly
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_CLASS_REP_CHARGE
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_CHARGE_MAX
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_DRIFT_TIME
+        strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_DRIFT_TIME_UNCORRECTED
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_CONFORMATION_FIT_SCORE
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_LC_FIT_SCORE
         strHeaders = strHeaders & vbTab & LCMSFEATURES_COLUMN_AVERAGE_ISOTOPIC_FIT
@@ -1820,6 +1822,9 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                             
                         Case LCMSFEATURES_COLUMN_DRIFT_TIME
                             intColumnMapping(LCMSFeaturesFileColumnConstants.DriftTime) = lngIndex
+                        
+                        Case LCMSFEATURES_COLUMN_DRIFT_TIME_UNCORRECTED
+                            ' Ignore this column
                             
                         Case LCMSFEATURES_COLUMN_CONFORMATION_FIT_SCORE
                             intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore) = lngIndex

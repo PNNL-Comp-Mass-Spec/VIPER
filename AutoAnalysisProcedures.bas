@@ -1445,12 +1445,14 @@ On Error GoTo GenerateHTMLBrowsingFileErrorHandler
         ' Write out the Mass Error and NET Error peak stats
         With glbPreferencesExpanded.AutoAnalysisCachedData.MassCalErrorPeakCached
             strRows(0) = strRows(0) & "<TD>Mass error peak center:" & strRightAlign & Trim(.Center) & "<TD width=100>ppm"
+            ' Peak width at the base
             strRows(1) = strRows(1) & "<TD>Mass error peak width:" & strRightAlign & Trim(.width) & "<TD width=100>ppm"
             strRows(2) = strRows(2) & "<TD>Mass error peak height:" & strRightAlign & Trim(.Height) & "<TD width=100>counts"
         End With
         
         With glbPreferencesExpanded.AutoAnalysisCachedData.NETTolErrorPeakCached
             strRows(0) = strRows(0) & "<TD>NET error peak center:" & strRightAlign & Trim(.Center) & "<TD>NET"
+            ' Peak width at the base
             strRows(1) = strRows(1) & "<TD>NET error peak width:" & strRightAlign & Trim(.width) & "<TD>NET"
             strRows(2) = strRows(2) & "<TD>NET error peak height:" & strRightAlign & Trim(.Height) & "<TD>counts"
         End With
@@ -2783,14 +2785,25 @@ On Error GoTo LoadInputFileErrorHandler
                                         End If
                                     End If
                                 Next intWildCardFileIndex
+                            ElseIf strFileExtensionsPrefList(intExtensionIndex) = CSV_ISOS_FILE_SUFFIX Then
+                                ' Preferentially choose the -isos.csv file over the filtered-isos.csv file
+                                    
                             End If
                             
                             If Len(strWildcardFileMatch) = 0 Then
                                 For intWildCardFileIndex = 0 To intWildcardFileMatchesCount - 1
                                     If LCase(Right(strWildcardFileMatches(intWildCardFileIndex), intExtensionLength)) = strFileExtensionsPrefList(intExtensionIndex) Then
-                                        ' Match found; record in strWildcardFileMatch and stop searching
+                                        ' Match found; record in strWildcardFileMatch
                                         strWildcardFileMatch = strWildcardFileMatches(intWildCardFileIndex)
-                                        Exit For
+                                        
+                                        If strFileExtensionsPrefList(intExtensionIndex) = CSV_ISOS_FILE_SUFFIX Then
+                                            If LCase(Right(strWildcardFileMatches(intWildCardFileIndex), Len(CSV_FILTERED_ISOS_FILE_SUFFIX))) = LCase(CSV_FILTERED_ISOS_FILE_SUFFIX) Then
+                                                ' Do not allow a match to the _filtered_isos.csv file
+                                                strWildcardFileMatch = ""
+                                            End If
+                                        End If
+
+                                        If Len(strWildcardFileMatch) > 0 Then Exit For
                                     End If
                                 Next intWildCardFileIndex
                             End If
@@ -3017,7 +3030,7 @@ On Error GoTo LoadInputFileErrorHandler
                         .MaximumDataCountEnabled = True
                         .MaximumDataCountToLoad = DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD
                         
-                        .TotalIntensityPercentageFilterEnabled = True
+                        .TotalIntensityPercentageFilterEnabled = False
                         .TotalIntensityPercentageFilter = DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD
                     End If
                     

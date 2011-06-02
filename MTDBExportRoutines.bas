@@ -621,7 +621,7 @@ With udtPutUMCParams
     cmdPutNewUMC.Parameters.Append .UMCInd
     Set .MemberCount = cmdPutNewUMC.CreateParameter("MemberCount", adInteger, adParamInput, , 0)
     cmdPutNewUMC.Parameters.Append .MemberCount
-    Set .UMCScore = cmdPutNewUMC.CreateParameter("UMCScore", adDouble, adParamInput, , 0)     ' Not currently used
+    Set .UMCScore = cmdPutNewUMC.CreateParameter("UMCScore", adDouble, adParamInput, , 0)     ' Only used for IMS data: holds the ConformationFitScore, which comes from .ClassScore
     cmdPutNewUMC.Parameters.Append .UMCScore
     
     Set .ScanFirst = cmdPutNewUMC.CreateParameter("ScanFirst", adInteger, adParamInput, , 0)

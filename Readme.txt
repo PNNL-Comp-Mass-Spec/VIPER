@@ -62,6 +62,20 @@ To fix this, you need to manually register the MassMatchCOM.dll by following the
 * Register the DLL using the command:
   * regsvr32 MassMatchCOM.dll
 
+When you run the regsvr32 command, if you get this error:
+  "The module "MassMatchCOM.dll" failed to load. Make sure the binary is stored 
+   at the specified path or debug it to check for problems with the binary or 
+   dependent .DLL files. The specified module could not be found."
+
+then you're likely missing DLLs MSVCP71.dll and MSVCR71.dll.  To verify this, check whether files
+MSVCP71.DLL and MSVCR71.DLL exist at c:\windows\system32 (or at c:\windows\SysWOW64 on 64-bit windows).
+
+If the files are missing, then follow the directions at 
+http://www.addictivetips.com/windows-tips/fix-msvcp71-dll-and-msvcr71-dll-missing-error-in-windows-7/ 
+to download the files and place them in folder c:\windows\system32 (or folder
+c:\windows\SysWOW64 on 64-bit windows).
+
+
 == Microsoft Access MT Databases ==
 
 Microsoft Access MT Database file formats:

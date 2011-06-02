@@ -26,6 +26,7 @@ Private Const DB_FIELD_AMT_NEW_ID = "AMT_ID"
 Private Const DB_FIELD_AMT_PEPTIDE = "Peptide"
 Private Const DB_FIELD_AMT_MW = "AMTMonoisotopicMass"
 Private Const DB_FIELD_AMT_NET = "NET"
+Private Const DB_FIELD_AMT_NET_COUNT = "NET_Count"
 Private Const DB_FIELD_AMT_RETENTION = "RetentionTime"            ' Stored in the AMTData().PNET; ignored if field PNET is present
 Private Const DB_FIELD_AMT_PNET = "PNET"
 Private Const DB_FIELD_AMT_NitrogenAtom = "NitrogenAtom"
@@ -34,7 +35,7 @@ Private Const DB_FIELD_AMT_Status = "Status"
 Private Const DB_FIELD_AMT_MSMSObsCount = "MSMS_Obs_Count"
 Private Const DB_FIELD_AMT_HighNormalizedScore = "High_Normalized_Score"
 Private Const DB_FIELD_AMT_HighDiscriminantScore = "High_Discriminant_Score"
-Private Const DB_FIELD_AMT_PeptideProphetProbability = "Peptide_Prophet_Probability"
+Private Const DB_FIELD_AMT_HighPeptideProphetProbability = "High_Peptide_Prophet_Probability"
 
 Private Const DB_FIELD_PROTEIN_AMT_ID As String = "AMT_ID"
 Private Const DB_FIELD_PROTEIN_Protein_ID As String = "Protein_ID"
@@ -47,7 +48,7 @@ Private Const DB_FIELD_TMASSTAGS_MW = "Monoisotopic_Mass"
 Private Const DB_FIELD_TMASSTAGS_MSMSObsCount = "Peptide_Obs_Count_Passing_Filter"
 Private Const DB_FIELD_TMASSTAGS_HighNormalizedScore = "High_Normalized_Score"
 Private Const DB_FIELD_TMASSTAGS_HighDiscriminantScore = "High_Discriminant_Score"
-Private Const DB_FIELD_TMASSTAGS_PeptideProphetProbability = "High_Peptide_Prophet_Probability"
+Private Const DB_FIELD_TMASSTAGS_HighPeptideProphetProbability = "High_Peptide_Prophet_Probability"
 
 Private Const DB_FIELD_TMTNET_NET = "Avg_GANET"
 Private Const DB_FIELD_TMTNET_PNET = "PNET"
@@ -257,7 +258,7 @@ Private Type udtAMTFieldPresentType
     MSMSObsCount As Boolean
     HighNormalizedScore As Boolean
     HighDiscriminantScore As Boolean
-    PeptideProphetProbability As Boolean
+    HighPeptideProphetProbability As Boolean
     
     ProteinInfo As udtAMTFieldPresentProteinTblType
     ProteinPeptideMap As udtAMTFieldPresentProteinPeptideMapTblType
@@ -903,9 +904,10 @@ On Error GoTo err_LegacyDBLoadAMTData
         If udtFieldPresent.NitrogenAtom Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_NitrogenAtom
         If udtFieldPresent.CysCount Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_CysCount
         If udtFieldPresent.MSMSObsCount Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_MSMSObsCount
+        If udtFieldPresent.NETCount Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_NET_COUNT
         If udtFieldPresent.HighNormalizedScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_HighNormalizedScore
         If udtFieldPresent.HighDiscriminantScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_HighDiscriminantScore
-        If udtFieldPresent.PeptideProphetProbability Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_PeptideProphetProbability
+        If udtFieldPresent.HighPeptideProphetProbability Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_AMT_HighPeptideProphetProbability
                           
         rsAMTSQL = rsAMTSQL & " FROM [" & TABLE_NAME_AMT & "]" & _
                               " ORDER BY " & strMTTable & DB_FIELD_AMT_MW & ";"
@@ -940,7 +942,7 @@ On Error GoTo err_LegacyDBLoadAMTData
         If udtFieldPresent.MSMSObsCount Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_MSMSObsCount
         If udtFieldPresent.HighNormalizedScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_HighNormalizedScore
         If udtFieldPresent.HighDiscriminantScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_HighDiscriminantScore
-        If udtFieldPresent.PeptideProphetProbability Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_PeptideProphetProbability
+        If udtFieldPresent.HighPeptideProphetProbability Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_HighPeptideProphetProbability
                           
         rsAMTSQL = rsAMTSQL & " FROM [" & TABLE_NAME_T_MASS_TAGS & "] INNER JOIN" & _
                                    " [" & TABLE_NAME_T_MASS_TAGS_NET & "] ON " & _
@@ -1087,12 +1089,6 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                 End If
             End If
             
-            If udtFieldPresent.NETCount Then
-               If Not IsNull(.Fields(DB_FIELD_TMTNET_CNT_NET).Value) Then
-                  AMTData(lngIndex).NETCount = CLng(.Fields(DB_FIELD_TMTNET_CNT_NET).Value)
-               End If
-            End If
-            
             
             ' Correct for files that have PNET defined but not NET, or vice versa
             ' This program uses AMTData().NET by default; AMTData().PNET historically held the retention time, in seconds, but now holds Predicted NET
@@ -1111,9 +1107,17 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
             If udtFieldPresent.MSMSObsCount Then
                If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_MSMSObsCount).Value) Then
                   AMTData(lngIndex).MSMSObsCount = CLng(.Fields(DB_FIELD_TMASSTAGS_MSMSObsCount).Value)
+                  AMTData(lngIndex).NETCount = AMTData(lngIndex).MSMSObsCount
                End If
             End If
             
+            If udtFieldPresent.NETCount Then
+               If Not IsNull(.Fields(DB_FIELD_TMTNET_CNT_NET).Value) Then
+                  AMTData(lngIndex).NETCount = CLng(.Fields(DB_FIELD_TMTNET_CNT_NET).Value)
+               End If
+            End If
+
+
             If udtFieldPresent.HighNormalizedScore Then
                If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_HighNormalizedScore).Value) Then
                   AMTData(lngIndex).HighNormalizedScore = CSng(.Fields(DB_FIELD_TMASSTAGS_HighNormalizedScore).Value)
@@ -1126,9 +1130,9 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                End If
             End If
             
-            If udtFieldPresent.PeptideProphetProbability Then
-               If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_PeptideProphetProbability).Value) Then
-                  AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_TMASSTAGS_PeptideProphetProbability).Value)
+            If udtFieldPresent.HighPeptideProphetProbability Then
+               If Not IsNull(.Fields(DB_FIELD_TMASSTAGS_HighPeptideProphetProbability).Value) Then
+                  AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_TMASSTAGS_HighPeptideProphetProbability).Value)
                End If
             End If
                      
@@ -1215,6 +1219,12 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                End If
             End If
             
+            If udtFieldPresent.NETCount Then
+                If Not IsNull(.Fields(DB_FIELD_AMT_NET_COUNT).Value) Then
+                    AMTData(lngIndex).NETCount = CLng(.Fields(DB_FIELD_AMT_NET_COUNT).Value)
+                End If
+            End If
+            
             If udtFieldPresent.HighNormalizedScore Then
                If Not IsNull(.Fields(DB_FIELD_AMT_HighNormalizedScore).Value) Then
                   AMTData(lngIndex).HighNormalizedScore = CSng(.Fields(DB_FIELD_AMT_HighNormalizedScore).Value)
@@ -1227,12 +1237,12 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                End If
             End If
             
-            If udtFieldPresent.PeptideProphetProbability Then
-               If Not IsNull(.Fields(DB_FIELD_AMT_PeptideProphetProbability).Value) Then
-                  AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_AMT_PeptideProphetProbability).Value)
+            If udtFieldPresent.HighPeptideProphetProbability Then
+               If Not IsNull(.Fields(DB_FIELD_AMT_HighPeptideProphetProbability).Value) Then
+                  AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_AMT_HighPeptideProphetProbability).Value)
                End If
             End If
-            
+                        
             blnSuccess = True
         Case Else
             ' Unknown version
@@ -1282,7 +1292,7 @@ Private Function EnumerateLegacyAMTFields(ByVal strLegacyDBFilePath As String, B
         .MSMSObsCount = False
         .HighNormalizedScore = False
         .HighDiscriminantScore = False
-        .PeptideProphetProbability = False
+        .HighPeptideProphetProbability = False
         
         With .ProteinInfo
             .ID = False
@@ -1323,7 +1333,7 @@ On Error GoTo err_EnumerateLegacyAMTFields:
                 Case LCase(DB_FIELD_TMASSTAGS_MSMSObsCount):            udtFieldPresent.MSMSObsCount = True
                 Case LCase(DB_FIELD_TMASSTAGS_HighNormalizedScore):     udtFieldPresent.HighNormalizedScore = True
                 Case LCase(DB_FIELD_TMASSTAGS_HighDiscriminantScore):   udtFieldPresent.HighDiscriminantScore = True
-                Case LCase(DB_FIELD_TMASSTAGS_PeptideProphetProbability):     udtFieldPresent.PeptideProphetProbability = True
+                Case LCase(DB_FIELD_TMASSTAGS_HighPeptideProphetProbability):     udtFieldPresent.HighPeptideProphetProbability = True
                 Case Else
                     ' Unknown field; skip it
                 End Select
@@ -1345,11 +1355,17 @@ On Error GoTo err_EnumerateLegacyAMTFields:
                 Case LCase(DB_FIELD_AMT_NitrogenAtom):              udtFieldPresent.NitrogenAtom = True
                 Case LCase(DB_FIELD_AMT_CysCount):                  udtFieldPresent.CysCount = True
                 Case LCase(DB_FIELD_AMT_MSMSObsCount):              udtFieldPresent.MSMSObsCount = True
+                Case LCase(DB_FIELD_AMT_NET_COUNT):                 udtFieldPresent.NETCount = True
                 Case LCase(DB_FIELD_AMT_HighNormalizedScore):       udtFieldPresent.HighNormalizedScore = True
                 Case LCase(DB_FIELD_AMT_HighDiscriminantScore):     udtFieldPresent.HighDiscriminantScore = True
-                Case LCase(DB_FIELD_AMT_PeptideProphetProbability):     udtFieldPresent.PeptideProphetProbability = True
+                Case LCase(DB_FIELD_AMT_HighPeptideProphetProbability):     udtFieldPresent.HighPeptideProphetProbability = True
                 Case Else
-                    ' Unknown field; skip it
+                    If fldAny.Name = "PeptideEx" Then
+                        ' Don't worry about this field
+                    Else
+                        ' Unknown field; skip it
+                        Debug.Assert False
+                    End If
                 End Select
             End If
         Next fldAny
@@ -2986,11 +3002,11 @@ Private Function GetLegacyDBRequiredMTTableFields(ByVal eDBGeneration As dbgData
     
     If eDBGeneration = dbgMTSOffline Then
         strMessage = "The [" & TABLE_NAME_T_MASS_TAGS & "] table should contain the fields: " & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " and " & DB_FIELD_TMASSTAGS_MW & ".  " & _
-                     "It can optionally contain the fields: " & DB_FIELD_TMASSTAGS_PEPTIDE & ", " & DB_FIELD_TMASSTAGS_MSMSObsCount & ", " & DB_FIELD_TMASSTAGS_HighNormalizedScore & ", " & DB_FIELD_TMASSTAGS_HighDiscriminantScore & ", and " & DB_FIELD_TMASSTAGS_PeptideProphetProbability & "." & _
+                     "It can optionally contain the fields: " & DB_FIELD_TMASSTAGS_PEPTIDE & ", " & DB_FIELD_TMASSTAGS_MSMSObsCount & ", " & DB_FIELD_TMASSTAGS_HighNormalizedScore & ", " & DB_FIELD_TMASSTAGS_HighDiscriminantScore & ", and " & DB_FIELD_TMASSTAGS_HighPeptideProphetProbability & "." & _
                      "In addition, the [" & TABLE_NAME_T_MASS_TAGS_NET & "] table should contain the fields: " & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " and " & DB_FIELD_TMTNET_NET & ", plus optionally " & DB_FIELD_TMTNET_PNET & " and " & DB_FIELD_TMTNET_STDEV & ".  "
     Else
         strMessage = "The [" & TABLE_NAME_AMT & "] table should contain the fields: " & DB_FIELD_AMT_NEW_ID & ", " & DB_FIELD_AMT_MW & ", " & DB_FIELD_AMT_NET & ", " & DB_FIELD_AMT_Status & ", and " & DB_FIELD_AMT_RETENTION & " or " & DB_FIELD_AMT_PNET & ".  " & _
-                     "It can optionally contain the fields: " & DB_FIELD_AMT_PEPTIDE & ", " & DB_FIELD_AMT_MSMSObsCount & ", " & DB_FIELD_AMT_HighNormalizedScore & ", " & DB_FIELD_AMT_HighDiscriminantScore & ", " & DB_FIELD_AMT_PeptideProphetProbability & ", " & DB_FIELD_AMT_NitrogenAtom & ", and " & DB_FIELD_AMT_CysCount & "."
+                     "It can optionally contain the fields: " & DB_FIELD_AMT_PEPTIDE & ", " & DB_FIELD_AMT_MSMSObsCount & ", " & DB_FIELD_AMT_NET_COUNT & ", " & DB_FIELD_AMT_HighNormalizedScore & ", " & DB_FIELD_AMT_HighDiscriminantScore & ", " & DB_FIELD_AMT_HighPeptideProphetProbability & ", " & DB_FIELD_AMT_NitrogenAtom & ", and " & DB_FIELD_AMT_CysCount & "."
     End If
     
     GetLegacyDBRequiredMTTableFields = strMessage

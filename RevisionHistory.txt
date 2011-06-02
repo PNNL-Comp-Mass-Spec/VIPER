@@ -1,5 +1,24 @@
 VIPER Change Log
 
+Version 3.48 - Build 443; April 7, 2011
+	- Added support for loading data from column NET_Count from table AMT in a legacy MTDB (Microsoft Access file)
+		- Required since LCMSWarp uses counts from column MSMS_Obs_Count in table AMT while STAC uses counts from column NET_Count
+		- For older Access DBs, if column NET_Count is missing, then STAC will use the values from MSMS_Obs_Count
+
+Version 3.48 - Build 442; April 5, 2011
+	- Now aborting load of _isos.csv files after reading 2,200,000 data points
+		- Necessary since VB6 will crash if the .IsoData array is ReDim'd larger than 2.2 million
+	- Fixed bug that failed to load data from the High_Peptide_Prophet_Probability column in legacy MTDBs (Microsoft Access files) 
+	- Fixed bug that set TotalIntensityPercentageFilterEnabled to True during Auto Analysis if the .Ini file was not found
+
+Version 3.48 - Build 441; January 31, 2011
+	- Fixed bug that caused estimation of the linear NET slope and intercept to fail on LCMSWarp when processing predefined LC-MS features
+		- This didn't affect results; it just caused the green linear NET line to not be visible on the LCMSWarp plot
+		- It also led to log message "Error - The NET Slope is 0; search results will be incorrect" during auto-analysis, but, again, this did not affect search results
+
+Version 3.48 - Build 440; January 28, 2011
+	- Now skipping _Filtered_Isos.csv files when finding candidate files to load during auto-analysis
+
 Version 3.48 - Build 349; January 27, 2011
 	- Disabled splitting of LC-MS features by abundance when reading _LCMSFeatures.txt files
 	- Fixed bug that was changing LC-MS Feature class mass values to the mass value of the most abundant member of a feature at inappropriate times:

@@ -886,7 +886,10 @@ On Error GoTo GetPeakStatsErrorHandler
 
     With udtBinnedErrorData
         dblPeakCenter = Round(.StartBin + udtThisPeak.IndexOfCenterOfMass * .BinSize, lngDigitsOfPrecisionToRoundTo)
+        
+        ' Peak width at the base
         dblPeakWidth = Round((udtThisPeak.IndexRight * .BinSize) - (udtThisPeak.IndexLeft * .BinSize), lngDigitsOfPrecisionToRoundTo)
+        
         dblPeakHeight = Round(udtThisPeak.MaximumIntensity, lngDigitsOfPrecisionToRoundTo)
         sngSignalToNoise = Round(udtThisPeak.SignalToNoiseRatio, 1)
     End With
