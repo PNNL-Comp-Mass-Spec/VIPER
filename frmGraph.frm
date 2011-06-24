@@ -2223,7 +2223,11 @@ Private Sub mnuResetAllOptionsToDefaults_Click()
         ResetExpandedPreferences glbPreferencesExpanded, "", True
         
         SetDefaultUMCDef GelSearchDef(nMyIndex).UMCDef
-        SetDefaultUMCIonNetDef GelSearchDef(nMyIndex).UMCIonNetDef, (GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
+        
+        Dim blnIMSDataPresent As Boolean
+        blnIMSDataPresent = (GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
+        
+        SetDefaultUMCIonNetDef GelSearchDef(nMyIndex).UMCIonNetDef, blnIMSDataPresent
         SetDefaultUMCNETAdjDef GelUMCNETAdjDef(nMyIndex)
         
         SetDefaultSearchAMTDef samtDef, GelUMCNETAdjDef(nMyIndex)
@@ -3662,7 +3666,7 @@ Public Sub CopyAllPointsInView(Optional ByVal lngMaxPointsCountToCopy As Long = 
     
     Dim blnCSPoints As Boolean
     Dim blnContainsIsotopeTags As Boolean
-    Dim blnIMSData As Boolean
+    Dim blnIMSDataPresent As Boolean
     
     ' The following two arrays are used to look up the mass of each MT tag, given the MT tag ID
     ' If the user specified a mass modification (like alkylation, ICAT, or N15), then the standard mass
@@ -3674,7 +3678,7 @@ Public Sub CopyAllPointsInView(Optional ByVal lngMaxPointsCountToCopy As Long = 
     Dim QSL As New QSLong
     
     Dim lngMassTagIndexPointer As Long, lngMassTagIndexOriginal As Long
-    Dim dblAMTMW As Double, dblAMTNet As Double, dblAMTNetStDev As Double
+    Dim dblAMTMW As Double, dblAMTNET As Double, dblAMTNetStDev As Double
     
     Dim strDBMatchList As String, strDBMatchOrMatches As String
     Dim strUMCIndices As String
@@ -3791,8 +3795,8 @@ On Error GoTo CopyAllPointsInViewErrorHandler
     With GelData(nMyIndex)
         strExport(0) = "Scan" & strSepChar & "NET" & strSepChar & "Index" & strSepChar
         
-        If ((.DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA) Then
-            blnIMSData = True
+        If (.DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA Then
+            blnIMSDataPresent = True
              strExport(0) = strExport(0) & "IMS_Drift_Time" & strSepChar
         End If
         
@@ -3913,7 +3917,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 
                 strExport(lngExportCount) = lngFN & strSepChar & Format$(dblNET, "0.0000") & strSepChar & lngIonIndex & strSepChar
                 
-                If blnIMSData Then
+                If blnIMSDataPresent Then
                     strExport(lngExportCount) = strExport(lngExportCount) & sngIMSDriftTime & strSepChar
                 End If
                 
@@ -3948,24 +3952,24 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                             If lngMassTagIndexPointer >= 0 Then
                                 lngMassTagIndexOriginal = lngAMTIDPointer(lngMassTagIndexPointer)
                                 dblAMTMW = AMTData(lngMassTagIndexOriginal).MW
-                                dblAMTNet = AMTData(lngMassTagIndexOriginal).NET
+                                dblAMTNET = AMTData(lngMassTagIndexOriginal).NET
                                 dblAMTNetStDev = AMTData(lngMassTagIndexOriginal).NETStDev
                                 Debug.Assert AMTData(lngMassTagIndexOriginal).ID = udtCurrIDMatchStats(0).IDIndex
                             Else
                                 dblAMTMW = 0
-                                dblAMTNet = 0
+                                dblAMTNET = 0
                                 dblAMTNetStDev = 0
                             End If
                         Else
                             dblAMTMW = 0
-                            dblAMTNet = 0
+                            dblAMTNET = 0
                             dblAMTNetStDev = 0
                         End If
                         
                         
                         With udtCurrIDMatchStats(0)
                             ' "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "MassDiff (ppm)" & strSepChar & "Uniqueness Probability"
-                            strExport(lngExportCount) = strExport(lngExportCount) & .IDIndex & strSepChar & dblAMTMW & strSepChar & dblAMTNet & strSepChar & dblAMTNetStDev & strSepChar & Round(.StacOrSLiC, 4) & strSepChar & Round(.MassDiffPPM, 4) & strSepChar & Round(.UniquenessProbability, 4)
+                            strExport(lngExportCount) = strExport(lngExportCount) & .IDIndex & strSepChar & dblAMTMW & strSepChar & dblAMTNET & strSepChar & dblAMTNetStDev & strSepChar & Round(.StacOrSLiC, 4) & strSepChar & Round(.MassDiffPPM, 4) & strSepChar & Round(.UniquenessProbability, 4)
                         End With
                         
                     Else
@@ -4058,7 +4062,7 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim lngMassTagIndexPointer As Long, lngMassTagIndexOriginal As Long
     
     Dim lngScanClassRep As Long
-    Dim dblGANETClassRep As Double, dblAMTMW As Double, dblAMTNet As Double, dblAMTNetStDev As Double
+    Dim dblGANETClassRep As Double, dblAMTMW As Double, dblAMTNET As Double, dblAMTNetStDev As Double
     Dim sngPeptideProphetProbability As Single
     Dim sngMassShiftPPMClassRep As Single
     
@@ -4300,7 +4304,10 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "MassShiftPPMClassRep" & strSepChar
     
-    If ((GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA) Then
+    Dim blnIMSDataPresent As Boolean
+    blnIMSDataPresent = (GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
+        
+    If blnIMSDataPresent Then
         blnIMSData = True
         strLineOut = strLineOut & "IMS_Drift_Time" & strSepChar & "IMS_Conformation_Fit_Score" & strSepChar
     End If
@@ -4478,21 +4485,21 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             If lngMassTagIndexPointer >= 0 Then
                 lngMassTagIndexOriginal = lngAMTIDPointer(lngMassTagIndexPointer)
                 dblAMTMW = AMTData(lngMassTagIndexOriginal).MW
-                dblAMTNet = AMTData(lngMassTagIndexOriginal).NET
+                dblAMTNET = AMTData(lngMassTagIndexOriginal).NET
                 dblAMTNetStDev = AMTData(lngMassTagIndexOriginal).NETStDev
                 sngPeptideProphetProbability = AMTData(lngMassTagIndexOriginal).PeptideProphetProbability
                 strPeptideSequence = AMTData(lngMassTagIndexOriginal).Sequence
                 Debug.Assert AMTData(lngMassTagIndexOriginal).ID = udtUMCsInView(lngUMCIndex).IDIndex
             Else
                 dblAMTMW = 0
-                dblAMTNet = 0
+                dblAMTNET = 0
                 dblAMTNetStDev = 0
                 sngPeptideProphetProbability = 0
                 strPeptideSequence = ""
             End If
         Else
             dblAMTMW = 0
-            dblAMTNet = 0
+            dblAMTNET = 0
             dblAMTNetStDev = 0
             sngPeptideProphetProbability = 0
             strPeptideSequence = ""
@@ -4501,7 +4508,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
         strLineOutEnd = strLineOutEnd & _
                         udtUMCsInView(lngUMCIndex).IDIndex & strSepChar & _
                         Round(dblAMTMW, 6) & strSepChar & _
-                        Round(dblAMTNet, 4) & strSepChar & _
+                        Round(dblAMTNET, 4) & strSepChar & _
                         Round(dblAMTNetStDev, 4) & strSepChar & _
                         Round(udtUMCsInView(lngUMCIndex).StacOrSLiC, 4) & strSepChar & _
                         Round(udtUMCsInView(lngUMCIndex).DelScore, 4)

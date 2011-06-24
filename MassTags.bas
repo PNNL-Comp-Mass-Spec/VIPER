@@ -69,7 +69,34 @@ Public Type udtMTFilteringOptionsType
     ExperimentExclusionFilter As String         ' Only used in Schema Version 2
     InternalStandardExplicit As String          ' Only used in Schema Version 2
     NETValueType As Integer                     ' Actually type nvtNetValueTypeConstants
+    
+    LoadConformers As Boolean
 End Type
+
+Private Const MT_FIELD_INDEX_MAX As Integer = 20
+Private Enum mtfMTFieldConstants
+    Mass_Tag_ID = 0
+    Peptide = 1             ' Peptide sequence
+    Monoisotopic_Mass = 2
+    NET_Value_to_Use = 3
+    NET_Obs_Count = 4
+    PNET = 5
+    High_Normalized_Score = 6
+    StD_GANET = 7
+    High_Discriminant_Score = 8
+    Peptide_Obs_Count_Passing_Filter = 9
+    Mod_Count = 10
+    Mod_Description = 11
+    High_Peptide_Prophet_Probability = 12
+    Min_MSGF_SpecProb = 13
+    Cleavage_State = 14
+    Conformer_ID = 15
+    Conformer_Charge = 16
+    Conformer = 17
+    Drift_Time_Avg = 18
+    Drift_Time_StDev = 19
+    Conformer_Obs_Count = 20
+End Enum
 
 'for legacy database CurrMTDatabase is zero-length string
 'for MT tag database CurrLegacyMTDatabase is zero length string
@@ -81,9 +108,10 @@ Public CurrMTSchemaVersion As Single
 
 Public CurrMTFilteringOptions As udtMTFilteringOptionsType
 
-' DB from which MT Stats are currently loaded
-Public CurrMTStatsDatabase As String
-Public CurrMTStatsFilteringOptions As udtMTFilteringOptionsType
+' Unused in June 2011
+'' DB from which MT Stats are currently loaded
+'Public CurrMTStatsDatabase As String
+'Public CurrMTStatsFilteringOptions As udtMTFilteringOptionsType
         
 'modification list as obtained from MTMain database
 '''Public ModCnt As Long
@@ -95,9 +123,14 @@ Public CurrMTStatsFilteringOptions As udtMTFilteringOptionsType
 
 
 ' MonroeMod: Added frmCallingForm, along with several statements referring to frmCallingForm (see below)
-'            In addition, now using GetMassTagsGANETParam SP, which takes individual parameters rather than
+'            In addition, now using SP GetMassTagsGANETParam or GetMassTagsPlusConformers, which take individual parameters rather than
 '            a delimited list of parameters
-Public Function LoadMassTags(ByVal lngGelIndex As Long, frmCallingForm As VB.Form, Optional intDBConnectionTimeOutSeconds As Integer = 300, Optional ByRef blnDBConnectionError As Boolean = False, Optional blnLoadtheoreticalMTFromGelORFMT As Boolean = False) As Boolean
+Public Function LoadMassTags(ByVal lngGelIndex As Long, _
+                             frmCallingForm As VB.Form, _
+                             Optional intDBConnectionTimeOutSeconds As Integer = 300, _
+                             Optional ByRef blnDBConnectionError As Boolean = False, _
+                             Optional blnLoadtheoreticalMTFromGelORFMT As Boolean = False) As Boolean
+                             
     '------------------------------------------------------------
     ' Executes command that retrieves MT tags from Organism MT tag database
     ' Returns True if at least one MT tag loaded.
@@ -136,6 +169,7 @@ Public Function LoadMassTags(ByVal lngGelIndex As Long, frmCallingForm As VB.For
     Dim lngMassTagsParseCount As Long, lngMassTagCountWithNullValues As Long
     ''Dim blnUseTheoreticalNETs As Boolean
     
+    Dim intIndex As Integer
     Dim lngErrorCode As Long
     Dim strMessage As String
     
@@ -163,24 +197,73 @@ Public Function LoadMassTags(ByVal lngGelIndex As Long, frmCallingForm As VB.For
     ' Lookup the current MT tags filter options
     LookupMTFilteringOptions lngGelIndex, udtFilteringOptions
     
-    On Error Resume Next
+    ' Initialize the field mapping
+    ReDim intFieldMapping(MT_FIELD_INDEX_MAX) As Integer
+    For intIndex = 0 To MT_FIELD_INDEX_MAX
+        intFieldMapping(intIndex) = -1
+    Next intIndex
     
-    sCommand = glbPreferencesExpanded.MTSConnectionInfo.spGetMassTags
-    If Len(sCommand) <= 0 Then
-        blnDBConnectionError = True
-        LoadMassTags = False
-        Exit Function
+    If (GelData(lngGelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA Then
+        udtFilteringOptions.LoadConformers = True
+    Else
+        udtFilteringOptions.LoadConformers = False
     End If
     
-    If LCase(sCommand) = "getmasstagsganet" Then
-        ' This SP has been replaced by "GetMassTagsGANETParam"
-        ' Update sCommand and .MTDB.DBStuff
-        sCommand = "GetMassTagsGANETParam"
-        glbPreferencesExpanded.MTSConnectionInfo.spGetMassTags = sCommand
-        If Err Then Err.Clear
+    If udtFilteringOptions.LoadConformers Then
+        sCommand = glbPreferencesExpanded.MTSConnectionInfo.spGetMassTagsPlusConformers
+        If Len(sCommand) <= 0 Then
+            sCommand = "GetMassTagsPlusConformers"
+            glbPreferencesExpanded.MTSConnectionInfo.spGetMassTags = sCommand
+        End If
+        
+        ' Define the field mapping for obtaining AMTs plus conformer information
+        intFieldMapping(mtfMTFieldConstants.Mass_Tag_ID) = 0
+        intFieldMapping(mtfMTFieldConstants.Peptide) = 1
+        intFieldMapping(mtfMTFieldConstants.Monoisotopic_Mass) = 2
+        intFieldMapping(mtfMTFieldConstants.NET_Value_to_Use) = 3
+        intFieldMapping(mtfMTFieldConstants.NET_Obs_Count) = 4
+        intFieldMapping(mtfMTFieldConstants.PNET) = 5
+        intFieldMapping(mtfMTFieldConstants.High_Normalized_Score) = 6
+        intFieldMapping(mtfMTFieldConstants.StD_GANET) = 7
+        intFieldMapping(mtfMTFieldConstants.High_Discriminant_Score) = 8
+        intFieldMapping(mtfMTFieldConstants.Peptide_Obs_Count_Passing_Filter) = 9
+        intFieldMapping(mtfMTFieldConstants.Mod_Count) = 10
+        intFieldMapping(mtfMTFieldConstants.Mod_Description) = 11
+        intFieldMapping(mtfMTFieldConstants.High_Peptide_Prophet_Probability) = 12
+        intFieldMapping(mtfMTFieldConstants.Min_MSGF_SpecProb) = 13
+        intFieldMapping(mtfMTFieldConstants.Cleavage_State) = 14
+        intFieldMapping(mtfMTFieldConstants.Conformer_ID) = 15
+        intFieldMapping(mtfMTFieldConstants.Conformer_Charge) = 16
+        intFieldMapping(mtfMTFieldConstants.Conformer) = 17
+        intFieldMapping(mtfMTFieldConstants.Drift_Time_Avg) = 18
+        intFieldMapping(mtfMTFieldConstants.Drift_Time_StDev) = 19
+        intFieldMapping(mtfMTFieldConstants.Conformer_Obs_Count) = 20
+
+    Else
+        sCommand = glbPreferencesExpanded.MTSConnectionInfo.spGetMassTags
+        If Len(sCommand) <= 0 Or LCase(sCommand) = "getmasstagsganet" Then
+            ' Note that GetMassTagsGANET was replaced by "GetMassTagsGANETParam" in 2004
+            sCommand = "GetMassTagsGANETParam"
+            glbPreferencesExpanded.MTSConnectionInfo.spGetMassTags = sCommand
+        End If
+        
+        ' Define the field mapping for obtaining AMTs
+        intFieldMapping(mtfMTFieldConstants.Mass_Tag_ID) = 0
+        intFieldMapping(mtfMTFieldConstants.Peptide) = 1
+        intFieldMapping(mtfMTFieldConstants.Monoisotopic_Mass) = 2
+        intFieldMapping(mtfMTFieldConstants.NET_Value_to_Use) = 3
+        intFieldMapping(mtfMTFieldConstants.NET_Obs_Count) = 12         ' Field "Cnt_GANET"
+        intFieldMapping(mtfMTFieldConstants.PNET) = 4
+        intFieldMapping(mtfMTFieldConstants.High_Normalized_Score) = 5
+        intFieldMapping(mtfMTFieldConstants.StD_GANET) = 6
+        intFieldMapping(mtfMTFieldConstants.High_Discriminant_Score) = 7
+        intFieldMapping(mtfMTFieldConstants.Peptide_Obs_Count_Passing_Filter) = 8
+        intFieldMapping(mtfMTFieldConstants.Mod_Count) = 9
+        intFieldMapping(mtfMTFieldConstants.Mod_Description) = 10
+        intFieldMapping(mtfMTFieldConstants.High_Peptide_Prophet_Probability) = 11
+
     End If
-    
-    On Error GoTo err_LoadMassTags
+   
     AMTGeneration = dbgMTSOnline
     Screen.MousePointer = vbHourglass
     AMTCnt = 0
@@ -321,103 +404,111 @@ Public Function LoadMassTags(ByVal lngGelIndex As Long, frmCallingForm As VB.For
     ''blnSkipNETSOutOfRange = True
     
     
-    With rsMassTags
-        
-        If .STATE = 0 And udtFilteringOptions.LimitToPMTsFromDataset Then
-            strMessage = "'Limit to Dataset For Job' was enabled but Job " & Trim(udtFilteringOptions.CurrentJob) & " was not found in database " & ExtractDBNameFromConnectionString(GelAnalysis(lngGelIndex).MTDB.cn)
-            AddToAnalysisHistory lngGelIndex, strMessage
     
-            If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-                MsgBox strMessage, vbExclamation + vbOKOnly, "Error Loading MT tags"
-            End If
+    If rsMassTags.STATE = 0 And udtFilteringOptions.LimitToPMTsFromDataset Then
+        strMessage = "'Limit to Dataset For Job' was enabled but Job " & Trim(udtFilteringOptions.CurrentJob) & " was not found in database " & ExtractDBNameFromConnectionString(GelAnalysis(lngGelIndex).MTDB.cn)
+        AddToAnalysisHistory lngGelIndex, strMessage
+
+        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+            MsgBox strMessage, vbExclamation + vbOKOnly, "Error Loading MT tags"
         End If
-        
-        If .STATE <> 0 Then
-            'load MT tag data
-            TraceLog 5, "LoadMassTags", "Start loading MT tags"
-            Do Until .EOF
-               AMTCnt = AMTCnt + 1
-               
-               ' Initialize this entry
-               InitializeAMTDataEntry AMTData(AMTCnt), NET_VALUE_IF_NULL
-                                       
-               AMTData(AMTCnt).ID = CLng(.Fields(0).Value)
-               AMTData(AMTCnt).Sequence = .Fields(1).Value
-               
-               AMTData(AMTCnt).HighNormalizedScore = FixNullDbl(.Fields(5).Value, 0)
-               AMTData(AMTCnt).HighDiscriminantScore = FixNullDbl(.Fields(7).Value, 0)
-               AMTData(AMTCnt).PeptideProphetProbability = FixNullDbl(.Fields(11).Value, 0)
-               
-                ' MonroeMod: Store -1 as the Mass value when the MT tag Mass value is Null
-               AMTData(AMTCnt).MW = FixNullDbl(.Fields(2).Value, MASS_VALUE_IF_NULL)
-                
-                ' MonroeMod: Store -100000 as the NET value when the MT tag NET value is Null
-                AMTData(AMTCnt).NET = FixNullDbl(.Fields(3).Value, NET_VALUE_IF_NULL)
-                AMTData(AMTCnt).NETStDev = FixNullDbl(.Fields(6).Value, 0)
-                
-               'AMTData(AMTCnt).NETCount = FixNullLng(.Fields("Cnt_GANET").Value, 0)
-               AMTData(AMTCnt).NETCount = FixNullLng(.Fields(12).Value, 0)
-                
-                AMTData(AMTCnt).MSMSObsCount = FixNullLng(.Fields(8).Value, 1)
-               
-               AMTData(AMTCnt).PNET = .Fields(4).Value         ' Field PNET in the database
-               
-        ' MonroeMod: the NitrogenCount() Function replaces the ELCount Function
-               AMTData(AMTCnt).CNT_N = NitrogenCount(AMTData(AMTCnt).Sequence)
-                
-               AMTData(AMTCnt).CNT_Cys = AACount(AMTData(AMTCnt).Sequence, "C")       'look for cysteine
-               
-               ' Advance to the next row
-               .MoveNext
-        
-        ' MonroeMod: Possibly skip MT tags with null mass values or null NET values
-               blnSkipMassTag = False
-               If AMTData(AMTCnt).MW = MASS_VALUE_IF_NULL Then
-                   If Not glbPreferencesExpanded.UseMassTagsWithNullMass Then
-                      blnSkipMassTag = True
-                   End If
-                   lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
-               End If
-               
-               If AMTData(AMTCnt).NET = NET_VALUE_IF_NULL Then
-                   If Not glbPreferencesExpanded.UseMassTagsWithNullNET Then
-                      blnSkipMassTag = True
-                   End If
-                   lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
-               End If
-               
-               
-    ''           If blnSkipNETSOutOfRange Then
-    ''                If AMTData(AMTCnt).NET < 0 Or AMTData(AMTCnt).NET > 1 Then
-    ''                    blnSkipMassTag = True
-    ''                End If
-    ''           End If
+    End If
+    
+    If rsMassTags.STATE <> 0 Then
+        'load MT tag data
+        TraceLog 5, "LoadMassTags", "Start loading MT tags"
+        Do Until rsMassTags.EOF
+           AMTCnt = AMTCnt + 1
+           
+           ' Initialize this entry
+           InitializeAMTDataEntry AMTData(AMTCnt), NET_VALUE_IF_NULL
+                                   
+           AMTData(AMTCnt).ID = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Mass_Tag_ID, -1)
+           AMTData(AMTCnt).Sequence = LoadMassTagsGetValueStr(rsMassTags, intFieldMapping, mtfMTFieldConstants.Peptide, "")
+           
+           AMTData(AMTCnt).HighNormalizedScore = LoadMassTagsGetValueDbl(rsMassTags, intFieldMapping, mtfMTFieldConstants.High_Normalized_Score, 0)
+           AMTData(AMTCnt).HighDiscriminantScore = LoadMassTagsGetValueDbl(rsMassTags, intFieldMapping, mtfMTFieldConstants.High_Discriminant_Score, 0)
+           AMTData(AMTCnt).PeptideProphetProbability = LoadMassTagsGetValueDbl(rsMassTags, intFieldMapping, mtfMTFieldConstants.High_Peptide_Prophet_Probability, 0)
+           
+            ' MonroeMod: Store -1 as the Mass value when the MT tag Mass value is Null
+            AMTData(AMTCnt).MW = LoadMassTagsGetValueDbl(rsMassTags, intFieldMapping, mtfMTFieldConstants.Monoisotopic_Mass, MASS_VALUE_IF_NULL)
             
-               If blnSkipMassTag Then
-                   AMTCnt = AMTCnt - 1
-               End If
-               lngMassTagsParseCount = lngMassTagsParseCount + 1
-               
-        ' MonroeMod
-               If AMTCnt Mod 100 = 0 Then
-                   If AMTCnt Mod 1000 = 0 Then
-                        TraceLog 3, "LoadMassTags", "Reading MT tags from DB, AMTCnt = " & LongToStringWithCommas(AMTCnt)
-                   Else
-                        TraceLog 1, "LoadMassTags", "Reading MT tags from DB, AMTCnt = " & LongToStringWithCommas(AMTCnt)
-                   End If
-                    
-                    If lngMassTagsParseCount = AMTCnt Then
-                        frmCallingForm.Caption = "Loading MT tags: " & LongToStringWithCommas(lngMassTagsParseCount)
-                    Else
-                        frmCallingForm.Caption = "Loading MT tags: " & LongToStringWithCommas(AMTCnt) & " valid of " & LongToStringWithCommas(lngMassTagsParseCount) & " PMT's"
-                    End If
-               End If
-               DoEvents
-            Loop
-            .Close
+            ' MonroeMod: Store -100000 as the NET value when the MT tag NET value is Null
+            AMTData(AMTCnt).NET = LoadMassTagsGetValueDbl(rsMassTags, intFieldMapping, mtfMTFieldConstants.NET_Value_to_Use, NET_VALUE_IF_NULL)
+            AMTData(AMTCnt).NETStDev = LoadMassTagsGetValueDbl(rsMassTags, intFieldMapping, mtfMTFieldConstants.StD_GANET, 0)
+            
+            AMTData(AMTCnt).NETCount = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.NET_Obs_Count, 0)
+            
+            AMTData(AMTCnt).MSMSObsCount = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Peptide_Obs_Count_Passing_Filter, 1)
+           
+            AMTData(AMTCnt).PNET = LoadMassTagsGetValueDbl(rsMassTags, intFieldMapping, mtfMTFieldConstants.PNET, 0)
+           
+            ' MonroeMod: the NitrogenCount() Function replaces the ELCount Function
+            AMTData(AMTCnt).CNT_N = NitrogenCount(AMTData(AMTCnt).Sequence)
+            
+            AMTData(AMTCnt).CNT_Cys = AACount(AMTData(AMTCnt).Sequence, "C")       'look for cysteine
+           
+            If udtFilteringOptions.LoadConformers Then
+                ' Load conformer information
+                AMTData(AMTCnt).Conformer_ID = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer_ID, 0)
+                AMTData(AMTCnt).Conformer_Charge = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer_Charge, 0)
+                AMTData(AMTCnt).Conformer = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer, 0)
+                 
+                AMTData(AMTCnt).Drift_Time_Avg = LoadMassTagsGetValueDbl(rsMassTags, intFieldMapping, mtfMTFieldConstants.Drift_Time_Avg, 0)
+                AMTData(AMTCnt).Conformer_Obs_Count = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer_Obs_Count, 0)
+            End If
+            
+            ' Advance to the next row
+            rsMassTags.MoveNext
     
-        End If
-    End With
+            ' MonroeMod: Possibly skip MT tags with null mass values or null NET values
+            blnSkipMassTag = False
+            If AMTData(AMTCnt).MW = MASS_VALUE_IF_NULL Then
+                If Not glbPreferencesExpanded.UseMassTagsWithNullMass Then
+                   blnSkipMassTag = True
+                End If
+                lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
+            End If
+            
+            If AMTData(AMTCnt).NET = NET_VALUE_IF_NULL Then
+                If Not glbPreferencesExpanded.UseMassTagsWithNullNET Then
+                   blnSkipMassTag = True
+                End If
+                lngMassTagCountWithNullValues = lngMassTagCountWithNullValues + 1
+            End If
+           
+           
+''           If blnSkipNETSOutOfRange Then
+''                If AMTData(AMTCnt).NET < 0 Or AMTData(AMTCnt).NET > 1 Then
+''                    blnSkipMassTag = True
+''                End If
+''           End If
+        
+           If blnSkipMassTag Then
+                AMTCnt = AMTCnt - 1
+           End If
+           lngMassTagsParseCount = lngMassTagsParseCount + 1
+           
+            ' MonroeMod
+            If AMTCnt Mod 100 = 0 Then
+                If AMTCnt Mod 1000 = 0 Then
+                    TraceLog 3, "LoadMassTags", "Reading MT tags from DB, AMTCnt = " & LongToStringWithCommas(AMTCnt)
+                Else
+                    TraceLog 1, "LoadMassTags", "Reading MT tags from DB, AMTCnt = " & LongToStringWithCommas(AMTCnt)
+                End If
+                
+                If lngMassTagsParseCount = AMTCnt Then
+                    frmCallingForm.Caption = "Loading MT tags: " & LongToStringWithCommas(lngMassTagsParseCount)
+                Else
+                    frmCallingForm.Caption = "Loading MT tags: " & LongToStringWithCommas(AMTCnt) & " valid of " & LongToStringWithCommas(lngMassTagsParseCount) & " PMT's"
+                End If
+            End If
+            DoEvents
+        Loop
+        rsMassTags.Close
+
+    End If
+
     
     ' Update the AMT staleness stats
     With glbPreferencesExpanded.MassTagStalenessOptions
@@ -500,264 +591,289 @@ err_LoadMassTags:
     GoTo exit_LoadMassTags
 End Function
 
-Public Function LoadMTStats(ByVal lngGelIndex As Long, frmCallingForm As VB.Form, Optional intDBConnectionTimeOutSeconds As Integer = 300, Optional ByRef blnDBConnectionError As Boolean = False) As Boolean
-
-    '------------------------------------------------------------
-    ' Executes command that retrieves MT Stats from an AMT Tag database
-    ' Returns True if at least one MT Stat entry was loaded.
-    ' Additionally, sets blnDBConnectionError to True if an error
-    '  occurs when connecting to the database, or when running the SP
-    ' This way, even if LoadMTStats returns false, if blnDBConnectionError = True
-    '  then we'll know we don't have a database connection problem; instead
-    '  there are simply no MT Stat entries
-    '------------------------------------------------------------
-    
-    Dim cnNew As New ADODB.Connection
-    Dim sCommand As String
-    Dim rsMTStats As New ADODB.Recordset
-    
-    Dim cmdGetMTStats As New ADODB.Command
-    
-    ' Stored procedure parameters
-    Dim prmNonFilterPassingMTsSamplingFraction As ADODB.Parameter
-    Dim prmNonFilterPassingMTsMaxCount As ADODB.Parameter
-    Dim prmMinimumHighNormalizedScore As ADODB.Parameter
-    Dim prmMinimumHighDiscriminantScore As ADODB.Parameter
-    Dim prmMinimumPeptideProphetProbability As ADODB.Parameter
-    Dim prmMinimumPMTQualityScore As ADODB.Parameter
-    
-    Dim strProgressDots As String
-    
-    Dim lngErrorCode As Long
-    Dim strMessage As String
-    
-    Const MASS_VALUE_IF_NULL As Double = 0
-    Const NET_VALUE_IF_NULL As Single = -100000
-    Const FSCORE_VALUE_IF_NULL As Integer = -100
-    Const MEMORY_RESERVE_CHUNK_SIZE As Long = 50000
-    
-    Const Default_NonFilterPassingMTsSamplingFraction As Single = 0.5
-    Const Default_NonFilterPassingMTsMaxCount As Long = 500000
-
-    Dim udtFilteringOptions As udtMTFilteringOptionsType
-    
-    Dim ErrCnt As Long                              'list only first 10 errors
-    
-    On Error GoTo err_LoadMTStats
-    
-    If GelAnalysis(lngGelIndex) Is Nothing Then
-        blnDBConnectionError = True
-        LoadMTStats = False
-        Exit Function
-    End If
-    
-    ' Reserve space for 50000 MT Stat entries
-    ' Memory reserved will be increased as needed
-    ReDim AMTScoreStats(49999)
-    
-    ' Lookup the current MT tags filter options
-    LookupMTFilteringOptions lngGelIndex, udtFilteringOptions
-    
-    On Error Resume Next
-    
-    sCommand = glbPreferencesExpanded.MTSConnectionInfo.spGetMTStats
-    If Len(sCommand) <= 0 Then
-        blnDBConnectionError = True
-        LoadMTStats = False
-        Exit Function
-    End If
-    
-    On Error GoTo err_LoadMTStats
-    
-    AMTScoreStatsCnt = 0
-    
-    TraceLog 5, "LoadMTStats", "EstablishConnection"
-    TraceLog 5, "LoadMTStats", "Connection String = " & GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString
-    
-    If Not EstablishConnection(cnNew, GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString, False) Then
-        TraceLog 5, "LoadMTStats", "EstablishConnection returned false"
-        Debug.Assert False
-        
-        If InStr(LCase(GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString), "pogo") > 0 Then
-            GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString = Replace(GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString, "pogo", "albert", 1, 1, vbTextCompare)
-        End If
-            
-        blnDBConnectionError = True
-        LoadMTStats = False
-        Exit Function
-    End If
-    
-    Dim strCaptionSaved As String
-    strCaptionSaved = frmCallingForm.Caption
-    frmCallingForm.Caption = "Initializing DB connection"
-   
-    TraceLog 3, "LoadMTStats", "Initialize LoadMTStats SPCommand"
-    
-    'create and tune command object to retrieve MT tags
-    ' Initialize the SP
-    InitializeSPCommand cmdGetMTStats, cnNew, sCommand
-    
-    TraceLog 3, "LoadMTStats", "Append parameters to cmdGetMTStats"
-    
-    Set prmNonFilterPassingMTsSamplingFraction = cmdGetMTStats.CreateParameter("NonFilterPassingMTsSamplingFraction", adSingle, adParamInput, , Default_NonFilterPassingMTsSamplingFraction)
-    cmdGetMTStats.Parameters.Append prmNonFilterPassingMTsSamplingFraction
-    
-    Set prmNonFilterPassingMTsMaxCount = cmdGetMTStats.CreateParameter("NonFilterPassingMTsMaxCount", adInteger, adParamInput, , Default_NonFilterPassingMTsMaxCount)
-    cmdGetMTStats.Parameters.Append prmNonFilterPassingMTsMaxCount
-        
-    Set prmMinimumHighNormalizedScore = cmdGetMTStats.CreateParameter("MinimumHighNormalizedScore", adSingle, adParamInput, , udtFilteringOptions.MinimumHighNormalizedScore)
-    cmdGetMTStats.Parameters.Append prmMinimumHighNormalizedScore
-    
-    Set prmMinimumHighDiscriminantScore = cmdGetMTStats.CreateParameter("MinimumHighDiscriminantScore", adSingle, adParamInput, , udtFilteringOptions.MinimumHighDiscriminantScore)
-    cmdGetMTStats.Parameters.Append prmMinimumHighDiscriminantScore
-
-    Set prmMinimumPeptideProphetProbability = cmdGetMTStats.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamInput, , udtFilteringOptions.MinimumPeptideProphetProbability)
-    cmdGetMTStats.Parameters.Append prmMinimumPeptideProphetProbability
-    
-    Set prmMinimumPMTQualityScore = cmdGetMTStats.CreateParameter("MinimumPMTQualityScore", adSingle, adParamInput, , udtFilteringOptions.MinimumPMTQualityScore)
-    cmdGetMTStats.Parameters.Append prmMinimumPMTQualityScore
-    
-    
-    'procedure returns error number or 0 if OK
-    If intDBConnectionTimeOutSeconds = 0 Then intDBConnectionTimeOutSeconds = 300
-    TraceLog 3, "LoadMTStats", "cmdGetMTStats.CommandTimeout = " & intDBConnectionTimeOutSeconds
-    cmdGetMTStats.CommandTimeout = intDBConnectionTimeOutSeconds
-    
-    TraceLog 5, "LoadMTStats", "cmdGetMTStats.Execute"
-    Set rsMTStats = cmdGetMTStats.Execute(, , adAsyncExecute)
-    
-    Do While (cmdGetMTStats.STATE And adStateExecuting)
-        Sleep 500
-        strProgressDots = strProgressDots & "."
-        If Len(strProgressDots) > 30 Then strProgressDots = "."
-        frmCallingForm.Caption = "Waiting to load MT Stats" & strProgressDots
-        DoEvents
-    Loop
-    
-    TraceLog 5, "LoadMTStats", "Done executing cmdGetMTStats"
-    frmCallingForm.Caption = "Loading MT stats: "
-    DoEvents
-    
-
-    If rsMTStats.STATE <> 0 Then
-        'load MT Stats
-        TraceLog 5, "LoadMTStats", "Start loading MT Stats"
-        Do Until rsMTStats.EOF
-            
-            If AMTScoreStatsCnt >= UBound(AMTScoreStats) Then
-                If UBound(AMTScoreStats) < 1000000 Then
-                    ReDim Preserve AMTScoreStats((UBound(AMTScoreStats) + 1) * 2 - 1)
-                Else
-                    ReDim Preserve AMTScoreStats((UBound(AMTScoreStats) + 1) * 1.5 - 1)
-                End If
-            End If
-
-            With rsMTStats
-                AMTScoreStats(AMTScoreStatsCnt).MTID = CLng(.Fields(0).Value)
-                AMTScoreStats(AMTScoreStatsCnt).MW = FixNullDbl(.Fields(1).Value, MASS_VALUE_IF_NULL)
-                AMTScoreStats(AMTScoreStatsCnt).NET = FixNullDbl(.Fields(2).Value, NET_VALUE_IF_NULL)
-                AMTScoreStats(AMTScoreStatsCnt).NETStDev = FixNullDbl(.Fields(3).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).NETCount = FixNullLng(.Fields(4).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).MSMSObsCount = FixNullLng(.Fields(5).Value, 1)
-                AMTScoreStats(AMTScoreStatsCnt).HighNormalizedScore = FixNullDbl(.Fields(6).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).HighDiscriminantScore = FixNullDbl(.Fields(7).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).PeptideProphetProbability = FixNullDbl(.Fields(8).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).ModCount = FixNullInt(.Fields(9).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).TrypticState = FixNullInt(.Fields(10).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).PepProphetObsCountCS1 = FixNullLng(.Fields(11).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).PepProphetObsCountCS2 = FixNullLng(.Fields(12).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).PepProphetObsCountCS3 = FixNullLng(.Fields(13).Value, 0)
-                AMTScoreStats(AMTScoreStatsCnt).PepProphetFScoreCS1 = FixNullDbl(.Fields(14).Value, FSCORE_VALUE_IF_NULL)
-                AMTScoreStats(AMTScoreStatsCnt).PepProphetFScoreCS2 = FixNullDbl(.Fields(15).Value, FSCORE_VALUE_IF_NULL)
-                AMTScoreStats(AMTScoreStatsCnt).PepProphetFScoreCS3 = FixNullDbl(.Fields(16).Value, FSCORE_VALUE_IF_NULL)
-                AMTScoreStats(AMTScoreStatsCnt).PassesFilters = FixNullInt(.Fields(17).Value, 0)
-            End With
-
-            AMTScoreStatsCnt = AMTScoreStatsCnt + 1
-            rsMTStats.MoveNext
-            
-            If AMTScoreStatsCnt Mod 500 = 0 Then
-                If AMTScoreStatsCnt Mod 5000 = 0 Then
-                     TraceLog 3, "LoadMTStats", "Reading MT stats from DB, AMTScoreStatsCnt = " & LongToStringWithCommas(AMTScoreStatsCnt)
-                Else
-                     TraceLog 1, "LoadMTStats", "Reading MT stats from DB, AMTScoreStatsCnt = " & LongToStringWithCommas(AMTScoreStatsCnt)
-                End If
-                 
-                frmCallingForm.Caption = "Loading MT stats: " & LongToStringWithCommas(AMTScoreStatsCnt)
-            End If
-           
-           DoEvents
-        Loop
-        rsMTStats.Close
-    
-    End If
-    
-    ' Update the AMT Stats staleness stats
-    With glbPreferencesExpanded.MassTagStalenessOptions
-        .AMTStatsLoadTime = Now()
-    End With
-      
-    'clean things and exit
-exit_LoadMTStats:
-    Screen.MousePointer = vbDefault
-    On Error Resume Next
-    Set cmdGetMTStats.ActiveConnection = Nothing
-    cnNew.Close
-    
-    TraceLog 5, "LoadMTStats", "Done reading MT Stats, MT Stats Count = " & AMTScoreStatsCnt
-    
-    If AMTScoreStatsCnt > 0 Then
-       If AMTScoreStatsCnt < UBound(AMTScoreStats) Then
-          ReDim Preserve AMTScoreStats(AMTScoreStatsCnt - 1)
-       End If
+Private Function LoadMassTagsGetValueDbl(ByRef rsMassTags As ADODB.Recordset, ByRef intFieldMapping() As Integer, eField As mtfMTFieldConstants, ByVal dblValueIfMissing As Double) As Double
+    If intFieldMapping(eField) < 0 Then
+        LoadMassTagsGetValueDbl = dblValueIfMissing
     Else
-       ReDim AMTScoreStats(0)
+        LoadMassTagsGetValueDbl = FixNullDbl(rsMassTags.Fields(intFieldMapping(eField)).Value, dblValueIfMissing)
     End If
-    
-    
-    ' MonroeMod
-    ' Restore the caption on the calling form
-    frmCallingForm.Caption = strCaptionSaved
-    If (AMTScoreStatsCnt > 0) Then
-        LoadMTStats = True
-    Else
-        LoadMTStats = False
-    End If
-    
-    'remember which database is currently loaded
-    CurrMTStatsDatabase = GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString
-    
-    'remember the current filtering options
-    CurrMTStatsFilteringOptions = udtFilteringOptions
-    
-    Exit Function
-
-err_LoadMTStats:
-    Select Case Err.Number
-    Case 13, 94                  'Type Mismatch or Invalid Use of Null
-        Resume Next              'just ignore it
-    Case 3265, 3704              'two common database connection errors
-        '2nd attempt will probably work so let user know they should try again
-        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-            MsgBox "Error loading MT stats from the database. Error could " _
-                 & "have been caused by network/server issues(timeout) so you " _
-                 & "might try loading again with Refresh function.", vbOKOnly, glFGTU
-        End If
-        blnDBConnectionError = True
-    Case Else
-        TraceLog 3, "LoadMTStats", "Error occurred (ErrCnt=" & Trim(ErrCnt) & "): " & Err.Description
-        
-        ErrCnt = ErrCnt + 1
-        If ErrCnt < 10 Then
-           LogErrors Err.Number, "LoadMTStats"
-           Resume Next
-        End If
-        blnDBConnectionError = True
-    End Select
-    AMTScoreStatsCnt = -1
-    GoTo exit_LoadMTStats
-
 End Function
+
+Private Function LoadMassTagsGetValueLng(ByRef rsMassTags As ADODB.Recordset, ByRef intFieldMapping() As Integer, eField As mtfMTFieldConstants, ByVal lngValueIfMissing As Long) As Long
+    If intFieldMapping(eField) < 0 Then
+        LoadMassTagsGetValueLng = lngValueIfMissing
+    Else
+        LoadMassTagsGetValueLng = FixNullLng(rsMassTags.Fields(intFieldMapping(eField)).Value, lngValueIfMissing)
+    End If
+End Function
+            
+Private Function LoadMassTagsGetValueStr(ByRef rsMassTags As ADODB.Recordset, ByRef intFieldMapping() As Integer, eField As mtfMTFieldConstants, ByVal strValueIfMissing As String) As String
+    If intFieldMapping(eField) < 0 Then
+        LoadMassTagsGetValueStr = strValueIfMissing
+    Else
+        LoadMassTagsGetValueStr = FixNull(rsMassTags.Fields(intFieldMapping(eField)).Value)
+    End If
+End Function
+            
+' Unused Function (June 2011)
+''Public Function LoadMTStats(ByVal lngGelIndex As Long, frmCallingForm As VB.Form, Optional intDBConnectionTimeOutSeconds As Integer = 300, Optional ByRef blnDBConnectionError As Boolean = False) As Boolean
+''
+''    '------------------------------------------------------------
+''    ' Executes command that retrieves MT Stats from an AMT Tag database
+''    ' Returns True if at least one MT Stat entry was loaded.
+''    ' Additionally, sets blnDBConnectionError to True if an error
+''    '  occurs when connecting to the database, or when running the SP
+''    ' This way, even if LoadMTStats returns false, if blnDBConnectionError = True
+''    '  then we'll know we don't have a database connection problem; instead
+''    '  there are simply no MT Stat entries
+''    '------------------------------------------------------------
+''
+''    Dim cnNew As New ADODB.Connection
+''    Dim sCommand As String
+''    Dim rsMTStats As New ADODB.Recordset
+''
+''    Dim cmdGetMTStats As New ADODB.Command
+''
+''    ' Stored procedure parameters
+''    Dim prmNonFilterPassingMTsSamplingFraction As ADODB.Parameter
+''    Dim prmNonFilterPassingMTsMaxCount As ADODB.Parameter
+''    Dim prmMinimumHighNormalizedScore As ADODB.Parameter
+''    Dim prmMinimumHighDiscriminantScore As ADODB.Parameter
+''    Dim prmMinimumPeptideProphetProbability As ADODB.Parameter
+''    Dim prmMinimumPMTQualityScore As ADODB.Parameter
+''
+''    Dim strProgressDots As String
+''
+''    Dim lngErrorCode As Long
+''    Dim strMessage As String
+''
+''    Const MASS_VALUE_IF_NULL As Double = 0
+''    Const NET_VALUE_IF_NULL As Single = -100000
+''    Const FSCORE_VALUE_IF_NULL As Integer = -100
+''    Const MEMORY_RESERVE_CHUNK_SIZE As Long = 50000
+''
+''    Const Default_NonFilterPassingMTsSamplingFraction As Single = 0.5
+''    Const Default_NonFilterPassingMTsMaxCount As Long = 500000
+''
+''    Dim udtFilteringOptions As udtMTFilteringOptionsType
+''
+''    Dim ErrCnt As Long                              'list only first 10 errors
+''
+''    On Error GoTo err_LoadMTStats
+''
+''    If GelAnalysis(lngGelIndex) Is Nothing Then
+''        blnDBConnectionError = True
+''        LoadMTStats = False
+''        Exit Function
+''    End If
+''
+''    ' Reserve space for 50000 MT Stat entries
+''    ' Memory reserved will be increased as needed
+''    ReDim AMTScoreStats(49999)
+''
+''    ' Lookup the current MT tags filter options
+''    LookupMTFilteringOptions lngGelIndex, udtFilteringOptions
+''
+''    On Error Resume Next
+''
+''    sCommand = glbPreferencesExpanded.MTSConnectionInfo.spGetMTStats
+''    If Len(sCommand) <= 0 Then
+''        blnDBConnectionError = True
+''        LoadMTStats = False
+''        Exit Function
+''    End If
+''
+''    On Error GoTo err_LoadMTStats
+''
+''    AMTScoreStatsCnt = 0
+''
+''    TraceLog 5, "LoadMTStats", "EstablishConnection"
+''    TraceLog 5, "LoadMTStats", "Connection String = " & GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString
+''
+''    If Not EstablishConnection(cnNew, GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString, False) Then
+''        TraceLog 5, "LoadMTStats", "EstablishConnection returned false"
+''        Debug.Assert False
+''
+''        If InStr(LCase(GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString), "pogo") > 0 Then
+''            GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString = Replace(GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString, "pogo", "albert", 1, 1, vbTextCompare)
+''        End If
+''
+''        blnDBConnectionError = True
+''        LoadMTStats = False
+''        Exit Function
+''    End If
+''
+''    Dim strCaptionSaved As String
+''    strCaptionSaved = frmCallingForm.Caption
+''    frmCallingForm.Caption = "Initializing DB connection"
+''
+''    TraceLog 3, "LoadMTStats", "Initialize LoadMTStats SPCommand"
+''
+''    'create and tune command object to retrieve MT tags
+''    ' Initialize the SP
+''    InitializeSPCommand cmdGetMTStats, cnNew, sCommand
+''
+''    TraceLog 3, "LoadMTStats", "Append parameters to cmdGetMTStats"
+''
+''    Set prmNonFilterPassingMTsSamplingFraction = cmdGetMTStats.CreateParameter("NonFilterPassingMTsSamplingFraction", adSingle, adParamInput, , Default_NonFilterPassingMTsSamplingFraction)
+''    cmdGetMTStats.Parameters.Append prmNonFilterPassingMTsSamplingFraction
+''
+''    Set prmNonFilterPassingMTsMaxCount = cmdGetMTStats.CreateParameter("NonFilterPassingMTsMaxCount", adInteger, adParamInput, , Default_NonFilterPassingMTsMaxCount)
+''    cmdGetMTStats.Parameters.Append prmNonFilterPassingMTsMaxCount
+''
+''    Set prmMinimumHighNormalizedScore = cmdGetMTStats.CreateParameter("MinimumHighNormalizedScore", adSingle, adParamInput, , udtFilteringOptions.MinimumHighNormalizedScore)
+''    cmdGetMTStats.Parameters.Append prmMinimumHighNormalizedScore
+''
+''    Set prmMinimumHighDiscriminantScore = cmdGetMTStats.CreateParameter("MinimumHighDiscriminantScore", adSingle, adParamInput, , udtFilteringOptions.MinimumHighDiscriminantScore)
+''    cmdGetMTStats.Parameters.Append prmMinimumHighDiscriminantScore
+''
+''    Set prmMinimumPeptideProphetProbability = cmdGetMTStats.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamInput, , udtFilteringOptions.MinimumPeptideProphetProbability)
+''    cmdGetMTStats.Parameters.Append prmMinimumPeptideProphetProbability
+''
+''    Set prmMinimumPMTQualityScore = cmdGetMTStats.CreateParameter("MinimumPMTQualityScore", adSingle, adParamInput, , udtFilteringOptions.MinimumPMTQualityScore)
+''    cmdGetMTStats.Parameters.Append prmMinimumPMTQualityScore
+''
+''
+''    'procedure returns error number or 0 if OK
+''    If intDBConnectionTimeOutSeconds = 0 Then intDBConnectionTimeOutSeconds = 300
+''    TraceLog 3, "LoadMTStats", "cmdGetMTStats.CommandTimeout = " & intDBConnectionTimeOutSeconds
+''    cmdGetMTStats.CommandTimeout = intDBConnectionTimeOutSeconds
+''
+''    TraceLog 5, "LoadMTStats", "cmdGetMTStats.Execute"
+''    Set rsMTStats = cmdGetMTStats.Execute(, , adAsyncExecute)
+''
+''    Do While (cmdGetMTStats.STATE And adStateExecuting)
+''        Sleep 500
+''        strProgressDots = strProgressDots & "."
+''        If Len(strProgressDots) > 30 Then strProgressDots = "."
+''        frmCallingForm.Caption = "Waiting to load MT Stats" & strProgressDots
+''        DoEvents
+''    Loop
+''
+''    TraceLog 5, "LoadMTStats", "Done executing cmdGetMTStats"
+''    frmCallingForm.Caption = "Loading MT stats: "
+''    DoEvents
+''
+''
+''    If rsMTStats.STATE <> 0 Then
+''        'load MT Stats
+''        TraceLog 5, "LoadMTStats", "Start loading MT Stats"
+''        Do Until rsMTStats.EOF
+''
+''            If AMTScoreStatsCnt >= UBound(AMTScoreStats) Then
+''                If UBound(AMTScoreStats) < 1000000 Then
+''                    ReDim Preserve AMTScoreStats((UBound(AMTScoreStats) + 1) * 2 - 1)
+''                Else
+''                    ReDim Preserve AMTScoreStats((UBound(AMTScoreStats) + 1) * 1.5 - 1)
+''                End If
+''            End If
+''
+''            With rsMTStats
+''                AMTScoreStats(AMTScoreStatsCnt).MTID = CLng(.Fields(0).Value)
+''                AMTScoreStats(AMTScoreStatsCnt).MW = FixNullDbl(.Fields(1).Value, MASS_VALUE_IF_NULL)
+''                AMTScoreStats(AMTScoreStatsCnt).NET = FixNullDbl(.Fields(2).Value, NET_VALUE_IF_NULL)
+''                AMTScoreStats(AMTScoreStatsCnt).NETStDev = FixNullDbl(.Fields(3).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).NETCount = FixNullLng(.Fields(4).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).MSMSObsCount = FixNullLng(.Fields(5).Value, 1)
+''                AMTScoreStats(AMTScoreStatsCnt).HighNormalizedScore = FixNullDbl(.Fields(6).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).HighDiscriminantScore = FixNullDbl(.Fields(7).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).PeptideProphetProbability = FixNullDbl(.Fields(8).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).ModCount = FixNullInt(.Fields(9).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).TrypticState = FixNullInt(.Fields(10).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).PepProphetObsCountCS1 = FixNullLng(.Fields(11).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).PepProphetObsCountCS2 = FixNullLng(.Fields(12).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).PepProphetObsCountCS3 = FixNullLng(.Fields(13).Value, 0)
+''                AMTScoreStats(AMTScoreStatsCnt).PepProphetFScoreCS1 = FixNullDbl(.Fields(14).Value, FSCORE_VALUE_IF_NULL)
+''                AMTScoreStats(AMTScoreStatsCnt).PepProphetFScoreCS2 = FixNullDbl(.Fields(15).Value, FSCORE_VALUE_IF_NULL)
+''                AMTScoreStats(AMTScoreStatsCnt).PepProphetFScoreCS3 = FixNullDbl(.Fields(16).Value, FSCORE_VALUE_IF_NULL)
+''                AMTScoreStats(AMTScoreStatsCnt).PassesFilters = FixNullInt(.Fields(17).Value, 0)
+''            End With
+''
+''            AMTScoreStatsCnt = AMTScoreStatsCnt + 1
+''            rsMTStats.MoveNext
+''
+''            If AMTScoreStatsCnt Mod 500 = 0 Then
+''                If AMTScoreStatsCnt Mod 5000 = 0 Then
+''                     TraceLog 3, "LoadMTStats", "Reading MT stats from DB, AMTScoreStatsCnt = " & LongToStringWithCommas(AMTScoreStatsCnt)
+''                Else
+''                     TraceLog 1, "LoadMTStats", "Reading MT stats from DB, AMTScoreStatsCnt = " & LongToStringWithCommas(AMTScoreStatsCnt)
+''                End If
+''
+''                frmCallingForm.Caption = "Loading MT stats: " & LongToStringWithCommas(AMTScoreStatsCnt)
+''            End If
+''
+''           DoEvents
+''        Loop
+''        rsMTStats.Close
+''
+''    End If
+''
+''    ' Update the AMT Stats staleness stats
+''    With glbPreferencesExpanded.MassTagStalenessOptions
+''        .AMTStatsLoadTime = Now()
+''    End With
+''
+''    'clean things and exit
+''exit_LoadMTStats:
+''    Screen.MousePointer = vbDefault
+''    On Error Resume Next
+''    Set cmdGetMTStats.ActiveConnection = Nothing
+''    cnNew.Close
+''
+''    TraceLog 5, "LoadMTStats", "Done reading MT Stats, MT Stats Count = " & AMTScoreStatsCnt
+''
+''    If AMTScoreStatsCnt > 0 Then
+''       If AMTScoreStatsCnt < UBound(AMTScoreStats) Then
+''          ReDim Preserve AMTScoreStats(AMTScoreStatsCnt - 1)
+''       End If
+''    Else
+''       ReDim AMTScoreStats(0)
+''    End If
+''
+''
+''    ' MonroeMod
+''    ' Restore the caption on the calling form
+''    frmCallingForm.Caption = strCaptionSaved
+''    If (AMTScoreStatsCnt > 0) Then
+''        LoadMTStats = True
+''    Else
+''        LoadMTStats = False
+''    End If
+''
+''    'remember which database is currently loaded
+''    CurrMTStatsDatabase = GelAnalysis(lngGelIndex).MTDB.cn.ConnectionString
+''
+''    'remember the current filtering options
+''    CurrMTStatsFilteringOptions = udtFilteringOptions
+''
+''    Exit Function
+''
+''err_LoadMTStats:
+''    Select Case Err.Number
+''    Case 13, 94                  'Type Mismatch or Invalid Use of Null
+''        Resume Next              'just ignore it
+''    Case 3265, 3704              'two common database connection errors
+''        '2nd attempt will probably work so let user know they should try again
+''        If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+''            MsgBox "Error loading MT stats from the database. Error could " _
+''                 & "have been caused by network/server issues(timeout) so you " _
+''                 & "might try loading again with Refresh function.", vbOKOnly, glFGTU
+''        End If
+''        blnDBConnectionError = True
+''    Case Else
+''        TraceLog 3, "LoadMTStats", "Error occurred (ErrCnt=" & Trim(ErrCnt) & "): " & Err.Description
+''
+''        ErrCnt = ErrCnt + 1
+''        If ErrCnt < 10 Then
+''           LogErrors Err.Number, "LoadMTStats"
+''           Resume Next
+''        End If
+''        blnDBConnectionError = True
+''    End Select
+''    AMTScoreStatsCnt = -1
+''    GoTo exit_LoadMTStats
+''
+''End Function
 
 Public Function LoadMassTagToProteinMapping(frmCallingForm As VB.Form, Ind As Long, blnIncludeORFsForMassTagsNotInMemory As Boolean) As Boolean
     '---------------------------------------------------------------------------
@@ -1266,8 +1382,9 @@ On Error Resume Next
             End If
         End With
         
-        strMessage = strMessage & "; MT Stats DB = " & CurrMTStatsDatabase
-        strMessage = strMessage & "; MT Stats Count = " & Trim(AMTScoreStatsCnt)
+        ' Unused variables (June 2011)
+        ' strMessage = strMessage & "; MT Stats DB = " & CurrMTStatsDatabase
+        ' strMessage = strMessage & "; MT Stats Count = " & Trim(AMTScoreStatsCnt)
     End If
     
     CurrMTDBInfo = strMessage

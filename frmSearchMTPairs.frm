@@ -1303,7 +1303,16 @@ End If
 If blnCreateNewEntryInMMDTable Then
     TraceLog 5, "frmSearchMTPairs->ExportIDPairsToUMCResultsTable", "Call AddEntryToMatchMakingDescriptionTable"
     'first write new analysis in T_Match_Making_Description table
-    lngErrorNumber = AddEntryToMatchMakingDescriptionTableEx(cnNew, lngMDID, ExpAnalysisSPName, CallerID, mMatchStatsCount, GelData(CallerID).CustomNETsDefined, True, strIniFileName, False, 0, 0, 0, 0, 0, 0, 0)
+    lngErrorNumber = AddEntryToMatchMakingDescriptionTableEx(cnNew, _
+                                                             lngMDID, _
+                                                             ExpAnalysisSPName, _
+                                                             CallerID, _
+                                                             mMatchStatsCount, _
+                                                             GelData(CallerID).CustomNETsDefined, _
+                                                             True, _
+                                                             strIniFileName, _
+                                                             mMTCnt, _
+                                                             False, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 Else
     lngErrorNumber = 0
 End If
@@ -1371,7 +1380,7 @@ For lngPairInd = 0 To PCount - 1
             udtPairMatchStats.ExpressionRatioMemberBasisCount = .ERMemberBasisCount
         End With
         
-        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndL, PIDCnt(lngPairInd), ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_L, 0
+        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndL, PIDCnt(lngPairInd), ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_L, 0, GelUMC(CallerID).UMCs(IndL).DriftTime
         
         ' Write the match results for this UMC
         udtPutUMCMatchParams.UMCResultsID.Value = FixNullLng(udtPutUMCParams.UMCResultsIDReturn.Value)
@@ -1401,7 +1410,7 @@ For lngPairInd = 0 To PCount - 1
         
         ' Second, add a new row to T_FTICR_UMC_Results for the heavy member of the pair
         ' Note that we do not record any MT tag hits for the heavy member of the pair
-        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndH, 0, ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_H, 0
+        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndH, 0, ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_H, 0, GelUMC(CallerID).UMCs(IndH).DriftTime
         
     End If
 Next lngPairInd
@@ -1756,7 +1765,7 @@ Private Function PrepareMTArrays() As Boolean
 'prepares masses from loaded MT tags based on specified
 'modifications; returns True if succesful, False on any error
 '---------------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim TmpCnt As Long
 Dim CysCnt As Long                 'Cysteine count in peptide
 
@@ -1846,11 +1855,11 @@ dblNETWobbleDistance = CSngSafe(txtDecoySearchNETWobble.Text)
    ReDim mMTNET(AMTCnt - 1)
    ReDim mMTMods(AMTCnt - 1)
    mMTCnt = 0
-   For i = 1 To AMTCnt
+   For I = 1 To AMTCnt
         If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
-            If AMTData(i).HighNormalizedScore >= mMTMinimumHighNormalizedScore And _
-               AMTData(i).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore And _
-               AMTData(i).PeptideProphetProbability >= mMTMinimumPeptideProphetProbability Then
+            If AMTData(I).HighNormalizedScore >= mMTMinimumHighNormalizedScore And _
+               AMTData(I).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore And _
+               AMTData(I).PeptideProphetProbability >= mMTMinimumPeptideProphetProbability Then
                 blnAddMassTag = True
             Else
                 blnAddMassTag = False
@@ -1862,23 +1871,23 @@ dblNETWobbleDistance = CSngSafe(txtDecoySearchNETWobble.Text)
         If blnAddMassTag Then
             mMTCnt = mMTCnt + 1
             mMTInd(mMTCnt - 1) = mMTCnt - 1
-            mMTOrInd(mMTCnt - 1) = i             'index; not the ID
-            mMTMWN14(mMTCnt - 1) = AMTData(i).MW
+            mMTOrInd(mMTCnt - 1) = I             'index; not the ID
+            mMTMWN14(mMTCnt - 1) = AMTData(I).MW
             Select Case samtDef.NETorRT
             Case glAMT_NET
-                 mMTNET(mMTCnt - 1) = AMTData(i).NET
+                 mMTNET(mMTCnt - 1) = AMTData(I).NET
             Case glAMT_RT_or_PNET
-                 mMTNET(mMTCnt - 1) = AMTData(i).PNET
+                 mMTNET(mMTCnt - 1) = AMTData(I).PNET
             End Select
             mMTMods(mMTCnt - 1) = ""
         End If
-   Next i
+   Next I
    
    If chkAlkylation.Value = vbChecked Then         'correct based on cys number for alkylation label
       UpdateStatus "Adding alkylated peptides..."
       TmpCnt = mMTCnt
-      For i = 0 To TmpCnt - 1
-          CysCnt = AMTData(mMTOrInd(i)).CNT_Cys
+      For I = 0 To TmpCnt - 1
+          CysCnt = AMTData(mMTOrInd(I)).CNT_Cys
           If CysCnt > 0 Then
              If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 1 Or _
                 GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
@@ -1887,34 +1896,34 @@ dblNETWobbleDistance = CSngSafe(txtDecoySearchNETWobble.Text)
                 For j = 1 To CysCnt
                     mMTCnt = mMTCnt + 1
                     mMTInd(mMTCnt - 1) = mMTCnt - 1
-                    mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
-                    mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * AlkMWCorrection
+                    mMTOrInd(mMTCnt - 1) = mMTOrInd(I)
+                    mMTMWN14(mMTCnt - 1) = mMTMWN14(I) + j * AlkMWCorrection
                     
                     If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
-                        mMTNET(mMTCnt - 1) = GetWobbledNET(mMTNET(i), dblNETWobbleDistance)
+                        mMTNET(mMTCnt - 1) = GetWobbledNET(mMTNET(I), dblNETWobbleDistance)
                     Else
-                        mMTNET(mMTCnt - 1) = mMTNET(i)
+                        mMTNET(mMTCnt - 1) = mMTNET(I)
                     End If
                     
-                    mMTMods(mMTCnt - 1) = mMTMods(i) & " " & MOD_TKN_ALK & "/" & j
+                    mMTMods(mMTCnt - 1) = mMTMods(I) & " " & MOD_TKN_ALK & "/" & j
                 Next j
              Else
                 ' Static Mods
                 ' Simply update the stats for this MT tag
-                mMTMWN14(i) = mMTMWN14(i) + CysCnt * AlkMWCorrection
-                mMTMods(i) = mMTMods(i) & " " & MOD_TKN_ALK & "/" & CysCnt
+                mMTMWN14(I) = mMTMWN14(I) + CysCnt * AlkMWCorrection
+                mMTMods(I) = mMTMods(I) & " " & MOD_TKN_ALK & "/" & CysCnt
              End If
           End If
-      Next i
+      Next I
    End If
    
        If dblResidueModMass <> 0 Or GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
       UpdateStatus "Adding modified residue mass peptides..."
       TmpCnt = mMTCnt
-      For i = 0 To TmpCnt - 1
+      For I = 0 To TmpCnt - 1
             
           If Len(strResiduesToModify) > 0 Then
-            ResidueOccurrenceCount = LookupResidueOccurrence(mMTOrInd(i), strResiduesToModify)
+            ResidueOccurrenceCount = LookupResidueOccurrence(mMTOrInd(I), strResiduesToModify)
             strResModToken = MOD_TKN_RES_MOD
           Else
             ' Add dblResidueModMass once to the entire MT tag
@@ -1931,25 +1940,25 @@ dblNETWobbleDistance = CSngSafe(txtDecoySearchNETWobble.Text)
                 For j = 1 To ResidueOccurrenceCount
                     mMTCnt = mMTCnt + 1
                     mMTInd(mMTCnt - 1) = mMTCnt - 1
-                    mMTOrInd(mMTCnt - 1) = mMTOrInd(i)
-                    mMTMWN14(mMTCnt - 1) = mMTMWN14(i) + j * dblResidueModMass
+                    mMTOrInd(mMTCnt - 1) = mMTOrInd(I)
+                    mMTMWN14(mMTCnt - 1) = mMTMWN14(I) + j * dblResidueModMass
                     
                     If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
-                        mMTNET(mMTCnt - 1) = GetWobbledNET(mMTNET(i), dblNETWobbleDistance)
+                        mMTNET(mMTCnt - 1) = GetWobbledNET(mMTNET(I), dblNETWobbleDistance)
                     Else
-                        mMTNET(mMTCnt - 1) = mMTNET(i)
+                        mMTNET(mMTCnt - 1) = mMTNET(I)
                     End If
                     
-                    mMTMods(mMTCnt - 1) = mMTMods(i) & " " & strResModToken & "/" & strResiduesToModify & j
+                    mMTMods(mMTCnt - 1) = mMTMods(I) & " " & strResModToken & "/" & strResiduesToModify & j
                 Next j
              Else
                 ' Static Mods
                 ' Simply update the stats for this MT tag
-                mMTMWN14(i) = mMTMWN14(i) + ResidueOccurrenceCount * dblResidueModMass
-                mMTMods(i) = mMTMods(i) & " " & strResModToken & "/" & strResiduesToModify & ResidueOccurrenceCount
+                mMTMWN14(I) = mMTMWN14(I) + ResidueOccurrenceCount * dblResidueModMass
+                mMTMods(I) = mMTMods(I) & " " & strResModToken & "/" & strResiduesToModify & ResidueOccurrenceCount
              End If
           End If
-      Next i
+      Next I
    End If
    
    If mMTCnt > 0 Then
@@ -2072,7 +2081,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                        Debug.Assert False
                     End Select
                     
-                    AMTRef = ConstructAMTReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(.CSData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblAMTMass, dblStacOrSLiC, dblDelSLiC, dblUPScore)
+                    AMTRef = ConstructAMTReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(.CSData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblAMTMass, dblStacOrSLiC, dblDelSLiC, dblUPScore, False, False, 0)
                     If Len(.CSData(lngIonIndexOriginal).MTID) = 0 Then
                         blnAddAMTRef = True
                     ElseIf InStr(.CSData(lngIonIndexOriginal).MTID, AMTRef) <= 0 Then
@@ -2104,7 +2113,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                        Debug.Assert False
                     End Select
 
-                    AMTRef = ConstructAMTReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblAMTMass, dblStacOrSLiC, dblDelSLiC, 0)
+                    AMTRef = ConstructAMTReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblAMTMass, dblStacOrSLiC, dblDelSLiC, 0, False, False, 0)
                     If Len(.IsoData(lngIonIndexOriginal).MTID) = 0 Then
                         blnAddAMTRef = True
                     ElseIf InStr(.IsoData(lngIonIndexOriginal).MTID, AMTRef) <= 0 Then
@@ -2365,7 +2374,7 @@ Private Sub SearchPairConglomerateMassAMT(ByRef udtTestUMC As udtUMCType, ByVal 
 
 End Sub
 
-Private Function SearchUMCTestNET(eMemberType As glDistType, lngMemberIndex As Long, dblAMTNet As Double, dblNETTol As Double, ByRef dblNETDifference As Double) As Boolean
+Private Function SearchUMCTestNET(eMemberType As glDistType, lngMemberIndex As Long, dblAMTNET As Double, dblNETTol As Double, ByRef dblNETDifference As Double) As Boolean
     
     Dim lngScan As Long
     Dim blnNETMatch As Boolean
@@ -2378,7 +2387,7 @@ Private Function SearchUMCTestNET(eMemberType As glDistType, lngMemberIndex As L
     End Select
     
     blnNETMatch = False
-    dblNETDifference = ConvertScanToNET(lngScan) - dblAMTNet
+    dblNETDifference = ConvertScanToNET(lngScan) - dblAMTNET
     If dblNETTol > 0 Then
         If Abs(dblNETDifference) <= dblNETTol Then
             blnNETMatch = True
@@ -2463,6 +2472,8 @@ Public Function ShowOrSavePairsAndIDs(Optional strOutputFilePath As String = "",
     Dim dblUMCMass As Double
     Dim dblMassErrorPPM As Double
     Dim dblGANETError As Double
+    
+    Dim dblDriftTimeClassRep As Double
     
     Dim lngLightScanClassRep As Long
     Dim dblLightNETClassRep As Double
@@ -2570,8 +2581,8 @@ Public Function ShowOrSavePairsAndIDs(Optional strOutputFilePath As String = "",
                     
                 strPairInfo = Trim(lngPairInd) & strSepChar
 
-                GetUMCClassRepScanAndNET CallerID, lngUMCIndexLight, lngLightScanClassRep, dblLightNETClassRep
-                GetUMCClassRepScanAndNET CallerID, lngUMCIndexHeavy, lngHeavyScanClassRep, dblHeavyNETClassRep
+                GetUMCClassRepScanAndNET CallerID, lngUMCIndexLight, lngLightScanClassRep, dblLightNETClassRep, dblDriftTimeClassRep
+                GetUMCClassRepScanAndNET CallerID, lngUMCIndexHeavy, lngHeavyScanClassRep, dblHeavyNETClassRep, dblDriftTimeClassRep
                 
                 With GelUMC(CallerID)
                     ' Light Member
@@ -2736,7 +2747,7 @@ Public Function StartSearchPaired(Optional blnShowMessages As Boolean = True, Op
 '--------------------------------------------------------
 Dim HitsCnt As Long
 Dim eResponse As VbMsgBoxResult
-Dim i As Long
+Dim I As Long
 Dim blnUserNotifiedOfError As Boolean
 Dim strSearchDescription As String
 
@@ -2794,25 +2805,25 @@ If PCount > 0 Then
          ReDim PIDInd2(PCount - 1)
          'set last index to -1 so that we know when there was
          'no identification if it doesn't change
-         For i = 0 To PCount - 1
-             PIDInd2(i) = -1
-         Next i
+         For I = 0 To PCount - 1
+             PIDInd2(I) = -1
+         Next I
          
          mMatchStatsCount = 0
          'reserve initial space for 10000 identifications
          ReDim mUMCMatchStats(10000)
          
          'do identification pair by pair
-         For i = 0 To PCount - 1
+         For I = 0 To PCount - 1
              'do not try if pair already excluded
-             If GelP_D_L(CallerID).Pairs(i).STATE <> glPAIR_Exc Then
-                If i Mod 50 = 0 Then
-                    UpdateStatus "Searching: " & Trim(i) & " / " & Trim(PCount)
+             If GelP_D_L(CallerID).Pairs(I).STATE <> glPAIR_Exc Then
+                If I Mod 50 = 0 Then
+                    UpdateStatus "Searching: " & Trim(I) & " / " & Trim(PCount)
                 End If
                 If mKeyPressAbortProcess > 1 Then Exit For
-                SearchPairSingleMass (i)
+                SearchPairSingleMass (I)
              End If
-         Next i
+         Next I
          
          'truncate results
          If mMatchStatsCount > 0 Then
@@ -3093,7 +3104,7 @@ MsgBox tmp, vbOKOnly, glFGTU
 End Sub
 
 Private Sub mnuET_Click(Index As Integer)
-    Dim i As Long
+    Dim I As Long
     Dim intIndexToUse As Integer
     
     If GelData(CallerID).CustomNETsDefined Then
@@ -3140,14 +3151,14 @@ On Error Resume Next
          Exit Sub
       End If
     End Select
-    For i = mnuET.LBound To mnuET.UBound
-        If i = Index Then
-           mnuET(i).Checked = True
-           lblETType.Caption = "ET Type: " & mnuET(i).Caption
+    For I = mnuET.LBound To mnuET.UBound
+        If I = Index Then
+           mnuET(I).Checked = True
+           lblETType.Caption = "ET Type: " & mnuET(I).Caption
         Else
-           mnuET(i).Checked = False
+           mnuET(I).Checked = False
         End If
-    Next i
+    Next I
     Call txtNETFormula_LostFocus        'make sure expression evaluator is
                                         'initialized for this formula
 End Sub
@@ -3226,12 +3237,12 @@ Private Sub mnuPExcludeIdentified_Click()
 '----------------------------------------
 'exclude all identified pairs
 '----------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelP_D_L(CallerID)
-    For i = 0 To .PCnt - 1
-        If PIDCnt(i) > 0 Then .Pairs(i).STATE = glPAIR_Exc
-    Next i
+    For I = 0 To .PCnt - 1
+        If PIDCnt(I) > 0 Then .Pairs(I).STATE = glPAIR_Exc
+    Next I
 End With
 End Sub
 
@@ -3239,12 +3250,12 @@ Private Sub mnuPExcludeUnidentified_Click()
 '------------------------------------------
 'exclude all identified pairs
 '------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelP_D_L(CallerID)
-    For i = 0 To .PCnt - 1
-        If PIDCnt(i) <= 0 Then .Pairs(i).STATE = glPAIR_Exc
-    Next i
+    For I = 0 To .PCnt - 1
+        If PIDCnt(I) <= 0 Then .Pairs(I).STATE = glPAIR_Exc
+    Next I
 End With
 End Sub
 
@@ -3256,16 +3267,16 @@ Private Sub mnuPIncludeUnqIdentified_Click()
 '---------------------------------------------------
 'exclude everything that is not uniquelly identified
 '---------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelP_D_L(CallerID)
-    For i = 0 To .PCnt - 1
-        If PIDCnt(i) = 1 Then
-           .Pairs(i).STATE = glPAIR_Inc
+    For I = 0 To .PCnt - 1
+        If PIDCnt(I) = 1 Then
+           .Pairs(I).STATE = glPAIR_Inc
         Else
-           .Pairs(i).STATE = glPAIR_Exc
+           .Pairs(I).STATE = glPAIR_Exc
         End If
-    Next i
+    Next I
 End With
 End Sub
 

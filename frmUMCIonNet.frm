@@ -56,8 +56,8 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "lblFilterConnections"
-      Tab(1).Control(1)=   "Frame1"
+      Tab(1).Control(0)=   "Frame1"
+      Tab(1).Control(1)=   "lblFilterConnections"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
@@ -421,8 +421,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassMassTopX"
-            Tab(2).Control(1)=   "fraClassAbundanceTopX"
+            Tab(2).Control(0)=   "fraClassAbundanceTopX"
+            Tab(2).Control(1)=   "fraClassMassTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -2084,15 +2084,15 @@ Private Function ExportPeaksForUMCFinding(ByVal strOutputFolder As String, _
     
     Dim blnUseGenericNET As Boolean
     Dim blnExportPoint As Boolean
-    Dim blnIMSData As Boolean
+    Dim blnIMSDataPresent As Boolean
     
 On Error GoTo ExportPeaksForUMCFindingErrorHandler
 
     strBaseStatus = "Exporting loaded peaks to find LC-MS features with external application"
     ChangeStatus strBaseStatus
 
-    If ((GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA) Then
-        blnIMSData = True
+    If (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA Then
+        blnIMSDataPresent = True
     End If
     
     If Not GetDataInScope(ISInd(), DataCnt) Then
@@ -2132,7 +2132,7 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                  "mono_plus2_abundance" & COL_DELIMITER & _
                  "index"
     
-    If blnIMSData Then
+    If blnIMSDataPresent Then
         strLineOut = strLineOut & COL_DELIMITER & "ims_drift_time"
     End If
                  
@@ -2177,7 +2177,7 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
                                  Trim(.IntensityMonoPlus2) & COL_DELIMITER & _
                                  Trim(ISInd(lngIndex))
 
-                    If blnIMSData Then
+                    If blnIMSDataPresent Then
                         strLineOut = strLineOut & COL_DELIMITER & Trim(.IMSDriftTime)
                     End If
     
@@ -4328,6 +4328,8 @@ ChangeStatus " Error preparing optimization structures."
 End Function
 
 Private Sub ResetToDefaults()
+    Dim blnIMSDataPresent As Boolean
+    
     With glbPreferencesExpanded
         With .UMCIonNetOptions
             .ConnectionLengthPostFilterMaxNET = 0.2
@@ -4343,13 +4345,14 @@ Private Sub ResetToDefaults()
         
         .UMCDrawType = umcdt_ActualUMC
         
-        If (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA Then
+        blnIMSDataPresent = (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
+        If blnIMSDataPresent Then
             .UMCAutoRefineOptions.UMCAutoRefineRemoveCountLow = False
         End If
     End With
     
     SetDefaultUMCDef UMCDef
-    SetDefaultUMCIonNetDef MyDef, (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
+    SetDefaultUMCIonNetDef MyDef, blnIMSDataPresent
         
     DisplayCurrentOptions
     

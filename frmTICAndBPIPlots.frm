@@ -3,7 +3,7 @@ Begin VB.Form frmTICAndBPIPlots
    BackColor       =   &H00FFFFFF&
    Caption         =   "TIC and BPI Plots"
    ClientHeight    =   5805
-   ClientLeft      =   165
+   ClientLeft      =   225
    ClientTop       =   855
    ClientWidth     =   8625
    KeyPreview      =   -1  'True
@@ -605,7 +605,10 @@ On Error GoTo ComputeAndDisplayChromatogramErrorHandler
         If lngPointerIndex Mod 250 = 0 Then UpdateStatus "Preparing chromatograms: " & Trim(lngPointerIndex) & " / " & Trim(lngIsoCount)
     Next lngPointerIndex
     
-    If (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA And lngIsoCount > 0 Then
+    Dim blnIMSDataPresent As Boolean
+    blnIMSDataPresent = (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
+    
+    If blnIMSDataPresent And lngIsoCount > 0 Then
         ' Populate the IMS chromatograms
         ' First, pre-scan the data to determine the range of IMS Drift Times present
         

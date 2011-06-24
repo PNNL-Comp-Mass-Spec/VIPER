@@ -191,7 +191,7 @@ Private Function InterpolateY(ByRef sngInterpolatedIntensity As Single, ByVal X1
         sngInterpolatedIntensity = Y1 + (Y2 - Y1) * ((sngXValToInterpolate - X1) / lngScanDifference)
         InterpolateY = True
     Else
-        ' sngXValToInterpolate is not between X1 and X2; cannot interpolate
+        ' X1 and X2 are identical; cannot interpolate
         InterpolateY = False
     End If
 End Function

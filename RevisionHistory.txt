@@ -1,5 +1,13 @@
 VIPER Change Log
 
+Version 3.48 - Build 444; June 24, 2011
+	- New version of STAC that is purely C# and uses the OMICS library
+		- STACConsole.exe		
+	- Added support for peak matching using a Drift Time tolerance (in addition to Mass and NET tolerances)
+		- Searching with drift times is only enabled if the _Isos.csv file contains column drift_time
+		- Furthermore, this will only work if one or more peptides have conformer ID values and drift times associated with them
+			- Obtained by calling stored procedure GetMassTagsPlusConformers instead of GetMassTagsGANETParam
+
 Version 3.48 - Build 443; April 7, 2011
 	- Added support for loading data from column NET_Count from table AMT in a legacy MTDB (Microsoft Access file)
 		- Required since LCMSWarp uses counts from column MSMS_Obs_Count in table AMT while STAC uses counts from column NET_Count

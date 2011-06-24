@@ -4,48 +4,86 @@ Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Begin VB.Form frmSearchMT_ConglomerateUMC 
    BackColor       =   &H00FFFFFF&
    Caption         =   "Search MT tag DB - Single LC-MS Feature Mass"
-   ClientHeight    =   7725
+   ClientHeight    =   8385
    ClientLeft      =   60
    ClientTop       =   630
    ClientWidth     =   14025
    LinkTopic       =   "Form1"
-   ScaleHeight     =   7725
+   ScaleHeight     =   8385
    ScaleWidth      =   14025
    StartUpPosition =   1  'CenterOwner
+   Begin VB.Frame fraDriftTime 
+      BackColor       =   &H00FFFFFF&
+      Caption         =   "IMS Drift Time Tolerance"
+      Height          =   650
+      Left            =   0
+      TabIndex        =   35
+      Top             =   4500
+      Width           =   4215
+      Begin VB.TextBox txtDriftTimeTol 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   2880
+         TabIndex        =   38
+         Text            =   "1"
+         Top             =   240
+         Width           =   735
+      End
+      Begin VB.CheckBox chkUseDriftTime 
+         BackColor       =   &H00FFFFFF&
+         Caption         =   "Use drift time"
+         ForeColor       =   &H80000008&
+         Height          =   255
+         Left            =   120
+         TabIndex        =   36
+         Top             =   240
+         Width           =   1800
+      End
+      Begin VB.Label lblDriftTimeUnits 
+         BackColor       =   &H00E0E0E0&
+         BackStyle       =   0  'Transparent
+         Caption         =   "msec"
+         Height          =   255
+         Left            =   3720
+         TabIndex        =   39
+         Top             =   240
+         Width           =   855
+      End
+      Begin VB.Label lblDriftTimeTol 
+         BackColor       =   &H00E0E0E0&
+         BackStyle       =   0  'Transparent
+         Caption         =   "Tolerance"
+         Height          =   255
+         Left            =   2040
+         TabIndex        =   37
+         Top             =   240
+         Width           =   855
+      End
+   End
    Begin VB.TextBox txtSTACMatchStats 
       Height          =   525
       Left            =   60
       Locked          =   -1  'True
       MultiLine       =   -1  'True
-      TabIndex        =   70
-      Top             =   7100
+      TabIndex        =   75
+      Top             =   7695
       Width           =   7455
    End
    Begin VB.Frame fraSTACPlotOptions 
       BackColor       =   &H00FFFFFF&
       Caption         =   "STAC Plot Options"
-      Height          =   1695
+      Height          =   1575
       Left            =   11880
-      TabIndex        =   64
+      TabIndex        =   69
       Top             =   960
       Width           =   2055
-      Begin VB.CheckBox chkPlotUniqueAMTs 
-         BackColor       =   &H00FFFFFF&
-         Caption         =   "Unique AMTs"
-         Height          =   255
-         Left            =   120
-         TabIndex        =   71
-         Top             =   240
-         Value           =   1  'Checked
-         Width           =   1815
-      End
       Begin VB.CheckBox chkPlotUPFilteredFDR 
          BackColor       =   &H00FFFFFF&
          Caption         =   "&UP Filtered FDR"
          Height          =   255
          Left            =   120
-         TabIndex        =   65
-         Top             =   480
+         TabIndex        =   70
+         Top             =   240
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -54,8 +92,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "FDR Gridlines"
          Height          =   255
          Left            =   120
-         TabIndex        =   68
-         Top             =   1320
+         TabIndex        =   73
+         Top             =   1200
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -64,8 +102,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Matches Gridlines"
          Height          =   255
          Left            =   120
-         TabIndex        =   67
-         Top             =   1080
+         TabIndex        =   72
+         Top             =   960
          Width           =   1815
       End
       Begin VB.CheckBox chkSTACPlotXGridlines 
@@ -73,8 +111,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Vertical Gridlines"
          Height          =   255
          Left            =   120
-         TabIndex        =   66
-         Top             =   840
+         TabIndex        =   71
+         Top             =   720
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -83,7 +121,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "&Zoom Out"
       Height          =   375
       Left            =   11880
-      TabIndex        =   69
+      TabIndex        =   74
       Top             =   3000
       Width           =   1335
    End
@@ -91,14 +129,14 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Copy Stats"
       Height          =   375
       Left            =   11880
-      TabIndex        =   63
+      TabIndex        =   68
       Top             =   360
       Width           =   1335
    End
    Begin CWUIControlsLib.CWGraph ctlSTACStats 
       Height          =   3255
       Left            =   7800
-      TabIndex        =   62
+      TabIndex        =   67
       Top             =   3480
       Width           =   4095
       _Version        =   393218
@@ -450,7 +488,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
    Begin MSComctlLib.ListView lvwSTACStats 
       Height          =   3015
       Left            =   7800
-      TabIndex        =   61
+      TabIndex        =   66
       Top             =   360
       Width           =   3975
       _ExtentX        =   7011
@@ -518,8 +556,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Left            =   60
       Locked          =   -1  'True
       MultiLine       =   -1  'True
-      TabIndex        =   59
-      Top             =   6525
+      TabIndex        =   64
+      Top             =   7125
       Width           =   7455
    End
    Begin VB.TextBox txtDBSearchMinimumHighDiscriminantScore 
@@ -588,14 +626,14 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Modifications"
       Height          =   1575
       Left            =   0
-      TabIndex        =   35
-      Top             =   4560
+      TabIndex        =   40
+      Top             =   5160
       Width           =   7575
       Begin VB.TextBox txtDecoySearchNETWobble 
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   5640
-         TabIndex        =   52
+         TabIndex        =   57
          Text            =   "0.1"
          Top             =   1080
          Width           =   615
@@ -604,7 +642,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   315
          Left            =   3120
          Style           =   2  'Dropdown List
-         TabIndex        =   43
+         TabIndex        =   48
          ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0000
          Top             =   480
          Width           =   1095
@@ -613,7 +651,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   3120
-         TabIndex        =   45
+         TabIndex        =   50
          Text            =   "0"
          Top             =   1080
          Width           =   855
@@ -625,7 +663,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   855
          Index           =   47
          Left            =   6600
-         TabIndex        =   53
+         TabIndex        =   58
          Top             =   360
          Width           =   795
          Begin VB.OptionButton optN 
@@ -634,7 +672,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   0
             Left            =   120
-            TabIndex        =   55
+            TabIndex        =   60
             Top             =   240
             Value           =   -1  'True
             Width           =   700
@@ -645,7 +683,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   1
             Left            =   120
-            TabIndex        =   56
+            TabIndex        =   61
             Top             =   525
             Width           =   700
          End
@@ -655,7 +693,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   103
             Left            =   120
-            TabIndex        =   54
+            TabIndex        =   59
             Top             =   0
             Width           =   600
          End
@@ -667,7 +705,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Height          =   750
          Index           =   49
          Left            =   4480
-         TabIndex        =   46
+         TabIndex        =   51
          Top             =   240
          Width           =   1920
          Begin VB.OptionButton optDBSearchModType 
@@ -676,7 +714,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   2
             Left            =   1080
-            TabIndex        =   50
+            TabIndex        =   55
             ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":00D7
             Top             =   360
             Width           =   975
@@ -687,7 +725,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   1
             Left            =   120
-            TabIndex        =   49
+            TabIndex        =   54
             ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0174
             Top             =   480
             Value           =   -1  'True
@@ -699,7 +737,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   0
             Left            =   120
-            TabIndex        =   48
+            TabIndex        =   53
             ToolTipText     =   "Changes the mass of all loaded AMTs, adding the value specified by the modification mass"
             Top             =   240
             Width           =   750
@@ -710,7 +748,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
             Height          =   255
             Index           =   100
             Left            =   120
-            TabIndex        =   47
+            TabIndex        =   52
             Top             =   0
             Width           =   900
          End
@@ -719,7 +757,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   1680
-         TabIndex        =   41
+         TabIndex        =   46
          Text            =   "57.0215"
          Top             =   960
          Width           =   855
@@ -729,7 +767,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Alkylation"
          Height          =   255
          Left            =   1560
-         TabIndex        =   39
+         TabIndex        =   44
          ToolTipText     =   "Check to add the alkylation mass correction below to all MT Tag masses (added to each cys residue)"
          Top             =   360
          Width           =   1095
@@ -739,7 +777,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "ICAT d8"
          Height          =   255
          Left            =   240
-         TabIndex        =   38
+         TabIndex        =   43
          Top             =   1080
          Width           =   975
       End
@@ -748,7 +786,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "ICAT d0"
          Height          =   255
          Left            =   240
-         TabIndex        =   37
+         TabIndex        =   42
          Top             =   720
          Width           =   975
       End
@@ -757,7 +795,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "PEO"
          Height          =   255
          Left            =   240
-         TabIndex        =   36
+         TabIndex        =   41
          Top             =   360
          Width           =   855
       End
@@ -766,7 +804,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Decoy NET Wobble"
          Height          =   375
          Left            =   4560
-         TabIndex        =   51
+         TabIndex        =   56
          Top             =   1080
          Width           =   1095
       End
@@ -775,7 +813,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Residue to modify:"
          Height          =   255
          Left            =   3000
-         TabIndex        =   42
+         TabIndex        =   47
          Top             =   240
          Width           =   1335
       End
@@ -791,7 +829,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Mass (Da):"
          Height          =   255
          Left            =   3000
-         TabIndex        =   44
+         TabIndex        =   49
          Top             =   840
          Width           =   1095
       End
@@ -821,7 +859,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Alkylation mass:"
          Height          =   255
          Left            =   1560
-         TabIndex        =   40
+         TabIndex        =   45
          Top             =   720
          Width           =   1335
       End
@@ -840,7 +878,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          ForeColor       =   &H80000008&
          Height          =   255
          Left            =   2640
-         TabIndex        =   23
+         TabIndex        =   24
          Top             =   600
          Width           =   2400
       End
@@ -849,7 +887,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Use Class NET of LC-MS Features"
          Height          =   375
          Left            =   2640
-         TabIndex        =   26
+         TabIndex        =   23
          ToolTipText     =   $"frmSearchMT_ConglomerateUMC.frx":0206
          Top             =   180
          Width           =   1965
@@ -889,7 +927,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Begin VB.TextBox txtNETFormula 
          Height          =   285
          Left            =   120
-         TabIndex        =   25
+         TabIndex        =   26
          Text            =   "(FN-MinFN)/(MaxFN-MinFN)"
          Top             =   1020
          Width           =   2775
@@ -909,7 +947,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Formula  F(FN, MinFN, MaxFN)"
          Height          =   255
          Left            =   120
-         TabIndex        =   24
+         TabIndex        =   25
          Top             =   810
          Width           =   2415
       End
@@ -984,7 +1022,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "STAC Search Stats"
       Height          =   255
       Left            =   7800
-      TabIndex        =   60
+      TabIndex        =   65
       Top             =   120
       Width           =   2295
    End
@@ -1051,16 +1089,16 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "Generic NET"
       Height          =   255
       Left            =   5280
-      TabIndex        =   58
-      Top             =   6240
+      TabIndex        =   63
+      Top             =   6840
       Width           =   2175
    End
    Begin VB.Label lblStatus 
       BackStyle       =   0  'Transparent
       Height          =   255
       Left            =   120
-      TabIndex        =   57
-      Top             =   6240
+      TabIndex        =   62
+      Top             =   6840
       Width           =   4935
    End
    Begin VB.Label Label1 
@@ -1220,6 +1258,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Const NET_PRECISION As Integer = 5
+Private Const STAC_STATS_LISTVIEW_COLCOUNT_WITH_CONFORMERS As Integer = 9
 
 Const MOD_TKN_NONE As String = "none"
 Const MOD_TKN_PEO As String = "PEO"
@@ -1253,7 +1292,7 @@ Const MNG_START_SIZE As Long = 500
 
 Const NET_WOBBLE_SEED As Long = 1000
 
-Private Const STAC_APP_NAME As String = "STAC.exe"
+Private Const STAC_APP_NAME As String = "STACConsole.exe"          ' Changed from "STAC.exe" to "STACConsole.exe" in June 2011
 Private Const TEMP_FILE_FLAG As String = "FILE"
 Private Const TEMP_FOLDER_FLAG As String = "FOLDER"
 
@@ -1266,13 +1305,13 @@ Private OldSearchFlag As Long
 
 'for faster search mass array will be sorted; therefore all other arrays
 'has to be addressed indirectly (mMTNET(mMTInd(i))
-Private mMTCnt                  'count of masses to search
-Private mMTInd() As Long        'index(unique key)              ' 0-based array
-Private mMTOrInd() As Long      'index of original MT tag (in AMT array)
-Private mMTMWN14() As Double    'mass to look for N14
-Private mMTMWN15() As Double    'mass to look for N15
-Private mMTNET() As Double      'NET value
-Private mMTMods() As String     'modification description
+Private mMTCnt                      ' count of masses to search
+Private mMTInd() As Long            ' index(unique key)              ' 0-based array
+Private mMTOrInd() As Long          ' index of original MT tag (in AMT array)
+Private mMTMWN14() As Double        ' mass to look for N14
+Private mMTMWN15() As Double        ' mass to look for N15
+Private mMTNET() As Double          ' NET value
+Private mMTMods() As String         ' modification description
 
 Private MWFastSearch As MWUtil
 
@@ -1283,6 +1322,7 @@ Private AlkMWCorrection As Double
 Private N14N15 As Long                  ' SEARCH_N14 or SEARCH_N15
 Private SearchType As Long              ' SEARCH_ALL, SEARCH_PAIRED, SEARCH_NON_PAIRED, or SEARCH_PAIRED_PLUS_NON_PAIRED
 Private mMTListContains16O18OMods As Boolean            ' Set to True when the user enters a full-peptide modification of 4.0085 Da (+/- 0.01 Da)
+Private mMTListContainsConformers As Boolean            ' Set to True when we're searching against conformers AND samtDef.UseDriftTime = True
 Private mSearchRegionShape As srsSearchRegionShapeConstants
 
 Private LastSearchTypeN14N15 As Long
@@ -1351,15 +1391,35 @@ Private Enum eSearchModeConstants
     eSearchModePairedPlusUnpaired = 2
     eSearchModeNonPaired = 3
 End Enum
+
+Private Const MAX_STAC_RESULTS_COLUMN_INDEX = 8
+Private Enum srcSTACResultsColumnConstants
+    srcMassTagID = 0
+    srcConformationID = 1
+    srcFeatureID = 2
+    srcSTACScore = 3
+    srcMassError = 4
+    srcNETError = 5
+    srcDriftTimeError = 6
+    srcUniquenessProbability = 7
+    srcFeatureDriftTime = 8
+End Enum
+
+Private Const MAX_STAC_FDR_COLUMN_INDEX = 8
+Private Enum sfcSTACFDRColumnConstants
+    sfcSTACCutoff = 0
+    sfcUniqueAMTTags = 1
+    sfcUniqueConformers = 2
+    sfcErrors = 3
+    sfcFDR = 4
+    sfcUniqueAMTTagsUPpt5 = 5
+    sfcUniqueConformersUPpt5 = 6
+    sfcErrorsUPpt5 = 7
+    sfcFDRUPpt5 = 8
+End Enum
+
+
 '
-
-Public Property Get PlotUniqueAMTs() As Boolean
-    PlotUniqueAMTs = cChkBox(chkPlotUniqueAMTs)
-End Property
-Public Property Let PlotUniqueAMTs(Value As Boolean)
-    SetCheckBox chkPlotUniqueAMTs, Value
-End Property
-
 Public Property Get PlotUPFilteredFDR() As Boolean
     PlotUPFilteredFDR = cChkBox(chkPlotUPFilteredFDR)
 End Property
@@ -1402,6 +1462,7 @@ Public Property Let UseSTAC(ByVal Value As Boolean)
     glbPreferencesExpanded.UseSTAC = Value
 End Property
 
+' Update the members of the UMC at index ClsInd wit hthe matches in mCurrIDMatches
 Private Function AddCurrIDsToAllIDs(ClsInd As Long) As Boolean
     '---------------------------------------------------------------------------
     'returns True if successful; adds current identifications to list of all IDs
@@ -1437,6 +1498,7 @@ Private Function AddCurrIDsToAllIDs(ClsInd As Long) As Boolean
             .FDRThreshold = 1
             .IDIsInternalStd = mCurrIDMatches(lngIndex).IDIsInternalStd
             .MultiAMTHitCount = lngAMTHitCount
+            .DriftTimeAligned = mCurrIDMatches(lngIndex).FeatureDriftTimeAligned
         End With
     Next lngIndex
     
@@ -1450,23 +1512,58 @@ err_AddCurrIDsToAllIDs:
     
 End Function
 
+Private Function AddFileToDelete(ByVal strFilePath As String)
+    
+    If Not mTempFilesToDelete.Exists(strFilePath) Then
+        ' File doesn't exist at present, so we should delete it when we're done
+        mTempFilesToDelete.add strFilePath, TEMP_FILE_FLAG
+    End If
+
+End Function
+
+
 Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False)
+    Dim lngMinimumHeight As Long
     
     If blnSizeForSTACPlotSave Then
         Me.width = 15000
         Me.Height = 10000
     Else
+        If GelContainsIMSData() Then
+            fraDriftTime.Visible = True
+            fraMods.Top = fraDriftTime.Top + fraDriftTime.Height + 10
+            If Me.UseSTAC Then
+                lngMinimumHeight = 9250
+            Else
+                lngMinimumHeight = 8750
+            End If
+        Else
+            fraDriftTime.Visible = False
+            fraMods.Top = fraNET.Top + fraNET.Height + 10
+            If Me.UseSTAC Then
+                lngMinimumHeight = 8500
+            Else
+                lngMinimumHeight = 8000
+            End If
+        End If
+        
+        lblETType.Top = fraMods.Top + fraMods.Height + 105
+        lblStatus.Top = lblETType.Top
+        
+        txtUniqueMatchStats.Top = fraMods.Top + fraMods.Height + 390
+        txtSTACMatchStats.Top = txtUniqueMatchStats.Top + txtUniqueMatchStats.Height + 45
+
         If Me.UseSTAC And STACStatsCount > 0 Then
             If Me.width < 14150 Then
                 Me.width = 14150
             End If
             
-            If Me.Height < 9000 Then
-                Me.Height = 9000
+            If Me.Height < 9250 Then
+                Me.Height = lngMinimumHeight
             End If
         Else
             Me.width = 7800
-            Me.Height = 8000
+            Me.Height = lngMinimumHeight
             txtSTACMatchStats.Visible = False
         End If
     End If
@@ -1559,9 +1656,9 @@ On Error GoTo ComputePeptideLevelSTACFDRErrorHandler
             mUMCMatchStats(lngIndex).FDRThreshold = dblFDR(lngIndex)
         Next lngIndex
         
-        ' Count the number of features passing each FDR threshold
-        For lngIndex = 0 To mMatchStatsCount - 1
-        Next lngIndex
+        ' This code was never completed ... Count the number of features passing each FDR threshold
+        ''For lngIndex = 0 To mMatchStatsCount - 1
+        ''Next lngIndex
     End If
     
     ComputePeptideLevelSTACFDR = True
@@ -1674,6 +1771,10 @@ Private Sub DisplayCurrentSearchTolerances()
         Else
            txtNETTol.Text = ""
         End If
+        
+        SetCheckBox chkUseDriftTime, .UseDriftTime
+        txtDriftTimeTol.Text = .DriftTimeTol
+        
     End With
 End Sub
 
@@ -1737,7 +1838,11 @@ Private Function DisplayHitSummary(strSearchScope As String) As String
     If eInternalStdSearchMode <> issmFindOnlyMassTags Then
         strStats = strStats & "; Unique Int Stds = " & LongToStringWithCommas(mSearchSummaryStats.UniqueIntStdCount) & " / " & LongToStringWithCommas(UMCInternalStandards.Count)
     End If
-    
+
+    If mSearchSummaryStats.ConformerCount > 0 Then
+        strStats = strStats & "; Unique Conformers = " & LongToStringWithCommas(mSearchSummaryStats.ConformerCountIdentified) & " / " & LongToStringWithCommas(mSearchSummaryStats.ConformerCount)
+    End If
+
     strSTACStats = "Unique AMT count, 1% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount1PctFDR) & ";  " & _
                    "5% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount5PctFDR) & ";  " & _
                    "10% FDR: " & LongToStringWithCommas(mSearchSummaryStats.UniqueMTCount10PctFDR) & ";  " & _
@@ -2204,6 +2309,7 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
     Dim blnUMCMatchFound() As Boolean       ' 0-based array, used to keep track of whether or not the UMC matched any MT tags or Internal Standards
     Dim blnSetStateToOK As Boolean
     Dim blnOverrideMassNETTolerance As Boolean
+    Dim dblDriftTimeAligned As Double
     
     On Error GoTo err_ExportMTDBbyUMC
     
@@ -2235,14 +2341,18 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
     lngErrorNumber = AddEntryToMatchMakingDescriptionTableEx(cnNew, lngMDID, ExpAnalysisSPName, CallerID, _
                                                              lngMatchHitCount, mSearchUsedCustomNETs, _
                                                              blnSetStateToOK, strIniFileName, _
+                                                             mMTCnt, _
                                                              blnOverrideMassNETTolerance, _
                                                              mSearchSummaryStats.MassToleranceFromSTAC, _
                                                              mSearchSummaryStats.NETToleranceFromSTAC, _
+                                                             mSearchSummaryStats.DriftTimeToleranceFromSTAC, _
                                                              mSearchSummaryStats.UniqueMTCount1PctFDR, _
                                                              mSearchSummaryStats.UniqueMTCount5PctFDR, _
                                                              mSearchSummaryStats.UniqueMTCount10PctFDR, _
                                                              mSearchSummaryStats.UniqueMTCount25PctFDR, _
-                                                             mSearchSummaryStats.UniqueMTCount50PctFDR)
+                                                             mSearchSummaryStats.UniqueMTCount50PctFDR, _
+                                                             mSearchSummaryStats.DriftTimeAlignmentSlope, _
+                                                             mSearchSummaryStats.DriftTimeAlignmentIntercept)
     
     If lngErrorNumber <> 0 Then
         Debug.Assert False
@@ -2277,7 +2387,6 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
     ' Initialize the variables for accessing the AddFTICRUmcCSStats SP
     ExportMTDBInitializePutUMCCSStatsParams cnNew, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, ExpUMCCSStats
     
-    
     ' Initialize the PairIndex lookup objects
     blnPairsPresent = PairIndexLookupInitialize(CallerID, objP1IndFastSearch, objP2IndFastSearch)
     
@@ -2288,7 +2397,15 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
          NTypeStr = MOD_TKN_N15
     End Select
     
+    ' Initialize the drift time mapping
+    Dim dblDriftTimeMapOriginal() As Double
+    Dim dblDriftTimeMapAligned() As Double
+    Dim lngDriftTimeMapCount As Long
     
+    InitializeDriftTimeMapping dblDriftTimeMapOriginal, dblDriftTimeMapAligned, lngDriftTimeMapCount
+
+    Dim lngIndex As Long
+ 
     If GelData(CallerID).MostRecentSearchUsedSTAC Then
         ' Populate T_Match_Making_FDR
         Me.Caption = "Exporting STAC Stats to DB"
@@ -2322,6 +2439,7 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
         End If
         
         lngUMCIndexOriginal = mUMCMatchStats(lngPointer).UMCIndex
+        
         If lngUMCIndexOriginal <> lngUMCIndexOriginalLastStored Then
             ' Add a new row to T_FTICR_UMC_Results
             ' Note: If we searched only paired LC-MS Features, then record both members of the pairs and set lngPeakFPRType to FPR_Type_N14_N15_L
@@ -2370,8 +2488,18 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                             lngPeakFPRType = FPR_Type_N14_N15_H      ' Heavy member of pair
                         End If
                     End With
-                    
-                    ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, lngInternalStdMatchCount
+                        
+                    If mUMCMatchStats(lngPointer).DriftTimeAligned > 0 Then
+                        ' Simply use .DriftTimeAligned cached in mUMCMatchStats(lngPointer)
+                        dblDriftTimeAligned = mUMCMatchStats(lngPointer).DriftTimeAligned
+                    ElseIf lngDriftTimeMapCount > 0 Then
+                        dblDriftTimeAligned = LookupAlignedDriftTime(dblDriftTimeMapOriginal, dblDriftTimeMapAligned, lngDriftTimeMapCount, GelUMC(CallerID).UMCs(lngUMCIndexOriginal).DriftTime)
+                        Debug.Assert dblDriftTimeAligned = mUMCMatchStats(lngPointer).DriftTimeAligned
+                    Else
+                        dblDriftTimeAligned = 0
+                    End If
+
+                    ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, lngInternalStdMatchCount, dblDriftTimeAligned
                     blnUMCMatchFound(lngUMCIndexOriginal) = True
         
                     ' Populate array with return value
@@ -2392,7 +2520,10 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                         
                         ' Always export the other member of the pair, even if it has already been exported
                         ' Note that we do not record any MT tag hits for the other member of the pair
-                        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginalPairOther, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0
+                        
+                        dblDriftTimeAligned = LookupAlignedDriftTime(dblDriftTimeMapOriginal, dblDriftTimeMapAligned, lngDriftTimeMapCount, GelUMC(CallerID).UMCs(lngUMCIndexOriginalPairOther).DriftTime)
+                        
+                        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginalPairOther, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0, dblDriftTimeAligned
                         blnUMCMatchFound(lngUMCIndexOriginalPairOther) = True
                         
                     End With
@@ -2400,8 +2531,18 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                 Next lngPairMatchIndex
             Else
                 lngPeakFPRType = FPR_Type_Standard
-            
-                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, lngInternalStdMatchCount
+                
+                If mUMCMatchStats(lngPointer).DriftTimeAligned > 0 Then
+                    ' Simply use .DriftTimeAligned cached in mUMCMatchStats(lngPointer)
+                    dblDriftTimeAligned = mUMCMatchStats(lngPointer).DriftTimeAligned
+                ElseIf lngDriftTimeMapCount > 0 Then
+                    dblDriftTimeAligned = LookupAlignedDriftTime(dblDriftTimeMapOriginal, dblDriftTimeMapAligned, lngDriftTimeMapCount, GelUMC(CallerID).UMCs(lngUMCIndexOriginal).DriftTime)
+                    Debug.Assert dblDriftTimeAligned = mUMCMatchStats(lngPointer).DriftTimeAligned
+                Else
+                    dblDriftTimeAligned = 0
+                End If
+
+                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, lngInternalStdMatchCount, dblDriftTimeAligned
                 blnUMCMatchFound(lngUMCIndexOriginal) = True
         
                 udtPutUMCMatchParams.UMCResultsID.Value = FixNullLng(udtPutUMCParams.UMCResultsIDReturn.Value)
@@ -2481,12 +2622,15 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                                     End If
                                 End With
                                         
-                                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0
+                                dblDriftTimeAligned = LookupAlignedDriftTime(dblDriftTimeMapOriginal, dblDriftTimeMapAligned, lngDriftTimeMapCount, GelUMC(CallerID).UMCs(lngUMCIndex).DriftTime)
+                                
+                                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0, dblDriftTimeAligned
                             Next lngPairMatchIndex
                         Else
                             lngPeakFPRType = FPR_Type_Standard
-                        
-                            ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, 0
+                            dblDriftTimeAligned = LookupAlignedDriftTime(dblDriftTimeMapOriginal, dblDriftTimeMapAligned, lngDriftTimeMapCount, GelUMC(CallerID).UMCs(lngUMCIndex).DriftTime)
+                                
+                            ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, 0, dblDriftTimeAligned
                         End If
                             
                     End If
@@ -2596,15 +2740,25 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
         udtPutUMCMatchParams.MassTagMods.Value = strMassMods
         
         udtPutUMCMatchParams.DelMatchScore.Value = mUMCMatchStats(lngPointer).DelScore
-        udtPutUMCMatchParams.UniquenessProbability.Value = CSng(mUMCMatchStats(lngPointer).UniquenessProbability)
-        udtPutUMCMatchParams.FDRThreshold.Value = CSng(mUMCMatchStats(lngPointer).FDRThreshold)
+        
+        ' Use CSqlReal instead of CSng to avoid transport errors for values between 1E-45 and 1.1E-38
+        udtPutUMCMatchParams.UniquenessProbability.Value = CSqlReal(mUMCMatchStats(lngPointer).UniquenessProbability)
+        udtPutUMCMatchParams.FDRThreshold.Value = CSqlReal(mUMCMatchStats(lngPointer).FDRThreshold)
+        
+        If mMTListContainsConformers Then
+            If AMTData(lngMassTagIndexOriginal).Conformer_ID > 0 Then
+                udtPutUMCMatchParams.ConformerID.Value = AMTData(lngMassTagIndexOriginal).Conformer_ID
+            Else
+                ' Make sure ConformerID is null (in case previous matches had a non-zero value)
+                udtPutUMCMatchParams.ConformerID.Value = Null
+            End If
+        End If
         
         cmdPutNewUMCMatch.Execute
     
     End If
 
 End Function
-
  
 Private Sub ExportMTDBStoreSTACStats(ByRef cnNew As ADODB.Connection, ByVal lngMDID As Long)
 
@@ -2629,17 +2783,19 @@ On Error GoTo AddMatchMakingFDRRowErrorHandler
         ' Note: Dividing the FDR values by 100 prior to storing in the DB
         
         With STACStats(lngIndex)
-            udtStoreSTACStatsParams.STACCutoff = .STACCuttoff
+            udtStoreSTACStatsParams.STACCutoff = CSqlReal(.STACCuttoff)
             
             udtStoreSTACStatsParams.UniqueAMTs = .UniqueAMTs
-            udtStoreSTACStatsParams.FDR = .FDR / 100#
-            udtStoreSTACStatsParams.Matches = .Matches
-            udtStoreSTACStatsParams.Errors = .Errors
+            udtStoreSTACStatsParams.UniqueConformers = .UniqueConformers
+            
+            udtStoreSTACStatsParams.FDR = CSqlReal(.FDR / 100#)
+            udtStoreSTACStatsParams.Errors = CSqlReal(.Errors)
             
             udtStoreSTACStatsParams.UPFilteredUniqueAMTs = .UP_Filtered_UniqueAMTs
-            udtStoreSTACStatsParams.UPFilteredFDR = .UP_Filtered_FDR / 100#
-            udtStoreSTACStatsParams.UPFilteredMatches = .UP_Filtered_Matches
-            udtStoreSTACStatsParams.UPFilteredErrors = .UP_Filtered_Errors
+            udtStoreSTACStatsParams.UPFilteredUniqueConformers = .UP_Filtered_UniqueConformers
+            
+            udtStoreSTACStatsParams.UPFilteredFDR = CSqlReal(.UP_Filtered_FDR / 100#)
+            udtStoreSTACStatsParams.UPFilteredErrors = CSqlReal(.UP_Filtered_Errors)
             
         End With
         
@@ -2661,6 +2817,11 @@ AddMatchMakingFDRRowErrorHandler:
     
 End Sub
 
+Private Function GelContainsIMSData() As Boolean
+    ' Return True if IMS data is present
+    GelContainsIMSData = (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
+End Function
+
 Private Sub GenerateUniqueMatchStats()
     ' Determine the number of LC-MS Features with at least one match,
     ' the unique number of MT tags matched, and the unique number of Internal Standards matched
@@ -2680,13 +2841,16 @@ Private Sub GenerateUniqueMatchStats()
     Dim lngInternalStdIndexOriginal As Long
     Dim lngMassTagIndexPointer As Long
     Dim lngMassTagIndexOriginal As Long
-     
+    
 On Error GoTo GenerateUniqueMatchStatsErrorHandler
 
     With mSearchSummaryStats
         .UMCCountWithHits = 0
         .UniqueMTCount = 0
         .UniqueIntStdCount = 0
+        .ConformerCount = 0
+        .ConformerCountIdentified = 0
+        
         .UniqueMTCount1PctFDR = 0
         .UniqueMTCount5PctFDR = 0
         .UniqueMTCount10PctFDR = 0
@@ -2801,8 +2965,26 @@ On Error GoTo GenerateUniqueMatchStatsErrorHandler
         .UniqueMTCount10PctFDR = htMTHitList10Pct.Count
         .UniqueMTCount25PctFDR = htMTHitList25Pct.Count
         .UniqueMTCount50PctFDR = htMTHitList50Pct.Count
+        
+        ' Count the number of entries in the mMT arrays that point to an AMT tag that is a conformer
+        For lngIndex = 0 To mMTCnt - 1
+            If AMTData(mMTOrInd(lngIndex)).Conformer_ID > 0 Then
+                .ConformerCount = .ConformerCount + 1
+            End If
+        Next lngIndex
+            
+        ' Now count the number of AMTs that are a conformer and had a match
+        For lngIndex = 0 To UBound(blnPMTTagMatched)
+            If blnPMTTagMatched(lngIndex) Then
+                If AMTData(lngIndex).Conformer_ID > 0 Then
+                    .ConformerCountIdentified = .ConformerCountIdentified + 1
+                End If
+            End If
+        Next lngIndex
+    
     End With
     
+        
     Exit Sub
 
 GenerateUniqueMatchStatsErrorHandler:
@@ -2810,6 +2992,32 @@ GenerateUniqueMatchStatsErrorHandler:
     LogErrors Err.Number, "GenerateUniqueMatchStats"
     
 End Sub
+
+Private Function GetColumnValueDbl(ByRef strSplitLine() As String, ByRef intColumnMapping() As Integer, ByVal eColumn As srcSTACResultsColumnConstants) As Double
+    Dim Value As Double
+    Value = 0
+    
+    If intColumnMapping(eColumn) >= 0 Then
+        If IsNumeric(strSplitLine(intColumnMapping(eColumn))) Then
+            Value = CDbl(strSplitLine(intColumnMapping(eColumn)))
+        End If
+    End If
+    
+    GetColumnValueDbl = Value
+End Function
+
+Private Function GetColumnValueLng(ByRef strSplitLine() As String, ByRef intColumnMapping() As Integer, ByVal eColumn As srcSTACResultsColumnConstants) As Long
+    Dim Value As Long
+    Value = 0
+    
+    If intColumnMapping(eColumn) >= 0 Then
+        If IsNumeric(strSplitLine(intColumnMapping(eColumn))) Then
+            Value = CLng(strSplitLine(intColumnMapping(eColumn)))
+        End If
+    End If
+    
+    GetColumnValueLng = Value
+End Function
 
 Private Function GetDBSearchModeType() As Byte
     If optDBSearchModType(MODS_DECOY).Value Then
@@ -2832,9 +3040,7 @@ Private Function GetTempReportFilePath() As String
 
     strTempReportFilePath = GetTempFolder() & "VIPER_Report " & mSTACSessionID
     
-    If Not mTempFilesToDelete.Exists(strTempReportFilePath) Then
-        mTempFilesToDelete.add strTempReportFilePath, TEMP_FILE_FLAG
-    End If
+    AddFileToDelete strTempReportFilePath
 
     GetTempReportFilePath = strTempReportFilePath
     
@@ -2843,18 +3049,25 @@ End Function
 Public Sub GetSummaryStats(ByRef UMCCountWithHits As Long, _
                            ByRef UniqueMTCount As Long, _
                            ByRef UniqueIntStdCount As Long, _
+                           ByRef ConformerCount As Long, _
+                           ByRef ConformerCountIdentified As Long, _
                            ByRef UniqueMTCount1PctFDR As Long, _
                            ByRef UniqueMTCount5PctFDR As Long, _
                            ByRef UniqueMTCount10PctFDR As Long, _
                            ByRef UniqueMTCount25PctFDR As Long, _
                            ByRef UniqueMTCount50PctFDR As Long, _
                            ByRef MassToleranceFromSTAC As Double, _
-                           ByRef NETToleranceFromSTAC As Double)
+                           ByRef NETToleranceFromSTAC As Double, _
+                           ByRef DriftTimeToleranceFromSTAC As Double, _
+                           ByRef DriftTimeAlignmentSlope As Double, _
+                           ByRef DriftTimeAlignmentIntercept As Double)
                             
     With mSearchSummaryStats
         UMCCountWithHits = .UMCCountWithHits
         UniqueMTCount = .UniqueMTCount
         UniqueIntStdCount = .UniqueIntStdCount
+        ConformerCount = .ConformerCount
+        ConformerCountIdentified = .ConformerCountIdentified
         UniqueMTCount1PctFDR = .UniqueMTCount1PctFDR
         UniqueMTCount5PctFDR = .UniqueMTCount5PctFDR
         UniqueMTCount10PctFDR = .UniqueMTCount10PctFDR
@@ -2862,6 +3075,9 @@ Public Sub GetSummaryStats(ByRef UMCCountWithHits As Long, _
         UniqueMTCount50PctFDR = .UniqueMTCount50PctFDR
         MassToleranceFromSTAC = .MassToleranceFromSTAC
         NETToleranceFromSTAC = .NETToleranceFromSTAC
+        DriftTimeToleranceFromSTAC = .DriftTimeToleranceFromSTAC
+        DriftTimeAlignmentSlope = .DriftTimeAlignmentSlope
+        DriftTimeAlignmentIntercept = .DriftTimeAlignmentIntercept
     End With
     
 End Sub
@@ -2926,6 +3142,81 @@ With MyExprEva
     ReDim VarVals(1 To 3)
 End With
 End Function
+
+Private Sub InitializeDriftTimeMapping(ByRef dblDriftTimeMapOriginal() As Double, ByRef dblDriftTimeMapAligned() As Double, ByRef lngDriftTimeMapCount As Long)
+
+    Dim lngIndex As Long
+    Dim blnCreateDriftTimeMap As Boolean
+    
+    blnCreateDriftTimeMap = False
+    For lngIndex = 0 To mMatchStatsCount - 1
+        If mUMCMatchStats(lngIndex).DriftTimeAligned > 0 Then
+            blnCreateDriftTimeMap = True
+            Exit For
+        End If
+    Next lngIndex
+
+    If Not blnCreateDriftTimeMap Then
+        ReDim dblDriftTimeMapOriginal(0)
+        ReDim dblDriftTimeMapAligned(0)
+        lngDriftTimeMapCount = 0
+        Exit Sub
+    End If
+    
+    ' Populate two arrays with original and aligned drift times
+    ' Note: as of June 2011, the mapping from original to aligned values is a simple linear mapping
+    
+    ReDim dblDriftTimeMapOriginal(mMatchStatsCount - 1)
+    ReDim dblDriftTimeMapAligned(mMatchStatsCount - 1)
+    
+    lngDriftTimeMapCount = 0
+    For lngIndex = 0 To mMatchStatsCount - 1
+        If mUMCMatchStats(lngIndex).DriftTimeAligned > 0 Then
+            dblDriftTimeMapOriginal(lngDriftTimeMapCount) = GelUMC(CallerID).UMCs(mUMCMatchStats(lngIndex).UMCIndex).DriftTime
+            dblDriftTimeMapAligned(lngDriftTimeMapCount) = mUMCMatchStats(lngIndex).DriftTimeAligned
+            lngDriftTimeMapCount = lngDriftTimeMapCount + 1
+        End If
+    Next lngIndex
+    
+    If lngDriftTimeMapCount < mMatchStatsCount Then
+        ReDim Preserve dblDriftTimeMapOriginal(lngDriftTimeMapCount - 1)
+        ReDim Preserve dblDriftTimeMapAligned(lngDriftTimeMapCount - 1)
+    End If
+    
+    Dim objQSDoubleWithDouble As New QSDoubleWithDouble
+     
+    ' Sort the data in dblDriftTimeMapOriginal
+    If Not objQSDoubleWithDouble.QSAsc(dblDriftTimeMapOriginal, dblDriftTimeMapAligned) Then
+        Debug.Assert False
+        Exit Sub
+    End If
+    
+    ' Remove any duplicates in dblDriftTimeMapOriginal (copy in place)
+    Dim lngDataCountNew As Long
+    lngDataCountNew = 1
+    
+    For lngIndex = 1 To lngDriftTimeMapCount - 1
+        If dblDriftTimeMapOriginal(lngIndex) <> dblDriftTimeMapOriginal(lngDataCountNew - 1) Then
+            ' Keep this point
+            If lngDataCountNew <> lngIndex Then
+                dblDriftTimeMapOriginal(lngDataCountNew) = dblDriftTimeMapOriginal(lngIndex)
+                dblDriftTimeMapAligned(lngDataCountNew) = dblDriftTimeMapAligned(lngIndex)
+            End If
+            lngDataCountNew = lngDataCountNew + 1
+        Else
+            ' Skip this point
+        End If
+    Next lngIndex
+    
+    If lngDataCountNew < lngDriftTimeMapCount Then
+        lngDriftTimeMapCount = lngDataCountNew
+        ReDim Preserve dblDriftTimeMapOriginal(lngDriftTimeMapCount - 1)
+        ReDim Preserve dblDriftTimeMapAligned(lngDriftTimeMapCount - 1)
+    End If
+    
+End Sub
+    
+
 
 Private Function InitializeORFInfo(blnForceDataReload As Boolean) As Boolean
     ' Initializes objMTDBNameLookupClass
@@ -3033,6 +3324,7 @@ If bLoading Then
     Else         'have to have MT tag database loaded
         Call LoadMTDB
     End If
+    
     UpdateStatus "Generating LC-MS Feature statistics ..."
     ClsCnt = UMCStatistics1(CallerID, ClsStat())
     UpdateStatus "Pairs Count: " & GelP_D_L(CallerID).PCnt
@@ -3068,17 +3360,32 @@ Private Sub InitializeSTACStatsListView()
     
     lvwSTACStats.ColumnHeaders.add , , "Unique AMTs", 1200
     lvwSTACStats.ColumnHeaders.add , , "FDR %", 800
-    lvwSTACStats.ColumnHeaders.add , , "Matches", 900
     lvwSTACStats.ColumnHeaders.add , , "Errors", 900
     
     lvwSTACStats.ColumnHeaders.add , , "Unique AMTs, UP>0.5", 1400
     lvwSTACStats.ColumnHeaders.add , , "FDR %, UP>0.5", 1000
-    lvwSTACStats.ColumnHeaders.add , , "Matches, UP>0.5", 1100
     lvwSTACStats.ColumnHeaders.add , , "Errors, UP>0.5", 1100
     
+    ' Note: If you add more columns here, be sure to update STAC_STATS_LISTVIEW_COLCOUNT_WITH_CONFORMERS
 End Sub
 
-Private Function IsValidMatch(dblCurrMW As Double, AbsMWErr As Double, CurrScan As Long, dblMatchNET As Double, dblMatchMass As Double) As Boolean
+Private Function InterpolateY(ByRef dblInterpolatedValue As Double, ByVal X1 As Double, ByVal x2 As Double, ByVal Y1 As Double, ByVal Y2 As Double, ByVal dblXValToInterpolate As Double) As Boolean
+    ' Given two X,Y coordinates interpolate or extrapolate to determine the Y value that would be seen for a given X value
+
+    Dim dblXDifference As Double
+
+    dblXDifference = x2 - X1
+    If dblXDifference <> 0 Then
+        dblInterpolatedValue = Y1 + (Y2 - Y1) * ((dblXValToInterpolate - X1) / dblXDifference)
+        InterpolateY = True
+    Else
+        ' X1 and X2 are identical; cannot interpolate
+        InterpolateY = False
+    End If
+End Function
+
+Private Function IsValidMatch(ByVal dblCurrMW As Double, ByVal AbsMWErr As Double, ByVal CurrScan As Long, _
+                             ByVal dblMatchNET As Double, ByVal dblMatchMass As Double) As Boolean
     ' Checks if dblCurrMW is within tolerance of the given MT tag
     ' Also checks if the NET equivalent of CurrScan is within tolerance of the NET value for the given MT tag
     ' Returns True if both are within tolerance, false otherwise
@@ -3185,7 +3492,14 @@ Private Function LoadSTACLogFile(ByRef fso As FileSystemObject, _
     
     Dim strLineIn As String
     Dim strMessage As String
-   Dim dblValue As Double
+    Dim dblValue As Double
+    
+    Dim blnSuccess As Boolean
+    Dim strSTACTolerances As String
+    Dim strDriftTimeAlignment As String
+    
+    strSTACTolerances = ""
+    strDriftTimeAlignment = ""
    
 On Error GoTo LoadSTACLogFileErrorHandler
 
@@ -3201,8 +3515,6 @@ On Error GoTo LoadSTACLogFileErrorHandler
             strLineIn = ts.ReadLine
             
             If StartsWith(strLineIn, "Error") Then
-                Debug.Assert False
-                    
                 If lngErrorCount = 0 Then
                     AddToAnalysisHistory CallerID, "STAC log file contains error messages:"
                 End If
@@ -3211,25 +3523,79 @@ On Error GoTo LoadSTACLogFileErrorHandler
                 
                 lngErrorCount = lngErrorCount + 1
                 
-            ElseIf StartsWith(strLineIn, "ToleranceNET") Then
-                If LoadSTACLogFileGetValue(strLineIn, dblValue) Then
-                    mSearchSummaryStats.NETToleranceFromSTAC = dblValue
+                If lngErrorCount = 1 And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                    MsgBox "Error from STAC: " & strLineIn, vbExclamation + vbOKOnly, "Error from STAC"
                 End If
-                
+
             ElseIf StartsWith(strLineIn, "ToleranceMassPPM") Then
-                If LoadSTACLogFileGetValue(strLineIn, dblValue) Then
+                If LoadSTACLogFileGetValue(strLineIn, dblValue, ":") Then
                     mSearchSummaryStats.MassToleranceFromSTAC = dblValue
+                    strSTACTolerances = "STAC computed optimal tolerances: Mass = " & Format(dblValue, "0.0000") & " ppm"
                 End If
                 
+            ElseIf StartsWith(strLineIn, "ToleranceNET") Then
+                If LoadSTACLogFileGetValue(strLineIn, dblValue, ":") Then
+                    mSearchSummaryStats.NETToleranceFromSTAC = dblValue
+                    strSTACTolerances = strSTACTolerances & ", NET = " & Format(dblValue, "0.0000")
+                End If
+                
+            ElseIf StartsWith(strLineIn, "ToleranceDriftTime") Then
+                If LoadSTACLogFileGetValue(strLineIn, dblValue, ":") Then
+                    mSearchSummaryStats.DriftTimeToleranceFromSTAC = dblValue
+                    strSTACTolerances = strSTACTolerances & ", DriftTime = " & Format(dblValue, "0.0000")
+                End If
+                
+            ElseIf StartsWith(strLineIn, "STAC Version") Then
+                ' Extract the version, for example: 1.1.9317.33033
+                
+                Dim intCharIndex As Integer
+                             
+                intCharIndex = InStr(strLineIn, "started on")
+                If intCharIndex > 1 Then
+                    strLineIn = Trim(Mid(strLineIn, 1, intCharIndex - 1))
+                End If
+                
+                AddToAnalysisHistory CallerID, "... using " & strLineIn
+                
+            ElseIf StartsWith(strLineIn, vbTab & "Slope") Then
+                If LoadSTACLogFileGetValue(strLineIn, dblValue, "=") Then
+                    mSearchSummaryStats.DriftTimeAlignmentSlope = dblValue
+                    strDriftTimeAlignment = "STAC drift time alignment used Slope = " & Format(dblValue, "0.00000")
+                End If
+                
+            ElseIf StartsWith(strLineIn, vbTab & "Intercept") Then
+                If LoadSTACLogFileGetValue(strLineIn, dblValue, "=") Then
+                    mSearchSummaryStats.DriftTimeAlignmentIntercept = dblValue
+                    strDriftTimeAlignment = strDriftTimeAlignment & " and Intercept = " & Format(dblValue, "0.00000")
+                End If
+                
+            ElseIf lngErrorCount > 0 Then
+                If StartsWith(strLineIn, "   at ") Then
+                    ' This is a stack trace line; log it
+                    
+                    AddToAnalysisHistory CallerID, "  " & strLineIn
+                End If
+
             End If
             
         Loop
     
         ts.Close
         
+        If Len(strSTACTolerances) > 0 Then
+            AddToAnalysisHistory CallerID, strSTACTolerances
+        End If
+        
+        If Len(strDriftTimeAlignment) > 0 Then
+            AddToAnalysisHistory CallerID, strDriftTimeAlignment
+        End If
+         
+        blnSuccess = True
+    Else
+        blnSuccess = False
     End If
     
-    LoadSTACLogFile = True
+    LoadSTACLogFile = blnSuccess
     Exit Function
 
 LoadSTACLogFileErrorHandler:
@@ -3243,11 +3609,13 @@ LoadSTACLogFileErrorHandler:
     
 End Function
 
-Private Function LoadSTACLogFileGetValue(ByVal strText As String, ByRef dblValue As Double) As Boolean
+Private Function LoadSTACLogFileGetValue(ByVal strText As String, ByRef dblValue As Double, ByVal strSepChar As String) As Boolean
     Dim strSplitLine() As String
     
 On Error GoTo LoadSTACLogFileGetValueErrorHandler
-    strSplitLine = Split(strText, ":")
+    If strSepChar = "" Then strSepChar = ":"
+    
+    strSplitLine = Split(strText, strSepChar)
     
     If UBound(strSplitLine) > 0 Then
         If IsNumeric(strSplitLine(1)) Then
@@ -3279,7 +3647,10 @@ Private Function LoadSTACResults(ByRef fso As FileSystemObject, _
     Dim strMessage As String
     
     Dim strSplitLine() As String
-   
+    
+    Dim intColIndex As Integer
+    Dim intColumnMapping() As Integer
+    
     Dim lngUMCIndexSaved As Long
     
     Dim blnValidData As Boolean
@@ -3290,6 +3661,9 @@ Private Function LoadSTACResults(ByRef fso As FileSystemObject, _
     Dim dblMassError As Double
     Dim dblNETError As Double
     Dim dblUP As Double
+    Dim dblDriftTimeError As Double
+    Dim dblFeatureDriftTimeAligned As Double
+    Dim lngConformationID As Long
     
     Dim lngMemberIndex As Long
     Dim lngInternalStdIndexOriginal As Long
@@ -3315,6 +3689,12 @@ On Error GoTo LoadSTACResultsErrorHandler
         UpdateStatus "Error managing memory."
     End If
     
+    ' Initialize intColumnMapping
+    ReDim intColumnMapping(MAX_STAC_RESULTS_COLUMN_INDEX)
+    For intColIndex = 0 To MAX_STAC_RESULTS_COLUMN_INDEX
+        intColumnMapping(intColIndex) = -1
+    Next intColIndex
+    
     Set ts = fso.OpenTextFile(strSTACDataFilePath, ForReading, False)
    
     lngUMCIndexSaved = -1
@@ -3325,14 +3705,48 @@ On Error GoTo LoadSTACResultsErrorHandler
         If Len(strLineIn) > 0 Then
             strSplitLine = Split(strLineIn, ",")
              
-            If UBound(strSplitLine) >= 5 Then
-                blnValidData = LoadSTACResultsParseLine(strSplitLine, _
+            If lngLinesRead = 0 Then
+                ' This is the header line; parse out the columns that are present
+                For intColIndex = 0 To UBound(strSplitLine)
+                    Select Case strSplitLine(intColIndex)
+                    Case "MassTagID"
+                        intColumnMapping(srcSTACResultsColumnConstants.srcMassTagID) = intColIndex
+                    Case "ConformationID"   ' Optional
+                        intColumnMapping(srcSTACResultsColumnConstants.srcConformationID) = intColIndex
+                    Case "FeatureID"
+                        intColumnMapping(srcSTACResultsColumnConstants.srcFeatureID) = intColIndex
+                    Case "STAC_Score"
+                        intColumnMapping(srcSTACResultsColumnConstants.srcSTACScore) = intColIndex
+                    Case "Mass_Error"
+                        intColumnMapping(srcSTACResultsColumnConstants.srcMassError) = intColIndex
+                    Case "NET_Error"
+                        intColumnMapping(srcSTACResultsColumnConstants.srcNETError) = intColIndex
+                    Case "Drift_Time_Error" ' Optional
+                        intColumnMapping(srcSTACResultsColumnConstants.srcDriftTimeError) = intColIndex
+                    Case "Feature_Drift_Time" ' Optional
+                        intColumnMapping(srcSTACResultsColumnConstants.srcFeatureDriftTime) = intColIndex
+                    Case "UP"
+                        intColumnMapping(srcSTACResultsColumnConstants.srcUniquenessProbability) = intColIndex
+                    End Select
+                Next intColIndex
+                
+                If intColumnMapping(srcSTACResultsColumnConstants.srcDriftTimeError) >= 0 And intColumnMapping(srcSTACResultsColumnConstants.srcFeatureDriftTime) < 0 Then
+                    Debug.Print "Feature_Drift_Time column is missing; update your version of STACConsole.exe"
+                    Debug.Assert False
+                End If
+            Else
+                
+                blnValidData = LoadSTACResultsParseLine(intColumnMapping, _
+                                                        strSplitLine, _
                                                         lngMassTagID, _
                                                         lngUMCIndex, _
                                                         dblSTACScore, _
                                                         dblMassError, _
                                                         dblNETError, _
-                                                        dblUP)
+                                                        dblUP, _
+                                                        dblDriftTimeError, _
+                                                        dblFeatureDriftTimeAligned, _
+                                                        lngConformationID)
                 
                 If blnValidData Then
                                    
@@ -3367,7 +3781,19 @@ On Error GoTo LoadSTACResultsErrorHandler
                     mCurrIDMatches(mCurrIDCnt).StacOrSLiC = dblSTACScore
                     mCurrIDMatches(mCurrIDCnt).MassErr = dblMassError
                     mCurrIDMatches(mCurrIDCnt).NETErr = dblNETError
+                    mCurrIDMatches(mCurrIDCnt).DriftTimeErr = dblDriftTimeError
+                    
+                    mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned = dblFeatureDriftTimeAligned
+                    
+                    If Not mCurrIDMatches(mCurrIDCnt).IDIsInternalStd And samtDef.UseDriftTime Then
+                        lngMassTagIndexPointer = mMTInd(mCurrIDMatches(mCurrIDCnt).IDInd)
+                        lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
+                        
+                        Debug.Assert lngConformationID = AMTData(lngMassTagIndexOriginal).Conformer_ID
+                    End If
+                    
                     mCurrIDMatches(mCurrIDCnt).UniquenessProbability = dblUP
+
 
                     If mCurrIDMatches(mCurrIDCnt).IDIsInternalStd Then
                         lngInternalStdIndexOriginal = mInternalStdIndexPointers(mCurrIDMatches(mCurrIDCnt).IDInd)
@@ -3419,6 +3845,7 @@ On Error GoTo LoadSTACResultsErrorHandler
                    
                 End If
             End If
+            
         End If
     
         If lngLinesRead Mod 250 = 0 Then
@@ -3450,7 +3877,8 @@ End Function
 
 Private Function LoadSTACStats(ByRef fso As FileSystemObject, _
                                ByVal strSTACFDRFilePath As String) As Boolean
-
+    ' Read data from the _FDR.csv file
+    
     Dim ts As TextStream
     
     Dim lngLinesRead As Long
@@ -3459,24 +3887,33 @@ Private Function LoadSTACStats(ByRef fso As FileSystemObject, _
     Dim strMessage As String
     
     Dim strSplitLine() As String
+    Dim intColumnMapping() As Integer
+    Dim intColIndex As Integer
     
     Dim dblCutoff As Double
     
-    Dim lngMatches As Long
     Dim dblErrors As Double
     Dim dblFDR As Double
     Dim lngUniqueAMTs As Long
 
-    Dim lngUPFilteredMatches As Long
     Dim dblUPFilteredErrors As Double
     Dim dblUPFilteredFDR As Double
     Dim lngUniqueAMTsUPFiltered As Long
+    
+    Dim lngUniqueConformers As Long
+    Dim lngUPFilteredUniqueConformers As Long
     
     Dim blnValidData As Boolean
     
     Dim lstNewItem As MSComctlLib.ListItem
     
 On Error GoTo LoadSTACStatsErrorHandler
+    
+    ' Initialize
+    ReDim intColumnMapping(MAX_STAC_FDR_COLUMN_INDEX)
+    For intColIndex = 0 To MAX_STAC_FDR_COLUMN_INDEX
+        intColumnMapping(intColIndex) = -1
+    Next intColIndex
     
     UpdateStatus "Reading STAC FDR stats"
     
@@ -3493,44 +3930,81 @@ On Error GoTo LoadSTACStatsErrorHandler
         If Len(strLineIn) > 0 Then
             strSplitLine = Split(strLineIn, ",")
              
-            If UBound(strSplitLine) >= 3 Then
-                blnValidData = LoadSTACStatsParseLine(strSplitLine, _
-                                                      dblCutoff, _
-                                                      lngUniqueAMTs, _
-                                                      dblFDR, _
-                                                      lngMatches, _
-                                                      dblErrors, _
-                                                      lngUniqueAMTsUPFiltered, _
-                                                      dblUPFilteredFDR, _
-                                                      lngUPFilteredMatches, _
-                                                      dblUPFilteredErrors)
+            If lngLinesRead = 0 Then
+                ' This is the header line; parse out the columns that are present
+                For intColIndex = 0 To UBound(strSplitLine)
+                    Select Case strSplitLine(intColIndex)
+                    Case "STAC Cutoff"
+                        intColumnMapping(sfcSTACFDRColumnConstants.sfcSTACCutoff) = intColIndex
+                    Case "Unique AMT Tags"
+                        intColumnMapping(sfcSTACFDRColumnConstants.sfcUniqueAMTTags) = intColIndex
+                    Case "Errors"
+                        intColumnMapping(sfcSTACFDRColumnConstants.sfcErrors) = intColIndex
+                    Case "FDR (%)"
+                        intColumnMapping(sfcSTACFDRColumnConstants.sfcFDR) = intColIndex
+                    Case "Unique AMT Tags (UP>0.5)"
+                        intColumnMapping(sfcSTACFDRColumnConstants.sfcUniqueAMTTagsUPpt5) = intColIndex
+                    Case "Errors (UP>0.5)"
+                        intColumnMapping(sfcSTACFDRColumnConstants.sfcErrorsUPpt5) = intColIndex
+                    Case "FDR (%) (UP>0.5)"
+                        intColumnMapping(sfcSTACFDRColumnConstants.sfcFDRUPpt5) = intColIndex
+                    Case "Unique Conformers"                                ' Optional
+                        intColumnMapping(sfcSTACFDRColumnConstants.sfcUniqueConformers) = intColIndex
+                    Case "Unique Conformers (UP>0.5)"                       ' Optional
+                        intColumnMapping(sfcSTACFDRColumnConstants.sfcUniqueConformersUPpt5) = intColIndex
+                    End Select
+                Next intColIndex
                 
-                If blnValidData Then
-                    With STACStats(STACStatsCount)
-                        .STACCuttoff = dblCutoff
-                        .UniqueAMTs = lngUniqueAMTs
-                        .FDR = dblFDR
-                        .Matches = lngMatches
-                        .Errors = dblErrors
-                        .UP_Filtered_UniqueAMTs = lngUniqueAMTsUPFiltered
-                        .UP_Filtered_FDR = dblUPFilteredFDR
-                        .UP_Filtered_Matches = lngUPFilteredMatches
-                        .UP_Filtered_Errors = dblUPFilteredErrors
-                    End With
+            Else
+                 
+                If UBound(strSplitLine) >= 3 Then
+                    blnValidData = LoadSTACStatsParseLine(intColumnMapping, _
+                                                          strSplitLine, _
+                                                          dblCutoff, _
+                                                          lngUniqueAMTs, _
+                                                          dblFDR, _
+                                                          dblErrors, _
+                                                          lngUniqueAMTsUPFiltered, _
+                                                          dblUPFilteredFDR, _
+                                                          dblUPFilteredErrors, _
+                                                          lngUniqueConformers, _
+                                                          lngUPFilteredUniqueConformers)
                     
-                    Set lstNewItem = lvwSTACStats.ListItems.add(, , Round(dblCutoff, 2))
-                            
-                    lstNewItem.SubItems(1) = lngUniqueAMTs
-                    lstNewItem.SubItems(2) = Round(dblFDR, 2)
-                    lstNewItem.SubItems(3) = lngMatches
-                    lstNewItem.SubItems(4) = Round(dblErrors, 1)
-
-                    lstNewItem.SubItems(5) = lngUniqueAMTsUPFiltered
-                    lstNewItem.SubItems(6) = Round(dblUPFilteredFDR, 2)
-                    lstNewItem.SubItems(7) = lngUPFilteredMatches
-                    lstNewItem.SubItems(8) = Round(dblUPFilteredErrors, 1)
-
-                    STACStatsCount = STACStatsCount + 1
+                    If blnValidData Then
+                        With STACStats(STACStatsCount)
+                            .STACCuttoff = dblCutoff
+                            .UniqueAMTs = lngUniqueAMTs
+                            .UniqueConformers = lngUniqueConformers
+                            .FDR = dblFDR
+                            .Errors = dblErrors
+                            .UP_Filtered_UniqueAMTs = lngUniqueAMTsUPFiltered
+                            .UP_Filtered_FDR = dblUPFilteredFDR
+                            .UP_Filtered_Errors = dblUPFilteredErrors
+                            .UP_Filtered_UniqueConformers = lngUPFilteredUniqueConformers
+                        End With
+                        
+                        If CurrMTFilteringOptions.LoadConformers And lvwSTACStats.ColumnHeaders.Count < STAC_STATS_LISTVIEW_COLCOUNT_WITH_CONFORMERS Then
+                            lvwSTACStats.ColumnHeaders.add , , "Unique Conformers", 1200
+                            lvwSTACStats.ColumnHeaders.add , , "Unique Conformers, UP>0.5", 1500
+                        End If
+                        
+                        Set lstNewItem = lvwSTACStats.ListItems.add(, , Round(dblCutoff, 2))
+                                
+                        lstNewItem.SubItems(1) = lngUniqueAMTs
+                        lstNewItem.SubItems(2) = Round(dblFDR, 2)
+                        lstNewItem.SubItems(3) = Round(dblErrors, 1)
+    
+                        lstNewItem.SubItems(4) = lngUniqueAMTsUPFiltered
+                        lstNewItem.SubItems(5) = Round(dblUPFilteredFDR, 2)
+                        lstNewItem.SubItems(6) = Round(dblUPFilteredErrors, 1)
+    
+                        If CurrMTFilteringOptions.LoadConformers Then
+                            lstNewItem.SubItems(7) = lngUniqueConformers
+                            lstNewItem.SubItems(8) = lngUPFilteredUniqueConformers
+                        End If
+                        
+                        STACStatsCount = STACStatsCount + 1
+                    End If
                 End If
             End If
         End If
@@ -3554,13 +4028,17 @@ LoadSTACStatsErrorHandler:
     
 End Function
 
-Private Function LoadSTACResultsParseLine(ByRef strSplitLine() As String, _
+Private Function LoadSTACResultsParseLine(ByRef intColumnMapping() As Integer, _
+                                          ByRef strSplitLine() As String, _
                                           ByRef lngMassTagID As Long, _
                                           ByRef lngUMCIndex As Long, _
                                           ByRef dblSTACScore As Double, _
                                           ByRef dblMassError As Double, _
                                           ByRef dblNETError As Double, _
-                                          ByRef dblUP As Double) As Boolean
+                                          ByRef dblUP As Double, _
+                                          ByRef dblDriftTimeError As Double, _
+                                          ByRef dblFeatureDriftTimeAligned, _
+                                          ByRef lngConformationID As Long) As Boolean
     
     Dim blnValidData As Boolean
     
@@ -3568,15 +4046,17 @@ On Error GoTo LoadSTACResultsParseLineErrorHandler
                 
     If IsNumeric(strSplitLine(0)) Then
         ' Parse this line
-        ' Column order is:
-        ' MassTagID, FeatureID, STAC_Score, Mass_Error, NET_Error, UP
         
-        lngMassTagID = CLng(strSplitLine(0))
-        lngUMCIndex = CLng(strSplitLine(1))
-        dblSTACScore = CDbl(strSplitLine(2))
-        dblMassError = CDbl(strSplitLine(3))
-        dblNETError = CDbl(strSplitLine(4))
-        dblUP = CDbl(strSplitLine(5))           ' Uniqueness probability (like SLiC)
+        lngMassTagID = GetColumnValueLng(strSplitLine, intColumnMapping, srcSTACResultsColumnConstants.srcMassTagID)
+        lngUMCIndex = GetColumnValueLng(strSplitLine, intColumnMapping, srcSTACResultsColumnConstants.srcFeatureID)
+        
+        dblSTACScore = GetColumnValueDbl(strSplitLine, intColumnMapping, srcSTACResultsColumnConstants.srcSTACScore)
+        dblMassError = GetColumnValueDbl(strSplitLine, intColumnMapping, srcSTACResultsColumnConstants.srcMassError)
+        dblNETError = GetColumnValueDbl(strSplitLine, intColumnMapping, srcSTACResultsColumnConstants.srcNETError)
+        dblDriftTimeError = GetColumnValueDbl(strSplitLine, intColumnMapping, srcSTACResultsColumnConstants.srcDriftTimeError)
+        dblUP = GetColumnValueDbl(strSplitLine, intColumnMapping, srcSTACResultsColumnConstants.srcUniquenessProbability)
+        dblFeatureDriftTimeAligned = GetColumnValueDbl(strSplitLine, intColumnMapping, srcSTACResultsColumnConstants.srcFeatureDriftTime)
+        lngConformationID = GetColumnValueLng(strSplitLine, intColumnMapping, srcSTACResultsColumnConstants.srcConformationID)
         
         blnValidData = True
         
@@ -3593,16 +4073,17 @@ LoadSTACResultsParseLineErrorHandler:
         
 End Function
 
-Private Function LoadSTACStatsParseLine(ByRef strSplitLine() As String, _
+Private Function LoadSTACStatsParseLine(ByRef intColumnMapping() As Integer, _
+                                        ByRef strSplitLine() As String, _
                                         ByRef dblCutoff As Double, _
                                         ByRef lngUniqueAMTs As Long, _
                                         ByRef dblFDR As Double, _
-                                        ByRef lngMatches As Long, _
                                         ByRef dblErrors As Double, _
                                         ByRef lngUPFilteredUniqueAMTs As Long, _
                                         ByRef dblUPFilteredFDR As Double, _
-                                        ByRef lngUPFilteredMatches As Long, _
-                                        ByRef dblUPFilteredErrors As Double) As Boolean
+                                        ByRef dblUPFilteredErrors As Double, _
+                                        ByRef lngUniqueConformers As Long, _
+                                        ByRef lngUPFilteredUniqueConformers As Long) As Boolean
     
     Dim blnValidData As Boolean
     
@@ -3610,25 +4091,22 @@ On Error GoTo LoadSTACStatsParseLineErrorHandler
                 
     If IsNumeric(strSplitLine(0)) Then
         ' Parse this line
-        ' Column order is:
-        ' STAC Cutoff, Matches Errors,FDR (%),Matches (UP>0.5),Errors (UP>0.5),FDR (%) (UP>0.5,Unique AMT Tags, Unique AMT Tags (UP>0.5)
+        ' Old Column order: STAC Cutoff, Matches, Errors, FDR (%), Matches (UP>0.5), Errors (UP>0.5), FDR (%) (UP>0.5, Unique AMT Tags, Unique AMT Tags (UP>0.5)
+        ' New Column order: STAC Cutoff, Unique AMT Tags, Errors, FDR (%),Unique AMT Tags (UP>0.5), Errors (UP>0.5), FDR (%) (UP>0.5)
         
-        dblCutoff = CDbl(strSplitLine(0))
-        lngMatches = CLng(strSplitLine(1))
-        dblErrors = CDbl(strSplitLine(2))
-        dblFDR = CDbl(strSplitLine(3))
+        ' New Column order: STAC Cutoff, Unique AMT Tags, Unique Conformers, Errors, FDR (%),Unique AMT Tags (UP>0.5), Unique Conformers (UP>0.5), Errors (UP>0.5), FDR (%) (UP>0.5)
+        
+        dblCutoff = GetColumnValueDbl(strSplitLine, intColumnMapping, sfcSTACFDRColumnConstants.sfcSTACCutoff)
+        lngUniqueAMTs = GetColumnValueLng(strSplitLine, intColumnMapping, sfcSTACFDRColumnConstants.sfcUniqueAMTTags)
+        dblErrors = GetColumnValueDbl(strSplitLine, intColumnMapping, sfcSTACFDRColumnConstants.sfcErrors)
+        dblFDR = GetColumnValueDbl(strSplitLine, intColumnMapping, sfcSTACFDRColumnConstants.sfcFDR)
           
-        lngUPFilteredMatches = CLng(strSplitLine(4))
-        dblUPFilteredErrors = CDbl(strSplitLine(5))
-        dblUPFilteredFDR = CDbl(strSplitLine(6))
+        lngUPFilteredUniqueAMTs = GetColumnValueLng(strSplitLine, intColumnMapping, sfcSTACFDRColumnConstants.sfcUniqueAMTTagsUPpt5)
+        dblUPFilteredErrors = GetColumnValueDbl(strSplitLine, intColumnMapping, sfcSTACFDRColumnConstants.sfcErrorsUPpt5)
+        dblUPFilteredFDR = GetColumnValueDbl(strSplitLine, intColumnMapping, sfcSTACFDRColumnConstants.sfcFDRUPpt5)
         
-        If UBound(strSplitLine) >= 8 Then
-            lngUniqueAMTs = CLng(strSplitLine(7))
-            lngUPFilteredUniqueAMTs = CLng(strSplitLine(8))
-        Else
-            lngUniqueAMTs = 0
-            lngUPFilteredUniqueAMTs = 0
-        End If
+        lngUniqueConformers = GetColumnValueLng(strSplitLine, intColumnMapping, sfcSTACFDRColumnConstants.sfcUniqueConformers)
+        lngUPFilteredUniqueConformers = GetColumnValueLng(strSplitLine, intColumnMapping, sfcSTACFDRColumnConstants.sfcUniqueConformersUPpt5)
         
         blnValidData = True
     
@@ -3678,6 +4156,80 @@ Private Sub LoadSTACResultsUpdateUMC(ByVal lngUMCIndex As Long)
                         
 End Sub
 
+Private Function LookupAlignedDriftTime(ByRef dblDriftTimeMapOriginal() As Double, ByRef dblDriftTimeMapAligned() As Double, _
+                                        ByVal lngDriftTimeMapCount As Long, ByVal dblDriftTimeOld As Double) As Double
+
+        Dim lngThresholdPointIndex As Long
+        Dim dblAlignedDriftTime As Double
+        dblAlignedDriftTime = 0
+        
+        If lngDriftTimeMapCount < 1 Then
+            ' No data loaded to search; return 0
+            Debug.Assert False
+        Else
+            
+            ' Find the first point with a drift time <= dblDriftTimeOld
+            lngThresholdPointIndex = BinarySearchDblFindNearest(dblDriftTimeMapOriginal, dblDriftTimeOld, 0, lngDriftTimeMapCount - 1, False)
+    
+            If dblDriftTimeMapOriginal(lngThresholdPointIndex) = dblDriftTimeOld Then
+                ' Exact match found
+                
+                dblAlignedDriftTime = dblDriftTimeMapAligned(lngThresholdPointIndex)
+                
+            Else
+                ' Exact match not found (that's OK; we'll interpolate)
+                
+                ' How often does this happen?
+                Debug.Assert False
+                
+                If lngDriftTimeMapCount <= 1 Then
+                    ' Cannot interpolate since only one data point in dblDriftTimeMapOriginal
+                    Debug.Assert False
+                Else
+                    
+                    ' dblDriftTimeOld should be between data point lngThresholdPointIndex and lngThresholdPointIndex+1
+                    
+                    If lngThresholdPointIndex = lngDriftTimeMapCount - 1 Then
+                        ' Need to decrement lngDriftTimeMapCount by 1
+                        lngDriftTimeMapCount = lngDriftTimeMapCount - 1
+                    End If
+                    
+                    If lngDriftTimeMapCount < 0 Then lngDriftTimeMapCount = 0
+                    
+                    ' Interpolate drift times
+                    Dim X1 As Double
+                    Dim x2 As Double
+                    Dim Y1 As Double
+                    Dim Y2 As Double
+                    
+                    Dim dblInterpolatedValue As Double
+                    Dim blnSuccess As Boolean
+                    
+                    X1 = dblDriftTimeMapOriginal(lngThresholdPointIndex)
+                    Y1 = dblDriftTimeMapAligned(lngThresholdPointIndex)
+                    
+                    x2 = dblDriftTimeMapOriginal(lngThresholdPointIndex + 1)
+                    Y2 = dblDriftTimeMapAligned(lngThresholdPointIndex + 1)
+                    
+                    blnSuccess = InterpolateY(dblInterpolatedValue, X1, x2, Y1, Y2, dblDriftTimeOld)
+                    
+                    If blnSuccess Then
+                        dblAlignedDriftTime = dblInterpolatedValue
+                    Else
+                        ' Interpolation failed
+                        Debug.Assert False
+                        dblAlignedDriftTime = 0
+                    End If
+                    
+                End If
+            End If
+        End If
+        
+        LookupAlignedDriftTime = dblAlignedDriftTime
+        
+End Function
+
+        
 Private Function ManageCurrID(ByVal ManageType As Long) As Boolean
 On Error GoTo exit_ManageCurrID
 Select Case ManageType
@@ -3772,6 +4324,21 @@ On Error GoTo PerformSearchErrorHandler
             End If
         End If
     
+        If GelContainsIMSData() And samtDef.DriftTimeTol < DEFAULT_DRIFT_TIME_TOL Then
+            strMessage = "Warning: Drift Time tolerance of " & samtDef.DriftTimeTol & " is less than the suggested minimum when using STAC (" & DEFAULT_DRIFT_TIME_TOL & ")."
+            
+            eResponse = MsgBox("You are strongly encouraged to use a Drift Time tolerance of " & DEFAULT_DRIFT_TIME_TOL & " or more when using STAC.  Auto-update it now?", vbQuestion + vbYesNoCancel, glFGTU)
+            If eResponse = vbCancel Then
+                PerformSearch = 0
+                Exit Function
+            ElseIf eResponse = vbYes Then
+                txtDriftTimeTol.Text = DEFAULT_DRIFT_TIME_TOL
+                samtDef.DriftTimeTol = DEFAULT_DRIFT_TIME_TOL
+            Else
+                AddToAnalysisHistory CallerID, strMessage
+            End If
+        End If
+        
     End If
     
     mKeyPressAbortProcess = 0
@@ -3790,6 +4357,8 @@ On Error GoTo PerformSearchErrorHandler
         .UMCCountWithHits = 0
         .UniqueMTCount = 0
         .UniqueIntStdCount = 0
+        .ConformerCount = 0
+        .ConformerCountIdentified = 0
         .UniqueMTCount1PctFDR = 0
         .UniqueMTCount5PctFDR = 0
         .UniqueMTCount10PctFDR = 0
@@ -3797,6 +4366,9 @@ On Error GoTo PerformSearchErrorHandler
         .UniqueMTCount50PctFDR = 0
         .MassToleranceFromSTAC = 0
         .NETToleranceFromSTAC = 0
+        .DriftTimeToleranceFromSTAC = 0
+        .DriftTimeAlignmentSlope = 0
+        .DriftTimeAlignmentIntercept = 0
     End With
 
     Select Case eSearchMode
@@ -3942,6 +4514,7 @@ End Function
 Private Sub PickParameters()
 Call txtMWTol_LostFocus
 Call txtNETTol_LostFocus
+Call txtDriftTimeTol_LostFocus
 Call txtAlkylationMWCorrection_LostFocus
 Call txtNETFormula_LostFocus
 End Sub
@@ -4040,6 +4613,15 @@ Private Function PrepareMTArrays() As Boolean
     
     Dim dblNETWobbleDistance As Double
     
+    Dim blnRemoveDuplicateConformers As Boolean
+
+    Dim lngAMTIDList() As Long                      ' 0-based array
+    Dim blnAMTIDUsed() As Boolean               ' 0-based array; marked true when an AMT is used
+    Dim lngAMTIDListCount As Long
+    
+    Dim lngIndex As Long
+    Dim lngIndexMatch As Long
+    
     On Error GoTo err_PrepareMTArrays
     
     ' Update GelSearchDef(CallerID).AMTSearchMassMods with the current settings
@@ -4119,23 +4701,90 @@ Private Function PrepareMTArrays() As Boolean
     Else
        UpdateStatus "Preparing arrays for search..."
        
-       If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
+        If GelSearchDef(CallerID).AMTSearchMassMods.ModMode = 2 Then
             ' Call Rnd() with a negative number before calling Randomize() lngRandomNumberSeed in order to
             '  guarantee that we get the same order of random numbers each time
             Call Rnd(-1)
             
            Randomize NET_WOBBLE_SEED
-       End If
-             
-       'initially reserve space for AMTCnt peptides
-       ReDim mMTInd(AMTCnt - 1)
-       ReDim mMTOrInd(AMTCnt - 1)
-       ReDim mMTMWN14(AMTCnt - 1)
-       ReDim mMTMWN15(AMTCnt - 1)
-       ReDim mMTNET(AMTCnt - 1)
-       ReDim mMTMods(AMTCnt - 1)
+        End If
+        
+      
+        blnRemoveDuplicateConformers = False
+        If CurrMTFilteringOptions.LoadConformers Then
+            ' Conformers were loaded
+            If samtDef.UseDriftTime Then
+                mMTListContainsConformers = True
+            Else
+                ' However, we're not searching on drift time
+                ' Thus, we need to filter the loaded AMT tags
+                mMTListContainsConformers = False
+                blnRemoveDuplicateConformers = True
+            End If
+        Else
+            mMTListContainsConformers = False
+        End If
+        
+        If blnRemoveDuplicateConformers Then
+            ' Construct a unique list of AMT IDs
+            
+            ReDim lngAMTIDList(AMTCnt - 1)
+            lngAMTIDListCount = AMTCnt
+                
+            ' First make a list of all AMT IDs in AMTData
+            For lngIndex = 0 To lngAMTIDListCount - 1
+                lngAMTIDList(lngIndex) = AMTData(lngIndex + 1).ID        ' Note that AMTData() is a 1-based array
+            Next lngIndex
+            
+            ' Next sort lngAMTIDList
+            Dim objQSLong As New QSLong
+            Dim EmptyArray() As Long            ' Empty array; required for call to .QSAsc()
+                
+            If objQSLong.QSAsc(lngAMTIDList(), EmptyArray()) Then
+                ' All is fine
+                ' Now step through lngAMTIDList() and condense it (copy in place)
+            
+                lngAMTIDListCount = 1
+                For lngIndex = 1 To AMTCnt - 1
+                    If lngAMTIDList(lngIndex) <> lngAMTIDList(lngAMTIDListCount - 1) Then
+                        ' Keep this point
+                        If lngAMTIDListCount <> lngIndex Then
+                            lngAMTIDList(lngAMTIDListCount) = lngAMTIDList(lngIndex)
+                        End If
+                        lngAMTIDListCount = lngAMTIDListCount + 1
+                    Else
+                        ' Skip this point
+                    End If
+                Next lngIndex
+                                        
+                ReDim blnAMTIDUsed(lngAMTIDListCount - 1)
+                   
+                Dim strMessage As String
+                strMessage = "Conformers were loaded into memory, but drift time is not being considered during peak matching.  Condensed list of AMTs from " & Format(AMTCnt, "#,##0") & " entries to " & Format(lngAMTIDListCount, "#,##0") & " entries"
+                AddToAnalysisHistory CallerID, strMessage
+                   
+            Else
+                ' Sort failed; this is unexpected
+                Debug.Assert False
+                LogErrors 0, "PrepareMTArrays", "objQSLong.QSAsc returned false sorting lngAMTIDList", CallerID
+                
+                ReDim blnAMTIDUsed(AMTCnt - 1)
+            
+            End If
+        End If
+        
+        ' Initially reserve space for AMTCnt peptides
+        ReDim mMTInd(AMTCnt - 1)
+        ReDim mMTOrInd(AMTCnt - 1)
+        ReDim mMTMWN14(AMTCnt - 1)
+        ReDim mMTMWN15(AMTCnt - 1)
+        ReDim mMTNET(AMTCnt - 1)
+        ReDim mMTMods(AMTCnt - 1)
+        
+        ' Note: Data in AMTData() is typically sorted by monoisotopic mass, and then by Mass_Tag_ID, but there is no guarantee of this
        mMTCnt = 0
        For i = 1 To AMTCnt
+            
             If mMTMinimumHighNormalizedScore > 0 Or mMTMinimumHighDiscriminantScore > 0 Or mMTMinimumPeptideProphetProbability > 0 Then
                 If AMTData(i).HighNormalizedScore >= mMTMinimumHighNormalizedScore And _
                    AMTData(i).HighDiscriminantScore >= mMTMinimumHighDiscriminantScore And _
@@ -4147,6 +4796,22 @@ Private Function PrepareMTArrays() As Boolean
             Else
                 blnAddMassTag = True
             End If
+            
+            If blnAddMassTag And blnRemoveDuplicateConformers Then
+                ' Check whether we have already added this AMT
+                lngIndexMatch = BinarySearchLng(lngAMTIDList, AMTData(i).ID, 0, lngAMTIDListCount - 1)
+                If lngIndexMatch < 0 Then
+                    ' This is unexpected
+                    Debug.Assert False
+                Else
+                    If blnAMTIDUsed(lngIndexMatch) Then
+                        blnAddMassTag = False
+                    Else
+                        blnAMTIDUsed(lngIndexMatch) = True
+                    End If
+                End If
+            End If
+            
             
             If blnAddMassTag Then
                 mMTCnt = mMTCnt + 1
@@ -4163,7 +4828,11 @@ Private Function PrepareMTArrays() As Boolean
                 mMTMods(mMTCnt - 1) = ""
             End If
        Next i
-       
+      
+       If blnRemoveDuplicateConformers Then
+            Debug.Assert mMTCnt <= lngAMTIDListCount
+       End If
+      
        If chkPEO.Value = vbChecked Then         'correct based on cys number for PEO label
           UpdateStatus "Adding PEO labeled peptides..."
           TmpCnt = mMTCnt
@@ -4401,29 +5070,29 @@ Private Function PrepareMTArrays() As Boolean
           Next i
        End If
        
-       If mMTCnt > 0 Then
-          UpdateStatus "Preparing fast search structures..."
-          ReDim Preserve mMTInd(mMTCnt - 1)
-          ReDim Preserve mMTOrInd(mMTCnt - 1)
-          ReDim Preserve mMTMWN14(mMTCnt - 1)
-          ReDim Preserve mMTMWN15(mMTCnt - 1)
-          ReDim Preserve mMTNET(mMTCnt - 1)
-          ReDim Preserve mMTMods(mMTCnt - 1)
-          Select Case N14N15
-          Case SEARCH_N14
-               If Not PrepareSearchN14() Then
-                  Debug.Assert False
-                  Call DestroySearchStructures
-                  Exit Function
-               End If
-          Case SEARCH_N15
-               If Not PrepareSearchN15() Then
-                  Debug.Assert False
-                  Call DestroySearchStructures
-                  Exit Function
-               End If
-          End Select
-       End If
+        If mMTCnt > 0 Then
+            UpdateStatus "Preparing fast search structures..."
+            ReDim Preserve mMTInd(mMTCnt - 1)
+            ReDim Preserve mMTOrInd(mMTCnt - 1)
+            ReDim Preserve mMTMWN14(mMTCnt - 1)
+            ReDim Preserve mMTMWN15(mMTCnt - 1)
+            ReDim Preserve mMTNET(mMTCnt - 1)
+            ReDim Preserve mMTMods(mMTCnt - 1)
+            Select Case N14N15
+            Case SEARCH_N14
+                 If Not PrepareSearchN14() Then
+                    Debug.Assert False
+                    Call DestroySearchStructures
+                    Exit Function
+                 End If
+            Case SEARCH_N15
+                 If Not PrepareSearchN15() Then
+                    Debug.Assert False
+                    Call DestroySearchStructures
+                    Exit Function
+                 End If
+            End Select
+        End If
     End If
     
     If Not PrepareSearchInternalStandards() Then
@@ -4534,7 +5203,9 @@ Private Sub RecordSearchResultsInData()
     Dim lngMassTagIndexOriginal As Long                 'absolute index in AMT... arrays
     Dim lngInternalStdIndexOriginal As Long
     Dim lngIonIndexOriginal As Long
+    
     Dim blnAddRef As Boolean
+    
     Dim lngIonCountUpdated As Long
     
     Dim AMTorInternalStdRef As String
@@ -4544,7 +5215,15 @@ Private Sub RecordSearchResultsInData()
     Dim dblDelScore As Double
     Dim dblUPScore As Double
     
+    Dim blnDriftTimesWereUsed As Boolean
+    Dim blnIncludeDriftTimeError As Boolean
+    Dim sngDriftTimeCorrectionFromSTAC As Single
+    
     Dim CurrScan As Long
+    
+    Dim CurrDriftTime As Single
+    Dim sngMatchDriftTime As Single
+    Dim sngDriftTimeError As Single
      
     'always reinitialize statistics arrays
     InitAMTStat
@@ -4555,6 +5234,12 @@ Private Sub RecordSearchResultsInData()
 
 On Error GoTo RecordSearchResultsInDataErrorHandler
 
+    If samtDef.UseDriftTime And samtDef.DriftTimeTol >= 0 Then
+        blnDriftTimesWereUsed = True
+    Else
+        blnDriftTimesWereUsed = False
+    End If
+    
     With GelData(CallerID)
         For lngIndex = 0 To mMatchStatsCount - 1
             If lngIndex Mod 50 = 0 Then
@@ -4568,6 +5253,8 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                 lngInternalStdIndexOriginal = mInternalStdIndexPointers(mUMCMatchStats(lngIndex).IDIndex)
                 dblMatchMass = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).MonoisotopicMass
                 dblMatchNET = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).NET
+                sngMatchDriftTime = 0
+                blnIncludeDriftTimeError = False
             Else
                 lngMassTagIndexPointer = mMTInd(mUMCMatchStats(lngIndex).IDIndex)
                 lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
@@ -4580,6 +5267,19 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                     dblMatchMass = mMTMWN15(mUMCMatchStats(lngIndex).IDIndex)
                 End If
                 dblMatchNET = AMTData(lngMassTagIndexOriginal).NET
+                sngMatchDriftTime = CSng(AMTData(lngMassTagIndexOriginal).Drift_Time_Avg)
+                blnIncludeDriftTimeError = blnDriftTimesWereUsed
+                    
+                If mUMCMatchStats(lngIndex).DriftTimeAligned > 0 Then
+                    ' Compute the distance that drift times tracked by VIPER need to be shifted to obtain the correct drift time relative to the AMT tags in memory
+                    sngDriftTimeCorrectionFromSTAC = mUMCMatchStats(lngIndex).DriftTimeAligned - GelUMC(CallerID).UMCs(lngUMCIndexOriginal).DriftTime
+                Else
+                    ' This should typically only happen if blnDriftTimesWereUsed is false
+                    Debug.Assert blnDriftTimesWereUsed = False
+                    
+                    sngDriftTimeCorrectionFromSTAC = 0
+                End If
+                
             End If
             
             dblStacOrSLiC = mUMCMatchStats(lngIndex).StacOrSLiC
@@ -4595,6 +5295,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                 Case glCSType
                     dblCurrMW = .CSData(lngIonIndexOriginal).AverageMW
                     CurrScan = .CSData(lngIonIndexOriginal).ScanNumber
+                    
                     Select Case samtDef.TolType
                     Case gltPPM
                        AbsMWErr = dblCurrMW * samtDef.MWTol * glPPM
@@ -4604,10 +5305,17 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                        Debug.Assert False
                     End Select
                     
+                    If blnIncludeDriftTimeError Then
+                        CurrDriftTime = .CSData(lngIonIndexOriginal).IMSDriftTime + sngDriftTimeCorrectionFromSTAC
+                        sngDriftTimeError = CurrDriftTime - sngMatchDriftTime
+                    Else
+                        sngDriftTimeError = 0
+                    End If
+                    
                     If mUMCMatchStats(lngIndex).IDIsInternalStd Then
                         AMTorInternalStdRef = ConstructInternalStdReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(CLng(.CSData(lngIonIndexOriginal).ScanNumber)), lngInternalStdIndexOriginal, dblStacOrSLiC, dblDelScore, dblUPScore)
                     Else
-                        AMTorInternalStdRef = ConstructAMTReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(CLng(.CSData(lngIonIndexOriginal).ScanNumber)), 0, lngMassTagIndexOriginal, dblMatchMass, dblStacOrSLiC, dblDelScore, dblUPScore)
+                        AMTorInternalStdRef = ConstructAMTReference(.CSData(lngIonIndexOriginal).AverageMW, ConvertScanToNET(CLng(.CSData(lngIonIndexOriginal).ScanNumber)), 0, lngMassTagIndexOriginal, dblMatchMass, dblStacOrSLiC, dblDelScore, dblUPScore, mMTListContainsConformers, blnIncludeDriftTimeError, sngDriftTimeError)
                     End If
                     
                     If Len(.CSData(lngIonIndexOriginal).MTID) = 0 Then
@@ -4633,6 +5341,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                 Case glIsoType
                     dblCurrMW = GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField)
                     CurrScan = .IsoData(lngIonIndexOriginal).ScanNumber
+                    
                     Select Case samtDef.TolType
                     Case gltPPM
                        AbsMWErr = dblCurrMW * samtDef.MWTol * glPPM
@@ -4641,11 +5350,18 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                     Case Else
                        Debug.Assert False
                     End Select
+                    
+                    If blnIncludeDriftTimeError Then
+                        CurrDriftTime = .IsoData(lngIonIndexOriginal).IMSDriftTime + sngDriftTimeCorrectionFromSTAC
+                        sngDriftTimeError = CurrDriftTime - sngMatchDriftTime
+                    Else
+                        sngDriftTimeError = 0
+                    End If
 
                     If mUMCMatchStats(lngIndex).IDIsInternalStd Then
                         AMTorInternalStdRef = ConstructInternalStdReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), lngInternalStdIndexOriginal, dblStacOrSLiC, dblDelScore, dblUPScore)
                     Else
-                        AMTorInternalStdRef = ConstructAMTReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblMatchMass, dblStacOrSLiC, dblDelScore, dblUPScore)
+                        AMTorInternalStdRef = ConstructAMTReference(GetIsoMass(.IsoData(lngIonIndexOriginal), samtDef.MWField), ConvertScanToNET(.IsoData(lngIonIndexOriginal).ScanNumber), 0, lngMassTagIndexOriginal, dblMatchMass, dblStacOrSLiC, dblDelScore, dblUPScore, mMTListContainsConformers, blnIncludeDriftTimeError, sngDriftTimeError)
                     End If
                     
                     ' Only add AMTorInternalStdRef if .MTID does not contain it
@@ -4907,6 +5623,13 @@ If ManageCurrID(MNG_RESET) Then
         End Select
     End If
     
+    Dim dblDriftTimeTol
+    If GelContainsIMSData() And samtDef.UseDriftTime Then
+        dblDriftTimeTol = samtDef.DriftTimeTol
+    Else
+        dblDriftTimeTol = -1
+    End If
+    
     ' Define the tolerances
     SearchAMTDefineTolerances CallerID, ClassInd, samtDef, dblClassMass, MWTolAbsBroad, NETTolBroad, MWTolAbsFinal, NETTolFinal
     
@@ -4921,7 +5644,7 @@ If ManageCurrID(MNG_RESET) Then
     If blnProceed Then
         If eInternalStdSearchMode <> issmFindOnlyInternalStandards Then
             ' Search for the MT tags using broad tolerances
-            SearchUMCSingleMassAMT GelUMC(CallerID).UMCs(ClassInd), MWTolAbsBroad, NETTolBroad
+            SearchUMCSingleMassAMT GelUMC(CallerID).UMCs(ClassInd), MWTolAbsBroad, NETTolBroad, dblDriftTimeTol
         End If
         ' MassTagHitCount holds the number of matching MT tags, excluding Internal Standards
         MassTagHitCount = mCurrIDCnt
@@ -4932,7 +5655,7 @@ If ManageCurrID(MNG_RESET) Then
     
     If eInternalStdSearchMode <> issmFindOnlyMassTags Then
         ' Search for Internal Standards using broad tolerances
-        SearchUMCSingleMassInternalStd GelUMC(CallerID).UMCs(ClassInd), MWTolAbsBroad, NETTolBroad
+        SearchUMCSingleMassInternalStd GelUMC(CallerID).UMCs(ClassInd), MWTolAbsBroad, NETTolBroad, dblDriftTimeTol
     End If
      
     If mCurrIDCnt > 0 Then
@@ -4972,14 +5695,15 @@ err_SearchUMCSingleMass:
     SearchUMCSingleMass = -1
 End Function
 
-Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTol As Double, ByVal dblNETTol As Double)
+Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTol As Double, ByVal dblNETTol As Double, ByVal dblDriftTimeTol As Double)
     ' Compare this LC-MS Feature's mass, NET, and charge with the MT tags
 
     Dim FastSearchMatchInd As Long
     Dim MatchInd1 As Long, MatchInd2 As Long
     
-    Dim dblMassTagMass As Double
-    Dim dblMassTagNET As Double
+    Dim dblAMTMass As Double
+    Dim dblAMTNET As Double
+    Dim dblAMTDriftTime As Double
 
     ' Only need to call MWFastSearch once, sending it udtTestUMC.ClassMW
     MatchInd1 = 0
@@ -4991,10 +5715,13 @@ Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTo
             ' Now test each MT tag with dblMWTol and dblNETTol and record the matches
             For FastSearchMatchInd = MatchInd1 To MatchInd2
                 
-                dblMassTagMass = MWFastSearch.GetMWByIndex(FastSearchMatchInd)
-                dblMassTagNET = mMTNET(mMTInd(FastSearchMatchInd))
+                dblAMTMass = MWFastSearch.GetMWByIndex(FastSearchMatchInd)
+                dblAMTNET = mMTNET(mMTInd(FastSearchMatchInd))
+                If dblDriftTimeTol > 0 Then
+                    dblAMTDriftTime = AMTData(mMTOrInd(mMTInd(FastSearchMatchInd))).Drift_Time_Avg
+                End If
                 
-                SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, udtTestUMC, dblMassTagMass, dblMassTagNET, False
+                SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, dblDriftTimeTol, udtTestUMC, dblAMTMass, dblAMTNET, dblAMTDriftTime, False
             
             Next FastSearchMatchInd
         End If
@@ -5002,7 +5729,7 @@ Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTo
 
 End Sub
 
-Private Sub SearchUMCSingleMassInternalStd(ByRef udtTestUMC As udtUMCType, ByVal dblMWTol As Double, ByVal dblNETTol As Double)
+Private Sub SearchUMCSingleMassInternalStd(ByRef udtTestUMC As udtUMCType, ByVal dblMWTol As Double, ByVal dblNETTol As Double, ByVal dblDriftTimeTol As Double)
     ' Compare this LC-MS Feature's mass, NET, and charge with the Internal Standard in UMCInternalStandards
 
     Dim FastSearchMatchInd As Long
@@ -5024,7 +5751,9 @@ Private Sub SearchUMCSingleMassInternalStd(ByRef udtTestUMC As udtUMCType, ByVal
                 udtInternalStd = UMCInternalStandards.InternalStandards(mInternalStdIndexPointers(FastSearchMatchInd))
                    
                 If SearchUMCTestCharge(udtTestUMC.ClassRepType, udtTestUMC.ClassRepInd, udtInternalStd) Then
-                    SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, udtTestUMC, udtInternalStd.MonoisotopicMass, udtInternalStd.NET, True
+                    'dblInternalStandardDriftTime = ??
+                    'SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, dblDriftTimeTol, udtTestUMC, udtInternalStd.MonoisotopicMass, udtInternalStd.NET, dblInternalStandardDriftTime, True
+                    SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, -1, udtTestUMC, udtInternalStd.MonoisotopicMass, udtInternalStd.NET, 0, True
                 End If
                 
             Next FastSearchMatchInd
@@ -5033,7 +5762,10 @@ Private Sub SearchUMCSingleMassInternalStd(ByRef udtTestUMC As udtUMCType, ByVal
 
 End Sub
 
-Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal dblMWTol As Double, ByVal dblNETTol As Double, ByRef udtTestUMC As udtUMCType, ByVal dblMassTagMass As Double, ByVal dblMassTagNET As Double, ByVal blnIsInternalStdMatch As Boolean)
+Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal dblMWTol As Double, ByVal dblNETTol As Double, ByVal dblDriftTimeTol As Double, _
+                                        ByRef udtTestUMC As udtUMCType, ByVal dblAMTMass As Double, ByVal dblAMTNET As Double, ByRef dblAMTDriftTime, _
+                                        ByVal blnIsInternalStdMatch As Boolean)
+                                        
     ' Note: This sub is called by both SearchUMCSingleMassAMT and SearchUMCSingleMassInternalStd
     
     ' Check if the match is within NET and mass tolerance
@@ -5050,10 +5782,13 @@ Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal 
 
     
     Dim blnFirstMatchFound As Boolean
+    Dim blnValidMatch As Boolean
+    
     Dim lngMemberIndex As Long
     
     Dim dblCurrMW As Double
     Dim dblNETDifference As Double
+    Dim dblDriftTimeDifference As Double
     
     With udtTestUMC
         ' See if each MassTag is within the NET tolerance of any of the members of the class
@@ -5061,62 +5796,97 @@ Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal 
         
         blnFirstMatchFound = False
         If glbPreferencesExpanded.UseUMCConglomerateNET Then
-            If SearchUMCTestNET(.ClassRepType, .ClassRepInd, dblMassTagNET, dblNETTol, dblNETDifference) Then
+            If SearchUMCTestNET(.ClassRepType, .ClassRepInd, dblAMTNET, dblNETTol, dblNETDifference) Then
                 
-                ' Either: AMT Matches this LC-MS Feature's median mass and Class Rep NET
-                ' Or:     Internal Standard Matches this LC-MS Feature's median mass, Class Rep NET, and charge
-                ' Thus:   Add to mCurrIDMatches()
+                If dblDriftTimeTol > 0 Then
+                    blnValidMatch = SearchUMCTestDriftTime(.ClassRepType, .ClassRepInd, dblAMTDriftTime, dblDriftTimeTol, dblDriftTimeDifference)
+                Else
+                    blnValidMatch = True
+                End If
                 
-                If mCurrIDCnt > UBound(mCurrIDMatches) Then ManageCurrID (MNG_ADD_START_SIZE)
-                
-                mCurrIDMatches(mCurrIDCnt).IDInd = FastSearchMatchInd
-                mCurrIDMatches(mCurrIDCnt).MatchingMemberCount = 0
-                mCurrIDMatches(mCurrIDCnt).StacOrSLiC = -1             ' Set this to -1 for now
-                mCurrIDMatches(mCurrIDCnt).MassErr = .ClassMW - dblMassTagMass
-                mCurrIDMatches(mCurrIDCnt).NETErr = dblNETDifference
-                mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = blnIsInternalStdMatch
-                mCurrIDMatches(mCurrIDCnt).UniquenessProbability = 0
-
-                mCurrIDCnt = mCurrIDCnt + 1
-                
-                blnFirstMatchFound = True
+                If blnValidMatch Then
+                    
+                    ' Either: AMT Matches this LC-MS Feature's median mass and Class Rep NET
+                    ' Or:     Internal Standard Matches this LC-MS Feature's median mass, Class Rep NET, and charge
+                    ' Thus:   Add to mCurrIDMatches()
+                    
+                    If mCurrIDCnt > UBound(mCurrIDMatches) Then ManageCurrID (MNG_ADD_START_SIZE)
+                    
+                    mCurrIDMatches(mCurrIDCnt).IDInd = FastSearchMatchInd
+                    mCurrIDMatches(mCurrIDCnt).MatchingMemberCount = 0
+                    mCurrIDMatches(mCurrIDCnt).StacOrSLiC = -1             ' Set this to -1 for now
+                    mCurrIDMatches(mCurrIDCnt).MassErr = .ClassMW - dblAMTMass
+                    mCurrIDMatches(mCurrIDCnt).NETErr = dblNETDifference
+                    mCurrIDMatches(mCurrIDCnt).DriftTimeErr = dblDriftTimeDifference
+                    
+                    ' Note that .FeatureDriftTimeAligned will simply be the orginal drift time of the UMC since VIPER doesn't compute aligned drift times
+                    ' In contrast, STAC performs an alignment and thus computes an improved drift time
+                    mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned = .DriftTime
+                    
+                    If dblDriftTimeTol > 0 Then
+                        ' This will be true if STAC was used; not if VIPER was used
+                        If GelData(CallerID).MostRecentSearchUsedSTAC Then
+                            Debug.Assert dblDriftTimeDifference + dblAMTDriftTime = .DriftTime
+                        End If
+                    End If
+                    
+                    mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = blnIsInternalStdMatch
+                    mCurrIDMatches(mCurrIDCnt).UniquenessProbability = 0
+    
+                    mCurrIDCnt = mCurrIDCnt + 1
+                    
+                    blnFirstMatchFound = True
+                End If
             End If
         End If
         
         If blnFirstMatchFound Or Not glbPreferencesExpanded.UseUMCConglomerateNET Then
             For lngMemberIndex = 0 To .ClassCount - 1
-                If SearchUMCTestNET(CInt(.ClassMType(lngMemberIndex)), .ClassMInd(lngMemberIndex), dblMassTagNET, dblNETTol, dblNETDifference) Then
+                If SearchUMCTestNET(CInt(.ClassMType(lngMemberIndex)), .ClassMInd(lngMemberIndex), dblAMTNET, dblNETTol, dblNETDifference) Then
                     
-                    Select Case .ClassMType(lngMemberIndex)
-                    Case glCSType
-                         dblCurrMW = GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).AverageMW
-                    Case glIsoType
-                         dblCurrMW = GetIsoMass(GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)), samtDef.MWField)
-                    End Select
+                    If dblDriftTimeTol > 0 Then
+                        blnValidMatch = SearchUMCTestDriftTime(.ClassRepType, .ClassRepInd, dblAMTDriftTime, dblDriftTimeTol, dblDriftTimeDifference)
+                    Else
+                        blnValidMatch = True
+                    End If
                     
-                    If Not blnFirstMatchFound Then
-                        ' We haven't had a match for this index yet; add to mCurrIDMatches()
+                    If blnValidMatch Then
+                    
+                        Select Case .ClassMType(lngMemberIndex)
+                        Case glCSType
+                             dblCurrMW = GelData(CallerID).CSData(.ClassMInd(lngMemberIndex)).AverageMW
+                        Case glIsoType
+                             dblCurrMW = GetIsoMass(GelData(CallerID).IsoData(.ClassMInd(lngMemberIndex)), samtDef.MWField)
+                        End Select
                         
-                        If mCurrIDCnt > UBound(mCurrIDMatches) Then ManageCurrID (MNG_ADD_START_SIZE)
+                        If Not blnFirstMatchFound Then
+                            ' We haven't had a match for this index yet; add to mCurrIDMatches()
+                            
+                            If mCurrIDCnt > UBound(mCurrIDMatches) Then ManageCurrID (MNG_ADD_START_SIZE)
+                            
+                            mCurrIDMatches(mCurrIDCnt).IDInd = FastSearchMatchInd
+                            mCurrIDMatches(mCurrIDCnt).MatchingMemberCount = 0
+                            mCurrIDMatches(mCurrIDCnt).StacOrSLiC = -1    ' Set this to -1 for now
+                            mCurrIDMatches(mCurrIDCnt).MassErr = .ClassMW - dblAMTMass
+                            mCurrIDMatches(mCurrIDCnt).NETErr = dblNETDifference
+                            mCurrIDMatches(mCurrIDCnt).DriftTimeErr = dblDriftTimeDifference
+                            mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned = .DriftTime
+                            mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = blnIsInternalStdMatch
+                            mCurrIDMatches(mCurrIDCnt).UniquenessProbability = 0
+                            
+                            mCurrIDCnt = mCurrIDCnt + 1
+                            
+                            blnFirstMatchFound = True
+                        End If
+    
+                        ' See if the member is within mass tolerance
+                        If Abs(dblAMTMass - dblCurrMW) <= dblMWTol Then
+                            ' Yes, within both mass and NET tolerance; increment mCurrIDMatches().MatchingMemberCount
+                            mCurrIDMatches(mCurrIDCnt - 1).MatchingMemberCount = mCurrIDMatches(mCurrIDCnt - 1).MatchingMemberCount + 1
+                        End If
                         
-                        mCurrIDMatches(mCurrIDCnt).IDInd = FastSearchMatchInd
-                        mCurrIDMatches(mCurrIDCnt).MatchingMemberCount = 0
-                        mCurrIDMatches(mCurrIDCnt).StacOrSLiC = -1    ' Set this to -1 for now
-                        mCurrIDMatches(mCurrIDCnt).MassErr = .ClassMW - dblMassTagMass
-                        mCurrIDMatches(mCurrIDCnt).NETErr = dblNETDifference
-                        mCurrIDMatches(mCurrIDCnt).IDIsInternalStd = blnIsInternalStdMatch
-                        mCurrIDMatches(mCurrIDCnt).UniquenessProbability = 0
-                        
-                        mCurrIDCnt = mCurrIDCnt + 1
-                        
-                        blnFirstMatchFound = True
                     End If
-
-                    ' See if the member is within mass tolerance
-                    If Abs(dblMassTagMass - dblCurrMW) <= dblMWTol Then
-                        ' Yes, within both mass and NET tolerance; increment mCurrIDMatches().MatchingMemberCount
-                        mCurrIDMatches(mCurrIDCnt - 1).MatchingMemberCount = mCurrIDMatches(mCurrIDCnt - 1).MatchingMemberCount + 1
-                    End If
+                    
                 End If
             Next lngMemberIndex
         End If
@@ -5135,7 +5905,7 @@ Private Function SearchUMCsUsingSTAC(ByVal eSearchMode As eSearchModeConstants) 
     Dim blnSuccess As Boolean
     
     Dim strSTACProgramPath As String
-    Dim strSTACOuputFolder As String
+    Dim strSTACOutputFolder As String
     Dim strArguments As String
     Dim strCurDirSaved As String
     
@@ -5152,6 +5922,7 @@ Private Function SearchUMCsUsingSTAC(ByVal eSearchMode As eSearchModeConstants) 
     Dim sngProcessingTimeSeconds As Single
     Dim sngMaxProcessingTimeMinutes As Single
     Dim blnAbortProcessing As Boolean
+    Dim blnUseDriftTime As Boolean
     
     On Error GoTo SearchUMCsUsingSTACErrorHandler
     
@@ -5159,9 +5930,14 @@ Private Function SearchUMCsUsingSTAC(ByVal eSearchMode As eSearchModeConstants) 
     If sngMaxProcessingTimeMinutes < 1 Then sngMaxProcessingTimeMinutes = 1
     If sngMaxProcessingTimeMinutes > 300 Then sngMaxProcessingTimeMinutes = 300
     
+    If GelContainsIMSData() And samtDef.UseDriftTime Then
+        blnUseDriftTime = True
+    Else
+        blnUseDriftTime = False
+    End If
     
     ' Write out the AMTs and UMCs that we're searching against
-    blnSuccess = SearchUMCsUsingSTACExportData(fso, eSearchMode)
+    blnSuccess = SearchUMCsUsingSTACExportData(fso, eSearchMode, blnUseDriftTime)
     
     If blnSuccess Then
         ' Make sure the STAC .exe exists
@@ -5179,29 +5955,25 @@ Private Function SearchUMCsUsingSTAC(ByVal eSearchMode As eSearchModeConstants) 
         End If
         
         
-        ' Create the STAC Output folder
+        ' Prior to June 2011 we create the STAC Output folder as a subfolder under the temp folder
+        ' When we switched to STAC_Console.exe, we stopped creating the subfolder
         ' We're including mSTACSessionID in the name in case multiple copies of VIPER are running
-        strSTACOuputFolder = fso.BuildPath(mSTACTempFolderPath, "STAC_Output" & mSTACSessionID)
-        
-        If Not mTempFilesToDelete.Exists(strSTACOuputFolder) Then
-            mTempFilesToDelete.add strSTACOuputFolder, TEMP_FOLDER_FLAG
-        End If
-
-        If Not fso.FolderExists(strSTACOuputFolder) Then
-            fso.CreateFolder strSTACOuputFolder
-        End If
+        strSTACOutputFolder = mSTACTempFolderPath
         
         ' Construct the command line arguments
         strArguments = ""
         strArguments = strArguments & " -m " & PossiblyQuotePath(mSTACAMTFilePath)
         strArguments = strArguments & " -u " & PossiblyQuotePath(mSTACUMCFilePath)
-        strArguments = strArguments & " -odir " & PossiblyQuotePath(strSTACOuputFolder)
+        
+        ' No longer supported as of June 2011
+        ' strArguments = strArguments & " -odir " & PossiblyQuotePath(strSTACOutputFolder)
         
         If cChkBox(chkSTACUsesPriorProbability) Then
             strArguments = strArguments & " -useP T"
         Else
             strArguments = strArguments & " -useP F"
         End If
+        
         
         
         Select Case samtDef.TolType
@@ -5218,11 +5990,15 @@ Private Function SearchUMCsUsingSTAC(ByVal eSearchMode As eSearchModeConstants) 
         
         strArguments = strArguments & " -ppm " & strPPMTol
         strArguments = strArguments & " -NET " & samtDef.NETTol
-                        
+
+        If blnUseDriftTime Then
+            strArguments = strArguments & " -driftTime " & samtDef.DriftTimeTol
+        End If
+        
         strMessage = "Calling " & STAC_APP_NAME & " using" & strArguments
         AddToAnalysisHistory CallerID, strMessage
         
-        strStatusBase = "Calling " & STAC_APP_NAME & " to search the LC-MS Features"
+        strStatusBase = "Calling STAC to search the LC-MS Features"
         UpdateStatus strStatusBase
         
         Set objProgRunner = New clsProgRunner
@@ -5274,7 +6050,7 @@ Private Function SearchUMCsUsingSTAC(ByVal eSearchMode As eSearchModeConstants) 
             
             If blnSuccess Then
                 ' Load the results
-                blnSuccess = SearchUMCsUsingSTACLoadResults(fso, strSTACOuputFolder, eSearchMode)
+                blnSuccess = SearchUMCsUsingSTACLoadResults(fso, strSTACOutputFolder, eSearchMode)
             End If
         End If
 
@@ -5294,7 +6070,8 @@ SearchUMCsUsingSTACErrorHandler:
 End Function
 
 Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
-                                               ByVal eSearchMode As eSearchModeConstants) As Boolean
+                                               ByVal eSearchMode As eSearchModeConstants, _
+                                               ByVal blnUseDriftTime As Boolean) As Boolean
     ' Write out the AMTs and UMCs that we're searching against
     
     Dim ts As TextStream
@@ -5307,9 +6084,10 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
     Dim sngInternalStdPepProphetProbability As Single
     Dim lngInternalStdNETCount As Integer
     Dim lngScanClassRep As Long
+    Dim intChargeClassRep As Integer
 
     Dim blnSearchThisUMC As Boolean
-                  
+    
     On Error GoTo SearchUMCsUsingSTACExportDataErrorHandler
     
     ' Get the temp folder path
@@ -5323,16 +6101,17 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
     mSTACAMTFilePath = fso.BuildPath(mSTACTempFolderPath, "STAC_AMT_DB" & mSTACSessionID & ".txt")
     mSTACUMCFilePath = fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & ".txt")
     
-    If Not mTempFilesToDelete.Exists(mSTACAMTFilePath) Then
-        mTempFilesToDelete.add mSTACAMTFilePath, TEMP_FILE_FLAG
-    End If
+    ' Add the STAC input files to mTempFilesToDelete
+    AddFileToDelete mSTACAMTFilePath
+    AddFileToDelete mSTACUMCFilePath
+    
+    ' Add the STAC result files to mTempFilesToDelete
+    AddFileToDelete fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & "_FDR.csv")
+    AddFileToDelete fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & "_STAC.csv")
+    AddFileToDelete fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & "_Log.txt")
         
-    If Not mTempFilesToDelete.Exists(mSTACUMCFilePath) Then
-        mTempFilesToDelete.add mSTACUMCFilePath, TEMP_FILE_FLAG
-    End If
         
     ' Write out the AMTs in the mMT arrays
-    
     Set ts = fso.OpenTextFile(mSTACAMTFilePath, ForWriting, True)
 
     ' Write the header line
@@ -5340,11 +6119,24 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
     ' Note: STAC uses Cnt_GANET (number of datasets a peptide is observed in) while
     '       LCMSWarp uses MSMS Observation Count (MSMSObsCount)
     
-    ts.WriteLine ("Mass_Tag_ID" & vbTab & _
-                  "Monoisotopic_Mass" & vbTab & _
-                  "Avg_GANET" & vbTab & _
-                  "High_Peptide_Prophet_Probability" & vbTab & _
-                  "Cnt_GANET")
+    Dim strLineOut As String
+    
+    strLineOut = "Mass_Tag_ID" & vbTab & _
+                 "Monoisotopic_Mass" & vbTab & _
+                 "Avg_GANET" & vbTab & _
+                 "High_Peptide_Prophet_Probability" & vbTab & _
+                 "Cnt_GANET"
+                      
+    If blnUseDriftTime Then
+        strLineOut = strLineOut & vbTab & _
+                    "Conformer_ID" & vbTab & _
+                    "Conformer_Charge" & vbTab & _
+                    "Conformer" & vbTab & _
+                    "Drift_Time_Avg" & vbTab & _
+                    "Conformer_Obs_Count"
+    End If
+    ts.WriteLine strLineOut
+    
 
     If eInternalStdSearchMode <> issmFindOnlyInternalStandards Then
         ' Write out the AMTs
@@ -5361,16 +6153,27 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
             
             ' Note that the Mass_Tag_ID column will not have the real mass tag ID values
             ' Instead, it contains the index value in mMTInd()
-            ' This is necessary in case we're using dynamic mods
+            ' This is necessary in case we're using dynamic mods or if we're using conformers
     
             ' Also, depending on the mass tag DB, .PeptideProphetProbability might contain
             ' probability values based on MSGF instead of Peptide Prophet
             With AMTData(mMTOrInd(mMTInd(i)))
-                ts.WriteLine (mMTInd(i) & vbTab & _
-                              dblMass & vbTab & _
-                              mMTNET(mMTInd(i)) & vbTab & _
-                              .PeptideProphetProbability & vbTab & _
-                              .NETCount)
+                strLineOut = mMTInd(i) & vbTab & _
+                             dblMass & vbTab & _
+                             mMTNET(mMTInd(i)) & vbTab & _
+                             .PeptideProphetProbability & vbTab & _
+                             .NETCount
+                
+                If blnUseDriftTime Then
+                    strLineOut = strLineOut & vbTab & _
+                                 .Conformer_ID & vbTab & _
+                                 .Conformer_Charge & vbTab & _
+                                 .Conformer & vbTab & _
+                                 .Drift_Time_Avg & vbTab & _
+                                 .Conformer_Obs_Count
+                End If
+    
+                ts.WriteLine strLineOut
                 
             End With
         Next i
@@ -5389,11 +6192,22 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
             sngInternalStdPepProphetProbability = 0.99
             lngInternalStdNETCount = 100
 
-            ts.WriteLine (CStr(mMTCnt + i) & vbTab & _
-                          dblMass & vbTab & _
-                          dblNET & vbTab & _
-                          sngInternalStdPepProphetProbability & vbTab & _
-                          lngInternalStdNETCount)
+            strLineOut = CStr(mMTCnt + i) & vbTab & _
+                         dblMass & vbTab & _
+                         dblNET & vbTab & _
+                         sngInternalStdPepProphetProbability & vbTab & _
+                         lngInternalStdNETCount
+                          
+            If blnUseDriftTime Then
+                strLineOut = strLineOut & vbTab & _
+                             0 & vbTab & _
+                             0 & vbTab & _
+                             0 & vbTab & _
+                             0 & vbTab & _
+                             0
+            End If
+                
+            ts.WriteLine strLineOut
         Next i
     End If
     
@@ -5405,7 +6219,12 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
     Set ts = fso.OpenTextFile(mSTACUMCFilePath, ForWriting, True)
    
     ' Write out the header line
-    ts.WriteLine ("UMCIndex" & vbTab & "NETClassRep" & vbTab & "UMCMonoMW")
+    strLineOut = "UMCIndex" & vbTab & "NETClassRep" & vbTab & "UMCMonoMW" & vbTab & "Class_Rep_Charge"
+    If blnUseDriftTime Then
+        strLineOut = strLineOut & vbTab & "IMS_Drift_Time"
+    End If
+    
+    ts.WriteLine strLineOut
     
     For i = 0 To ClsCnt - 1
          
@@ -5462,8 +6281,10 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
                   Select Case GelUMC(CallerID).UMCs(i).ClassRepType
                   Case glCSType
                       lngScanClassRep = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(i).ClassRepInd).ScanNumber
+                      intChargeClassRep = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(i).ClassRepInd).Charge
                   Case glIsoType
                       lngScanClassRep = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(i).ClassRepInd).ScanNumber
+                      intChargeClassRep = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(i).ClassRepInd).Charge
                   End Select
                   
                   If lngScanClassRep >= 0 Then
@@ -5476,9 +6297,16 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
                     End If
                     
                     
-                    ts.WriteLine (i & vbTab & _
-                               dblNET & vbTab & _
-                               GelUMC(CallerID).UMCs(i).ClassMW)
+                    strLineOut = i & vbTab & _
+                                 dblNET & vbTab & _
+                                 GelUMC(CallerID).UMCs(i).ClassMW & vbTab & _
+                                 intChargeClassRep
+                    
+                    If blnUseDriftTime Then
+                        strLineOut = strLineOut & vbTab & GelUMC(CallerID).UMCs(i).DriftTime
+                    End If
+                    
+                    ts.WriteLine strLineOut
                   End If
              End If
          End If
@@ -5492,10 +6320,10 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
 
 SearchUMCsUsingSTACExportDataErrorHandler:
     Debug.Assert False
-    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->SearchUMCsUsingSTACExportData"
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
         MsgBox "An error has occured while exporting data for STAC to use: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, "Error"
     End If
+    LogErrors Err.Number, "frmSearchMT_ConglomerateUMC->SearchUMCsUsingSTACExportData"
     SearchUMCsUsingSTACExportData = False
     
 End Function
@@ -5613,7 +6441,7 @@ Private Sub SearchUMCsUsingVIPER(ByVal eSearchMode As eSearchModeConstants)
  
 End Sub
 
-Private Function SearchUMCTestCharge(eMemberType As glDistType, lngMemberIndex As Long, udtInternalStd As udtInternalStandardEntryType) As Boolean
+Private Function SearchUMCTestCharge(ByVal eMemberType As glDistType, ByVal lngMemberIndex As Long, ByRef udtInternalStd As udtInternalStandardEntryType) As Boolean
     ' Make sure at least one of the charges for this Net Adj Locker is present in the UMC
 
     Dim blnValidHit As Boolean
@@ -5639,7 +6467,36 @@ Private Function SearchUMCTestCharge(eMemberType As glDistType, lngMemberIndex A
 
 End Function
 
-Private Function SearchUMCTestNET(eMemberType As glDistType, lngMemberIndex As Long, dblAMTNet As Double, ByVal dblNETTol As Double, ByRef dblNETDifference As Double) As Boolean
+Private Function SearchUMCTestDriftTime(ByVal eMemberType As glDistType, ByVal lngMemberIndex As Long, ByVal dblAMTDriftTime As Double, _
+                                        ByVal dblDriftTimeTol As Double, ByRef dblDriftTimeDifference As Double) As Boolean
+    
+    Dim dblDriftTime As Double
+    Dim blnDriftTimeMatch As Boolean
+    
+    Select Case eMemberType
+    Case glCSType
+        dblDriftTime = GelData(CallerID).CSData(lngMemberIndex).IMSDriftTime
+    Case glIsoType
+        dblDriftTime = GelData(CallerID).IsoData(lngMemberIndex).IMSDriftTime
+    End Select
+    
+    blnDriftTimeMatch = False
+    dblDriftTimeDifference = dblDriftTime - dblAMTDriftTime
+    If dblDriftTimeTol > 0 Then
+        If Abs(dblDriftTimeDifference) <= dblDriftTimeTol Then
+            blnDriftTimeMatch = True
+        End If
+    Else
+        ' dblDriftTimeTol = 0; assume a match
+        blnDriftTimeMatch = True
+    End If
+
+    SearchUMCTestDriftTime = blnDriftTimeMatch
+    
+End Function
+
+Private Function SearchUMCTestNET(ByVal eMemberType As glDistType, ByVal lngMemberIndex As Long, ByVal dblAMTNET As Double, _
+                                  ByVal dblNETTol As Double, ByRef dblNETDifference As Double) As Boolean
     
     Dim lngScan As Long
     Dim blnNETMatch As Boolean
@@ -5652,7 +6509,7 @@ Private Function SearchUMCTestNET(eMemberType As glDistType, lngMemberIndex As L
     End Select
     
     blnNETMatch = False
-    dblNETDifference = ConvertScanToNET(lngScan) - dblAMTNet
+    dblNETDifference = ConvertScanToNET(lngScan) - dblAMTNET
     If dblNETTol > 0 Then
         If Abs(dblNETDifference) <= dblNETTol Then
             blnNETMatch = True
@@ -5709,6 +6566,7 @@ Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean
             .MWTol = DEFAULT_TOLERANCE_REFINEMENT_MW_TOL
             .TolType = DEFAULT_TOLERANCE_REFINEMENT_MW_TOL_TYPE
             .NETTol = DEFAULT_TOLERANCE_REFINEMENT_NET_TOL
+            .DriftTimeTol = DEFAULT_TOLERANCE_REFINEMENT_DRIFT_TIME_TOL
         End With
     
     Else
@@ -5718,6 +6576,7 @@ Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean
             .MWTol = DEFAULT_MW_TOL
             .TolType = DEFAULT_TOL_TYPE
             .NETTol = DEFAULT_NET_TOL
+            .DriftTimeTol = DEFAULT_DRIFT_TIME_TOL
         End With
     End If
     
@@ -5750,6 +6609,9 @@ Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean
     
     txtNETTol = udtSearchDef.NETTol
     
+    txtDriftTimeTol = udtSearchDef.DriftTimeTol
+    SetCheckBox chkUseDriftTime, udtSearchDef.UseDriftTime
+    
     SetCheckBox chkPEO, False
     SetCheckBox chkICATLt, False
     SetCheckBox chkICATHv, False
@@ -5766,7 +6628,6 @@ Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean
 
     PickParameters
     
-    SetCheckBox chkPlotUniqueAMTs, True
     SetCheckBox chkPlotUPFilteredFDR, True
     
     SetCheckBox chkSTACPlotXGridlines, True
@@ -5998,8 +6859,14 @@ Private Function ShowOrSaveResultsByIon(Optional strOutputFilePath As String = "
     
     strLineOut = "Index" & strSepChar & "Scan" & strSepChar & "ChargeState" & strSepChar & "MonoMW" & strSepChar & "Abundance" & strSepChar
     strLineOut = strLineOut & "Fit" & strSepChar & "ER" & strSepChar & "LockerID" & strSepChar & "FreqShift" & strSepChar & "MassCorrection" & strSepChar & "MultiMassTagHitCount" & strSepChar
-    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "Peptide_Warning_PossiblyIncorrect"
+    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar
     
+    If mMTListContainsConformers Then
+        strLineOut = strLineOut & "Conformer" & strSepChar & "MassTagDriftTime" & strSepChar
+    End If
+    
+    strLineOut = strLineOut & "Peptide_Warning_PossiblyIncorrect"
+
     If blnIncludeORFInfo Then
         strLineOut = strLineOut & strSepChar & "MultiORFCount" & strSepChar & "ORFName"
     End If
@@ -6147,15 +7014,15 @@ On Error GoTo ShowOrSaveSTACStatsErrorHandler
     strLineOut = "STAC Cutoff" & strSepChar & _
                  "UniqueAMTs" & strSepChar & _
                  "FDR" & strSepChar & _
-                 "Matches" & strSepChar & _
-                 "Errors"
-
-    strLineOut = strLineOut & strSepChar & _
+                 "Errors" & strSepChar & _
                  "UniqueAMTs, UP>0.5" & strSepChar & _
                  "FDR, UP>0.5" & strSepChar & _
-                 "Matches, UP>0.5" & strSepChar & _
                  "Errors, UP>0.5"
 
+    If mMTListContainsConformers Then
+        strLineOut = strLineOut & strSepChar & "UniqueConformers" & strSepChar & "UniqueConformers, UP>0.5"
+    End If
+    
     If blnCopyToClipboard Then
         strClipboardText = strClipboardText & strLineOut & vbCrLf
     Else
@@ -6168,14 +7035,15 @@ On Error GoTo ShowOrSaveSTACStatsErrorHandler
             strLineOut = Round(.STACCuttoff, 2) & strSepChar & _
                          .UniqueAMTs & strSepChar & _
                          Format(.FDR / 100#, "0.000%") & strSepChar & _
-                         .Matches & strSepChar & _
-                         Round(.Errors, 1)
-
-            strLineOut = strLineOut & strSepChar & _
+                         Round(.Errors, 1) & strSepChar & _
                          .UP_Filtered_UniqueAMTs & strSepChar & _
                          Format(.UP_Filtered_FDR / 100#, "0.000%") & strSepChar & _
-                         .UP_Filtered_Matches & strSepChar & _
                          Round(.UP_Filtered_Errors, 1)
+            
+            If mMTListContainsConformers Then
+                strLineOut = strLineOut & strSepChar & .UniqueConformers & strSepChar & .UP_Filtered_UniqueConformers
+            End If
+
         End With
         
         If blnCopyToClipboard Then
@@ -6260,6 +7128,10 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     
     Dim dblGANETClassRep As Double
     Dim dblGANETError As Double
+    
+    Dim dblDriftTimeClassRep As Double
+    Dim dblDriftTimeError As Double
+    
     Dim objORFNameFastSearch As New FastSearchArrayLong
     Dim blnSuccess As Boolean
     
@@ -6277,6 +7149,12 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     
     Dim lngPeakFPRType As Long
     
+    Dim intConformer As Integer
+    Dim dblMTDriftTime As Double
+    Dim lngMTDriftTimeObsCount As Long
+    Dim lngConformerID As Long
+
+
 On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     
     If blnIncludeORFInfo Then
@@ -6321,7 +7199,17 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar & "PairMemberType" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar
-    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar
+    strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar
+    
+    If mMTListContainsConformers Then
+        strLineOut = strLineOut & "Conformer" & strSepChar & "MassTagDriftTime" & strSepChar & "MassTagDriftTimeObsCount" & strSepChar & "ConformerID" & strSepChar
+    End If
+    
+    strLineOut = strLineOut & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar
+    
+    If mMTListContainsConformers Then
+        strLineOut = strLineOut & "DriftTimeError" & strSepChar
+    End If
     
     If GelData(CallerID).MostRecentSearchUsedSTAC Then
         strLineOut = strLineOut & "STAC_Score" & strSepChar & "Del_STAC" & strSepChar & "Uniqueness Probability" & strSepChar & "FDR Threshold" & strSepChar
@@ -6357,6 +7245,12 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
                 strPeptideSequence = .PeptideSequence
             End With
             sngPeptideProphetProbability = 0
+            
+            intConformer = 0
+            dblMTDriftTime = 0
+            lngMTDriftTimeObsCount = 0
+            lngConformerID = 0
+
         Else
             lngMassTagIndexPointer = mMTInd(mUMCMatchStats(mgInd).IDIndex)
             lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
@@ -6375,9 +7269,14 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             
             sngPeptideProphetProbability = AMTData(lngMassTagIndexOriginal).PeptideProphetProbability
             strPeptideSequence = AMTData(lngMassTagIndexOriginal).Sequence
+            
+            intConformer = AMTData(lngMassTagIndexOriginal).Conformer
+            dblMTDriftTime = AMTData(lngMassTagIndexOriginal).Drift_Time_Avg
+            lngMTDriftTimeObsCount = AMTData(lngMassTagIndexOriginal).Conformer_Obs_Count
+            lngConformerID = AMTData(lngMassTagIndexOriginal).Conformer_ID
         End If
     
-        GetUMCClassRepScanAndNET CallerID, lngUMCIndexOriginal, lngScanClassRep, dblGANETClassRep
+        GetUMCClassRepScanAndNET CallerID, lngUMCIndexOriginal, lngScanClassRep, dblGANETClassRep, dblDriftTimeClassRep
         
         With GelUMC(CallerID).UMCs(lngUMCIndexOriginal)
             strLineOut = lngUMCIndexOriginal & strSepChar & .MinScan & strSepChar & .MaxScan & strSepChar & lngScanClassRep & strSepChar & Format(dblGANETClassRep, "0.0000") & strSepChar & Round(.ClassMW, 6) & strSepChar
@@ -6427,8 +7326,11 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
         With GelUMC(CallerID).UMCs(lngUMCIndexOriginal)
             dblMassErrorPPM = MassToPPM(.ClassMW - dblMatchMass, .ClassMW)
             dblGANETError = dblGANETClassRep - dblMatchNET
+            
+            ' Note: use .DriftTimeAligned and not dblDriftTimeClassRep
+            dblDriftTimeError = mUMCMatchStats(mgInd).DriftTimeAligned - dblMTDriftTime
         End With
-        
+
         strLineOutEnd = strLineOutEnd & strMatchID & strSepChar & Round(dblMatchMass, 6) & strSepChar
         
         If Not mUMCMatchStats(mgInd).IDIsInternalStd Then
@@ -6438,7 +7340,21 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             End If
         End If
         
+        If mMTListContainsConformers Then
+            ' Conformer   MassTagDriftTime    MassTagDriftTimeObsCount    ConformerID
+            strLineOutEnd = strLineOutEnd & strSepChar & _
+                            intConformer & strSepChar & _
+                            Round(dblMTDriftTime, 4) & strSepChar & _
+                            lngMTDriftTimeObsCount & strSepChar & _
+                            lngConformerID
+        End If
+        
         strLineOutEnd = strLineOutEnd & strSepChar & mUMCMatchStats(mgInd).MemberHitCount & strSepChar & Round(dblMassErrorPPM, 4) & strSepChar & Round(dblGANETError, NET_PRECISION)
+        
+        If mMTListContainsConformers Then
+            strLineOutEnd = strLineOutEnd & strSepChar & Round(dblDriftTimeError, 4)
+        End If
+    
         strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).StacOrSLiC, 4)
         strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).DelScore, 4)
         
@@ -6573,6 +7489,9 @@ Private Sub StartExportResultsToDBbyUMC()
     Dim eResponse As VbMsgBoxResult
     Dim strStatus As String
     Dim strUMCSearchMode As String
+    Dim blnProceed As Boolean
+    
+    Static blnPasswordEnteredSuccessfully As Boolean
     
 On Error GoTo ExportResultsToDBErrorHandler
     
@@ -6580,8 +7499,17 @@ On Error GoTo ExportResultsToDBErrorHandler
         MsgBox "Search results not found in memory.", vbInformation + vbOKOnly, "Nothing to Export"
     Else
         eResponse = MsgBox("Proceed with exporting of the search results to the database?  This is an advanced feature that should normally only be performed during VIPER Automated PRISM Analysis Mode.  If you continue, you will be prompted for a password.", vbQuestion + vbYesNo + vbDefaultButton1, "Export Results")
+        
         If eResponse = vbYes Then
-            If QueryUserForExportToDBPassword(, False) Then
+            If blnPasswordEnteredSuccessfully Then
+                ' Do not re-prompt for the password
+                blnProceed = True
+            Else
+                blnProceed = QueryUserForExportToDBPassword(, False)
+                If blnProceed Then blnPasswordEnteredSuccessfully = True
+            End If
+
+            If blnProceed Then
                 ' Update the text in MD_Parameters
                 strUMCSearchMode = FindSettingInAnalysisHistory(CallerID, UMC_SEARCH_MODE_SETTING_TEXT, , True, ":", ";")
                 If Right(strUMCSearchMode, 1) = ")" Then strUMCSearchMode = Left(strUMCSearchMode, Len(strUMCSearchMode) - 1)
@@ -6646,6 +7574,7 @@ StartsWithErrorHandler:
     StartsWith = False
     
 End Function
+
 Private Sub UpdateUMCsPairingStatusNow()
     Dim blnSuccess As Boolean
     blnSuccess = UpdateUMCsPairingStatus(CallerID, eClsPaired())
@@ -6673,13 +7602,12 @@ On Error GoTo UpdateSTACPlotErrorHandler
         Exit Sub
     End If
     
-    blnUniqueAMTs = Me.PlotUniqueAMTs
     blnUPFilteredFDR = Me.PlotUPFilteredFDR
     
     ' Find the first non-zero Matches entry in STACStats()
     For lngIndex = 0 To STACStatsCount - 1
         lngEndIndex = lngIndex
-        If STACStats(lngIndex).Matches > 0 Then Exit For
+        If STACStats(lngIndex).UniqueAMTs > 0 Then Exit For
     Next lngIndex
     
     If lngEndIndex >= STACStatsCount - 1 Then
@@ -6695,19 +7623,10 @@ On Error GoTo UpdateSTACPlotErrorHandler
         lngTargetIndex = STACStatsCount - 1 - lngIndex
         
         varMatches(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
-        If blnUniqueAMTs Then
-            varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueAMTs
-        Else
-            varMatches(1, lngTargetIndex) = STACStats(lngIndex).Matches
-        End If
-        
+        varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueAMTs
         
         varMatchesFiltered(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
-        If blnUniqueAMTs Then
-            varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueAMTs
-        Else
-            varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_Matches
-        End If
+        varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueAMTs
 
         varFDR(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
         If blnUPFilteredFDR Then
@@ -6718,7 +7637,6 @@ On Error GoTo UpdateSTACPlotErrorHandler
         
         If varFDR(1, lngTargetIndex) = 0 And lngTargetIndex > 0 Then
             ' When the reported FDR is 0, use the previous value
-            Debug.Assert False
             varFDR(1, lngTargetIndex) = varFDR(1, lngTargetIndex - 1)
         End If
         
@@ -6748,16 +7666,12 @@ Private Sub UpdateSTACPlotLayout()
     
     Dim strCaption As String
     
-    strCaption = "STAC Trends -- Red=FDR, Blue=Matches, Green=UP Filtered Matches"
+    strCaption = "STAC Trends -- Red=FDR, Blue=Unique AMTs, Green=UP Filtered AMTs"
     
     ctlSTACStats.Caption = strCaption
     
     ctlSTACStats.Axes(1).Caption = "STAC Threshold"
-    If Me.PlotUniqueAMTs Then
-        ctlSTACStats.Axes(2).Caption = "Unique AMTs"
-    Else
-        ctlSTACStats.Axes(2).Caption = "Matches"
-    End If
+    ctlSTACStats.Axes(2).Caption = "Unique AMTs"
     
     If Me.PlotUPFilteredFDR Then
         ctlSTACStats.Axes(3).Caption = "FDR, UP > 0.5"
@@ -6811,7 +7725,11 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
     Dim strBaseMatchInfo As String
     Dim strLineOut As String
     Dim lngAMTRefIndex As Long
+    
+    Dim strMassTagIDRef As String
     Dim lngMassTagID As Long
+    Dim intConformerCharge As Integer
+    Dim intConformer As Integer
     
     Dim lngOriginalAMTIndex As Long             ' Index of the AMT in AMTData().MW, etc.
     Dim lngMTOrIndIndexOriginal As Long         ' Index of the AMT in mMTOrInd()
@@ -6827,12 +7745,25 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
     
     Dim dblAMTMass As Double
     Dim dblBestAMTMass As Double, dblBestAMTMassDiff As Double
+    Dim intBestAMTConformer As Integer
     Dim strBestAMTMods As String, strBestSequence As String
+    Dim dblAMTDriftTime As Double
    
     ' AMTRefsCnt is the number of AMTs that this ion matched (aka MultiMassTagHitCount)
     strBaseMatchInfo = strLineOutPrefix & strSepChar & AMTRefsCnt
     For lngAMTRefIndex = 1 To AMTRefsCnt         'extract MT tag ID
-        lngMassTagID = CLng(GetIDFromString(AMTRefs(lngAMTRefIndex), AMTMark, AMTIDEnd))
+            
+        strMassTagIDRef = GetIDFromString(AMTRefs(lngAMTRefIndex), AMTMark, AMTIDEnd)
+        
+        ' Typically strMassTagIDRef will simply hold an integer representing Mass_Tag_ID
+        ' However, if we searched conformers, then it will hold a decimal number representing Mass_Tag_ID, charge, and conformer, for example: 74866100.0201
+        ' where .02 means charge 2+ and 01 means conformer 1
+        
+        lngMassTagID = CLng(strMassTagIDRef)
+        If mMTListContainsConformers Then
+            intConformerCharge = Int((CDbl(strMassTagIDRef) - lngMassTagID) * 100#)
+            intConformer = Round(((CDbl(strMassTagIDRef) - lngMassTagID) * 100# - intConformerCharge) * 100, 0)
+        End If
         
         strLineOut = strBaseMatchInfo & strSepChar & lngMassTagID & strSepChar
         
@@ -6841,9 +7772,23 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
             
             lngOriginalAMTIndex = lngMatchingIndices(0)
             
+            If mMTListContainsConformers And lngMatchCount > 1 Then
+                For lngPointerIndex = 0 To lngMatchCount - 1
+                    If AMTData(lngMatchingIndices(lngPointerIndex)).Conformer_Charge = intConformerCharge Then
+                        If AMTData(lngMatchingIndices(lngPointerIndex)).Conformer = intConformer Then
+                            ' Update lngOriginalAMTIndex
+                            lngOriginalAMTIndex = lngMatchingIndices(lngPointerIndex)
+                        End If
+                    End If
+                Next lngPointerIndex
+            End If
+            
+            
             ' Now look for lngOriginalAMTIndex in lngMTOrInd()
             ' It could actually be present several times if the mass modifications were
             '  defined as dynamic (rather than static)
+            ' It could also be present if ConformerID is non-zero
+            
             If objMTOrIndFastSearch.FindMatchingIndices(lngOriginalAMTIndex, lngMatchingIndices(), lngMatchCount) Then
                 ' Match Found
                 
@@ -6873,6 +7818,7 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
                             
                             If lngMassTagIndexOriginal <= AMTCnt Then
                                 strBestSequence = AMTData(lngMassTagIndexOriginal).Sequence
+                                dblAMTDriftTime = AMTData(lngMassTagIndexOriginal).Drift_Time_Avg
                             Else
                                 ' Invalid MT tag index
                                 Debug.Assert False
@@ -6886,6 +7832,7 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
                                 
                                 If lngMassTagIndexOriginal <= AMTCnt Then
                                     strBestSequence = AMTData(lngMassTagIndexOriginal).Sequence
+                                    dblAMTDriftTime = AMTData(lngMassTagIndexOriginal).Drift_Time_Avg
                                 Else
                                     ' Invalid MT tag index
                                     Debug.Assert False
@@ -6911,6 +7858,11 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
         If Len(strBestAMTMods) > 0 Then
             strLineOut = strLineOut & " " & strBestAMTMods
         End If
+        
+        If mMTListContainsConformers Then
+            strLineOut = strLineOut & strSepChar & intConformer & strSepChar & Round(dblAMTDriftTime, 4)
+        End If
+
         strLineOut = strLineOut & strSepChar & strBestSequence & strSepChar
         
         If Not blnIncludeORFInfo Then
@@ -7035,10 +7987,6 @@ Private Sub chkDisableCustomNETs_Click()
     EnableDisableNETFormulaControls
 End Sub
 
-Private Sub chkPlotUniqueAMTs_Click()
-    UpdateSTACPlot
-End Sub
-
 Private Sub chkPlotUPFilteredFDR_Click()
     UpdateSTACPlot
 End Sub
@@ -7057,6 +8005,10 @@ End Sub
 
 Private Sub chkSTACUsesPriorProbability_Click()
     Me.STACUsesPriorProbability = cChkBox(chkSTACUsesPriorProbability)
+End Sub
+
+Private Sub chkUseDriftTime_Click()
+    samtDef.UseDriftTime = cChkBox(chkUseDriftTime)
 End Sub
 
 Private Sub chkUseSTAC_Click()
@@ -7454,6 +8406,23 @@ End Sub
 
 Private Sub txtDBSearchMinimumPeptideProphetProbability_LostFocus()
     ValidateTextboxValueDbl txtDBSearchMinimumPeptideProphetProbability, 0, 1, 0
+End Sub
+
+Private Sub txtDriftTimeTol_LostFocus()
+    If IsNumeric(txtDriftTimeTol.Text) Then
+       samtDef.DriftTimeTol = CDbl(txtDriftTimeTol.Text)
+    Else
+       If Len(Trim(txtDriftTimeTol.Text)) > 0 Then
+          MsgBox "Drift Time Tolerance should be number between 0 and 100.", vbOKOnly
+          txtDriftTimeTol.SetFocus
+       Else
+          samtDef.DriftTimeTol = -1   'do not consider drift time when searching
+       End If
+    End If
+End Sub
+
+Private Sub txtDriftTimeTol_Validate(Cancel As Boolean)
+    TextBoxLimitNumberLength txtDriftTimeTol, 12
 End Sub
 
 Private Sub txtMWTol_LostFocus()

@@ -328,34 +328,34 @@ End Sub
 
 Public Function GetERClrInd(ByVal ER As Double) As Integer
 'returns color index in aDDColors for specified ER
-Dim i As Integer
+Dim I As Integer
 On Error Resume Next
 GetERClrInd = -50
-i = -50
-Do While ER > aDDScale(i) And i < 50
-   i = i + 1
+I = -50
+Do While ER > aDDScale(I) And I < 50
+   I = I + 1
 Loop
-GetERClrInd = i
+GetERClrInd = I
 End Function
 
 Public Sub DDInitColors()
-Dim i As Integer
+Dim I As Integer
 Dim DDRatioScale As Double
 DDRatioScale = (glDDRatioMax - 1) / 50 'variable step for DDratio>1
-For i = -50 To 50
-    If i < 0 Then
-       aDDScale(i) = 1 + i * 0.02
-       aDDColors(i) = ((&H40404 * (-i)) And (glUnderColor Xor glMidColor) Xor glMidColor)
+For I = -50 To 50
+    If I < 0 Then
+       aDDScale(I) = 1 + I * 0.02
+       aDDColors(I) = ((&H40404 * (-I)) And (glUnderColor Xor glMidColor) Xor glMidColor)
     Else
-       If i = 0 Then
-          aDDScale(i) = 0.02
-          aDDColors(i) = glMidColor
+       If I = 0 Then
+          aDDScale(I) = 0.02
+          aDDColors(I) = glMidColor
        Else
-          aDDScale(i) = 1 + i * DDRatioScale
-          aDDColors(i) = ((&H40404 * i) And (glOverColor Xor glMidColor) Xor glMidColor)
+          aDDScale(I) = 1 + I * DDRatioScale
+          aDDColors(I) = ((&H40404 * I) And (glOverColor Xor glMidColor) Xor glMidColor)
        End If
     End If
-Next i
+Next I
 End Sub
 
 Public Sub MDIStatus(ByVal Visibility As Boolean, _
@@ -470,7 +470,7 @@ Public Function LinearNETAlignmentSelectUMCToUse(ByVal lngGelIndex As Long, _
 'selects unique mass classes that will be used to correct NET based
 'on specified criteria; returns number selected; -1 on any error
 '------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim Cnt As Long
 
 Dim ePairedSearchUMCSelection As punaPairsUMCNetAdjustmentConstants
@@ -478,13 +478,13 @@ Dim ePairedSearchUMCSelection As punaPairsUMCNetAdjustmentConstants
 On Error GoTo exit_LinearNETAlignmentSelectUMCToUse
 LinearNETAlignmentSelectUMCToUse = -1
 
-For i = 0 To GelUMC(lngGelIndex).UMCCnt - 1
-    With GelUMC(lngGelIndex).UMCs(i)
+For I = 0 To GelUMC(lngGelIndex).UMCCnt - 1
+    With GelUMC(lngGelIndex).UMCs(I)
         .ClassStatusBits = .ClassStatusBits And Not UMC_INDICATOR_BIT_USED_FOR_NET_ADJ
         .ClassStatusBits = .ClassStatusBits And Not UMC_INDICATOR_BIT_LOWSEGMENTCOUNT_ADDITION
         .ClassStatusBits = .ClassStatusBits And Not UMC_INDICATOR_BIT_NET_ADJ_DB_HIT
     End With
-Next i
+Next I
 
 ePairedSearchUMCSelection = glbPreferencesExpanded.PairSearchOptions.NETAdjustmentPairedSearchUMCSelection
     
@@ -502,39 +502,39 @@ If ePairedSearchUMCSelection <> punaPairedAndUnpaired Then
     Case punaPairedAll, punaPairedLight, punaPairedHeavy
         ' First exclude everything
         ' Then, include LC-MS Features that are paired, depending upon ePairedSearchUMCSelection
-        For i = 0 To GelUMC(lngGelIndex).UMCCnt - 1
-            UseUMC(i) = False
-        Next i
+        For I = 0 To GelUMC(lngGelIndex).UMCCnt - 1
+            UseUMC(I) = False
+        Next I
         
         If ePairedSearchUMCSelection = punaPairedAll Then
             ' Add back all LC-MS Features belonging to pairs
-            For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p1) = True
-                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p2) = True
-            Next i
+            For I = 0 To GelP_D_L(lngGelIndex).PCnt - 1
+                UseUMC(GelP_D_L(lngGelIndex).Pairs(I).p1) = True
+                UseUMC(GelP_D_L(lngGelIndex).Pairs(I).p2) = True
+            Next I
         ElseIf ePairedSearchUMCSelection = punaPairedHeavy Then
             ' Add back LC-MS Features belonging to the heavy member of pairs
-            For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p2) = True
-            Next i
+            For I = 0 To GelP_D_L(lngGelIndex).PCnt - 1
+                UseUMC(GelP_D_L(lngGelIndex).Pairs(I).p2) = True
+            Next I
         Else
             ' punaPairedLight
             ' Add back LC-MS Features belonging to the light member of pairs
-            For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-                UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p1) = True
-            Next i
+            For I = 0 To GelP_D_L(lngGelIndex).PCnt - 1
+                UseUMC(GelP_D_L(lngGelIndex).Pairs(I).p1) = True
+            Next I
         End If
     Case punaUnpairedOnly
         ' Exclude LC-MS Features that are paired
-        For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-            UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p1) = False
-            UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p2) = False
-        Next i
+        For I = 0 To GelP_D_L(lngGelIndex).PCnt - 1
+            UseUMC(GelP_D_L(lngGelIndex).Pairs(I).p1) = False
+            UseUMC(GelP_D_L(lngGelIndex).Pairs(I).p2) = False
+        Next I
     Case punaUnpairedPlusPairedLight
         ' Exclude LC-MS Features that belong to heavy members of pairs
-        For i = 0 To GelP_D_L(lngGelIndex).PCnt - 1
-            UseUMC(GelP_D_L(lngGelIndex).Pairs(i).p2) = False
-        Next i
+        For I = 0 To GelP_D_L(lngGelIndex).PCnt - 1
+            UseUMC(GelP_D_L(lngGelIndex).Pairs(I).p2) = False
+        Next I
     End Select
     
 End If
@@ -543,11 +543,11 @@ If UMCNetAdjDef.MinUMCCount > 1 Or UMCNetAdjDef.MinScanRange > 1 Then
     ' filter-out all mass classes with insufficient membership
     '  or
     ' filter-out all mass classes with insufficient scan coverage
-    For i = 0 To GelUMC(lngGelIndex).UMCCnt - 1
-        If UseUMC(i) = True Then
-            UseUMC(i) = LinearNETAlignmentUMCSelectionFilterCheck(lngGelIndex, i)
+    For I = 0 To GelUMC(lngGelIndex).UMCCnt - 1
+        If UseUMC(I) = True Then
+            UseUMC(I) = LinearNETAlignmentUMCSelectionFilterCheck(lngGelIndex, I)
         End If
-    Next i
+    Next I
 End If
 
 If UMCNetAdjDef.TopAbuPct >= 0 And UMCNetAdjDef.TopAbuPct < 100 Then
@@ -561,15 +561,15 @@ If UMCNetAdjDef.TopAbuPct >= 0 And UMCNetAdjDef.TopAbuPct < 100 Then
 End If
 
 Debug.Assert UBound(UseUMC) = GelUMC(lngGelIndex).UMCCnt - 1
-For i = 0 To UBound(UseUMC)
-    With GelUMC(lngGelIndex).UMCs(i)
-        If UseUMC(i) Then
+For I = 0 To UBound(UseUMC)
+    With GelUMC(lngGelIndex).UMCs(I)
+        If UseUMC(I) Then
             Cnt = Cnt + 1
             ' Turn on the UMC_INDICATOR_BIT_USED_FOR_NET_ADJ bit
             .ClassStatusBits = .ClassStatusBits Or UMC_INDICATOR_BIT_USED_FOR_NET_ADJ
         End If
     End With
-Next i
+Next I
 LinearNETAlignmentSelectUMCToUse = Cnt
 Exit Function
 
@@ -991,7 +991,7 @@ End Function
 Public Sub PrintFileInfo(Ind As Long, InfoType As Integer)
 Dim aInfo As Variant
 Dim iLinesCount As Integer
-Dim i As Integer
+Dim I As Integer
 On Error GoTo err_printfileinfo
 
 aInfo = Fileinfo(Ind, InfoType)
@@ -1011,9 +1011,9 @@ Else
    Printer.Print "File Info for: " & GelBody(Ind).Caption
    Printer.Font.Bold = False
    Printer.Print " "
-   For i = 0 To iLinesCount
-      Printer.Print aInfo(i)
-   Next i
+   For I = 0 To iLinesCount
+      Printer.Print aInfo(I)
+   Next I
    Printer.Print
    Printer.Print "COMMENT"
    Printer.Print GelData(Ind).Comment
@@ -1050,17 +1050,17 @@ Public Function FactorN(ByVal X As Long, ByVal n As Long) As Long
 '----------------------------------------------------------------
 'returns factor of the x closest to the N
 '----------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim CurrFacN As Long
 
 CurrFacN = 1
-For i = 1 To CLng(X / 2)
-    If X Mod i = 0 Then
-       If Abs(i - n) <= Abs(CurrFacN - n) Then
-          CurrFacN = i
+For I = 1 To CLng(X / 2)
+    If X Mod I = 0 Then
+       If Abs(I - n) <= Abs(CurrFacN - n) Then
+          CurrFacN = I
        End If
     End If
-Next i
+Next I
 FactorN = CurrFacN
 End Function
 
@@ -1316,12 +1316,12 @@ Public Sub GetColorAPIDlg(ByVal Ownerhwnd As Long, _
                           ThingColor As Long)
 Dim ChClr As ChooseColor
 Dim CustColor(15) As Long
-Dim i As Integer
+Dim I As Integer
 Dim Res As Long
 
-For i = 0 To 15
-    CustColor(i) = GetSysColor(i)
-Next i
+For I = 0 To 15
+    CustColor(I) = GetSysColor(I)
+Next I
 
 ChClr.lStructSize = Len(ChClr)
 ChClr.hwndOwner = Ownerhwnd
@@ -1520,6 +1520,16 @@ With udtAMTDef
     .MaxMassTags = 5
     .SkipReferenced = False
     .SaveNCnt = True
+    .UseDriftTime = False
+    .DriftTimeTol = DEFAULT_DRIFT_TIME_TOL
+    .AdditionalValue1 = 0
+    .AdditionalValue2 = 0
+    .AdditionalValue3 = 0
+    .AdditionalValue4 = 0
+    .AdditionalValue5 = 0
+    .AdditionalValue6 = 0
+    .AdditionalValue7 = 0
+    .AdditionalValue8 = 0
 End With
 End Sub
 
@@ -1749,11 +1759,11 @@ Public Function GetChildCount() As Long
 '-------------------------------------------------------
 'returns number of currently loaded child(gel) forms
 '-------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim nCount As Long
-For i = 0 To UBound(GelStatus)
-    If Not GelStatus(i).Deleted Then nCount = nCount + 1
-Next i
+For I = 0 To UBound(GelStatus)
+    If Not GelStatus(I).Deleted Then nCount = nCount + 1
+Next I
 GetChildCount = nCount
 End Function
 
@@ -1860,14 +1870,14 @@ Public Function AACount(ByVal Seq As String, _
 Dim AA_ANSI As Byte        'number of amino acids to count
 Dim BPC As Long            'bytes per character
 Dim bSeq() As Byte         'sequence as a byte array
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 BPC = LenB(aa)
 AA_ANSI = CByte(Asc(aa))
 bSeq = Seq
-For i = 0 To UBound(bSeq) Step BPC
-    If bSeq(i) = AA_ANSI Then AACount = AACount + 1
-Next i
+For I = 0 To UBound(bSeq) Step BPC
+    If bSeq(I) = AA_ANSI Then AACount = AACount + 1
+Next I
 End Function
 
 ' Unused Function (July 2003)
@@ -1991,24 +2001,24 @@ End Function
 
 
 Private Sub InitChargeStateMap()
-Dim i As Long
-For i = 1 To 5
-    glCS1(i) = i
-    glCS2(i) = i
-Next i
+Dim I As Long
+For I = 1 To 5
+    glCS1(I) = I
+    glCS2(I) = I
+Next I
 End Sub
 
 Public Function GetChargeStateMapIndex(ByVal CS As Long) As Long
 '-----------------------------------------------------------------
 'returns bin index 1 to 5 to which charge state belongs; 6 if none
 '-----------------------------------------------------------------
-Dim i As Long
-For i = 1 To 5
-    If glCS1(i) <= CS And CS <= glCS2(i) Then
-       GetChargeStateMapIndex = i
+Dim I As Long
+For I = 1 To 5
+    If glCS1(I) <= CS And CS <= glCS2(I) Then
+       GetChargeStateMapIndex = I
        Exit Function
     End If
-Next i
+Next I
 GetChargeStateMapIndex = 6
 End Function
 

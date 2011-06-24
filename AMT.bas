@@ -87,6 +87,9 @@ Public Const NETErrEnd = ")"
 Public Const RTErrMark = "(RT Err: "
 Public Const RTErrEnd = ")"
 
+Public Const DriftTimeErrMark = "(DT Err: "
+Public Const DriftTimeErrEnd = ")"
+
 Public Const NCntMark = "(N: "
 
 'generic elution time (in use since 07/2001)
@@ -152,7 +155,7 @@ Private Const TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP = "T_Mass_Tag_to_Protein_Map"
 Private Const TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP_ALT = "T_Mass_Tags_to_Protein_Map"
 
 'This corresponds to FileInfoVersions(fioSearchDefinitions) version 2 through version 8
-Public Type SearchAMTDefinition
+Public Type SearchAMTDefinition2002
     SearchScope As Integer       'current scope or all points (actually type glScope) ; Not used on frmSearchMT_ConglomerateUMC
     SearchFlag As Integer        'defines which AMTs are included in search; corresponds to constants glAMT_CONFIRM_ ; if 0, then all data is searched ; Not used on frmSearchMT_ConglomerateUMC
     MWField As Integer           'MWField for Isotopic data
@@ -166,6 +169,33 @@ Public Type SearchAMTDefinition
     SkipReferenced As Boolean    'if True skip data points already referenced by AMT ID
     SaveNCnt As Boolean          'if true keep also number of N atoms in ID field; however, data referenced with Not Found will be searched
 End Type
+
+'This corresponds to FileInfoVersions(fioSearchDefinitions) version 9
+Public Type SearchAMTDefinition
+    SearchScope As Integer       'current scope or all points (actually type glScope) ; Not used on frmSearchMT_ConglomerateUMC
+    SearchFlag As Integer        'defines which AMTs are included in search; corresponds to constants glAMT_CONFIRM_ ; if 0, then all data is searched ; Not used on frmSearchMT_ConglomerateUMC
+    MWField As Integer           'MWField for Isotopic data
+    TolType As Integer           'ppm or Dalton; represented by 0 = ppm = gltPPM or 2 = Da = gltABS (actually type glMassToleranceConstants)
+    NETorRT As Integer           'Use NET or use RT (on some forms, use NET or use PNET)
+    Formula As String            'Formula to calculate NET
+    MWTol As Double              'actual MW Tolerance (search is +/- this tolerance)
+    NETTol As Double             'NET Tolerance (search is +/- this tolerance)
+    MassTag As Double            'if used special search is performed
+    MaxMassTags As Long          'maximum number of MT tags
+    SkipReferenced As Boolean    'if True skip data points already referenced by AMT ID
+    SaveNCnt As Boolean          'if true keep also number of N atoms in ID field; however, data referenced with Not Found will be searched
+    UseDriftTime As Boolean     ' True to use drift time
+    DriftTimeTol As Double      ' Drift time tolerance, in milliseconds
+    AdditionalValue1 As Long    ' 4 bytes
+    AdditionalValue2 As Long    ' 4 bytes
+    AdditionalValue3 As Long    ' 4 bytes
+    AdditionalValue4 As Long    ' 4 bytes
+    AdditionalValue5 As Long    ' 4 bytes
+    AdditionalValue6 As Long    ' 4 bytes
+    AdditionalValue7 As Long    ' 4 bytes
+    AdditionalValue8 As Long    ' 4 bytes
+End Type
+
 
 Public Type SearchORFDefinition
     SearchScope As Long
@@ -186,11 +216,13 @@ Public Type udtUMCMassTagRawMatches
     UniquenessProbability As Double         ' Uniqueness Probability from STAC
     MassErr As Double                       ' Observed difference (error) between MT tag mass and UMC class mass (in Da)
     NETErr As Double                        ' Observed difference (error) between MT tag NET and UMC class NET
+    DriftTimeErr As Double                  ' Observed difference (error) between MT drift time and UMC drift time
+    FeatureDriftTimeAligned As Double       ' Aligned (corrected) drift time for the feature
     IDIsInternalStd As Boolean
 End Type
 
 Public Type udtAMTDataType
-    ID As Long                          'AMT ID
+    ID As Long                          'AMT ID (Mass_Tag_ID); this will be a unique integer unless conformers were loaded, in which case this won't be unique
     flag As Integer                     'Status field
     MW As Double                        'Theoretical molecular weight
     NET As Double                       'elution time (average NET)
@@ -204,28 +236,35 @@ Public Type udtAMTDataType
     HighDiscriminantScore As Single     'High discriminant score
     PeptideProphetProbability As Single 'High Peptide Prophet Probability
     Sequence As String                  'peptide sequences;
+    
+    Conformer_ID As Long                ' IMS conformer ID
+    Conformer_Charge As Byte            ' IMS conformer charge
+    Conformer As Integer                ' Conformer number for the given AMT tag (0, 1, 2, etc.)
+    Drift_Time_Avg As Double            ' Average IMS Drift time
+    Conformer_Obs_Count As Long         ' IMS conformer observation count
 End Type
 
-Public Type udtAMTScoreStatsType
-    MTID As Long                          'AMT ID
-    MW As Double                        'Theoretical molecular weight
-    NET As Double                       'elution time
-    NETStDev As Double                  'elution time standard deviation
-    NETCount As Integer
-    MSMSObsCount As Long                'number of observations by MS/MS
-    HighNormalizedScore As Single       'High normalized score (typically XCorr)
-    HighDiscriminantScore As Single     'High discriminant score
-    PeptideProphetProbability As Single 'High Peptide Prophet Probability
-    ModCount As Integer
-    TrypticState As Byte
-    PepProphetObsCountCS1 As Integer
-    PepProphetObsCountCS2 As Integer
-    PepProphetObsCountCS3 As Integer
-    PepProphetFScoreCS1 As Single
-    PepProphetFScoreCS2 As Single
-    PepProphetFScoreCS3 As Single
-    PassesFilters As Byte
-End Type
+' Unused data type(June 2011)
+'Public Type udtAMTScoreStatsType
+'    MTID As Long                          'AMT ID
+'    MW As Double                        'Theoretical molecular weight
+'    NET As Double                       'elution time
+'    NETStDev As Double                  'elution time standard deviation
+'    NETCount As Integer
+'    MSMSObsCount As Long                'number of observations by MS/MS
+'    HighNormalizedScore As Single       'High normalized score (typically XCorr)
+'    HighDiscriminantScore As Single     'High discriminant score
+'    PeptideProphetProbability As Single 'High Peptide Prophet Probability
+'    ModCount As Integer
+'    TrypticState As Byte
+'    PepProphetObsCountCS1 As Integer
+'    PepProphetObsCountCS2 As Integer
+'    PepProphetObsCountCS3 As Integer
+'    PepProphetFScoreCS1 As Single
+'    PepProphetFScoreCS2 As Single
+'    PepProphetFScoreCS3 As Single
+'    PassesFilters As Byte
+'End Type
 
 
 Private Type udtAMTFieldPresentProteinTblType
@@ -267,12 +306,14 @@ End Type
 Public Type udtSTACStatsType
     STACCuttoff As Double
     UniqueAMTs As Long              ' Unique number of AMT tags matched (filtered on UP > 0.5)
+    UniqueConformers As Long
     FDR As Double                   ' Number between 0 and 100 representing FDR; we divide by 100 when storing in the DB
-    Matches As Long                 ' Number of AMT Tags that the LC-MS Features Matched (non-unique count)
+    ' Deprecated in June 2011: Matches As Long                 ' Number of AMT Tags that the LC-MS Features Matched (non-unique count)
     Errors As Double                ' Number of items in Matches that are estimated to be wrong
     UP_Filtered_UniqueAMTs As Long  ' Unique number of AMT tags matched (filtered on UP > 0.5)
+    UP_Filtered_UniqueConformers As Long
     UP_Filtered_FDR As Double       ' Number between 0 and 100 representing FDR (filtered on UP > 0.5); we divide by 100 when storing in the DB
-    UP_Filtered_Matches As Long     ' Number of AMT Tags that the LC-MS Features Matched (filtered on UP > 0.5)
+    ' Deprecated in June 2011: UP_Filtered_Matches As Long     ' Number of AMT Tags that the LC-MS Features Matched (filtered on UP > 0.5)
     UP_Filtered_Errors As Double    ' Number of items in Up_Filtered_Matches that are estimated to be wrong (filtered on UP > 0.5)
 End Type
 
@@ -280,6 +321,9 @@ Public Type udtSearchSummaryStatsType
     UMCCountWithHits As Long
     UniqueMTCount As Long
     UniqueIntStdCount As Long
+    
+    ConformerCount As Long
+    ConformerCountIdentified As Long
     
     ' The FDR-based stats will be non-zero only if STAC was used
     ' These values are only for AMT Tags; they do not include internal standards
@@ -289,8 +333,11 @@ Public Type udtSearchSummaryStatsType
     UniqueMTCount25PctFDR As Long
     UniqueMTCount50PctFDR As Long
     
-    MassToleranceFromSTAC As Double     ' Half-width of the Mass error histogram at the base (at 2.5 StDev)
-    NETToleranceFromSTAC As Double      ' Half-width of the NET error histogram at the base (at 2.5 StDev)
+    MassToleranceFromSTAC As Double             ' Half-width of the Mass error histogram at the base (at 2.5 StDev)
+    NETToleranceFromSTAC As Double              ' Half-width of the NET error histogram at the base (at 2.5 StDev)
+    DriftTimeToleranceFromSTAC As Double        ' Half-width of the Drift-time error histogram at the base (at 2.5 StDev)
+    DriftTimeAlignmentSlope As Double           ' Slope used to convert from observed drift time to aligned drift time
+    DriftTimeAlignmentIntercept As Double       ' Intercept used to convert from observed drift time to aligned drift time
 End Type
 
 
@@ -317,11 +364,12 @@ Private aSearchFlag() As Boolean
 'This is a 1-based array, ranging from 1 to AMTCnt
 Public AMTData() As udtAMTDataType
 
+' Unused variables (June 2011)
 'Global array of data loaded from AMT database
 'Array is sorted on MTID (since the Stored Procedure returns the data that way)
 'This is a 0-based array, ranging from 0 to AMTScoreStatsCnt-1
-Public AMTScoreStatsCnt As Long
-Public AMTScoreStats() As udtAMTScoreStatsType
+'Public AMTScoreStatsCnt As Long
+'Public AMTScoreStats() As udtAMTScoreStatsType
 
 'arrays down are used to compare AMT database with
 'current gel and eventually recalculate NET for gels
@@ -538,13 +586,17 @@ Public Function ConstructAMTReference(ByVal MW As Double, _
                                       ByVal dblAMTMass As Double, _
                                       ByVal dblStacOrSLiC As Double, _
                                       ByVal dblDelSLiCScore As Double, _
-                                      ByVal dblUPScore As Double) As String
+                                      ByVal dblUPScore As Double, _
+                                      ByVal blnIncludeConformerNum As Boolean, _
+                                      ByVal blnIncludeDriftTimeError As Boolean, _
+                                      ByVal dblDriftTimeError As Double) As String
                                       
     'returns AMT reference string based on MW and samtDef
     'this function is called from SearchAMT and similar functions
     
     Dim AMTRef As String
     Dim MWTolRef As Double
+    Dim AMTID As String
     
     Dim blnStoreAbsoluteValueOfError As Boolean
     
@@ -561,10 +613,17 @@ Public Function ConstructAMTReference(ByVal MW As Double, _
     
     ' The following assertion will fail if we used a huge search tolerance
     'Debug.Assert Abs(MWTolRef) < 1
+        
+    If blnIncludeConformerNum Then
+        AMTID = Trim(AMTData(AMTMatchIndex).ID) + _
+                     Format(AMTData(AMTMatchIndex).Conformer_Charge / 100# + AMTData(AMTMatchIndex).Conformer / 10000#, ".0000")
+    Else
+        AMTID = Trim(AMTData(AMTMatchIndex).ID)
+    End If
     
     'put AMT ID and actual errors
     If samtDef.SaveNCnt Then
-        AMTRef = AMTMark & Trim(AMTData(AMTMatchIndex).ID) & _
+        AMTRef = AMTMark & AMTID & _
                  MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd & _
                  MTSLiCMark & Round(dblStacOrSLiC, 4) & MTSLiCEnd & _
                  MTDelSLiCMark & Round(dblDelSLiCScore, 4) & MTDelSLiCEnd & _
@@ -572,15 +631,19 @@ Public Function ConstructAMTReference(ByVal MW As Double, _
                  MTNCntMark & AMTData(AMTMatchIndex).CNT_N & MTEndMark
     Else
           
-        AMTRef = AMTMark & Trim(AMTData(AMTMatchIndex).ID) & _
+        AMTRef = AMTMark & AMTID & _
                  MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd & _
                  MTSLiCMark & Round(dblStacOrSLiC, 4) & MTSLiCEnd & _
                  MTDelSLiCMark & Round(dblDelSLiCScore, 4) & MTDelSLiCEnd & _
                  MTUPMark & Round(dblUPScore, 4) & MTUpEND
     End If
-  
+ 
+    If blnIncludeDriftTimeError Then
+        AMTRef = AMTRef & DriftTimeErrMark & Format(dblDriftTimeError, "0.0000") & DriftTimeErrEnd
+    End If
+
     If Delta > 0 Then AMTRef = AMTRef & MTDltMark & Delta
-    
+       
     'do statistics
     AMTHits(AMTMatchIndex) = AMTHits(AMTMatchIndex) + 1
     AMTMWErr(AMTMatchIndex) = AMTMWErr(AMTMatchIndex) + Abs(MWTolRef)
@@ -965,9 +1028,10 @@ On Error GoTo err_LegacyDBLoadAMTData
     ' Clear MTtoORFMapCount
     MTtoORFMapCount = 0
         
+    ' Unused variables (June 2011)
     ' Clear the Score Stats array; this data cannot be loaded from Legacy DBs
-    AMTScoreStatsCnt = 0
-    ReDim AMTScoreStats(0)
+    ' AMTScoreStatsCnt = 0
+    ' ReDim AMTScoreStats(0)
     
     Do Until rsAMT.EOF
         If AMTCnt >= UBound(AMTData) Then
@@ -1724,7 +1788,7 @@ On Error GoTo LookupSTACCutoffForFDRErrorHandler
         ' Find the first entry in STACStats() with a positive value for Matches
         For lngIndex = 0 To STACStatsCount - 1
             lngStartIndex = lngIndex
-            If STACStats(lngIndex).Matches > 0 Then Exit For
+            If STACStats(lngIndex).UniqueAMTs > 0 Then Exit For
         Next lngIndex
         
         If dblFDR < STACStats(lngStartIndex).FDR / 100# Then
@@ -2602,20 +2666,28 @@ Public Function IsAMTReferencedByUMC(udtUMC As udtUMCType, lngGelIndex As Long) 
 End Function
 
 Public Sub InitializeAMTDataEntry(ByRef udtAMTDataPoint As udtAMTDataType, Optional NET_VALUE_IF_NULL As Single = -100000)
-    udtAMTDataPoint.ID = 0
-    udtAMTDataPoint.flag = 0
-    udtAMTDataPoint.MW = 0
-    udtAMTDataPoint.NET = 0
-    udtAMTDataPoint.MSMSObsCount = 1
-    udtAMTDataPoint.NETStDev = 0
-    udtAMTDataPoint.NETCount = 0
-    udtAMTDataPoint.PNET = NET_VALUE_IF_NULL
-    udtAMTDataPoint.CNT_N = -1
-    udtAMTDataPoint.CNT_Cys = -1
-    udtAMTDataPoint.HighNormalizedScore = 0
-    udtAMTDataPoint.HighDiscriminantScore = 0
-    udtAMTDataPoint.PeptideProphetProbability = 0
-    udtAMTDataPoint.Sequence = ""
+    With udtAMTDataPoint
+        .ID = 0
+        .flag = 0
+        .MW = 0
+        .NET = 0
+        .MSMSObsCount = 1
+        .NETStDev = 0
+        .NETCount = 0
+        .PNET = NET_VALUE_IF_NULL
+        .CNT_N = -1
+        .CNT_Cys = -1
+        .HighNormalizedScore = 0
+        .HighDiscriminantScore = 0
+        .PeptideProphetProbability = 0
+        .Sequence = ""
+        
+        .Conformer_ID = 0
+        .Conformer_Charge = 0
+        .Conformer = 0
+        .Drift_Time_Avg = 0
+        .Conformer_Obs_Count = 0
+    End With
 End Sub
 
 
@@ -2762,6 +2834,7 @@ With samtDef
     Case Else
         Debug.Assert False
     End Select
+    
     Select Case .NETorRT
     Case glAMT_NET
         sTmp = sTmp & "NET Calculation Formula: " & .Formula & vbCrLf
@@ -2778,6 +2851,15 @@ With samtDef
            sTmp = sTmp & "RT Tolerance: " & .NETTol & vbCrLf
         End If
     End Select
+    
+    If .UseDriftTime Then
+        If .DriftTimeTol < 0 Then
+           sTmp = sTmp & "Drift Time Tolerance: Not used as criteria in search."
+        Else
+           sTmp = sTmp & "Drift Time Tolerance: " & .DriftTimeTol & vbCrLf
+        End If
+    End If
+    
     If .SearchFlag > 0 Then
          sTmp = sTmp & "Search limited by condition: " & .SearchFlag & vbCrLf
     Else
@@ -2897,16 +2979,29 @@ GetAMTRefFromString2 = Cnt
 End Function
 
 Public Function GetMWErrFromString(ByVal S As String) As String
-'returns MW error from AMT string (always in ppm)
-Dim Pos1 As Integer, Pos2 As Integer
-Pos1 = InStr(1, S, MWErrMark)
-If Pos1 > 0 Then
-   Pos1 = Pos1 + Len(MWErrMark)
-   Pos2 = InStr(Pos1, S, MWErrEnd)
-   If Pos2 > 0 Then GetMWErrFromString = Mid$(S, Pos1, Pos2 - Pos1)
-Else
-    GetMWErrFromString = ""
-End If
+    'returns MW error from AMT string (always in ppm)
+    Dim Pos1 As Integer, Pos2 As Integer
+    Pos1 = InStr(1, S, MWErrMark)
+    If Pos1 > 0 Then
+       Pos1 = Pos1 + Len(MWErrMark)
+       Pos2 = InStr(Pos1, S, MWErrEnd)
+       If Pos2 > 0 Then GetMWErrFromString = Mid$(S, Pos1, Pos2 - Pos1)
+    Else
+        GetMWErrFromString = ""
+    End If
+End Function
+
+Public Function GetDriftTimeErrFromString(ByVal S As String) As String
+    'returns Drift Time error from AMT string
+    Dim Pos1 As Integer, Pos2 As Integer
+    Pos1 = InStr(1, S, DriftTimeErrMark)
+    If Pos1 > 0 Then
+       Pos1 = Pos1 + Len(DriftTimeErrMark)
+       Pos2 = InStr(Pos1, S, DriftTimeErrEnd)
+       If Pos2 > 0 Then GetDriftTimeErrFromString = Mid$(S, Pos1, Pos2 - Pos1)
+    Else
+        GetDriftTimeErrFromString = ""
+    End If
 End Function
 
 Public Function GetETErrFromString(ByVal S As String) As String
@@ -3576,10 +3671,11 @@ If ET1stOKs > 0 Then
     sTmp = sTmp & "ET Range: " & Format$(ET1stMin, "0.000000") & " - " & Format$(ET1stMax, "0.000000") & vbCrLf
 End If
 
-If AMTScoreStatsCnt > 0 Then
-    sTmp = sTmp & vbCrLf
-    sTmp = sTmp & "MT Stats: " & Format$(AMTScoreStatsCnt, "###,###,##0")
-End If
+' Unused variables (June 2011)
+''If AMTScoreStatsCnt > 0 Then
+''    sTmp = sTmp & vbCrLf
+''    sTmp = sTmp & "MT Stats: " & Format$(AMTScoreStatsCnt, "###,###,##0")
+''End If
 
 CheckMassTags = sTmp
 End Function

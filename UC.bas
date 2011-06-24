@@ -156,7 +156,7 @@ Public Type UMCDefinition2003a
 End Type
        
 'definition type for the Unique Masses Classes
-'This corresponds to FileInfoVersions(fioSearchDefinitions) versions 4 and 5
+'This corresponds to FileInfoVersions(fioSearchDefinitions) versions 4 through 9
 'and to FileInfoVersions(fioGelUMC) versions 3 and 4
 Public Type UMCDefinition
     UMCType As Integer                      'type; Options include glUMC_TYPE_INTENSITY = 0; glUMC_TYPE_FIT = 1; glUMC_TYPE_MINCNT = 2; glUMC_TYPE_MAXCNT = 3; glUMC_TYPE_UNQAMT = 4; glUMC_TYPE_ISHRINKINGBOX = 5; glUMC_TYPE_FSHRINKINGBOX = 6; glUMC_TYPE_FROM_NET = 7

@@ -3,28 +3,48 @@ Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmErrorDistribution2DLoadedData 
    BackColor       =   &H00FFFFFF&
    Caption         =   "Tolerance Refinement (Mass and NET Error Plots)"
-   ClientHeight    =   8730
+   ClientHeight    =   8460
    ClientLeft      =   225
-   ClientTop       =   795
+   ClientTop       =   855
    ClientWidth     =   13155
    LinkTopic       =   "Form1"
-   ScaleHeight     =   8730
+   ScaleHeight     =   8460
    ScaleWidth      =   13155
    StartUpPosition =   3  'Windows Default
+   Begin VB.Frame fraDriftTimeErrors 
+      BackColor       =   &H00FFFFFF&
+      Caption         =   "Drift Time Error Plot Status"
+      Height          =   1425
+      Left            =   120
+      TabIndex        =   136
+      Top             =   8450
+      Width           =   3015
+      Begin VB.TextBox txtDriftTimePeakStats 
+         BorderStyle     =   0  'None
+         Height          =   1110
+         Left            =   120
+         Locked          =   -1  'True
+         MultiLine       =   -1  'True
+         TabIndex        =   137
+         Text            =   "frmErrorDistribution2D.frx":0000
+         Top             =   220
+         Width           =   2835
+      End
+   End
    Begin VB.Frame fraControlsAndPlotContainer 
       BackColor       =   &H00FFFFFF&
       BorderStyle     =   0  'None
       Caption         =   "Frame1"
       Height          =   6200
       Left            =   5880
-      TabIndex        =   68
+      TabIndex        =   70
       Top             =   0
       Width           =   7000
       Begin VB.TextBox txtMaximumAbundance 
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   5640
-         TabIndex        =   76
+         TabIndex        =   78
          Text            =   "0"
          Top             =   960
          Width           =   855
@@ -33,7 +53,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   5640
-         TabIndex        =   74
+         TabIndex        =   76
          Text            =   "0"
          Top             =   600
          Width           =   855
@@ -43,7 +63,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Use UMC class stats"
          Height          =   255
          Left            =   3720
-         TabIndex        =   72
+         TabIndex        =   74
          Top             =   240
          Width           =   2535
       End
@@ -52,7 +72,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Include Internal Standard matches"
          Height          =   255
          Left            =   3720
-         TabIndex        =   71
+         TabIndex        =   73
          Top             =   0
          Value           =   1  'Checked
          Width           =   3015
@@ -60,34 +80,50 @@ Begin VB.Form frmErrorDistribution2DLoadedData
       Begin VB.Frame fraOptions 
          BackColor       =   &H00FFFFFF&
          Caption         =   "Options"
-         Height          =   2295
+         Height          =   2700
          Left            =   -120
-         TabIndex        =   80
+         TabIndex        =   82
          Top             =   1200
          Width           =   6615
+         Begin VB.TextBox txtDriftTimeBinSize 
+            Height          =   285
+            Left            =   5280
+            TabIndex        =   106
+            Text            =   "0.1"
+            Top             =   1920
+            Width           =   735
+         End
+         Begin VB.TextBox txtDriftTimeRange 
+            Height          =   285
+            Left            =   2040
+            TabIndex        =   104
+            Text            =   "10"
+            Top             =   1920
+            Width           =   735
+         End
          Begin VB.CheckBox chkShowPeakEdges 
             BackColor       =   &H00FFFFFF&
             Caption         =   "Show Peak Edges"
             Height          =   255
             Left            =   2520
-            TabIndex        =   87
+            TabIndex        =   89
             Top             =   960
             Width           =   2175
          End
          Begin VB.TextBox txtMassRangePPM 
             Height          =   285
             Left            =   2040
-            TabIndex        =   93
+            TabIndex        =   95
             Text            =   "100"
             Top             =   1200
             Width           =   735
          End
          Begin VB.TextBox txtButterworthFrequency 
             Height          =   285
-            Left            =   2760
-            TabIndex        =   103
+            Left            =   2640
+            TabIndex        =   108
             Text            =   "0.15"
-            Top             =   1920
+            Top             =   2300
             Width           =   735
          End
          Begin VB.CheckBox chkShowSmoothedData 
@@ -95,7 +131,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Smoothed Data"
             Height          =   255
             Left            =   240
-            TabIndex        =   84
+            TabIndex        =   86
             Top             =   960
             Width           =   2175
          End
@@ -104,7 +140,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Center Y Axis"
             Height          =   255
             Left            =   2520
-            TabIndex        =   86
+            TabIndex        =   88
             Top             =   480
             Value           =   1  'Checked
             Width           =   1335
@@ -114,7 +150,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Connect Points with Line"
             Height          =   255
             Left            =   240
-            TabIndex        =   83
+            TabIndex        =   85
             Top             =   720
             Value           =   1  'Checked
             Width           =   2175
@@ -124,7 +160,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Gridlines"
             Height          =   255
             Left            =   2520
-            TabIndex        =   85
+            TabIndex        =   87
             Top             =   240
             Value           =   1  'Checked
             Width           =   1455
@@ -132,7 +168,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGANETRange 
             Height          =   285
             Left            =   2040
-            TabIndex        =   99
+            TabIndex        =   100
             Text            =   "0.3"
             Top             =   1560
             Width           =   735
@@ -140,7 +176,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGANETBinSize 
             Height          =   285
             Left            =   5280
-            TabIndex        =   101
+            TabIndex        =   102
             Text            =   "0.005"
             Top             =   1560
             Width           =   735
@@ -148,7 +184,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtMassBinSizePPM 
             Height          =   285
             Left            =   5280
-            TabIndex        =   96
+            TabIndex        =   98
             Text            =   "0.5"
             Top             =   1200
             Width           =   735
@@ -156,7 +192,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGraphPointSize 
             Height          =   285
             Left            =   5280
-            TabIndex        =   89
+            TabIndex        =   91
             Text            =   "2"
             Top             =   240
             Width           =   735
@@ -164,7 +200,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGraphLineWidth 
             Height          =   285
             Left            =   5280
-            TabIndex        =   91
+            TabIndex        =   93
             Text            =   "3"
             Top             =   600
             Width           =   735
@@ -174,7 +210,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Auto Scale X Range"
             Height          =   255
             Left            =   240
-            TabIndex        =   81
+            TabIndex        =   83
             Top             =   240
             Value           =   1  'Checked
             Width           =   1815
@@ -184,18 +220,45 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Point Symbols"
             Height          =   255
             Left            =   240
-            TabIndex        =   82
+            TabIndex        =   84
             Top             =   480
             Value           =   1  'Checked
             Width           =   1815
+         End
+         Begin VB.Label Label1 
+            BackStyle       =   0  'Transparent
+            Caption         =   "Drift Time Range"
+            Height          =   255
+            Left            =   240
+            TabIndex        =   103
+            Top             =   1950
+            Width           =   1575
+         End
+         Begin VB.Label lblGANETRange 
+            BackStyle       =   0  'Transparent
+            Caption         =   "NET Range (± 0)"
+            Height          =   255
+            Left            =   240
+            TabIndex        =   135
+            Top             =   1590
+            Width           =   1575
+         End
+         Begin VB.Label Label2 
+            BackStyle       =   0  'Transparent
+            Caption         =   "Drift Time Bin Size"
+            Height          =   255
+            Left            =   3840
+            TabIndex        =   105
+            Top             =   1950
+            Width           =   1335
          End
          Begin VB.Label lblButterworthFrequency 
             BackStyle       =   0  'Transparent
             Caption         =   "Butterworth Sampling Frequency"
             Height          =   255
-            Left            =   240
-            TabIndex        =   102
-            Top             =   1950
+            Left            =   120
+            TabIndex        =   107
+            Top             =   2330
             Width           =   2415
          End
          Begin VB.Label lblMassRangePPM 
@@ -203,7 +266,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Mass Range (± 0)"
             Height          =   255
             Left            =   240
-            TabIndex        =   92
+            TabIndex        =   94
             Top             =   1230
             Width           =   1575
          End
@@ -212,25 +275,16 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Left            =   2880
-            TabIndex        =   94
+            TabIndex        =   96
             Top             =   1230
             Width           =   495
-         End
-         Begin VB.Label lblGANETRange 
-            BackStyle       =   0  'Transparent
-            Caption         =   "NET Range (± 0)"
-            Height          =   255
-            Left            =   240
-            TabIndex        =   98
-            Top             =   1590
-            Width           =   1575
          End
          Begin VB.Label lblGANETBinSize 
             BackStyle       =   0  'Transparent
             Caption         =   "NET Bin Size"
             Height          =   255
             Left            =   3840
-            TabIndex        =   100
+            TabIndex        =   101
             Top             =   1590
             Width           =   1335
          End
@@ -239,7 +293,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Left            =   6120
-            TabIndex        =   97
+            TabIndex        =   99
             Top             =   1230
             Width           =   495
          End
@@ -248,7 +302,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Mass Bin Size"
             Height          =   255
             Left            =   3840
-            TabIndex        =   95
+            TabIndex        =   97
             Top             =   1230
             Width           =   1335
          End
@@ -257,7 +311,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Point Size"
             Height          =   255
             Left            =   4080
-            TabIndex        =   88
+            TabIndex        =   90
             Top             =   270
             Width           =   855
          End
@@ -266,7 +320,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Line Width"
             Height          =   255
             Left            =   4080
-            TabIndex        =   90
+            TabIndex        =   92
             Top             =   630
             Width           =   975
          End
@@ -276,7 +330,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Show Tolerance Refinement Controls"
          Height          =   255
          Left            =   0
-         TabIndex        =   70
+         TabIndex        =   72
          Top             =   400
          Value           =   1  'Checked
          Width           =   3015
@@ -285,14 +339,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Height          =   315
          Left            =   0
          Style           =   2  'Dropdown List
-         TabIndex        =   69
+         TabIndex        =   71
          Top             =   0
          Width           =   3015
       End
       Begin VIPER.ctlSpectraPlotter ctlPlotter 
          Height          =   4815
          Left            =   0
-         TabIndex        =   131
+         TabIndex        =   134
          Top             =   1320
          Width           =   6855
          _ExtentX        =   12091
@@ -304,7 +358,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Maximum Abundance"
          Height          =   195
          Left            =   3840
-         TabIndex        =   75
+         TabIndex        =   77
          Top             =   960
          Width           =   1695
       End
@@ -314,7 +368,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Minimum SLiC"
          Height          =   195
          Left            =   4320
-         TabIndex        =   73
+         TabIndex        =   75
          Top             =   630
          Width           =   1215
       End
@@ -323,7 +377,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Loading..."
          Height          =   495
          Left            =   1080
-         TabIndex        =   78
+         TabIndex        =   80
          Top             =   720
          Width           =   3375
       End
@@ -332,7 +386,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "MTDB Status:"
          Height          =   255
          Left            =   0
-         TabIndex        =   77
+         TabIndex        =   79
          ToolTipText     =   "Status of the MT tag database"
          Top             =   720
          Width           =   1095
@@ -342,7 +396,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Ready"
          Height          =   255
          Left            =   0
-         TabIndex        =   79
+         TabIndex        =   81
          Top             =   960
          Width           =   3735
       End
@@ -360,7 +414,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Relative Risk Statistics"
          Height          =   735
          Left            =   120
-         TabIndex        =   106
+         TabIndex        =   109
          Top             =   6120
          Width           =   3015
          Begin VB.TextBox txtRelativeRiskStatistics 
@@ -369,7 +423,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   107
+            TabIndex        =   110
             Top             =   220
             Width           =   2835
          End
@@ -379,7 +433,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "UMC Mass Statistics"
          Height          =   1395
          Left            =   3240
-         TabIndex        =   104
+         TabIndex        =   62
          Top             =   4680
          Width           =   2550
          Begin VB.TextBox txtUMCMassStatistics 
@@ -388,8 +442,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   105
-            Text            =   "frmErrorDistribution2D.frx":0000
+            TabIndex        =   63
+            Text            =   "frmErrorDistribution2D.frx":0079
             Top             =   280
             Width           =   2355
          End
@@ -399,7 +453,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Current DB Search Tolerances"
          Height          =   745
          Left            =   3240
-         TabIndex        =   62
+         TabIndex        =   64
          Top             =   6120
          Width           =   2535
          Begin VB.TextBox txtDBSearchMassTolerances 
@@ -408,8 +462,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   63
-            Text            =   "frmErrorDistribution2D.frx":0054
+            TabIndex        =   65
+            Text            =   "frmErrorDistribution2D.frx":00CD
             Top             =   220
             Width           =   2355
          End
@@ -419,7 +473,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "NET Calibration Plot Status"
          Height          =   1425
          Left            =   3240
-         TabIndex        =   66
+         TabIndex        =   68
          Top             =   6960
          Width           =   2550
          Begin VB.TextBox txtNETCalibrationPeakCenter 
@@ -428,8 +482,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   67
-            Text            =   "frmErrorDistribution2D.frx":008B
+            TabIndex        =   69
+            Text            =   "frmErrorDistribution2D.frx":0104
             Top             =   220
             Width           =   2355
          End
@@ -439,7 +493,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Mass Calibration Plot Status"
          Height          =   1425
          Left            =   120
-         TabIndex        =   64
+         TabIndex        =   66
          Top             =   6960
          Width           =   3015
          Begin VB.TextBox txtMassCalibrationPeakCenter 
@@ -448,8 +502,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   65
-            Text            =   "frmErrorDistribution2D.frx":0101
+            TabIndex        =   67
+            Text            =   "frmErrorDistribution2D.frx":017A
             Top             =   220
             Width           =   2835
          End
@@ -544,7 +598,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabHeight       =   520
          BackColor       =   16777215
          TabCaption(0)   =   "Mass Calibration Refinement"
-         TabPicture(0)   =   "frmErrorDistribution2D.frx":017A
+         TabPicture(0)   =   "frmErrorDistribution2D.frx":01F3
          Tab(0).ControlEnabled=   0   'False
          Tab(0).Control(0)=   "cmdResetToDefaults"
          Tab(0).Control(1)=   "cmdAbortProcessing(0)"
@@ -562,7 +616,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Tab(0).Control(13)=   "lblMassCalibrationRefinementDescription"
          Tab(0).ControlCount=   14
          TabCaption(1)   =   "Tolerance Refinement"
-         TabPicture(1)   =   "frmErrorDistribution2D.frx":0196
+         TabPicture(1)   =   "frmErrorDistribution2D.frx":020F
          Tab(1).ControlEnabled=   -1  'True
          Tab(1).Control(0)=   "cmdMassToleranceRefinementStart"
          Tab(1).Control(0).Enabled=   0   'False
@@ -582,7 +636,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Tab(1).Control(7).Enabled=   0   'False
          Tab(1).ControlCount=   8
          TabCaption(2)   =   "Pairwise Diffs"
-         TabPicture(2)   =   "frmErrorDistribution2D.frx":01B2
+         TabPicture(2)   =   "frmErrorDistribution2D.frx":022B
          Tab(2).ControlEnabled=   0   'False
          Tab(2).Control(0)=   "cmdAbortProcessing(2)"
          Tab(2).Control(1)=   "cmdRecomputeHistograms(1)"
@@ -594,7 +648,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   375
             Index           =   2
             Left            =   -74520
-            TabIndex        =   128
+            TabIndex        =   131
             Top             =   3960
             Visible         =   0   'False
             Width           =   2055
@@ -604,7 +658,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   375
             Index           =   1
             Left            =   -74520
-            TabIndex        =   129
+            TabIndex        =   132
             Top             =   3960
             Width           =   2055
          End
@@ -612,14 +666,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Pairwise LC-MS Feature Diffs"
             Height          =   2415
             Left            =   -74880
-            TabIndex        =   110
+            TabIndex        =   113
             Top             =   480
             Width           =   4095
             Begin VB.TextBox txtPairwiseMassDiffNETOffset 
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   125
+               TabIndex        =   128
                Text            =   "0"
                Top             =   2040
                Width           =   615
@@ -628,7 +682,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   122
+               TabIndex        =   125
                Text            =   "0.1"
                Top             =   1680
                Width           =   615
@@ -637,7 +691,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Caption         =   "Compute pairwise differences"
                Height          =   255
                Left            =   120
-               TabIndex        =   111
+               TabIndex        =   114
                Top             =   270
                Width           =   3015
             End
@@ -645,7 +699,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   113
+               TabIndex        =   116
                Text            =   "-100"
                Top             =   600
                Width           =   615
@@ -654,7 +708,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   116
+               TabIndex        =   119
                Text            =   "100"
                Top             =   960
                Width           =   615
@@ -663,7 +717,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   119
+               TabIndex        =   122
                Text            =   "0.25"
                Top             =   1320
                Width           =   615
@@ -673,7 +727,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   11
                Left            =   2760
-               TabIndex        =   126
+               TabIndex        =   129
                Top             =   2070
                Width           =   540
             End
@@ -682,7 +736,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   15
                Left            =   120
-               TabIndex        =   124
+               TabIndex        =   127
                Top             =   2070
                Width           =   1425
             End
@@ -691,7 +745,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   13
                Left            =   1680
-               TabIndex        =   130
+               TabIndex        =   133
                Top             =   1710
                Width           =   345
             End
@@ -700,7 +754,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   12
                Left            =   120
-               TabIndex        =   121
+               TabIndex        =   124
                Top             =   1710
                Width           =   1425
             End
@@ -709,7 +763,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   10
                Left            =   2760
-               TabIndex        =   123
+               TabIndex        =   126
                Top             =   1710
                Width           =   540
             End
@@ -718,7 +772,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   9
                Left            =   2760
-               TabIndex        =   120
+               TabIndex        =   123
                Top             =   1350
                Width           =   540
             End
@@ -727,7 +781,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   11
                Left            =   120
-               TabIndex        =   112
+               TabIndex        =   115
                Top             =   630
                Width           =   1905
             End
@@ -736,7 +790,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   4
                Left            =   2760
-               TabIndex        =   114
+               TabIndex        =   117
                Top             =   630
                Width           =   540
             End
@@ -745,7 +799,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   9
                Left            =   120
-               TabIndex        =   115
+               TabIndex        =   118
                Top             =   990
                Width           =   1905
             End
@@ -754,7 +808,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   2
                Left            =   2760
-               TabIndex        =   117
+               TabIndex        =   120
                Top             =   990
                Width           =   540
             End
@@ -763,7 +817,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   7
                Left            =   120
-               TabIndex        =   118
+               TabIndex        =   121
                Top             =   1350
                Width           =   1905
             End
@@ -772,7 +826,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Set to Defaults"
             Height          =   375
             Left            =   -71160
-            TabIndex        =   109
+            TabIndex        =   112
             Top             =   600
             Width           =   1455
          End
@@ -780,7 +834,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Use min or max tol if out of range"
             Height          =   375
             Left            =   3720
-            TabIndex        =   108
+            TabIndex        =   111
             Top             =   1920
             Value           =   1  'Checked
             Width           =   1575
@@ -1204,7 +1258,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Explanation goes here"
             Height          =   975
             Left            =   -74880
-            TabIndex        =   127
+            TabIndex        =   130
             Top             =   3000
             Width           =   5235
          End
@@ -1349,6 +1403,7 @@ Public Enum mdmMassErrorDisplayModeConstants
     mdmMassErrorDa = 1
     mdmGanetError = 2
     mdmPairwiseMassDifferences = 3
+    mdmDriftTimeError = 4
 End Enum
 
 Private Type udtUMCStatsDetailsType
@@ -1382,24 +1437,30 @@ Private mRawErrorsCount As Long
 Private mRawMassErrorsPPM() As Single        ' 0-based array, in PPM
 Private mRawMassErrorsDa() As Single         ' 0-based array, in Da
 Private mRawNETErrors() As Single            ' 0-based array
+Private mRawDriftTimeErrors() As Single      ' 0-based array
 
 ' Note: These arrays are initially empty
 ' They are populated using ComputeErrorsIndividualPoints, which should be called
-'  if the mRawMassErrorsPPM(), mRawMassErrorsDa(), and mRawNETErrors() arrays were
+'  if the mRawMassErrorsPPM(), mRawMassErrorsDa(), mRawNETErrors(), and mRawDriftTimeErrors() arrays were
 '  populated using UMC-based stats.  This data is then used by
 '  RefineDBSearchMassToleranceStart & RefineDBSearchNETToleranceStart
 Private mRawErrorsIndividualPointsCount As Long             ' Initially set to 0
 Private mRawMassErrorsIndividualPointsPPM() As Single       ' 0-based array, in PPM
 Private mRawMassErrorsIndividualPointsDa() As Single        ' 0-based array, in Da
 Private mRawNETErrorsIndividualPoints() As Single           ' 0-based array
+Private mRawDriftTimeErrorsIndividualPointsCount() As Single    ' 0-based array
 
 Private mMassPPMErrors As udtBinnedDataType
 Private mMassDaErrors As udtBinnedDataType
 Private mGanetErrors As udtBinnedDataType
+Private mDriftTimeErrors As udtBinnedDataType
 Private mPairwiseMassDifferences As udtBinnedDataType
+
+Private mDriftTimesDefined As Boolean       ' True if data is present in mRawDriftTimeErrors
 
 Private mUMCStats As udtUMCStatsType
 
+' The following arrays can be used to determine the index in AMTData() of a given MassTagID
 Private mAMTIDSorted() As Long                  ' 0-based array
 Private mAMTIDSortedInd() As Long               ' 0-based array
 
@@ -1414,6 +1475,7 @@ Private mFormInitialized As Boolean
 
 Private mMassCalErrorPeakCached As udtErrorPlottingPeakCacheType
 Private mNETTolErrorPeakCached As udtErrorPlottingPeakCacheType
+Private mDriftTimeErrorPeakCached As udtErrorPlottingPeakCacheType
 
 Private mGraphTitle As String
 
@@ -1431,7 +1493,18 @@ Private mGelAnalysisIsValid As Boolean
 Private mAbortProcessing As Boolean
 '
 
-Private Function AddNewErrValues(ByRef sngRawMassErrorsPPM() As Single, ByRef sngRawMassErrorsDa() As Single, ByRef sngRawNETErrors() As Single, ByRef lngRawErrorsCount As Long, ByRef Refs() As String, ByVal RefsCnt As Long, ByVal dblIonMass As Double, ByVal sngIonGANET As Single, ByVal dblIonAbundance As Double, ByVal dblMassErrPPMCorrection As Double, ByVal blnInternalStdMatch As Boolean) As Boolean
+Private Function AddNewErrValues(ByRef sngRawMassErrorsPPM() As Single, _
+                                 ByRef sngRawMassErrorsDa() As Single, _
+                                 ByRef sngRawNETErrors() As Single, _
+                                 ByRef sngRawDriftTimeErrors() As Single, _
+                                 ByRef lngRawErrorsCount As Long, _
+                                 ByRef Refs() As String, _
+                                 ByVal RefsCnt As Long, _
+                                 ByVal dblIonMass As Double, _
+                                 ByVal sngIonGANET As Single, _
+                                 ByVal dblIonAbundance As Double, _
+                                 ByVal dblMassErrPPMCorrection As Double, _
+                                 ByVal blnInternalStdMatch As Boolean) As Boolean
     
     Dim strRefID As String
     Dim strPPMMassError As String
@@ -1451,6 +1524,10 @@ Private Function AddNewErrValues(ByRef sngRawMassErrorsPPM() As Single, ByRef sn
     Dim dblMaxMassErrorPPMtoStore As Double
     
     Dim sngGANETError As Single
+    
+    Dim strDriftTimeError As String
+    Dim dblDriftTimeErrorFromID As Double
+    
     Dim blnValidSLiC As Boolean
     Dim blnHitFound As Boolean
     
@@ -1512,6 +1589,9 @@ On Error GoTo AddNewErrValuesErrorHandler
                 ' Extract the recorded mass error (in ppm)
                 strPPMMassError = GetMWErrFromString(Refs(lngMatchIndex))
                 
+                ' Extract the recorded drift time error (if any)
+                strDriftTimeError = GetDriftTimeErrFromString(Refs(lngMatchIndex))
+                
                 blnValidSLiC = True
                 If glbPreferencesExpanded.RefineMSDataOptions.MinimumSLiC > 0 Then
                     If GetSLiCFromString(Refs(lngMatchIndex)) < glbPreferencesExpanded.RefineMSDataOptions.MinimumSLiC Then
@@ -1533,6 +1613,12 @@ On Error GoTo AddNewErrValuesErrorHandler
                     End If
                 End If
                 
+            End If
+            
+            If IsNumeric(strDriftTimeError) Then
+                dblDriftTimeErrorFromID = CDbl(strDriftTimeError)
+            Else
+                dblDriftTimeErrorFromID = 0
             End If
             
             If blnValidSLiC Then
@@ -1591,13 +1677,15 @@ On Error GoTo AddNewErrValuesErrorHandler
                             ReDim Preserve sngRawMassErrorsPPM(lngNewDataCount - 1)
                             ReDim Preserve sngRawMassErrorsDa(lngNewDataCount - 1)
                             ReDim Preserve sngRawNETErrors(lngNewDataCount - 1)
+                            ReDim Preserve sngRawDriftTimeErrors(lngNewDataCount - 1)
                             ''ReDim Preserve mDataSourceIonIndex(lngNewDataCount - 1)
                         End If
                         
-                        ' Add Errors to sngRawMassErrorsPPM(), sngRawMassErrorsDa(), and sngRawNETErrors()
+                        ' Add Errors to sngRawMassErrorsPPM(), sngRawMassErrorsDa(), sngRawNETErrors(), and sngRawDriftTimeErrors
                         sngRawMassErrorsPPM(lngRawErrorsCount) = dblMassErrorPPM
                         sngRawMassErrorsDa(lngRawErrorsCount) = CSng(dblMassErrorDa)
                         sngRawNETErrors(lngRawErrorsCount) = sngGANETError
+                        sngRawDriftTimeErrors(lngRawErrorsCount) = CSng(dblDriftTimeErrorFromID)
                         
                         lngRawErrorsCount = lngRawErrorsCount + 1
                     
@@ -1869,6 +1957,7 @@ Private Sub ClearRawDataArrays()
     ReDim mRawMassErrorsPPM(0)
     ReDim mRawMassErrorsDa(0)
     ReDim mRawNETErrors(0)
+    ReDim mRawDriftTimeErrors(0)
 End Sub
 
 Private Sub ClearRawDataIndividualPointsArrays()
@@ -1876,22 +1965,26 @@ Private Sub ClearRawDataIndividualPointsArrays()
     ReDim mRawMassErrorsIndividualPointsPPM(0)
     ReDim mRawMassErrorsIndividualPointsDa(0)
     ReDim mRawNETErrorsIndividualPoints(0)
+    ReDim mRawDriftTimeErrorsIndividualPointsCount(0)
 End Sub
 
 Private Sub ClearBinnedDataArrays()
     mMassPPMErrors.BinnedCount = 0
     mMassDaErrors.BinnedCount = 0
     mGanetErrors.BinnedCount = 0
+    mDriftTimeErrors.BinnedCount = 0
     mPairwiseMassDifferences.BinnedCount = 0
     
     ReDim mMassPPMErrors.Binned(0)
     ReDim mMassDaErrors.Binned(0)
     ReDim mGanetErrors.Binned(0)
+    ReDim mDriftTimeErrors.Binned(0)
     ReDim mPairwiseMassDifferences.Binned(0)
     
     ReDim mMassPPMErrors.SmoothedBins(0)
     ReDim mMassDaErrors.SmoothedBins(0)
     ReDim mGanetErrors.SmoothedBins(0)
+    ReDim mDriftTimeErrors.SmoothedBins(0)
     ReDim mPairwiseMassDifferences.SmoothedBins(0)
     
 End Sub
@@ -2029,7 +2122,7 @@ On Error GoTo ComputeMassErrorsErrorHandler
         ClearRawDataIndividualPointsArrays
     End If
     
-    ComputeErrorsWork mRawMassErrorsPPM, mRawMassErrorsDa, mRawNETErrors, mRawErrorsCount, glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats, lngDataWithHits
+    ComputeErrorsWork mRawMassErrorsPPM, mRawMassErrorsDa, mRawNETErrors, mRawDriftTimeErrors, mRawErrorsCount, glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats, lngDataWithHits
     
     If mRawErrorsCount > 0 Then
         UpdateStatus "Binning data"
@@ -2048,7 +2141,7 @@ On Error GoTo ComputeMassErrorsErrorHandler
             objHistogram.StartBinDigitsAfterDecimal = 0
             
             If Not objHistogram.BinData(mRawMassErrorsPPM, mRawErrorsCount, .Binned, .BinnedCount) Then
-                LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors"
+                LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors for mRawMassErrorsPPM"
             End If
             
             .StartBin = objHistogram.StartBin
@@ -2068,7 +2161,7 @@ On Error GoTo ComputeMassErrorsErrorHandler
             objHistogram.StartBinDigitsAfterDecimal = 3
             
             If Not objHistogram.BinData(mRawMassErrorsDa, mRawErrorsCount, .Binned, .BinnedCount) Then
-                LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors"
+                LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors for mRawMassErrorsDa"
             End If
             
             .StartBin = objHistogram.StartBin
@@ -2081,14 +2174,44 @@ On Error GoTo ComputeMassErrorsErrorHandler
             Next lngIndex
         End With
 
-        ' Finally, the GANET errors
+        ' Now the GANET errors
         With mGanetErrors
             objHistogram.BinSize = glbPreferencesExpanded.ErrorPlottingOptions.GANETBinSize
             objHistogram.DefaultBinSize = 0.005
             objHistogram.StartBinDigitsAfterDecimal = 1
         
             If Not objHistogram.BinData(mRawNETErrors, mRawErrorsCount, .Binned, .BinnedCount) Then
-                LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors"
+                LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors for mRawNETErrors"
+            End If
+            
+            .StartBin = objHistogram.StartBin
+            .BinSize = objHistogram.BinSize
+            .BinRangeMaximum = objHistogram.BinRangeMaximum
+        
+            ReDim .SmoothedBins(UBound(.Binned))
+            For lngIndex = 0 To UBound(.Binned)
+                .SmoothedBins(lngIndex) = .Binned(lngIndex)
+            Next lngIndex
+        End With
+        
+        
+        ' Now the drift time errors
+        With mDriftTimeErrors
+            ' See if any non-zero values are present in mRawDriftTimeErrors
+            mDriftTimesDefined = False
+            For lngIndex = 0 To mRawErrorsCount - 1
+                If mRawDriftTimeErrors(lngIndex) > 0 Then
+                    mDriftTimesDefined = True
+                    Exit For
+                End If
+            Next lngIndex
+            
+            objHistogram.BinSize = glbPreferencesExpanded.ErrorPlottingOptions.DriftTimeBinSize
+            objHistogram.DefaultBinSize = 0.005
+            objHistogram.StartBinDigitsAfterDecimal = 3
+        
+            If Not objHistogram.BinData(mRawDriftTimeErrors, mRawErrorsCount, .Binned, .BinnedCount) Then
+                LogErrors objHistogram.ErrorNumber, "frmErrorDistribution2DLoaddedData->ComputeErrors for mRawDriftTimeErrors"
             End If
             
             .StartBin = objHistogram.StartBin
@@ -2165,7 +2288,7 @@ On Error GoTo ComputeErrorsIndividualPointsErrorHandler
     
     UpdateStatus "Populating individual point error arrays"
     
-    ComputeErrorsWork mRawMassErrorsIndividualPointsPPM, mRawMassErrorsIndividualPointsDa, mRawNETErrorsIndividualPoints, mRawErrorsIndividualPointsCount, False, 0
+    ComputeErrorsWork mRawMassErrorsIndividualPointsPPM, mRawMassErrorsIndividualPointsDa, mRawNETErrorsIndividualPoints, mRawDriftTimeErrorsIndividualPointsCount, mRawErrorsIndividualPointsCount, False, 0
     
     Exit Sub
     
@@ -2177,7 +2300,13 @@ ComputeErrorsIndividualPointsErrorHandler:
     
 End Sub
 
-Private Sub ComputeErrorsWork(ByRef sngRawMassErrorsPPM() As Single, ByRef sngRawMassErrorsDa() As Single, ByRef sngRawNETErrors() As Single, ByRef lngRawErrorsCount As Long, ByVal blnUseUMCClassStats As Boolean, ByRef lngDataWithHits As Long)
+Private Sub ComputeErrorsWork(ByRef sngRawMassErrorsPPM() As Single, _
+                              ByRef sngRawMassErrorsDa() As Single, _
+                              ByRef sngRawNETErrors() As Single, _
+                              ByRef sngRawDriftTimeErrors() As Single, _
+                              ByRef lngRawErrorsCount As Long, _
+                              ByVal blnUseUMCClassStats As Boolean, _
+                              ByRef lngDataWithHits As Long)
 
     Dim IsoField As Integer
     Dim lngIndex As Long
@@ -2194,6 +2323,7 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
     ReDim sngRawMassErrorsPPM(INITIAL_DATA_COUNT - 1)
     ReDim sngRawMassErrorsDa(INITIAL_DATA_COUNT - 1)
     ReDim sngRawNETErrors(INITIAL_DATA_COUNT - 1)
+    ReDim sngRawDriftTimeErrors(INITIAL_DATA_COUNT - 1)
     ''ReDim sngDataSourceIonIndex(INITIAL_DATA_COUNT - 1)
     
     IsoField = GelData(CallerID).Preferences.IsoDataField
@@ -2201,7 +2331,7 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
 
     lngDataWithHits = 0
     
-    ' First fill sngRawMassErrorsPPM(), sngRawMassErrorsDa(), and sngRawNETErrors() with all of the observed errors
+    ' First fill sngRawMassErrorsPPM(), sngRawMassErrorsDa(), sngRawNETErrors(), and sngRawDriftTimeErrors with all of the observed errors
     If blnUseUMCClassStats Then
         ' Working with LC-MS Features
         With GelUMC(CallerID)
@@ -2213,14 +2343,18 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
                         ' Note: Since the match to the MT tag is stored with a mass error value relative to a given data point's mass,
                         '       we need to compute the difference in mass between the class rep and the class mass (converted to ppm)
                         dblMassErrPPMCorrection = MassToPPM(.ClassMW - GelData(CallerID).CSData(.ClassRepInd).AverageMW, .ClassMW)
-                        If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, GelData(CallerID).CSData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, GelData(CallerID).CSData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
+                        If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                                     GelData(CallerID).CSData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, _
+                                                     GelData(CallerID).CSData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
                            ' Hit found
                            lngDataWithHits = lngDataWithHits + 1
                        End If
                     Case gldtIS
                         ' See note above
                         dblMassErrPPMCorrection = MassToPPM(.ClassMW - GetIsoMass(GelData(CallerID).IsoData(.ClassRepInd), IsoField), .ClassMW)
-                        If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, GelData(CallerID).IsoData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, GelData(CallerID).IsoData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
+                        If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                                      GelData(CallerID).IsoData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, _
+                                                      GelData(CallerID).IsoData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
                             ' Hit found
                             lngDataWithHits = lngDataWithHits + 1
                         End If
@@ -2240,7 +2374,8 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
             ' Charge state data
             For lngCSDataIndex = 1 To .CSLines
                 With .CSData(lngCSDataIndex)
-                    If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, .MTID, .AverageMW, .Abundance, .ScanNumber, 0) Then
+                    If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                                  .MTID, .AverageMW, .Abundance, .ScanNumber, 0) Then
                         ' Hit found
                         lngDataWithHits = lngDataWithHits + 1
                     End If
@@ -2254,7 +2389,8 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
             ' Isotopic data
             For lngIsoDataIndex = 1 To .IsoLines
                 With .IsoData(lngIsoDataIndex)
-                    If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, .MTID, GetIsoMass(GelData(CallerID).IsoData(lngIsoDataIndex), IsoField), .Abundance, .ScanNumber, 0) Then
+                    If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                                  .MTID, GetIsoMass(GelData(CallerID).IsoData(lngIsoDataIndex), IsoField), .Abundance, .ScanNumber, 0) Then
                         ' Hit found
                         lngDataWithHits = lngDataWithHits + 1
                     End If
@@ -2298,7 +2434,16 @@ End Sub
 '''    ComputeErrorsExtractValuesIso = blnSuccess
 '''End Function
 
-Private Function ComputeErrorsExtractValues(ByRef sngRawMassErrorsPPM() As Single, ByRef sngRawMassErrorsDa() As Single, ByRef sngRawNETErrors() As Single, ByRef lngRawErrorsCount As Long, ByVal strRefString As String, ByVal dblIonMass As Double, ByVal dblIonAbundance As Double, ByVal lngScanNumber As Long, dblMassErrPPMCorrection As Double) As Boolean
+Private Function ComputeErrorsExtractValues(ByRef sngRawMassErrorsPPM() As Single, _
+                                            ByRef sngRawMassErrorsDa() As Single, _
+                                            ByRef sngRawNETErrors() As Single, _
+                                            ByRef sngRawDriftTimeErrors() As Single, _
+                                            ByRef lngRawErrorsCount As Long, _
+                                            ByVal strRefString As String, _
+                                            ByVal dblIonMass As Double, _
+                                            ByVal dblIonAbundance As Double, _
+                                            ByVal lngScanNumber As Long, _
+                                            dblMassErrPPMCorrection As Double) As Boolean
     Dim sngIonGANET As Single
     
     Dim Refs() As String         ' 1-based array
@@ -2311,8 +2456,9 @@ Private Function ComputeErrorsExtractValues(ByRef sngRawMassErrorsPPM() As Singl
         sngIonGANET = ConvertScanToNET(lngScanNumber)
         
         ' Compute mass error in ppm between AMT and actual data
-        ' Record in sngRawMassErrorsPPM(), sngRawMassErrorsDa(), and sngRawNETErrors()
-        blnHitFound = AddNewErrValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, False)
+        ' Record in sngRawMassErrorsPPM(), sngRawMassErrorsDa(), sngRawNETErrors(), and sngRawDriftTimeErrors
+        blnHitFound = AddNewErrValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                      Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, False)
     End If
     
     If glbPreferencesExpanded.RefineMSDataOptions.IncludeInternalStdMatches Then
@@ -2323,7 +2469,8 @@ Private Function ComputeErrorsExtractValues(ByRef sngRawMassErrorsPPM() As Singl
                 sngIonGANET = ConvertScanToNET(lngScanNumber)
             End If
         
-            blnHitFound = AddNewErrValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, lngRawErrorsCount, Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, True)
+            blnHitFound = AddNewErrValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                          Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, True)
         End If
     End If
     
@@ -2482,6 +2629,7 @@ Private Sub DisplayErrorPlotPeakStats()
     
     Dim udtMassErrorPeak As udtPeakStatsType
     Dim udtNETErrorPeak As udtPeakStatsType
+    Dim udtDriftTimeErrorPeak As udtPeakStatsType
     
     Dim lngDigitsOfPrecisionToRoundMassTo As Long
     Dim lngMultiplier As Long
@@ -2535,6 +2683,19 @@ On Error GoTo DisplayErrorPlotPeakStatsErrorHandler
         End With
     End With
 
+    With mDriftTimeErrorPeakCached
+        .Center = 0
+        .width = 0
+        .Height = 0
+        .SingleValidPeak = False
+        With .PeakStats
+            .IndexOfMaximum = 0
+            .IndexBaseLeft = 0
+            .IndexBaseRight = 0
+            .TruePositiveArea = 0
+            .FalsePositiveArea = 0
+        End With
+    End With
     
     If cboErrorDisplayMode.ListIndex = mdmMassErrorDa Then
         lngDigitsOfPrecisionToRoundMassTo = MASS_DA_ADJUSTMENT_PRECISION - 1
@@ -2646,6 +2807,52 @@ On Error GoTo DisplayErrorPlotPeakStatsErrorHandler
         strRelativeRisk = strRelativeRisk & "Valid NET error peak not found"
     End If
 
+    If mDriftTimesDefined Then
+        blnValidPeakFound = FindPeakStatsUsingBinnedErrorData(mDriftTimeErrors, udtDriftTimeErrorPeak, blnSingleGoodPeakFound)
+        If blnValidPeakFound Then
+            Dim lngDigitsOfPrecisionToRoundTo As Long
+            lngDigitsOfPrecisionToRoundTo = 8
+            
+            GetPeakStats mDriftTimeErrors, udtDriftTimeErrorPeak, dblPeakCenter, dblPeakWidth, dblPeakHeight, sngSignalToNoise, lngDigitsOfPrecisionToRoundTo
+        
+            With mDriftTimeErrorPeakCached
+                .Center = dblPeakCenter
+                .width = dblPeakWidth           ' Peak width at the base
+                .Height = dblPeakHeight
+                .SignalToNoise = sngSignalToNoise
+                .SingleValidPeak = blnSingleGoodPeakFound
+                .PeakStats = udtDriftTimeErrorPeak
+            
+                strRelativeRisk = strRelativeRisk & DisplayErrorPlotRelativeRisk("DriftTime: ", .PeakStats.TruePositiveArea, .PeakStats.FalsePositiveArea)
+            End With
+        
+            If sngSignalToNoise >= 3 Then
+                strSignalToNoise = Round(sngSignalToNoise, 0)
+            Else
+                strSignalToNoise = Round(sngSignalToNoise, 1)
+            End If
+            
+            If sngSignalToNoise <> 0 Then
+                strNoiseLevel = Round(dblPeakHeight / sngSignalToNoise, 0)
+            Else
+                strNoiseLevel = "0"
+            End If
+            
+            txtDriftTimePeakStats = _
+                "Peak Center: " & Round(dblPeakCenter, 4) & " msec" & vbCrLf & _
+                "Peak Width: " & Round(dblPeakWidth, 4) & " msec" & vbCrLf & _
+                "Peak Height: " & Round(dblPeakHeight, 0) & " counts/bin" & vbCrLf & _
+                "Noise: " & strNoiseLevel & " counts" & vbCrLf & _
+                "S/N: " & strSignalToNoise & vbCrLf & _
+                "Single good peak: " & blnSingleGoodPeakFound
+        Else
+            txtDriftTimePeakStats = "A valid peak could not be found"
+            strRelativeRisk = strRelativeRisk & "Valid DriftTime error peak not found"
+        End If
+    Else
+         txtDriftTimePeakStats = "n/a"
+    End If
+    
     txtRelativeRiskStatistics = strRelativeRisk
     
     Exit Sub
@@ -2698,10 +2905,15 @@ Private Sub EnableDisableCalculating(ByVal blnCalculating As Boolean, Optional B
     cmdNETToleranceRefinementStart.Visible = Not blnCalculating
     
     chkIncludeInternalStandards.Enabled = blnEnableOptions
+    
     txtMassRangePPM.Enabled = blnEnableOptions
     txtGANETRange.Enabled = blnEnableOptions
+    txtDriftTimeRange.Enabled = blnEnableOptions
+    
     txtMassBinSizePPM.Enabled = blnEnableOptions
     txtGANETBinSize.Enabled = blnEnableOptions
+    txtDriftTimeBinSize.Enabled = blnEnableOptions
+    
     txtButterworthFrequency.Enabled = blnEnableOptions
     
     cboErrorDisplayMode.Enabled = blnEnableOptions
@@ -2741,14 +2953,23 @@ On Error GoTo ExportMassErrorsErrorHandler
     UpdateStatus "Exporting"
     
     ' Header row is strErrorData(0)
-    ' Data is from strErrorData(1) to strErrorData(mMassPPMErrors.BinnedCount + mGANETErrors.BinnedCount)
+    ' Data is from strErrorData(1) to strErrorData(mMassPPMErrors.BinnedCount + mGANETErrors.BinnedCount + mDriftTimeErrors.BinnedCount)
     ReDim strErrorData(0 To mRawErrorsCount)
     
     ' Fill strErrorData() with the Mass Errors and GANET errors
-    strErrorData(0) = "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError"
+    
+    If mDriftTimesDefined Then
+        strErrorData(0) = "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError" & vbTab & "DriftTimeError"
+    Else
+        strErrorData(0) = "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError"
+    End If
     
     For lngIndex = 0 To mRawErrorsCount - 1
-        strErrorData(lngIndex + 1) = Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRawNETErrors(lngIndex))
+        If mDriftTimesDefined Then
+            strErrorData(lngIndex + 1) = Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRawNETErrors(lngIndex)) & vbTab & Trim(mRawDriftTimeErrors(lngIndex))
+        Else
+            strErrorData(lngIndex + 1) = Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRawNETErrors(lngIndex))
+        End If
         
         If lngIndex Mod 1000 = 0 Then UpdateStatus "Exporting: " & Trim(lngIndex) & " / " & mRawErrorsCount
     Next lngIndex
@@ -2806,23 +3027,32 @@ Public Function ExportErrorsBinnedToClipboardOrFile(strFilePath As String, blnSh
     Dim strYValues As String
     
     Dim intDisplayModeSaved As Integer
+    Dim blnIncludeSmoothedData As Boolean
     
     ' Save the current value of cboErrorDisplayMode
     intDisplayModeSaved = cboErrorDisplayMode.ListIndex
+    
+    blnIncludeSmoothedData = cChkBox(chkShowSmoothedData)
     
     If blnVisibleDifferencesOnly Then
         Select Case intDisplayModeSaved
         Case mdmMassErrorDisplayModeConstants.mdmMassErrorPPM
             lngCountAvailable = mMassPPMErrors.BinnedCount
+        
         Case mdmMassErrorDisplayModeConstants.mdmMassErrorDa
             lngCountAvailable = mMassDaErrors.BinnedCount
+        
         Case mdmMassErrorDisplayModeConstants.mdmGanetError
             lngCountAvailable = mGanetErrors.BinnedCount
+        
+        Case mdmMassErrorDisplayModeConstants.mdmDriftTimeError
+            lngCountAvailable = mDriftTimeErrors.BinnedCount
+            
         Case Else
             lngCountAvailable = 0
         End Select
     Else
-        lngCountAvailable = mMassPPMErrors.BinnedCount + mMassDaErrors.BinnedCount + mGanetErrors.BinnedCount
+        lngCountAvailable = mMassPPMErrors.BinnedCount + mMassDaErrors.BinnedCount + mGanetErrors.BinnedCount + mDriftTimeErrors.BinnedCount
     End If
     
     If lngCountAvailable = 0 Then
@@ -2840,13 +3070,13 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
     UpdateStatus "Exporting"
     
     strHeaderSuffix = vbTab & "Count" & vbTab
-    If cChkBox(chkShowSmoothedData) Then
+    If blnIncludeSmoothedData Then
         strHeaderSuffix = strHeaderSuffix & "Smoothed_Count" & vbTab
     End If
     strHeaderSuffix = strHeaderSuffix & "Comment"
     
     ' Header row is strErrors(0)
-    ' Data is from strErrors(1) to strErrors(mMassPPMErrors.BinnedCount + mGANETErrors.BinnedCount)
+    ' Data is from strErrors(1) to strErrors(mMassPPMErrors.BinnedCount + mGANETErrors.BinnedCount + mDriftTimeErrors.BinnedCount)
     ReDim strErrors(0 To lngCountAvailable + 6)
     lngOutputArrayCount = 0
     
@@ -2875,7 +3105,7 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
         For lngIndex = 0 To mMassPPMErrors.BinnedCount - 1
             sngErrorValue = mMassPPMErrors.StartBin + lngIndex * mMassPPMErrors.BinSize
             strYValues = Trim(mMassPPMErrors.Binned(lngIndex))
-            If cChkBox(chkShowSmoothedData) Then
+            If blnIncludeSmoothedData Then
                 strYValues = strYValues & vbTab & Trim(mMassPPMErrors.SmoothedBins(lngIndex))
             End If
             
@@ -2909,7 +3139,7 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
         For lngIndex = 0 To mMassDaErrors.BinnedCount - 1
             sngErrorValue = mMassDaErrors.StartBin + lngIndex * mMassDaErrors.BinSize
             strYValues = Trim(mMassDaErrors.Binned(lngIndex))
-            If cChkBox(chkShowSmoothedData) Then
+            If blnIncludeSmoothedData Then
                 strYValues = strYValues & vbTab & Trim(mMassDaErrors.SmoothedBins(lngIndex))
             End If
             
@@ -2917,7 +3147,6 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
             lngOutputArrayCount = lngOutputArrayCount + 1
         Next lngIndex
     End If
-    
     
     If Not blnVisibleDifferencesOnly Or intDisplayModeSaved = mdmMassErrorDisplayModeConstants.mdmGanetError Then
         ' 3. Fill strErrors() with the GANET errors
@@ -2944,7 +3173,7 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
         For lngIndex = 0 To mGanetErrors.BinnedCount - 1
             sngErrorValue = mGanetErrors.StartBin + lngIndex * mGanetErrors.BinSize
             strYValues = Trim(mGanetErrors.Binned(lngIndex))
-            If cChkBox(chkShowSmoothedData) Then
+            If blnIncludeSmoothedData Then
                 strYValues = strYValues & vbTab & Trim(mGanetErrors.SmoothedBins(lngIndex))
             End If
             
@@ -2953,8 +3182,44 @@ On Error GoTo ExportMassErrorsBinnedErrorHandler
         Next lngIndex
         
     End If
+     
     
-    ' 4. Save to file or copy to clipboard
+    If Not blnVisibleDifferencesOnly Or intDisplayModeSaved = mdmMassErrorDisplayModeConstants.mdmDriftTimeError Then
+        ' 4. Fill strErrors() with the DriftTime errors
+        If cboErrorDisplayMode.ListIndex <> mdmMassErrorDisplayModeConstants.mdmDriftTimeError Then
+            cboErrorDisplayMode.ListIndex = mdmMassErrorDisplayModeConstants.mdmDriftTimeError
+        End If
+        
+        strErrors(lngOutputArrayCount) = vbCrLf & "DriftTimeError" & strHeaderSuffix
+        lngOutputArrayCount = lngOutputArrayCount + 1
+        
+        strBinAsScientific = Format(mDriftTimeErrors.BinSize, "0E+00")
+        lngCharLoc = InStr(strBinAsScientific, "E")
+        If lngCharLoc > 0 Then
+            strBinAsScientific = Mid(strBinAsScientific, lngCharLoc + 1)
+            If Left(strBinAsScientific, 1) = "+" Then
+                lngDigitsToRound = 1
+            Else
+                lngDigitsToRound = Abs(CLngSafe(strBinAsScientific)) + 1
+            End If
+        Else
+            lngDigitsToRound = 1
+        End If
+        
+        For lngIndex = 0 To mDriftTimeErrors.BinnedCount - 1
+            sngErrorValue = mDriftTimeErrors.StartBin + lngIndex * mDriftTimeErrors.BinSize
+            strYValues = Trim(mDriftTimeErrors.Binned(lngIndex))
+            If blnIncludeSmoothedData Then
+                strYValues = strYValues & vbTab & Trim(mDriftTimeErrors.SmoothedBins(lngIndex))
+            End If
+            
+            strErrors(lngOutputArrayCount) = Round(sngErrorValue, lngDigitsToRound) & vbTab & strYValues & vbTab & LookupErrorBinComment(lngIndex, mDriftTimeErrorPeakCached)
+            lngOutputArrayCount = lngOutputArrayCount + 1
+        Next lngIndex
+        
+    End If
+    
+    ' 5. Save to file or copy to clipboard
     If Len(strFilePath) > 0 Then
         OutFileNum = FreeFile()
         Open strFilePath For Output As #OutFileNum
@@ -3021,6 +3286,10 @@ End Sub
 
 Public Sub RecordNETTolPeakStatsNow()
     glbPreferencesExpanded.AutoAnalysisCachedData.NETTolErrorPeakCached = mNETTolErrorPeakCached
+End Sub
+
+Public Sub RecordDriftTimePeakStatsNow()
+    glbPreferencesExpanded.AutoAnalysisCachedData.DriftTimeErrorPeakCached = mDriftTimeErrorPeakCached
 End Sub
 
 Private Function InitExprEvaluator(ByVal sExpr As String) As Boolean
@@ -3260,6 +3529,7 @@ Private Sub PopulateComboBoxes()
         .AddItem "Mass Error (Da)"
         .AddItem "NET Error"
         .AddItem "Pairwise Mass Differences (Da)"
+        .AddItem "Drift Time Error"
         .ListIndex = mdmMassErrorDisplayModeConstants.mdmMassErrorPPM
     End With
     
@@ -4205,6 +4475,7 @@ On Error GoTo ShowOrCompute3DErrorDistribErrorHandler
         With glbPreferencesExpanded.ErrorPlottingOptions
             If .MassBinSizePPM <= 0 Then .MassBinSizePPM = DEFAULT_MASS_BIN_SIZE_PPM
             If .GANETBinSize <= 0 Then .GANETBinSize = DEFAULT_GANET_BIN_SIZE
+            If .DriftTimeBinSize <= 0 Then .DriftTimeBinSize = DEFAULT_DRIFTTIME_BIN_SIZE
             
             ' Adjust the bin size if more than 100 bins will be needed
             sngMassBinSizePPM = .MassBinSizePPM
@@ -4282,6 +4553,8 @@ Private Sub UpdateControlsWithSettings()
         txtMassBinSizePPM = .MassBinSizePPM
         txtGANETRange = .GANETRange
         txtGANETBinSize = .GANETBinSize
+        txtDriftTimeRange = .DriftTimeRange
+        txtDriftTimeBinSize = .DriftTimeBinSize
         
         txtButterworthFrequency = .ButterWorthFrequency
         
@@ -4405,8 +4678,15 @@ On Error GoTo GraphMassErrorsErrorHandler
         With mNETTolErrorPeakCached
             strPlotTitle = strPlotTitle & vbCrLf & DisplayErrorPlotRelativeRisk("Relative Risk: ", .PeakStats.TruePositiveArea, .PeakStats.FalsePositiveArea) & vbCrLf
         End With
+        
+    Case mdmDriftTimeError
+        With mDriftTimeErrorPeakCached
+            strPlotTitle = strPlotTitle & vbCrLf & DisplayErrorPlotRelativeRisk("Relative Risk: ", .PeakStats.TruePositiveArea, .PeakStats.FalsePositiveArea) & vbCrLf
+        End With
+        
     Case mdmPairwiseMassDifferences
         ' Do not alter strPlotTitle
+        
     Case Else
         ' Includes mdmMassErrorPPM & mdmMassErrorDa
         With mMassCalErrorPeakCached
@@ -4463,6 +4743,8 @@ On Error GoTo GraphMassErrorsErrorHandler
                 dblRange = PPMToMass(CDbl(glbPreferencesExpanded.ErrorPlottingOptions.MassRangePPM), 2000)
             Case mdmGanetError
                 dblRange = glbPreferencesExpanded.ErrorPlottingOptions.GANETRange
+            Case mdmDriftTimeError
+                dblRange = glbPreferencesExpanded.ErrorPlottingOptions.DriftTimeRange
             Case mdmPairwiseMassDifferences
                 dblRange = Abs(glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassDiffMaximum)
                 If Abs(glbPreferencesExpanded.RefineMSDataOptions.PairwiseMassDiffMaximum) > dblRange Then
@@ -4545,16 +4827,25 @@ Private Sub UpdatePlotAddSeries(intSeriesNumber As Integer, lngSeriesColor As Lo
             ' Debug.Assert glbPreferencesExpanded.ErrorPlottingOptions.MassBinSizePPM = mMassPPMErrors.BinSize
             UpdatePlotAddData intSeriesNumber, blnUseSmoothedData, mMassPPMErrors
             strXAxisTitle = "Mass Error (ppm)"
+        
         Case mdmMassErrorDa
             UpdatePlotAddData intSeriesNumber, blnUseSmoothedData, mMassDaErrors
             strXAxisTitle = "Mass Error (Da)"
+        
         Case mdmGanetError
             Debug.Assert glbPreferencesExpanded.ErrorPlottingOptions.GANETBinSize = mGanetErrors.BinSize
             UpdatePlotAddData intSeriesNumber, blnUseSmoothedData, mGanetErrors
             strXAxisTitle = "NET Error"
+        
+        Case mdmDriftTimeError
+            Debug.Assert glbPreferencesExpanded.ErrorPlottingOptions.DriftTimeBinSize = mDriftTimeErrors.BinSize
+            UpdatePlotAddData intSeriesNumber, blnUseSmoothedData, mDriftTimeErrors
+            strXAxisTitle = "Drift Time Error"
+        
         Case mdmPairwiseMassDifferences
             UpdatePlotAddData intSeriesNumber, blnUseSmoothedData, mPairwiseMassDifferences
             strXAxisTitle = "Pairwise Mass Differences (Da)"
+            
         Case Else
             ' This shouldn't happen
             Debug.Assert False
@@ -4629,10 +4920,16 @@ On Error GoTo UpdatePlotAddPeakEdgesErrorHandler
     Select Case cboErrorDisplayMode.ListIndex
     Case mdmMassErrorPPM
         UpdatePlotAddPeakEdgeData intSeriesNumber, lngSeriesColor, mMassPPMErrors, mMassCalErrorPeakCached
+    
     Case mdmMassErrorDa
         UpdatePlotAddPeakEdgeData intSeriesNumber, lngSeriesColor, mMassDaErrors, mMassCalErrorPeakCached
+    
     Case mdmGanetError
         UpdatePlotAddPeakEdgeData intSeriesNumber, lngSeriesColor, mGanetErrors, mNETTolErrorPeakCached
+        
+    Case mdmDriftTimeError
+        UpdatePlotAddPeakEdgeData intSeriesNumber, lngSeriesColor, mDriftTimeErrors, mDriftTimeErrorPeakCached
+        
     Case mdmPairwiseMassDifferences
         ' Not supported for this mode
     Case Else
@@ -5098,6 +5395,36 @@ Private Sub txtGraphPointSize_Validate(Cancel As Boolean)
     UpdatePlot
 End Sub
 
+Private Sub txtDriftTimeBinSize_KeyDown(KeyCode As Integer, Shift As Integer)
+ If KeyCode = vbKeyReturn Then
+        txtDriftTimeBinSize_Validate (False)
+        ComputeErrors False
+    End If
+End Sub
+
+Private Sub txtDriftTimeBinSize_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtDriftTimeBinSize, KeyAscii, True, True
+End Sub
+
+Private Sub txtDriftTimeBinSize_Validate(Cancel As Boolean)
+    ValidateTextboxValueLng txtDriftTimeBinSize, 0.001, 10000, DEFAULT_DRIFTTIME_BIN_SIZE
+    With glbPreferencesExpanded.ErrorPlottingOptions
+        If .DriftTimeBinSize <> CSngSafe(txtDriftTimeBinSize) Then
+            .DriftTimeBinSize = CSngSafe(txtDriftTimeBinSize)
+        End If
+    End With
+End Sub
+
+Private Sub txtDriftTimeRange_KeyPress(KeyAscii As Integer)
+    TextBoxKeyPressHandler txtDriftTimeRange, KeyAscii, True, False
+End Sub
+
+Private Sub txtDriftTimeRange_Validate(Cancel As Boolean)
+    ValidateTextboxValueLng txtDriftTimeRange, 0.25, 10000, 10
+    glbPreferencesExpanded.ErrorPlottingOptions.DriftTimeRange = CSngSafe(txtDriftTimeRange)
+    UpdatePlot
+End Sub
+
 Private Sub txtMassBinSizePPM_KeyDown(KeyCode As Integer, Shift As Integer)
  If KeyCode = vbKeyReturn Then
         txtMassBinSizePPM_Validate (False)
@@ -5123,7 +5450,7 @@ Private Sub txtMassRangePPM_KeyPress(KeyAscii As Integer)
 End Sub
 
 Private Sub txtMassRangePPM_Validate(Cancel As Boolean)
-    ValidateTextboxValueLng txtMassRangePPM, 1, 10000, 100
+    ValidateTextboxValueLng txtMassRangePPM, 1, 10000, 40
     glbPreferencesExpanded.ErrorPlottingOptions.MassRangePPM = CSngSafe(txtMassRangePPM)
     UpdatePlot
 End Sub

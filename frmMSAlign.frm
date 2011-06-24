@@ -7,7 +7,7 @@ Begin VB.Form frmMSAlign
    Caption         =   "LCMSWarp"
    ClientHeight    =   10410
    ClientLeft      =   225
-   ClientTop       =   795
+   ClientTop       =   855
    ClientWidth     =   14340
    LinkTopic       =   "MS Align"
    MinButton       =   0   'False
@@ -114,8 +114,8 @@ Begin VB.Form frmMSAlign
       TabCaption(2)   =   "Tolerances"
       TabPicture(2)   =   "frmMSAlign.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraBinningOptions"
-      Tab(2).Control(1)=   "fraNETTolerances"
+      Tab(2).Control(0)=   "fraNETTolerances"
+      Tab(2).Control(1)=   "fraBinningOptions"
       Tab(2).ControlCount=   2
       TabCaption(3)   =   "Calib Type"
       TabPicture(3)   =   "frmMSAlign.frx":0054
@@ -125,11 +125,11 @@ Begin VB.Form frmMSAlign
       TabCaption(4)   =   "Adv1"
       TabPicture(4)   =   "frmMSAlign.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "fraMTRangeFilters"
-      Tab(4).Control(1)=   "txtWarpMassZScoreTolerance"
+      Tab(4).Control(0)=   "Label21"
+      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
       Tab(4).Control(2)=   "Frame1"
-      Tab(4).Control(3)=   "chkWarpMassUseLSQ"
-      Tab(4).Control(4)=   "Label21"
+      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
+      Tab(4).Control(4)=   "fraMTRangeFilters"
       Tab(4).ControlCount=   5
       TabCaption(5)   =   "Adv2"
       TabPicture(5)   =   "frmMSAlign.frx":008C
@@ -2333,8 +2333,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   8.12373994823405E-247
-         DataMax_5       =   8.12373994823405E-247
+         DataMin_5       =   5.01546619392668E-234
+         DataMax_5       =   5.01546619392668E-234
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2400,8 +2400,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   7.2872490313501E-297
-         DataMax_14      =   7.2872490313501E-297
+         DataMin_14      =   7.36027105276457E-298
+         DataMax_14      =   7.36027105276457E-298
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2469,8 +2469,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   7.29485512984267E-297
-         DataMax_23      =   7.29485512984267E-297
+         DataMin_23      =   7.36875791879731E-298
+         DataMax_23      =   7.36875791879731E-298
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -4410,6 +4410,9 @@ Private Sub EnableDisableControls(blnEnabled As Boolean)
     Case Else
         fraMassWarpOptions.Enabled = False
     End Select
+    
+    ' MTStats menu no longer used (June 2011)
+    mnuPMTTagsLoadMTStats.Enabled = False
     
     DoEvents
 End Sub

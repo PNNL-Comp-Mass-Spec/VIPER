@@ -99,6 +99,7 @@ Public Function BinaryLoadData(ByVal strFilePath As String, ByVal lngGelIndex As
     Dim GelSearchDef2003c As udtSearchDefinition2003cGroupType
     Dim GelSearchDef2003d As udtSearchDefinition2003dGroupType
     Dim GelSearchDef2003e As udtSearchDefinition2003eGroupType
+    Dim GelSearchDef2004 As udtSearchDefinition2004GroupType
     
     Dim sngVersionsInFile(FILEIO_SECTION_COUNT) As Single
     Dim lngOffsetsInFile(FILEIO_SECTION_COUNT) As Long
@@ -379,6 +380,13 @@ On Error GoTo BinaryLoadDataErrorHandler
                 Get #InFileNum, , GelSearchDef2003e
                 
                 CopyGelSearchDef2003eToCurrent GelSearchDef2003e, GelSearchDef(lngGelIndex)
+                blnSearchDefLoaded = True
+            ElseIf sngVersionsInFile(fioSearchDefinitions) = 8# Then
+                ' Update from Version 8 to the current version
+                Seek #InFileNum, lngOffsetsInFile(fioSearchDefinitions)
+                Get #InFileNum, , GelSearchDef2004
+                
+                CopyGelSearchDef2004ToCurrent GelSearchDef2004, GelSearchDef(lngGelIndex)
                 blnSearchDefLoaded = True
             Else
                 MsgBox "The Search Definitions " & FILE_FORMAT_ERROR_MESSAGE
@@ -1177,6 +1185,35 @@ Private Sub BinarySaveDataInitSection(lngOverallProgressValue As Long, strProgre
     
     Seek #OutFileNum, lngFileOffsetByte
     
+End Sub
+
+Private Sub CopyAMTSearchDef2002ToCurrent(ByRef OldDef As SearchAMTDefinition2002, ByRef CurrentSearchDef As SearchAMTDefinition)
+    
+    With CurrentSearchDef
+        .SearchScope = OldDef.SearchScope
+        .SearchFlag = OldDef.SearchFlag
+        .MWField = OldDef.MWField
+        .TolType = OldDef.TolType
+        .NETorRT = OldDef.NETorRT
+        .Formula = OldDef.Formula
+        .MWTol = OldDef.MWTol
+        .NETTol = OldDef.NETTol
+        .MassTag = OldDef.MassTag
+        .MaxMassTags = OldDef.MaxMassTags
+        .SkipReferenced = OldDef.SkipReferenced
+        .SaveNCnt = OldDef.SaveNCnt
+        .UseDriftTime = False
+        .DriftTimeTol = DEFAULT_DRIFT_TIME_TOL
+        .AdditionalValue1 = 0
+        .AdditionalValue2 = 0
+        .AdditionalValue3 = 0
+        .AdditionalValue4 = 0
+        .AdditionalValue5 = 0
+        .AdditionalValue6 = 0
+        .AdditionalValue7 = 0
+        .AdditionalValue8 = 0
+    End With
+
 End Sub
 
 Private Sub CopyDeltaLabelPairDetails2004bToCurrent(ByVal OldPairDetailsCount As Long, ByRef OldDeltaLabelPairDetails() As udtIsoPairsDetails2004bType, ByRef CurrentDeltaLabelPairs As IsoPairsDltLblType)
@@ -2390,9 +2427,11 @@ Private Sub CopyGelSearchDef2002ToCurrent(OldDef As udtSearchDefinition2002Group
     With CurrentSearchDef
         CopyGelUMCDef2002ToCurrent OldDef.UMCDef, .UMCDef
         .UMCIonNetDef = UMCIonNetDef
-        .AMTSearchOnIons = OldDef.AMTSearchOnIons
-        .AMTSearchOnUMCs = OldDef.AMTSearchOnUMCs
-        .AMTSearchOnPairs = OldDef.AMTSearchOnPairs
+        
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnIons, .AMTSearchOnIons
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnUMCs, .AMTSearchOnUMCs
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnPairs, .AMTSearchOnPairs
+        
         .AnalysisHistory() = OldDef.AnalysisHistory()
         .AnalysisHistoryCount = OldDef.AnalysisHistoryCount
         With .MassCalibrationInfo
@@ -2409,9 +2448,11 @@ Private Sub CopyGelSearchDef2003ToCurrent(OldDef As udtSearchDefinition2003Group
     With CurrentSearchDef
         CopyGelUMCDef2003aToCurrent OldDef.UMCDef, .UMCDef
         .UMCIonNetDef = UMCIonNetDef
-        .AMTSearchOnIons = OldDef.AMTSearchOnIons
-        .AMTSearchOnUMCs = OldDef.AMTSearchOnUMCs
-        .AMTSearchOnPairs = OldDef.AMTSearchOnPairs
+        
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnIons, .AMTSearchOnIons
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnUMCs, .AMTSearchOnUMCs
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnPairs, .AMTSearchOnPairs
+        
         .AnalysisHistory() = OldDef.AnalysisHistory()
         .AnalysisHistoryCount = OldDef.AnalysisHistoryCount
         With .MassCalibrationInfo
@@ -2429,9 +2470,11 @@ Private Sub CopyGelSearchDef2003bToCurrent(OldDef As udtSearchDefinition2003bGro
     With CurrentSearchDef
         CopyGelUMCDef2003aToCurrent OldDef.UMCDef, .UMCDef
         .UMCIonNetDef = UMCIonNetDef
-        .AMTSearchOnIons = OldDef.AMTSearchOnIons
-        .AMTSearchOnUMCs = OldDef.AMTSearchOnUMCs
-        .AMTSearchOnPairs = OldDef.AMTSearchOnPairs
+        
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnIons, .AMTSearchOnIons
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnUMCs, .AMTSearchOnUMCs
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnPairs, .AMTSearchOnPairs
+        
         .AnalysisHistory() = OldDef.AnalysisHistory()
         .AnalysisHistoryCount = OldDef.AnalysisHistoryCount
         With .MassCalibrationInfo
@@ -2449,9 +2492,11 @@ Private Sub CopyGelSearchDef2003cToCurrent(OldDef As udtSearchDefinition2003cGro
     With CurrentSearchDef
         CopyGelUMCDef2003aToCurrent OldDef.UMCDef, .UMCDef
         .UMCIonNetDef = UMCIonNetDef
-        .AMTSearchOnIons = OldDef.AMTSearchOnIons
-        .AMTSearchOnUMCs = OldDef.AMTSearchOnUMCs
-        .AMTSearchOnPairs = OldDef.AMTSearchOnPairs
+        
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnIons, .AMTSearchOnIons
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnUMCs, .AMTSearchOnUMCs
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnPairs, .AMTSearchOnPairs
+        
         .AnalysisHistory() = OldDef.AnalysisHistory()
         .AnalysisHistoryCount = OldDef.AnalysisHistoryCount
         .MassCalibrationInfo = OldDef.MassCalibrationInfo
@@ -2466,9 +2511,11 @@ Private Sub CopyGelSearchDef2003dToCurrent(OldDef As udtSearchDefinition2003dGro
     With CurrentSearchDef
         CopyGelUMCDef2003aToCurrent OldDef.UMCDef, .UMCDef
         .UMCIonNetDef = UMCIonNetDef
-        .AMTSearchOnIons = OldDef.AMTSearchOnIons
-        .AMTSearchOnUMCs = OldDef.AMTSearchOnUMCs
-        .AMTSearchOnPairs = OldDef.AMTSearchOnPairs
+        
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnIons, .AMTSearchOnIons
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnUMCs, .AMTSearchOnUMCs
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnPairs, .AMTSearchOnPairs
+        
         .AnalysisHistory() = OldDef.AnalysisHistory()
         .AnalysisHistoryCount = OldDef.AnalysisHistoryCount
         .MassCalibrationInfo = OldDef.MassCalibrationInfo
@@ -2498,13 +2545,42 @@ Private Sub CopyGelSearchDef2003eToCurrent(OldDef As udtSearchDefinition2003eGro
     With CurrentSearchDef
         CopyGelUMCDef2003aToCurrent OldDef.UMCDef, .UMCDef
         .UMCIonNetDef = OldDef.UMCIonNetDef
-        .AMTSearchOnIons = OldDef.AMTSearchOnIons
-        .AMTSearchOnUMCs = OldDef.AMTSearchOnUMCs
-        .AMTSearchOnPairs = OldDef.AMTSearchOnPairs
+        
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnIons, .AMTSearchOnIons
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnUMCs, .AMTSearchOnUMCs
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnPairs, .AMTSearchOnPairs
+        
         .AnalysisHistory() = OldDef.AnalysisHistory()
         .AnalysisHistoryCount = OldDef.AnalysisHistoryCount
         .MassCalibrationInfo = OldDef.MassCalibrationInfo
         .AMTSearchMassMods = OldDef.AMTSearchMassMods
+        .OtherInfo = OldDef.OtherInfo
+    End With
+
+End Sub
+
+Private Sub CopyGelSearchDef2004ToCurrent(OldDef As udtSearchDefinition2004GroupType, ByRef CurrentSearchDef As udtSearchDefinitionGroupType)
+    
+    With CurrentSearchDef
+        .UMCDef = OldDef.UMCDef
+        .UMCIonNetDef = OldDef.UMCIonNetDef
+        
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnIons, .AMTSearchOnIons
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnUMCs, .AMTSearchOnUMCs
+        CopyAMTSearchDef2002ToCurrent OldDef.AMTSearchOnPairs, .AMTSearchOnPairs
+        
+        .AnalysisHistory() = OldDef.AnalysisHistory()
+        .AnalysisHistoryCount = OldDef.AnalysisHistoryCount
+        .MassCalibrationInfo = OldDef.MassCalibrationInfo
+        .AMTSearchMassMods = OldDef.AMTSearchMassMods
+        .AdditionalValue1 = 0
+        .AdditionalValue2 = 0
+        .AdditionalValue3 = 0
+        .AdditionalValue4 = 0
+        .AdditionalValue5 = 0
+        .AdditionalValue6 = 0
+        .AdditionalValue7 = 0
+        .AdditionalValue8 = 0
         .OtherInfo = OldDef.OtherInfo
     End With
 
@@ -2866,7 +2942,7 @@ Private Sub InitFileIOOffsetsAndVersions()
     FileInfoVersions(fioGelUMC) = 5#                ' Note: Version 1# = UMCListType2002, Version 2# = UMCListType2003a, Version 3# = UMC2004, Version 4# is same structure size as 5#, but four old Double variables were turned into several new 16-bit and 32-bit integer variables, Version 5# = current UMC type
     FileInfoVersions(fioGelAnalysis) = 1#
     FileInfoVersions(fioUMCNetAdjDef) = 6#          ' Note: Version 1# = NetAdjDefinition2003, Version 2# was a short-lived beta version, Version 3# = NetAdjDefinition2004, Version 4# = NetAdjDefinition2005a,  Version 5# = NetAdjDefinition2005b, Version 6# = current NetAdjDef type
-    FileInfoVersions(fioSearchDefinitions) = 8#     ' Note: Version 2# uses UMCDefinition2002, Version 3# uses UMCDefinition2003, Version 4#, 5#, 6#, and 7# use UMCDefinition2003a, Version 8# uses current UMCDefinition type
+    FileInfoVersions(fioSearchDefinitions) = 9#     ' Note: Version 2# uses UMCDefinition2002, Version 3# uses UMCDefinition2003, Version 4#, 5#, 6#, and 7# use UMCDefinition2003a, 8# uses current UMCDefinition2005 type, Version 9# uses current UMCDefinition type
     FileInfoVersions(fioORFData) = 5#               ' Since GelORFData().ORFs() and GelORFMassTags().ORFs() are parallel arrays, be sure to change the fioORFData and fioORFMassTags version numbers together
     FileInfoVersions(fioORFMassTags) = 5#
     FileInfoVersions(fioGelPairs) = 2#

@@ -10,10 +10,12 @@ Option Explicit
 Public Const DEFAULT_TOLERANCE_REFINEMENT_MW_TOL As Double = 25
 Public Const DEFAULT_TOLERANCE_REFINEMENT_MW_TOL_TYPE As Integer = gltPPM
 Public Const DEFAULT_TOLERANCE_REFINEMENT_NET_TOL As Double = 0.05
+Public Const DEFAULT_TOLERANCE_REFINEMENT_DRIFT_TIME_TOL As Double = -1
 
 Public Const DEFAULT_MW_TOL As Double = 6
 Public Const DEFAULT_TOL_TYPE As Integer = gltPPM
 Public Const DEFAULT_NET_TOL As Double = 0.025
+Public Const DEFAULT_DRIFT_TIME_TOL As Double = 5
 
 Private Const RECENT_DB_CONNECTIONS_MAX_COUNT As Integer = 25
 Private Const RECENT_DB_CONNECTIONS_SECTION_NAME As String = "RecentDBConnections"
@@ -42,6 +44,7 @@ Private sSwitchPref As String            'IsoDataFrom, case 2 close results, Iso
 
 Public Const DEFAULT_MASS_BIN_SIZE_PPM As Single = 0.2
 Public Const DEFAULT_GANET_BIN_SIZE As Single = 0.001
+Public Const DEFAULT_DRIFTTIME_BIN_SIZE As Single = 0.05
 
 Public Const DEFAULT_MAXIMUM_DATA_COUNT_TO_LOAD As Long = 400000
 Public Const DEFAULT_TOTAL_INTENSITY_PERCENTAGE_TO_LOAD As Single = 90       ' Value between 0 and 100
@@ -245,20 +248,20 @@ Dim aTmp(10) As String
 Dim StartPos As Integer
 Dim EndPos As Integer
 Dim bDone As Boolean
-Dim i As Integer
+Dim I As Integer
 On Error GoTo err_resolve
 StartPos = 1
-i = 0
+I = 0
 bDone = False
 Do While Not bDone
    EndPos = InStr(StartPos, S, ",")
    If EndPos > 0 Then
-      i = i + 1
-      aTmp(i) = Mid$(S, StartPos, EndPos - StartPos)
+      I = I + 1
+      aTmp(I) = Mid$(S, StartPos, EndPos - StartPos)
       StartPos = EndPos + 1
    Else
-      i = i + 1
-      aTmp(i) = Mid$(S, StartPos, Len(S) - StartPos + 1)
+      I = I + 1
+      aTmp(I) = Mid$(S, StartPos, Len(S) - StartPos + 1)
       bDone = True
    End If
 Loop
@@ -817,6 +820,8 @@ On Error GoTo LoadSettingsFileHandler
         .MaxMassTags = GetIniFileSettingLng(IniStuff, "SearchAMTDef", "MaxMassTags", .MaxMassTags)
         .SkipReferenced = GetIniFileSettingBln(IniStuff, "SearchAMTDef", "SkipReferenced", .SkipReferenced)
         .SaveNCnt = GetIniFileSettingBln(IniStuff, "SearchAMTDef", "SaveNCnt", .SaveNCnt)
+        .UseDriftTime = GetIniFileSettingBln(IniStuff, "SearchAMTDef", "UseDriftTime", .UseDriftTime)
+        .DriftTimeTol = GetIniFileSettingDbl(IniStuff, "SearchAMTDef", "DriftTimeTol", .DriftTimeTol)
     End With
     
     ' Initialize the setting strings
@@ -935,6 +940,8 @@ On Error GoTo LoadSettingsFileHandler
         .MassBinSizePPM = GetIniFileSettingSng(IniStuff, "ErrorPlottingOptions", "MassBinSizePPM", .MassBinSizePPM)
         .GANETRange = GetIniFileSettingSng(IniStuff, "ErrorPlottingOptions", "GANETRange", .GANETRange)
         .GANETBinSize = GetIniFileSettingSng(IniStuff, "ErrorPlottingOptions", "GANETBinSize", .GANETBinSize)
+        .DriftTimeRange = GetIniFileSettingSng(IniStuff, "ErrorPlottingOptions", "DriftTimeRange", .DriftTimeRange)
+        .DriftTimeBinSize = GetIniFileSettingSng(IniStuff, "ErrorPlottingOptions", "DriftTimeBinSize", .DriftTimeBinSize)
         .ButterWorthFrequency = GetIniFileSettingSng(IniStuff, "ErrorPlottingOptions", "ButterWorthFrequency", .ButterWorthFrequency)
         
         With .Graph2DOptions
@@ -1299,6 +1306,8 @@ On Error GoTo LoadSettingsFileHandler
             
             .SaveErrorGraphicMass = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SaveErrorGraphicMass", .SaveErrorGraphicMass)
             .SaveErrorGraphicGANET = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SaveErrorGraphicGANET", .SaveErrorGraphicGANET)
+            .SaveErrorGraphicDriftTime = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SaveErrorGraphicDriftTime", .SaveErrorGraphicDriftTime)
+            
             .SaveErrorGraphic3D = GetIniFileSettingBln(IniStuff, "AutoAnalysisOptions", "SaveErrorGraphic3D", .SaveErrorGraphic3D)
             .SaveErrorGraphicFileType = GetIniFileSettingInt(IniStuff, "AutoAnalysisOptions", "SaveErrorGraphicFileType", CInt(.SaveErrorGraphicFileType))
             .SaveErrorGraphSizeWidthPixels = GetIniFileSettingLng(IniStuff, "AutoAnalysisOptions", "SaveErrorGraphSizeWidthPixels", .SaveErrorGraphSizeWidthPixels)
@@ -1902,6 +1911,8 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingLng sKeys, sVals, iKVCount, "MaxMassTags", .MaxMassTags
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SkipReferenced", .SkipReferenced
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveNCnt", .SaveNCnt
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseDriftTime", .UseDriftTime
+        AddKeyValueSettingDbl sKeys, sVals, iKVCount, "DriftTimeTol", .DriftTimeTol
     End With
     IniStuff.WriteSection "SearchAMTDef", sKeys(), sVals(), iKVCount
    
@@ -2062,6 +2073,8 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "MassBinSizePPM", .MassBinSizePPM
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "GANETRange", .GANETRange
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "GANETBinSize", .GANETBinSize
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "DriftTimeRange", .DriftTimeRange
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "DriftTimeBinSize", .DriftTimeBinSize
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "ButterWorthFrequency", .ButterWorthFrequency
     End With
     IniStuff.WriteSection "ErrorPlottingOptions", sKeys(), sVals(), iKVCount
@@ -2425,6 +2438,8 @@ On Error GoTo SaveSettingsFileHandler
         
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveErrorGraphicMass", .SaveErrorGraphicMass
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveErrorGraphicGANET", .SaveErrorGraphicGANET
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveErrorGraphicDriftTime", .SaveErrorGraphicDriftTime
+        
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "SaveErrorGraphic3D", .SaveErrorGraphic3D
         AddKeyValueSetting sKeys, sVals, iKVCount, "SaveErrorGraphicFileTypeList", "; Options are " & GetErrorGraphicsTypeList()
         AddKeyValueSettingInt sKeys, sVals, iKVCount, "SaveErrorGraphicFileType", CInt(.SaveErrorGraphicFileType)
@@ -2642,6 +2657,7 @@ On Error GoTo SaveSettingsFileHandler
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetLockers", .spGetLockers
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTagMatchCount", .spGetMassTagMatchCount
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTags", .spGetMassTags
+            AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTagsPlusConformers", .spGetMassTagsPlusConformers
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetMassTagsSubset", .spGetMassTagsSubset
             AddKeyValueSetting sKeys, sVals, iKVCount, "spGetPMResultStats", .spGetPMResultStats
             AddKeyValueSetting sKeys, sVals, iKVCount, "spPutAnalysis", .spPutAnalysis
@@ -3327,7 +3343,7 @@ Private Sub ResetICR2LSPreferences()
 End Sub
 
 Public Sub ResetDataFilters(ByVal lngGelIndex As Long, ByRef udtPreferences As GelPrefs)
-    Dim i As Integer
+    Dim I As Integer
     
 On Error GoTo ResetDataFiltersErrorHandler
 
@@ -3338,9 +3354,9 @@ On Error GoTo ResetDataFiltersErrorHandler
     End With
     
     With GelData(lngGelIndex)
-       For i = 1 To MAX_FILTER_COUNT              'Do not use any filter initially
-         .DataFilter(i, 0) = False
-       Next i
+       For I = 1 To MAX_FILTER_COUNT              'Do not use any filter initially
+         .DataFilter(I, 0) = False
+       Next I
        .Preferences = udtPreferences
        .DataFilter(fltDupTolerance, 1) = udtPreferences.DupTolerance
        .DataFilter(fltDBTolerance, 1) = udtPreferences.DBTolerance
@@ -3472,6 +3488,8 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .MassBinSizePPM = DEFAULT_MASS_BIN_SIZE_PPM
                 .GANETRange = 0.15
                 .GANETBinSize = DEFAULT_GANET_BIN_SIZE
+                .DriftTimeRange = 5
+                .DriftTimeBinSize = DEFAULT_DRIFTTIME_BIN_SIZE
                 .ButterWorthFrequency = 0.2
                 
                 With .Graph2DOptions
@@ -3853,6 +3871,8 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 
                 .SaveErrorGraphicMass = True
                 .SaveErrorGraphicGANET = True
+                .SaveErrorGraphicDriftTime = True
+                
                 .SaveErrorGraphic3D = True
                 .SaveErrorGraphicFileType = pftPictureFileTypeConstants.pftPNG
                 .SaveErrorGraphSizeWidthPixels = 800
@@ -3958,6 +3978,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                     .spGetLockers = "GetLockers_02_2002"
                     .spGetMassTagMatchCount = "GetMassTagMatchCount"
                     .spGetMassTags = "GetMassTagsGANETParam"
+                    .spGetMassTagsPlusConformers = "GetMassTagsPlusConformers"
                     .spGetMassTagsSubset = "GetMassTagsForSubset"
                     .spGetPMResultStats = "GetPeakMatchingTaskResultStats"
                     .spPutAnalysis = "AddMatchMaking"

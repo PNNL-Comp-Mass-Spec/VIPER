@@ -439,7 +439,15 @@ On Error GoTo AutoAnalysis_ErrorHandler
             Else
                 intHtmlFileColumnOverride = 0
             End If
-            AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, False, Not blnRefinementWasPerformed, ehmErrorHistogramModeConstants.ehmFinalTolerances, intHtmlFileColumnOverride
+            
+            Dim blnSavingDataDuringToleranceRefinement As Boolean
+            blnSavingDataDuringToleranceRefinement = False
+            
+            AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, _
+                                               blnSavingDataDuringToleranceRefinement, _
+                                               Not blnRefinementWasPerformed, _
+                                               ehmErrorHistogramModeConstants.ehmFinalTolerances, _
+                                               intHtmlFileColumnOverride
         End If
         
     ' 19. Possibly save the Points and/or LC-MS Features to disk
@@ -2582,7 +2590,7 @@ Private Function AutoAnalysisLoadInputFile(ByRef udtWorkingParams As udtAutoAnal
     Dim intWildcardFileMatchesCount As Integer
     Dim intFileExtensionsPrefListCount As Integer, intExtensionLength As Integer
     Dim strFileExtensionsPrefList(MAX_FILE_EXTENSIONS_PREF_LIST_COUNT) As String        ' 0-based array
-    Dim strSubString As String
+    Dim strSubstring As String
     
     Dim strKeyValue As String
     Dim strDefault As String
@@ -2771,12 +2779,12 @@ On Error GoTo LoadInputFileErrorHandler
                                     If LCase(Right(strWildcardFileMatches(intWildCardFileIndex), intExtensionLength)) = strFileExtensionsPrefList(intExtensionIndex) Then
                                         ' Match found; make sure it doesn't have the form _x.??? or _xx.??? where x is any character
                                         
-                                        strSubString = LCase(Right(strWildcardFileMatches(intWildCardFileIndex), 7))
-                                        If Left(strSubString, 1) = "_" Then
+                                        strSubstring = LCase(Right(strWildcardFileMatches(intWildCardFileIndex), 7))
+                                        If Left(strSubstring, 1) = "_" Then
                                             ' Skip this file
                                         Else
-                                            strSubString = LCase(Right(strWildcardFileMatches(intWildCardFileIndex), 6))
-                                            If Left(strSubString, 1) = "_" Then
+                                            strSubstring = LCase(Right(strWildcardFileMatches(intWildCardFileIndex), 6))
+                                            If Left(strSubstring, 1) = "_" Then
                                                 ' Skip this file
                                             Else
                                                 strWildcardFileMatch = strWildcardFileMatches(intWildCardFileIndex)
@@ -4352,7 +4360,14 @@ SaveChromatogramsErrorHandler:
 
 End Sub
 
-Private Sub AutoAnalysisSaveErrorDistributions(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, ByRef fso As FileSystemObject, ByVal blnSavingDataDuringToleranceRefinement As Boolean, ByVal blnUpdateCachedErrorPeakStats As Boolean, ByVal eErrorHistogramMode As ehmErrorHistogramModeConstants, ByVal intHtmlFileColumnOverride As Integer)
+Private Sub AutoAnalysisSaveErrorDistributions(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, _
+                                               ByRef udtAutoParams As udtAutoAnalysisParametersType, _
+                                               ByRef fso As FileSystemObject, _
+                                               ByVal blnSavingDataDuringToleranceRefinement As Boolean, _
+                                               ByVal blnUpdateCachedErrorPeakStats As Boolean, _
+                                               ByVal eErrorHistogramMode As ehmErrorHistogramModeConstants, _
+                                               ByVal intHtmlFileColumnOverride As Integer)
+                                               
     ' Note: blnUpdateCachedErrorPeakStats is only valid if blnSavingDataDuringToleranceRefinement = False
     ' Note: strFileNameSuffix is only valid if blnSavingDataDuringToleranceRefinement = True
     ' If intHtmlFileColumnOverride is <> 0, then will save the graphic in the given column
@@ -4392,8 +4407,12 @@ On Error GoTo SaveErrorGraphicErrorHandler
     
     lngError = 0
     With glbPreferencesExpanded.AutoAnalysisOptions
-        If (.SaveErrorGraphicMass Or .SaveErrorGraphicGANET Or .SaveErrorGraphic3D Or blnSavingDataDuringToleranceRefinement) And _
-            Not .DoNotSaveOrExport Then
+        If (.SaveErrorGraphicMass Or _
+            .SaveErrorGraphicGANET Or _
+            .SaveErrorGraphic3D Or _
+            .SaveErrorGraphicDriftTime Or _
+            blnSavingDataDuringToleranceRefinement) And _
+           Not .DoNotSaveOrExport Then
             
             If Not blnSavingDataDuringToleranceRefinement Then
                 frmErrorDistribution2DLoadedData.CallerID = udtWorkingParams.GelIndex
@@ -4403,6 +4422,7 @@ On Error GoTo SaveErrorGraphicErrorHandler
                 If blnUpdateCachedErrorPeakStats Then
                     frmErrorDistribution2DLoadedData.RecordMassCalPeakStatsNow
                     frmErrorDistribution2DLoadedData.RecordNETTolPeakStatsNow
+                    frmErrorDistribution2DLoadedData.RecordDriftTimePeakStatsNow
                 End If
             Else
                 ' The form was already loaded and initialized by the calling function
@@ -4449,6 +4469,7 @@ On Error GoTo SaveErrorGraphicErrorHandler
             frmErrorDistribution2DLoadedData.Height = lngHeightTwips
             DoEvents
             
+            ' Mass error histogram
             If (.SaveErrorGraphicMass Or blnSavingDataDuringToleranceRefinement) And lngError = 0 Then
                 frmErrorDistribution2DLoadedData.SetPlotMode mdmMassErrorPPM
                 strFilePath = udtWorkingParams.ResultsFileNameBase & "_MassErrors" & strFileNameSuffix & strGraphicExtension
@@ -4488,6 +4509,7 @@ On Error GoTo SaveErrorGraphicErrorHandler
                 End If
             End If
             
+            ' NET error histogram
             If (.SaveErrorGraphicGANET Or blnSavingDataDuringToleranceRefinement) And lngError = 0 Then
                 frmErrorDistribution2DLoadedData.SetPlotMode mdmGanetError
                 strFilePath = udtWorkingParams.ResultsFileNameBase & "_GANETErrors" & strFileNameSuffix & strGraphicExtension
@@ -4527,6 +4549,56 @@ On Error GoTo SaveErrorGraphicErrorHandler
                 End If
             End If
             
+            ' Drift Time error histogram (do not save it during tolerance refinement)
+            If (.SaveErrorGraphicDriftTime And Not blnSavingDataDuringToleranceRefinement) And lngError = 0 Then
+            
+                ' Only continue if a drift time tolerance was used
+                If samtDef.UseDriftTime And samtDef.DriftTimeTol >= 0 Then
+                    
+                    frmErrorDistribution2DLoadedData.SetPlotMode mdmDriftTimeError
+                    strFilePath = udtWorkingParams.ResultsFileNameBase & "_DriftTimeErrors" & strFileNameSuffix & strGraphicExtension
+                    strFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strFilePath)
+                    If .SaveErrorGraphicFileType = pftPictureFileTypeConstants.pftJPG Then
+                        lngError = frmErrorDistribution2DLoadedData.SaveChartPictureToFile(False, strFilePath, False)
+                    Else
+                        lngError = frmErrorDistribution2DLoadedData.SaveChartPictureToFile(True, strFilePath, False)
+                    End If
+                
+                    intRowToUse = 5
+                    Select Case eErrorHistogramMode
+                    Case ehmErrorHistogramModeConstants.ehmBeforeRefinement
+                        strFigureCaption = "Drift Time Errors Before Refinement"
+                        intColumnToUse = 0
+                    Case ehmErrorHistogramModeConstants.ehmAfterLCMSWARP
+                        strFigureCaption = "Drift Time Errors After LCMSWARP"
+                        intColumnToUse = 0
+                    Case ehmErrorHistogramModeConstants.ehmFinalTolerances
+                        strFigureCaption = "Drift Time Errors with Final Tolerances"
+                        If SAVE_FINAL_TOLERANCE_PLOTS Then
+                            intColumnToUse = 3
+                        Else
+                            intColumnToUse = 0
+                        End If
+                    Case Else
+                        ' Unknown mode
+                        Debug.Assert False
+                    End Select
+                            
+                    If intHtmlFileColumnOverride <> 0 Then
+                        intColumnToUse = intHtmlFileColumnOverride
+                    End If
+                
+                    If intColumnToUse <> 0 Then
+                        AddNewOutputFileForHtml udtWorkingParams, fso.GetFileName(strFilePath), strFigureCaption, intRowToUse, intColumnToUse
+                    End If
+                    
+                Else
+                    AddToAnalysisHistory udtWorkingParams.GelIndex, "SaveErrorGraphicDriftTime is set to true, but drift time was not used; will not save a drift time error histogram"
+                End If
+
+            End If
+            
+            ' 3D error graphic
             If Not blnSavingDataDuringToleranceRefinement And .SaveErrorGraphic3D And lngError = 0 Then
                 strFilePath = udtWorkingParams.ResultsFileNameBase & "_MassAndGANETErrors3D" & strGraphicExtension
                 strFilePath = fso.BuildPath(udtWorkingParams.GelOutputFolder, strFilePath)
@@ -5225,13 +5297,19 @@ On Error GoTo SearchDatabaseErrorHandler
                     frmSearchMT_ConglomerateUMC.GetSummaryStats .UMCCountWithHits, _
                                                                 .UniqueMTCount, _
                                                                 .UniqueIntStdCount, _
+                                                                .ConformerCount, _
+                                                                .ConformerCountIdentified, _
                                                                 .UniqueMTCount1PctFDR, _
                                                                 .UniqueMTCount5PctFDR, _
                                                                 .UniqueMTCount10PctFDR, _
                                                                 .UniqueMTCount25PctFDR, _
                                                                 .UniqueMTCount50PctFDR, _
                                                                 .MassToleranceFromSTAC, _
-                                                                .NETToleranceFromSTAC
+                                                                .NETToleranceFromSTAC, _
+                                                                .DriftTimeToleranceFromSTAC, _
+                                                                .DriftTimeAlignmentSlope, _
+                                                                .DriftTimeAlignmentIntercept
+
                 End With
                 
                 With frmSearchMT_ConglomerateUMC
@@ -5264,8 +5342,6 @@ On Error GoTo SearchDatabaseErrorHandler
                              
                              ' Save two STAC plots; the first is unfiltered, the second is filtered on UP > 0.5
                             For intSTACPlotIndex = 0 To 1
-                                
-                                .PlotUniqueAMTs = True
                                 
                                 If intSTACPlotIndex = 0 Then
                                     .PlotUPFilteredFDR = False
@@ -5555,6 +5631,7 @@ On Error GoTo AutoAnalysisToleranceRefinementErrorHandler
             samtDef.MWTol = .DBSearchMWTol
             samtDef.TolType = .DBSearchTolType
             samtDef.NETTol = .DBSearchNETTol
+            samtDef.UseDriftTime = False
             GelSearchDef(udtWorkingParams.GelIndex).AMTSearchOnIons = samtDef
             GelSearchDef(udtWorkingParams.GelIndex).AMTSearchOnUMCs = samtDef
             GelSearchDef(udtWorkingParams.GelIndex).AMTSearchOnPairs = samtDef
@@ -6013,7 +6090,7 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
         End If
     End With
     
-    ' 5b. Copy samtDef to the other search definitions
+    ' 5b. Copy samtDef to the other search definitions (samtDef was restored from udtAMTDefSaved)
     With GelSearchDef(udtWorkingParams.GelIndex)
         .AMTSearchOnIons = samtDef
         .AMTSearchOnUMCs = samtDef
@@ -6028,7 +6105,7 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
     
     ' 5e. Restore .UseSTAC
     glbPreferencesExpanded.UseSTAC = blnUseStacSaved
-    
+   
     ' 5f. Write the latest AnalysisHistory information to the log
     AutoAnalysisAppendLatestHistoryToLog udtAutoParams, udtWorkingParams
 
@@ -6163,7 +6240,13 @@ Private Sub AutoAnalysisToleranceRefinementSaveErrorDistributions(ByRef objError
         End If
         
         ' 3. Save the error distributions (Note that blnUpdateCachedErrorPeakStats is ignored here since blnSavingDataDuringToleranceRefinement = True
-        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, True, blnUpdateCachedErrorPeakStats, eErrorHistogramMode, 0
+        Dim blnSavingDataDuringToleranceRefinement As Boolean
+        blnSavingDataDuringToleranceRefinement = True
+        
+        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, _
+                                           blnSavingDataDuringToleranceRefinement, _
+                                           blnUpdateCachedErrorPeakStats, _
+                                           eErrorHistogramMode, 0
         
         ' Make sure the tolerance refinement controls are shown
         .ShowHideToleranceRefinementControls True
@@ -6173,6 +6256,7 @@ Private Sub AutoAnalysisToleranceRefinementSaveErrorDistributions(ByRef objError
         If blnUpdateCachedErrorPeakStats Then
             .RecordMassCalPeakStatsNow
             .RecordNETTolPeakStatsNow
+            .RecordDriftTimePeakStatsNow
         End If
     End With
 
@@ -6377,8 +6461,14 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
         ' Save a graphical picture of the data
         AutoAnalysisSavePictureGraphic udtWorkingParams, udtAutoParams, fso, False, True
 
-        ' Create the mass and NET error plots
-        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, False, False, ehmErrorHistogramModeConstants.ehmFinalTolerances, 2
+        ' Create the mass and NET error plots (plus optionally the DriftTime Error plot)
+        Dim blnSavingDataDuringToleranceRefinement As Boolean
+        blnSavingDataDuringToleranceRefinement = True
+        
+        AutoAnalysisSaveErrorDistributions udtWorkingParams, udtAutoParams, fso, _
+                                           blnSavingDataDuringToleranceRefinement, _
+                                           False, _
+                                           ehmErrorHistogramModeConstants.ehmFinalTolerances, 2
 
 ''        ' First, save the current overall adjustment value
 ''        With GelSearchDef(udtWorkingParams.GelIndex).MassCalibrationInfo
@@ -6402,6 +6492,7 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
 ''
 ''            frmErrorDistribution2DLoadedData.RecordMassCalPeakStatsNow
 ''            frmErrorDistribution2DLoadedData.RecordNETTolPeakStatsNow
+''            frmErrorDistribution2DLoadedData.RecordDriftTimePeakStatsNow
 ''            Unload frmErrorDistribution2DLoadedData
 ''        End If
 ''

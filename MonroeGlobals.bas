@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "April 7, 2011"
+Public Const APP_BUILD_DATE As String = "June 24, 2011"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -606,9 +606,9 @@ End Type
 'This corresponds to FileInfoVersions(fioSearchDefinitions) version 2
 Public Type udtSearchDefinition2002GroupType
     UMCDef As UMCDefinition2002
-    AMTSearchOnIons As SearchAMTDefinition
-    AMTSearchOnUMCs As SearchAMTDefinition
-    AMTSearchOnPairs As SearchAMTDefinition
+    AMTSearchOnIons As SearchAMTDefinition2002
+    AMTSearchOnUMCs As SearchAMTDefinition2002
+    AMTSearchOnPairs As SearchAMTDefinition2002
     AnalysisHistory() As String
     AnalysisHistoryCount As Long
 End Type
@@ -616,9 +616,9 @@ End Type
 'This corresponds to FileInfoVersions(fioSearchDefinitions) version 3
 Public Type udtSearchDefinition2003GroupType
     UMCDef As UMCDefinition2003a                     ' Updated for this version
-    AMTSearchOnIons As SearchAMTDefinition
-    AMTSearchOnUMCs As SearchAMTDefinition
-    AMTSearchOnPairs As SearchAMTDefinition
+    AMTSearchOnIons As SearchAMTDefinition2002
+    AMTSearchOnUMCs As SearchAMTDefinition2002
+    AMTSearchOnPairs As SearchAMTDefinition2002
     AnalysisHistory() As String
     AnalysisHistoryCount As Long
 End Type
@@ -627,9 +627,9 @@ End Type
 Public Type udtSearchDefinition2003bGroupType
     UMCDef As UMCDefinition2003a
     UMCIonNetDef As UMCIonNetDefinition            ' New for this version; used on frmUMCIonNet
-    AMTSearchOnIons As SearchAMTDefinition
-    AMTSearchOnUMCs As SearchAMTDefinition
-    AMTSearchOnPairs As SearchAMTDefinition
+    AMTSearchOnIons As SearchAMTDefinition2002
+    AMTSearchOnUMCs As SearchAMTDefinition2002
+    AMTSearchOnPairs As SearchAMTDefinition2002
     AnalysisHistory() As String
     AnalysisHistoryCount As Long
 End Type
@@ -638,9 +638,9 @@ End Type
 Public Type udtSearchDefinition2003cGroupType
     UMCDef As UMCDefinition2003a
     UMCIonNetDef As UMCIonNetDefinition
-    AMTSearchOnIons As SearchAMTDefinition
-    AMTSearchOnUMCs As SearchAMTDefinition
-    AMTSearchOnPairs As SearchAMTDefinition
+    AMTSearchOnIons As SearchAMTDefinition2002
+    AMTSearchOnUMCs As SearchAMTDefinition2002
+    AMTSearchOnPairs As SearchAMTDefinition2002
     AnalysisHistory() As String
     AnalysisHistoryCount As Long
     MassCalibrationInfo As udtMassCalibrationInfoType       ' New for this version
@@ -651,9 +651,9 @@ End Type
 Public Type udtSearchDefinition2003dGroupType
     UMCDef As UMCDefinition2003a
     UMCIonNetDef As UMCIonNetDefinition
-    AMTSearchOnIons As SearchAMTDefinition
-    AMTSearchOnUMCs As SearchAMTDefinition
-    AMTSearchOnPairs As SearchAMTDefinition
+    AMTSearchOnIons As SearchAMTDefinition2002
+    AMTSearchOnUMCs As SearchAMTDefinition2002
+    AMTSearchOnPairs As SearchAMTDefinition2002
     AnalysisHistory() As String                                         ' History (log) of the searches and steps performed for this gel; an entry is made whenever LC-MS Features are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
     AnalysisHistoryCount As Long
     MassCalibrationInfo As udtMassCalibrationInfoType
@@ -665,9 +665,9 @@ End Type
 Public Type udtSearchDefinition2003eGroupType
     UMCDef As UMCDefinition2003a
     UMCIonNetDef As UMCIonNetDefinition
-    AMTSearchOnIons As SearchAMTDefinition
-    AMTSearchOnUMCs As SearchAMTDefinition
-    AMTSearchOnPairs As SearchAMTDefinition
+    AMTSearchOnIons As SearchAMTDefinition2002
+    AMTSearchOnUMCs As SearchAMTDefinition2002
+    AMTSearchOnPairs As SearchAMTDefinition2002
     AnalysisHistory() As String                                     ' History (log) of the searches and steps performed for this gel; an entry is made whenever LC-MS Features are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
     AnalysisHistoryCount As Long
     MassCalibrationInfo As udtMassCalibrationInfoType
@@ -676,16 +676,38 @@ Public Type udtSearchDefinition2003eGroupType
 End Type
 
 'This corresponds to FileInfoVersions(fioSearchDefinitions) version 8
-Public Type udtSearchDefinitionGroupType
+Public Type udtSearchDefinition2004GroupType
     UMCDef As UMCDefinition                                         ' Updated for this version
     UMCIonNetDef As UMCIonNetDefinition
-    AMTSearchOnIons As SearchAMTDefinition
-    AMTSearchOnUMCs As SearchAMTDefinition
-    AMTSearchOnPairs As SearchAMTDefinition
+    AMTSearchOnIons As SearchAMTDefinition2002
+    AMTSearchOnUMCs As SearchAMTDefinition2002
+    AMTSearchOnPairs As SearchAMTDefinition2002
     AnalysisHistory() As String                                     ' History (log) of the searches and steps performed for this gel; an entry is made whenever LC-MS Features are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
     AnalysisHistoryCount As Long
     MassCalibrationInfo As udtMassCalibrationInfoType
     AMTSearchMassMods As udtDBSearchMassModificationOptionsType
+    OtherInfo As String
+End Type
+
+'This corresponds to FileInfoVersions(fioSearchDefinitions) version 9
+Public Type udtSearchDefinitionGroupType
+    UMCDef As UMCDefinition
+    UMCIonNetDef As UMCIonNetDefinition
+    AMTSearchOnIons As SearchAMTDefinition                          ' Updated for this version
+    AMTSearchOnUMCs As SearchAMTDefinition                          ' Updated for this version
+    AMTSearchOnPairs As SearchAMTDefinition                         ' Updated for this version
+    AnalysisHistory() As String                                     ' History (log) of the searches and steps performed for this gel; an entry is made whenever LC-MS Features are searched for, or modified, and whenever MT tags are searched against; entries also made for other actions
+    AnalysisHistoryCount As Long
+    MassCalibrationInfo As udtMassCalibrationInfoType
+    AMTSearchMassMods As udtDBSearchMassModificationOptionsType
+    AdditionalValue1 As Long        ' 4 bytes
+    AdditionalValue2 As Long        ' 4 bytes
+    AdditionalValue3 As Long        ' 4 bytes
+    AdditionalValue4 As Long        ' 4 bytes
+    AdditionalValue5 As Long        ' 4 bytes
+    AdditionalValue6 As Long        ' 4 bytes
+    AdditionalValue7 As Long        ' 4 bytes
+    AdditionalValue8 As Long        ' 4 bytes
     OtherInfo As String
 End Type
 
@@ -774,6 +796,8 @@ Public Type udtErrorDistributionOptionsType
     MassBinSizePPM As Single                    ' Size of each bin; this should be a nice round number like 10, 5, 1, 0.5, 0.1, etc.
     GANETRange As Single
     GANETBinSize As Single                      ' Size of each bin; this should be a nice round number like 1, 0.1, 0.01, 0.005, 0.001, etc.
+    DriftTimeRange As Single
+    DriftTimeBinSize As Single                  ' Size of each bin; this should be a nice round number like 10, 5, 1, 0.5, 0.1, etc.
     
     ButterWorthFrequency As Single              ' Butterworth sampling frequency (affects smoothing); defaults to 0.15
     
@@ -899,6 +923,7 @@ Public Type udtUMCMassTagMatchStats
     FDRThreshold As Double          ' When using STAC, this is the FDR Threshold that the given STAC score corresponds to
     MassDiffPPM As Double           ' Mass difference between AMT and given UMC or given point
     MultiAMTHitCount As Long        ' The number of Unique MT tag hits for each UMC; only applies to AMT's (in other words, ignores Internal Standard)
+    DriftTimeAligned As Single      ' Aligned Drift Time computed via STAC
 End Type
 
 Public Type udtExclusionIonType
@@ -1060,6 +1085,7 @@ Public Type udtAutoAnalysisOptionsType
     
     SaveErrorGraphicMass As Boolean
     SaveErrorGraphicGANET As Boolean
+    SaveErrorGraphicDriftTime As Boolean
     SaveErrorGraphic3D As Boolean
     SaveErrorGraphicFileType As pftPictureFileTypeConstants         ' 1=PNG, 2=JPG; this also defines the format for saving TIC and BPI Plots
     SaveErrorGraphSizeWidthPixels As Long       ' This also defines the format for saving TIC and BPI Plots
@@ -1190,6 +1216,7 @@ Public Type udtAutoAnalysisCachedDataType
     Initialized As Boolean
     MassCalErrorPeakCached As udtErrorPlottingPeakCacheType
     NETTolErrorPeakCached As udtErrorPlottingPeakCacheType
+    DriftTimeErrorPeakCached As udtErrorPlottingPeakCacheType
 End Type
 
 Public Type udtAutoAnalyzeStateType
@@ -1226,6 +1253,7 @@ Public Type udtMTSConnectionInfoType
     spGetLockers As String
     spGetMassTagMatchCount As String
     spGetMassTags As String
+    spGetMassTagsPlusConformers As String
     spGetMassTagsSubset As String
     spGetPMResultStats As String
     spPutAnalysis As String
