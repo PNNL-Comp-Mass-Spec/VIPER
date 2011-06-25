@@ -16,7 +16,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
       Caption         =   "Drift Time Error Plot Status"
       Height          =   1425
       Left            =   120
-      TabIndex        =   136
+      TabIndex        =   138
       Top             =   8450
       Width           =   3015
       Begin VB.TextBox txtDriftTimePeakStats 
@@ -25,7 +25,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Left            =   120
          Locked          =   -1  'True
          MultiLine       =   -1  'True
-         TabIndex        =   137
+         TabIndex        =   139
          Text            =   "frmErrorDistribution2D.frx":0000
          Top             =   220
          Width           =   2835
@@ -35,18 +35,27 @@ Begin VB.Form frmErrorDistribution2DLoadedData
       BackColor       =   &H00FFFFFF&
       BorderStyle     =   0  'None
       Caption         =   "Frame1"
-      Height          =   6200
+      Height          =   6555
       Left            =   5880
       TabIndex        =   70
       Top             =   0
       Width           =   7000
-      Begin VB.TextBox txtMaximumAbundance 
+      Begin VB.TextBox txtMinimumUP 
          Alignment       =   1  'Right Justify
          Height          =   285
          Left            =   5640
          TabIndex        =   78
          Text            =   "0"
-         Top             =   960
+         Top             =   900
+         Width           =   855
+      End
+      Begin VB.TextBox txtMaximumAbundance 
+         Alignment       =   1  'Right Justify
+         Height          =   285
+         Left            =   5640
+         TabIndex        =   80
+         Text            =   "0"
+         Top             =   1200
          Width           =   855
       End
       Begin VB.TextBox txtMinimumSLiC 
@@ -82,13 +91,13 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Options"
          Height          =   2700
          Left            =   -120
-         TabIndex        =   82
-         Top             =   1200
+         TabIndex        =   84
+         Top             =   1560
          Width           =   6615
          Begin VB.TextBox txtDriftTimeBinSize 
             Height          =   285
             Left            =   5280
-            TabIndex        =   106
+            TabIndex        =   108
             Text            =   "0.1"
             Top             =   1920
             Width           =   735
@@ -96,7 +105,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtDriftTimeRange 
             Height          =   285
             Left            =   2040
-            TabIndex        =   104
+            TabIndex        =   106
             Text            =   "10"
             Top             =   1920
             Width           =   735
@@ -106,14 +115,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Peak Edges"
             Height          =   255
             Left            =   2520
-            TabIndex        =   89
+            TabIndex        =   91
             Top             =   960
             Width           =   2175
          End
          Begin VB.TextBox txtMassRangePPM 
             Height          =   285
             Left            =   2040
-            TabIndex        =   95
+            TabIndex        =   97
             Text            =   "100"
             Top             =   1200
             Width           =   735
@@ -121,7 +130,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtButterworthFrequency 
             Height          =   285
             Left            =   2640
-            TabIndex        =   108
+            TabIndex        =   110
             Text            =   "0.15"
             Top             =   2300
             Width           =   735
@@ -131,7 +140,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Smoothed Data"
             Height          =   255
             Left            =   240
-            TabIndex        =   86
+            TabIndex        =   88
             Top             =   960
             Width           =   2175
          End
@@ -140,7 +149,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Center Y Axis"
             Height          =   255
             Left            =   2520
-            TabIndex        =   88
+            TabIndex        =   90
             Top             =   480
             Value           =   1  'Checked
             Width           =   1335
@@ -150,7 +159,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Connect Points with Line"
             Height          =   255
             Left            =   240
-            TabIndex        =   85
+            TabIndex        =   87
             Top             =   720
             Value           =   1  'Checked
             Width           =   2175
@@ -160,7 +169,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Gridlines"
             Height          =   255
             Left            =   2520
-            TabIndex        =   87
+            TabIndex        =   89
             Top             =   240
             Value           =   1  'Checked
             Width           =   1455
@@ -168,7 +177,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGANETRange 
             Height          =   285
             Left            =   2040
-            TabIndex        =   100
+            TabIndex        =   102
             Text            =   "0.3"
             Top             =   1560
             Width           =   735
@@ -176,7 +185,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGANETBinSize 
             Height          =   285
             Left            =   5280
-            TabIndex        =   102
+            TabIndex        =   104
             Text            =   "0.005"
             Top             =   1560
             Width           =   735
@@ -184,7 +193,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtMassBinSizePPM 
             Height          =   285
             Left            =   5280
-            TabIndex        =   98
+            TabIndex        =   100
             Text            =   "0.5"
             Top             =   1200
             Width           =   735
@@ -192,7 +201,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGraphPointSize 
             Height          =   285
             Left            =   5280
-            TabIndex        =   91
+            TabIndex        =   93
             Text            =   "2"
             Top             =   240
             Width           =   735
@@ -200,7 +209,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Begin VB.TextBox txtGraphLineWidth 
             Height          =   285
             Left            =   5280
-            TabIndex        =   93
+            TabIndex        =   95
             Text            =   "3"
             Top             =   600
             Width           =   735
@@ -210,7 +219,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Auto Scale X Range"
             Height          =   255
             Left            =   240
-            TabIndex        =   83
+            TabIndex        =   85
             Top             =   240
             Value           =   1  'Checked
             Width           =   1815
@@ -220,7 +229,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Show Point Symbols"
             Height          =   255
             Left            =   240
-            TabIndex        =   84
+            TabIndex        =   86
             Top             =   480
             Value           =   1  'Checked
             Width           =   1815
@@ -230,7 +239,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Drift Time Range"
             Height          =   255
             Left            =   240
-            TabIndex        =   103
+            TabIndex        =   105
             Top             =   1950
             Width           =   1575
          End
@@ -239,7 +248,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "NET Range (± 0)"
             Height          =   255
             Left            =   240
-            TabIndex        =   135
+            TabIndex        =   137
             Top             =   1590
             Width           =   1575
          End
@@ -248,7 +257,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Drift Time Bin Size"
             Height          =   255
             Left            =   3840
-            TabIndex        =   105
+            TabIndex        =   107
             Top             =   1950
             Width           =   1335
          End
@@ -257,7 +266,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Butterworth Sampling Frequency"
             Height          =   255
             Left            =   120
-            TabIndex        =   107
+            TabIndex        =   109
             Top             =   2330
             Width           =   2415
          End
@@ -266,7 +275,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Mass Range (± 0)"
             Height          =   255
             Left            =   240
-            TabIndex        =   94
+            TabIndex        =   96
             Top             =   1230
             Width           =   1575
          End
@@ -275,7 +284,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Left            =   2880
-            TabIndex        =   96
+            TabIndex        =   98
             Top             =   1230
             Width           =   495
          End
@@ -284,7 +293,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "NET Bin Size"
             Height          =   255
             Left            =   3840
-            TabIndex        =   101
+            TabIndex        =   103
             Top             =   1590
             Width           =   1335
          End
@@ -293,7 +302,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "ppm"
             Height          =   255
             Left            =   6120
-            TabIndex        =   99
+            TabIndex        =   101
             Top             =   1230
             Width           =   495
          End
@@ -302,7 +311,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Mass Bin Size"
             Height          =   255
             Left            =   3840
-            TabIndex        =   97
+            TabIndex        =   99
             Top             =   1230
             Width           =   1335
          End
@@ -311,7 +320,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Point Size"
             Height          =   255
             Left            =   4080
-            TabIndex        =   90
+            TabIndex        =   92
             Top             =   270
             Width           =   855
          End
@@ -320,7 +329,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Line Width"
             Height          =   255
             Left            =   4080
-            TabIndex        =   92
+            TabIndex        =   94
             Top             =   630
             Width           =   975
          End
@@ -346,11 +355,21 @@ Begin VB.Form frmErrorDistribution2DLoadedData
       Begin VIPER.ctlSpectraPlotter ctlPlotter 
          Height          =   4815
          Left            =   0
-         TabIndex        =   134
-         Top             =   1320
+         TabIndex        =   136
+         Top             =   1680
          Width           =   6855
          _ExtentX        =   12091
          _ExtentY        =   8493
+      End
+      Begin VB.Label lblMinimumUP 
+         Alignment       =   1  'Right Justify
+         BackStyle       =   0  'Transparent
+         Caption         =   "Minimum UP"
+         Height          =   195
+         Left            =   4320
+         TabIndex        =   77
+         Top             =   930
+         Width           =   1215
       End
       Begin VB.Label lblMaximumAbundance 
          Alignment       =   1  'Right Justify
@@ -358,14 +377,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Maximum Abundance"
          Height          =   195
          Left            =   3840
-         TabIndex        =   77
-         Top             =   960
+         TabIndex        =   79
+         Top             =   1200
          Width           =   1695
       End
       Begin VB.Label lblMinimumSLiC 
          Alignment       =   1  'Right Justify
          BackStyle       =   0  'Transparent
-         Caption         =   "Minimum SLiC"
+         Caption         =   "Min STAC/SLiC"
          Height          =   195
          Left            =   4320
          TabIndex        =   75
@@ -377,7 +396,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Loading..."
          Height          =   495
          Left            =   1080
-         TabIndex        =   80
+         TabIndex        =   82
          Top             =   720
          Width           =   3375
       End
@@ -386,7 +405,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "MTDB Status:"
          Height          =   255
          Left            =   0
-         TabIndex        =   79
+         TabIndex        =   81
          ToolTipText     =   "Status of the MT tag database"
          Top             =   720
          Width           =   1095
@@ -396,8 +415,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Ready"
          Height          =   255
          Left            =   0
-         TabIndex        =   81
-         Top             =   960
+         TabIndex        =   83
+         Top             =   1200
          Width           =   3735
       End
    End
@@ -414,7 +433,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          Caption         =   "Relative Risk Statistics"
          Height          =   735
          Left            =   120
-         TabIndex        =   109
+         TabIndex        =   111
          Top             =   6120
          Width           =   3015
          Begin VB.TextBox txtRelativeRiskStatistics 
@@ -423,7 +442,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Left            =   120
             Locked          =   -1  'True
             MultiLine       =   -1  'True
-            TabIndex        =   110
+            TabIndex        =   112
             Top             =   220
             Width           =   2835
          End
@@ -600,20 +619,20 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabCaption(0)   =   "Mass Calibration Refinement"
          TabPicture(0)   =   "frmErrorDistribution2D.frx":01F3
          Tab(0).ControlEnabled=   0   'False
-         Tab(0).Control(0)=   "cmdResetToDefaults"
-         Tab(0).Control(1)=   "cmdAbortProcessing(0)"
-         Tab(0).Control(2)=   "cmdRecomputeHistograms(0)"
-         Tab(0).Control(3)=   "cmdMassCalibrationRevert"
-         Tab(0).Control(4)=   "txtMassCalibrationOverallAdjustment"
-         Tab(0).Control(5)=   "txtMassCalibrationNewIncrementalAdjustment"
-         Tab(0).Control(6)=   "cmdMassCalibrationManual"
-         Tab(0).Control(7)=   "fraMassCalibrationRefinement"
-         Tab(0).Control(8)=   "cmdMassCalibrationRefinementStart"
-         Tab(0).Control(9)=   "lblMassCalibrationOverallAdjustment"
-         Tab(0).Control(10)=   "lblMassCalibrationRefinementUnits(1)"
-         Tab(0).Control(11)=   "lblMassCalibrationAdjustment"
-         Tab(0).Control(12)=   "lblMassCalibrationRefinementUnits(2)"
-         Tab(0).Control(13)=   "lblMassCalibrationRefinementDescription"
+         Tab(0).Control(0)=   "lblMassCalibrationRefinementDescription"
+         Tab(0).Control(1)=   "lblMassCalibrationRefinementUnits(2)"
+         Tab(0).Control(2)=   "lblMassCalibrationAdjustment"
+         Tab(0).Control(3)=   "lblMassCalibrationRefinementUnits(1)"
+         Tab(0).Control(4)=   "lblMassCalibrationOverallAdjustment"
+         Tab(0).Control(5)=   "cmdMassCalibrationRefinementStart"
+         Tab(0).Control(6)=   "fraMassCalibrationRefinement"
+         Tab(0).Control(7)=   "cmdMassCalibrationManual"
+         Tab(0).Control(8)=   "txtMassCalibrationNewIncrementalAdjustment"
+         Tab(0).Control(9)=   "txtMassCalibrationOverallAdjustment"
+         Tab(0).Control(10)=   "cmdMassCalibrationRevert"
+         Tab(0).Control(11)=   "cmdRecomputeHistograms(0)"
+         Tab(0).Control(12)=   "cmdAbortProcessing(0)"
+         Tab(0).Control(13)=   "cmdResetToDefaults"
          Tab(0).ControlCount=   14
          TabCaption(1)   =   "Tolerance Refinement"
          TabPicture(1)   =   "frmErrorDistribution2D.frx":020F
@@ -638,17 +657,17 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabCaption(2)   =   "Pairwise Diffs"
          TabPicture(2)   =   "frmErrorDistribution2D.frx":022B
          Tab(2).ControlEnabled=   0   'False
-         Tab(2).Control(0)=   "cmdAbortProcessing(2)"
-         Tab(2).Control(1)=   "cmdRecomputeHistograms(1)"
-         Tab(2).Control(2)=   "fraPairwiseDifferences"
-         Tab(2).Control(3)=   "lblPairwiseDifferencesOverview"
+         Tab(2).Control(0)=   "lblPairwiseDifferencesOverview"
+         Tab(2).Control(1)=   "fraPairwiseDifferences"
+         Tab(2).Control(2)=   "cmdRecomputeHistograms(1)"
+         Tab(2).Control(3)=   "cmdAbortProcessing(2)"
          Tab(2).ControlCount=   4
          Begin VB.CommandButton cmdAbortProcessing 
             Caption         =   "Abort Processing"
             Height          =   375
             Index           =   2
             Left            =   -74520
-            TabIndex        =   131
+            TabIndex        =   133
             Top             =   3960
             Visible         =   0   'False
             Width           =   2055
@@ -658,7 +677,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   375
             Index           =   1
             Left            =   -74520
-            TabIndex        =   132
+            TabIndex        =   134
             Top             =   3960
             Width           =   2055
          End
@@ -666,14 +685,14 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Pairwise LC-MS Feature Diffs"
             Height          =   2415
             Left            =   -74880
-            TabIndex        =   113
+            TabIndex        =   115
             Top             =   480
             Width           =   4095
             Begin VB.TextBox txtPairwiseMassDiffNETOffset 
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   128
+               TabIndex        =   130
                Text            =   "0"
                Top             =   2040
                Width           =   615
@@ -682,7 +701,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   125
+               TabIndex        =   127
                Text            =   "0.1"
                Top             =   1680
                Width           =   615
@@ -691,7 +710,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Caption         =   "Compute pairwise differences"
                Height          =   255
                Left            =   120
-               TabIndex        =   114
+               TabIndex        =   116
                Top             =   270
                Width           =   3015
             End
@@ -699,7 +718,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   116
+               TabIndex        =   118
                Text            =   "-100"
                Top             =   600
                Width           =   615
@@ -708,7 +727,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   119
+               TabIndex        =   121
                Text            =   "100"
                Top             =   960
                Width           =   615
@@ -717,7 +736,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Alignment       =   1  'Right Justify
                Height          =   285
                Left            =   2040
-               TabIndex        =   122
+               TabIndex        =   124
                Text            =   "0.25"
                Top             =   1320
                Width           =   615
@@ -727,7 +746,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   11
                Left            =   2760
-               TabIndex        =   129
+               TabIndex        =   131
                Top             =   2070
                Width           =   540
             End
@@ -736,7 +755,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   15
                Left            =   120
-               TabIndex        =   127
+               TabIndex        =   129
                Top             =   2070
                Width           =   1425
             End
@@ -745,7 +764,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   13
                Left            =   1680
-               TabIndex        =   133
+               TabIndex        =   135
                Top             =   1710
                Width           =   345
             End
@@ -754,7 +773,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   12
                Left            =   120
-               TabIndex        =   124
+               TabIndex        =   126
                Top             =   1710
                Width           =   1425
             End
@@ -763,7 +782,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   10
                Left            =   2760
-               TabIndex        =   126
+               TabIndex        =   128
                Top             =   1710
                Width           =   540
             End
@@ -772,7 +791,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   9
                Left            =   2760
-               TabIndex        =   123
+               TabIndex        =   125
                Top             =   1350
                Width           =   540
             End
@@ -781,7 +800,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   11
                Left            =   120
-               TabIndex        =   115
+               TabIndex        =   117
                Top             =   630
                Width           =   1905
             End
@@ -790,7 +809,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   4
                Left            =   2760
-               TabIndex        =   117
+               TabIndex        =   119
                Top             =   630
                Width           =   540
             End
@@ -799,7 +818,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   9
                Left            =   120
-               TabIndex        =   118
+               TabIndex        =   120
                Top             =   990
                Width           =   1905
             End
@@ -808,7 +827,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   2
                Left            =   2760
-               TabIndex        =   120
+               TabIndex        =   122
                Top             =   990
                Width           =   540
             End
@@ -817,7 +836,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
                Height          =   255
                Index           =   7
                Left            =   120
-               TabIndex        =   121
+               TabIndex        =   123
                Top             =   1350
                Width           =   1905
             End
@@ -826,7 +845,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Set to Defaults"
             Height          =   375
             Left            =   -71160
-            TabIndex        =   112
+            TabIndex        =   114
             Top             =   600
             Width           =   1455
          End
@@ -834,7 +853,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Use min or max tol if out of range"
             Height          =   375
             Left            =   3720
-            TabIndex        =   111
+            TabIndex        =   113
             Top             =   1920
             Value           =   1  'Checked
             Width           =   1575
@@ -1258,7 +1277,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Caption         =   "Explanation goes here"
             Height          =   975
             Left            =   -74880
-            TabIndex        =   130
+            TabIndex        =   132
             Top             =   3000
             Width           =   5235
          End
@@ -1528,8 +1547,9 @@ Private Function AddNewErrValues(ByRef sngRawMassErrorsPPM() As Single, _
     Dim strDriftTimeError As String
     Dim dblDriftTimeErrorFromID As Double
     
-    Dim blnValidSLiC As Boolean
+    Dim blnPassesFilters As Boolean
     Dim blnHitFound As Boolean
+    Dim strScoreValue As String
     
     Static LastErrorDisplayTime As Date
     
@@ -1561,14 +1581,26 @@ On Error GoTo AddNewErrValuesErrorHandler
                 ' Extract the recorded mass error (in ppm)
                 strPPMMassError = GetMWErrFromString(Refs(lngMatchIndex))
             
-                blnValidSLiC = True
+                blnPassesFilters = True
                 If glbPreferencesExpanded.RefineMSDataOptions.MinimumSLiC > 0 Then
-                    If GetSLiCFromString(Refs(lngMatchIndex)) < glbPreferencesExpanded.RefineMSDataOptions.MinimumSLiC Then
-                        blnValidSLiC = False
+                    strScoreValue = GetSLiCFromString(Refs(lngMatchIndex))
+                    If IsNumeric(strScoreValue) Then
+                        If CSng(strScoreValue) < glbPreferencesExpanded.RefineMSDataOptions.MinimumSLiC Then
+                            blnPassesFilters = False
+                        End If
                     End If
                 End If
                 
-                If blnValidSLiC Then
+                If blnPassesFilters And glbPreferencesExpanded.RefineMSDataOptions.MinimumUP > 0 Then
+                    strScoreValue = GetUPFromString(Refs(lngMatchIndex))
+                    If IsNumeric(strScoreValue) Then
+                        If CSng(strScoreValue) < glbPreferencesExpanded.RefineMSDataOptions.MinimumUP Then
+                            blnPassesFilters = False
+                        End If
+                    End If
+                End If
+                
+                If blnPassesFilters Then
                     lngIndexPointer = BinarySearchLng(mInternalStdIDSorted(), CLngSafe(strRefID))
                     If lngIndexPointer >= 0 Then
                         lngInternalStdIndex = mInternalStdIDSortedInd(lngIndexPointer)
@@ -1592,14 +1624,26 @@ On Error GoTo AddNewErrValuesErrorHandler
                 ' Extract the recorded drift time error (if any)
                 strDriftTimeError = GetDriftTimeErrFromString(Refs(lngMatchIndex))
                 
-                blnValidSLiC = True
+                blnPassesFilters = True
                 If glbPreferencesExpanded.RefineMSDataOptions.MinimumSLiC > 0 Then
-                    If GetSLiCFromString(Refs(lngMatchIndex)) < glbPreferencesExpanded.RefineMSDataOptions.MinimumSLiC Then
-                        blnValidSLiC = False
+                    strScoreValue = GetSLiCFromString(Refs(lngMatchIndex))
+                    If IsNumeric(strScoreValue) Then
+                        If CSng(strScoreValue) < glbPreferencesExpanded.RefineMSDataOptions.MinimumSLiC Then
+                            blnPassesFilters = False
+                        End If
                     End If
                 End If
-
-                If blnValidSLiC Then
+                 
+                If blnPassesFilters And glbPreferencesExpanded.RefineMSDataOptions.MinimumUP > 0 Then
+                    strScoreValue = GetUPFromString(Refs(lngMatchIndex))
+                    If IsNumeric(strScoreValue) Then
+                        If CSng(strScoreValue) < glbPreferencesExpanded.RefineMSDataOptions.MinimumUP Then
+                            blnPassesFilters = False
+                        End If
+                    End If
+                End If
+                
+                If blnPassesFilters Then
                     lngIndexPointer = BinarySearchLng(mAMTIDSorted(), CLngSafe(strRefID))
                     If lngIndexPointer >= 0 Then
                         lngMTIndex = mAMTIDSortedInd(lngIndexPointer)
@@ -1621,7 +1665,7 @@ On Error GoTo AddNewErrValuesErrorHandler
                 dblDriftTimeErrorFromID = 0
             End If
             
-            If blnValidSLiC Then
+            If blnPassesFilters Then
                 
                 If IsNumeric(strPPMMassError) Then
                     dblMassErrorPPMFromID = CDbl(strPPMMassError) + dblMassErrPPMCorrection
@@ -2919,6 +2963,7 @@ Private Sub EnableDisableCalculating(ByVal blnCalculating As Boolean, Optional B
     cboErrorDisplayMode.Enabled = blnEnableOptions
     chkUseUMCClassStats.Enabled = blnEnableOptions
     txtMinimumSLiC.Enabled = blnEnableOptions
+    txtMinimumUP.Enabled = blnEnableOptions
     
     If blnCalculating Then
         Me.MousePointer = vbHourglass
@@ -3636,7 +3681,7 @@ On Error GoTo RefineMassCalibrationStartErrorHandler
             MsgBox strMessage & ".", vbExclamation + vbOKOnly, "Valid Peak Not Found"
         Else
             With glbPreferencesExpanded.RefineMSDataOptions
-                strMessage = "Warning - " & strMessage & "; Minimum peak height = " & .MinimumPeakHeight & " counts/bin; Percentage of peak max for finding peak width = " & .PercentageOfMaxForFindingWidth & "%; Minimum SLiC = " & .MinimumSLiC & "; Minimum Signal/Noise = " & Trim(.MinimumSignalToNoiseRatioForLowAbundancePeaks)
+                strMessage = "Warning - " & strMessage & "; Minimum peak height = " & .MinimumPeakHeight & " counts/bin; Percentage of peak max for finding peak width = " & .PercentageOfMaxForFindingWidth & "%; Minimum SLiC = " & .MinimumSLiC & "; Minimum UP = " & .MinimumUP & "; Minimum Signal/Noise = " & Trim(.MinimumSignalToNoiseRatioForLowAbundancePeaks)
                 If .MaximumAbundance > 0 Then
                     strMessage = strMessage & "; Maximum Abundance = " & Trim(.MaximumAbundance)
                 End If
@@ -3784,7 +3829,7 @@ Private Function RefineMassCalibrationWork(ByVal lngGelIndex As Long, ByRef udtB
                     Else
                         strMessage = "Adjusted mass calibration"
                     End If
-                    strMessage = strMessage & " using the peak identified on the mass error plot; " & strMassCalibrationPeakStats & "; Percentage of peak max for finding peak width = " & .PercentageOfMaxForFindingWidth & "%; Minimum SLiC = " & .MinimumSLiC
+                    strMessage = strMessage & " using the peak identified on the mass error plot; " & strMassCalibrationPeakStats & "; Percentage of peak max for finding peak width = " & .PercentageOfMaxForFindingWidth & "%; Minimum SLiC = " & .MinimumSLiC & "; Minimum UP = " & .MinimumUP
                     
                     If .MaximumAbundance > 0 Then
                         strMessage = strMessage & "; Maximum Abundance = " & Trim(.MaximumAbundance)
@@ -3980,8 +4025,9 @@ On Error GoTo RefineDBSearchMassToleranceStartErrorHandler
     With glbPreferencesExpanded.RefineMSDataOptions
         strPeakOptionsMsg = "Percentage of peak max for finding peak width = " & .PercentageOfMaxForFindingWidth & "%"
         
-        strFilterOptionsMsg = "Use LC-MS Feature class stats = " & Trim(blnUsingUMCClassStats)
-        strFilterOptionsMsg = strFilterOptionsMsg & "; Minimum SLiC Score = " & Trim(.MinimumSLiC)
+        strFilterOptionsMsg = "Use LC-MS Feature class stats = " & Trim(blnUsingUMCClassStats) & _
+                              "; Minimum SLiC Score = " & Trim(.MinimumSLiC) & _
+                              "; Minimum UP = " & Trim(.MinimumUP)
         If .MaximumAbundance > 0 Then
             strFilterOptionsMsg = strFilterOptionsMsg & "; Maximum Abundance = " & Trim(.MaximumAbundance)
         End If
@@ -4234,8 +4280,9 @@ On Error GoTo RefineDBSearchNETToleranceStartErrorHandler
     With glbPreferencesExpanded.RefineMSDataOptions
         strPeakOptionsMsg = "Percentage of peak max for finding peak width = " & .PercentageOfMaxForFindingWidth & "%"
     
-        strFilterOptionsMsg = "Use LC-MS Feature class stats = " & Trim(blnUsingUMCClassStats)
-        strFilterOptionsMsg = strFilterOptionsMsg & "; Minimum SLiC Score = " & Trim(.MinimumSLiC)
+        strFilterOptionsMsg = "Use LC-MS Feature class stats = " & Trim(blnUsingUMCClassStats) & _
+                              "; Minimum SLiC Score = " & Trim(.MinimumSLiC) & _
+                              "; Minimum UP = " & Trim(.MinimumUP)
         If .MaximumAbundance > 0 Then
             strFilterOptionsMsg = strFilterOptionsMsg & "; Maximum Abundance = " & Trim(.MaximumAbundance)
         End If
@@ -4611,6 +4658,7 @@ Private Sub UpdateControlsWithSettings()
         SetCheckBox chkIncludeInternalStandards, .IncludeInternalStdMatches
         SetCheckBox chkUseUMCClassStats, .UseUMCClassStats
         txtMinimumSLiC = Trim(.MinimumSLiC)
+        txtMinimumUP = Trim(.MinimumUP)
         txtMaximumAbundance = Trim(.MaximumAbundance)
     End With
     
@@ -5485,6 +5533,23 @@ Private Sub txtMinimumSLiC_Validate(Cancel As Boolean)
     With glbPreferencesExpanded.RefineMSDataOptions
         If .MinimumSLiC <> CSngSafe(txtMinimumSLiC) Then
             .MinimumSLiC = CSngSafe(txtMinimumSLiC)
+        End If
+    End With
+End Sub
+
+Private Sub txtMinimumUP_KeyDown(KeyCode As Integer, Shift As Integer)
+    If KeyCode = vbKeyReturn Then
+        txtMinimumUP_Validate (False)
+        ComputeErrors False
+    End If
+End Sub
+
+Private Sub txtMinimumUP_Validate(Cancel As Boolean)
+    ValidateTextboxValueDbl txtMinimumUP, 0, 1, 0
+    
+    With glbPreferencesExpanded.RefineMSDataOptions
+        If .MinimumUP <> CSngSafe(txtMinimumUP) Then
+            .MinimumUP = CSngSafe(txtMinimumUP)
         End If
     End With
 End Sub

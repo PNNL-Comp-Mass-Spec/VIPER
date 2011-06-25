@@ -1,6 +1,13 @@
 VIPER Change Log
 
 Version 3.48 - Build 444; June 24, 2011
+	- Fixed bug in AutoAnalysisToleranceRefinement that erroneously updated MinimumPeakHeight to the MinimumSLiC value at the completion of tolerance refinement
+	- Added support for a minimum UP value when creating Mass, NET, and Drift Time error histograms
+		- Default to UP >= 0.5
+	- Now writing out the original Mass_Tag_ID value to column Mass_Tag_ID_Original when creating the STAC_AMT_DB file
+	- Changed default Drift Time tolerance to 2.5 msec
+
+Version 3.48 - Build 444; June 23, 2011
 	- New version of STAC that is purely C# and uses the OMICS library
 		- STACConsole.exe		
 	- Added support for peak matching using a Drift Time tolerance (in addition to Mass and NET tolerances)

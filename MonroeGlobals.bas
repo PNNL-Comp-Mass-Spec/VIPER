@@ -1004,6 +1004,7 @@ Public Type udtRefineMSDataOptionsType
     
     UseUMCClassStats As Boolean
     MinimumSLiC As Single
+    MinimumUP As Single
     MaximumAbundance As Double                          ' When UseUMCClassStats = True, then the UMC class abundances are tested against MaximumAbundance; when UseUMCClassStats = False, we're using individual data points and thus the individual data point abundances are tested against MaximumAbundance
     
     EMMassErrorPeakToleranceEstimatePPM As Single       ' Used to compute the initial variance value to send to the Expectation Maximization algorithm; this is estimated peak half width at 5 sigma

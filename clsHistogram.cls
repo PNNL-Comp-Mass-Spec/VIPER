@@ -230,7 +230,6 @@ Public Function ComputeBinDetails(ByRef sngBinRangeMinimum As Single, ByRef sngB
     Loop
     If sngBinRangeMinimum < sngDataRangeLastVal Then
         ' Acceptable answer not found
-        Debug.Assert False
         sngBinRangeMinimum = sngDataRangeLastVal
     End If
 

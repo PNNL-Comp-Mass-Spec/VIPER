@@ -15,7 +15,7 @@ Public Const DEFAULT_TOLERANCE_REFINEMENT_DRIFT_TIME_TOL As Double = -1
 Public Const DEFAULT_MW_TOL As Double = 6
 Public Const DEFAULT_TOL_TYPE As Integer = gltPPM
 Public Const DEFAULT_NET_TOL As Double = 0.025
-Public Const DEFAULT_DRIFT_TIME_TOL As Double = 5
+Public Const DEFAULT_DRIFT_TIME_TOL As Double = 2.5
 
 Private Const RECENT_DB_CONNECTIONS_MAX_COUNT As Integer = 25
 Private Const RECENT_DB_CONNECTIONS_SECTION_NAME As String = "RecentDBConnections"
@@ -1017,6 +1017,7 @@ On Error GoTo LoadSettingsFileHandler
         
         .UseUMCClassStats = GetIniFileSettingBln(IniStuff, "RefineMSDataOptions", "UseUMCClassStats", .UseUMCClassStats)
         .MinimumSLiC = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "MinimumSLiC", .MinimumSLiC)
+        .MinimumUP = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "MinimumUP", .MinimumUP)
         .MaximumAbundance = GetIniFileSettingDbl(IniStuff, "RefineMSDataOptions", "MaximumAbundance", .MaximumAbundance)
         
         .EMMassErrorPeakToleranceEstimatePPM = GetIniFileSettingSng(IniStuff, "RefineMSDataOptions", "EMMassErrorPeakToleranceEstimatePPM", .EMMassErrorPeakToleranceEstimatePPM)
@@ -2152,6 +2153,7 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "IncludeInternalStdMatches", .IncludeInternalStdMatches
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseUMCClassStats", .UseUMCClassStats
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "MinimumSLiC", .MinimumSLiC
+        AddKeyValueSettingSng sKeys, sVals, iKVCount, "MinimumUP", .MinimumUP
         AddKeyValueSettingDbl sKeys, sVals, iKVCount, "MaximumAbundance", .MaximumAbundance
     
         AddKeyValueSettingSng sKeys, sVals, iKVCount, "EMMassErrorPeakToleranceEstimatePPM", .EMMassErrorPeakToleranceEstimatePPM
@@ -3560,6 +3562,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .IncludeInternalStdMatches = True
                 .UseUMCClassStats = True
                 .MinimumSLiC = 0
+                .MinimumUP = 0
                 .MaximumAbundance = 0
                 
                 .EMMassTolRefineForceUseSingleDataPointErrors = True

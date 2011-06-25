@@ -5571,6 +5571,7 @@ Private Sub AutoAnalysisToleranceRefinement(ByRef udtWorkingParams As udtAutoAna
     Dim udtAutoAnalysisOptionsSaved As udtAutoAnalysisOptionsType
     Dim udtAMTDefSaved As SearchAMTDefinition
     Dim sngSLiCSaved As Single
+    Dim sngUPSaved As Single
     Dim blnUseStacSaved As Boolean
     
     Dim blnSuccess As Boolean, blnValidPeakFound As Boolean
@@ -5647,10 +5648,12 @@ On Error GoTo AutoAnalysisToleranceRefinementErrorHandler
         .AutoAnalysisSearchMode(0).ExportResultsToDatabase = False
     End With
     
-    ' 1b. Save the current value for .MinimumSLiC, then force .MinimumSLiC to 0
+    ' 1b. Save the current value for .MinimumSLiC and .MinimumUP then force them to 0
     With glbPreferencesExpanded.RefineMSDataOptions
         sngSLiCSaved = .MinimumSLiC
+        sngUPSaved = .MinimumUP
         .MinimumSLiC = 0
+        .MinimumUP = 0
     End With
  
     ' 1d. Save the current value for .UseSTAC then force .UseStac to False
@@ -6100,8 +6103,9 @@ Const APPLY_ADDNL_LINEAR_MASS_ADJUSTMENT As Boolean = True
     ' 5c. Restore .AutoAnalysisOptions
     glbPreferencesExpanded.AutoAnalysisOptions = udtAutoAnalysisOptionsSaved
     
-    ' 5d. Restore .MinimumSLiC
-    glbPreferencesExpanded.RefineMSDataOptions.MinimumPeakHeight = sngSLiCSaved
+    ' 5d. Restore .MinimumSLiC and .MinimumUP
+    glbPreferencesExpanded.RefineMSDataOptions.MinimumSLiC = sngSLiCSaved
+    glbPreferencesExpanded.RefineMSDataOptions.MinimumUP = sngUPSaved
     
     ' 5e. Restore .UseSTAC
     glbPreferencesExpanded.UseSTAC = blnUseStacSaved

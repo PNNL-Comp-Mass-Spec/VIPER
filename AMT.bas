@@ -114,6 +114,7 @@ Public Const MTDelSLiCEnd = ")"
 
 Public Const MTUPMark = "(UP: "
 Public Const MTUpEND = ")"
+Public Const MTUPMarkLength = 5
 
 Public Const MTDltMark = "Dlt:"         'used both for labeling
 Public Const MTNCntMark = "(N:"         'used if N count is stored
@@ -1615,7 +1616,7 @@ Private Function LegacyDBLoadProteinData(ByRef frmCallingForm As VB.Form, ByVal 
     Dim lngAMTIndex As Long
     Dim lngORFMapItemsExamined As Long
     
-    Dim i As Long
+    Dim I As Long
     
     Dim strErrorMessage As String
     Dim blnSuccess As Boolean
@@ -1684,7 +1685,7 @@ On Error GoTo err_LegacyDBLoadProteinData
     ' Reset MTtoORFMapCount back to 0 since we may not load all of the mappings
     MTtoORFMapCount = 0
     
-    i = 0
+    I = 0
     With rsMT_ORF_Map
         .MoveFirst
         Do Until .EOF
@@ -1720,8 +1721,8 @@ On Error GoTo err_LegacyDBLoadProteinData
            
             .MoveNext
         
-            i = i + 1
-            If i Mod 100 = 0 Then frmCallingForm.Caption = "Loading MT to Protein Mapping: " & LongToStringWithCommas(i)
+            I = I + 1
+            If I Mod 100 = 0 Then frmCallingForm.Caption = "Loading MT to Protein Mapping: " & LongToStringWithCommas(I)
         Loop
     End With
     rsMT_ORF_Map.Close
@@ -1840,48 +1841,48 @@ Public Sub RemoveAMT(ByVal Ind As Long, ByVal Scope As Integer)
 'that this function takes into account is SearchScope; that way
 'we can test search with various parameters on small portion of file
 'and later clean it if we dont want to keep the search results
-Dim i As Long
+Dim I As Long
 
 Select Case Scope
 Case glScope.glSc_All
   With GelData(Ind)
       If .CSLines > 0 Then
-         For i = 1 To .CSLines
-            If i Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Calling CleanAMTRef .CSData(" & i & ")"
+         For I = 1 To .CSLines
+            If I Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Calling CleanAMTRef .CSData(" & I & ")"
                ' Old Method:
                '' CleanAMTRef .CSData(i).MTID
-               .CSData(i).MTID = ""
-         Next i
+               .CSData(I).MTID = ""
+         Next I
       End If
       If .IsoLines > 0 Then
-         For i = 1 To .IsoLines
-            If i Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Calling CleanAMTRef .IsoData(" & i & ")"
+         For I = 1 To .IsoLines
+            If I Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Calling CleanAMTRef .IsoData(" & I & ")"
             
             ' Old Method:
             '' CleanAMTRef .IsoData(i).MTID
             
             ' New Method:
-            .IsoData(i).MTID = ""
-         Next i
+            .IsoData(I).MTID = ""
+         Next I
       End If
   End With
 Case glScope.glSc_Current
   With GelData(Ind)
     If .CSLines > 0 Then
-       For i = 1 To .CSLines
-        If i Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Possibly calling CleanAMTRef .CSData(" & i & ")"
-         If GelDraw(Ind).CSID(i) > 0 And GelDraw(Ind).CSR(i) > 0 Then
-            CleanAMTRef .CSData(i).MTID
+       For I = 1 To .CSLines
+        If I Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Possibly calling CleanAMTRef .CSData(" & I & ")"
+         If GelDraw(Ind).CSID(I) > 0 And GelDraw(Ind).CSR(I) > 0 Then
+            CleanAMTRef .CSData(I).MTID
          End If
-       Next i
+       Next I
     End If
     If .IsoLines > 0 Then
-       For i = 1 To .IsoLines
-        If i Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Possibly calling CleanAMTRef .IsoData(" & i & ")"
-         If GelDraw(Ind).IsoID(i) > 0 And GelDraw(Ind).IsoR(i) > 0 Then
-            CleanAMTRef .IsoData(i).MTID
+       For I = 1 To .IsoLines
+        If I Mod 1000 = 1 Then TraceLog 4, "RemoveAMT", "Possibly calling CleanAMTRef .IsoData(" & I & ")"
+         If GelDraw(Ind).IsoID(I) > 0 And GelDraw(Ind).IsoR(I) > 0 Then
+            CleanAMTRef .IsoData(I).MTID
          End If
-       Next i
+       Next I
     End If
   End With
 End Select
@@ -1891,41 +1892,41 @@ Public Sub RemoveInternalStd(ByVal Ind As Long, ByVal Scope As Integer)
 ' Removes ISTD reference from the gel
 ' Scope can be glScope.glSc_All or glScope.glSc_Current
 
-Dim i As Long
+Dim I As Long
 
 Select Case Scope
 Case glScope.glSc_All
   With GelData(Ind)
       If .CSLines > 0 Then
-         For i = 1 To .CSLines
-             If i Mod 1000 = 1 Then TraceLog 4, "RemoveInternalStd", "Calling CleanInternalStdRef .CSData(" & i & ")"
-             CleanInternalStdRef .CSData(i).MTID
-         Next i
+         For I = 1 To .CSLines
+             If I Mod 1000 = 1 Then TraceLog 4, "RemoveInternalStd", "Calling CleanInternalStdRef .CSData(" & I & ")"
+             CleanInternalStdRef .CSData(I).MTID
+         Next I
       End If
       If .IsoLines > 0 Then
-         For i = 1 To .IsoLines
-             If i Mod 1000 = 1 Then TraceLog 4, "RemoveInternalStd", "Calling CleanInternalStdRef .IsoData(" & i & ")"
-             CleanInternalStdRef .IsoData(i).MTID
-         Next i
+         For I = 1 To .IsoLines
+             If I Mod 1000 = 1 Then TraceLog 4, "RemoveInternalStd", "Calling CleanInternalStdRef .IsoData(" & I & ")"
+             CleanInternalStdRef .IsoData(I).MTID
+         Next I
       End If
   End With
 Case glScope.glSc_Current
   With GelData(Ind)
     If .CSLines > 0 Then
-       For i = 1 To .CSLines
-         If i Mod 1000 = 1 Then TraceLog 4, "RemoveInternalStd", "Possibly calling CleanInternalStdRef .CSData(" & i & ")"
-         If GelDraw(Ind).CSID(i) > 0 And GelDraw(Ind).CSR(i) > 0 Then
-            CleanInternalStdRef .CSData(i).MTID
+       For I = 1 To .CSLines
+         If I Mod 1000 = 1 Then TraceLog 4, "RemoveInternalStd", "Possibly calling CleanInternalStdRef .CSData(" & I & ")"
+         If GelDraw(Ind).CSID(I) > 0 And GelDraw(Ind).CSR(I) > 0 Then
+            CleanInternalStdRef .CSData(I).MTID
          End If
-       Next i
+       Next I
     End If
     If .IsoLines > 0 Then
-       For i = 1 To .IsoLines
-         If i Mod 1000 = 1 Then TraceLog 4, "RemoveInternalStd", "Possibly calling CleanInternalStdRef .IsoData(" & i & ")"
-         If GelDraw(Ind).IsoID(i) > 0 And GelDraw(Ind).IsoR(i) > 0 Then
-            CleanInternalStdRef .IsoData(i).MTID
+       For I = 1 To .IsoLines
+         If I Mod 1000 = 1 Then TraceLog 4, "RemoveInternalStd", "Possibly calling CleanInternalStdRef .IsoData(" & I & ")"
+         If GelDraw(Ind).IsoID(I) > 0 And GelDraw(Ind).IsoR(I) > 0 Then
+            CleanInternalStdRef .IsoData(I).MTID
          End If
-       Next i
+       Next I
     End If
   End With
 End Select
@@ -1946,7 +1947,7 @@ Dim MaxFN As Long
 Dim ScanWidth As Long
 Dim AMTRef As String
 Dim IsoF As Integer     'Isotopic MW field; just shortcut
-Dim i As Long
+Dim I As Long
 Dim blnProceed As Boolean
 
 If Not GelData(Ind).CustomNETsDefined Then
@@ -1969,18 +1970,18 @@ With GelData(Ind)
    If ScanWidth <= 0 And samtDef.NETTol >= 0 Then GoTo err_SearchAMT  'can not do it
    SetAMTSearchFlags samtDef.SearchFlag, aSearchFlag()
         If .CSLines > 0 Then
-           For i = 1 To .CSLines
+           For I = 1 To .CSLines
             ' MonroeMod Begin
-            If i Mod 100 = 0 Then
-                frmCallingForm.Caption = "Working: " & i & " / " & .CSLines
+            If I Mod 100 = 0 Then
+                frmCallingForm.Caption = "Working: " & I & " / " & .CSLines
                 DoEvents
             End If
             ' MonroeMod Finish
              
-             If samtDef.SearchScope = glScope.glSc_All Or (GelDraw(Ind).CSID(i) > 0 And GelDraw(Ind).CSR(i) > 0) Then
+             If samtDef.SearchScope = glScope.glSc_All Or (GelDraw(Ind).CSID(I) > 0 And GelDraw(Ind).CSR(I) > 0) Then
                 ' Proceed if using all the data, or if the ion is in the current scope
                 If samtDef.SkipReferenced Then
-                   blnProceed = Not IsAMTReferenced(.CSData(i).MTID)
+                   blnProceed = Not IsAMTReferenced(.CSData(I).MTID)
                 Else
                    blnProceed = True
                 End If
@@ -1988,31 +1989,31 @@ With GelData(Ind)
                    If samtDef.NETTol >= 0 Then
                       Select Case samtDef.NETorRT
                       Case glAMT_NET
-                        AMTRef = GetAMTReferenceMWNET(.CSData(i).AverageMW, NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), 0)
+                        AMTRef = GetAMTReferenceMWNET(.CSData(I).AverageMW, NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), 0)
                       Case glAMT_RT_or_PNET
-                        AMTRef = GetAMTReferenceMWRT(.CSData(i).AverageMW, NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), 0)
+                        AMTRef = GetAMTReferenceMWRT(.CSData(I).AverageMW, NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), 0)
                       End Select
                    Else
-                      AMTRef = GetAMTReferenceMW(.CSData(i).AverageMW, NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), 0)
+                      AMTRef = GetAMTReferenceMW(.CSData(I).AverageMW, NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), 0)
                    End If
-                   InsertBefore .CSData(i).MTID, AMTRef
+                   InsertBefore .CSData(I).MTID, AMTRef
                 End If
              End If
-           Next i
+           Next I
         End If
         If .IsoLines > 0 Then
-           For i = 1 To .IsoLines
+           For I = 1 To .IsoLines
             ' MonroeMod Begin
-            If i Mod 100 = 0 Then
-                frmCallingForm.Caption = "Working: " & i & " / " & .IsoLines
+            If I Mod 100 = 0 Then
+                frmCallingForm.Caption = "Working: " & I & " / " & .IsoLines
                 DoEvents
             End If
             ' MonroeMod Finish
             
-             If samtDef.SearchScope = glScope.glSc_All Or (GelDraw(Ind).IsoID(i) > 0 And GelDraw(Ind).IsoR(i) > 0) Then
+             If samtDef.SearchScope = glScope.glSc_All Or (GelDraw(Ind).IsoID(I) > 0 And GelDraw(Ind).IsoR(I) > 0) Then
                 ' Proceed if using all the data, or if the ion is in the current scope
                 If samtDef.SkipReferenced Then
-                   blnProceed = Not IsAMTReferenced(.IsoData(i).MTID)
+                   blnProceed = Not IsAMTReferenced(.IsoData(I).MTID)
                 Else
                    blnProceed = True
                 End If
@@ -2020,17 +2021,17 @@ With GelData(Ind)
                    If samtDef.NETTol >= 0 Then
                       Select Case samtDef.NETorRT
                       Case glAMT_NET
-                        AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(i), IsoF), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), 0)
+                        AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(I), IsoF), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), 0)
                       Case glAMT_RT_or_PNET
-                        AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(i), IsoF), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), 0)
+                        AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(I), IsoF), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), 0)
                       End Select
                    Else
-                      AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(i), IsoF), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), 0)
+                      AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(I), IsoF), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), 0)
                    End If
-                   InsertBefore .IsoData(i).MTID, AMTRef
+                   InsertBefore .IsoData(I).MTID, AMTRef
                 End If
              End If
-           Next i
+           Next I
         End If
    SearchAMT = HitsCount
    
@@ -2361,7 +2362,7 @@ Dim sMWTolRef As String
 Dim FirstInd As Long
 Dim LastInd As Long
 Dim AbsTol As Double
-Dim i As Long
+Dim I As Long
 On Error GoTo exit_GetAMTReferenceMW
 
 Select Case samtDef.TolType
@@ -2373,36 +2374,36 @@ Case Else
     Debug.Assert False
 End Select
 If mwutSearch.FindIndexRange(MW, AbsTol, FirstInd, LastInd) Then
-   For i = FirstInd To LastInd
-     If IsGoodAMTFlag(AMTData(i).flag) Then
+   For I = FirstInd To LastInd
+     If IsGoodAMTFlag(AMTData(I).flag) Then
         HitsCount = HitsCount + 1
         If blnStoreAbsoluteValueOfError Then
-            MWTolRef = Abs(MW - AMTData(i).MW)
+            MWTolRef = Abs(MW - AMTData(I).MW)
         Else
-            MWTolRef = MW - AMTData(i).MW
+            MWTolRef = MW - AMTData(I).MW
         End If
         sMWTolRef = MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd
         'put AMT ID and actual errors
-        AMTRef = AMTRef & AMTMark & Trim(AMTData(i).ID) & sMWTolRef
-        If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(i).CNT_N & MTEndMark
+        AMTRef = AMTRef & AMTMark & Trim(AMTData(I).ID) & sMWTolRef
+        If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(I).CNT_N & MTEndMark
         If Delta > 0 Then AMTRef = AMTRef & MTDltMark & Delta
         AMTRef = AMTRef & glARG_SEP & Chr$(32)
         'do statistics
-        AMTHits(i) = AMTHits(i) + 1
-        AMTMWErr(i) = AMTMWErr(i) + MWTolRef
+        AMTHits(I) = AMTHits(I) + 1
+        AMTMWErr(I) = AMTMWErr(I) + MWTolRef
         Select Case samtDef.NETorRT
         Case glAMT_NET
              ' 7/26/2004 MEM - Reversed the order of subtraction to be Observed - Database, consistent with the MWTolRef calculation above
-             AMTNETErr(i) = AMTNETErr(i) + (NETRT - AMTData(i).NET)
+             AMTNETErr(I) = AMTNETErr(I) + (NETRT - AMTData(I).NET)
         Case glAMT_RT_or_PNET
-             If (AMTData(i).PNET >= 0) Then    'there are some negative RTs
-                AMTNETErr(i) = AMTNETErr(i) + (NETRT - AMTData(i).PNET)
+             If (AMTData(I).PNET >= 0) Then    'there are some negative RTs
+                AMTNETErr(I) = AMTNETErr(I) + (NETRT - AMTData(I).PNET)
              End If
         End Select
-        If NETRT < AMTNETMin(i) Then AMTNETMin(i) = NETRT
-        If NETRT > AMTNETMax(i) Then AMTNETMax(i) = NETRT
+        If NETRT < AMTNETMin(I) Then AMTNETMin(I) = NETRT
+        If NETRT > AMTNETMax(I) Then AMTNETMax(I) = NETRT
      End If
-   Next i
+   Next I
 End If
 'If Len(AMTRef) <= 0 Then AMTRef = AMTMark & NoHarvest & glARG_SEP & Chr$(32)
 exit_GetAMTReferenceMW:
@@ -2423,7 +2424,7 @@ Dim sNETTolRef As String
 Dim FirstInd As Long
 Dim LastInd As Long
 Dim AbsTol As Double
-Dim i As Long
+Dim I As Long
 On Error GoTo exit_GetAMTReferenceMWNET
 
 Select Case samtDef.TolType
@@ -2435,31 +2436,31 @@ Case Else
     Debug.Assert False
 End Select
 If mwutSearch.FindIndexRange(MW, AbsTol, FirstInd, LastInd) Then
-   For i = FirstInd To LastInd
-     If ((Abs(NET - AMTData(i).NET) <= samtDef.NETTol) And (IsGoodAMTFlag(AMTData(i).flag))) Then
+   For I = FirstInd To LastInd
+     If ((Abs(NET - AMTData(I).NET) <= samtDef.NETTol) And (IsGoodAMTFlag(AMTData(I).flag))) Then
         HitsCount = HitsCount + 1
         If blnStoreAbsoluteValueOfError Then
-            MWTolRef = Abs(MW - AMTData(i).MW)
+            MWTolRef = Abs(MW - AMTData(I).MW)
         Else
-            MWTolRef = MW - AMTData(i).MW
+            MWTolRef = MW - AMTData(I).MW
         End If
         sMWTolRef = MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd
         ' 7/26/2004 MEM - Reversed the order of subtraction to be Observed - Database, consistent with the MWTolRef calculation above
-        NETTolRef = (NET - AMTData(i).NET)
+        NETTolRef = (NET - AMTData(I).NET)
         sNETTolRef = NETErrMark & Format$(NETTolRef, "0.000") & NETErrEnd
         'put AMT ID and actual errors
-        AMTRef = AMTRef & AMTMark & Trim(AMTData(i).ID) & sMWTolRef & sNETTolRef
-        If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(i).CNT_N & MTEndMark
+        AMTRef = AMTRef & AMTMark & Trim(AMTData(I).ID) & sMWTolRef & sNETTolRef
+        If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(I).CNT_N & MTEndMark
         If Delta > 0 Then AMTRef = AMTRef & MTDltMark & Delta
         AMTRef = AMTRef & glARG_SEP & Chr$(32)
         'do statistics
-        AMTHits(i) = AMTHits(i) + 1
-        AMTMWErr(i) = AMTMWErr(i) + MWTolRef
-        AMTNETErr(i) = AMTNETErr(i) + NETTolRef
-        If NET < AMTNETMin(i) Then AMTNETMin(i) = NET
-        If NET > AMTNETMax(i) Then AMTNETMax(i) = NET
+        AMTHits(I) = AMTHits(I) + 1
+        AMTMWErr(I) = AMTMWErr(I) + MWTolRef
+        AMTNETErr(I) = AMTNETErr(I) + NETTolRef
+        If NET < AMTNETMin(I) Then AMTNETMin(I) = NET
+        If NET > AMTNETMax(I) Then AMTNETMax(I) = NET
      End If
-   Next i
+   Next I
 End If
 'If Len(AMTRef) = 0 Then AMTRef = AMTMark & NoHarvest & glARG_SEP & Chr$(32)
 exit_GetAMTReferenceMWNET:
@@ -2481,7 +2482,7 @@ Dim sRTolRef As String
 Dim FirstInd As Long
 Dim LastInd As Long
 Dim AbsTol As Double
-Dim i As Long
+Dim I As Long
 On Error GoTo exit_GetAMTReferenceMWRT
 
 Select Case samtDef.TolType
@@ -2493,30 +2494,30 @@ Case Else
     Debug.Assert False
 End Select
 If mwutSearch.FindIndexRange(MW, AbsTol, FirstInd, LastInd) Then
-   For i = FirstInd To LastInd
-     If ((Abs(RT - AMTData(i).PNET) <= samtDef.NETTol) And (IsGoodAMTFlag(AMTData(i).flag))) Then
+   For I = FirstInd To LastInd
+     If ((Abs(RT - AMTData(I).PNET) <= samtDef.NETTol) And (IsGoodAMTFlag(AMTData(I).flag))) Then
         HitsCount = HitsCount + 1
         If blnStoreAbsoluteValueOfError Then
-            MWTolRef = Abs(MW - AMTData(i).MW)
+            MWTolRef = Abs(MW - AMTData(I).MW)
         Else
-            MWTolRef = MW - AMTData(i).MW
+            MWTolRef = MW - AMTData(I).MW
         End If
         sMWTolRef = MWErrMark & Format$(MWTolRef / (MW * glPPM), "0.00") & MWErrEnd
-        RTolRef = (AMTData(i).PNET - RT)
+        RTolRef = (AMTData(I).PNET - RT)
         sRTolRef = RTErrMark & Format$(RTolRef, "0.000") & RTErrEnd
         'put AMT ID and actual errors
-        AMTRef = AMTRef & AMTMark & Trim(AMTData(i).ID) & sMWTolRef & sRTolRef
-        If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(i).CNT_N & MTEndMark
+        AMTRef = AMTRef & AMTMark & Trim(AMTData(I).ID) & sMWTolRef & sRTolRef
+        If samtDef.SaveNCnt Then AMTRef = AMTRef & MTNCntMark & AMTData(I).CNT_N & MTEndMark
         If Delta > 0 Then AMTRef = AMTRef & MTDltMark & Delta
         AMTRef = AMTRef & glARG_SEP & Chr$(32)
         'do statistics; AMTs with negative RT swill not be identified anyways
-        AMTHits(i) = AMTHits(i) + 1
-        AMTMWErr(i) = AMTMWErr(i) + MWTolRef
-        AMTNETErr(i) = AMTNETErr(i) + RTolRef
-        If RT < AMTNETMin(i) Then AMTNETMin(i) = RT
-        If RT > AMTNETMax(i) Then AMTNETMax(i) = RT
+        AMTHits(I) = AMTHits(I) + 1
+        AMTMWErr(I) = AMTMWErr(I) + MWTolRef
+        AMTNETErr(I) = AMTNETErr(I) + RTolRef
+        If RT < AMTNETMin(I) Then AMTNETMin(I) = RT
+        If RT > AMTNETMax(I) Then AMTNETMax(I) = RT
      End If
-   Next i
+   Next I
 End If
 'If Len(AMTRef) = 0 Then AMTRef = AMTMark & NoHarvest & glARG_SEP & Chr$(32)
 exit_GetAMTReferenceMWRT:
@@ -2641,25 +2642,25 @@ Public Function IsInternalStdReferenced(S As String) As Boolean
 End Function
 
 Public Function IsAMTReferencedByUMC(udtUMC As udtUMCType, lngGelIndex As Long) As Boolean
-    Dim i As Long
+    Dim I As Long
     Dim blnAMTMatchPresent As Boolean
     
     With udtUMC
         blnAMTMatchPresent = False
-        For i = 0 To .ClassCount - 1
-            Select Case .ClassMType(i)
+        For I = 0 To .ClassCount - 1
+            Select Case .ClassMType(I)
             Case glCSType
-                If IsAMTReferenced(GelData(lngGelIndex).CSData(.ClassMInd(i)).MTID) Then
+                If IsAMTReferenced(GelData(lngGelIndex).CSData(.ClassMInd(I)).MTID) Then
                     blnAMTMatchPresent = True
                     Exit For
                 End If
             Case glIsoType
-                If IsAMTReferenced(GelData(lngGelIndex).IsoData(.ClassMInd(i)).MTID) Then
+                If IsAMTReferenced(GelData(lngGelIndex).IsoData(.ClassMInd(I)).MTID) Then
                     blnAMTMatchPresent = True
                     Exit For
                 End If
             End Select
-        Next i
+        Next I
     End With
     
     IsAMTReferencedByUMC = blnAMTMatchPresent
@@ -3051,6 +3052,22 @@ End If
 
 End Function
 
+Public Function GetUPFromString(ByVal S As String) As String
+'-------------------------------------------------------------
+'returns UP Score (uniqueness probability) from AMT string
+'-------------------------------------------------------------
+Dim Pos1 As Integer, Pos2 As Integer
+Pos1 = InStr(1, S, MTUPMark)
+If Pos1 > 0 Then
+   Pos1 = Pos1 + MTUPMarkLength
+   Pos2 = InStr(Pos1, S, MTUpEND)
+   If Pos2 > 0 Then GetUPFromString = Mid$(S, Pos1, Pos2 - Pos1)
+Else
+    GetUPFromString = ""
+End If
+
+End Function
+
 '''Public Function GetAMTBestErrIndex(AMTs() As String) As Long
 ''''returns index with best(smallest) error; -1 on any error
 '''Dim BestAMTErr As Double
@@ -3126,19 +3143,19 @@ Private Function IsGoodAMTFlag(ByVal AMTFlag As Integer) As Boolean
 'satisfies SearchFlag conditions; SearchFlag array needs to be
 'set prior to call to this function
 Dim AMTF() As Boolean
-Dim i As Integer
+Dim I As Integer
 SetAMTSearchFlags AMTFlag, AMTF()
 If aSearchFlag(-1) Then     'no search conditions
    IsGoodAMTFlag = True
 Else
-   For i = 1 To 7                       'if for any of Flags 1 to 7
-       If aSearchFlag(i) Then           'SearchFlag is set and AMT is
-          If Not AMTF(i) Then           'not AMT is not good enough
+   For I = 1 To 7                       'if for any of Flags 1 to 7
+       If aSearchFlag(I) Then           'SearchFlag is set and AMT is
+          If Not AMTF(I) Then           'not AMT is not good enough
              IsGoodAMTFlag = False
              Exit Function
           End If
        End If
-   Next i
+   Next I
    If aSearchFlag(0) Then                   'high accuracy AMT could be
       If (Not (AMTF(0) Or AMTF(1))) Then    'also marked as high accuracy
          IsGoodAMTFlag = False              'and NET condition
@@ -3183,7 +3200,7 @@ End Function
 
 Public Sub InitAMTStat()
     'redimensions and initialize statistic arrays
-    Dim i As Long
+    Dim I As Long
     If AMTCnt > 0 Then
        ReDim AMTHits(1 To AMTCnt)
        ReDim AMTMWErr(1 To AMTCnt)
@@ -3191,10 +3208,10 @@ Public Sub InitAMTStat()
        ReDim AMTNETMin(1 To AMTCnt)
        ReDim AMTNETMax(1 To AMTCnt)
        'only last 2 arrays need special initialization
-       For i = 1 To AMTCnt
-           AMTNETMin(i) = glHugeOverExp
-           AMTNETMax(i) = -1
-       Next i
+       For I = 1 To AMTCnt
+           AMTNETMin(I) = glHugeOverExp
+           AMTNETMax(I) = -1
+       Next I
     End If
 End Sub
 
@@ -3311,7 +3328,7 @@ Dim MaxFN As Long
 Dim ScanWidth As Long
 Dim AMTRef As String
 Dim IsoF As Integer     'Isotopic MW field; just shortcut
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 
 If Not GelData(Ind).CustomNETsDefined Then
     If Not InitExprEvaluator(sExpr) Then
@@ -3332,161 +3349,161 @@ With GelData(Ind)
    Case glScope.glSc_All                 'search all data
      If samtDef.SkipReferenced Then
         If .CSLines > 0 Then
-           For i = 1 To .CSLines
-             If Not IsAMTReferenced(.CSData(i).MTID) Then
+           For I = 1 To .CSLines
+             If Not IsAMTReferenced(.CSData(I).MTID) Then
                 For j = 1 To samtDef.MaxMassTags
                   If samtDef.NETTol >= 0 Then
                      Select Case samtDef.NETorRT
                      Case glAMT_NET
-                       AMTRef = GetAMTReferenceMWNET(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                       AMTRef = GetAMTReferenceMWNET(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                      Case glAMT_RT_or_PNET
-                       AMTRef = GetAMTReferenceMWRT(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                       AMTRef = GetAMTReferenceMWRT(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                      End Select
                   Else
-                     AMTRef = GetAMTReferenceMW(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                     AMTRef = GetAMTReferenceMW(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                   End If
-                  InsertBefore .CSData(i).MTID, AMTRef
+                  InsertBefore .CSData(I).MTID, AMTRef
                 Next j
              End If
-           Next i
+           Next I
         End If
         If .IsoLines > 0 Then
-          For i = 1 To .IsoLines
-            If Not IsAMTReferenced(.IsoData(i).MTID) Then
+          For I = 1 To .IsoLines
+            If Not IsAMTReferenced(.IsoData(I).MTID) Then
               For j = 1 To samtDef.MaxMassTags
                  If samtDef.NETTol >= 0 Then
                     Select Case samtDef.NETorRT
                     Case glAMT_NET
-                      AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                      AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                     Case glAMT_RT_or_PNET
-                      AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                      AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                     End Select
                  Else
-                    AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                    AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                  End If
-                 InsertBefore .IsoData(i).MTID, AMTRef
+                 InsertBefore .IsoData(I).MTID, AMTRef
                Next j
              End If
-          Next i
+          Next I
         End If
      Else
         If .CSLines > 0 Then
-          For i = 1 To .CSLines
+          For I = 1 To .CSLines
             For j = 1 To samtDef.MaxMassTags
               If samtDef.NETTol >= 0 Then
                  Select Case samtDef.NETorRT
                  Case glAMT_NET
-                   AMTRef = GetAMTReferenceMWNET(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                   AMTRef = GetAMTReferenceMWNET(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                  Case glAMT_RT_or_PNET
-                   AMTRef = GetAMTReferenceMWRT(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                   AMTRef = GetAMTReferenceMWRT(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                  End Select
               Else
-                 AMTRef = GetAMTReferenceMW(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                 AMTRef = GetAMTReferenceMW(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
               End If
-              InsertBefore .CSData(i).MTID, AMTRef
+              InsertBefore .CSData(I).MTID, AMTRef
             Next j
-          Next i
+          Next I
         End If
         If .IsoLines > 0 Then
-          For i = 1 To .IsoLines
+          For I = 1 To .IsoLines
             For j = 1 To samtDef.MaxMassTags
               If samtDef.NETTol >= 0 Then
                  Select Case samtDef.NETorRT
                  Case glAMT_NET
-                   AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                   AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                  Case glAMT_RT_or_PNET
-                   AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                   AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                  End Select
               Else
-                 AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                 AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
               End If
-              InsertBefore .IsoData(i).MTID, AMTRef
+              InsertBefore .IsoData(I).MTID, AMTRef
             Next j
-          Next i
+          Next I
         End If
      End If
    Case glScope.glSc_Current             'search current view data
      If samtDef.SkipReferenced Then
         If .CSLines > 0 Then
-           For i = 1 To .CSLines
-              If GelDraw(Ind).CSID(i) > 0 And GelDraw(Ind).CSR(i) > 0 Then
-                 If Not IsAMTReferenced(.CSData(i).MTID) Then
+           For I = 1 To .CSLines
+              If GelDraw(Ind).CSID(I) > 0 And GelDraw(Ind).CSR(I) > 0 Then
+                 If Not IsAMTReferenced(.CSData(I).MTID) Then
                     For j = 1 To samtDef.MaxMassTags
                       If samtDef.NETTol >= 0 Then
                         Select Case samtDef.NETorRT
                         Case glAMT_NET
-                           AMTRef = GetAMTReferenceMWNET(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                           AMTRef = GetAMTReferenceMWNET(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                         Case glAMT_RT_or_PNET
-                           AMTRef = GetAMTReferenceMWRT(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                           AMTRef = GetAMTReferenceMWRT(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                         End Select
                       Else
-                        AMTRef = GetAMTReferenceMW(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                        AMTRef = GetAMTReferenceMW(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                       End If
-                      InsertBefore .CSData(i).MTID, AMTRef
+                      InsertBefore .CSData(I).MTID, AMTRef
                     Next j
                   End If
               End If
-           Next i
+           Next I
         End If
         If .IsoLines > 0 Then
-           For i = 1 To .IsoLines
-              If GelDraw(Ind).IsoID(i) > 0 And GelDraw(Ind).IsoR(i) > 0 Then
-                 If Not IsAMTReferenced(.IsoData(i).MTID) Then
+           For I = 1 To .IsoLines
+              If GelDraw(Ind).IsoID(I) > 0 And GelDraw(Ind).IsoR(I) > 0 Then
+                 If Not IsAMTReferenced(.IsoData(I).MTID) Then
                     For j = 1 To samtDef.MaxMassTags
                       If samtDef.NETTol >= 0 Then
                          Select Case samtDef.NETorRT
                          Case glAMT_NET
-                           AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                           AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                          Case glAMT_RT_or_PNET
-                           AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                           AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                          End Select
                       Else
-                         AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                         AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                       End If
-                      InsertBefore .IsoData(i).MTID, AMTRef
+                      InsertBefore .IsoData(I).MTID, AMTRef
                     Next j
                  End If
               End If
-           Next i
+           Next I
         End If
      Else
         If .CSLines > 0 Then
-           For i = 1 To .CSLines
-              If GelDraw(Ind).CSID(i) > 0 And GelDraw(Ind).CSR(i) > 0 Then
+           For I = 1 To .CSLines
+              If GelDraw(Ind).CSID(I) > 0 And GelDraw(Ind).CSR(I) > 0 Then
                  For j = 1 To samtDef.MaxMassTags
                    If samtDef.NETTol >= 0 Then
                       Select Case samtDef.NETorRT
                       Case glAMT_NET
-                        AMTRef = GetAMTReferenceMWNET(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                        AMTRef = GetAMTReferenceMWNET(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                       Case glAMT_RT_or_PNET
-                        AMTRef = GetAMTReferenceMWRT(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                        AMTRef = GetAMTReferenceMWRT(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                       End Select
                    Else
-                      AMTRef = GetAMTReferenceMW(.CSData(i).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(i).ScanNumber, MinFN, MaxFN), j)
+                      AMTRef = GetAMTReferenceMW(.CSData(I).AverageMW - (j * samtDef.MassTag), NET_RT(Ind, .CSData(I).ScanNumber, MinFN, MaxFN), j)
                    End If
-                   InsertBefore .CSData(i).MTID, AMTRef
+                   InsertBefore .CSData(I).MTID, AMTRef
                  Next j
               End If
-           Next i
+           Next I
         End If
         If .IsoLines > 0 Then
-           For i = 1 To .IsoLines
-              If GelDraw(Ind).IsoID(i) > 0 And GelDraw(Ind).IsoR(i) > 0 Then
+           For I = 1 To .IsoLines
+              If GelDraw(Ind).IsoID(I) > 0 And GelDraw(Ind).IsoR(I) > 0 Then
                  For j = 1 To samtDef.MaxMassTags
                    If samtDef.NETTol >= 0 Then
                       Select Case samtDef.NETorRT
                       Case glAMT_NET
-                        AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                        AMTRef = GetAMTReferenceMWNET(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                       Case glAMT_RT_or_PNET
-                        AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                        AMTRef = GetAMTReferenceMWRT(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                       End Select
                    Else
-                      AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(i), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(i).ScanNumber, MinFN, MaxFN), j)
+                      AMTRef = GetAMTReferenceMW(GetIsoMass(.IsoData(I), IsoF) - (j * samtDef.MassTag), NET_RT(Ind, .IsoData(I).ScanNumber, MinFN, MaxFN), j)
                    End If
-                   InsertBefore .IsoData(i).MTID, AMTRef
+                   InsertBefore .IsoData(I).MTID, AMTRef
                  Next j
               End If
-           Next i
+           Next I
         End If
       End If
    End Select
@@ -3539,7 +3556,7 @@ Public Function CheckMassTags() As String
 'returns string with some important data parameters
 '--------------------------------------------------
 Dim sTmp As String
-Dim i As Long
+Dim I As Long
 
 Dim IDNulls As Long
 Dim IDOKs As Long
@@ -3571,23 +3588,23 @@ ETAllMax = -glHugeOverExp
 ET1stMin = glHugeOverExp
 ET1stMax = -glHugeOverExp
 
-For i = 1 To AMTCnt
+For I = 1 To AMTCnt
     
-    If IsNull(AMTData(i).ID) Then        'check ID strings
+    If IsNull(AMTData(I).ID) Then        'check ID strings
        IDNulls = IDNulls + 1
     Else
        IDOKs = IDOKs + 1
     End If
     
     
-    If IsNull(AMTData(i).MW) Then
+    If IsNull(AMTData(I).MW) Then
        MWNulls = MWNulls + 1
     Else
-       If IsNumeric(AMTData(i).MW) Then
-          If AMTData(i).MW > 0 Then
+       If IsNumeric(AMTData(I).MW) Then
+          If AMTData(I).MW > 0 Then
              MWOKs = MWOKs + 1
-             If AMTData(i).MW > MWMax Then MWMax = AMTData(i).MW
-             If AMTData(i).MW < MWMin Then MWMin = AMTData(i).MW
+             If AMTData(I).MW > MWMax Then MWMax = AMTData(I).MW
+             If AMTData(I).MW < MWMin Then MWMin = AMTData(I).MW
           Else
              MWOthers = MWOthers + 1
           End If
@@ -3597,14 +3614,14 @@ For i = 1 To AMTCnt
     End If
     
     
-    If IsNull(AMTData(i).NET) Then
+    If IsNull(AMTData(I).NET) Then
        ETAllNulls = ETAllNulls + 1
     Else
-       If IsNumeric(AMTData(i).NET) Then
-          If AMTData(i).NET > 0 Then                 'should also check for <=1
+       If IsNumeric(AMTData(I).NET) Then
+          If AMTData(I).NET > 0 Then                 'should also check for <=1
              ETAllOKs = ETAllOKs + 1
-             If AMTData(i).NET > ETAllMax Then ETAllMax = AMTData(i).NET
-             If AMTData(i).NET < ETAllMin Then ETAllMin = AMTData(i).NET
+             If AMTData(I).NET > ETAllMax Then ETAllMax = AMTData(I).NET
+             If AMTData(I).NET < ETAllMin Then ETAllMin = AMTData(I).NET
           Else
              ETAllOthers = ETAllOthers + 1
           End If
@@ -3613,14 +3630,14 @@ For i = 1 To AMTCnt
        End If
     End If
     
-    If IsNull(AMTData(i).PNET) Then
+    If IsNull(AMTData(I).PNET) Then
        ET1stNulls = ET1stNulls + 1
     Else
-       If IsNumeric(AMTData(i).PNET) Then
-          If AMTData(i).PNET > 0 Then
+       If IsNumeric(AMTData(I).PNET) Then
+          If AMTData(I).PNET > 0 Then
              ET1stOKs = ET1stOKs + 1
-             If AMTData(i).PNET > ET1stMax Then ET1stMax = AMTData(i).PNET
-             If AMTData(i).PNET < ET1stMin Then ET1stMin = AMTData(i).PNET
+             If AMTData(I).PNET > ET1stMax Then ET1stMax = AMTData(I).PNET
+             If AMTData(I).PNET < ET1stMin Then ET1stMin = AMTData(I).PNET
           Else
              ET1stOthers = ET1stOthers + 1
           End If
@@ -3630,7 +3647,7 @@ For i = 1 To AMTCnt
     End If
     
     
-Next i
+Next I
 
 If Len(CurrMTDatabase) > 0 Then         'MT tag database
    sTmp = "Database type: MTS" & vbCrLf
@@ -3698,24 +3715,24 @@ Public Function GetMTHits1(ByVal MW As Double, _
 '------------------------------------------------------------
 Dim Ind1 As Long
 Dim Ind2 As Long
-Dim i As Long
+Dim I As Long
 Dim TmpCnt As Long
 On Error GoTo err_GetMTHits1:
 
 If mwutSearch.FindIndexRange(MW, MWTol, Ind1, Ind2) Then
    ReDim HitsCnt(100)       'should be plenty
    If ETTol >= 0 Then       'use ET tolerance
-      For i = Ind1 To Ind2
-        If ((Abs(ET - AMTData(i).NET) <= ETTol)) Then
+      For I = Ind1 To Ind2
+        If ((Abs(ET - AMTData(I).NET) <= ETTol)) Then
            TmpCnt = TmpCnt + 1
-           HitsInd(TmpCnt - 1) = i
+           HitsInd(TmpCnt - 1) = I
         End If
-      Next i
+      Next I
    Else                     'ET does not matter
-      For i = Ind1 To Ind2
+      For I = Ind1 To Ind2
         TmpCnt = TmpCnt + 1
-        HitsInd(TmpCnt - 1) = i
-      Next i
+        HitsInd(TmpCnt - 1) = I
+      Next I
    End If
 End If
 exit_GetMTHits1:
@@ -3758,24 +3775,24 @@ Public Function GetMTHits2(ByVal MW As Double, _
 '------------------------------------------------------------
 Dim Ind1 As Long
 Dim Ind2 As Long
-Dim i As Long
+Dim I As Long
 Dim TmpCnt As Long
 On Error GoTo err_GetMTHits2:
 
 If mwutSearch.FindIndexRange(MW, MWTol, Ind1, Ind2) Then
    ReDim HitsCnt(100)       'should be plenty
    If ETTol >= 0 Then       'use ET tolerance
-      For i = Ind1 To Ind2
-        If ((Abs(ET - AMTData(i).PNET) <= ETTol)) Then
+      For I = Ind1 To Ind2
+        If ((Abs(ET - AMTData(I).PNET) <= ETTol)) Then
            TmpCnt = TmpCnt + 1
-           HitsInd(TmpCnt - 1) = i
+           HitsInd(TmpCnt - 1) = I
         End If
-      Next i
+      Next I
    Else                     'ET does not matter
-      For i = Ind1 To Ind2
+      For I = Ind1 To Ind2
         TmpCnt = TmpCnt + 1
-        HitsInd(TmpCnt - 1) = i
-      Next i
+        HitsInd(TmpCnt - 1) = I
+      Next I
    End If
 End If
 exit_GetMTHits2:
