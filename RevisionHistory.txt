@@ -1,5 +1,10 @@
 VIPER Change Log
 
+Version 3.48 - Build 445; June 27, 2011
+	- New version of STAC Console
+		- Fixes bug counting number of unique conformers
+	- Updated call to stored procedure AddMatchMakingFDR to remove parameters @Matches and @UPFilteredMatches
+
 Version 3.48 - Build 444; June 24, 2011
 	- Fixed bug in AutoAnalysisToleranceRefinement that erroneously updated MinimumPeakHeight to the MinimumSLiC value at the completion of tolerance refinement
 	- Added support for a minimum UP value when creating Mass, NET, and Drift Time error histograms
@@ -14,6 +19,7 @@ Version 3.48 - Build 444; June 23, 2011
 		- Searching with drift times is only enabled if the _Isos.csv file contains column drift_time
 		- Furthermore, this will only work if one or more peptides have conformer ID values and drift times associated with them
 			- Obtained by calling stored procedure GetMassTagsPlusConformers instead of GetMassTagsGANETParam
+	- Now passing parameters @UniqueConformers and @UPFilteredUniqueConformers to AddMatchMakingFDR
 
 Version 3.48 - Build 443; April 7, 2011
 	- Added support for loading data from column NET_Count from table AMT in a legacy MTDB (Microsoft Access file)

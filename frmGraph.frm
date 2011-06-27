@@ -1181,14 +1181,14 @@ picGraph.Refresh
 End Sub
 
 Private Sub PointVisiblilityShowAll()
-    Dim i As Integer
+    Dim I As Integer
     lAction = glNoAction
     
     ' Set all points to visible (positive ids) and clear selection
     With GelData(nMyIndex)
-         For i = 1 To MAX_FILTER_COUNT
-            .DataFilter(i, 0) = False
-         Next i
+         For I = 1 To MAX_FILTER_COUNT
+            .DataFilter(I, 0) = False
+         Next I
          .DataFilter(fltID, 1) = 0      'identity
          
          GelCSIncludeAll (nMyIndex)
@@ -1209,14 +1209,14 @@ Private Sub PointVisibilityShowUMCPoints()
 End Sub
 
 Private Sub PointVisiblilityInvert()
-    Dim i As Integer
+    Dim I As Integer
     lAction = glNoAction
     
     ' Invert the visible points and clear selection
     With GelData(nMyIndex)
-         For i = 1 To MAX_FILTER_COUNT
-            .DataFilter(i, 0) = False
-         Next i
+         For I = 1 To MAX_FILTER_COUNT
+            .DataFilter(I, 0) = False
+         Next I
          .DataFilter(fltID, 1) = 0      'identity
          
          GelCSInvertVisible (nMyIndex)
@@ -2461,7 +2461,7 @@ End Sub
 
 Private Sub mnu2lsOptions_Click()
 Dim blnAutoAdjSizeSaved As Boolean
-Dim i As Integer
+Dim I As Integer
 
 frmOptions.Tag = nMyIndex
 If IsWinLoaded(TrackerCaption) Then frmTracker.Hide
@@ -2507,11 +2507,11 @@ csMyCooSys.ZoomInR lngXMin, dblYMin, lngXMax, dblYMax
 
 If Abs(vWhatever) >= 2 Then
     ' Need to call Coordinate draw for the other Gels (it gets called for this gel in the above call to .ZoomInR
-    For i = 1 To UBound(GelBody)
-        If i <> nMyIndex And Not GelStatus(i).Deleted Then
-            GelBody(i).csMyCooSys.CoordinateDraw
+    For I = 1 To UBound(GelBody)
+        If I <> nMyIndex And Not GelStatus(I).Deleted Then
+            GelBody(I).csMyCooSys.CoordinateDraw
         End If
-    Next i
+    Next I
 End If
 
 bNeedToUpdate = True
@@ -3650,7 +3650,7 @@ End Sub
 
 Public Sub CopyAllPointsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1, Optional blnPromptForFileToExportTo As Boolean = False, Optional strFilePathForce As String = "")
     
-    Dim i As Long, j As Long
+    Dim I As Long, j As Long
     Dim dblMW As Double, dblMtoZ As Double, dblAbu As Double
     Dim dblAbuIReportMWMono As Double, dblAbuIReport2Da As Double
     Dim dblNET As Double
@@ -3836,11 +3836,11 @@ On Error GoTo CopyAllPointsInViewErrorHandler
         If Len(strFilePath) > 0 Then Print #OutFileNum, strExport(0)
         
         lngExportCount = 1
-        For i = 1 To lngIonCount
+        For I = 1 To lngIonCount
             If blnCSPoints Then
-                lngFN = .CSData(lngIonPointerArray(i)).ScanNumber
+                lngFN = .CSData(lngIonPointerArray(I)).ScanNumber
             Else
-                lngFN = .IsoData(lngIonPointerArray(i)).ScanNumber
+                lngFN = .IsoData(lngIonPointerArray(I)).ScanNumber
             End If
             
             If lngFN > lngFNPrevious Then
@@ -3859,7 +3859,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 lngFNPrevious = lngFN
             End If
             
-            lngIonIndex = lngIonPointerArray(i)
+            lngIonIndex = lngIonPointerArray(I)
             If blnCSPoints Then
                 dblAbu = .CSData(lngIonIndex).Abundance
                 intCharge = .CSData(lngIonIndex).Charge
@@ -3992,11 +3992,11 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 End If
             Loop While Len(strDBMatchList) > 0
             
-            If i Mod 100 = 0 Then
-                frmProgress.UpdateProgressBar i
+            If I Mod 100 = 0 Then
+                frmProgress.UpdateProgressBar I
                 If KeyPressAbortProcess > 1 Then Exit For
             End If
-        Next i
+        Next I
     End With
     
     If Len(strFilePath) > 0 Then
@@ -4118,7 +4118,7 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim blnIsotopeLabelPresent(ISOTOPE_LABEL_TAG_CONSTANT_COUNT) As Boolean
     Dim strIsotopes As String
     
-    Dim blnIMSData As Boolean
+    Dim blnIMSDataPresent As Boolean
     
 On Error GoTo CopyAllUMCsInViewErrorHandler
 
@@ -4304,11 +4304,9 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "MassShiftPPMClassRep" & strSepChar
     
-    Dim blnIMSDataPresent As Boolean
     blnIMSDataPresent = (GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
         
     If blnIMSDataPresent Then
-        blnIMSData = True
         strLineOut = strLineOut & "IMS_Drift_Time" & strSepChar & "IMS_Conformation_Fit_Score" & strSepChar
     End If
     
@@ -4418,7 +4416,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             End If
                                     
             
-            If blnIMSData Then
+            If blnIMSDataPresent Then
                 ' Note that the LC-MS Feature's central drift time will not necessarily be the same as the drift time of the class rep
                 ' Favor using the LC-MS Feature's .DriftTime
                 If .DriftTime = 0 Then

@@ -4291,6 +4291,7 @@ On Error GoTo PerformSearchErrorHandler
             strMessage = "Warning: Mass tolerance of " & strSearchTolText & " is less than the suggested minimum when using STAC (" & DEFAULT_MW_TOL & " ppm)."
             
             If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                ' Auto-analyzing file; do not show the warning
             Else
                 eResponse = MsgBox("You are strongly encouraged to use a mass tolerance of " & DEFAULT_MW_TOL & " ppm or more when using STAC.  Auto-update it now?", vbQuestion + vbYesNoCancel, glFGTU)
                 If eResponse = vbCancel Then
@@ -4312,30 +4313,38 @@ On Error GoTo PerformSearchErrorHandler
         If samtDef.NETTol < DEFAULT_NET_TOL Then
             strMessage = "Warning: NET tolerance of " & samtDef.NETTol & " is less than the suggested minimum when using STAC (" & DEFAULT_NET_TOL & ")."
             
-            eResponse = MsgBox("You are strongly encouraged to use a NET tolerance of " & DEFAULT_NET_TOL & " or more when using STAC.  Auto-update it now?", vbQuestion + vbYesNoCancel, glFGTU)
-            If eResponse = vbCancel Then
-                PerformSearch = 0
-                Exit Function
-            ElseIf eResponse = vbYes Then
-                txtNETTol.Text = DEFAULT_NET_TOL
-                samtDef.NETTol = DEFAULT_NET_TOL
+            If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                ' Auto-analyzing file; do not show the warning
             Else
-                AddToAnalysisHistory CallerID, strMessage
+                eResponse = MsgBox("You are strongly encouraged to use a NET tolerance of " & DEFAULT_NET_TOL & " or more when using STAC.  Auto-update it now?", vbQuestion + vbYesNoCancel, glFGTU)
+                If eResponse = vbCancel Then
+                    PerformSearch = 0
+                    Exit Function
+                ElseIf eResponse = vbYes Then
+                    txtNETTol.Text = DEFAULT_NET_TOL
+                    samtDef.NETTol = DEFAULT_NET_TOL
+                Else
+                    AddToAnalysisHistory CallerID, strMessage
+                End If
             End If
         End If
     
         If GelContainsIMSData() And samtDef.DriftTimeTol < DEFAULT_DRIFT_TIME_TOL Then
             strMessage = "Warning: Drift Time tolerance of " & samtDef.DriftTimeTol & " is less than the suggested minimum when using STAC (" & DEFAULT_DRIFT_TIME_TOL & ")."
             
-            eResponse = MsgBox("You are strongly encouraged to use a Drift Time tolerance of " & DEFAULT_DRIFT_TIME_TOL & " or more when using STAC.  Auto-update it now?", vbQuestion + vbYesNoCancel, glFGTU)
-            If eResponse = vbCancel Then
-                PerformSearch = 0
-                Exit Function
-            ElseIf eResponse = vbYes Then
-                txtDriftTimeTol.Text = DEFAULT_DRIFT_TIME_TOL
-                samtDef.DriftTimeTol = DEFAULT_DRIFT_TIME_TOL
+            If glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+                ' Auto-analyzing file; do not show the warning
             Else
-                AddToAnalysisHistory CallerID, strMessage
+                eResponse = MsgBox("You are strongly encouraged to use a Drift Time tolerance of " & DEFAULT_DRIFT_TIME_TOL & " or more when using STAC.  Auto-update it now?", vbQuestion + vbYesNoCancel, glFGTU)
+                If eResponse = vbCancel Then
+                    PerformSearch = 0
+                    Exit Function
+                ElseIf eResponse = vbYes Then
+                    txtDriftTimeTol.Text = DEFAULT_DRIFT_TIME_TOL
+                    samtDef.DriftTimeTol = DEFAULT_DRIFT_TIME_TOL
+                Else
+                    AddToAnalysisHistory CallerID, strMessage
+                End If
             End If
         End If
         
@@ -6121,12 +6130,12 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
     
     Dim strLineOut As String
     
-    strLineOut = "Mass_Tag_ID" & vbTab & _
+    strLineOut = "Mass_Tag_Index" & vbTab & _
                  "Monoisotopic_Mass" & vbTab & _
                  "Avg_GANET" & vbTab & _
                  "High_Peptide_Prophet_Probability" & vbTab & _
                  "Cnt_GANET" & vbTab & _
-                 "Mass_Tag_ID_Original"
+                 "Mass_Tag_ID"
                       
     If blnUseDriftTime Then
         strLineOut = strLineOut & vbTab & _

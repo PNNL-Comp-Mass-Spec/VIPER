@@ -1012,9 +1012,9 @@ Public Sub ExportMTDBInitializeStoreSTACStats(cnNew As ADODB.Connection, _
         Set .FDR = cmdStoreSTACStats.CreateParameter("FDR", adSingle, adParamInput, , 0)
         cmdStoreSTACStats.Parameters.Append .FDR
         
-        ' Matches was deprecated in June 2011, but we still need to pass it to stored procedure AddMatchMakingFDR
-        Set Matches = cmdStoreSTACStats.CreateParameter("Matches", adInteger, adParamInput, , 0)
-        cmdStoreSTACStats.Parameters.Append Matches
+        ' Matches was deprecated in June 2011
+        'Set Matches = cmdStoreSTACStats.CreateParameter("Matches", adInteger, adParamInput, , 0)
+        'cmdStoreSTACStats.Parameters.Append Matches
         
         Set .Errors = cmdStoreSTACStats.CreateParameter("Errors", adSingle, adParamInput, , 0)
         cmdStoreSTACStats.Parameters.Append .Errors
@@ -1025,9 +1025,9 @@ Public Sub ExportMTDBInitializeStoreSTACStats(cnNew As ADODB.Connection, _
         Set .UPFilteredFDR = cmdStoreSTACStats.CreateParameter("UPFilteredFDR", adSingle, adParamInput, , 0)
         cmdStoreSTACStats.Parameters.Append .UPFilteredFDR
              
-        ' UPFilteredMatches was deprecated in June 2011, but we still need to pass it to stored procedure AddMatchMakingFDR
-        Set UPFilteredMatches = cmdStoreSTACStats.CreateParameter("UPFilteredMatches", adInteger, adParamInput, , 0)
-        cmdStoreSTACStats.Parameters.Append UPFilteredMatches
+        ' UPFilteredMatches was deprecated in June 2011
+        'Set UPFilteredMatches = cmdStoreSTACStats.CreateParameter("UPFilteredMatches", adInteger, adParamInput, , 0)
+        'cmdStoreSTACStats.Parameters.Append UPFilteredMatches
         
         Set .UPFilteredErrors = cmdStoreSTACStats.CreateParameter("UPFilteredErrors", adSingle, adParamInput, , 0)
         cmdStoreSTACStats.Parameters.Append .UPFilteredErrors
