@@ -41,8 +41,8 @@ Begin VB.Form frmFilter
       TabCaption(0)   =   "Tolerances"
       TabPicture(0)   =   "frmFilter.frx":000C
       Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "fraTolerances"
-      Tab(0).Control(1)=   "fraExcludeDuplicatesOrFit"
+      Tab(0).Control(0)=   "fraExcludeDuplicatesOrFit"
+      Tab(0).Control(1)=   "fraTolerances"
       Tab(0).ControlCount=   2
       TabCaption(1)   =   "Identity and Comparative Display"
       TabPicture(1)   =   "frmFilter.frx":0028
@@ -752,7 +752,7 @@ Private Sub CancelChanges()
 End Sub
 
 Private Sub DisplayCurrentSettings(blnQueryIfNoVisiblePoints As Boolean)
-Dim i As Long
+Dim I As Long
 Dim tmp As Long
 mUpdatingSettings = True
 With GelData(CallerID)
@@ -890,18 +890,18 @@ With GelData(CallerID)
      End Select
      If .DataFilter(fltAR, 0) Then
         tmp = Abs(.DataFilter(fltAR, 0))
-        For i = 4 To 0 Step -1
-            If tmp >= 2 ^ i Then
-               chkDiffDisplay(i).Value = vbChecked
-               tmp = tmp - 2 ^ i
+        For I = 4 To 0 Step -1
+            If tmp >= 2 ^ I Then
+               chkDiffDisplay(I).Value = vbChecked
+               tmp = tmp - 2 ^ I
             Else
-               chkDiffDisplay(i).Value = vbUnchecked
+               chkDiffDisplay(I).Value = vbUnchecked
             End If
-        Next i
+        Next I
      Else
-        For i = 0 To 4
+        For I = 0 To 4
             chkDiffDisplay(0).Value = vbUnchecked
-        Next i
+        Next I
      End If
      'put ER range no matter are we using it or not
      If .DataFilter(fltAR, 1) < 0 Then
@@ -933,27 +933,27 @@ End Sub
 
 
 Private Function FilterChanged() As Boolean
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 On Error Resume Next
 FilterChanged = False
-For i = 1 To MAX_FILTER_COUNT
+For I = 1 To MAX_FILTER_COUNT
     For j = 0 To 2
-        If OldSettings(i, j) <> GelData(CallerID).DataFilter(i, j) Then
+        If OldSettings(I, j) <> GelData(CallerID).DataFilter(I, j) Then
            FilterChanged = True
            Exit Function
         End If
     Next j
-Next i
+Next I
 End Function
 
-Public Function FilterRange(ByVal i As Long) As Boolean
+Public Function FilterRange(ByVal I As Long) As Boolean
 '------------------------------------------------------------------------------
 'verification that filter parameters have sense; this function serves abundance
 'molecular mass and charge state for isotopic data ranges
 '------------------------------------------------------------------------------
 Dim sMsg As String
 On Error Resume Next
-Select Case i
+Select Case I
 Case fltCSAbu
   sMsg = "Charge State Abundance Range"
 Case fltIsoAbu
@@ -965,8 +965,8 @@ Case fltIsoAbu
 Case fltIsoCS
   sMsg = "Isotopic Charge State Range"
 End Select
-If (GelData(CallerID).DataFilter(i, 1) > GelData(CallerID).DataFilter(i, 2) Or _
-   (GelData(CallerID).DataFilter(i, 2) <= 0)) Then
+If (GelData(CallerID).DataFilter(I, 1) > GelData(CallerID).DataFilter(I, 2) Or _
+   (GelData(CallerID).DataFilter(I, 2) <= 0)) Then
         If SayUserURDumb(sMsg) = vbYes Then
            FilterRange = True
         Else
@@ -1084,45 +1084,6 @@ With GelData(CallerID)
 End With
 End Function
 
-' Unused function (February 2005)
-''Public Function FilterDBFit() As Boolean
-''Dim aBadDBFits As Variant
-''Dim BadDBFitsCount As Long
-''Dim j As Long
-''On Error Resume Next
-''With GelData(CallerID)
-''    If .DataFilter(fltDBTolerance, 0) Then
-''        If .DataFilter(fltDBTolerance, 1) > 0 Then
-''           aBadDBFits = GetBadDBFits(CallerID, CDbl(.DataFilter(fltDBTolerance, 1)))
-''           If Not IsNull(aBadDBFits) Then
-''              BadDBFitsCount = UBound(aBadDBFits, 2)
-''              With GelDraw(CallerID)
-''                For j = 1 To BadDBFitsCount
-''                  Select Case aBadDBFits(0, j)
-''                  Case glCSType
-''                    .CSID(aBadDBFits(1, j)) = -Abs(.CSID(aBadDBFits(1, j)))
-''                  Case glIsoType
-''                    .IsoID(aBadDBFits(1, j)) = -Abs(.IsoID(aBadDBFits(1, j)))
-''                  End Select
-''                Next j
-''              End With
-''           End If
-''           FilterDBFit = True
-''        Else
-''           If SayUserURDumb("Exclude data with database ...") = vbYes Then
-''              GelCSExcludeAll (CallerID)
-''              GelIsoExcludeAll (CallerID)
-''              FilterDBFit = True
-''           Else
-''              FilterDBFit = False
-''           End If
-''        End If
-''    Else
-''        FilterDBFit = True
-''    End If
-''End With
-''End Function
-
 Public Function FilterDuplicates() As Boolean
 Dim aDuplicates As Variant
 Dim DuplicatesCount As Long
@@ -1158,7 +1119,7 @@ End Function
 Public Function Filter2CloseGuesses() As Boolean
 Dim aWorseGuesses As Variant
 Dim WorseGuessesCount As Long
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelData(CallerID)
     If .DataFilter(fltCase2CloseResults, 0) Then
@@ -1177,9 +1138,9 @@ With GelData(CallerID)
               If Not IsNull(aWorseGuesses) Then
                  WorseGuessesCount = UBound(aWorseGuesses)
                  With GelDraw(CallerID)
-                    For i = 1 To WorseGuessesCount
-                     .IsoID(aWorseGuesses(i)) = -Abs(.IsoID(aWorseGuesses(i)))
-                    Next i
+                    For I = 1 To WorseGuessesCount
+                     .IsoID(aWorseGuesses(I)) = -Abs(.IsoID(aWorseGuesses(I)))
+                    Next I
                  End With
               End If
               Filter2CloseGuesses = True
@@ -1197,23 +1158,6 @@ With GelData(CallerID)
     End If
 End With
 End Function
-
-' Unused function (February 2005)
-''Private Sub FilterIsoCom()
-''Dim ThisList() As String
-''On Error Resume Next
-''With GelData(CallerID)
-''    If CBool(.DataFilter(fltIsoCom, 0)) Then
-''       ThisList = Split(.DataFilter(fltIsoCom, 0), glARG_SEP)
-''       Select Case .DataFilter(fltIsoCom, 1)
-''       Case 0
-''            FilterIsoComExclusive CallerID, ThisList
-''       Case 1
-''            FilterIsoComInclusive CallerID, ThisList
-''       End Select
-''    End If
-''End With
-''End Sub
 
 Public Function FilterThis(blnQueryIfNoVisiblePoints As Boolean) As Boolean
 '-----------------------------------------------------------
@@ -1366,23 +1310,23 @@ Private Sub PopulateComboBoxes()
 End Sub
 
 Private Sub RestoreOldSettings()
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 On Error Resume Next
-For i = 1 To MAX_FILTER_COUNT
+For I = 1 To MAX_FILTER_COUNT
     For j = 0 To 2
-        GelData(CallerID).DataFilter(i, j) = OldSettings(i, j)
+        GelData(CallerID).DataFilter(I, j) = OldSettings(I, j)
     Next j
-Next i
+Next I
 End Sub
 
 Private Sub SaveOldSettings()
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 On Error Resume Next
-For i = 1 To MAX_FILTER_COUNT
+For I = 1 To MAX_FILTER_COUNT
     For j = 0 To 2
-        OldSettings(i, j) = GelData(CallerID).DataFilter(i, j)
+        OldSettings(I, j) = GelData(CallerID).DataFilter(I, j)
     Next j
-Next i
+Next I
 End Sub
 
 Private Function SayUserURDumb(sSection As String) As Integer
@@ -1459,7 +1403,7 @@ Private Sub ToggleWindowStayOnTop(blnEnableStayOnTop As Boolean)
 End Sub
 
 Private Sub UpdateFilterStatus(blnQueryIfNoVisiblePoints As Boolean)
-    Dim i As Long
+    Dim I As Long
     Dim lngVisiblePoints As Long
     Dim lngTotalPoints As Long
     Dim strPercentVisible As String
@@ -1469,13 +1413,13 @@ Private Sub UpdateFilterStatus(blnQueryIfNoVisiblePoints As Boolean)
 On Error GoTo UpdateFilterStatusErrorHandler
     
     With GelDraw(CallerID)
-        For i = 1 To .IsoCount
-            If .IsoID(i) >= 0 Then lngVisiblePoints = lngVisiblePoints + 1
-        Next i
+        For I = 1 To .IsoCount
+            If .IsoID(I) >= 0 Then lngVisiblePoints = lngVisiblePoints + 1
+        Next I
         
-        For i = 1 To .CSCount
-            If .CSID(i) >= 0 Then lngVisiblePoints = lngVisiblePoints + 1
-        Next i
+        For I = 1 To .CSCount
+            If .CSID(I) >= 0 Then lngVisiblePoints = lngVisiblePoints + 1
+        Next I
         
         lngTotalPoints = .IsoCount + .CSCount
         

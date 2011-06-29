@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Begin VB.Form frmOverlayManager 
    BackColor       =   &H00C0C0C0&
    BorderStyle     =   3  'Fixed Dialog
@@ -863,25 +863,22 @@ Begin VB.Form frmOverlayManager
       _ExtentX        =   8705
       _ExtentY        =   8281
       Style           =   1
-      _Version        =   327682
-      BeginProperty Tabs {0713E432-850A-101B-AFC0-4210102A8DA7} 
+      _Version        =   393216
+      BeginProperty Tabs {1EFB6598-857C-11D1-B16A-00C0F0283628} 
          NumTabs         =   3
-         BeginProperty Tab1 {0713F341-850A-101B-AFC0-4210102A8DA7} 
+         BeginProperty Tab1 {1EFB659A-857C-11D1-B16A-00C0F0283628} 
             Caption         =   "Creator"
             Key             =   "C"
-            Object.Tag             =   ""
             ImageVarType    =   2
          EndProperty
-         BeginProperty Tab2 {0713F341-850A-101B-AFC0-4210102A8DA7} 
+         BeginProperty Tab2 {1EFB659A-857C-11D1-B16A-00C0F0283628} 
             Caption         =   "Editor"
             Key             =   "E"
-            Object.Tag             =   ""
             ImageVarType    =   2
          EndProperty
-         BeginProperty Tab3 {0713F341-850A-101B-AFC0-4210102A8DA7} 
+         BeginProperty Tab3 {1EFB659A-857C-11D1-B16A-00C0F0283628} 
             Caption         =   "Misc"
             Key             =   "M"
-            Object.Tag             =   ""
             ImageVarType    =   2
          EndProperty
       EndProperty
@@ -921,34 +918,34 @@ Dim CurrZPos As Long                'current z-order position(selected from the 
 Dim CurrOlyInd As Long              'and coresponding oly UMC index
 
 Private Sub chkDefCreateWithID_Click()
-OlyOptions.DefWithID = (chkDefCreateWithID.value = vbChecked)
+OlyOptions.DefWithID = (chkDefCreateWithID.Value = vbChecked)
 End Sub
 
 Private Sub chkDefUniSize_Click()
-OlyOptions.DefUniformSize = (chkDefUniSize.value = vbChecked)
+OlyOptions.DefUniformSize = (chkDefUniSize.Value = vbChecked)
 End Sub
 
 Private Sub chkShowHGrid_Click()
-OlyOptions.GRID.HorzGridVisible = (chkShowHGrid.value = vbChecked)
+OlyOptions.GRID.HorzGridVisible = (chkShowHGrid.Value = vbChecked)
 End Sub
 
 Private Sub chkShowText_Click()
 On Error Resume Next
-Oly(CurrOlyInd).ShowText = (chkShowText.value = vbChecked)
+Oly(CurrOlyInd).ShowText = (chkShowText.Value = vbChecked)
 End Sub
 
 Private Sub chkShowVGrid_Click()
-OlyOptions.GRID.VertGridVisible = (chkShowVGrid.value = vbChecked)
+OlyOptions.GRID.VertGridVisible = (chkShowVGrid.Value = vbChecked)
 End Sub
 
 Private Sub chkUniSize_Click()
 On Error Resume Next
-Oly(CurrOlyInd).UniformSize = (chkUniSize.value = vbChecked)
+Oly(CurrOlyInd).UniformSize = (chkUniSize.Value = vbChecked)
 End Sub
 
 Private Sub chkVisible_Click()
 On Error Resume Next
-Oly(CurrOlyInd).Visible = (chkVisible.value = vbChecked)
+Oly(CurrOlyInd).Visible = (chkVisible.Value = vbChecked)
 End Sub
 
 Private Sub cmbDefNETAdjustment_Click()
@@ -1054,7 +1051,7 @@ FillDisplaysCombo
 FillNETAdjustmentCombo
 cmbDefShape.ListIndex = OlyOptions.DefShape
 cmbDefNETAdjustment.ListIndex = OlyOptions.DefNETAdjustment
-optType(OlyOptions.DefType).value = True
+optType(OlyOptions.DefType).Value = True
 lblDefClr.BackColor = OlyOptions.DefColor
 lblBackClr.BackColor = OlyOptions.BackColor
 lblForeClr.BackColor = OlyOptions.ForeColor
@@ -1068,19 +1065,19 @@ txtFontHeight.Text = OlyOptions.DefFontHeight
 txtDefNETTol.Text = OlyOptions.DefNETTol
 txtDefTextHeight.Text = OlyOptions.DefTextHeight
 If OlyOptions.DefUniformSize Then
-   chkDefUniSize.value = vbChecked
+   chkDefUniSize.Value = vbChecked
 Else
-   chkDefUniSize.value = vbUnchecked
+   chkDefUniSize.Value = vbUnchecked
 End If
 If OlyOptions.GRID.VertGridVisible Then
-   chkShowVGrid.value = vbChecked
+   chkShowVGrid.Value = vbChecked
 Else
-   chkShowVGrid.value = vbUnchecked
+   chkShowVGrid.Value = vbUnchecked
 End If
 If OlyOptions.GRID.HorzGridVisible Then
-   chkShowHGrid.value = vbChecked
+   chkShowHGrid.Value = vbChecked
 Else
-   chkShowHGrid.value = vbUnchecked
+   chkShowHGrid.Value = vbUnchecked
 End If
 Select Case OlyOptions.GRID.LineStyle
 Case PS_SOLID
@@ -1094,17 +1091,17 @@ Case PS_DASHDOTDOT
 Case Else            'default is PS_DASH
      cmbGridlineStyle.ListIndex = glsDASH
 End Select
-optOrientation(OlyOptions.Orientation).value = True
+optOrientation(OlyOptions.Orientation).Value = True
 If OlyCnt > 0 Then
    If InitZOrderFromOly() Then FillOverlaidList
 End If
 If OlyOptions.DefWithID Then
-   chkDefCreateWithID.value = vbChecked
+   chkDefCreateWithID.Value = vbChecked
 Else
-   chkDefCreateWithID.value = vbUnchecked
+   chkDefCreateWithID.Value = vbUnchecked
 End If
-optHGridAutoMode(OlyOptions.GRID.HorzAutoMode).value = True
-optVGridAutoMode(OlyOptions.GRID.VertAutoMode).value = True
+optHGridAutoMode(OlyOptions.GRID.HorzAutoMode).Value = True
+optVGridAutoMode(OlyOptions.GRID.VertAutoMode).Value = True
 txtHGridBinsCnt.Text = OlyOptions.GRID.HorzBinsCount
 txtVGridBinsCnt.Text = OlyOptions.GRID.VertBinsCount
 txtHGridWidth.Text = OlyOptions.GRID.HorzWidth
@@ -1172,19 +1169,19 @@ If CurrZPos >= 0 Then
    txtComment.Text = Oly(CurrOlyInd).Comment
    txtNewName.Text = Oly(CurrOlyInd).Name
    If Oly(CurrOlyInd).UniformSize Then
-      chkUniSize.value = vbChecked
+      chkUniSize.Value = vbChecked
    Else
-      chkUniSize.value = vbUnchecked
+      chkUniSize.Value = vbUnchecked
    End If
    If Oly(CurrOlyInd).ShowText Then
-      chkShowText.value = vbChecked
+      chkShowText.Value = vbChecked
    Else
-      chkShowText.value = vbUnchecked
+      chkShowText.Value = vbUnchecked
    End If
    If Oly(CurrOlyInd).Visible Then
-      chkVisible.value = vbChecked
+      chkVisible.Value = vbChecked
    Else
-      chkVisible.value = vbUnchecked
+      chkVisible.Value = vbUnchecked
    End If
    txtTextHeight.Text = Oly(CurrOlyInd).TextHeightPct
 End If
@@ -1225,17 +1222,17 @@ End Select
 End Sub
 
 Private Sub TabStrip1_Click()
-Dim i As Integer
+Dim I As Integer
 ActiveTab = TabStrip1.SelectedItem.Index
-For i = 0 To TabStrip1.Tabs.Count - 1
-    If i = TabStrip1.SelectedItem.Index - 1 Then
-       Picture1(i).Left = 240
-       Picture1(i).Enabled = True
+For I = 0 To TabStrip1.Tabs.Count - 1
+    If I = TabStrip1.SelectedItem.Index - 1 Then
+       Picture1(I).Left = 240
+       Picture1(I).Enabled = True
     Else
-       Picture1(i).Left = -20000
-       Picture1(i).Enabled = False
+       Picture1(I).Left = -20000
+       Picture1(I).Enabled = False
     End If
-Next i
+Next I
 Select Case ActiveTab
 Case TAB_CREATOR
      cmdCommands(CMD_CREATE).Enabled = True
@@ -1403,11 +1400,11 @@ End Sub
 
 
 Private Sub FillDisplaysCombo()
-Dim i As Long
+Dim I As Long
 cmbDisplayList.Clear
-For i = 0 To UBound(GelBody)
-    cmbDisplayList.AddItem GelBody(i).Caption, i
-Next i
+For I = 0 To UBound(GelBody)
+    cmbDisplayList.AddItem GelBody(I).Caption, I
+Next I
 End Sub
 
 
@@ -1415,13 +1412,13 @@ Private Sub FillOverlaidList()
 '------------------------------------------------
 'fill list of overlaid displays in z-order
 '------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim ZOrderOlyInd As Long
 lstOverlays.Clear
-For i = 0 To OlyCnt - 1
-    ZOrderOlyInd = GetOlyIndFromZOrder(i)
-    If ZOrderOlyInd >= 0 Then lstOverlays.AddItem Oly(ZOrderOlyInd).Name, i
-Next i
+For I = 0 To OlyCnt - 1
+    ZOrderOlyInd = GetOlyIndFromZOrder(I)
+    If ZOrderOlyInd >= 0 Then lstOverlays.AddItem Oly(ZOrderOlyInd).Name, I
+Next I
 End Sub
 
 
@@ -1430,27 +1427,15 @@ Private Function InitZOrderFromOly() As Boolean
 'put overlaids in current z-order; this reverse indexing could probably be used
 'in most cases; sometimes we will have to sort it though
 '------------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim TmpZOrder() As Long
 On Error Resume Next
 ReDim TmpZOrder(OlyCnt - 1)
-For i = 0 To OlyCnt - 1
-    TmpZOrder(Oly(i).ZOrder) = Oly(i).DisplayInd
-Next i
+For I = 0 To OlyCnt - 1
+    TmpZOrder(Oly(I).ZOrder) = Oly(I).DisplayInd
+Next I
 If MyZOrder.AddInZOrderAll(TmpZOrder) Then InitZOrderFromOly = True
 End Function
-
-' Unused Function (May 2003)
-'''Private Function UpdateZOrderInOly() As Boolean
-''''---------------------------------------------------------------------
-''''updates z-order member of overlay structures based on current z-order
-''''---------------------------------------------------------------------
-'''Dim i As Long
-'''On Error Resume Next
-'''For i = 0 To OlyCnt - 1
-'''    Oly(i).ZOrder = MyZOrder.GetZOrder(i)
-'''Next i
-'''End Function
 
 Private Sub FillTypeCombos()
 With cmbShape

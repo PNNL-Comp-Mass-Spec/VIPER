@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
 Begin VB.Form frmProtoViewPRISM 
    Caption         =   "Protein Based Analysis - PRISM"
    ClientHeight    =   8670
@@ -146,7 +146,6 @@ Begin VB.Form frmProtoViewPRISM
       _ExtentX        =   9975
       _ExtentY        =   6588
       _Version        =   393217
-      Enabled         =   -1  'True
       TextRTF         =   $"frmProtoViewPRISM.frx":030A
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "Courier New"
@@ -400,7 +399,7 @@ Me.MousePointer = vbDefault
 End Sub
 
 Private Sub Form_Load()
-Dim i As Long
+Dim I As Long
 bLoading = True
 ListTopPosViewAll = lstPeptides.Top
 ListTopPosPeptOnly = rtbORFSeq.Top
@@ -412,9 +411,9 @@ If AMTCnt > 0 Then
    PeptOption = OPT_PEPT_DB_LOADED         'select ORF peptides among loaded MT tags
    'add MT tags indexes in collection with ID as an key so that we can access them fast
    Set AMTIDCol = New Collection
-   For i = 1 To AMTCnt
-       AMTIDCol.add i, AMTData(i).ID
-   Next i
+   For I = 1 To AMTCnt
+       AMTIDCol.add I, AMTData(I).ID
+   Next I
 Else                                       'nothing is loaded so that is not an option
    PeptOption = OPT_PEPT_DIGESTION
    mnuMTSOptions(OPT_PEPT_DIGESTION).Checked = True
@@ -428,11 +427,11 @@ lblStatus.Caption = Msg
 DoEvents
 End Sub
 
-Private Sub lstPeptides_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub lstPeptides_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
 LaSpots1.ToggleSpotSelection lstPeptides.ListIndex
 End Sub
 
-Private Sub lstPeptides_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub lstPeptides_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
 LaSpots1.ToggleSpotSelection lstPeptides.ListIndex
 End Sub
 
@@ -466,15 +465,15 @@ mnuFNETGANET.Checked = False
 End Sub
 
 Private Sub mnuMTSOptions_Click(Index As Integer)
-Dim i As Long
+Dim I As Long
 PeptOption = Index
-For i = mnuMTSOptions.LBound To mnuMTSOptions.UBound
-    If i = PeptOption Then
-       mnuMTSOptions(i).Checked = True
+For I = mnuMTSOptions.LBound To mnuMTSOptions.UBound
+    If I = PeptOption Then
+       mnuMTSOptions(I).Checked = True
     Else
-       mnuMTSOptions(i).Checked = False
+       mnuMTSOptions(I).Checked = False
     End If
-Next i
+Next I
 End Sub
 
 Private Sub mnuR_Click()
@@ -499,18 +498,18 @@ End Sub
 Private Sub mnuTSearchAll_Click()
 Dim CurrMW As Double
 Dim CurrNET As Double
-Dim i As Long
+Dim I As Long
 If PrepareSearchObject() Then
    If ManageHitsArray(MNG_ARRAY_REDIM, 1000) Then
       With GelData(CallerID)
-        For i = 1 To .CSLines
-            CurrMW = .CSData(i).AverageMW
-            CurrNET = CalcNET(.CSData(i).ScanNumber)
-        Next i
-        For i = 1 To .IsoLines
-            CurrMW = GetIsoMass(.IsoData(i), .Preferences.IsoDataField)
-            CurrNET = CalcNET(.IsoData(i).ScanNumber)
-        Next i
+        For I = 1 To .CSLines
+            CurrMW = .CSData(I).AverageMW
+            CurrNET = CalcNET(.CSData(I).ScanNumber)
+        Next I
+        For I = 1 To .IsoLines
+            CurrMW = GetIsoMass(.IsoData(I), .Preferences.IsoDataField)
+            CurrNET = CalcNET(.IsoData(I).ScanNumber)
+        Next I
       End With
    End If
 Else
@@ -567,7 +566,7 @@ Private Sub GetPeptidesDBAll()
 End Sub
 
 Private Sub GetPeptidesDBLoaded()
-Dim i As Long
+Dim I As Long
 Dim TmpMW As Double
 Dim IsPeptLoaded As Boolean
 Dim ListLabel As String
@@ -575,18 +574,18 @@ On Error GoTo err_GetPeptidesDBLoaded
 
 'find all peptides among loaded MT tags mapped with current ORF - they don't have to be
 'among loaded MT tags - therefore call to retrieve it from AMTIDCol could fail (RTE - 5)
-For i = 1 To MTtoORFMapCount
-    If ORFIDMap(i) = ORFID(CurrORFInd) Then
+For I = 1 To MTtoORFMapCount
+    If ORFIDMap(I) = ORFID(CurrORFInd) Then
        IsPeptLoaded = True                                   'assume peptide is loaded
-       TmpMW = AMTData(AMTIDCol.Item(CStr(MTIDMap(i)))).MW   'if not this will fail
+       TmpMW = AMTData(AMTIDCol.Item(CStr(MTIDMap(I)))).MW   'if not this will fail
        If IsPeptLoaded Then
           PeptCnt = PeptCnt + 1
-          PeptID(PeptCnt) = MTIDMap(i)
+          PeptID(PeptCnt) = MTIDMap(I)
           PeptMW(PeptCnt) = TmpMW
-          PeptNET(PeptCnt) = AMTData(AMTIDCol.Item(CStr(MTIDMap(i)))).NET
+          PeptNET(PeptCnt) = AMTData(AMTIDCol.Item(CStr(MTIDMap(I)))).NET
        End If
     End If
-Next i
+Next I
 If PeptCnt > 0 Then
    If PeptCnt < UBound(PeptID) Then
       ReDim Preserve PeptID(1 To PeptCnt)
@@ -599,18 +598,18 @@ If PeptCnt > 0 Then
    'calculate peptide significances and make list entries
    Dim MWFmt As String
    Dim MWSpc As String
-   For i = 1 To PeptCnt
-       PeptPS(i) = CalcMTPS(i)
-       MWFmt = Format$(PeptMW(i), "0.00")
+   For I = 1 To PeptCnt
+       PeptPS(I) = CalcMTPS(I)
+       MWFmt = Format$(PeptMW(I), "0.00")
        If Len(MWFmt) > 7 Then
           MWSpc = ""
        Else
           MWSpc = String(8 - Len(MWFmt), Chr$(32))
        End If
-       ListLabel = Format$(i, "@@@@") & " " & Format$(PeptID(i), "@@@@@@@@") _
-                   & " " & MWSpc & MWFmt & "Da " & Format$(PeptPS(i), "0.0000")
+       ListLabel = Format$(I, "@@@@") & " " & Format$(PeptID(I), "@@@@@@@@") _
+                   & " " & MWSpc & MWFmt & "Da " & Format$(PeptPS(I), "0.0000")
        lstPeptides.AddItem ListLabel
-   Next i
+   Next I
    'update picture
 ' MonroeMod: Added PeptIntensity()
    If Not LaSpots1.AddSpotsMany(PeptID(), PeptNET(), PeptMW(), PeptIntensity()) Then
@@ -793,12 +792,6 @@ Else
 End If
 End Sub
 
-' Unused Function (May 2003)
-'''Private Function SearchCurrentORF() As Long
-''''search 2D display for selected peptides of current ORF; returns
-''''number of hits; -1 on any error
-'''End Function
-
 Private Function ManageHitsArray(ByVal ManageType As Long, ByVal Count As Long) As Boolean
 On Error GoTo exit_ManageHitsArray
 Select Case ManageType
@@ -836,16 +829,16 @@ Public Function PrepareSearchObject() As Boolean
 Dim TmpMW() As Double
 Dim MWInd() As Long
 Dim qsdSort As New QSDouble
-Dim i As Long
+Dim I As Long
 On Error GoTo exit_PrepareSearchObject
 Set MWSearchObject = Nothing
 If PeptCnt > 0 Then
    ReDim TmpMW(PeptCnt - 1)
    ReDim MWInd(PeptCnt - 1)
-   For i = 0 To PeptCnt - 1
-       MWInd(i) = i
-       TmpMW(i) = PeptMW(i)
-   Next i
+   For I = 0 To PeptCnt - 1
+       MWInd(I) = I
+       TmpMW(I) = PeptMW(I)
+   Next I
    If qsdSort.QSAsc(TmpMW(), MWInd()) Then
       If MWSearchObject.Fill(TmpMW()) Then PrepareSearchObject = True
    End If

@@ -371,7 +371,7 @@ Private Function SearchMassTagsMW() As Boolean
 'searches MT tags for matching masses and returns True if
 'OK, False if any error or user canceled the whole thing
 '----------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim eResponse As VbMsgBoxResult
 Dim TmpCnt As Long
 Dim Hits() As Long
@@ -389,9 +389,9 @@ ReDim IDState(MAX_ID_CNT - 1)
 With GelData(CallerID)
      Select Case ThisDef.TolType
      Case gltPPM
-          For i = 1 To .CSLines
-             MW = .CSData(i).AverageMW
-             Scan = GelData(CallerID).CSData(i).ScanNumber
+          For I = 1 To .CSLines
+             MW = .CSData(I).AverageMW
+             Scan = GelData(CallerID).CSData(I).ScanNumber
              MWAbsErr = MW * ThisDef.MWTol * glPPM
              Select Case ThisDef.NETorRT
              Case glAMT_NET
@@ -402,18 +402,18 @@ With GelData(CallerID)
              If TmpCnt > 0 Then
                 For j = 0 To TmpCnt - 1
                     IDType(IDCnt) = glCSType
-                    IDInd(IDCnt) = i
+                    IDInd(IDCnt) = I
                     ID(IDCnt) = Hits(j)
                     IDState(IDCnt) = 0
                     IDScan(IDCnt) = Scan
                     IDCnt = IDCnt + 1   'if reaches limit we will have correct
                 Next j                  'results by doing increase at the end
              End If
-          Next i
-          For i = 1 To .IsoLines
-             MW = GetIsoMass(.IsoData(i), ThisDef.MWField)
+          Next I
+          For I = 1 To .IsoLines
+             MW = GetIsoMass(.IsoData(I), ThisDef.MWField)
              MWAbsErr = MW * ThisDef.MWTol * glPPM
-             Scan = GelData(CallerID).IsoData(i).ScanNumber
+             Scan = GelData(CallerID).IsoData(I).ScanNumber
              Select Case ThisDef.NETorRT
              Case glAMT_NET
                 TmpCnt = GetMTHits1(MW, MWAbsErr, -1, -1, Hits())
@@ -423,19 +423,19 @@ With GelData(CallerID)
              If TmpCnt > 0 Then
                 For j = 0 To TmpCnt - 1
                     IDType(IDCnt) = glIsoType
-                    IDInd(IDCnt) = i
+                    IDInd(IDCnt) = I
                     ID(IDCnt) = Hits(j)
                     IDState(IDCnt) = 0
                     IDScan(IDCnt) = Scan
                     IDCnt = IDCnt + 1
                 Next j
              End If
-          Next i
+          Next I
      Case gltABS
           MWAbsErr = ThisDef.MWTol
-          For i = 1 To .CSLines
-             MW = .CSData(i).AverageMW
-             Scan = GelData(CallerID).CSData(i).ScanNumber
+          For I = 1 To .CSLines
+             MW = .CSData(I).AverageMW
+             Scan = GelData(CallerID).CSData(I).ScanNumber
              Select Case ThisDef.NETorRT
              Case glAMT_NET
                 TmpCnt = GetMTHits1(MW, MWAbsErr, -1, -1, Hits())
@@ -445,17 +445,17 @@ With GelData(CallerID)
              If TmpCnt > 0 Then
                 For j = 0 To TmpCnt - 1
                     IDType(IDCnt) = glCSType
-                    IDInd(IDCnt) = i
+                    IDInd(IDCnt) = I
                     ID(IDCnt) = Hits(j)
                     IDState(IDCnt) = 0
                     IDScan(IDCnt) = Scan
                     IDCnt = IDCnt + 1   'if reaches limit we will have correct
                 Next j                  'results by doing increase at the end
              End If
-          Next i
-          For i = 1 To .IsoLines
-             MW = GetIsoMass(.IsoData(i), ThisDef.MWField)
-             Scan = GelData(CallerID).IsoData(i).ScanNumber
+          Next I
+          For I = 1 To .IsoLines
+             MW = GetIsoMass(.IsoData(I), ThisDef.MWField)
+             Scan = GelData(CallerID).IsoData(I).ScanNumber
              Select Case ThisDef.NETorRT
              Case glAMT_NET
                 TmpCnt = GetMTHits1(MW, MWAbsErr, -1, -1, Hits())
@@ -465,14 +465,14 @@ With GelData(CallerID)
              If TmpCnt > 0 Then
                 For j = 0 To TmpCnt - 1
                     IDType(IDCnt) = glIsoType
-                    IDInd(IDCnt) = i
+                    IDInd(IDCnt) = I
                     ID(IDCnt) = Hits(j)
                     IDState(IDCnt) = 0
                     IDScan(IDCnt) = Scan
                     IDCnt = IDCnt + 1
                 Next j
              End If
-          Next i
+          Next I
     Case Else
           Debug.Assert False
      End Select
@@ -527,7 +527,7 @@ Private Function SearchMassTagsMWNET() As Boolean
 'searches MT tags for matching masses and returns True if
 'OK, False if any error or user canceled the whole thing
 '----------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim eResponse As VbMsgBoxResult
 Dim TmpCnt As Long
 Dim Hits() As Long
@@ -545,9 +545,9 @@ ReDim IDState(MAX_ID_CNT - 1)
 With GelData(CallerID)
      Select Case ThisDef.TolType
      Case gltPPM
-          For i = 1 To .CSLines
-             MW = .CSData(i).AverageMW
-             Scan = GelData(CallerID).CSData(i).ScanNumber
+          For I = 1 To .CSLines
+             MW = .CSData(I).AverageMW
+             Scan = GelData(CallerID).CSData(I).ScanNumber
              MWAbsErr = MW * ThisDef.MWTol * glPPM
              Select Case ThisDef.NETorRT
              Case glAMT_NET
@@ -558,18 +558,18 @@ With GelData(CallerID)
              If TmpCnt > 0 Then
                 For j = 0 To TmpCnt - 1
                     IDType(IDCnt) = glCSType
-                    IDInd(IDCnt) = i
+                    IDInd(IDCnt) = I
                     ID(IDCnt) = Hits(j)
                     IDState(IDCnt) = 0
                     IDScan(IDCnt) = Scan
                     IDCnt = IDCnt + 1   'if reaches limit we will have correct
                 Next j                  'results by doing increase at the end
              End If
-          Next i
-          For i = 1 To .IsoLines
-             MW = GetIsoMass(.IsoData(i), ThisDef.MWField)
+          Next I
+          For I = 1 To .IsoLines
+             MW = GetIsoMass(.IsoData(I), ThisDef.MWField)
              MWAbsErr = MW * ThisDef.MWTol * glPPM
-             Scan = GelData(CallerID).IsoData(i).ScanNumber
+             Scan = GelData(CallerID).IsoData(I).ScanNumber
              Select Case ThisDef.NETorRT
              Case glAMT_NET
                 TmpCnt = GetMTHits1(MW, MWAbsErr, GetNET(Scan), ThisDef.NETTol, Hits())
@@ -579,19 +579,19 @@ With GelData(CallerID)
              If TmpCnt > 0 Then
                 For j = 0 To TmpCnt - 1
                     IDType(IDCnt) = glIsoType
-                    IDInd(IDCnt) = i
+                    IDInd(IDCnt) = I
                     ID(IDCnt) = Hits(j)
                     IDState(IDCnt) = 0
                     IDScan(IDCnt) = Scan
                     IDCnt = IDCnt + 1
                 Next j
              End If
-          Next i
+          Next I
      Case gltABS
           MWAbsErr = ThisDef.MWTol
-          For i = 1 To .CSLines
-             MW = .CSData(i).AverageMW
-             Scan = GelData(CallerID).CSData(i).ScanNumber
+          For I = 1 To .CSLines
+             MW = .CSData(I).AverageMW
+             Scan = GelData(CallerID).CSData(I).ScanNumber
              Select Case ThisDef.NETorRT
              Case glAMT_NET
                 TmpCnt = GetMTHits1(MW, MWAbsErr, GetNET(Scan), ThisDef.NETTol, Hits())
@@ -601,17 +601,17 @@ With GelData(CallerID)
              If TmpCnt > 0 Then
                 For j = 0 To TmpCnt - 1
                     IDType(IDCnt) = glCSType
-                    IDInd(IDCnt) = i
+                    IDInd(IDCnt) = I
                     ID(IDCnt) = Hits(j)
                     IDState(IDCnt) = 0
                     IDScan(IDCnt) = Scan
                     IDCnt = IDCnt + 1   'if reaches limit we will have correct
                 Next j                  'results by doing increase at the end
              End If
-          Next i
-          For i = 1 To .IsoLines
-             MW = GetIsoMass(.IsoData(i), ThisDef.MWField)
-             Scan = GelData(CallerID).IsoData(i).ScanNumber
+          Next I
+          For I = 1 To .IsoLines
+             MW = GetIsoMass(.IsoData(I), ThisDef.MWField)
+             Scan = GelData(CallerID).IsoData(I).ScanNumber
              Select Case ThisDef.NETorRT
              Case glAMT_NET
                 TmpCnt = GetMTHits1(MW, MWAbsErr, GetNET(Scan), ThisDef.NETTol, Hits())
@@ -621,14 +621,14 @@ With GelData(CallerID)
              If TmpCnt > 0 Then
                 For j = 0 To TmpCnt - 1
                     IDType(IDCnt) = glIsoType
-                    IDInd(IDCnt) = i
+                    IDInd(IDCnt) = I
                     ID(IDCnt) = Hits(j)
                     IDState(IDCnt) = 0
                     IDScan(IDCnt) = Scan
                     IDCnt = IDCnt + 1
                 Next j
              End If
-          Next i
+          Next I
     Case Else
           Debug.Assert False
      End Select
@@ -971,19 +971,19 @@ Private Sub CleanIdentifications()
 '-------------------------------------------------------------
 'removes identifications that will not be used from the arrays
 '-------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim NewCnt As Long
 On Error Resume Next
 UpdateStatus "Restructuring data ..."
-For i = 0 To IDCnt - 1
-    If IDState(i) = 0 Then
+For I = 0 To IDCnt - 1
+    If IDState(I) = 0 Then
        NewCnt = NewCnt + 1
-       ID(NewCnt - 1) = ID(i)
-       IDInd(NewCnt - 1) = IDInd(i)
-       IDType(NewCnt - 1) = IDType(i)
-       IDScan(NewCnt - 1) = IDScan(i)
+       ID(NewCnt - 1) = ID(I)
+       IDInd(NewCnt - 1) = IDInd(I)
+       IDType(NewCnt - 1) = IDType(I)
+       IDScan(NewCnt - 1) = IDScan(I)
     End If
-Next i
+Next I
 If NewCnt > 0 Then
    ReDim Preserve ID(NewCnt - 1)
    ReDim Preserve IDInd(NewCnt - 1)
@@ -1057,7 +1057,7 @@ Private Sub ReportAdjustments()
 Dim fso As New FileSystemObject
 Dim ts As TextStream
 Dim fname As String
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 UpdateStatus "Generating report ..."
 fname = GetTempFolder() & RawDataTmpFile
@@ -1072,9 +1072,9 @@ ts.WriteLine "Intercept: " & AdjInt
 ts.WriteLine "Average Deviation: " & AdjAvD
 ts.WriteLine
 ts.WriteLine "ID" & glARG_SEP & "ID_NET" & glARG_SEP & "Scan"
-For i = 0 To IDCnt - 1
-    ts.WriteLine Trim(AMTData(ID(i)).ID) & glARG_SEP & AMTData(ID(i)).NET & glARG_SEP & IDScan(i)
-Next i
+For I = 0 To IDCnt - 1
+    ts.WriteLine Trim(AMTData(ID(I)).ID) & glARG_SEP & AMTData(ID(I)).NET & glARG_SEP & IDScan(I)
+Next I
 ts.Close
 Set fso = Nothing
 UpdateStatus ""
@@ -1089,7 +1089,7 @@ Private Function FillTheGRID() As Boolean
 '----------------------------------------
 'fills GRID arrays with ID information
 '----------------------------------------
-Dim i As Long
+Dim I As Long
 Dim DummyInd() As Long      'dummy array(empty) will allow us to
                             'sort only on one array
 Dim QSL As QSLong
@@ -1097,21 +1097,21 @@ On Error GoTo err_FillTheGRID
 UpdateStatus "Loading data structures ..."
 If IDCnt > 0 And AMTCnt > 0 Then
    ReDim GRID(AMTCnt)      'AMT arrays are 1-based
-   For i = 0 To IDCnt - 1
-       With GRID(ID(i))
+   For I = 0 To IDCnt - 1
+       With GRID(ID(I))
            .Count = .Count + 1
            ReDim Preserve .Members(.Count - 1)
-           .Members(.Count - 1) = i
+           .Members(.Count - 1) = I
        End With
-   Next i
+   Next I
    'order members of each group on scan numbers
-   For i = 0 To AMTCnt
-       If GRID(i).Count > 1 Then
+   For I = 0 To AMTCnt
+       If GRID(I).Count > 1 Then
           Set QSL = New QSLong
-          If Not QSL.QSAsc(GRID(i).Members, DummyInd) Then GoTo err_FillTheGRID
+          If Not QSL.QSAsc(GRID(I).Members, DummyInd) Then GoTo err_FillTheGRID
           Set QSL = Nothing
        End If
-   Next i
+   Next I
    FillTheGRID = True
    UpdateStatus ""
 Else
@@ -1143,11 +1143,11 @@ Private Sub ClearTheGRID()
 '--------------------------------------------
 'destroys GRID data structure
 '--------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
-For i = 0 To UBound(GRID)
-    If GRID(i).Count > 0 Then Erase GRID(i).Members
-Next i
+For I = 0 To UBound(GRID)
+    If GRID(I).Count > 0 Then Erase GRID(I).Members
+Next I
 Erase GRID
 End Sub
 
@@ -1156,18 +1156,18 @@ Private Sub MarkDuplicateIDInstances()
 'sets state of all identifications not first instance
 '(in scan order) to STATE_NOT_1ST_INSTANCE
 '----------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 On Error Resume Next
 UpdateStatus "Eliminating duplicate IDs ..."
-For i = 0 To IDCnt - 1
-    With GRID(ID(i))
+For I = 0 To IDCnt - 1
+    With GRID(ID(I))
          If .Count > 1 Then
             For j = 1 To .Count - 1
                 IDState(.Members(j)) = IDState(.Members(j)) + STATE_NOT_1ST_INSTANCE
             Next j
          End If
     End With
-Next i
+Next I
 UpdateStatus ""
 End Sub
 
@@ -1177,12 +1177,12 @@ Private Sub MarkLongIDs()
 'long range to STATE_TOO_LONG_ELUTION
 '-----------------------------------------------------
 Dim AllowedScanRange As Double
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 On Error Resume Next
 UpdateStatus "Eliminating IDs with long elution ..."
 AllowedScanRange = EliminateHowLong * ScanRange / 100
-For i = 0 To IDCnt - 1
-  With GRID(ID(i))
+For I = 0 To IDCnt - 1
+  With GRID(ID(I))
     If .Count > 1 Then
        If (IDScan(.Members(.Count - 1)) - IDScan(.Members(0))) > AllowedScanRange Then
           For j = 0 To .Count - 1       'mark them all as too long
@@ -1191,7 +1191,7 @@ For i = 0 To IDCnt - 1
        End If
     End If
   End With
-Next i
+Next I
 UpdateStatus ""
 End Sub
 
@@ -1201,14 +1201,14 @@ Private Sub MarkIDsWithBadNET()
 'sets state of all identifications with bad NET numbers
 'to STATE_BAD_NET
 '------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 UpdateStatus "Eliminating IDs with bad elution ..."
-For i = 0 To IDCnt - 1
-    If AMTData(ID(i)).NET < 0 Or AMTData(ID(i)).NET > 1 Then
-       IDState(i) = IDState(i) + STATE_BAD_NET
+For I = 0 To IDCnt - 1
+    If AMTData(ID(I)).NET < 0 Or AMTData(ID(I)).NET > 1 Then
+       IDState(I) = IDState(I) + STATE_BAD_NET
     End If
-Next i
+Next I
 UpdateStatus ""
 End Sub
 
@@ -1242,36 +1242,36 @@ Private Function ScoreIDs() As Boolean
 Dim ScoreOrder() As Long
 Dim Score() As Double
 Dim qsd As New QSDouble
-Dim i As Long
+Dim I As Long
 On Error GoTo err_ScoreIDs
 
 ReDim ScoreOrder(IDCnt - 1)
 ReDim Score(IDCnt - 1)
 With GelData(CallerID)
-    For i = 0 To IDCnt - 1
-        ScoreOrder(i) = i
-        Select Case IDType(i)
+    For I = 0 To IDCnt - 1
+        ScoreOrder(I) = I
+        Select Case IDType(I)
         Case glCSType
-             Score(i) = (Log(.CSData(IDInd(i)).Abundance) / Log(10))
+             Score(I) = (Log(.CSData(IDInd(I)).Abundance) / Log(10))
         Case glIsoType
-             Score(i) = (Log(.IsoData(IDInd(i)).Abundance) / Log(10)) - .IsoData(IDInd(i)).Fit
+             Score(I) = (Log(.IsoData(IDInd(I)).Abundance) / Log(10)) - .IsoData(IDInd(I)).Fit
         End Select
-    Next i
+    Next I
 End With
 If Not qsd.QSDesc(Score(), ScoreOrder()) Then GoTo err_ScoreIDs
 Set qsd = Nothing
 
 If IDCnt > MaxIDToUse Then
-   For i = 0 To MaxIDToUse - 1
-       IDState(ScoreOrder(i)) = 0
-   Next i
-   For i = MaxIDToUse To IDCnt - 1
-       IDState(ScoreOrder(i)) = IDState(ScoreOrder(i)) + STATE_OUTSCORED
-   Next i
+   For I = 0 To MaxIDToUse - 1
+       IDState(ScoreOrder(I)) = 0
+   Next I
+   For I = MaxIDToUse To IDCnt - 1
+       IDState(ScoreOrder(I)) = IDState(ScoreOrder(I)) + STATE_OUTSCORED
+   Next I
 Else
-   For i = 0 To IDCnt - 1
-       IDState(ScoreOrder(i)) = 0
-   Next i
+   For I = 0 To IDCnt - 1
+       IDState(ScoreOrder(I)) = 0
+   Next I
 End If
 ScoreIDs = True
 Exit Function
@@ -1302,19 +1302,6 @@ On Error Resume Next
 GetNET = (ScanNumber - ScanMin) / ScanRange
 End Function
 
-' Unused Function (March 2003)
-'''Private Function GetUnqIDCntUsed() As Long
-''''------------------------------------------------
-''''returns number of unique IDs used in calculation
-''''------------------------------------------------
-'''Dim i As Long, Cnt As Long
-'''On Error Resume Next
-'''For i = 0 To UBound(GRID)
-'''    If GRID(i).Count > 0 Then Cnt = Cnt + 1
-'''Next i
-'''GetUnqIDCntUsed = Cnt
-'''End Function
-
 Private Sub CalculateSlopeIntercept()
 '-----------------------------------------------------
 'least square method to lay best straight line through
@@ -1324,19 +1311,19 @@ Dim SumY As Double
 Dim SumX As Double
 Dim SumXY As Double
 Dim SumXX As Double
-Dim i As Long
+Dim I As Long
 UpdateStatus "Calculating Slope & Intercept"
 SumY = 0
 SumX = 0
 SumXY = 0
 SumXX = 0
 ' Loop through all the selected identifications
-For i = 0 To IDCnt - 1
-    SumX = SumX + IDScan(i)
-    SumY = SumY + AMTData(ID(i)).NET
-    SumXY = SumXY + IDScan(i) * AMTData(ID(i)).NET
-    SumXX = SumXX + CDbl(IDScan(i)) ^ 2
-Next i
+For I = 0 To IDCnt - 1
+    SumX = SumX + IDScan(I)
+    SumY = SumY + AMTData(ID(I)).NET
+    SumXY = SumXY + IDScan(I) * AMTData(ID(I)).NET
+    SumXX = SumXX + CDbl(IDScan(I)) ^ 2
+Next I
 AdjSlp = (IDCnt * SumXY - SumX * SumY) / (IDCnt * SumXX - SumX * SumX)
 AdjInt = (SumY - AdjSlp * SumX) / IDCnt
 Call CalculateAvgDev
@@ -1353,13 +1340,13 @@ End Sub
 
 
 Private Sub CalculateAvgDev()
-Dim i As Long
+Dim I As Long
 Dim TtlDist As Double
 On Error GoTo err_CalculateAvgDev
 TtlDist = 0
-For i = 0 To IDCnt - 1
-    TtlDist = TtlDist + (AdjSlp * IDScan(i) + AdjInt - AMTData(ID(i)).NET) ^ 2
-Next i
+For I = 0 To IDCnt - 1
+    TtlDist = TtlDist + (AdjSlp * IDScan(I) + AdjInt - AMTData(ID(I)).NET) ^ 2
+Next I
 AdjAvD = TtlDist / IDCnt
 Exit Sub
 

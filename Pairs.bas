@@ -183,14 +183,14 @@ LogErrors Err.Number, "AddDltLblPairs"
 End Function
 
 Public Sub ResetERValues(ByVal Ind As Long)
-    Dim i As Long
+    Dim I As Long
     With GelData(Ind)
-        For i = 1 To .CSLines
-            .CSData(i).ExpressionRatio = ER_NO_RATIO
-        Next i
-        For i = 1 To .IsoLines
-            .IsoData(i).ExpressionRatio = ER_NO_RATIO
-        Next i
+        For I = 1 To .CSLines
+            .CSData(I).ExpressionRatio = ER_NO_RATIO
+        Next I
+        For I = 1 To .IsoLines
+            .IsoData(I).ExpressionRatio = ER_NO_RATIO
+        Next I
     End With
 End Sub
 
@@ -248,19 +248,19 @@ Public Sub InitDltLblPairsER(ByVal Ind As Long, _
 'be called before any ER operation
 '----------------------------------------------------------
 On Error Resume Next
-Dim i As Long
+Dim I As Long
 With GelP_D_L(Ind)
     .SearchDef.ERCalcType = ERCalcType
     If .PCnt > 0 Then
-        For i = 0 To .PCnt - 1
-            With .Pairs(i)
+        For I = 0 To .PCnt - 1
+            With .Pairs(I)
                 .ER = 0
                 .ERStDev = 0
                 .ERChargeStateBasisCount = 0
                 ReDim .ERChargesUsed(0)
                 .ERMemberBasisCount = 0
             End With
-        Next i
+        Next I
     End If
 End With
 
@@ -276,7 +276,7 @@ Public Sub CalcDltLblPairsER_Solo(ByVal Ind As Long)
 'individual distribution pairs - solo pairs are always
 'of isotopic peak type
 '-----------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim objDltLblPairsUMC As clsDltLblPairsUMC
 Set objDltLblPairsUMC = New clsDltLblPairsUMC
 
@@ -285,43 +285,30 @@ Call InitDltLblPairsER(Ind, GelP_D_L(Ind).SearchDef.ERCalcType, False)
 With GelP_D_L(Ind)
   Select Case .SearchDef.ERCalcType
   Case ectER_RAT
-    For i = 0 To .PCnt - 1
-        .Pairs(i).ER = objDltLblPairsUMC.ComputeRatioER( _
-                            GelData(Ind).IsoData(.Pairs(i).p1).Abundance, _
-                            GelData(Ind).IsoData(.Pairs(i).p2).Abundance)
-        .Pairs(i).ERMemberBasisCount = 1
-    Next i
+    For I = 0 To .PCnt - 1
+        .Pairs(I).ER = objDltLblPairsUMC.ComputeRatioER( _
+                            GelData(Ind).IsoData(.Pairs(I).p1).Abundance, _
+                            GelData(Ind).IsoData(.Pairs(I).p2).Abundance)
+        .Pairs(I).ERMemberBasisCount = 1
+    Next I
   Case ectER_LOG
-    For i = 0 To .PCnt - 1
-        .Pairs(i).ER = objDltLblPairsUMC.ComputeLogER( _
-                            GelData(Ind).IsoData(.Pairs(i).p1).Abundance, _
-                            GelData(Ind).IsoData(.Pairs(i).p2).Abundance)
-        .Pairs(i).ERMemberBasisCount = 1
-    Next i
+    For I = 0 To .PCnt - 1
+        .Pairs(I).ER = objDltLblPairsUMC.ComputeLogER( _
+                            GelData(Ind).IsoData(.Pairs(I).p1).Abundance, _
+                            GelData(Ind).IsoData(.Pairs(I).p2).Abundance)
+        .Pairs(I).ERMemberBasisCount = 1
+    Next I
   Case ectER_ALT
-    For i = 0 To .PCnt - 1
-        .Pairs(i).ER = objDltLblPairsUMC.ComputeAltER( _
-                            GelData(Ind).IsoData(.Pairs(i).p1).Abundance, _
-                            GelData(Ind).IsoData(.Pairs(i).p2).Abundance)
-        .Pairs(i).ERMemberBasisCount = 1
-    Next i
+    For I = 0 To .PCnt - 1
+        .Pairs(I).ER = objDltLblPairsUMC.ComputeAltER( _
+                            GelData(Ind).IsoData(.Pairs(I).p1).Abundance, _
+                            GelData(Ind).IsoData(.Pairs(I).p2).Abundance)
+        .Pairs(I).ERMemberBasisCount = 1
+    Next I
   End Select
 End With
 AddToAnalysisHistory Ind, "Recalculated expression ratios"
 End Sub
-
-' Unused Function (May 2003)
-'''Public Sub ClearDltLblPairsER(ByVal Ind As Long)
-''''-----------------------------------------------
-''''deletes expression ratio for delta label pairs
-''''-----------------------------------------------
-'''On Error Resume Next
-'''GelP_D_L(Ind).SearchDef.ERCalcType = glER_NONE
-'''Erase GelP_D_L(Ind).P1P2ER
-'''Erase GelP_D_L(Ind).P1P2ERStDev
-'''Erase GelP_D_L(Ind).P1P2ERBasisCount
-'''End Sub
-
 
 Public Function GetERDesc(ByVal ERCalcType As Long) As String
 '--------------------------------------------------------
@@ -358,57 +345,6 @@ Case Else
     GetERDesc = "Unknown"
 End Select
 End Function
-
-' Unused Function (March 2003)
-'''Public Sub DltLblPairsReport(ByVal Ind As Long)
-''''--------------------------------------------------
-''''generates and displays generic DltLbl pairs report
-''''--------------------------------------------------
-'''Dim FileNum As Integer
-'''Dim FileNam As String
-'''Dim sLine As String
-'''Dim i As Long
-'''Dim strSepChar as string
-'''On Error Resume Next
-'''strSepChar = LookupDefaultSeparationCharacter()
-'''If GelP_D_L(Ind).PCnt > 0 Then
-'''   With GelP_D_L(Ind)
-'''     FileNum = FreeFile
-'''     FileNam = GetTempFolder() & RawDataTmpFile
-'''     Open FileNam For Output As FileNum
-'''     'print gel file name and Search definition as reference
-'''     Print #FileNum, "Gel File: " & GelBody(Ind).Caption
-'''
-'''     Print #FileNum, "Label type: "
-'''     Print #FileNum, "Delta type: "
-'''     Print #FileNum, "Delta Mass= " & .SearchDef.DeltaMass
-'''     Print #FileNum, "Label Mass= " & .SearchDef.LightLabelMass
-'''     Print #FileNum, "ER Type: " & GetERDesc(.SearchDef.ERCalcType)
-'''
-'''     sLine = "Lt.ID" & strSepChar & "Lt.MW" & strSepChar & "Lt.Scan" & strSepChar _
-'''           & "Lt.Int" & strSepChar & "Lt.Lbl.Cnt" & strSepChar & "Hv.ID" & strSepChar _
-'''           & "Hv.MW" & strSepChar & "Hv.Scan" & strSepChar & "Hv.Int" & strSepChar _
-'''           & "Hv.Lbl.Cnt" & strSepChar & "Hv.Dlt.Cnt"
-'''
-'''     Print #FileNum, sLine
-'''     For i = 0 To .PCnt - 1
-'''       sLine = .Pairs(i).P1 & strSepChar & GelData(Ind).IsoData(.Pairs(i).P1).MonoisotopicMW & strSepChar _
-'''               & GelData(Ind).IsoData(.Pairs(i).P1, 1) & strSepChar _
-'''               & GelData(Ind).IsoData(.Pairs(i).P1, 3) & strSepChar & .P1LblCnt(i) & strSepChar _
-'''               & .Pairs(i).P2 & strSepChar & GelData(Ind).IsoData(.Pairs(i).P2).MonoisotopicMW & strSepChar _
-'''               & GelData(Ind).IsoData(.Pairs(i).P2, 1) & strSepChar _
-'''               & GelData(Ind).IsoData(.Pairs(i).P2, 3) & strSepChar _
-'''               & .P2LblCnt(i) & strSepChar & .P2DltCnt(i)
-'''       Print #FileNum, sLine
-'''     Next i
-'''     Close FileNum
-'''   End With
-'''   frmDataInfo.Tag = "Dlt_Lbl"
-'''   frmDataInfo.Show vbModal
-'''Else
-'''   MsgBox "No pairs found.", vbOKOnly
-'''End If
-'''End Sub
 
 Public Function PairsLookupFPRType(ByVal lngGelIndex As Long, ByVal blnHeavyPairMember As Boolean) As Long
     
@@ -469,7 +405,7 @@ Public Function PairsResetExclusionFlag(ByVal Ind As Long) As String
 '---------------------------------------------------
 'Resets the exclusion flag for all pairs to glPAIR_Neutral
 '---------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim OKCnt As Long
 Dim DeletedCnt As Long
 Dim strMessage As String
@@ -477,9 +413,9 @@ Dim strMessage As String
 On Error Resume Next
 With GelP_D_L(Ind)
   If .PCnt > 0 Then
-    For i = 0 To .PCnt - 1
-        .Pairs(i).STATE = glPAIR_Neu
-    Next i
+    For I = 0 To .PCnt - 1
+        .Pairs(I).STATE = glPAIR_Neu
+    Next I
     
     strMessage = "Reset all pairs to neutral inclusion state; total pair count = " & .PCnt
   Else
@@ -638,17 +574,17 @@ End Function
 Public Sub PairSearchIncludeNeutralPairs(ByVal lngGelIndex As Long)
     ' Changes the PState() value for those pairs with a state of glPAIR_Neu to glPAIR_Inc
     
-    Dim i As Long
+    Dim I As Long
 
 On Error GoTo PairSearchChangeIncludeNeutralPairsErrorHandler
 
     If GelP_D_L(lngGelIndex).PCnt > 0 Then
         With GelP_D_L(lngGelIndex)
-            For i = 0 To .PCnt - 1
-                If .Pairs(i).STATE = glPAIR_Neu Then
-                   .Pairs(i).STATE = glPAIR_Inc
+            For I = 0 To .PCnt - 1
+                If .Pairs(I).STATE = glPAIR_Neu Then
+                   .Pairs(I).STATE = glPAIR_Inc
                 End If
-            Next i
+            Next I
         End With
     End If
 
@@ -666,7 +602,7 @@ End Sub
 Public Function PairsSearchMarkBadER(ERMin As Double, ERMax As Double, lngGelIndex As Long, blnUMCBasedPairs As Boolean) As String
 ' Returns a status message
 
-Dim i As Long
+Dim I As Long
 Dim lngExclusionCount As Long
 Dim strPairType As String
 Dim strMessage As String
@@ -685,14 +621,14 @@ If GelP_D_L(lngGelIndex).PCnt > 0 Then
         .SearchDef.ERInclusionMax = ERMax
         
         lngExclusionCount = 0
-        For i = 0 To .PCnt - 1
-            If (.Pairs(i).ER < ERMin) Or (.Pairs(i).ER > ERMax) Then
-               .Pairs(i).STATE = glPAIR_Exc
+        For I = 0 To .PCnt - 1
+            If (.Pairs(I).ER < ERMin) Or (.Pairs(I).ER > ERMax) Then
+               .Pairs(I).STATE = glPAIR_Exc
                lngExclusionCount = lngExclusionCount + 1
             Else
-               .Pairs(i).STATE = glPAIR_Inc
+               .Pairs(I).STATE = glPAIR_Inc
             End If
-        Next i
+        Next I
     
         strMessage = "Excluded " & Trim(lngExclusionCount) & " pairs (" & Trim(.PCnt) & " pairs total)"
         
@@ -722,7 +658,7 @@ Public Sub ReportDltLblPairs_S(ByVal Ind As Long, PState As Integer, Optional st
 Dim fname As String
 Dim sLine As String
 Dim LPart As String, HPart As String
-Dim i As Long
+Dim I As Long
 Dim fso As New FileSystemObject
 Dim ts As TextStream
 Dim blnSaveToDiskOnly As Boolean
@@ -775,8 +711,8 @@ With GelP_D_L(Ind)
             & "Hight Scan" & strSepChar & "High Lbl Count" & strSepChar & "Delta Count" & strSepChar & "ER"
             
       ts.WriteLine sLine
-      For i = 0 To .PCnt - 1
-        With .Pairs(i)
+      For I = 0 To .PCnt - 1
+        With .Pairs(I)
             If .STATE = PState Or Abs(PState) <> 1 Then
               LPart = .p1 & strSepChar & Round(GetIsoMass(GelData(Ind).IsoData(.p1), GelData(Ind).Preferences.IsoDataField), 6) & strSepChar _
                        & GelData(Ind).IsoData(.p1).Abundance & strSepChar _
@@ -788,7 +724,7 @@ With GelP_D_L(Ind)
               ts.WriteLine sLine
             End If
         End With
-      Next i
+      Next I
       ts.Close
       DoEvents
       If Not blnSaveToDiskOnly Then
@@ -849,7 +785,7 @@ Private Sub ReportDltLblPairs_UMC(ByVal Ind As Long, _
     '------------------------------------------------------
     Dim fname As String
     Dim sLine As String
-    Dim i As Long
+    Dim I As Long
     Dim intChargeStateBasis As Integer
     Dim fso As New FileSystemObject
     Dim ts As TextStream
@@ -937,8 +873,8 @@ Private Sub ReportDltLblPairs_UMC(ByVal Ind As Long, _
               
             ts.WriteLine sLine
             
-            For i = 0 To .PCnt - 1
-                With .Pairs(i)
+            For I = 0 To .PCnt - 1
+                With .Pairs(I)
                     If .STATE = PState Or Abs(PState) <> 1 Then
                         sLine = ""
                         
@@ -948,7 +884,7 @@ Private Sub ReportDltLblPairs_UMC(ByVal Ind As Long, _
                         
                         ' First the light member
                         ' New method, grabbing values directly from GelUMC().UMCs()
-                        sLine = sLine & i & strSepChar & .p1 & strSepChar & Round(GelUMC(Ind).UMCs(.p1).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.p1).ClassAbundance & strSepChar
+                        sLine = sLine & I & strSepChar & .p1 & strSepChar & Round(GelUMC(Ind).UMCs(.p1).ClassMW, 6) & strSepChar & GelUMC(Ind).UMCs(.p1).ClassAbundance & strSepChar
                         sLine = sLine & .P1LblCnt & strSepChar & GelUMC(Ind).UMCs(.p1).MinScan & strSepChar & GelUMC(Ind).UMCs(.p1).MaxScan & strSepChar
                     
                         ' Record ChargeBasis and UMCMZForChargeBasis
@@ -1004,7 +940,7 @@ Private Sub ReportDltLblPairs_UMC(ByVal Ind As Long, _
                         ts.WriteLine sLine
                     End If
                 End With
-            Next i
+            Next I
             ts.Close
             DoEvents
             
@@ -1052,7 +988,7 @@ Public Sub ReportERStat(ByVal Ind As Long, _
 '------------------------------------------------------
 Dim fname As String
 Dim sLine As String
-Dim i As Long
+Dim I As Long
 Dim fso As New FileSystemObject
 Dim ts As TextStream
 Dim blnSaveToDiskOnly As Boolean
@@ -1095,11 +1031,11 @@ ts.WriteLine
 sLine = "ER Bin" & strSepChar & "All Pairs" & strSepChar _
       & "Included Pairs" & strSepChar & "Excluded Pairs"
 ts.WriteLine sLine
-For i = 0 To 1000
-    sLine = ERBin(i) & strSepChar & ERAll(i) & strSepChar _
-            & ERInc(i) & strSepChar & ERExc(i)
+For I = 0 To 1000
+    sLine = ERBin(I) & strSepChar & ERAll(I) & strSepChar _
+            & ERInc(I) & strSepChar & ERExc(I)
     ts.WriteLine sLine
-Next i
+Next I
 ts.Close
 DoEvents
 If Not blnSaveToDiskOnly Then
@@ -1153,7 +1089,7 @@ Dim dblMassDiff As Double
 Dim dblMassDiffMin As Double
 Dim dblMassDiffMax As Double
 
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim blnKeepMostConfidentAmbiguous As Boolean
 
 blnKeepMostConfidentAmbiguous = glbPreferencesExpanded.PairSearchOptions.KeepMostConfidentAmbiguous
@@ -1167,19 +1103,19 @@ ClsCnt = GelUMC(Ind).UMCCnt
         ReDim ClsHCnt(ClsCnt - 1)
        
         With GelP_D_L(Ind)
-            For i = 0 To .PCnt - 1
-                If Not .Pairs(i).STATE = glPAIR_Exc Then
-                   ClsLCnt(.Pairs(i).p1) = ClsLCnt(.Pairs(i).p1) + 1
-                   ClsHCnt(.Pairs(i).p2) = ClsHCnt(.Pairs(i).p2) + 1
+            For I = 0 To .PCnt - 1
+                If Not .Pairs(I).STATE = glPAIR_Exc Then
+                   ClsLCnt(.Pairs(I).p1) = ClsLCnt(.Pairs(I).p1) + 1
+                   ClsHCnt(.Pairs(I).p2) = ClsHCnt(.Pairs(I).p2) + 1
                 End If
-            Next i
+            Next I
         End With
         
-        For i = 0 To GelP_D_L(Ind).PCnt - 1
-           If Not GelP_D_L(Ind).Pairs(i).STATE = glPAIR_Exc Then
-              If ClsLCnt(GelP_D_L(Ind).Pairs(i).p1) = 1 And ClsHCnt(GelP_D_L(Ind).Pairs(i).p1) = 0 _
-                 And ClsLCnt(GelP_D_L(Ind).Pairs(i).p2) = 0 And ClsHCnt(GelP_D_L(Ind).Pairs(i).p2) = 1 Then
-                 GelP_D_L(Ind).Pairs(i).STATE = glPAIR_Inc
+        For I = 0 To GelP_D_L(Ind).PCnt - 1
+           If Not GelP_D_L(Ind).Pairs(I).STATE = glPAIR_Exc Then
+              If ClsLCnt(GelP_D_L(Ind).Pairs(I).p1) = 1 And ClsHCnt(GelP_D_L(Ind).Pairs(I).p1) = 0 _
+                 And ClsLCnt(GelP_D_L(Ind).Pairs(I).p2) = 0 And ClsHCnt(GelP_D_L(Ind).Pairs(I).p2) = 1 Then
+                 GelP_D_L(Ind).Pairs(I).STATE = glPAIR_Inc
                  IncPairsCnt = IncPairsCnt + 1
               Else
                 ' Ambiguous pair; either the light or heavy UMC is shared among multiple pairs
@@ -1188,10 +1124,10 @@ ClsCnt = GelUMC(Ind).UMCCnt
                     ' ToDo: Check this; decide whether or not to check for ClsHCnt() = 0
                     ' Debug.Assert False
                     
-                    If ClsLCnt(GelP_D_L(Ind).Pairs(i).p1) > 1 And ClsHCnt(GelP_D_L(Ind).Pairs(i).p1) = 0 Then
+                    If ClsLCnt(GelP_D_L(Ind).Pairs(I).p1) > 1 And ClsHCnt(GelP_D_L(Ind).Pairs(I).p1) = 0 Then
                     End If
                     
-                    If ClsLCnt(GelP_D_L(Ind).Pairs(i).p1) > 1 Then
+                    If ClsLCnt(GelP_D_L(Ind).Pairs(I).p1) > 1 Then
                         ' The light member of the pair is a member of several pairs, and it is the light member in all of them
                         ' Only keep one of the pairs that the light member is a member of
                         ' Choose the pair to keep based on the one with the largest sum of Light + Heavy
@@ -1201,7 +1137,7 @@ ClsCnt = GelUMC(Ind).UMCCnt
                             MatchingPairsCount = 0
                             ReDim MatchingPairs(0)
                             For j = 0 To .PCnt - 1
-                                If .Pairs(j).p1 = .Pairs(i).p1 Then
+                                If .Pairs(j).p1 = .Pairs(I).p1 Then
                                     ReDim Preserve MatchingPairs(MatchingPairsCount)
                                     MatchingPairs(MatchingPairsCount) = j
                                     MatchingPairsCount = MatchingPairsCount + 1
@@ -1215,12 +1151,12 @@ ClsCnt = GelUMC(Ind).UMCCnt
                         Else
                             ' This shouldn't happen
                             Debug.Assert False
-                             GelP_D_L(Ind).Pairs(i).STATE = glPAIR_Inc
+                             GelP_D_L(Ind).Pairs(I).STATE = glPAIR_Inc
                             IncPairsCnt = IncPairsCnt + 1
                         End If
                         
                     'ElseIf ClsLCnt(GelP_D_L(Ind).Pairs(i).P2) = 0 And ClsHCnt(GelP_D_L(Ind).Pairs(i).P1) > 1 Then
-                    ElseIf ClsHCnt(GelP_D_L(Ind).Pairs(i).p1) > 1 Then
+                    ElseIf ClsHCnt(GelP_D_L(Ind).Pairs(I).p1) > 1 Then
                         ' The heavy member of the pair is a member of several pairs, and it is the heavy member in all of them
                         ' Choose the pair to keep based on the one with the largest sum of Light + Heavy
                         ' However, since we perform database searching based on the light member's mass, we'll only examine those pairs that have the same
@@ -1230,14 +1166,14 @@ ClsCnt = GelUMC(Ind).UMCCnt
                         '  if they have the same spacing between the light and heavy members
                         With GelP_D_L(Ind)
                         
-                            dblMassDiff = Abs(GelUMC(Ind).UMCs(.Pairs(i).p2).ClassMW - GelUMC(Ind).UMCs(.Pairs(i).p1).ClassMW)
+                            dblMassDiff = Abs(GelUMC(Ind).UMCs(.Pairs(I).p2).ClassMW - GelUMC(Ind).UMCs(.Pairs(I).p1).ClassMW)
                             dblMassDiffMin = dblMassDiff - .SearchDef.DeltaMassTolerance * 2
                             dblMassDiffMax = dblMassDiff + .SearchDef.DeltaMassTolerance * 2
                             
                             MatchingPairsCount = 0
                             ReDim MatchingPairs(0)
                             For j = 0 To .PCnt - 1
-                                If .Pairs(j).p2 = .Pairs(i).p2 Then
+                                If .Pairs(j).p2 = .Pairs(I).p2 Then
                                     ' Make sure the mass difference is allowable
                                     dblMassDiff = Abs(GelUMC(Ind).UMCs(.Pairs(j).p2).ClassMW - GelUMC(Ind).UMCs(.Pairs(j).p1).ClassMW)
                                     
@@ -1256,21 +1192,21 @@ ClsCnt = GelUMC(Ind).UMCCnt
                         Else
                             ' This shouldn't happen
                             Debug.Assert False
-                             GelP_D_L(Ind).Pairs(i).STATE = glPAIR_Inc
+                             GelP_D_L(Ind).Pairs(I).STATE = glPAIR_Inc
                             IncPairsCnt = IncPairsCnt + 1
                         End If
                         
                     Else
                         ' Since we don't know what else to do, exclude the pair
-                        GelP_D_L(Ind).Pairs(i).STATE = glPAIR_Exc
+                        GelP_D_L(Ind).Pairs(I).STATE = glPAIR_Exc
                     End If
                     
                 Else
-                    GelP_D_L(Ind).Pairs(i).STATE = glPAIR_Exc
+                    GelP_D_L(Ind).Pairs(I).STATE = glPAIR_Exc
                 End If
               End If
            End If
-       Next i
+       Next I
        ResolveDltLblPairsUMC = IncPairsCnt
     Else
        ResolveDltLblPairsUMC = -1
@@ -1283,27 +1219,27 @@ Private Sub ResolveDltLblPairsUMCFindBest(ByVal Ind As Long, MatchingPairs() As 
     Dim dblHighestSum As Double
     Dim dblCompareSum As Double
     Dim IndexBestSum As Long
-    Dim i As Long
+    Dim I As Long
     
     With GelP_D_L(Ind)
         dblHighestSum = GelUMC(Ind).UMCs(.Pairs(0).p1).ClassAbundance + GelUMC(Ind).UMCs(.Pairs(0).p2).ClassAbundance
         IndexBestSum = 0
             
         ' Determine the pair with the highest sum of Light + Heavy
-        For i = 1 To MatchingPairsCount - 1
-            dblCompareSum = GelUMC(Ind).UMCs(.Pairs(MatchingPairs(i)).p1).ClassAbundance + GelUMC(Ind).UMCs(.Pairs(MatchingPairs(i)).p2).ClassAbundance
+        For I = 1 To MatchingPairsCount - 1
+            dblCompareSum = GelUMC(Ind).UMCs(.Pairs(MatchingPairs(I)).p1).ClassAbundance + GelUMC(Ind).UMCs(.Pairs(MatchingPairs(I)).p2).ClassAbundance
             If dblCompareSum > dblHighestSum Then
                 dblHighestSum = dblCompareSum
-                IndexBestSum = i
+                IndexBestSum = I
             End If
-        Next i
+        Next I
         
         ' Exclude all pairs in MatchingPairs() except the one at IndexBestSum
-        For i = 0 To MatchingPairsCount - 1
-            If i <> IndexBestSum Then
-                .Pairs(MatchingPairs(i)).STATE = glPAIR_Exc
+        For I = 0 To MatchingPairsCount - 1
+            If I <> IndexBestSum Then
+                .Pairs(MatchingPairs(I)).STATE = glPAIR_Exc
             End If
-        Next i
+        Next I
     End With
     
 End Sub
@@ -1326,7 +1262,7 @@ Dim IsoLCnt() As Long      'parallel with isotopic data-shows how
 Dim IsoHCnt() As Long      'many times each peak was used as L/H
 Dim IsoCnt As Long
 Dim IncPairsCnt As Long
-Dim i As Long
+Dim I As Long
 IsoCnt = GelData(Ind).IsoLines
 With GelP_D_L(Ind)
     If .PCnt > 0 And IsoCnt > 0 Then
@@ -1334,25 +1270,25 @@ With GelP_D_L(Ind)
        'heavy member of a pair(ignore already excluded pairs)
        ReDim IsoLCnt(IsoCnt)
        ReDim IsoHCnt(IsoCnt)
-       For i = 0 To .PCnt - 1
-           If Not .Pairs(i).STATE = glPAIR_Exc Then
-              IsoLCnt(.Pairs(i).p1) = IsoLCnt(.Pairs(i).p1) + 1
-              IsoHCnt(.Pairs(i).p2) = IsoHCnt(.Pairs(i).p2) + 1
+       For I = 0 To .PCnt - 1
+           If Not .Pairs(I).STATE = glPAIR_Exc Then
+              IsoLCnt(.Pairs(I).p1) = IsoLCnt(.Pairs(I).p1) + 1
+              IsoHCnt(.Pairs(I).p2) = IsoHCnt(.Pairs(I).p2) + 1
            End If
-       Next i
+       Next I
        'there could be more sophisticated ways to resolve
        'pairs to get higher number of resolved OK pairs
-       For i = 0 To .PCnt - 1
-           If Not .Pairs(i).STATE = glPAIR_Exc Then
-              If IsoLCnt(.Pairs(i).p1) = 1 And IsoHCnt(.Pairs(i).p1) = 0 _
-                 And IsoLCnt(.Pairs(i).p2) = 0 And IsoHCnt(.Pairs(i).p2) = 1 Then
-                 .Pairs(i).STATE = glPAIR_Inc
+       For I = 0 To .PCnt - 1
+           If Not .Pairs(I).STATE = glPAIR_Exc Then
+              If IsoLCnt(.Pairs(I).p1) = 1 And IsoHCnt(.Pairs(I).p1) = 0 _
+                 And IsoLCnt(.Pairs(I).p2) = 0 And IsoHCnt(.Pairs(I).p2) = 1 Then
+                 .Pairs(I).STATE = glPAIR_Inc
                  IncPairsCnt = IncPairsCnt + 1
               Else
-                 .Pairs(i).STATE = glPAIR_Exc
+                 .Pairs(I).STATE = glPAIR_Exc
               End If
            End If
-       Next i
+       Next I
        ResolveDltLblPairs_S = IncPairsCnt
     Else
        ResolveDltLblPairs_S = -1
@@ -1365,7 +1301,7 @@ Public Function DeleteExcludedPairs(ByVal Ind As Long) As String
 'deletes pairs marked as glPAIR_Exc to save some mem
 'returns a status message
 '---------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim OKCnt As Long
 Dim DeletedCnt As Long
 Dim strMessage As String
@@ -1373,14 +1309,14 @@ Dim strMessage As String
 On Error Resume Next
 With GelP_D_L(Ind)
   If .PCnt > 0 Then
-    For i = 0 To .PCnt - 1
-        If .Pairs(i).STATE <> glPAIR_Exc Then
+    For I = 0 To .PCnt - 1
+        If .Pairs(I).STATE <> glPAIR_Exc Then
            OKCnt = OKCnt + 1
-           .Pairs(OKCnt - 1) = .Pairs(i)
+           .Pairs(OKCnt - 1) = .Pairs(I)
         Else
             DeletedCnt = DeletedCnt + 1
         End If
-    Next i
+    Next I
     .PCnt = OKCnt
     If .PCnt > 0 Then
        ReDim Preserve .Pairs(.PCnt - 1)
@@ -1424,7 +1360,7 @@ Public Sub FillUMC_ERs(ByVal Ind As Long)
 'fills expression numbers from GelP_D_L to data arrays
 'UMC pairs
 '-----------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim CurrType As Long
 Dim CurrInd As Long
 Dim CurrER As Double
@@ -1436,14 +1372,14 @@ ResetERValues Ind
 
 ' Now copy the ER values from .Pairs().ER to .ExpressionRatio
 With GelP_D_L(Ind)
-    For i = 0 To .PCnt - 1
-        CurrER = .Pairs(i).ER
+    For I = 0 To .PCnt - 1
+        CurrER = .Pairs(I).ER
         If CurrER < glHugeUnderExp Then
             CurrER = glHugeUnderExp
         ElseIf CurrER > glHugeOverExp Then
             CurrER = glHugeOverExp
         End If
-        With GelUMC(Ind).UMCs(.Pairs(i).p1)
+        With GelUMC(Ind).UMCs(.Pairs(I).p1)
             For j = 0 To .ClassCount - 1
                 CurrType = .ClassMType(j)
                 CurrInd = .ClassMInd(j)
@@ -1455,7 +1391,7 @@ With GelP_D_L(Ind)
                 End Select
             Next j
         End With
-        With GelUMC(Ind).UMCs(.Pairs(i).p2)
+        With GelUMC(Ind).UMCs(.Pairs(I).p2)
             For j = 0 To .ClassCount - 1
                 CurrType = .ClassMType(j)
                 CurrInd = .ClassMInd(j)
@@ -1467,7 +1403,7 @@ With GelP_D_L(Ind)
                 End Select
             Next j
         End With
-    Next i
+    Next I
 End With
     
 GelStatus(Ind).Dirty = True
@@ -1485,7 +1421,7 @@ Public Sub FillSolo_ERs(ByVal Ind As Long)
 'fills expression numbers from GelP_D_L to data arrays
 'Solo pairs
 '-----------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 
 ' Initialize all of the ER entries to 0
@@ -1493,17 +1429,17 @@ ResetERValues Ind
 
 ' Now copy the ER values from .Pairs(i).ER to .IsoData().ExpressionRatio
 With GelP_D_L(Ind)
-    For i = 0 To .PCnt - 1
-        GelData(Ind).IsoData(.Pairs(i).p1).ExpressionRatio = .Pairs(i).ER
-        GelData(Ind).IsoData(.Pairs(i).p2).ExpressionRatio = .Pairs(i).ER
-    Next i
+    For I = 0 To .PCnt - 1
+        GelData(Ind).IsoData(.Pairs(I).p1).ExpressionRatio = .Pairs(I).ER
+        GelData(Ind).IsoData(.Pairs(I).p2).ExpressionRatio = .Pairs(I).ER
+    Next I
 End With
 
 GelStatus(Ind).Dirty = True
 
 End Sub
 
-Public Function ChargeStatesMatch(ByVal lngGelIndex As Long, ByVal i As Long, ByVal j As Long) As Boolean
+Public Function ChargeStatesMatch(ByVal lngGelIndex As Long, ByVal I As Long, ByVal j As Long) As Boolean
     ' Checks if the two LC-MS Features have matching charge states
     ' i and j specify the UMC indices in GelUMC(lngGelIndex).UMCs()
     '
@@ -1515,9 +1451,9 @@ Public Function ChargeStatesMatch(ByVal lngGelIndex As Long, ByVal i As Long, By
     
     blnChargesMatch = False
     With GelUMC(lngGelIndex)
-        For intIndex = 0 To .UMCs(i).ChargeStateCount - 1
+        For intIndex = 0 To .UMCs(I).ChargeStateCount - 1
             For intIndexCompare = 0 To .UMCs(j).ChargeStateCount - 1
-                If .UMCs(i).ChargeStateBasedStats(intIndex).Charge = .UMCs(j).ChargeStateBasedStats(intIndexCompare).Charge Then
+                If .UMCs(I).ChargeStateBasedStats(intIndex).Charge = .UMCs(j).ChargeStateBasedStats(intIndexCompare).Charge Then
                     blnChargesMatch = True
                     Exit For
                 End If
@@ -1530,7 +1466,7 @@ Public Function ChargeStatesMatch(ByVal lngGelIndex As Long, ByVal i As Long, By
     
 End Function
 
-Public Function PairsOverlapAtEdgesWithinTol(ByVal lngGelIndex As Long, ByVal i As Long, ByVal j As Long, ByVal lngScanTolerance As Long) As Boolean
+Public Function PairsOverlapAtEdgesWithinTol(ByVal lngGelIndex As Long, ByVal I As Long, ByVal j As Long, ByVal lngScanTolerance As Long) As Boolean
     ' Checks if the two LC-MS Features overlap at the edges
     ' i and j specify the UMC indices in GelUMC(lngGelIndex).UMCs()
     '
@@ -1540,15 +1476,15 @@ Public Function PairsOverlapAtEdgesWithinTol(ByVal lngGelIndex As Long, ByVal i 
     
     blnOverlap = False
     With GelUMC(lngGelIndex)
-        If ((Abs(.UMCs(j).MinScan - .UMCs(i).MinScan) <= lngScanTolerance) And _
-            (Abs(.UMCs(j).MaxScan - .UMCs(i).MaxScan) <= lngScanTolerance)) Then
+        If ((Abs(.UMCs(j).MinScan - .UMCs(I).MinScan) <= lngScanTolerance) And _
+            (Abs(.UMCs(j).MaxScan - .UMCs(I).MaxScan) <= lngScanTolerance)) Then
             blnOverlap = True
         Else
            ' If beginnings and/or ends differ by more than ScanTol
            ' but one class is completely overlapped with another,
            ' then this still can be considered a good pair
-           If (.UMCs(j).MinScan <= .UMCs(i).MinScan And .UMCs(j).MaxScan >= .UMCs(i).MaxScan) Or _
-              (.UMCs(i).MinScan <= .UMCs(j).MinScan And .UMCs(i).MaxScan >= .UMCs(j).MaxScan) Then
+           If (.UMCs(j).MinScan <= .UMCs(I).MinScan And .UMCs(j).MaxScan >= .UMCs(I).MaxScan) Or _
+              (.UMCs(I).MinScan <= .UMCs(j).MinScan And .UMCs(I).MaxScan >= .UMCs(j).MaxScan) Then
                 blnOverlap = True
             End If
         End If
@@ -1565,7 +1501,7 @@ Public Function UpdateUMCsPairingStatus(ByVal lngGelIndex As Long, ByRef eClsPai
     'Note that this function skips excluded pairs
     '----------------------------------------------------------------------
     
-    Dim i As Long
+    Dim I As Long
     
     On Error GoTo UpdateUMCsPairingStatusErrorHandler
     
@@ -1579,8 +1515,8 @@ Public Function UpdateUMCsPairingStatus(ByVal lngGelIndex As Long, ByRef eClsPai
     
     With GelP_D_L(lngGelIndex)
         If .PCnt > 0 Then
-            For i = 0 To .PCnt - 1
-                With .Pairs(i)
+            For I = 0 To .PCnt - 1
+                With .Pairs(I)
                     If .STATE <> glPAIR_Exc Then
                         'light class
                         Select Case eClsPaired(.p1)
@@ -1613,7 +1549,7 @@ Public Function UpdateUMCsPairingStatus(ByVal lngGelIndex As Long, ByRef eClsPai
                         End Select
                     End If
                 End With
-            Next i
+            Next I
         End If
     End With
     UpdateUMCsPairingStatus = True

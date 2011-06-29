@@ -2,7 +2,7 @@ VERSION 5.00
 Begin VB.Form frmPairBrowser 
    Caption         =   "Pair Browser"
    ClientHeight    =   9285
-   ClientLeft      =   165
+   ClientLeft      =   225
    ClientTop       =   855
    ClientWidth     =   7545
    LinkTopic       =   "Form1"
@@ -440,8 +440,8 @@ On Error GoTo AutoZoom2DPlotErrorHandler
 
     ' Determine the UMC indices for this pair's members
     With GelP_D_L(CallerIDLoaded).Pairs(lngPairIndexOriginal)
-        lngUMCIndexLight = .P1
-        lngUMCIndexHeavy = .P2
+        lngUMCIndexLight = .p1
+        lngUMCIndexHeavy = .p2
     End With
     
     BrowseFeaturesZoomAndHighlight2DPlot glbPreferencesExpanded.PairBrowserPlottingOptions, CallerIDLoaded, lngUMCIndexLight, lngUMCIndexHeavy
@@ -510,7 +510,7 @@ On Error GoTo DeleteMarkedPairsErrorHandler
                 If mPairsAreFilteredForHitsOnly Then
                     For lngPairIndex = 0 To .PCnt - 1
                         If Not blnOriginalPairEntryExamined(lngPairIndex) Then
-                            Debug.Assert Not IsAMTReferencedByUMC(GelUMC(CallerIDLoaded).UMCs(.Pairs(lngPairIndex).P1), CallerIDLoaded)
+                            Debug.Assert Not IsAMTReferencedByUMC(GelUMC(CallerIDLoaded).UMCs(.Pairs(lngPairIndex).p1), CallerIDLoaded)
                             
                             udtNewPairList(lngNewPairCount) = .Pairs(lngPairIndex)
                             blnOriginalPairEntryExamined(lngPairIndex) = True
@@ -853,7 +853,7 @@ On Error GoTo GeneratePairDescriptionErrorHandler
 
     lngPairIndexOriginal = mPairInfoOrignalIndex(lngPairIndexDereferenced)
     
-    With GelUMC(CallerIDLoaded).UMCs(GelP_D_L(CallerIDLoaded).Pairs(lngPairIndexOriginal).P1)
+    With GelUMC(CallerIDLoaded).UMCs(GelP_D_L(CallerIDLoaded).Pairs(lngPairIndexOriginal).p1)
         strDBMatchList = FixNull(GelData(CallerIDLoaded).IsoData(.ClassRepInd).MTID)
         
         ' Extract just the MTID's from this list
@@ -862,8 +862,8 @@ On Error GoTo GeneratePairDescriptionErrorHandler
     
     With GelP_D_L(CallerIDLoaded).Pairs(lngPairIndexOriginal)
     
-        udtUMCLight = GelUMC(CallerIDLoaded).UMCs(.P1)
-        udtUMCHeavy = GelUMC(CallerIDLoaded).UMCs(.P2)
+        udtUMCLight = GelUMC(CallerIDLoaded).UMCs(.p1)
+        udtUMCHeavy = GelUMC(CallerIDLoaded).UMCs(.p2)
     
         If Not blnVerbose Then
             strDescription = "#" & Trim(lngPairIndexOriginal) & ", "
@@ -877,7 +877,7 @@ On Error GoTo GeneratePairDescriptionErrorHandler
             strDescriptionAddnl = ""
         Else
             strDescription = ""
-            strDescription = strDescription & "LC-MS Features " & .P1 & " and " & .P2 & vbCrLf
+            strDescription = strDescription & "LC-MS Features " & .p1 & " and " & .p2 & vbCrLf
             strDescription = strDescription & "Abundances " & DoubleToStringScientific(udtUMCLight.ClassAbundance, 3)
             strDescription = strDescription & " and " & DoubleToStringScientific(udtUMCHeavy.ClassAbundance, 3) & vbCrLf
             
@@ -1072,7 +1072,7 @@ On Error GoTo PopulateControlsErrorHandler
                     For lngPairIndex = 0 To .PCnt - 1
                         
                         With .Pairs(lngPairIndex)
-                            If IsAMTReferencedByUMC(GelUMC(CallerIDLoaded).UMCs(.P1), CallerIDLoaded) Then
+                            If IsAMTReferencedByUMC(GelUMC(CallerIDLoaded).UMCs(.p1), CallerIDLoaded) Then
                                 blnAddPair = True
                             Else
                                 blnAddPair = False
@@ -1212,11 +1212,11 @@ On Error GoTo SortAndDisplayPairsErrorHandler
             Select Case cboPairSortOrder.ListIndex
             Case epsMass
                 For lngIndex = 0 To mPairsCount - 1
-                    dblDataToSort(lngIndex) = GelUMC(CallerIDLoaded).UMCs(.Pairs(mPairInfoOrignalIndex(lngIndex)).P1).ClassMW
+                    dblDataToSort(lngIndex) = GelUMC(CallerIDLoaded).UMCs(.Pairs(mPairInfoOrignalIndex(lngIndex)).p1).ClassMW
                 Next lngIndex
             Case epsTime
                 For lngIndex = 0 To mPairsCount - 1
-                    lngUMCIndexOriginal = .Pairs(mPairInfoOrignalIndex(lngIndex)).P1
+                    lngUMCIndexOriginal = .Pairs(mPairInfoOrignalIndex(lngIndex)).p1
                     With GelUMC(CallerIDLoaded).UMCs(lngUMCIndexOriginal)
                         Select Case .ClassRepType
                         Case gldtCS
@@ -1229,8 +1229,8 @@ On Error GoTo SortAndDisplayPairsErrorHandler
             Case epsAbundance
                 For lngIndex = 0 To mPairsCount - 1
                     ' Sum of light and heavy member abundances
-                    dblDataToSort(lngIndex) = GelUMC(CallerIDLoaded).UMCs(.Pairs(mPairInfoOrignalIndex(lngIndex)).P1).ClassAbundance
-                    dblDataToSort(lngIndex) = dblDataToSort(lngIndex) + GelUMC(CallerIDLoaded).UMCs(.Pairs(mPairInfoOrignalIndex(lngIndex)).P2).ClassAbundance
+                    dblDataToSort(lngIndex) = GelUMC(CallerIDLoaded).UMCs(.Pairs(mPairInfoOrignalIndex(lngIndex)).p1).ClassAbundance
+                    dblDataToSort(lngIndex) = dblDataToSort(lngIndex) + GelUMC(CallerIDLoaded).UMCs(.Pairs(mPairInfoOrignalIndex(lngIndex)).p2).ClassAbundance
                 Next lngIndex
             Case epsER
                 For lngIndex = 0 To mPairsCount - 1
@@ -1414,8 +1414,8 @@ On Error GoTo UpdatePlotForPairErrorHandler
         blnUseMaxValueEachScan = .SearchDef.UseIdenticalChargesForER
         
         With .Pairs(lngPairIndexOriginal)
-            lngUMCIndexLight = .P1
-            lngUMCIndexHeavy = .P2
+            lngUMCIndexLight = .p1
+            lngUMCIndexHeavy = .p2
         
             If .ERChargeStateBasisCount > 0 Then
                 ' Copy the .ERChargesUsed() array to intChargesUsed()
@@ -1557,177 +1557,6 @@ Private Sub UpdateStatus(ByVal strMessage As String, Optional blnAppendOnOffText
     
     ctlStatus.AddMessageText strMessage
 End Sub
-
-' Unused Function (February 2005)
-''Private Sub PopulateUMCPlotData(intChargesUsed() As Integer, ByVal lngUMCIndex As Long, ByRef lngDataPointCount As Long, ByRef dblScanData() As Double, ByRef dblAbuData() As Double, ByVal blnUseMaxValueEachScan As Boolean)
-''    ' Note that the arrays are 1-based, for compatibility reasons with the plot control
-''
-''    Dim lngScanMin As Long
-''    Dim lngScanIndex As Long
-''    Dim lngScanCountNew As Long
-''
-''    Dim lngGapSize As Long
-''    Dim lngMaxGapSize As Long
-''    Dim lngScanIndexCompare As Long
-''
-''    Dim blnCopyDataPoint As Boolean
-''    Dim blnCopyingGapData As Boolean
-''
-''    Dim intChargeIndex As Integer
-''
-''    With GelUMC(CallerIDLoaded).UMCs(lngUMCIndex)
-''        lngScanMin = .MinScan
-''        lngDataPointCount = .MaxScan - lngScanMin + 1
-''    End With
-''
-''    ReDim dblScanData(1 To lngDataPointCount)
-''    ReDim dblAbuData(1 To lngDataPointCount)
-''
-''    For lngScanIndex = 1 To lngDataPointCount
-''        dblScanData(lngScanIndex) = lngScanIndex + lngScanMin - 1
-''    Next lngScanIndex
-''
-''
-''    If glbPreferencesExpanded.PairBrowserPlottingOptions.PlotAllChargeStates Or intChargesUsed(0) = 0 Then
-''        ' Sum all charge states
-''        PopulateUMCAbuDataWork dblAbuData(), CallerIDLoaded, lngUMCIndex, 0, lngScanMin, False
-''    Else
-''        ' Only use the charge states listed in intChargesUsed
-''        For intChargeIndex = 0 To UBound(intChargesUsed())
-''            PopulateUMCAbuDataWork dblAbuData(), CallerIDLoaded, lngUMCIndex, intChargesUsed(intChargeIndex), lngScanMin, blnUseMaxValueEachScan
-''        Next intChargeIndex
-''    End If
-''
-''    ' Remove the points with an abundance of 0, provided the gap size is less than
-''    lngMaxGapSize = GelUMC(CallerIDLoaded).def.InterpolateMaxGapSize
-''
-''    lngScanCountNew = 0
-''    blnCopyingGapData = False
-''    For lngScanIndex = 1 To lngDataPointCount
-''        If dblAbuData(lngScanIndex) = 0 Then
-''            If blnCopyingGapData Then
-''                blnCopyDataPoint = True
-''            Else
-''                If lngScanIndex = 1 Or lngScanIndex = lngDataPointCount Then
-''                    blnCopyDataPoint = True
-''                Else
-''                    lngGapSize = lngDataPointCount - lngScanIndex + 1
-''                    blnCopyDataPoint = False
-''                    For lngScanIndexCompare = lngScanIndex + 1 To lngDataPointCount
-''                        If dblAbuData(lngScanIndexCompare) > 0 Then
-''                            ' Find the gap distance to the next scan with data
-''                            lngGapSize = dblScanData(lngScanIndexCompare) - dblScanData(lngScanIndex)
-''                            Exit For
-''                        End If
-''                    Next lngScanIndexCompare
-''
-''                    ' This should possibly be: If lngGapSize > lngMaxGapSize Then
-''                    If lngGapSize > lngMaxGapSize Then
-''                        blnCopyingGapData = True
-''                        blnCopyDataPoint = True
-''                    End If
-''                End If
-''            End If
-''        Else
-''            blnCopyDataPoint = True
-''            blnCopyingGapData = False
-''        End If
-''
-''        If blnCopyDataPoint Then
-''            lngScanCountNew = lngScanCountNew + 1
-''            dblScanData(lngScanCountNew) = dblScanData(lngScanIndex)
-''            dblAbuData(lngScanCountNew) = dblAbuData(lngScanIndex)
-''        End If
-''    Next lngScanIndex
-''
-''    If lngScanCountNew <= 0 Then
-''        ReDim dblScanData(1 To 1)
-''        ReDim dblAbuData(1 To 1)
-''        lngScanCountNew = 0
-''    Else
-''        ' Make sure there is a zero at the beginning of the array
-''        If dblAbuData(1) <> 0 Then
-''            lngScanCountNew = lngScanCountNew + 1
-''            If lngScanCountNew > lngDataPointCount Then
-''                ReDim Preserve dblScanData(1 To lngScanCountNew)
-''                ReDim Preserve dblAbuData(1 To lngScanCountNew)
-''            End If
-''
-''            For lngScanIndex = lngScanCountNew To 2 Step -1
-''                dblAbuData(lngScanIndex) = dblAbuData(lngScanIndex - 1)
-''                dblScanData(lngScanIndex) = dblScanData(lngScanIndex - 1)
-''            Next lngScanIndex
-''
-''            dblAbuData(1) = 0
-''            dblScanData(1) = dblScanData(2) - 1
-''        End If
-''
-''        ' Make sure there is a zero at the end of the array
-''        If dblAbuData(lngScanCountNew) <> 0 Then
-''            lngScanCountNew = lngScanCountNew + 1
-''            If lngScanCountNew > lngDataPointCount Then
-''                ReDim Preserve dblScanData(1 To lngScanCountNew)
-''                ReDim Preserve dblAbuData(1 To lngScanCountNew)
-''            End If
-''
-''            dblAbuData(lngScanCountNew) = 0
-''            dblScanData(lngScanCountNew) = dblScanData(lngScanCountNew - 1) + 1
-''        End If
-''
-''        If lngScanCountNew < lngDataPointCount Then
-''            ReDim Preserve dblScanData(1 To lngScanCountNew)
-''            ReDim Preserve dblAbuData(1 To lngScanCountNew)
-''        End If
-''        lngDataPointCount = lngScanCountNew
-''    End If
-''
-''End Sub
-''
-' Unused Function (February 2005)
-''Private Sub PopulateUMCAbuDataWork(ByRef dblAbundance() As Double, ByVal lngGelIndex As Long, ByVal UMCIndex As Long, ByVal intTargetCharge As Integer, ByVal lngScanNumberStart As Long, blnUseMaxValueEachScan As Boolean)
-''    ' Note: The algorithms in this function are the same as those in
-''    '       Pairs.bas->CalcDltLblPairsScanByScanPopulate
-''    '
-''    ' Note that the dblAbundance() array is 1-based, for compatibility reasons with the plot control
-''
-''    Dim lngMemberIndex As Long
-''    Dim lngScan As Long, lngScanIndex As Long
-''    Dim intCharge As Integer
-''    Dim dblAbu As Double
-''
-''    With GelUMC(lngGelIndex).UMCs(UMCIndex)
-''        For lngMemberIndex = 0 To .ClassCount - 1
-''            Select Case .ClassMType(lngMemberIndex)
-''            Case gldtCS
-''                 lngScan = GelData(lngGelIndex).CSData(.ClassMInd(lngMemberIndex)).ScanNumber
-''                 intCharge = GelData(lngGelIndex).CSData(.ClassMInd(lngMemberIndex)).Charge
-''                 dblAbu = GelData(lngGelIndex).CSData(.ClassMInd(lngMemberIndex)).Abundance
-''            Case gldtIS
-''                 lngScan = GelData(lngGelIndex).IsoData(.ClassMInd(lngMemberIndex)).ScanNumber
-''                 intCharge = GelData(lngGelIndex).IsoData(.ClassMInd(lngMemberIndex)).Charge
-''                 dblAbu = GelData(lngGelIndex).IsoData(.ClassMInd(lngMemberIndex)).Abundance
-''            End Select
-''
-''            If intTargetCharge <= 0 Or intCharge = intTargetCharge Then
-''                ' Note: Must add 1 due to 1-based array
-''                lngScanIndex = lngScan - lngScanNumberStart + 1
-''                If lngScanIndex < 1 Then
-''                    ' This shouldn't happen
-''                    Debug.Assert False
-''                Else
-''                    If blnUseMaxValueEachScan Then
-''                        If dblAbu > dblAbundance(lngScanIndex) Then
-''                            dblAbundance(lngScanIndex) = dblAbu
-''                        End If
-''                    Else
-''                        dblAbundance(lngScanIndex) = dblAbundance(lngScanIndex) + dblAbu
-''                    End If
-''                End If
-''            End If
-''        Next lngMemberIndex
-''    End With
-''
-''End Sub
 
 Private Sub UndoPairDeletion()
     Dim lngIndex As Long

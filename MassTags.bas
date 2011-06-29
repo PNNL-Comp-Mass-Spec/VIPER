@@ -1082,22 +1082,6 @@ err_LoadMassTagToProteinMapping:
     GoTo exit_LoadMassTagToProteinMapping
 End Function
 
-
-' Unused Function (May 2003)
-'''Public Function GetMassTagsLoadArgs() As String
-''''------------------------------------------------
-''''returns description of parameters used to load
-''''currently loaded MT tags
-''''------------------------------------------------
-'''Dim Tmp As String
-'''Tmp = "MTSubset ID:" & CurrMTSubsetID * vbCrLf
-'''Tmp = Tmp & "Modifications Inclusion List: " & CurrMTIncList & vbCrLf
-'''If CurrMTConfirmedOnly Then Tmp = Tmp & "Confirmed MT tags only" & vbCrLf
-'''If CurrMTAccurateOnly Then Tmp = Tmp & "Accurate MT tags only" & vbCrLf
-'''If CurrMTLockersOnly Then Tmp = Tmp & "Lockers only" & vbCrLf
-'''GetMassTagsLoadArgs = Tmp
-'''End Function
-
 Public Function BoolToTinyInt(blnOption As Boolean) As Integer
     
     If blnOption Then
@@ -1477,7 +1461,7 @@ Public Function FillDisplay0ResidualCounts(ByVal Ind As Long) As Boolean
 'NOTE: Unfortunately this can be done only for isotopic data; this is done
 'for some strange visualization (Kostas)
 '---------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim CurrID As Long
 Dim cnNew As New ADODB.Connection
 
@@ -1491,16 +1475,16 @@ On Error GoTo FillDisplay0ResidualCountsErrorHandler
 
 With GelData(Ind)
     If .CSLines > 0 Then
-       For i = 1 To .CSLines
-           CurrID = CLng(GetTagValueFromText(CStr(.CSData(i).MTID), "MT:"))
-           .CSData(i).AverageMW = Len(GetPeptSeqForID_MT(CurrID, Ind, cnNew))
-       Next i
+       For I = 1 To .CSLines
+           CurrID = CLng(GetTagValueFromText(CStr(.CSData(I).MTID), "MT:"))
+           .CSData(I).AverageMW = Len(GetPeptSeqForID_MT(CurrID, Ind, cnNew))
+       Next I
     End If
     If .IsoLines > 0 Then
-       For i = 1 To .IsoLines
-           CurrID = CLng(GetTagValueFromText(CStr(.IsoData(i).MTID), "MT:"))
-           .IsoData(i).MostAbundantMW = Len(GetPeptSeqForID_MT(CurrID, Ind, cnNew))
-       Next i
+       For I = 1 To .IsoLines
+           CurrID = CLng(GetTagValueFromText(CStr(.IsoData(I).MTID), "MT:"))
+           .IsoData(I).MostAbundantMW = Len(GetPeptSeqForID_MT(CurrID, Ind, cnNew))
+       Next I
     End If
     GelData(Ind).MaxMW = 1000
     GelData(Ind).MinMW = 1
@@ -1607,83 +1591,6 @@ Public Function LookupDBSchemaVersionViaCNString(strConnectionString As String) 
     LookupDBSchemaVersionViaCNString = sngSchemaVersion
 End Function
 
-' Unused Function (May 2003)
-'''Public Function GetPeptSeqForID_Legacy(ByVal ID As String) As String
-'''
-'''End Function
-
-
-' Unused Function (March 2003)
-'''Public Function GetGlobalMods() As Boolean
-''''------------------------------------------------------------
-''''retrieves list of global modifications from MTMain database;
-''''returns True if succesful(at least one loaded mod)
-''''------------------------------------------------------------
-'''On Error GoTo exit_GetGlobalMods
-'''If ModCnt > 0 Then          'do nothing
-'''   GetGlobalMods = True
-'''   Exit Function
-'''Else
-'''
-'''End If
-'''exit_GetGlobalMods:
-'''GetGlobalMods = (ModCnt > 0)
-'''End Function
-'''
-
-' Unused Function (May 2003)
-'''Public Function GetMassTagName(MassTagID As Long, MTNames() As String) As Long
-''''-----------------------------------------------------------------------------
-''''fills array of names for MassTagID with MT tag names and returns number of
-''''it; -1 on any error
-''''NOTE: error handling here is not perfect; revisit it!!!
-''''-----------------------------------------------------------------------------
-'''Dim cnNew As New ADODB.Connection
-'''Dim sCommand As String
-'''Dim rsMTName As New ADODB.Recordset
-'''Dim cmdGetMTName As New ADODB.Command
-'''Dim prmMTID As ADODB.Parameter
-'''Dim tmpArr() As String
-'''Dim NamesCnt As Long
-'''Dim i As Long
-'''On Error GoTo err_GetMassTagName
-'''sCommand = glbPreferencesExpanded.MTSConnectionInfo.spGetMassTagNames
-'''cnNew.ConnectionString = GelAnalysis(1).MTDB.cn.ConnectionString
-'''cnNew.Open
-''''create and tune command object to retrieve MT tag names
-'''' Initialize the SP
-'''InitializeSPCommand cmdGetMTName, cnNew, sCommand
-'''Set prmMTID = cmdGetMTName.CreateParameter("MassTagID", adInteger, adParamInput, , MassTagID)
-'''cmdGetMTName.Parameters.Append prmMTID
-'''Set rsMTName = cmdGetMTName.Execute
-'''rsMTName.Open
-'''tmpArr = rsMTName.GetRows(adGetRowsRest, adBookmarkFirst)
-'''rsMTName.Close
-''''GetRows returns 2-dimensional array; we have to put it in the 1-dim
-'''NamesCnt = UBound(tmpArr, 2) + 1
-'''
-'''exit_GetMassTagName:
-'''If NamesCnt > 0 Then
-'''   ReDim MTNames(NamesCnt - 1)
-'''   For i = 0 To NamesCnt - 1
-'''       MTNames(i) = tmpArr(0, i)
-'''   Next i
-'''   GetMassTagName = NamesCnt
-'''Else
-'''   Erase MTNames
-'''End If
-'''
-'''Set cmdGetMTName.ActiveConnection = Nothing
-'''cnNew.Close
-'''Exit Function
-'''
-'''err_GetMassTagName:
-'''GetMassTagName = -1
-'''Resume exit_GetMassTagName
-'''End Function
-
-
-
 Public Function GetMassTagNameDisplay(MTNames() As String) As String
 '-------------------------------------------------------------------
 'returns first name from the list and if more than one total number
@@ -1691,16 +1598,16 @@ Public Function GetMassTagNameDisplay(MTNames() As String) As String
 '-------------------------------------------------------------------
 Dim FirstNameInList As String
 Dim ListCnt As Long
-Dim i As Long
+Dim I As Long
 On Error GoTo err_GetMassTagNameDisplay
 ListCnt = UBound(MTNames) + 1
 If ListCnt > 0 Then
-   For i = 0 To ListCnt - 1
-       If Len(MTNames(i)) > 0 Then
-          FirstNameInList = MTNames(i)
+   For I = 0 To ListCnt - 1
+       If Len(MTNames(I)) > 0 Then
+          FirstNameInList = MTNames(I)
           Exit For
        End If
-   Next i
+   Next I
 End If
 If Len(FirstNameInList) <= 0 Then FirstNameInList = IdUnknown
 If ListCnt > 1 Then
@@ -1713,73 +1620,4 @@ Exit Function
 err_GetMassTagNameDisplay:
 GetMassTagNameDisplay = ""
 End Function
-
-
-' Unused Function (May 2003)
-'''Public Function LoadMassTagNames() As Long
-''''--------------------------------------------------------------------
-''''retrieves list of MT tag IDs and associated names; -1 on any error
-''''--------------------------------------------------------------------
-'''Dim cnNew As New ADODB.Connection
-'''Dim sSQL As String
-'''Dim rsMTName As New ADODB.Recordset
-'''Dim cmdGetMTName As New ADODB.Command
-'''On Error GoTo err_LoadMassTagNames
-'''sSQL = glbPreferencesExpanded.MTSConnectionInfo.sqlGetMTNames
-'''cnNew.ConnectionString = GelAnalysis(1).MTDB.cn.ConnectionString
-'''cnNew.Open
-''''create and tune command object to retrieve MT tag names
-'''Set cmdGetMTName.ActiveConnection = cnNew
-'''cmdGetMTName.CommandText = sSQL
-'''cmdGetMTName.CommandType = adCmdText
-'''cmdGetMTName.CommandTimeout = glbPreferencesExpanded.AutoAnalysisOptions.DBConnectionTimeoutSeconds
-'''Set rsMTName = cmdGetMTName.Execute
-'''With rsMTName
-'''    .Open
-'''    .MoveFirst
-'''    Do Until .EOF
-'''       nameCnt = nameCnt + 1
-'''       nameMTID(nameCnt) = .Fields(0).value
-'''       nameMTName(nameCnt) = .Fields(1).value
-'''       .MoveNext
-'''    Loop
-'''    .Close
-'''End With
-'''
-'''exit_LoadMassTagNames:
-'''If nameCnt > 0 Then
-'''   ReDim Preserve nameMTID(1 To nameCnt)
-'''   ReDim Preserve nameMTName(1 To nameCnt)
-'''   LoadMassTagNames = nameCnt
-'''Else
-'''   Erase nameMTID
-'''   Erase nameMTName
-'''   nameCnt = 0
-'''End If
-'''Set cmdGetMTName.ActiveConnection = Nothing
-'''cnNew.Close
-'''Exit Function
-'''
-'''err_LoadMassTagNames:
-'''Select Case Err.Number
-'''Case 9
-'''    Err.Clear
-'''    ReDim Preserve nameMTID(1 To nameCnt + 10000)
-'''    ReDim Preserve nameMTName(1 To nameCnt + 10000)
-'''    Resume
-'''Case 13, 94                  'Type Mismatch or Invalid Use of Null
-'''    Resume Next              'just ignore it
-'''Case 3265, 3704              'two errors I have encountered
-'''    '2nd attempt will probably work so let user know it should try again
-'''    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-'''    MsgBox "Error loading MT tag names. Error could " _
-'''         & "have been caused by network/server issues(timeout) so you " _
-'''         & "might try loading again with Refresh function.", vbOKOnly, glFGTU
-'''    End If
-'''Case Else
-'''     LogErrors Err.Number, "LoadMassTagToProteinMapping"
-'''     LoadMassTagNames = -1
-'''     Resume exit_LoadMassTagNames
-'''End Select
-'''End Function
 

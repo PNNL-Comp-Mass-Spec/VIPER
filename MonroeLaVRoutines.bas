@@ -1270,57 +1270,6 @@ Public Function DoubleToStringScientific(ByVal dblValue As Double, Optional intD
 End Function
 
 
-' Unused Function (July 2003)
-'''Public Function ELCountViaMwtWin(strSequenceOneLetter As String, strElementSymbol As String, Optional blnSequenceIsThreeLetterCodes As Boolean = False) As Long
-'''    ' Determines the empirical formula for strSequenceOneLetter
-'''    ' Looks for strElementSymbol in the empirical formula
-'''    ' Note that strElementSymbol must be properly capitalized
-'''    ' Returns the number of atoms of the element in the formula
-'''    ' Returns 0 if not found (or an error)
-'''
-'''    Dim strFormula As String, strNewformula As String
-'''    Dim lngCharLoc As Long
-'''    Dim lngError As Long
-'''    Dim intElementID As Integer
-'''
-'''    If Not gMwtWinLoaded Then
-'''        ELCountViaMwtWin = 0
-'''        Exit Function
-'''    End If
-'''
-'''    objMwtWin.Peptide.SetSequence strSequenceOneLetter, ntgHydrogen, ctgHydroxyl, blnSequenceIsThreeLetterCodes, True, False
-'''
-'''    strFormula = objMwtWin.Peptide.GetSequence(True, False, False, True, False)
-'''
-'''    ' If Xxx is present in strFormula then remove it
-'''    Do
-'''        lngCharLoc = InStr(strFormula, "Xxx")
-'''        If lngCharLoc > 0 Then
-'''            If lngCharLoc > 1 Then
-'''                strNewformula = Left(strFormula, lngCharLoc - 1)
-'''            End If
-'''            strNewformula = strNewformula & Mid(strFormula, lngCharLoc + 3)
-'''            strFormula = strNewformula
-'''        End If
-'''    Loop While lngCharLoc > 0
-'''
-'''    lngError = objMwtWin.Compound.SetFormula(strFormula)
-'''
-'''    If lngError = 0 Then
-'''        If strElementSymbol = "N" Then
-'''            intElementID = 7
-'''        Else
-'''            intElementID = objMwtWin.GetElementID(strElementSymbol)
-'''        End If
-'''
-'''        ELCountViaMwtWin = objMwtWin.Compound.GetAtomCountForElement(intElementID)
-'''    Else
-'''        ELCountViaMwtWin = 0
-'''    End If
-'''
-'''End Function
-
-
 Public Function GetMassTagSearchSummaryText(strSearchDescription As String, lngHitCount As Long, sngMTMinimumHighNormalizedScore As Single, sngMTMinimumHighDiscriminantScore As Single, sngMTMinimumPeptideProphetProbability As Single, udtSAmtDef As SearchAMTDefinition, blnIncludeConglomerateNETStatus As Boolean, blnUsingCustomNETs As Boolean) As String
     Dim strScope As String
     Dim strSummary As String
@@ -1367,25 +1316,6 @@ End Function
 Public Function GetProgramVersion() As String
     GetProgramVersion = App.major & "." & App.minor & " Build " & App.Revision
 End Function
-' Unused Function (February 2005)
-''Public Function GetPeakAbuCriteria(NETPeakSelectionMode As Long) As String
-''
-''    Select Case NETPeakSelectionMode
-''    Case UMCNetConstants.UMCNetBefore
-''        GetPeakAbuCriteria = "BEFORE"
-''    Case UMCNetConstants.UMCNetAt
-''        GetPeakAbuCriteria = "AT"
-''    Case UMCNetConstants.UMCNetAfter
-''        GetPeakAbuCriteria = "AFTER"
-''    Case UMCNetConstants.UMCNetFirst
-''        GetPeakAbuCriteria = "FIRST"
-''    Case UMCNetConstants.UMCNetLast
-''        GetPeakAbuCriteria = "LAST"
-''    Case Else
-''        GetPeakAbuCriteria = "??"
-''    End Select
-''
-''End Function
 
 Public Function GetUMCClassRepScanAndNET(ByVal CallerID As Long, ByVal lngUMCIndex As Long, ByRef lngScanClassRep As Long, ByRef dblNETClassRep As Double, ByRef dblDriftTimeClassRep As Double) As Boolean
 
@@ -5551,89 +5481,6 @@ UpdateIonToUMCIndicesErrorHandler:
     If blnShowProgressUsingFormCaption Then frmCallingForm.Caption = strCaptionSaved
     
 End Sub
-
-' Unused function (February 2005)
-''Public Sub UpdateMasterScanOrder(ByRef udtScanInfo() As udtScanInfoType, ByVal lngNewScanNumber As Long, ByVal sngElutionTime As Single, ByVal blnAssumeSequentialOrdering As Boolean)
-''    ' Appends lngNewScanNumber to udtScanInfo() if it is larger than the value at udtScanInfo(lngMasterScanInfoCount)
-''    ' If blnAssumeSequentialOrdering = False, and if lngNewScanNumber is less than the value at udtScanInfo(lngMasterScanInfoCount), then
-''    '  inserts lngNewScanNumber into the appropriate position in udtScanInfo()
-''    ' Note that udtScanInfo() is a 1-based array
-''
-''    Dim lngIndex As Long
-''    Dim lngIndex2 As Long
-''    Dim lngMasterScanInfoCount As Long
-''    Dim blnAlreadyPresent As Boolean
-''
-''    lngMasterScanInfoCount = UBound(udtScanInfo)
-''
-''    If lngMasterScanInfoCount <= 0 Then
-''        lngMasterScanInfoCount = 1
-''        ReDim udtScanInfo(lngMasterScanInfoCount)
-''        With udtScanInfo(lngMasterScanInfoCount)
-''            .ScanNumber = lngNewScanNumber
-''            .ElutionTime = sngElutionTime
-''            .ScanType = 1
-''        End With
-''    Else
-''        If udtScanInfo(lngMasterScanInfoCount).ScanNumber < lngNewScanNumber Then
-''            lngMasterScanInfoCount = lngMasterScanInfoCount + 1
-''            ReDim Preserve udtScanInfo(lngMasterScanInfoCount)
-''            With udtScanInfo(lngMasterScanInfoCount)
-''                .ScanNumber = lngNewScanNumber
-''                .ElutionTime = sngElutionTime
-''                .ScanType = 1
-''            End With
-''        ElseIf Not blnAssumeSequentialOrdering Then
-''            If udtScanInfo(lngMasterScanInfoCount).ScanNumber > lngNewScanNumber Then
-''                ' Need to insert lngNewScanNumber into udtScanInfo
-''                For lngIndex = 1 To lngMasterScanInfoCount
-''                    If udtScanInfo(lngIndex).ScanNumber > lngNewScanNumber Then
-''                        ' Insert the value at lngIndex
-''                        Exit For
-''                    End If
-''                Next lngIndex
-''
-''                If lngIndex > lngMasterScanInfoCount Then
-''                    ' Match not found; this is unexpected
-''                    Debug.Assert False
-''                    lngMasterScanInfoCount = lngMasterScanInfoCount + 1
-''                    ReDim Preserve udtScanInfo(lngMasterScanInfoCount)
-''                    With udtScanInfo(lngMasterScanInfoCount)
-''                        .ScanNumber = lngNewScanNumber
-''                        .ElutionTime = sngElutionTime
-''                        .ScanType = 1
-''                    End With
-''                Else
-''                    ' Insert lngNewScanNumber, provided it isn't already present
-''                    blnAlreadyPresent = False
-''                    If lngIndex > 1 Then
-''                        If udtScanInfo(lngIndex - 1).ScanNumber = lngNewScanNumber Then
-''                            ' lngNewScanNumber isn't actually new
-''                            blnAlreadyPresent = True
-''                        End If
-''                    End If
-''
-''                    If Not blnAlreadyPresent Then
-''                        ' Shift the items items in udtScanInfo() up one position, then insert lngNewScanNumber
-''                        lngMasterScanInfoCount = lngMasterScanInfoCount + 1
-''                        ReDim Preserve udtScanInfo(lngMasterScanInfoCount)
-''
-''                        For lngIndex2 = lngMasterScanInfoCount To lngIndex + 1 Step -1
-''                            udtScanInfo(lngIndex2) = udtScanInfo(lngIndex2 - 1)
-''                        Next lngIndex2
-''                        With udtScanInfo(lngIndex)
-''                            .ScanNumber = lngNewScanNumber
-''                            .ElutionTime = sngElutionTime
-''                            .ScanType = 1
-''                        End With
-''                    End If
-''                End If
-''
-''            End If
-''        End If
-''    End If
-''
-''End Sub
 
 Public Sub UpdateNetAdjRangeStats(udtUMCNetAdjDef As NetAdjDefinition, lblNetAdjInitialNETStats As Label)
     Dim strMessage As String

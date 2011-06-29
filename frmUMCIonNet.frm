@@ -56,8 +56,8 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "Frame1"
-      Tab(1).Control(1)=   "lblFilterConnections"
+      Tab(1).Control(0)=   "lblFilterConnections"
+      Tab(1).Control(1)=   "Frame1"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
@@ -421,8 +421,8 @@ Begin VB.Form frmUMCIonNet
             TabCaption(2)   =   "Adv Class Stats"
             TabPicture(2)   =   "frmUMCIonNet.frx":0090
             Tab(2).ControlEnabled=   0   'False
-            Tab(2).Control(0)=   "fraClassAbundanceTopX"
-            Tab(2).Control(1)=   "fraClassMassTopX"
+            Tab(2).Control(0)=   "fraClassMassTopX"
+            Tab(2).Control(1)=   "fraClassAbundanceTopX"
             Tab(2).ControlCount=   2
             Begin VB.Frame fraClassMassTopX 
                Caption         =   "Class Mass Top X"
@@ -1541,7 +1541,7 @@ Private Function BuildCurrentClass() As Boolean
 'builds class for the current settings in the HUMCEquCls array; returns True on success
 'class has to be sorted if more than 2 elements (to preserve scan order)
 '---------------------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim BestInd As Long
 'Dim MySort As New QSLong
 On Error GoTo err_BuildCurrentClass
@@ -1564,11 +1564,11 @@ With GelUMC(CallerID)
           
           ReDim .ClassMInd(HUMCEquClsCnt - 1)
           ReDim .ClassMType(HUMCEquClsCnt - 1)
-          For i = 0 To HUMCEquClsCnt - 1
+          For I = 0 To HUMCEquClsCnt - 1
               .ClassCount = .ClassCount + 1
-              .ClassMInd(.ClassCount - 1) = HUMCEquCls(i)
+              .ClassMInd(.ClassCount - 1) = HUMCEquCls(I)
               .ClassMType(.ClassCount - 1) = glIsoType
-          Next i
+          Next I
                     
           ' Note: This code has been moved to UMCIonNet.Bas->FindUMCClassRepIndex
           BestInd = FindUMCClassRepIndex(CallerID, GelUMC(CallerID).UMCCnt, CInt(UMCRepresentative))
@@ -1744,7 +1744,7 @@ Private Sub CreateNet()
 'before filling permanent GelUMCIon structures results are sorted on Ind1/Ind2;
 'this will optimize class creation and reduce the total entropy in the Universe
 '------------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim TmpCnt As Long
 Dim Ind1() As Long, Ind2() As Long, Dist() As Double, SortInd() As Long
 Dim blnEraseUMCIonNetworks As Boolean
@@ -1758,13 +1758,13 @@ If ResCnt > 0 Then
    TmpCnt = 0
    ReDim Ind1(ResCnt - 1):   ReDim Ind2(ResCnt - 1):
    ReDim Dist(ResCnt - 1):   ReDim SortInd(ResCnt - 1)
-   For i = 0 To ResCnt - 1
-       If Not ResEliminate(i) Then
+   For I = 0 To ResCnt - 1
+       If Not ResEliminate(I) Then
           TmpCnt = TmpCnt + 1
-          Ind1(TmpCnt - 1) = DataOInd(ResInd1(i)):   Ind2(TmpCnt - 1) = DataOInd(ResInd2(i))
-          Dist(TmpCnt - 1) = ResDist(i):             SortInd(TmpCnt - 1) = TmpCnt - 1
+          Ind1(TmpCnt - 1) = DataOInd(ResInd1(I)):   Ind2(TmpCnt - 1) = DataOInd(ResInd2(I))
+          Dist(TmpCnt - 1) = ResDist(I):             SortInd(TmpCnt - 1) = TmpCnt - 1
        End If
-   Next i
+   Next I
    Call ManageResArrays(amtErase)           'don't need results arrays anymore
    If TmpCnt > 0 Then
       ReDim Preserve Ind1(TmpCnt - 1):   ReDim Preserve Ind2(TmpCnt - 1):
@@ -1775,11 +1775,11 @@ If ResCnt > 0 Then
          .NETCount = TmpCnt
          ReDim .NetInd1(TmpCnt - 1):   ReDim .NetInd2(TmpCnt - 1):   ReDim .NetDist(TmpCnt - 1)
          .MinDist = glHugeDouble:      .MaxDist = -glHugeDouble
-         For i = 0 To TmpCnt - 1
-             .NetInd1(i) = Ind1(SortInd(i)):   .NetInd2(i) = Ind2(SortInd(i)):   .NetDist(i) = Dist(SortInd(i))
-             If Dist(SortInd(i)) < .MinDist Then .MinDist = Dist(SortInd(i))
-             If Dist(SortInd(i)) > .MaxDist Then .MaxDist = Dist(SortInd(i))
-         Next i
+         For I = 0 To TmpCnt - 1
+             .NetInd1(I) = Ind1(SortInd(I)):   .NetInd2(I) = Ind2(SortInd(I)):   .NetDist(I) = Dist(SortInd(I))
+             If Dist(SortInd(I)) < .MinDist Then .MinDist = Dist(SortInd(I))
+             If Dist(SortInd(I)) > .MaxDist Then .MaxDist = Dist(SortInd(I))
+         Next I
       End With
    Else
       blnEraseUMCIonNetworks = True
@@ -1945,51 +1945,51 @@ Private Function EliminateLongConnections(ByVal TooLong As Double) As Long
 'mark long connections for elimination
 'returns the number of connections eliminated
 '------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim Count As Long
 On Error Resume Next
 ChangeStatus " Rejecting long connections..."
-For i = 0 To ResCnt - 1
-    If ResDist(i) > TooLong Then
-       ResEliminate(i) = True
+For I = 0 To ResCnt - 1
+    If ResDist(I) > TooLong Then
+       ResEliminate(I) = True
        Count = Count + 1
     End If
-Next i
+Next I
 ChangeStatus " Long connections eliminated: " & Count
 EliminateLongConnections = Count
 End Function
 
 ' Unused function (July 2003)
-Private Sub EliminateRedundantConnectionsDirect()
-'-----------------------------------------------------------------------------------
-'marks redundant connections for eliminations; if we have ResInd1(i)=m, ResInd2(i)=n
-'and ResInd1(j)=n, ResInd2(j)=m for some i,j then eliminate i if m>n or j if m<=n
-'-----------------------------------------------------------------------------------
-Dim i As Long, j As Long
-Dim Count As Long
-On Error Resume Next
-ChangeStatus " Eliminating redundancy..."
-For i = 0 To DataCnt - 1
-    If Not ResEliminate(i) Then
-       For j = i + 1 To DataCnt - 1
-           If Not ResEliminate(j) Then
-              If ResInd1(i) = ResInd2(j) Then
-                 If ResInd2(i) = ResInd1(j) Then
-                    Count = Count + 1
-                    'mark for elimination one where ResInd1>ResInd2
-                    If ResInd1(i) > ResInd2(i) Then
-                       ResEliminate(i) = True
-                    Else
-                       ResEliminate(j) = True
-                    End If
-                 End If
-              End If
-           End If
-       Next j
-    End If
-Next i
-ChangeStatus " Redundant connections eliminated: " & Count
-End Sub
+''Private Sub EliminateRedundantConnectionsDirect()
+'''-----------------------------------------------------------------------------------
+'''marks redundant connections for eliminations; if we have ResInd1(i)=m, ResInd2(i)=n
+'''and ResInd1(j)=n, ResInd2(j)=m for some i,j then eliminate i if m>n or j if m<=n
+'''-----------------------------------------------------------------------------------
+''Dim I As Long, j As Long
+''Dim Count As Long
+''On Error Resume Next
+''ChangeStatus " Eliminating redundancy..."
+''For I = 0 To DataCnt - 1
+''    If Not ResEliminate(I) Then
+''       For j = I + 1 To DataCnt - 1
+''           If Not ResEliminate(j) Then
+''              If ResInd1(I) = ResInd2(j) Then
+''                 If ResInd2(I) = ResInd1(j) Then
+''                    Count = Count + 1
+''                    'mark for elimination one where ResInd1>ResInd2
+''                    If ResInd1(I) > ResInd2(I) Then
+''                       ResEliminate(I) = True
+''                    Else
+''                       ResEliminate(j) = True
+''                    End If
+''                 End If
+''              End If
+''           End If
+''       Next j
+''    End If
+''Next I
+''ChangeStatus " Redundant connections eliminated: " & Count
+''End Sub
 
 
 Public Function EliminateLongConnections_Net(TooLongConnection As Double) As Long
@@ -1999,7 +1999,7 @@ Public Function EliminateLongConnections_Net(TooLongConnection As Double) As Lon
 'EliminateLongConnections which is used when Net is created
 'returns the number of connections eliminated
 '--------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim TmpCnt As Long
 Dim lngOriginalConnectionCount As Long
 
@@ -2010,16 +2010,16 @@ With GelUMCIon(CallerID)
     lngOriginalConnectionCount = .NETCount
     If .NETCount > 0 Then
        .MinDist = glHugeDouble:     .MaxDist = -glHugeDouble
-       For i = 0 To .NETCount - 1
-           If .NetDist(i) <= TooLongConnection Then
+       For I = 0 To .NETCount - 1
+           If .NetDist(I) <= TooLongConnection Then
               TmpCnt = TmpCnt + 1
-              .NetInd1(TmpCnt - 1) = .NetInd1(i)
-              .NetInd2(TmpCnt - 1) = .NetInd2(i)
-              .NetDist(TmpCnt - 1) = .NetDist(i)
+              .NetInd1(TmpCnt - 1) = .NetInd1(I)
+              .NetInd2(TmpCnt - 1) = .NetInd2(I)
+              .NetDist(TmpCnt - 1) = .NetDist(I)
               If .NetDist(TmpCnt - 1) < .MinDist Then .MinDist = .NetDist(TmpCnt - 1)
               If .NetDist(TmpCnt - 1) > .MaxDist Then .MaxDist = .NetDist(TmpCnt - 1)
            End If
-       Next i
+       Next I
        If TmpCnt > 0 Then
           ReDim Preserve .NetInd1(TmpCnt - 1)
           ReDim Preserve .NetInd2(TmpCnt - 1)
@@ -2467,7 +2467,7 @@ FinalizeNewUMCsErrorHandler:
 End Function
 
 Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcessingMode)
-    Dim i As Long, j As Long                'loop controlers
+    Dim I As Long, j As Long                'loop controlers
     Dim iOInd As Long, jOInd As Long        'indexes in original Data arrays
     Dim BestForI As Long                    'index of best match for index i
     Dim ShortestDistance As Double, CurrDistance As Double
@@ -2512,8 +2512,8 @@ Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcess
           Case METRIC_EUCLIDEAN
               Select Case MyDef.NETType
                   Case Net_SPIDER_66                                'remember all connections shorter than threshold
-                      For i = 0 To DataCnt - 1
-                          iOInd = OptIndO(i)
+                      For I = 0 To DataCnt - 1
+                          iOInd = OptIndO(I)
     
                          ' Only compute the distance if intOddEvenIteration = 0 or if the scan number for
                          ' the data point is the appropriate odd or even value
@@ -2522,15 +2522,15 @@ Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcess
                               lngNewTickCount = GetTickCount()     ' Note that GetTickCount returns a negative number after 24 days of computer Uptime and resets to 0 after 48 days
                               If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
                                   ' Only update 4 times per second
-                                  ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                                  ChangeStatus ("Calculating line " & I & " / " & Trim(DataCnt) & strScanNumMode)
                                   If mAbortProcess Then Exit For
                                   lngTickCountLastUpdate = lngNewTickCount
                                   dtLastUpdateTime = Now()
                               End If
-                              j = i + 1
+                              j = I + 1
                               bTooFarAway = (j > DataCnt - 1)
                               Do Until bTooFarAway
-                                  If MetricEuclidDim1(i, j) > MyDef.TooDistant Then
+                                  If MetricEuclidDim1(I, j) > MyDef.TooDistant Then
                                       bTooFarAway = True
                                   Else
                                       jOInd = OptIndO(j)
@@ -2556,24 +2556,24 @@ Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcess
                                   If j > DataCnt - 1 Then bTooFarAway = True
                               Loop
                           End If
-                      Next i
+                      Next I
                   Case Else
-                      For i = 0 To DataCnt - 1
-                          iOInd = OptIndO(i)
+                      For I = 0 To DataCnt - 1
+                          iOInd = OptIndO(I)
                           BestForI = -1
                           ShortestDistance = glHugeDouble
                           If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
                               ' Only update 4 times per second
-                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              ChangeStatus ("Calculating line " & I & " / " & Trim(DataCnt) & strScanNumMode)
                               If mAbortProcess Then Exit For
                               lngTickCountLastUpdate = lngNewTickCount
                               dtLastUpdateTime = Now()
                           End If
                           If mAbortProcess Then Exit For
-                          j = i + 1
+                          j = I + 1
                           bTooFarAway = (j > DataCnt - 1)
                           Do Until bTooFarAway
-                              If MetricEuclidDim1(i, j) > MyDef.TooDistant Then
+                              If MetricEuclidDim1(I, j) > MyDef.TooDistant Then
                                   bTooFarAway = True
                               Else
                                   jOInd = OptIndO(j)
@@ -2605,25 +2605,25 @@ Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcess
                                   End If
                               End If
                           End If
-                      Next i
+                      Next I
               End Select
           Case METRIC_HONDURAS
               Select Case MyDef.NETType
                   Case Net_SPIDER_66                                'remember all connections shorter than threshold
-                      For i = 0 To DataCnt - 1
-                          iOInd = OptIndO(i)
+                      For I = 0 To DataCnt - 1
+                          iOInd = OptIndO(I)
                           If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
                               ' Only update 4 times per second
-                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              ChangeStatus ("Calculating line " & I & " / " & Trim(DataCnt) & strScanNumMode)
                               If mAbortProcess Then Exit For
                               lngTickCountLastUpdate = lngNewTickCount
                               dtLastUpdateTime = Now()
                           End If
                           If mAbortProcess Then Exit For
-                          j = i + 1
+                          j = I + 1
                           bTooFarAway = (j > DataCnt - 1)
                           Do Until bTooFarAway
-                              If MetricHondurasDim1(i, j) > MyDef.TooDistant Then
+                              If MetricHondurasDim1(I, j) > MyDef.TooDistant Then
                                   bTooFarAway = True
                               Else
                                   jOInd = OptIndO(j)
@@ -2650,24 +2650,24 @@ Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcess
                               j = j + 1
                               If j > DataCnt - 1 Then bTooFarAway = True
                           Loop
-                      Next i
+                      Next I
                   Case Else
-                      For i = 0 To DataCnt - 1
-                          iOInd = OptIndO(i)
+                      For I = 0 To DataCnt - 1
+                          iOInd = OptIndO(I)
                           BestForI = -1
                           ShortestDistance = glHugeDouble
                           If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
                               ' Only update 4 times per second
-                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              ChangeStatus ("Calculating line " & I & " / " & Trim(DataCnt) & strScanNumMode)
                               If mAbortProcess Then Exit For
                               lngTickCountLastUpdate = lngNewTickCount
                               dtLastUpdateTime = Now()
                           End If
                           If mAbortProcess Then Exit For
-                          j = i + 1
+                          j = I + 1
                           bTooFarAway = (j > DataCnt - 1)
                           Do Until bTooFarAway
-                              If MetricHondurasDim1(i, j) > MyDef.TooDistant Then
+                              If MetricHondurasDim1(I, j) > MyDef.TooDistant Then
                                   bTooFarAway = True
                               Else
                                   jOInd = OptIndO(j)
@@ -2700,25 +2700,25 @@ Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcess
                                   End If
                               End If
                           End If
-                      Next i
+                      Next I
               End Select
           Case METRIC_INFINITY
               Select Case MyDef.NETType
                   Case Net_SPIDER_66                                'remember all connections shorter than threshold
-                      For i = 0 To DataCnt - 1
-                          iOInd = OptIndO(i)
+                      For I = 0 To DataCnt - 1
+                          iOInd = OptIndO(I)
                           If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
                               ' Only update 4 times per second
-                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              ChangeStatus ("Calculating line " & I & " / " & Trim(DataCnt) & strScanNumMode)
                               If mAbortProcess Then Exit For
                               lngTickCountLastUpdate = lngNewTickCount
                               dtLastUpdateTime = Now()
                           End If
                           If mAbortProcess Then Exit For
-                          j = i + 1
+                          j = I + 1
                           bTooFarAway = (j > DataCnt - 1)
                           Do Until bTooFarAway
-                              If MetricInfinityDim1(i, j) > MyDef.TooDistant Then
+                              If MetricInfinityDim1(I, j) > MyDef.TooDistant Then
                                   bTooFarAway = True
                               Else
                                   jOInd = OptIndO(j)
@@ -2745,24 +2745,24 @@ Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcess
                               j = j + 1
                               If j > DataCnt - 1 Then bTooFarAway = True
                           Loop
-                      Next i
+                      Next I
                   Case Else
-                      For i = 0 To DataCnt - 1
-                          iOInd = OptIndO(i)
+                      For I = 0 To DataCnt - 1
+                          iOInd = OptIndO(I)
                           BestForI = -1
                           ShortestDistance = glHugeDouble
                           If lngNewTickCount - lngTickCountLastUpdate > 250 Or Now - dtLastUpdateTime > mOneSecond Then
                               ' Only update 4 times per second
-                              ChangeStatus ("Calculating line " & i & " / " & Trim(DataCnt) & strScanNumMode)
+                              ChangeStatus ("Calculating line " & I & " / " & Trim(DataCnt) & strScanNumMode)
                               If mAbortProcess Then Exit For
                               lngTickCountLastUpdate = lngNewTickCount
                               dtLastUpdateTime = Now()
                           End If
                           If mAbortProcess Then Exit For
-                          j = i + 1
+                          j = I + 1
                           bTooFarAway = (j > DataCnt - 1)
                           Do Until bTooFarAway
-                              If MetricInfinityDim1(i, j) > MyDef.TooDistant Then
+                              If MetricInfinityDim1(I, j) > MyDef.TooDistant Then
                                   bTooFarAway = True
                               Else
                                   jOInd = OptIndO(j)
@@ -2797,7 +2797,7 @@ Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcess
                                   End If
                               End If
                           End If
-                      Next i
+                      Next I
               End Select
       End Select
     
@@ -3220,7 +3220,7 @@ Dim bDone As Long
 Dim CurrConnInd As Long
 Dim CurrInd1 As Long, CurrInd2 As Long
 Dim intScopeUsedForConnections As Integer
-Dim i As Long
+Dim I As Long
 Dim lngTickCountLastUpdate As Long, lngNewTickCount As Long
 Dim dtLastUpdateTime As Date
 
@@ -3262,13 +3262,13 @@ If ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
                HUMCEquClsWk(0) = CurrInd1:          HUMCEquClsWk(1) = CurrInd2
                HUMCEquClsCnt = 2                    'always start this type of classes with 2 points
                'build class; we have to go in both direction to discover full connection
-               For i = CurrConnInd + 1 To HUMCNetCnt - 1
-                   If HUMCNetUsed(i) = HUMCNotUsed Then
-                      CurrInd1 = .NetInd1(i):    CurrInd2 = .NetInd2(i)
+               For I = CurrConnInd + 1 To HUMCNetCnt - 1
+                   If HUMCNetUsed(I) = HUMCNotUsed Then
+                      CurrInd1 = .NetInd1(I):    CurrInd2 = .NetInd2(I)
                       'condition in the following two If statements will not be True
                       'simultaneously but this way it will work even if they are
                       If HUMCIsoUsed(CurrInd1) = HUMCInUse Then
-                         HUMCNetUsed(i) = HUMCUsed
+                         HUMCNetUsed(I) = HUMCUsed
                          If HUMCIsoUsed(CurrInd2) = HUMCNotUsed Then     'add it to class if not already there
                             HUMCIsoUsed(CurrInd2) = HUMCInUse
                             HUMCEquClsCnt = HUMCEquClsCnt + 1
@@ -3276,7 +3276,7 @@ If ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
                          End If
                       End If
                       If HUMCIsoUsed(CurrInd2) = HUMCInUse Then
-                         HUMCNetUsed(i) = HUMCUsed
+                         HUMCNetUsed(I) = HUMCUsed
                          If HUMCIsoUsed(CurrInd1) = HUMCNotUsed Then     'add it to class if not already there
                             HUMCIsoUsed(CurrInd1) = HUMCInUse
                             HUMCEquClsCnt = HUMCEquClsCnt + 1
@@ -3284,13 +3284,13 @@ If ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
                          End If
                       End If
                    End If
-               Next i
+               Next I
                'need to go in another direction to pick up eventual skiping transitions
-               For i = HUMCNetCnt - 1 To CurrConnInd + 1 Step -1
-                   If HUMCNetUsed(i) = HUMCNotUsed Then
-                      CurrInd1 = .NetInd1(i):    CurrInd2 = .NetInd2(i)
+               For I = HUMCNetCnt - 1 To CurrConnInd + 1 Step -1
+                   If HUMCNetUsed(I) = HUMCNotUsed Then
+                      CurrInd1 = .NetInd1(I):    CurrInd2 = .NetInd2(I)
                       If HUMCIsoUsed(CurrInd1) = HUMCInUse Then
-                         HUMCNetUsed(i) = HUMCUsed
+                         HUMCNetUsed(I) = HUMCUsed
                          If HUMCIsoUsed(CurrInd2) = HUMCNotUsed Then     'add it to class if not already there
                             HUMCIsoUsed(CurrInd2) = HUMCInUse
                             HUMCEquClsCnt = HUMCEquClsCnt + 1
@@ -3298,7 +3298,7 @@ If ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
                          End If
                       End If
                       If HUMCIsoUsed(CurrInd2) = HUMCInUse Then
-                         HUMCNetUsed(i) = HUMCUsed
+                         HUMCNetUsed(I) = HUMCUsed
                          If HUMCIsoUsed(CurrInd1) = HUMCNotUsed Then     'add it to class if not already there
                             HUMCIsoUsed(CurrInd1) = HUMCInUse
                             HUMCEquClsCnt = HUMCEquClsCnt + 1
@@ -3306,13 +3306,13 @@ If ManageClasses(CallerID, UMCManageConstants.UMCMngInitialize) Then
                          End If
                       End If
                    End If
-               Next i
+               Next I
                'now pack findings to nice small array convenient to create classes
                ReDim HUMCEquCls(HUMCEquClsCnt - 1)
-               For i = 0 To HUMCEquClsCnt - 1       'make sure not to use more than belongs to this class
-                   HUMCEquCls(i) = HUMCEquClsWk(i)
-                   HUMCIsoUsed(HUMCEquCls(i)) = HUMCUsed                'they are used now
-               Next i
+               For I = 0 To HUMCEquClsCnt - 1       'make sure not to use more than belongs to this class
+                   HUMCEquCls(I) = HUMCEquClsWk(I)
+                   HUMCIsoUsed(HUMCEquCls(I)) = HUMCUsed                'they are used now
+               Next I
                'extract and add class to the structure
                Call BuildCurrentClass
                CurrConnInd = CurrConnInd + 1
@@ -3396,7 +3396,7 @@ Private Function GetUMCIsoDefinitionText(Ind As Long, Optional ByVal blnMultiple
 '-----------------------------------------------------------------------
 'returns formatted strDesc of the IonNet for 2D display with index Ind
 '-----------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim strLineSeparator As String
 Dim strAddnlText As String
 
@@ -3425,13 +3425,13 @@ With GelUMCIon(Ind).ThisNetDef
         Else
             strDesc = strDesc & "Metric dimensions description; "
         End If
-        For i = 0 To .NetDim - 1
+        For I = 0 To .NetDim - 1
             If Not blnMultipleLines Then
-                strDesc = strDesc & "Dimension" & Trim(i + 1) & " = "
+                strDesc = strDesc & "Dimension" & Trim(I + 1) & " = "
             End If
             
-            If .MetricData(i).Use Then
-                Select Case .MetricData(i).DataType
+            If .MetricData(I).Use Then
+                Select Case .MetricData(I).DataType
                 Case uindUMCIonNetDimConstants.uindMonoMW
                      strAddnlText = "Monoisotopic mass; "
                 Case uindUMCIonNetDimConstants.uindAvgMW
@@ -3455,24 +3455,24 @@ With GelUMCIon(Ind).ThisNetDef
                 End Select
                 
                 strDesc = strDesc & strAddnlText
-                strDesc = strDesc & "Weight factor: " & .MetricData(i).WeightFactor & "; "
+                strDesc = strDesc & "Weight factor: " & .MetricData(I).WeightFactor & "; "
                 strDesc = strDesc & "Constraint: "
-                Select Case .MetricData(i).ConstraintType
+                Select Case .MetricData(I).ConstraintType
                 Case Net_CT_None
                      strAddnlText = "none"
                 Case Net_CT_LT
-                     strAddnlText = "Distance < " & .MetricData(i).ConstraintValue
+                     strAddnlText = "Distance < " & .MetricData(I).ConstraintValue
                 Case Net_CT_GT
-                     strAddnlText = "Distance > " & .MetricData(i).ConstraintValue
+                     strAddnlText = "Distance > " & .MetricData(I).ConstraintValue
                 Case Net_CT_EQ
-                     strAddnlText = "Distance equal to " & .MetricData(i).ConstraintValue
+                     strAddnlText = "Distance equal to " & .MetricData(I).ConstraintValue
                 End Select
                 
                 strDesc = strDesc & strAddnlText
-                If .MetricData(i).ConstraintType <> Net_CT_None Then
-                     Select Case .MetricData(i).DataType
+                If .MetricData(I).ConstraintType <> Net_CT_None Then
+                     Select Case .MetricData(I).DataType
                      Case uindUMCIonNetDimConstants.uindMonoMW, uindUMCIonNetDimConstants.uindAvgMW, uindUMCIonNetDimConstants.uindTmaMW
-                         strDesc = strDesc & " " & GetMetricDataMassUnits(.MetricData(i).ConstraintUnits)
+                         strDesc = strDesc & " " & GetMetricDataMassUnits(.MetricData(I).ConstraintUnits)
                      Case Else
                          ' Do not append the units
                      End Select
@@ -3481,7 +3481,7 @@ With GelUMCIon(Ind).ThisNetDef
                 strDesc = strDesc & "Unused"
             End If
             strDesc = strDesc & strLineSeparator
-        Next i
+        Next I
      Else
         strDesc = strDesc & "Metric strDesc not dimensioned"
      End If
@@ -3528,7 +3528,7 @@ Private Function HUMCAddingSingleMemberUMCs() As Long
 'NOTE: this function makes sense only in a larger context of an UMC
 'from Net procedure
 '------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim Cnt As Long
 Dim ISInd() As Long         ' In-scope index
 Dim lngDataInScope As Long
@@ -3541,8 +3541,8 @@ lngDataInScope = GetISScope(CallerID, ISInd(), GelUMC(CallerID).def.DefScope)
 
 ChangeStatus " Adding single-member LC-MS Features..."
 With GelUMC(CallerID)
-    For i = 1 To lngDataInScope
-        lngOriginalIndex = ISInd(i)
+    For I = 1 To lngDataInScope
+        lngOriginalIndex = ISInd(I)
         
         If HUMCIsoUsed(lngOriginalIndex) = HUMCNotUsed Then               'not used in any class
             
@@ -3563,7 +3563,7 @@ With GelUMC(CallerID)
             
             Cnt = Cnt + 1
         End If
-    Next i
+    Next I
 
 End With
 HUMCAddingSingleMemberUMCs = Cnt
@@ -3862,7 +3862,7 @@ Resume Next
 
 End Function
 
-Private Function MetricEuclid(i As Long, j As Long) As Double
+Private Function MetricEuclid(I As Long, j As Long) As Double
 '------------------------------------------------------------------
 'returns Euclidean distance between two points in MyDef.NetDim-dim space
 'i and j are indexes in data arrays; -1 on any error
@@ -3871,7 +3871,7 @@ Dim k As Long
 Dim TmpSum As Double
 On Error GoTo err_MetricEuclid
 For k = 0 To MyDef.NetDim - 1
-    TmpSum = TmpSum + (DataVal(i, k) - DataVal(j, k)) ^ 2
+    TmpSum = TmpSum + (DataVal(I, k) - DataVal(j, k)) ^ 2
 Next k
 MetricEuclid = Sqr(TmpSum)
 Exit Function
@@ -3881,25 +3881,25 @@ MetricEuclid = -1
 End Function
 
 
-Private Function MetricEuclidDim1(i As Long, j As Long) As Double
+Private Function MetricEuclidDim1(I As Long, j As Long) As Double
 '------------------------------------------------------------------------
 'returns Euclidean distance between two points for the optimization array
 '------------------------------------------------------------------------
 On Error Resume Next
-MetricEuclidDim1 = Abs(OptValO(i) - OptValO(j))
+MetricEuclidDim1 = Abs(OptValO(I) - OptValO(j))
 End Function
 
 
-Private Function MetricEuclidDim1Any(DimInd As Long, i As Long, j As Long) As Double
+Private Function MetricEuclidDim1Any(DimInd As Long, I As Long, j As Long) As Double
 '----------------------------------------------------------------------------------
 'returns Euclidean distance between two points for the data dimension DimInd
 '----------------------------------------------------------------------------------
 On Error Resume Next
-MetricEuclidDim1Any = Abs(DataVal(i, DimInd) - DataVal(j, DimInd))
+MetricEuclidDim1Any = Abs(DataVal(I, DimInd) - DataVal(j, DimInd))
 End Function
 
 
-Private Function MetricHonduras(i As Long, j As Long) As Double
+Private Function MetricHonduras(I As Long, j As Long) As Double
 '----------------------------------------------------------------------
 'returns Honduras distance between two points in MyDef.NetDim-dim space
 'i and j are indexes in data arrays; -1 on any error
@@ -3908,7 +3908,7 @@ Dim k As Long
 Dim TmpSum As Double
 On Error GoTo err_MetricHonduras
 For k = 0 To MyDef.NetDim - 1
-    TmpSum = TmpSum + Abs(DataVal(i, k) - DataVal(j, k))
+    TmpSum = TmpSum + Abs(DataVal(I, k) - DataVal(j, k))
 Next k
 MetricHonduras = TmpSum
 Exit Function
@@ -3919,24 +3919,24 @@ End Function
 
 
 'One dimensional Honduras metric is the same as Euclidean
-Private Function MetricHondurasDim1(i As Long, j As Long) As Double
+Private Function MetricHondurasDim1(I As Long, j As Long) As Double
 '------------------------------------------------------------------------
 'returns Honduras distance between two points for the optimization array
 '------------------------------------------------------------------------
 On Error Resume Next
-MetricHondurasDim1 = Abs(OptValO(i) - OptValO(j))
+MetricHondurasDim1 = Abs(OptValO(I) - OptValO(j))
 End Function
 
 
-Private Function MetricHondurasDim1Any(DimInd As Long, i As Long, j As Long) As Double
+Private Function MetricHondurasDim1Any(DimInd As Long, I As Long, j As Long) As Double
 '------------------------------------------------------------------------------------
 'returns Honduras distance between two points for the data dimension DimInd
 '------------------------------------------------------------------------------------
 On Error Resume Next
-MetricHondurasDim1Any = Abs(DataVal(i, DimInd) - DataVal(j, DimInd))
+MetricHondurasDim1Any = Abs(DataVal(I, DimInd) - DataVal(j, DimInd))
 End Function
 
-Private Function MetricInfinity(i As Long, j As Long) As Double
+Private Function MetricInfinity(I As Long, j As Long) As Double
 '----------------------------------------------------------------------
 'returns Infinity distance between two points in MyDef.NetDim-dim space
 'i and j are indexes in data arrays; -1 on any error
@@ -3947,7 +3947,7 @@ Dim AbsDistance As Double
 On Error GoTo err_MetricInfinity
 tmpMax = 0
 For k = 0 To MyDef.NetDim - 1
-    AbsDistance = Abs(DataVal(i, k) - DataVal(j, k))
+    AbsDistance = Abs(DataVal(I, k) - DataVal(j, k))
     If AbsDistance > tmpMax Then tmpMax = AbsDistance
 Next k
 MetricInfinity = tmpMax
@@ -3959,21 +3959,21 @@ End Function
 
 
 'One dimensional Infinity metric is the same as Euclidean
-Private Function MetricInfinityDim1(i As Long, j As Long) As Double
+Private Function MetricInfinityDim1(I As Long, j As Long) As Double
 '------------------------------------------------------------------------
 'returns Infinity distance between two points for the optimization array
 '------------------------------------------------------------------------
 On Error Resume Next
-MetricInfinityDim1 = Abs(OptValO(i) - OptValO(j))
+MetricInfinityDim1 = Abs(OptValO(I) - OptValO(j))
 End Function
 
 
-Private Function MetricInfinityDim1Any(DimInd As Long, i As Long, j As Long) As Double
+Private Function MetricInfinityDim1Any(DimInd As Long, I As Long, j As Long) As Double
 '------------------------------------------------------------------------------------
 'returns Infinity distance between two points for the data dimension DimInd
 '------------------------------------------------------------------------------------
 On Error Resume Next
-MetricInfinityDim1Any = Abs(DataVal(i, DimInd) - DataVal(j, DimInd))
+MetricInfinityDim1Any = Abs(DataVal(I, DimInd) - DataVal(j, DimInd))
 End Function
 
 Private Sub PopulateComboBoxes()
@@ -4181,7 +4181,7 @@ Private Function PrepareDataArrays() As Boolean
 '------------------------------------------------------------------------
 'prepares data arrays and returns True if successful
 '------------------------------------------------------------------------
-    Dim i As Long, j As Long
+    Dim I As Long, j As Long
     Dim lngScanNumberRelativeIndex As Long
     
     Dim strMessage As String
@@ -4213,63 +4213,63 @@ On Error GoTo err_PrepareDataArrays
                 If MyDef.MetricData(j).Use Then
                     Select Case MyDef.MetricData(j).DataType
                     Case uindUMCIonNetDimConstants.uindMonoMW
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
-                            DataVal(i - 1, j) = .IsoData(ISInd(i)).MonoisotopicMW * MyDef.MetricData(j).WeightFactor
-                        Next i
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
+                            DataVal(I - 1, j) = .IsoData(ISInd(I)).MonoisotopicMW * MyDef.MetricData(j).WeightFactor
+                        Next I
                     Case uindUMCIonNetDimConstants.uindAvgMW
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
-                            DataVal(i - 1, j) = .IsoData(ISInd(i)).AverageMW * MyDef.MetricData(j).WeightFactor
-                        Next i
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
+                            DataVal(I - 1, j) = .IsoData(ISInd(I)).AverageMW * MyDef.MetricData(j).WeightFactor
+                        Next I
                     Case uindUMCIonNetDimConstants.uindTmaMW
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
-                            DataVal(i - 1, j) = .IsoData(ISInd(i)).MostAbundantMW * MyDef.MetricData(j).WeightFactor
-                        Next i
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
+                            DataVal(I - 1, j) = .IsoData(ISInd(I)).MostAbundantMW * MyDef.MetricData(j).WeightFactor
+                        Next I
                     Case uindUMCIonNetDimConstants.uindScan
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
                             ' When processing odd-only or even-only scans in frmUMCSimple, we divide lngScanNumberRelativeIndex by 2 since we're only keeping every other scan
                             ' However, we will not do that in this function, since a scan gap of 1 is allowed for, and since that can mess up the minimum Scan Width filters applied by the LCMSFeatureFinder
-                            lngScanNumberRelativeIndex = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(i)).ScanNumber)
-                            DataVal(i - 1, j) = lngScanNumberRelativeIndex * MyDef.MetricData(j).WeightFactor
-                        Next i
+                            lngScanNumberRelativeIndex = LookupScanNumberRelativeIndex(CallerID, .IsoData(ISInd(I)).ScanNumber)
+                            DataVal(I - 1, j) = lngScanNumberRelativeIndex * MyDef.MetricData(j).WeightFactor
+                        Next I
                     Case uindUMCIonNetDimConstants.uindFit
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
-                            DataVal(i - 1, j) = .IsoData(ISInd(i)).Fit * MyDef.MetricData(j).WeightFactor
-                        Next i
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
+                            DataVal(I - 1, j) = .IsoData(ISInd(I)).Fit * MyDef.MetricData(j).WeightFactor
+                        Next I
                     Case uindUMCIonNetDimConstants.uindMZ
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
-                            DataVal(i - 1, j) = .IsoData(ISInd(i)).MZ * MyDef.MetricData(j).WeightFactor
-                        Next i
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
+                            DataVal(I - 1, j) = .IsoData(ISInd(I)).MZ * MyDef.MetricData(j).WeightFactor
+                        Next I
                     Case uindUMCIonNetDimConstants.uindGenericNET
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
-                            DataVal(i - 1, j) = ((.IsoData(ISInd(i)).ScanNumber - MinScan) / (MaxScan - MinScan)) * MyDef.MetricData(j).WeightFactor
-                        Next i
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
+                            DataVal(I - 1, j) = ((.IsoData(ISInd(I)).ScanNumber - MinScan) / (MaxScan - MinScan)) * MyDef.MetricData(j).WeightFactor
+                        Next I
                     Case uindUMCIonNetDimConstants.uindChargeState
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
-                            DataVal(i - 1, j) = .IsoData(ISInd(i)).Charge * MyDef.MetricData(j).WeightFactor
-                        Next i
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
+                            DataVal(I - 1, j) = .IsoData(ISInd(I)).Charge * MyDef.MetricData(j).WeightFactor
+                        Next I
                     Case uindUMCIonNetDimConstants.uindLogAbundance
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
-                            If .IsoData(ISInd(i)).Abundance > 0 Then
-                              DataVal(i - 1, j) = Log(.IsoData(ISInd(i)).Abundance) / Log(10#) * MyDef.MetricData(j).WeightFactor
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
+                            If .IsoData(ISInd(I)).Abundance > 0 Then
+                              DataVal(I - 1, j) = Log(.IsoData(ISInd(I)).Abundance) / Log(10#) * MyDef.MetricData(j).WeightFactor
                             Else
                               ' Cannot perform Log(0)
-                              DataVal(i - 1, j) = 0
+                              DataVal(I - 1, j) = 0
                             End If
-                        Next i
+                        Next I
                     Case uindUMCIonNetDimConstants.uindIMSDriftTime
-                        For i = 1 To DataCnt
-                            DataOInd(i - 1) = ISInd(i)
-                            DataVal(i - 1, j) = .IsoData(ISInd(i)).IMSDriftTime * MyDef.MetricData(j).WeightFactor
-                        Next i
+                        For I = 1 To DataCnt
+                            DataOInd(I - 1) = ISInd(I)
+                            DataVal(I - 1, j) = .IsoData(ISInd(I)).IMSDriftTime * MyDef.MetricData(j).WeightFactor
+                        Next I
                     End Select
                 End If
             Next j
@@ -4308,16 +4308,16 @@ Private Function PrepareOptimization() As Boolean
 '-----------------------------------------------------------------
 'creates and sorts optimization arrays; returns True if successful
 '-----------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim qsdMySort As New QSDouble
 On Error GoTo err_PrepareOptimization
 ChangeStatus " Creating optimization structures..."
 ReDim OptIndO(DataCnt - 1)
 ReDim OptValO(DataCnt - 1)
-For i = 0 To DataCnt - 1
-    OptIndO(i) = i
-    OptValO(i) = DataVal(i, 0)
-Next i
+For I = 0 To DataCnt - 1
+    OptIndO(I) = I
+    OptValO(I) = DataVal(I, 0)
+Next I
 PrepareOptimization = qsdMySort.QSAsc(OptValO, OptIndO)
 Exit Function
 
@@ -4438,27 +4438,27 @@ Private Sub SetDefinition()
 '--------------------------------------------------------------
 'sets definitions frm structures to control properties
 '--------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error GoTo err_SetDefinition
 With MyDef
     txtRejectLongConnections.Text = .TooDistant
     txtNETType.Text = .NETType
     cmbMetricType.ListIndex = .MetricType
-    For i = 0 To .NetDim - 1
-        With .MetricData(i)
+    For I = 0 To .NetDim - 1
+        With .MetricData(I)
             If .Use Then
-               chkUse(i) = vbChecked
+               chkUse(I) = vbChecked
             Else
-               chkUse(i) = vbUnchecked
+               chkUse(I) = vbUnchecked
             End If
-            cmbData(i).ListIndex = .DataType
+            cmbData(I).ListIndex = .DataType
             ' Note: cmbConstraintUnits() is updated inside DisplayDynamicUnits
-            cmbConstraint(i).ListIndex = .ConstraintType
-            txtWeightingFactor(i).Text = .WeightFactor
-            txtConstraint(i).Text = .ConstraintValue
-            cmbConstraintUnits(i).ListIndex = .ConstraintUnits
+            cmbConstraint(I).ListIndex = .ConstraintType
+            txtWeightingFactor(I).Text = .WeightFactor
+            txtConstraint(I).Text = .ConstraintValue
+            cmbConstraintUnits(I).ListIndex = .ConstraintUnits
         End With
-    Next i
+    Next I
 End With
 
 DisplayDynamicUnits
@@ -4538,7 +4538,7 @@ Private Sub ShowHideCommandButtons(ByVal blnCalculating As Boolean)
 
     fraDREAMS.Enabled = Not blnCalculating
     fraUMCScope.Enabled = Not blnCalculating
-    fraNET(0).Enabled = Not blnCalculating
+    fraNet(0).Enabled = Not blnCalculating
     fraLCMSFeatureStats.Enabled = Not blnCalculating
     fraOptionFrame(0).Enabled = Not blnCalculating
     fraOptionFrame(1).Enabled = Not blnCalculating
@@ -4633,7 +4633,7 @@ Public Sub Status(ByVal StatusMsg As String)
     ChangeStatus StatusMsg
 End Sub
 
-Private Function SubjectToConstraintEuclid(i As Long, j As Long) As Boolean
+Private Function SubjectToConstraintEuclid(I As Long, j As Long) As Boolean
 '-------------------------------------------------------------------------
 'returns True if any used dimension is subject to constraint rule
 '-------------------------------------------------------------------------
@@ -4646,12 +4646,12 @@ For DimInd = 0 To MyDef.NetDim - 1
        Select Case .ConstraintType
        Case Net_CT_None         'no constraint
        Case Net_CT_LT           'distance in this dimension has to be less than constraint value
-            If MetricEuclidDim1Any(DimInd, i, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+            If MetricEuclidDim1Any(DimInd, I, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, I) Then
                SubjectToConstraintEuclid = True
                Exit Function
             End If
        Case Net_CT_GT           'distance in this dimension has to be more than constraint value
-            If MetricEuclidDim1Any(DimInd, i, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+            If MetricEuclidDim1Any(DimInd, I, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, I) Then
                SubjectToConstraintEuclid = True
                Exit Function
             End If
@@ -4662,7 +4662,7 @@ Next DimInd
 exit_SubjectToConstrainEuclid:
 End Function
 
-Private Function SubjectToConstraintHonduras(i As Long, j As Long) As Boolean
+Private Function SubjectToConstraintHonduras(I As Long, j As Long) As Boolean
 '-------------------------------------------------------------------------
 'returns True if any used dimension is subject to constraint rule
 '-------------------------------------------------------------------------
@@ -4674,12 +4674,12 @@ For DimInd = 0 To MyDef.NetDim - 1
        Select Case .ConstraintType
        Case Net_CT_None         'no constraint
        Case Net_CT_LT           'distance in this dimension has to be less than constraint value
-            If MetricHondurasDim1Any(DimInd, i, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+            If MetricHondurasDim1Any(DimInd, I, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, I) Then
                SubjectToConstraintHonduras = True
                Exit Function
             End If
        Case Net_CT_GT           'distance in this dimension has to be more than constraint value
-            If MetricHondurasDim1Any(DimInd, i, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+            If MetricHondurasDim1Any(DimInd, I, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, I) Then
                SubjectToConstraintHonduras = True
                Exit Function
             End If
@@ -4691,7 +4691,7 @@ exit_SubjectToConstrainHonduras:
 End Function
 
 
-Private Function SubjectToConstraintInfinity(i As Long, j As Long) As Boolean
+Private Function SubjectToConstraintInfinity(I As Long, j As Long) As Boolean
 '---------------------------------------------------------------------------
 'returns True if any used dimension is subject to constraint rule
 '---------------------------------------------------------------------------
@@ -4703,12 +4703,12 @@ For DimInd = 0 To MyDef.NetDim - 1
        Select Case .ConstraintType
        Case Net_CT_None         'no constraint
        Case Net_CT_LT           'distance in this dimension has to be less than constraint value
-            If MetricInfinityDim1Any(DimInd, i, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+            If MetricInfinityDim1Any(DimInd, I, j) >= PPMToDaIfNeeded(.ConstraintValue, DimInd, I) Then
                SubjectToConstraintInfinity = True
                Exit Function
             End If
        Case Net_CT_GT           'distance in this dimension has to be more than constraint value
-            If MetricInfinityDim1Any(DimInd, i, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, i) Then
+            If MetricInfinityDim1Any(DimInd, I, j) <= PPMToDaIfNeeded(.ConstraintValue, DimInd, I) Then
                SubjectToConstraintInfinity = True
                Exit Function
             End If
@@ -4756,15 +4756,15 @@ End Sub
 Private Function UpdateNetDimInfo() As Boolean
 
     Dim strMessage As String
-    Dim i As Integer
+    Dim I As Integer
     
     MyDef.NetDim = chkUse.Count
 
     ' Update .NetActualDim
     MyDef.NetActualDim = 0
-    For i = 0 To chkUse.Count - 1
-        If chkUse(i).Value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
-    Next i
+    For I = 0 To chkUse.Count - 1
+        If chkUse(I).Value = vbChecked Then MyDef.NetActualDim = MyDef.NetActualDim + 1
+    Next I
     
     If MyDef.NetActualDim < 1 Then
        strMessage = "At least one data dimension has to be selected."

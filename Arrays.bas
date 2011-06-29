@@ -9,19 +9,19 @@ Public Function GetBadFits(Ind As Long, Fit As Double) As Variant
 'Ind Index of GelData, Fit is acceptable Fit limit; function returns
 'variant array index of bad fits in Iso data arrays
 '-------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim BFDCount As Long
 Dim aTmp() As Variant
 On Error GoTo err_GetBadFits
 BFDCount = 0
 With GelData(Ind)
     ReDim aTmp(.IsoLines)
-    For i = 1 To .IsoLines
-        If .IsoData(i).Fit > Fit Then
+    For I = 1 To .IsoLines
+        If .IsoData(I).Fit > Fit Then
             BFDCount = BFDCount + 1
-            aTmp(BFDCount) = i
+            aTmp(BFDCount) = I
         End If
-    Next i
+    Next I
 End With
 If BFDCount > 0 Then
    ReDim Preserve aTmp(BFDCount)
@@ -41,19 +41,19 @@ Public Function GetBadStDevs(Ind As Long, StDev As Double) As Variant
 'Ind Index of GelData, StDev is acceptable standard deviation limit;
 'function returns variant array index of bad fits in Iso data arrays
 '--------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim BadCount As Long
 Dim aTmp() As Variant
 On Error GoTo err_GetBadStDevs
 BadCount = 0
 With GelData(Ind)
     ReDim aTmp(.CSLines)
-    For i = 1 To .CSLines
-        If .CSData(i).MassStDev > StDev Then
+    For I = 1 To .CSLines
+        If .CSData(I).MassStDev > StDev Then
             BadCount = BadCount + 1
-            aTmp(BadCount) = i
+            aTmp(BadCount) = I
         End If
-    Next i
+    Next I
 End With
 If BadCount > 0 Then
    ReDim Preserve aTmp(BadCount)
@@ -73,7 +73,7 @@ Public Sub SortIsotopicData(ByVal Ind As Long)
 'sort .IsoData on the .IsoDataField inside one scan;
 'this procedure is called only when new Display file is created (duplicates elimination)
 '---------------------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim nScanCount As Long
 Dim nCurrentScan As Long
 Dim IsoField As Integer
@@ -84,22 +84,22 @@ nScanCount = 0
 With GelData(Ind)
   If .IsoLines > 1 Then       'nothing to sort if not at least 2 points
      IsoField = .Preferences.IsoDataField
-     For i = 1 To .IsoLines
+     For I = 1 To .IsoLines
         If nCurrentScan Mod 50 = 0 Then
             ' Yes, I want nCurrentScan Mod 50 but the progress value to be i
-            frmProgress.UpdateSubtaskProgressBar i
+            frmProgress.UpdateSubtaskProgressBar I
             If KeyPressAbortProcess > 1 Then Exit For
         End If
         
         nScanCount = 1
-        nCurrentScan = .IsoData(i).ScanNumber
+        nCurrentScan = .IsoData(I).ScanNumber
 
-        If i < .IsoLines Then
+        If I < .IsoLines Then
             ' Find the ending point for this scan
-            Do While .IsoData(i + nScanCount).ScanNumber = nCurrentScan
+            Do While .IsoData(I + nScanCount).ScanNumber = nCurrentScan
                 nScanCount = nScanCount + 1
-                If i + nScanCount >= .IsoLines Then
-                    nScanCount = .IsoLines - i + 1
+                If I + nScanCount >= .IsoLines Then
+                    nScanCount = .IsoLines - I + 1
                     Exit Do
                 End If
             Loop
@@ -110,12 +110,12 @@ With GelData(Ind)
         If nScanCount > 1 Then
             ' Now sort the peaks in this scan
             ' Sort .IsoData() on the IsoField mass
-            ShellSortIsoArray .IsoData(), i, i + nScanCount - 1, IsoField
+            ShellSortIsoArray .IsoData(), I, I + nScanCount - 1, IsoField
 
             ' Bump up i as required
-            i = i + nScanCount - 1
+            I = I + nScanCount - 1
         End If
-     Next i
+     Next I
   End If
 End With
 Exit Sub
@@ -182,7 +182,7 @@ Public Function GetWorseGuess(ByVal Ind As Long, ByVal Choice As Integer) As Var
 'Choice=1 return those with * in .IsoVar(i,1); Choice=2 return less likely of two
 'based on other results in the same scan
 '-----------------------------------------------------------------------------------
-Dim i As Long, j As Long, k As Long
+Dim I As Long, j As Long, k As Long
 Dim bLastScan As Boolean
 Dim ScanStart As Long
 Dim ScanCount As Long
@@ -210,12 +210,12 @@ With GelData(Ind)
     If .IsoLines > 1 Then
       CurrScan = 0
       ScanCount = 0
-      For i = 1 To .IsoLines
-        If i = .IsoLines Then   'this is neccessary to take care of the last scan
+      For I = 1 To .IsoLines
+        If I = .IsoLines Then   'this is neccessary to take care of the last scan
            ScanCount = ScanCount + 1
            bLastScan = True
         End If
-        If (.IsoData(i).ScanNumber = CurrScan) And (Not bLastScan) Then
+        If (.IsoData(I).ScanNumber = CurrScan) And (Not bLastScan) Then
            ScanCount = ScanCount + 1
         Else      'new scan - do and reset
            If ScanCount > 1 Then
@@ -241,10 +241,10 @@ With GelData(Ind)
               Next j
            End If
            ScanCount = 1
-           CurrScan = .IsoData(i).ScanNumber
-           ScanStart = i
+           CurrScan = .IsoData(I).ScanNumber
+           ScanStart = I
         End If
-      Next i
+      Next I
     End If
   End Select
 End With
@@ -267,7 +267,7 @@ Public Function GetDuplicates(iInd As Long, nDT As Double) As Variant
 'returns variant containing array of indexes of duplicates in .IsoData array
 '(most abundant) in the multiplet is not returned as a duplicate
 '--------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim DupCount As Long
 Dim ScanStart As Long
 Dim ScanCount As Long
@@ -285,12 +285,12 @@ With GelData(iInd)
   If .IsoLines > 1 Then        'no sense otherwise
     ReDim aTmp(.IsoLines)
     IsoField = .Preferences.IsoDataField
-    For i = 1 To .IsoLines
-        If i = .IsoLines Then   'this is neccessary to take care of the last scan
+    For I = 1 To .IsoLines
+        If I = .IsoLines Then   'this is neccessary to take care of the last scan
            ScanCount = ScanCount + 1
            CurrScan = -1
         End If
-        If .IsoData(i).ScanNumber = CurrScan Then
+        If .IsoData(I).ScanNumber = CurrScan Then
           ScanCount = ScanCount + 1
         Else                          'new scan; eliminate duplicates
           j = ScanStart              'in previous scan
@@ -315,10 +315,10 @@ With GelData(iInd)
             j = j + k
           Loop
           ScanCount = 1             'and reset counter
-          CurrScan = .IsoData(i).ScanNumber
-          ScanStart = i
+          CurrScan = .IsoData(I).ScanNumber
+          ScanStart = I
         End If
-    Next i
+    Next I
   End If
 End With
 If DupCount > 0 Then
@@ -334,81 +334,30 @@ GetDuplicates = Null
 LogErrors Err.Number, "GetDuplicates"
 End Function
 
-' Unused function (February 2005)
-''Public Function GetBadDBFits(iInd As Long, nDBFit As Double) As Variant
-'''--------------------------------------------------------------------------
-''' THIS FUNCTION IS UNUSED
-'''
-'''iInd Index of GelData, nDBFit is acceptable Fit limit
-'''function returns variant containing array of indexes in .CSData and .IsoData
-'''first row contains glCSType or glIsoType; second row index
-'''rows and columns are here transposed for easier redimensioning
-'''--------------------------------------------------------------------------
-''Dim i As Long
-''Dim IsoField As Integer
-''Dim BDBFCount As Long
-''Dim aTmp() As Variant
-''On Error GoTo err_getbaddbfits
-''BDBFCount = 0
-''With GelData(iInd)
-''    ReDim aTmp(1, .DataLines)
-''    If .CSLines > 0 Then
-''       For i = 1 To .CSLines
-''         If Abs(.CSData(i).AverageMW - .CSData(i).IsotopicFitRatio) > nDBFit Then
-''            BDBFCount = BDBFCount + 1
-''            aTmp(0, BDBFCount) = glCSType
-''            aTmp(1, BDBFCount) = i
-''         End If
-''       Next i
-''    End If
-''    IsoField = .Preferences.IsoDataField
-''    If .IsoLines > 0 Then
-''       For i = 1 To .IsoLines
-''         If Abs(GetIsoMass(.IsoData(i), IsoField) - .IsoData(i).IsotopicFitRatio) > nDBFit Then
-''            BDBFCount = BDBFCount + 1
-''            aTmp(0, BDBFCount) = glIsoType
-''            aTmp(1, BDBFCount) = i
-''         End If
-''       Next i
-''    End If
-''End With
-''If BDBFCount > 0 Then
-''   ReDim Preserve aTmp(1, BDBFCount)
-''   GetBadDBFits = aTmp
-''Else
-''   GetBadDBFits = Null
-''End If
-''Exit Function
-''
-''err_getbaddbfits:
-''GetBadDBFits = Null
-''LogErrors Err.Number, "GetBadDBFits"
-''End Function
-
 Private Function CountWhat(iInd As Long, ScanNum As Double, MW As Double, DT As Double) As Long
 '-------------------------------------------------------------------------------------------------
 'This function is just to make code for GetWorseGuess shorter; it returns number of MWs
 'same as the MW (same within DT -duplicate tolerance)inside the CS and ISO data arrays
 '-------------------------------------------------------------------------------------------------
 Dim MyCount As Long
-Dim i As Long
+Dim I As Long
 Dim IsoField As Integer
 MyCount = 0
 With GelData(iInd)
    If .CSLines > 0 Then
-      For i = 1 To .CSLines
-          If .CSData(i).ScanNumber = ScanNum Then
-             If Abs(.CSData(i).AverageMW - MW) < DT Then MyCount = MyCount + 1
+      For I = 1 To .CSLines
+          If .CSData(I).ScanNumber = ScanNum Then
+             If Abs(.CSData(I).AverageMW - MW) < DT Then MyCount = MyCount + 1
           End If
-      Next i
+      Next I
    End If
    If .IsoLines > 0 Then
       IsoField = .Preferences.IsoDataField
-      For i = 1 To .IsoLines
-          If .IsoData(i).ScanNumber = ScanNum Then
-             If Abs(GetIsoMass(.IsoData(i), IsoField) - MW) < DT Then MyCount = MyCount + 1
+      For I = 1 To .IsoLines
+          If .IsoData(I).ScanNumber = ScanNum Then
+             If Abs(GetIsoMass(.IsoData(I), IsoField) - MW) < DT Then MyCount = MyCount + 1
           End If
-      Next i
+      Next I
    End If
 End With
 CountWhat = MyCount
@@ -419,48 +368,24 @@ Public Function GetDFIndex(ByVal Ind As Long, ByVal FN As Long) As Long
 '-------------------------------------------------------------------------
 'retrieves index in DF arrays for specified scan number
 '-------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim MaxInd As Long
 On Error GoTo exit_GetDFIndex
 With GelData(Ind)
     MaxInd = UBound(.ScanInfo)
     If MaxInd > 0 Then
-       For i = 1 To MaxInd
-           If .ScanInfo(i).ScanNumber = FN Then
-              GetDFIndex = i
+       For I = 1 To MaxInd
+           If .ScanInfo(I).ScanNumber = FN Then
+              GetDFIndex = I
               Exit Function
            End If
-       Next i
+       Next I
     End If
 End With
 'if here scan number was not found
 exit_GetDFIndex:
 GetDFIndex = -1
 End Function
-
-' Unused Function (March 2003)
-'''Public Function GetpIIndex(ByVal Ind As Long, ByVal pi) As Long
-''''--------------------------------------------------------------
-''''retrieves index in DF arrays for specified scan number
-''''--------------------------------------------------------------
-'''Dim i As Long
-'''Dim MaxInd As Long
-'''On Error GoTo err_GetpIIndex
-'''With GelData(Ind)
-'''    MaxInd = UBound(.DFPI)
-'''    If MaxInd > 0 And IsNumeric(pi) Then
-'''       For i = 1 To MaxInd
-'''           If .DFPI(i) = pi Then
-'''              GetpIIndex = i
-'''              Exit Function
-'''           End If
-'''       Next i
-'''    End If
-'''End With
-''''if here pI was not found
-'''err_GetpIIndex:
-'''GetpIIndex = -1
-'''End Function
 
 
 Public Function MinpIToFN(ByVal Ind As Long, ByVal spI As Double) As Long
@@ -594,17 +519,17 @@ Dim SM As Double
 Dim TmpCnt As Long
 Dim MinInd As Long
 Dim MaxInd As Long
-Dim i As Long
+Dim I As Long
 On Error GoTo err_Avg_V
 
 MinInd = LBound(aVal)
 MaxInd = UBound(aVal)
 SM = 0
 TmpCnt = 0
-For i = MinInd To MaxInd
+For I = MinInd To MaxInd
     TmpCnt = TmpCnt + 1
-    SM = SM + CDbl(aVal(i))
-Next i
+    SM = SM + CDbl(aVal(I))
+Next I
 Cnt = TmpCnt
 If TmpCnt > 0 Then Res = SM / TmpCnt
 Exit Sub
@@ -615,113 +540,6 @@ End Sub
 
 
 'FUNCTIONS RELATED TO MAINTENANCE OF FIELDS IN CSData/IsoData ARRAYS
-
-' Unused Function (March 2003)
-'''Public Function RemoveRefFromIDField(ByVal Ind As Long, ByVal Scope As Integer, ByVal RefMark As String)
-''''-------------------------------------------------------------------------------------------------------
-''''removes all refs. marked with RefMark from the field CS/IsoVar(i,3); which is considered to be ID field
-''''-------------------------------------------------------------------------------------------------------
-'''Dim i As Long
-'''On Error Resume Next
-'''Select Case Scope
-'''Case glScope.glSc_All
-'''  With GelData(Ind)
-'''      If .CSLines > 0 Then
-'''         For i = 1 To .CSLines
-'''             CleanRef .CSData(i).mtid, RefMark
-'''         Next i
-'''      End If
-'''      If .IsoLines > 0 Then
-'''         For i = 1 To .IsoLines
-'''             CleanRef .IsoData(i).MTID, RefMark
-'''         Next i
-'''      End If
-'''  End With
-'''Case glScope.glSc_Current
-'''  With GelData(Ind)
-'''    If .CSLines > 0 Then
-'''       For i = 1 To .CSLines
-'''         If GelDraw(Ind).CSID(i) > 0 And GelDraw(Ind).CSR(i) > 0 Then
-'''            CleanRef .CSData(i).mtid, RefMark
-'''         End If
-'''       Next i
-'''    End If
-'''    If .IsoLines > 0 Then
-'''       For i = 1 To .IsoLines
-'''         If GelDraw(Ind).IsoID(i) > 0 And GelDraw(Ind).IsoR(i) > 0 Then
-'''            CleanRef .IsoData(i).MTID, RefMark
-'''         End If
-'''       Next i
-'''    End If
-'''  End With
-'''End Select
-'''End Function
-'''
-'''
-'''Public Sub CleanRef(ByRef s As Variant, ByVal RefMark As String)
-''''---------------------------------------------------------------
-''''cleans string s from all references marked as RefMark
-''''---------------------------------------------------------------
-'''Dim Done As Boolean
-'''Dim RefMarkPos As Long
-'''Dim TerminatorPos As Long
-'''On Error Resume Next
-'''If IsNull(s) Then Exit Sub  'do not do anything if already null
-'''Do Until Done
-'''   RefMarkPos = InStr(1, s, RefMark)
-'''   If RefMarkPos > 0 Then
-'''      TerminatorPos = InStr(RefMarkPos, s, glARG_SEP)
-'''      If TerminatorPos > 0 Then
-'''         s = Trim$(Left$(s, RefMarkPos - 1) & Right$(s, Len(s) - TerminatorPos))
-'''         If Len(s) <= 0 Then Done = True
-'''      Else
-'''         s = Trim$(Left$(s, RefMarkPos - 1))
-'''         Done = True
-'''      End If
-'''   Else
-'''      Done = True
-'''   End If
-'''Loop
-'''End Sub
-
-''Public Sub CleanVarField(ByVal Ind As Long, ByVal Field As Integer)
-'''---------------------------------------------------------------------
-'''cleans CS/IsoVar fields in specific gel (sets it to Null)
-'''---------------------------------------------------------------------
-''Dim i As Long
-''With GelData(Ind)
-''  If .CSLines > 0 Then
-''     For i = 1 To .CSLines
-''         If Not IsNull(.CSVar(i, Field)) Then .CSVar(i, Field) = Null
-''     Next i
-''  End If
-''  If .IsoLines > 0 Then
-''     For i = 1 To .IsoLines
-''         If Not IsNull(.IsoVar(i, Field)) Then .IsoVar(i, Field) = Null
-''     Next i
-''  End If
-''End With
-''End Sub
-
-' Unused Function (March 2003)
-'''Public Sub RemoveStringFromVarField(ByVal Ind As Long, ByVal s As String, ByVal Field As Integer)
-''''------------------------------------------------------------------------------------------------
-''''removes string s from Field in CS/IsoVar arrays if found
-''''------------------------------------------------------------------------------------------------
-'''Dim i As Long
-'''With GelData(Ind)
-'''  If .CSLines > 0 Then
-'''     For i = 1 To .CSLines
-'''         RemoveSubstring .CSVar(i, Field), s
-'''     Next i
-'''  End If
-'''  If .IsoLines > 0 Then
-'''     For i = 1 To .IsoLines
-'''         RemoveSubstring .IsoVar(i, Field), s
-'''     Next i
-'''  End If
-'''End With
-'''End Sub
 
 Public Sub Remove1stSubstring(ByRef S As String, ByVal SubS As String)
 '---------------------------------------------------------------------
@@ -793,7 +611,7 @@ Public Sub RemoveBadMTs_Delta(ByVal Ind As Long)
 'IDR all MT delta matches are included;if there is no IDR all MTs are included; if MT does not
 'contain delta information it is included (cr:04/02/2001;nt)
 '----------------------------------------------------------------------------------------------
-Dim i As Long, j As Long, k As Long
+Dim I As Long, j As Long, k As Long
 Dim MTCnt As Long
 Dim MTRef() As String
 Dim sMTDlt As String
@@ -804,16 +622,16 @@ Dim IDlt() As Long
 Dim HasDltMatch As Boolean
 On Error Resume Next
 With GelData(Ind)
-  For i = 1 To .CSLines
-    If IsAMTReferenced(.CSData(i).MTID) Then
-       IDRCnt = GetTagRefFromString(PAIR_DLT_MARK, CStr(.CSData(i).MTID), IDRRef())
+  For I = 1 To .CSLines
+    If IsAMTReferenced(.CSData(I).MTID) Then
+       IDRCnt = GetTagRefFromString(PAIR_DLT_MARK, CStr(.CSData(I).MTID), IDRRef())
        If IDRCnt > 0 Then
           ReDim IDlt(IDRCnt - 1)
           For j = 0 To IDRCnt - 1
               sIDlt = GetIDFromString(IDRRef(j), PAIR_DLT_MARK)
               If IsNumeric(sIDlt) Then IDlt(j) = CLng(sIDlt)
           Next j
-          MTCnt = GetTagRefFromString(AMTMark, CStr(.CSData(i).MTID), MTRef())
+          MTCnt = GetTagRefFromString(AMTMark, CStr(.CSData(I).MTID), MTRef())
           For j = 0 To MTCnt - 1
             sMTDlt = GetIDFromString(MTRef(j), MTDltMark)
             HasDltMatch = False
@@ -824,21 +642,21 @@ With GelData(Ind)
                  End If
                Next k
             End If
-            If Not HasDltMatch Then RemoveSubstring .CSData(i).MTID, MTRef(j)
+            If Not HasDltMatch Then RemoveSubstring .CSData(I).MTID, MTRef(j)
           Next j
        End If
     End If
-  Next i
-  For i = 1 To .IsoLines
-    If IsAMTReferenced(.IsoData(i).MTID) Then
-       IDRCnt = GetTagRefFromString(PAIR_DLT_MARK, CStr(.IsoData(i).MTID), IDRRef())
+  Next I
+  For I = 1 To .IsoLines
+    If IsAMTReferenced(.IsoData(I).MTID) Then
+       IDRCnt = GetTagRefFromString(PAIR_DLT_MARK, CStr(.IsoData(I).MTID), IDRRef())
        If IDRCnt > 0 Then
           ReDim IDlt(IDRCnt - 1)
           For j = 0 To IDRCnt - 1
               sIDlt = GetIDFromString(IDRRef(j), PAIR_DLT_MARK)
               If IsNumeric(sIDlt) Then IDlt(j) = CLng(sIDlt)
           Next j
-          MTCnt = GetTagRefFromString(AMTMark, CStr(.IsoData(i).MTID), MTRef())
+          MTCnt = GetTagRefFromString(AMTMark, CStr(.IsoData(I).MTID), MTRef())
           For j = 0 To MTCnt - 1
             sMTDlt = GetIDFromString(MTRef(j), MTDltMark)
             HasDltMatch = False
@@ -849,11 +667,11 @@ With GelData(Ind)
                  End If
                Next k
             End If
-            If Not HasDltMatch Then RemoveSubstring .IsoData(i).MTID, MTRef(j)
+            If Not HasDltMatch Then RemoveSubstring .IsoData(I).MTID, MTRef(j)
           Next j
        End If
     End If
-  Next i
+  Next I
 End With
 GelStatus(Ind).Dirty = True
 End Sub
@@ -869,7 +687,7 @@ Dim TagRefCnt  As Long
 Dim TagLen As Long
 Dim AllRef() As String
 Dim AllRefCnt As Long
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 
 TagLen = Len(Tag)
@@ -879,13 +697,13 @@ If (Len(S) > 0 And TagLen > 0) Then             'pick all references
 End If
 If AllRefCnt > 0 Then
    ReDim TagRef(AllRefCnt - 1)
-   For i = 0 To AllRefCnt - 1
-       AllRef(i) = Trim$(AllRef(i))
-       If Left$(AllRef(i), TagLen) = Tag Then   'select desired tag references
+   For I = 0 To AllRefCnt - 1
+       AllRef(I) = Trim$(AllRef(I))
+       If Left$(AllRef(I), TagLen) = Tag Then   'select desired tag references
           TagRefCnt = TagRefCnt + 1
-          TagRef(TagRefCnt - 1) = AllRef(i)
+          TagRef(TagRefCnt - 1) = AllRef(I)
        End If
-   Next i
+   Next I
 End If
 If TagRefCnt > 0 Then                           'trim array
    ReDim Preserve TagRef(TagRefCnt - 1)
@@ -902,7 +720,7 @@ Public Sub RemoveBadMTs_DeltaMT(ByVal Ind As Long, ByVal DeltaType As Long)
 'DeltaType can be N14/N15 or ICAT
 'cr:04/02/2001;nt
 '------------------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim MTCnt As Long
 Dim MTRef() As String
 Dim sMTDlt As String
@@ -940,9 +758,9 @@ If Not objAMTIDFastSearch.Fill(lngAMTID()) Then
 End If
 
 With GelData(Ind)
-  For i = 1 To .CSLines
-    If IsAMTReferenced(.CSData(i).MTID) Then
-        MTCnt = GetTagRefFromString(AMTMark, CStr(.CSData(i).MTID), MTRef())
+  For I = 1 To .CSLines
+    If IsAMTReferenced(.CSData(I).MTID) Then
+        MTCnt = GetTagRefFromString(AMTMark, CStr(.CSData(I).MTID), MTRef())
         For j = 0 To MTCnt - 1
             sMTDlt = GetIDFromString(MTRef(j), MTDltMark)
             sMTID = GetIDFromString(MTRef(j), AMTMark, AMTIDEnd)
@@ -953,21 +771,21 @@ With GelData(Ind)
                     Select Case DeltaType
                     Case PAIR_ICAT
                         If AMTData(MTIDInd).CNT_Cys < CLng(sMTDlt) Then
-                            RemoveSubstring .CSData(i).MTID, MTRef(j)
+                            RemoveSubstring .CSData(I).MTID, MTRef(j)
                         End If
                     Case PAIR_N14N15
                         If AMTData(MTIDInd).CNT_N < CLng(sMTDlt) Then
-                            RemoveSubstring .CSData(i).MTID, MTRef(j)
+                            RemoveSubstring .CSData(I).MTID, MTRef(j)
                         End If
                     End Select
                 End If
             End If
        Next j
     End If
-  Next i
-  For i = 1 To .IsoLines
-    If IsAMTReferenced(.IsoData(i).MTID) Then
-        MTCnt = GetTagRefFromString(AMTMark, CStr(.IsoData(i).MTID), MTRef())
+  Next I
+  For I = 1 To .IsoLines
+    If IsAMTReferenced(.IsoData(I).MTID) Then
+        MTCnt = GetTagRefFromString(AMTMark, CStr(.IsoData(I).MTID), MTRef())
         For j = 0 To MTCnt - 1
             sMTDlt = GetIDFromString(MTRef(j), MTDltMark)
             sMTID = GetIDFromString(MTRef(j), AMTMark, AMTIDEnd)
@@ -978,18 +796,18 @@ With GelData(Ind)
                     Select Case DeltaType
                     Case PAIR_ICAT
                         If AMTData(MTIDInd).CNT_Cys < CLng(sMTDlt) Then
-                            RemoveSubstring .IsoData(i).MTID, MTRef(j)
+                            RemoveSubstring .IsoData(I).MTID, MTRef(j)
                         End If
                     Case PAIR_N14N15
                         If AMTData(MTIDInd).CNT_N < CLng(sMTDlt) Then
-                            RemoveSubstring .IsoData(i).MTID, MTRef(j)
+                            RemoveSubstring .IsoData(I).MTID, MTRef(j)
                         End If
                     End Select
                 End If
             End If
         Next j
     End If
-  Next i
+  Next I
 End With
 GelStatus(Ind).Dirty = True
 End Sub
@@ -998,15 +816,15 @@ Public Sub RemoveIDWithoutID(ByVal Ind As Long)
 '-------------------------------------------------------
 'clears all IDs that does not include Database reference
 '-------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelData(Ind)
-  For i = 1 To .CSLines
-    If Not IsAMTReferenced(.CSData(i).MTID) Then .CSData(i).MTID = ""
-  Next i
-  For i = 1 To .IsoLines
-    If Not IsAMTReferenced(.IsoData(i).MTID) Then .IsoData(i).MTID = ""
-  Next i
+  For I = 1 To .CSLines
+    If Not IsAMTReferenced(.CSData(I).MTID) Then .CSData(I).MTID = ""
+  Next I
+  For I = 1 To .IsoLines
+    If Not IsAMTReferenced(.IsoData(I).MTID) Then .IsoData(I).MTID = ""
+  Next I
 End With
 GelStatus(Ind).Dirty = True
 End Sub
@@ -1016,15 +834,15 @@ Public Sub CleanIDData(ByVal Ind As Long)
 '----------------------------------------
 'clears all IDs
 '----------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelData(Ind)
-  For i = 1 To .CSLines
-    .CSData(i).MTID = ""
-  Next i
-  For i = 1 To .IsoLines
-    .IsoData(i).MTID = ""
-  Next i
+  For I = 1 To .CSLines
+    .CSData(I).MTID = ""
+  Next I
+  For I = 1 To .IsoLines
+    .IsoData(I).MTID = ""
+  Next I
 End With
 GelStatus(Ind).Dirty = True
 End Sub
@@ -1038,7 +856,7 @@ Dim ArrCnt As Long
 Dim MySort As New QSLongIndOnly           'use sort that does not change order of original arrays
 Dim MyScanSort As QSLongIndOnly          'this will sort just temporary arrays
 Dim Scan() As Long, ScanInd() As Long   'used to sort on second index
-Dim i As Long, j As Long, tmp As Long
+Dim I As Long, j As Long, tmp As Long
 Dim CurrInd1 As Long
 Dim ScanStartPos As Long, ScanEndPos As Long, ScanCnt As Long
 On Error GoTo err_Sort2LongArrays
@@ -1048,9 +866,9 @@ If ArrCnt > 0 Then
       If MySort.QSAsc(Ind1(), SortInd()) Then           'sort fast on first index
          'now sort scans of same first index rows on second index
          CurrInd1 = -1:      ScanCnt = 0
-         For i = 0 To ArrCnt - 1
-             If Ind1(SortInd(i)) = CurrInd1 Then           'still in the same Scan
-                ScanEndPos = i                            'index in SortInd array
+         For I = 0 To ArrCnt - 1
+             If Ind1(SortInd(I)) = CurrInd1 Then           'still in the same Scan
+                ScanEndPos = I                            'index in SortInd array
                 ScanCnt = ScanCnt + 1
              Else                                          'new Scan; sort previous if anything to sort
                 If ScanCnt > 0 Then                       'nothing to sort otherwise
@@ -1077,10 +895,10 @@ If ArrCnt > 0 Then
                       End If
                    End If
                 End If
-                CurrInd1 = Ind1(SortInd(i))                'start new Scan
-                ScanStartPos = i:   ScanEndPos = i:   ScanCnt = 1
+                CurrInd1 = Ind1(SortInd(I))                'start new Scan
+                ScanStartPos = I:   ScanEndPos = I:   ScanCnt = 1
              End If
-         Next i
+         Next I
          'sort last Scan
          If ScanCnt > 0 Then                       'nothing to sort otherwise
             If ScanCnt > 1 Then                    'nothing to sort otherwise

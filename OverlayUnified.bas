@@ -83,10 +83,10 @@ Public Type OverlayCoo
     DataCnt As Long
     CSCnt As Long
     IsoCnt As Long
-    x() As Single
+    X() As Single
     XL() As Single            'adjustment before    - box only
     XU() As Single            'adjustment after     - box only
-    y() As Single
+    Y() As Single
     YL() As Single            'adjustment lower     - box only
     YU() As Single            'adjustment upper     - box only
     R() As Single             '                     - spots
@@ -120,22 +120,6 @@ Public OlyCoo() As OverlayCoo
 Public OlyAdj() As OverlayAdjustment        'used only with sticks
 Public OlyOptions As OverlayOptions
 Public OlyJiggyOptions As OverlayJiggyOptions
-
-' Unused Function (May 2003)
-'''Public Function IsOverlaid(ByVal Ind As Long) As Boolean
-''''-------------------------------------------------------
-''''return True if display Ind is already overlaid
-''''-------------------------------------------------------
-'''Dim i As Long
-'''On Error GoTo exit_IsOverlaid
-'''For i = 0 To OlyCnt - 1
-'''    If Oly(i).DisplayInd Then
-'''       IsOverlaid = True
-'''       GoTo exit_IsOverlaid
-'''    End If
-'''Next i
-'''exit_IsOverlaid:
-'''End Function
 
 Public Function AddDisplayToOverlay(ByVal Ind As Long) As Boolean
 '----------------------------------------------------------------
@@ -196,22 +180,22 @@ Public Function RemoveZOrderPositionFromOverlay(ByVal ZPosition As Long) As Bool
 '----------------------------------------------------------------------------------
 'removes display on ZPosition in the overlay; returns True if successful
 '----------------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim ZPositionFound As Boolean
 On Error Resume Next
-For i = 0 To OlyCnt - 1
-    If Oly(i).ZOrder > ZPosition Then Oly(i).ZOrder = Oly(i).ZOrder - 1
+For I = 0 To OlyCnt - 1
+    If Oly(I).ZOrder > ZPosition Then Oly(I).ZOrder = Oly(I).ZOrder - 1
     If ZPositionFound Then
-       Oly(i - 1) = Oly(i)
-       OlyCoo(i - 1) = OlyCoo(i - 1)
-       OlyAdj(i - 1) = OlyAdj(i - 1)
+       Oly(I - 1) = Oly(I)
+       OlyCoo(I - 1) = OlyCoo(I - 1)
+       OlyAdj(I - 1) = OlyAdj(I - 1)
     Else
-       If Oly(i).ZOrder = ZPosition Then
+       If Oly(I).ZOrder = ZPosition Then
           ZPositionFound = True
-          Call RemoveOlyClr(i - 1)
+          Call RemoveOlyClr(I - 1)
        End If
     End If
-Next i
+Next I
 If ZPositionFound Then
    OlyCnt = OlyCnt - 1
    ReDim Preserve Oly(OlyCnt - 1)
@@ -220,40 +204,20 @@ If ZPositionFound Then
    RemoveZOrderPositionFromOverlay = True
 End If
 End Function
-'
-' Unused Function (May 2003)
-'''Public Function RemoveDisplayAllFromOverlay(ByVal Ind As Long) As Boolean
-''''--------------------------------------------------------------------------
-''''removes all displays with index Ind from overlay; returns True if OK; this
-''''is neccessary - more than one instance of a display could exist in overlay
-''''--------------------------------------------------------------------------
-'''Dim i As Long
-'''Dim Done As Boolean
-'''Do Until Done
-'''   For i = 0 To OlyCnt - 1
-'''       If Oly(i).DisplayInd = Ind Then
-'''          RemoveZOrderPositionFromOverlay Oly(i).ZOrder
-'''          Exit For
-'''       End If
-'''   Next i
-'''   If i >= OlyCnt Then Done = True
-'''Loop
-'''End Function
-'
-'
+
 Public Function GetOlyIndFromZOrder(ZPosition As Long) As Long
 '---------------------------------------------------------------
 'returns index in array Oly for specified ZPosition; -1 on error
 '---------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 GetOlyIndFromZOrder = -1
-For i = 0 To OlyCnt - 1
-    If Oly(i).ZOrder = ZPosition Then
-       GetOlyIndFromZOrder = i
+For I = 0 To OlyCnt - 1
+    If Oly(I).ZOrder = ZPosition Then
+       GetOlyIndFromZOrder = I
        Exit Function
     End If
-Next i
+Next I
 End Function
 '
 Private Function InitOverlayCooAdj(ByVal OlyInd As Long, DisplayInd As Long) As Boolean
@@ -273,10 +237,10 @@ With OlyCoo(OlyInd)
          .CSCnt = 0
          .IsoCnt = 0
     End Select
-    ReDim .x(.DataCnt - 1)
+    ReDim .X(.DataCnt - 1)
     ReDim .XL(.DataCnt - 1)
     ReDim .XU(.DataCnt - 1)
-    ReDim .y(.DataCnt - 1)
+    ReDim .Y(.DataCnt - 1)
     ReDim .YL(.DataCnt - 1)
     ReDim .YU(.DataCnt - 1)
     ReDim .R(.DataCnt - 1)
@@ -301,16 +265,16 @@ Private Function InitOlyAdjustmentFixSym(ByVal OlyInd As Long) As Boolean
 '-----------------------------------------------------------------------
 'initialize overlay adjustment as a fixed value for all spots
 '-----------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 With OlyAdj(OlyInd)
     ReDim .NETL(OlyCoo(OlyInd).DataCnt - 1)
     ReDim .NETU(OlyCoo(OlyInd).DataCnt - 1)
     'ReDim .MW_ppmL(OlyCoo(OlyInd).DataCnt - 1)
     'ReDim .MW_ppmU(OlyCoo(OlyInd).DataCnt - 1)
-    For i = 0 To OlyCoo(OlyInd).DataCnt - 1
-        .NETL(i) = Oly(OlyInd).NETTol
-        .NETU(i) = Oly(OlyInd).NETTol
-    Next i
+    For I = 0 To OlyCoo(OlyInd).DataCnt - 1
+        .NETL(I) = Oly(OlyInd).NETTol
+        .NETU(I) = Oly(OlyInd).NETTol
+    Next I
 End With
 End Function
 '
@@ -319,13 +283,13 @@ Public Function GetOlyZOrder(ZOrder() As Long) As Boolean
 '--------------------------------------------------------
 'fills Oly indexes in z-order; returns True if OK
 '--------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error GoTo exit_GetOlyZOrder
 If OlyCnt > 0 Then
    ReDim ZOrder(OlyCnt - 1)
-   For i = 0 To OlyCnt - 1
-       ZOrder(Oly(i).ZOrder) = i
-   Next i
+   For I = 0 To OlyCnt - 1
+       ZOrder(Oly(I).ZOrder) = I
+   Next I
 End If
 GetOlyZOrder = True
 exit_GetOlyZOrder:
@@ -337,11 +301,11 @@ Public Sub GetOverlayLimits(dMinNET As Double, dMinMW As Double, dMinAbu As Doub
 '------------------------------------------------------------------------------------
 'retrieve limits of overlaid displays so that all fit in - use the largest box
 '------------------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 dMinNET = glHugeOverExp:     dMinMW = glHugeOverExp:      dMinAbu = glHugeOverExp
 dMaxNET = -glHugeOverExp:    dMaxMW = -glHugeOverExp:     dMaxAbu = -glHugeOverExp
-For i = 0 To OlyCnt - 1
-    With Oly(i)
+For I = 0 To OlyCnt - 1
+    With Oly(I)
         If .minNET < dMinNET Then dMinNET = .minNET
         If .MinMW < dMinMW Then dMinMW = .MinMW
         If .MinAbu < dMinAbu Then dMinAbu = .MinAbu
@@ -349,7 +313,7 @@ For i = 0 To OlyCnt - 1
         If .MaxMW > dMaxMW Then dMaxMW = .MaxMW
         If .MaxAbu > dMaxAbu Then dMaxAbu = .MaxAbu
     End With
-Next i
+Next I
 End Sub
 '
 '
@@ -391,7 +355,7 @@ Private Function InitOlyVisibility(ByVal OlyInd As Long) As Boolean
 'initializes visibility for OlyInd of DisplayInd; returns True if succesful
 'for unique mass class is vissible if it's class representative is visible
 '--------------------------------------------------------------------------
-Dim i As Long, TmpCnt As Long
+Dim I As Long, TmpCnt As Long
 Dim ClsRepInd As Long, ClsRepType As Long
 On Error GoTo exit_InitOlyVisibility
 If OlyOptions.DefCurrScopeVisible Then
@@ -399,91 +363,57 @@ If OlyOptions.DefCurrScopeVisible Then
    Case olySolo
       With GelDraw(Oly(OlyInd).DisplayInd)
           If (.CSCount > 0 And .CSVisible) Then
-             For i = 1 To .CSCount
+             For I = 1 To .CSCount
                  TmpCnt = TmpCnt + 1
-                 If .CSID(i) > 0 And .CSR(i) > 0 Then
+                 If .CSID(I) > 0 And .CSR(I) > 0 Then
                     OlyCoo(OlyInd).Visible(TmpCnt - 1) = True
                  Else
                     OlyCoo(OlyInd).Visible(TmpCnt - 1) = False
                  End If
-             Next i
+             Next I
           End If
           If (.IsoCount > 0 And .IsoVisible) Then
-             For i = 1 To .IsoCount
+             For I = 1 To .IsoCount
                  TmpCnt = TmpCnt + 1
-                 If .IsoID(i) > 0 And .IsoR(i) > 0 Then
+                 If .IsoID(I) > 0 And .IsoR(I) > 0 Then
                     OlyCoo(OlyInd).Visible(TmpCnt - 1) = True
                  Else
                     OlyCoo(OlyInd).Visible(TmpCnt - 1) = False
                  End If
-             Next i
+             Next I
          End If
       End With
    Case OlyUMC
       With GelDraw(Oly(OlyInd).DisplayInd)
-         For i = 0 To GelUMC(Oly(OlyInd).DisplayInd).UMCCnt - 1
-             ClsRepInd = GelUMC(Oly(OlyInd).DisplayInd).UMCs(i).ClassRepInd
-             ClsRepType = GelUMC(Oly(OlyInd).DisplayInd).UMCs(i).ClassRepType
+         For I = 0 To GelUMC(Oly(OlyInd).DisplayInd).UMCCnt - 1
+             ClsRepInd = GelUMC(Oly(OlyInd).DisplayInd).UMCs(I).ClassRepInd
+             ClsRepType = GelUMC(Oly(OlyInd).DisplayInd).UMCs(I).ClassRepType
              Select Case ClsRepType
              Case glCSType
                   If .CSVisible Then
                      If .CSID(ClsRepInd) > 0 And .CSR(ClsRepInd) > 0 Then
-                        OlyCoo(OlyInd).Visible(i) = True
+                        OlyCoo(OlyInd).Visible(I) = True
                      Else
-                        OlyCoo(OlyInd).Visible(i) = False
+                        OlyCoo(OlyInd).Visible(I) = False
                      End If
                   End If
              Case glIsoType
                   If .IsoVisible Then
                      If .IsoID(ClsRepInd) > 0 And .IsoR(ClsRepInd) > 0 Then
-                        OlyCoo(OlyInd).Visible(i) = True
+                        OlyCoo(OlyInd).Visible(I) = True
                      Else
-                        OlyCoo(OlyInd).Visible(i) = False
+                        OlyCoo(OlyInd).Visible(I) = False
                      End If
                   End If
              End Select
-         Next i
+         Next I
       End With
    End Select
 Else
-   For i = 0 To OlyCoo(OlyInd).DataCnt - 1
-       OlyCoo(OlyInd).Visible(i) = True
-   Next i
+   For I = 0 To OlyCoo(OlyInd).DataCnt - 1
+       OlyCoo(OlyInd).Visible(I) = True
+   Next I
 End If
 InitOlyVisibility = True
 exit_InitOlyVisibility:
 End Function
-'
-'
-' Unused Function (May 2003)
-'''Public Function GetOlyTextFromID(ByVal OlyInd As Long) As Boolean
-'''Dim i As Long
-'''Dim TmpCnt As Long
-'''Dim FullText As String
-'''Dim DisplayInd As Long
-'''On Error Resume Next
-'''DisplayInd = Oly(OlyInd).DisplayInd
-'''With OlyCoo(OlyInd)
-'''    For i = 0 To .CSCnt - 1
-'''        TmpCnt = TmpCnt + 1
-'''        FullText = ""
-'''        FullText = GelData(DisplayInd).CSData(i + 1).MTID
-'''        If Len(FullText) > 20 Then
-'''           .Text(TmpCnt - 1) = Left$(FullText, 20)
-'''        Else
-'''           .Text(TmpCnt - 1) = FullText
-'''        End If
-'''    Next i
-'''    For i = 0 To .IsoCnt - 1
-'''        TmpCnt = TmpCnt + 1
-'''        FullText = ""
-'''        FullText = GelData(DisplayInd).IsoData(i + 1).MTID
-'''        If Len(FullText) > 20 Then
-'''           .Text(TmpCnt - 1) = Left$(FullText, 20)
-'''        Else
-'''           .Text(TmpCnt - 1) = FullText
-'''        End If
-'''    Next i
-'''End With
-'''End Function
-

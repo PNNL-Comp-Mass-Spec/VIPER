@@ -341,7 +341,7 @@ Dim ts As TextStream
 Dim sLine As String
 Dim fname As String
 Dim ShowExported As Boolean
-Dim i As Long
+Dim I As Long
 Dim strSepChar As String
 
 On Error GoTo err_ExportText
@@ -370,55 +370,55 @@ sLine = "Index" & strSepChar & "Type" & strSepChar & "Scan Number" & strSepChar 
 ts.WriteLine sLine
 'here comes actual export----
 With GelData(CallerID)
-    For i = 0 To SRCount - 1
-        sLine = SRInd(i) & strSepChar & SRType(i) & strSepChar
-        Select Case SRType(i)
+    For I = 0 To SRCount - 1
+        sLine = SRInd(I) & strSepChar & SRType(I) & strSepChar
+        Select Case SRType(I)
         Case glCSType
-            sLine = sLine & .CSData(SRInd(i)).ScanNumber & strSepChar _
-                & .CSData(SRInd(i)).Charge & strSepChar _
-                & .CSData(SRInd(i)).AverageMW & strSepChar _
-                & .CSData(SRInd(i)).Abundance & strSepChar _
-                & .CSData(SRInd(i)).MassStDev & strSepChar
+            sLine = sLine & .CSData(SRInd(I)).ScanNumber & strSepChar _
+                & .CSData(SRInd(I)).Charge & strSepChar _
+                & .CSData(SRInd(I)).AverageMW & strSepChar _
+                & .CSData(SRInd(I)).Abundance & strSepChar _
+                & .CSData(SRInd(I)).MassStDev & strSepChar
 ''            If IsNumeric(.CSVar(SRInd(i), csvfMTDDRatio)) Then
 ''                sLine = sLine & CDbl(.CSVar(SRInd(i), csvfMTDDRatio))
 ''            End If
             sLine = sLine & strSepChar
             With GelLM(CallerID)
               If .CSCnt > 0 Then
-                sLine = sLine & .CSLckID(SRInd(i)) & strSepChar _
-                    & .CSFreqShift(SRInd(i)) & strSepChar _
-                    & .CSMassCorrection(SRInd(i)) & strSepChar
+                sLine = sLine & .CSLckID(SRInd(I)) & strSepChar _
+                    & .CSFreqShift(SRInd(I)) & strSepChar _
+                    & .CSMassCorrection(SRInd(I)) & strSepChar
               Else
                 sLine = sLine & strSepChar & strSepChar & strSepChar
               End If
             End With
         Case glIsoType
-            sLine = sLine & .IsoData(SRInd(i)).ScanNumber & strSepChar _
-                & .IsoData(SRInd(i)).Charge & strSepChar _
-                & .IsoData(SRInd(i)).MonoisotopicMW & strSepChar _
-                & .IsoData(SRInd(i)).Abundance & strSepChar _
-                & .IsoData(SRInd(i)).Fit & strSepChar
+            sLine = sLine & .IsoData(SRInd(I)).ScanNumber & strSepChar _
+                & .IsoData(SRInd(I)).Charge & strSepChar _
+                & .IsoData(SRInd(I)).MonoisotopicMW & strSepChar _
+                & .IsoData(SRInd(I)).Abundance & strSepChar _
+                & .IsoData(SRInd(I)).Fit & strSepChar
 ''            If IsNumeric(.IsoVar(SRInd(i), isvfMTDDRatio)) Then
 ''              sLine = sLine & CDbl(.IsoVar(SRInd(i), isvfMTDDRatio))
 ''            End If
             sLine = sLine & strSepChar
             With GelLM(CallerID)
               If .IsoCnt > 0 Then
-                sLine = sLine & .IsoLckID(SRInd(i)) & strSepChar _
-                    & .IsoFreqShift(SRInd(i)) & strSepChar _
-                    & .IsoMassCorrection(SRInd(i)) & strSepChar
+                sLine = sLine & .IsoLckID(SRInd(I)) & strSepChar _
+                    & .IsoFreqShift(SRInd(I)) & strSepChar _
+                    & .IsoMassCorrection(SRInd(I)) & strSepChar
               Else
                 sLine = sLine & strSepChar & strSepChar & strSepChar
               End If
             End With
         End Select
-        sLine = sLine & SRHitsCount(i) & strSepChar & SRMassTagID(i) & strSepChar _
-            & SRUMCInd(i) & strSepChar & UMCStat2(SRUMCInd(i), 2) & strSepChar _
-            & UMCStat2(SRUMCInd(i), 3) & strSepChar & UMCStat2(SRUMCInd(i), 8) _
-            & strSepChar & UMCStat2(SRUMCInd(i), 4) & strSepChar _
-            & UMCStat2(SRUMCInd(i), 6) & strSepChar & UMCStat2(SRUMCInd(i), 1)
+        sLine = sLine & SRHitsCount(I) & strSepChar & SRMassTagID(I) & strSepChar _
+            & SRUMCInd(I) & strSepChar & UMCStat2(SRUMCInd(I), 2) & strSepChar _
+            & UMCStat2(SRUMCInd(I), 3) & strSepChar & UMCStat2(SRUMCInd(I), 8) _
+            & strSepChar & UMCStat2(SRUMCInd(I), 4) & strSepChar _
+            & UMCStat2(SRUMCInd(I), 6) & strSepChar & UMCStat2(SRUMCInd(I), 1)
         ts.WriteLine sLine
-    Next i
+    Next I
 End With
 
 ts.Close
@@ -437,190 +437,6 @@ err_ExportText:
 ExportText = Err.Number
 End Function
 
-' September 2004: Unused Function
-''Public Function ExportMTDB(Optional ByRef lngErrorNumber As Long, Optional ByRef lngMDID As Long) As String
-'''---------------------------------------------------
-'''this is simple but long procedure of exporting data
-'''results to Organism MT tag database associated
-'''lngErrorNumber will contain the error number, if an error occurs
-'''---------------------------------------------------
-''Dim i As Long
-''Dim ExpCnt As Long
-''Dim strCaptionSaved As String
-'''ADO objects for stored procedure adding Match Making row
-''Dim cnNew As New ADODB.Connection
-'''ADO objects for stored procedure that adds FTICR peak rows
-''Dim cmdPutNewPeak As New ADODB.Command
-''Dim prmMMDID As New ADODB.Parameter
-''Dim prmFTICRID As New ADODB.Parameter
-''Dim prmFTICRType As New ADODB.Parameter
-''Dim prmScanNumber As New ADODB.Parameter
-''Dim prmChargeState As New ADODB.Parameter
-''Dim prmMonoisotopicMass As New ADODB.Parameter
-''Dim prmAbundance As New ADODB.Parameter
-''Dim prmFit As New ADODB.Parameter
-''Dim prmExpressionRatio As New ADODB.Parameter
-''Dim prmLckID As New ADODB.Parameter
-''Dim prmFreqShift As New ADODB.Parameter
-''Dim prmMassCorrection As New ADODB.Parameter
-''Dim prmMassTagID As New ADODB.Parameter
-''Dim prmResType As New ADODB.Parameter
-''Dim prmHitsCount As New ADODB.Parameter
-''Dim prmUMCInd As New ADODB.Parameter
-''Dim prmUMCFirstScan As New ADODB.Parameter
-''Dim prmUMCLastScan As New ADODB.Parameter
-''Dim prmUMCCount As New ADODB.Parameter
-''Dim prmUMCAbundance As New ADODB.Parameter
-''Dim prmUMCBestFit As New ADODB.Parameter
-''Dim prmUMCAvgMW As New ADODB.Parameter
-''Dim prmPairInd As New ADODB.Parameter
-''
-''On Error GoTo err_ExportMTDB
-''
-''strCaptionSaved = Me.Caption
-''
-''Me.Caption = "Connecting to database"
-''If Not EstablishConnection(cnNew, GelAnalysis(CallerID).MTDB.cn.ConnectionString, False) Then
-''    Debug.Assert False
-''    lngErrorNumber = -1
-''    ExportMTDB = "Error: Unable to establish a connection to the database"
-''    Exit Function
-''End If
-''
-'''first write new analysis in T_Match_Making_Description table
-''AddEntryToMatchMakingDescriptionTable cnNew, lngMDID, ExpAnalysisSPName, CallerID, SRCount, GelData(CallerID).CustomNETsDefined, False, strIniFileName
-''
-''' MonroeMod
-''AddToAnalysisHistory CallerID, "Exported UMC Identification results to database (" & ExtractDBNameFromConnectionString(GelAnalysis(CallerID).MTDB.cn.ConnectionString) & "); MMD_ID = " & lngMDID
-''AddToAnalysisHistory CallerID, "Export to MMD table details: Reference Job = " & GelAnalysis(CallerID).MD_Reference_Job & "; MD_File = " & GelAnalysis(CallerID).MD_file
-''
-'''nothing to export
-''If SRCount <= 0 Then Exit Function
-''
-''' Initialize the SP
-''InitializeSPCommand cmdPutNewPeak, cnNew, ExpPeakSPName
-''
-''Set prmMMDID = cmdPutNewPeak.CreateParameter("MMDID", adInteger, adParamInput, , lngMDID)
-''cmdPutNewPeak.Parameters.Append prmMMDID
-''Set prmFTICRID = cmdPutNewPeak.CreateParameter("FTICRID", adVarChar, adParamInput, 50, Null)
-''cmdPutNewPeak.Parameters.Append prmFTICRID
-''Set prmFTICRType = cmdPutNewPeak.CreateParameter("FTICRType", adTinyInt, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmFTICRType
-''Set prmScanNumber = cmdPutNewPeak.CreateParameter("ScanNumber", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmScanNumber
-''Set prmChargeState = cmdPutNewPeak.CreateParameter("ChargeState", adSmallInt, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmChargeState
-''Set prmMonoisotopicMass = cmdPutNewPeak.CreateParameter("MonoisotopicMass", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmMonoisotopicMass
-''Set prmAbundance = cmdPutNewPeak.CreateParameter("Abundance", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmAbundance
-''Set prmFit = cmdPutNewPeak.CreateParameter("Fit", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmFit
-''Set prmExpressionRatio = cmdPutNewPeak.CreateParameter("ExpressionRatio", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmExpressionRatio
-''Set prmLckID = cmdPutNewPeak.CreateParameter("LckID", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmLckID
-''Set prmFreqShift = cmdPutNewPeak.CreateParameter("FreqShift", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmFreqShift
-''Set prmMassCorrection = cmdPutNewPeak.CreateParameter("MassCorrection", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmMassCorrection
-''Set prmMassTagID = cmdPutNewPeak.CreateParameter("MassTagID", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmMassTagID
-''Set prmResType = cmdPutNewPeak.CreateParameter("Type", adInteger, adParamInput, , FPR_Type_Standard)
-''cmdPutNewPeak.Parameters.Append prmResType
-''Set prmHitsCount = cmdPutNewPeak.CreateParameter("HitCount", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmHitsCount
-''Set prmUMCInd = cmdPutNewPeak.CreateParameter("UMCInd", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCInd
-''Set prmUMCFirstScan = cmdPutNewPeak.CreateParameter("UMCFirstScan", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCFirstScan
-''Set prmUMCLastScan = cmdPutNewPeak.CreateParameter("UMCLastScan", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCLastScan
-''Set prmUMCCount = cmdPutNewPeak.CreateParameter("UMCCount", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCCount
-''Set prmUMCAbundance = cmdPutNewPeak.CreateParameter("UMCAbundance", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCAbundance
-''Set prmUMCBestFit = cmdPutNewPeak.CreateParameter("UMCBestFit", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCBestFit
-''Set prmUMCAvgMW = cmdPutNewPeak.CreateParameter("UMCAvgMW", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCAvgMW
-''Set prmPairInd = cmdPutNewPeak.CreateParameter("PairInd", adInteger, adParamInput, , -1)
-''cmdPutNewPeak.Parameters.Append prmPairInd
-''
-'''now export data
-''ExpCnt = 0
-''With GelData(CallerID)
-''    For i = 0 To SRCount - 1
-''        If i Mod 25 = 0 Then
-''            Me.Caption = "Exporting to DB: " & Trim(i) & " / " & Trim(SRCount)
-''            DoEvents
-''        End If
-''
-''        prmFTICRID.value = SRInd(i)
-''        prmFTICRType.value = SRType(i)
-''        Select Case SRType(i)
-''        Case glCSType
-''            prmScanNumber.value = .CSData(SRInd(i)).ScanNumber
-''            prmChargeState.value = .CSData(SRInd(i)).Charge
-''            prmMonoisotopicMass.value = .CSData(SRInd(i)).AverageMW
-''            prmAbundance.value = .CSData(SRInd(i)).Abundance
-''            prmFit.value = .CSData(SRInd(i)).MassStDev     'standard deviation
-''            prmExpressionRatio.value = LookupExpressionRatioValue(CallerID, SRInd(i), False)
-''            With GelLM(CallerID)
-''              If .CSCnt > 0 Then
-''                prmLckID.value = .CSLckID(SRInd(i))
-''                prmFreqShift.value = .CSFreqShift(SRInd(i))
-''                prmMassCorrection.value = .CSMassCorrection(SRInd(i))
-''              End If
-''            End With
-''        Case glIsoType
-''            prmScanNumber.value = .IsoData(SRInd(i)).ScanNumber
-''            prmChargeState.value = .IsoData(SRInd(i)).Charge
-''            prmMonoisotopicMass.value = .IsoData(SRInd(i)).MonoisotopicMW
-''            prmAbundance.value = .IsoData(SRInd(i)).Abundance
-''            prmFit.value = .IsoData(SRInd(i)).Fit
-''            prmExpressionRatio.value = LookupExpressionRatioValue(CallerID, SRInd(i), True)
-''            With GelLM(CallerID)
-''              If .IsoCnt > 0 Then
-''                prmLckID.value = .IsoLckID(SRInd(i))
-''                prmFreqShift.value = .IsoFreqShift(SRInd(i))
-''                prmMassCorrection.value = .IsoMassCorrection(SRInd(i))
-''              End If
-''            End With
-''        End Select
-''        prmHitsCount.value = SRHitsCount(i)
-''        prmMassTagID.value = SRMassTagID(i)
-''        prmUMCInd.value = SRUMCInd(i)
-''        prmUMCFirstScan.value = UMCStat2(SRUMCInd(i), 2)
-''        prmUMCLastScan.value = UMCStat2(SRUMCInd(i), 3)
-''        prmUMCCount.value = UMCStat2(SRUMCInd(i), 8)
-''        prmUMCAbundance.value = UMCStat2(SRUMCInd(i), 4)
-''        prmUMCBestFit.value = UMCStat2(SRUMCInd(i), 6)
-''        prmUMCAvgMW.value = UMCStat2(SRUMCInd(i), 1)
-''
-''        cmdPutNewPeak.Execute
-''        ExpCnt = ExpCnt + 1
-''    Next i
-''End With
-''
-''' MonroeMod
-''AddToAnalysisHistory CallerID, "Export to Peak Results table details: LC-MS Feature Peaks Match Count = " & ExpCnt
-''
-''ExportMTDB = ExpCnt & " associations between MT tags and FTICR peaks exported."
-''Set cmdPutNewPeak.ActiveConnection = Nothing
-''cnNew.Close
-''Me.Caption = strCaptionSaved
-''lngErrorNumber = 0
-''Exit Function
-''
-''err_ExportMTDB:
-''ExportMTDB = "Error: " & Err.Number & vbCrLf & Err.Description
-''lngErrorNumber = Err.Number
-''If Not cnNew Is Nothing Then cnNew.Close
-''Me.Caption = strCaptionSaved
-''End Function
-
-
 Public Sub UpdateStatus(ByVal Msg As String)
 lblStatus.Caption = Msg
 DoEvents
@@ -629,7 +445,7 @@ End Sub
 Public Function StartSearch(Optional blnShowMessages As Boolean = True) As Long
 ' Returns the number of hits
 Dim Res As Long
-Dim i As Long, j As Long, k As Long
+Dim I As Long, j As Long, k As Long
 Dim CurrInd As Long
 Dim CurrType As Long
 Dim CurrMW As Double
@@ -650,13 +466,13 @@ If Res > 0 Then
    If InitSRArrays(20000) Then
       With GelUMC(CallerID)
         'do class by class
-        For i = 0 To .UMCCnt - 1
+        For I = 0 To .UMCCnt - 1
             ' MonroeMod
-            If i Mod 25 = 0 Then UpdateStatus "Searching peaks from class: " & i & "/" & .UMCCnt
+            If I Mod 25 = 0 Then UpdateStatus "Searching peaks from class: " & I & "/" & .UMCCnt
             'and class member by class member
-            For j = 0 To .UMCs(i).ClassCount - 1
-                CurrInd = .UMCs(i).ClassMInd(j)
-                CurrType = .UMCs(i).ClassMType(j)
+            For j = 0 To .UMCs(I).ClassCount - 1
+                CurrInd = .UMCs(I).ClassMInd(j)
+                CurrType = .UMCs(I).ClassMType(j)
                 Select Case CurrType
                 Case glCSType
                      CurrMW = GelData(CallerID).CSData(CurrInd).AverageMW
@@ -669,13 +485,13 @@ If Res > 0 Then
                        SRCount = SRCount + 1
                        SRInd(SRCount - 1) = CurrInd
                        SRType(SRCount - 1) = CurrType
-                       SRUMCInd(SRCount - 1) = i
+                       SRUMCInd(SRCount - 1) = I
                        SRMassTagID(SRCount - 1) = HitsID(k)
                        SRHitsCount(SRCount - 1) = HitsCount
                    Next k
                 End If
             Next j
-        Next i
+        Next I
         UpdateStatus "Searching peaks from class: " & .UMCCnt & "/" & .UMCCnt
       End With
    Else
@@ -824,7 +640,7 @@ Private Function GetMT_ID_ForMW(ByVal MW As Double, _
 Dim FirstInd As Long
 Dim LastInd As Long
 Dim AbsTol As Double
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 
 GetMT_ID_ForMW = 0
@@ -839,9 +655,9 @@ End Select
 If mwutSearch.FindIndexRange(MW, AbsTol, FirstInd, LastInd) Then
    If FirstInd <= LastInd And LastInd > 0 Then
       ReDim ID(LastInd - FirstInd)
-      For i = FirstInd To LastInd
-          ID(i - FirstInd) = AMTData(i).ID
-      Next i
+      For I = FirstInd To LastInd
+          ID(I - FirstInd) = AMTData(I).ID
+      Next I
       GetMT_ID_ForMW = LastInd - FirstInd + 1
    End If
 End If

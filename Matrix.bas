@@ -64,16 +64,16 @@ End Sub
 Public Function GetJobVector(ByVal Ind As Long, ByVal SelectMatrix As Variant, ByVal JobMatrix As Variant) As Variant
 'returns vector (variant array) appropriate for this job and coosys selection
 Dim JobColumn As Integer
-Dim i As Integer
+Dim I As Integer
 Dim aRes(1 To 4) As Long
 On Error GoTo err_GetJobVector
 
 With GelBody(Ind).csMyCooSys
     JobColumn = SelectMatrix(.csOriginXY, .csOrigin)
 End With
-For i = 1 To 4
-    aRes(i) = JobMatrix(i, JobColumn)
-Next i
+For I = 1 To 4
+    aRes(I) = JobMatrix(I, JobColumn)
+Next I
 GetJobVector = aRes
 Exit Function
 
@@ -241,50 +241,32 @@ vLgndCSMatrix = aMatrix
 
 End Sub
 
-' Unused Function (March 2003)
-'''Public Function SP1(ByVal vMatrix As Variant, ByVal col As Integer, ByVal X1 As Long, ByVal x2 As Long, ByVal X3 As Long, ByVal x4 As Long) As Long
-''''calculates scalar product of matrix column and vectors
-'''Dim aVec2(1 To 4) As Long
-'''Dim i  As Integer
-'''Dim Tmp As Long
-'''
-'''aVec2(1) = X1
-'''aVec2(2) = x2
-'''aVec2(3) = X3
-'''aVec2(4) = x4
-'''Tmp = 0
-'''For i = 1 To 4
-'''    Tmp = Tmp + vMatrix(i, col) * aVec2(i)
-'''Next i
-'''SP1 = Tmp
-'''End Function
-
 Public Function SP(ByVal vVec1 As Variant, ByVal X1 As Long, ByVal x2 As Long, ByVal X3 As Long, ByVal x4 As Long) As Long
 'calculates scalar product of two vectors
 Dim aVec2(1 To 4) As Long
-Dim i  As Integer
-Dim Tmp As Long
+Dim I  As Integer
+Dim tmp As Long
 
 aVec2(1) = X1
 aVec2(2) = x2
 aVec2(3) = X3
 aVec2(4) = x4
-Tmp = 0
-For i = 1 To 4
-    Tmp = Tmp + vVec1(i) * aVec2(i)
-Next i
-SP = Tmp
+tmp = 0
+For I = 1 To 4
+    tmp = tmp + vVec1(I) * aVec2(I)
+Next I
+SP = tmp
 End Function
 
 
 Private Function TransposeCol(ByVal vMatrix As Variant) As Variant
 'returns variant arrray with transposed columns
 Dim aMatrix(1 To 4, 1 To 4) As Long
-Dim i As Integer, j As Integer
+Dim I As Integer, j As Integer
 For j = 1 To 4
-    For i = 1 To 4
-        aMatrix(i, 4 - j + 1) = vMatrix(i, j)
-    Next i
+    For I = 1 To 4
+        aMatrix(I, 4 - j + 1) = vMatrix(I, j)
+    Next I
 Next j
 TransposeCol = aMatrix
 End Function

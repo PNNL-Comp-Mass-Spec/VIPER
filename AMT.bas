@@ -21,39 +21,39 @@ Public Enum dbgDatabaseGenerationConstants
 End Enum
 
 ' These fieldes apply to dbgGeneration1 through dbgGeneration1000
-Private Const DB_FIELD_AMT_OLD_ID = "ID"
-Private Const DB_FIELD_AMT_NEW_ID = "AMT_ID"
-Private Const DB_FIELD_AMT_PEPTIDE = "Peptide"
-Private Const DB_FIELD_AMT_MW = "AMTMonoisotopicMass"
-Private Const DB_FIELD_AMT_NET = "NET"
-Private Const DB_FIELD_AMT_NET_COUNT = "NET_Count"
-Private Const DB_FIELD_AMT_RETENTION = "RetentionTime"            ' Stored in the AMTData().PNET; ignored if field PNET is present
-Private Const DB_FIELD_AMT_PNET = "PNET"
-Private Const DB_FIELD_AMT_NitrogenAtom = "NitrogenAtom"
-Private Const DB_FIELD_AMT_CysCount = "AA_Cystine_Count"
-Private Const DB_FIELD_AMT_Status = "Status"
-Private Const DB_FIELD_AMT_MSMSObsCount = "MSMS_Obs_Count"
-Private Const DB_FIELD_AMT_HighNormalizedScore = "High_Normalized_Score"
-Private Const DB_FIELD_AMT_HighDiscriminantScore = "High_Discriminant_Score"
-Private Const DB_FIELD_AMT_HighPeptideProphetProbability = "High_Peptide_Prophet_Probability"
+Private Const DB_FIELD_AMT_OLD_ID As String = "ID"
+Private Const DB_FIELD_AMT_NEW_ID As String = "AMT_ID"
+Private Const DB_FIELD_AMT_PEPTIDE As String = "Peptide"
+Private Const DB_FIELD_AMT_MW As String = "AMTMonoisotopicMass"
+Private Const DB_FIELD_AMT_NET As String = "NET"
+Private Const DB_FIELD_AMT_NET_COUNT As String = "NET_Count"
+Private Const DB_FIELD_AMT_RETENTION As String = "RetentionTime"            ' Stored in AMTData().PNET; ignored if field PNET is present
+Private Const DB_FIELD_AMT_PNET As String = "PNET"
+Private Const DB_FIELD_AMT_NitrogenAtom As String = "NitrogenAtom"
+Private Const DB_FIELD_AMT_CysCount As String = "AA_Cystine_Count"
+Private Const DB_FIELD_AMT_Status As String = "Status"
+Private Const DB_FIELD_AMT_MSMSObsCount As String = "MSMS_Obs_Count"
+Private Const DB_FIELD_AMT_HighNormalizedScore As String = "High_Normalized_Score"
+Private Const DB_FIELD_AMT_HighDiscriminantScore As String = "High_Discriminant_Score"
+Private Const DB_FIELD_AMT_HighPeptideProphetProbability As String = "High_Peptide_Prophet_Probability"
 
 Private Const DB_FIELD_PROTEIN_AMT_ID As String = "AMT_ID"
 Private Const DB_FIELD_PROTEIN_Protein_ID As String = "Protein_ID"
 Private Const DB_FIELD_PROTEIN_Protein_Name As String = "Protein_Name"
 
 ' These fields apply to dbgMTSOffline
-Private Const DB_FIELD_TMASSTAGS_MASS_TAG_ID = "Mass_Tag_ID"
-Private Const DB_FIELD_TMASSTAGS_PEPTIDE = "Peptide"
-Private Const DB_FIELD_TMASSTAGS_MW = "Monoisotopic_Mass"
-Private Const DB_FIELD_TMASSTAGS_MSMSObsCount = "Peptide_Obs_Count_Passing_Filter"
-Private Const DB_FIELD_TMASSTAGS_HighNormalizedScore = "High_Normalized_Score"
-Private Const DB_FIELD_TMASSTAGS_HighDiscriminantScore = "High_Discriminant_Score"
-Private Const DB_FIELD_TMASSTAGS_HighPeptideProphetProbability = "High_Peptide_Prophet_Probability"
+Private Const DB_FIELD_TMASSTAGS_MASS_TAG_ID  As String = "Mass_Tag_ID"
+Private Const DB_FIELD_TMASSTAGS_PEPTIDE  As String = "Peptide"
+Private Const DB_FIELD_TMASSTAGS_MW  As String = "Monoisotopic_Mass"
+Private Const DB_FIELD_TMASSTAGS_MSMSObsCount  As String = "Peptide_Obs_Count_Passing_Filter"
+Private Const DB_FIELD_TMASSTAGS_HighNormalizedScore  As String = "High_Normalized_Score"
+Private Const DB_FIELD_TMASSTAGS_HighDiscriminantScore  As String = "High_Discriminant_Score"
+Private Const DB_FIELD_TMASSTAGS_HighPeptideProphetProbability  As String = "High_Peptide_Prophet_Probability"
 
-Private Const DB_FIELD_TMTNET_NET = "Avg_GANET"
-Private Const DB_FIELD_TMTNET_PNET = "PNET"
-Private Const DB_FIELD_TMTNET_STDEV = "StD_GANET"
-Private Const DB_FIELD_TMTNET_CNT_NET = "Cnt_GANET"
+Private Const DB_FIELD_TMTNET_NET As String = "Avg_GANET"
+Private Const DB_FIELD_TMTNET_PNET As String = "PNET"
+Private Const DB_FIELD_TMTNET_STDEV As String = "StD_GANET"
+Private Const DB_FIELD_TMTNET_CNT_NET As String = "Cnt_GANET"
 
 Private Const DB_FIELD_TPROTEINS_Protein_ID As String = "Ref_ID"
 Private Const DB_FIELD_TPROTEINS_Protein_Name As String = "Reference"
@@ -64,6 +64,12 @@ Private Const DB_FIELD_TPROTEINS_Protein_Mass As String = "Monoisotopic_Mass"
 
 Private Const DB_FIELD_TMASSTAGSPROTEINMAP_MASS_TAG_Name = "Mass_Tag_Name"
 
+Private Const DB_FIELD_TMASSTAGCONFORMERS_Conformer_ID As String = "Conformer_ID"
+Private Const DB_FIELD_TMASSTAGCONFORMERS_Conformer_Charge As String = "Conformer_Charge"
+Private Const DB_FIELD_TMASSTAGCONFORMERS_Conformer As String = "Conformer"
+Private Const DB_FIELD_TMASSTAGCONFORMERS_Drift_Time_Avg As String = "Drift_Time_Avg"
+Private Const DB_FIELD_TMASSTAGCONFORMERS_Drift_Time_StDev As String = "Drift_Time_StDev"
+Private Const DB_FIELD_TMASSTAGCONFORMERS_Conformer_Obs_Count As String = "Conformer_Obs_Count"
 
 Public Const glAMT_NET = 0
 Public Const glAMT_RT_or_PNET = 1
@@ -154,6 +160,8 @@ Private Const TABLE_NAME_T_MASS_TAGS_NET = "T_Mass_Tags_NET"
 Private Const TABLE_NAME_T_PROTEINS = "T_Proteins"
 Private Const TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP = "T_Mass_Tag_to_Protein_Map"
 Private Const TABLE_NAME_T_MASS_TAG_TO_PROTEIN_MAP_ALT = "T_Mass_Tags_to_Protein_Map"
+Private Const TABLE_NAME_T_MASS_TAG_CONFORMERS = "T_Mass_Tag_Conformers_Observed"
+
 
 'This corresponds to FileInfoVersions(fioSearchDefinitions) version 2 through version 8
 Public Type SearchAMTDefinition2002
@@ -299,9 +307,9 @@ Private Type udtAMTFieldPresentType
     HighNormalizedScore As Boolean
     HighDiscriminantScore As Boolean
     HighPeptideProphetProbability As Boolean
-    
     ProteinInfo As udtAMTFieldPresentProteinTblType
     ProteinPeptideMap As udtAMTFieldPresentProteinPeptideMapTblType
+    ConformerInfo As Boolean
 End Type
 
 Public Type udtSTACStatsType
@@ -413,7 +421,12 @@ Dim HitsCount As Long
 Dim MyExprEva As ExprEvaluator
 Dim VarVals() As Long
 
-Public Function ConnectToLegacyAMTDB(ByRef frmCallingForm As Form, ByVal lngGelIndex As Long, ByVal AskUser As Boolean, ByVal blnLoadProteinInfo As Boolean, ByVal blnIncludeProteinsForMassTagsNotImMemory As Boolean) As Boolean
+Public Function ConnectToLegacyAMTDB(ByRef frmCallingForm As Form, _
+                                     ByVal lngGelIndex As Long, _
+                                     ByVal AskUser As Boolean, _
+                                     ByVal blnLoadProteinInfo As Boolean, _
+                                     ByVal blnIncludeProteinsForMassTagsNotImMemory As Boolean) As Boolean
+                                     
     ' Load AMT data from an Access database
     
     Static strLegacyDBNotifiedProteinTableFieldError As String
@@ -430,11 +443,13 @@ Public Function ConnectToLegacyAMTDB(ByRef frmCallingForm As Form, ByVal lngGelI
     Dim strDBPathFull As String
     Dim fso As New FileSystemObject
     
+    Dim blnLoadConformers As Boolean
+    
 On Error GoTo err_ConnectToLegacyAMTDB
     
     ConnectToLegacyAMTDB = False
     If AskUser And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        eResponse = MsgBox("2DGel will access AMT database: " & vbCrLf _
+        eResponse = MsgBox("VIPER will access AMT database: " & vbCrLf _
                      & GelData(lngGelIndex).PathtoDatabase & vbCrLf & "Multiple versions of the AMT " _
                      & "database might exist. Make sure that listed file " _
                      & "is 'The AMT' database. Choose OK to continue. " _
@@ -531,6 +546,14 @@ On Error GoTo err_ConnectToLegacyAMTDB
         Exit Function
     End If
     
+    If (GelData(lngGelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA Then
+        blnLoadConformers = True
+        udtFieldPresent.ConformerInfo = LegacyDBCheckForConformerTable(eDBGeneration, GelData(lngGelIndex).PathtoDatabase)
+    Else
+        blnLoadConformers = False
+        udtFieldPresent.ConformerInfo = False
+    End If
+
     If AMTProteinTablesExist Then
         If Not EnumerateProteinTableFields(GelData(lngGelIndex).PathtoDatabase, lngGelIndex, eDBGeneration, strMTToProteinMapTableName, udtFieldPresent) Then
             If strLegacyDBNotifiedProteinTableFieldError <> GelData(lngGelIndex).PathtoDatabase Then
@@ -545,7 +568,7 @@ On Error GoTo err_ConnectToLegacyAMTDB
     
     ' The data should be ready to load
     ' First load the MT tags
-    blnSuccess = LegacyDBLoadAMTData(frmCallingForm, GelData(lngGelIndex).PathtoDatabase, lngGelIndex, udtFieldPresent, eDBGeneration)
+    blnSuccess = LegacyDBLoadAMTData(frmCallingForm, GelData(lngGelIndex).PathtoDatabase, lngGelIndex, udtFieldPresent, eDBGeneration, blnLoadConformers)
     
     If blnSuccess And blnLoadProteinInfo And AMTProteinTablesExist Then
         ' Now load the proteins
@@ -819,11 +842,28 @@ Private Function GetTableRowCount(ByRef objThisDB As Database, ByVal strTableNam
     
 End Function
 
-' Unused function (March 2006)
-''Public Function GetAMTRecordByID(ByVal ID As String) As String
-'''retrieves record from AMT by it's ID (primary key)
-''MsgBox "Not implemented at the moment.", vbOKOnly, glFGTU
-''End Function
+Private Function LegacyDBCheckForConformerTable(ByVal eDBGeneration As dbgDatabaseGenerationConstants, ByVal strLegacyDBPath As String) As Boolean
+
+    Static strLegacyDBPathSaved As String
+    
+    Dim blnConformerTablesExist As Boolean
+    
+    Dim strErrorMessage As String
+    
+    Dim lngTableRowCount As Long
+    
+    blnConformerTablesExist = False
+    If eDBGeneration = dbgDatabaseGenerationConstants.dbgMTSOffline Then
+        ' See if the Mass Tag_Conformers table exists (and contains data)
+        lngTableRowCount = GetTableRowCount(dbAMT, TABLE_NAME_T_MASS_TAG_CONFORMERS, False)
+        If lngTableRowCount > 0 Then
+            blnConformerTablesExist = True
+        End If
+    End If
+    
+    LegacyDBCheckForConformerTable = blnConformerTablesExist
+    
+End Function
 
 Private Function LegacyDBCheckForProteinTables(ByVal eDBGeneration As dbgDatabaseGenerationConstants, ByVal strLegacyDBPath As String, ByRef strMTToProteinMapTableName As String) As Boolean
 
@@ -885,7 +925,13 @@ Private Function LegacyDBCheckForProteinTables(ByVal eDBGeneration As dbgDatabas
     
 End Function
     
-Private Function LegacyDBLoadAMTData(ByRef frmCallingForm As VB.Form, ByVal strLegacyDBFilePath As String, ByVal lngGelIndex As Long, ByRef udtFieldPresent As udtAMTFieldPresentType, ByVal eDBGeneration As dbgDatabaseGenerationConstants) As Boolean
+Private Function LegacyDBLoadAMTData(ByRef frmCallingForm As VB.Form, _
+                                     ByVal strLegacyDBFilePath As String, _
+                                     ByVal lngGelIndex As Long, _
+                                     ByRef udtFieldPresent As udtAMTFieldPresentType, _
+                                     ByVal eDBGeneration As dbgDatabaseGenerationConstants, _
+                                     ByVal blnLoadConformers As Boolean) As Boolean
+
 '------------------------------------------------------------
 'loads data from AMT table in a Microsoft Access file into arrays
 'returns True on success
@@ -895,16 +941,25 @@ Private Function LegacyDBLoadAMTData(ByRef frmCallingForm As VB.Form, ByVal strL
     Dim rsAMTSQL As String
     Dim rsAMT As Recordset
     Dim IDFieldName As String
+    
     Dim strMTTable As String
     Dim strNETTable As String
+    Dim strConformerTable As String
+    
     Dim strErrorMessage As String
     Dim strCaptionSaved As String
     
     Dim lngMassTagCountWithNullValues As Long
+    Dim blnLoadingConformers As Boolean
     
     ' Save the form's caption
     strCaptionSaved = frmCallingForm.Caption
     
+    If blnLoadConformers And udtFieldPresent.ConformerInfo Then
+        blnLoadingConformers = True
+    Else
+        blnLoadingConformers = False
+    End If
 
 On Error GoTo err_LegacyDBLoadAMTData
     
@@ -977,11 +1032,12 @@ On Error GoTo err_LegacyDBLoadAMTData
                               " ORDER BY " & strMTTable & DB_FIELD_AMT_MW & ";"
     Case dbgMTSOffline
         
-        ' Query both T_Mass_Tags and T_Mass_Tags_NET in one query
-        ' We can use an Inner Join since EnumerateLegacyAMTFields has already validated that both tables exist
-        
+        ' Use T_Mass_Tags and T_Mass_Tags_NET
+        ' We can join these tables since EnumerateLegacyAMTFields has already validated that both tables exist
+    
         strMTTable = "[" & TABLE_NAME_T_MASS_TAGS & "]."
         strNETTable = "[" & TABLE_NAME_T_MASS_TAGS_NET & "]."
+        strConformerTable = "[" & TABLE_NAME_T_MASS_TAG_CONFORMERS & "]."
         
         rsAMTSQL = "SELECT " & strMTTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID & ", " & _
                                strMTTable & DB_FIELD_TMASSTAGS_MW & ", " & _
@@ -1007,13 +1063,41 @@ On Error GoTo err_LegacyDBLoadAMTData
         If udtFieldPresent.HighNormalizedScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_HighNormalizedScore
         If udtFieldPresent.HighDiscriminantScore Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_HighDiscriminantScore
         If udtFieldPresent.HighPeptideProphetProbability Then rsAMTSQL = rsAMTSQL & ", " & strMTTable & DB_FIELD_TMASSTAGS_HighPeptideProphetProbability
-                          
-        rsAMTSQL = rsAMTSQL & " FROM [" & TABLE_NAME_T_MASS_TAGS & "] INNER JOIN" & _
-                                   " [" & TABLE_NAME_T_MASS_TAGS_NET & "] ON " & _
-                                   " " & strMTTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " = " & _
-                                   " " & strNETTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID & _
-                              " ORDER BY " & strMTTable & DB_FIELD_TMASSTAGS_MW & ";"
+                              
+        If blnLoadingConformers Then
+            ' Include the conformer fields in T_Mass_Tag_Conformers_Observed
+            
+            rsAMTSQL = rsAMTSQL & ", " & strConformerTable & DB_FIELD_TMASSTAGCONFORMERS_Conformer_ID & _
+                                  ", " & strConformerTable & "Charge AS " & DB_FIELD_TMASSTAGCONFORMERS_Conformer_Charge & _
+                                  ", " & strConformerTable & DB_FIELD_TMASSTAGCONFORMERS_Conformer & _
+                                  ", " & strConformerTable & DB_FIELD_TMASSTAGCONFORMERS_Drift_Time_Avg & _
+                                  ", " & strConformerTable & "Obs_Count AS " & DB_FIELD_TMASSTAGCONFORMERS_Conformer_Obs_Count
 
+        End If
+        
+        Dim strMTandMTNET As String
+        strMTandMTNET = "[" & TABLE_NAME_T_MASS_TAGS & "] INNER JOIN" & _
+                       " [" & TABLE_NAME_T_MASS_TAGS_NET & "] ON " & _
+                        " " & strMTTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " = " & _
+                        " " & strNETTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID
+                                       
+        If blnLoadConformers And udtFieldPresent.ConformerInfo Then
+            ' Join in table T_Mass_Tag_Conformers_Observed
+                                                   
+            rsAMTSQL = rsAMTSQL & " FROM (" & strMTandMTNET & ") LEFT JOIN " & _
+                                       "[" & TABLE_NAME_T_MASS_TAG_CONFORMERS & "] ON " & _
+                                       " " & strMTTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID & " = " & _
+                                       " " & strConformerTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID
+
+        Else
+            rsAMTSQL = rsAMTSQL & " FROM " & strMTandMTNET
+        End If
+        
+                                       
+        rsAMTSQL = rsAMTSQL & " ORDER BY " & strMTTable & DB_FIELD_TMASSTAGS_MW & ", " & _
+                                             strMTTable & DB_FIELD_TMASSTAGS_MASS_TAG_ID & ";"
+        
+        
     Case Else
         ' Unknown version
         Debug.Assert False
@@ -1043,7 +1127,7 @@ On Error GoTo err_LegacyDBLoadAMTData
             End If
         End If
         
-        If LegacyDBLoadAMTDataWork(rsAMT, AMTCnt + 1, lngMassTagCountWithNullValues, udtFieldPresent, eDBGeneration) Then
+        If LegacyDBLoadAMTDataWork(rsAMT, AMTCnt + 1, lngMassTagCountWithNullValues, udtFieldPresent, eDBGeneration, blnLoadingConformers) Then
             AMTCnt = AMTCnt + 1
         End If
         
@@ -1082,6 +1166,7 @@ exit_LegacyDBLoadAMTData:
     With CurrMTFilteringOptions
         .MTSubsetID = -1
         .MTIncList = ""
+        .LoadConformers = blnLoadingConformers
     End With
     
     If GelAnalysis(lngGelIndex) Is Nothing Then
@@ -1107,7 +1192,13 @@ err_LegacyDBLoadAMTData:
 
 End Function
 
-Private Function LegacyDBLoadAMTDataWork(ByRef rsAMT As Recordset, ByVal lngIndex As Long, ByRef lngMassTagCountWithNullValues As Long, ByRef udtFieldPresent As udtAMTFieldPresentType, ByVal eDBGeneration As dbgDatabaseGenerationConstants) As Boolean
+Private Function LegacyDBLoadAMTDataWork(ByRef rsAMT As Recordset, _
+                                         ByVal lngIndex As Long, _
+                                         ByRef lngMassTagCountWithNullValues As Long, _
+                                         ByRef udtFieldPresent As udtAMTFieldPresentType, _
+                                         ByVal eDBGeneration As dbgDatabaseGenerationConstants, _
+                                         ByVal blnLoadingConformers As Boolean) As Boolean
+                                         
     Const NET_VALUE_IF_NULL As Single = -100000
 
     Dim blnSuccess As Boolean
@@ -1200,7 +1291,29 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                   AMTData(lngIndex).PeptideProphetProbability = CSng(.Fields(DB_FIELD_TMASSTAGS_HighPeptideProphetProbability).Value)
                End If
             End If
-                     
+        
+            If blnLoadingConformers Then
+                If Not IsNull(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer_ID).Value) Then
+                      AMTData(lngIndex).Conformer_ID = CLng(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer_ID).Value)
+                End If
+                
+                If Not IsNull(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer_Charge).Value) Then
+                      AMTData(lngIndex).Conformer_Charge = CByte(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer_Charge).Value)
+                End If
+                
+                If Not IsNull(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer).Value) Then
+                      AMTData(lngIndex).Conformer = CInt(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer).Value)
+                End If
+                
+                If Not IsNull(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Drift_Time_Avg).Value) Then
+                      AMTData(lngIndex).Drift_Time_Avg = CDbl(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Drift_Time_Avg).Value)
+                End If
+                
+                If Not IsNull(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer_Obs_Count).Value) Then
+                      AMTData(lngIndex).Conformer_Obs_Count = CLng(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer_Obs_Count).Value)
+                End If
+            End If
+            
             blnSuccess = True
         Case dbgGeneration1000, dbgGeneration1, dbgGeneration0800, dbgGeneration0900
             
@@ -1373,6 +1486,8 @@ Private Function EnumerateLegacyAMTFields(ByVal strLegacyDBFilePath As String, B
             .MTName = False
             .ProteinID = False
         End With
+        
+        .ConformerInfo = False
     End With
     
 On Error GoTo err_EnumerateLegacyAMTFields:
@@ -3184,20 +3299,6 @@ Else
 End If
 End Function
 
-' Unused Function (March 2003)
-'''Private Function CntGoodAMTs() As Long
-''''returns number of OKFlagged AMTs; search flag needs to be set
-''''before use of this function; this was used to test behavior
-''''of Flags
-'''Dim i As Long
-'''Dim Cnt As Long
-'''Cnt = 0
-'''For i = 1 To UBound(AMTData)
-'''    If IsGoodAMTFlag(AMTData(i).Flag) Then Cnt = Cnt + 1
-'''Next i
-'''CntGoodAMTs = Cnt
-'''End Function
-
 Public Sub InitAMTStat()
     'redimensions and initialize statistic arrays
     Dim I As Long
@@ -3223,97 +3324,6 @@ Erase AMTNETErr
 Erase AMTNETMin
 Erase AMTNETMax
 End Sub
-
-' Unused Function (March 2003)
-'''Public Function GetLockerAMTInd(ByVal ID As String) As Long
-''''string should contain only one Locker mark so we take first
-''''returns index in AMT array of AMT before Locker Mark
-''''if any or -1 if none or on any error
-'''
-'''Dim LMMarkPos As Integer
-'''Dim AMTIDs() As String
-'''Dim AMTsCnt As Long
-'''On Error GoTo err_GetLockerAMTInd
-'''LMMarkPos = InStr(1, ID, glMASS_LOCKER_MARK)
-'''If LMMarkPos > 0 Then
-'''   'retrieve all AMT reference in front of Locker mark
-'''   AMTsCnt = GetAMTRefFromString1(Left$(ID, LMMarkPos - 1), AMTIDs())
-'''   If AMTsCnt > 0 Then
-'''      GetLockerAMTInd = GetAMTRefInd(AMTIDs(AMTsCnt))
-'''      Exit Function
-'''   End If
-'''End If
-'''
-'''err_GetLockerAMTInd:
-'''GetLockerAMTInd = -1
-'''End Function
-
-' Unused Function (April 2008)
-''Public Function GetAMTRefInd(ByVal AMTRef As Long) As Long
-'''returns index in AMT array of AMTRef; -1 if not found or error
-''Dim i As Long
-''On Error GoTo err_GetAMTRefInd
-''For i = 1 To AMTCnt
-''    If AMTRef = AMTData(i).ID Then
-''       GetAMTRefInd = i
-''       Exit Function
-''    End If
-''Next i
-''err_GetAMTRefInd:
-''GetAMTRefInd = -1
-''End Function
-
-' Unused Function (March 2003)
-'''Public Function GetBestAMTMatchInd(ByVal s As String) As Long
-''''---------------------------------------------------------------
-''''if s contains more than one AMT reference function returns
-''''negative Index of reference with smallest MW error(first if
-''''no error reference is found
-''''if s contains only one AMT function returns its index
-''''function returns 0 if no AMT reference is found or on any error
-''''---------------------------------------------------------------
-'''Dim AMTsCnt As Long
-'''Dim AMTs() As String
-'''Dim sMWErr As String
-'''Dim MWErr As Double
-'''Dim MinMWErr As Double
-'''Dim MinMWErrInd As Long
-'''Dim i As Long
-'''On Error GoTo err_GetBestAMTMatchInd
-'''
-''''pick all ATM reference (together with errors)
-'''AMTsCnt = GetAMTRefFromString2(s, AMTs())
-'''If AMTsCnt > 1 Then
-'''   MinMWErr = glHugeOverExp
-'''   MinMWErrInd = 0
-'''   For i = 1 To AMTsCnt
-'''       sMWErr = GetMWErrFromString(AMTs(i))
-'''       If IsNumeric(sMWErr) Then
-'''          MWErr = CDbl(sMWErr)
-'''       Else
-'''          MWErr = glHugeOverExp
-'''       End If
-'''       If MWErr < MinMWErr Then
-'''          MinMWErr = MWErr
-'''          MinMWErrInd = i
-'''       End If
-'''   Next i
-'''   If MinMWErrInd > 0 Then  'negative index so that we know there were multiple hits
-'''      GetBestAMTMatchInd = -GetAMTRefInd(GetIDFromString(AMTs(MinMWErrInd), AMTMark, AMTIDEnd))
-'''   Else
-'''      GetBestAMTMatchInd = -GetAMTRefInd(GetIDFromString(AMTs(1), AMTMark, AMTIDEnd))
-'''   End If
-'''ElseIf AMTsCnt = 1 Then
-'''   GetBestAMTMatchInd = GetAMTRefInd(GetIDFromString(AMTs(1), AMTMark, AMTIDEnd))
-'''Else
-'''   GetBestAMTMatchInd = 0
-'''End If
-'''Exit Function
-'''
-'''err_GetBestAMTMatchInd:
-'''GetBestAMTMatchInd = 0
-'''End Function
-
 
 Public Function SearchAMTWithTag1(ByVal Ind As Long, _
                                  ByVal sExpr As String) As Long
@@ -3518,37 +3528,6 @@ err_SearchAMTWithTag1:
 SearchAMTWithTag1 = -1
 GoTo exit_SearchAMTWithTag1
 End Function
-
-' Unused Function (March 2003)
-'''Public Function IsLCKReferenced(s) As Boolean
-''''-----------------------------------------------
-''''returns True if string s contains LCK reference
-''''-----------------------------------------------
-'''If IsNull(s) Then
-'''   IsLCKReferenced = False
-'''Else
-'''   If InStr(1, s, LCK_MARK) > 0 Then
-'''      IsLCKReferenced = True
-'''   Else
-'''      IsLCKReferenced = False
-'''   End If
-'''End If
-'''End Function
-'''
-'''Public Function IsMTGReferenced(s) As Boolean
-''''-----------------------------------------------
-''''returns True if string s contains MTG reference
-''''-----------------------------------------------
-'''If IsNull(s) Then
-'''   IsMTGReferenced = False
-'''Else
-'''   If InStr(1, s, MTG_MARK) > 0 Then
-'''      IsMTGReferenced = True
-'''   Else
-'''      IsMTGReferenced = False
-'''   End If
-'''End If
-'''End Function
 
 
 Public Function CheckMassTags() As String

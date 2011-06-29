@@ -837,12 +837,14 @@ Begin VB.Form frmGraph
       End
       Begin VB.Menu mnuSUMCLockMass 
          Caption         =   "UMC Lock &Mass"
+         Visible         =   0   'False
       End
       Begin VB.Menu mnuSLockMass 
          Caption         =   "PRISM Loc&k Mass"
       End
       Begin VB.Menu mnuSIntCalLockMass 
          Caption         =   "Internal &Calibration Lock Mass"
+         Visible         =   0   'False
       End
       Begin VB.Menu mnuSSep3 
          Caption         =   "-"
@@ -2068,14 +2070,6 @@ frmFilterGraph.Tag = nMyIndex
 frmFilterGraph.Show vbModal
 End Sub
 
-' Unused function (February 2005)
-''Private Sub mnu2lsFilterIsoCom_Click()
-''' Legacy: Filter on Isotopic Composition
-''On Error Resume Next
-''frmFilterIsoCom.Tag = nMyIndex
-''frmFilterIsoCom.Show vbModal
-''End Sub
-
 Private Sub mnu2lsFilterPointsByMass_Click()
     frmExcludeMassRange.SetCallerID nMyIndex
     frmExcludeMassRange.Show vbModal
@@ -3151,10 +3145,10 @@ MyExport.Show vbModal
 Set MyExport = Nothing
 End Sub
 
-Private Sub mnuSIntCalLockMass_Click()
-frmIntCalLM.Tag = nMyIndex
-frmIntCalLM.Show vbModal
-End Sub
+'Private Sub mnuSIntCalLockMass_Click()
+'frmIntCalLM.Tag = nMyIndex
+'frmIntCalLM.Show vbModal
+'End Sub
 
 
 Private Sub mnuSLbl_S_Click()
@@ -3176,6 +3170,7 @@ strScope = OpenFileAPIDlg(Me.hwnd, strFilter, 1, "Load Scope")
 If Len(strScope) > 0 Then ICR2LSLoadScope strScope, 0
 End Sub
 
+' No longer supported (June 2011)
 ''Private Sub mnuSLockMass_Click()
 ''frmMTLockMass.Tag = nMyIndex
 ''frmMTLockMass.Show vbModal
@@ -3187,11 +3182,11 @@ End Sub
 ''frmMSMSSearch.Show vbModal
 ''End Sub
 
-
-Private Sub mnuSUMCLockMass_Click()
-frmUMCLockMass.Tag = nMyIndex
-frmUMCLockMass.Show vbModal
-End Sub
+' No longer supported (June 2011)
+'Private Sub mnuSUMCLockMass_Click()
+'frmUMCLockMass.Tag = nMyIndex
+'frmUMCLockMass.Show vbModal
+'End Sub
 
 Private Sub mnuTileH_Click()
 MDIForm1.Arrange vbTileHorizontal

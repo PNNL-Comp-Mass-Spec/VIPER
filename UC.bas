@@ -1284,84 +1284,23 @@ Public Function UMCScanLocker(ByVal Ind As Long, _
 '-----------------------------DON'T KNOW DO I NEED THIS
 'looks like I do!(in locking procedures)
 '------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error GoTo exit_UMCScanLocker
 With GelUMC(Ind).UMCs(ClassInd)
   If .ClassCount > 0 Then
-     For i = 1 To .ClassCount
-       If .ClassMType(i) = gldtIS Then
-          If GelData(Ind).IsoData(.ClassMInd(i)).ScanNumber = FN Then
-             UMCScanLocker = .ClassMInd(i)
+     For I = 1 To .ClassCount
+       If .ClassMType(I) = gldtIS Then
+          If GelData(Ind).IsoData(.ClassMInd(I)).ScanNumber = FN Then
+             UMCScanLocker = .ClassMInd(I)
              Exit Function
           End If
        End If
-     Next i
+     Next I
   End If
 End With
 exit_UMCScanLocker:
 UMCScanLocker = -1
 End Function
-
-' Unused Function (March 2003)
-'''Public Function GetClsInd(ByVal Ind As Long, _
-'''                          ByVal ID As Long, _
-'''                          ByVal IDType As Integer, _
-'''                          ByRef ClsInd() As Long) As Long
-''''---------------------------------------------------------
-''''returns number of classes in GelUMC(Ind).UMCs to which
-''''belongs element in CS/IS array ID; -1 if not found/error
-''''class indexes are loaded to ClsInd array
-''''---------------------------------------------------------
-'''Dim i As Long, j As Long
-'''Dim TmpCnt As Long
-'''On Error GoTo exit_GetClsInd
-'''
-'''TmpCnt = 0
-'''With GelUMC(Ind)
-'''  If .UMCCnt > 0 Then
-'''    For i = 0 To .UMCCnt - 1
-'''      With .UMCs(i)
-'''        If .ClassCount > 0 Then
-'''          For j = 0 To .ClassCount - 1
-'''            If .ClassMType(j) = IDType And .ClassMInd(j) = ID Then
-'''               TmpCnt = TmpCnt + 1
-'''               ClsInd(TmpCnt - 1) = i
-'''               Exit For    'j For...
-'''            End If
-'''          Next j
-'''        End If
-'''      End With
-'''    Next i
-'''    If TmpCnt > 0 Then ReDim Preserve ClsInd(TmpCnt - 1)
-'''  End If
-'''End With
-'''
-'''exit_GetClsInd:
-'''If Err Then TmpCnt = -1
-'''GetClsInd = TmpCnt
-'''End Function
-'''
-'''
-'''Public Function GetClsIndInClsStat(ByVal ClsStat As Variant, _
-'''                                   ByVal ClsRepInd As Long) As Long
-''''-------------------------------------------------------------------
-''''returns class index in ClsStat array for ClsRepInd; -1 on any error
-''''----------------------------------------------------DO I NEED THIS?
-'''Dim ClsStatCnt As Long
-'''Dim i As Long
-'''On Error GoTo exit_GetClsIndInClsStat
-'''GetClsIndInClsStat = -1
-'''If IsArray(ClsStat) Then
-'''   ClsStatCnt = UBound(ClsStat)
-'''   For i = 1 To ClsStatCnt
-'''      If ClsStat(i, 1) = ClsRepInd Then
-'''         GetClsIndInClsStat = i
-'''         Exit Function
-'''      End If
-'''   Next i
-'''End If
-'''exit_GetClsIndInClsStat:
-'''End Function
 
 Public Function UMCStatistics1(ByVal Ind As Long, _
                                ByRef Stat() As Double) As Long
@@ -1400,7 +1339,7 @@ Public Function UMCStatistics1(ByVal Ind As Long, _
 'column 18 (ustMassStDev)       - standard deviation of mass
 'column 19 (ustDriftTime)       - Representative Drift Time
 
-Dim i As Long
+Dim I As Long
 Dim j As Long
 Dim ISF As Integer
 
@@ -1427,21 +1366,21 @@ With GelUMC(Ind)
         ISF = mftMWMono
      End If
      
-     For i = 0 To .UMCCnt - 1
-        With .UMCs(i)
+     For I = 0 To .UMCCnt - 1
+        With .UMCs(I)
           If .ClassCount > 0 Then
-             Stat(i, 0) = i
+             Stat(I, 0) = I
              
              'class representative(mass and intensity)
              Select Case .ClassRepType
              Case gldtCS
-               Stat(i, ustClassRepMW) = GelData(Ind).CSData(.ClassRepInd).AverageMW
-               Stat(i, ustClassRepIntensity) = GelData(Ind).CSData(.ClassRepInd).Abundance
-               Stat(i, ustDriftTime) = GelData(Ind).CSData(.ClassRepInd).IMSDriftTime
+               Stat(I, ustClassRepMW) = GelData(Ind).CSData(.ClassRepInd).AverageMW
+               Stat(I, ustClassRepIntensity) = GelData(Ind).CSData(.ClassRepInd).Abundance
+               Stat(I, ustDriftTime) = GelData(Ind).CSData(.ClassRepInd).IMSDriftTime
              Case gldtIS
-               Stat(i, ustClassRepMW) = GetIsoMass(GelData(Ind).IsoData(.ClassRepInd), ISF)
-               Stat(i, ustClassRepIntensity) = GelData(Ind).IsoData(.ClassRepInd).Abundance
-               Stat(i, ustDriftTime) = GelData(Ind).IsoData(.ClassRepInd).IMSDriftTime
+               Stat(I, ustClassRepMW) = GetIsoMass(GelData(Ind).IsoData(.ClassRepInd), ISF)
+               Stat(I, ustClassRepIntensity) = GelData(Ind).IsoData(.ClassRepInd).Abundance
+               Stat(I, ustDriftTime) = GelData(Ind).IsoData(.ClassRepInd).IMSDriftTime
              End Select
              
              'class members are sometimes sorted on scan number, but not always
@@ -1514,28 +1453,28 @@ With GelUMC(Ind)
              Next j
              
              ' Minimum and Maximum Mass
-             Stat(i, ustMassMin) = MassMin
-             Stat(i, ustMassMax) = MassMax
+             Stat(I, ustMassMin) = MassMin
+             Stat(I, ustMassMax) = MassMax
              
              ' Start and End Scan Number
-             Stat(i, ustScanStart) = lngScanStart
-             Stat(i, ustScanEnd) = lngScanEnd
+             Stat(I, ustScanStart) = lngScanStart
+             Stat(I, ustScanEnd) = lngScanEnd
              
              ' Compute pseudo StDev of Mass
-             Stat(i, ustClassMW) = .ClassMW       'average or class representative
+             Stat(I, ustClassMW) = .ClassMW       'average or class representative
              tmp1 = MassSumSq / .ClassCount
              tmp2 = .ClassMW ^ 2
              MassStDevSquared = Abs(tmp1 - tmp2)
-             Stat(i, ustClassMWStDev) = Sqr(MassStDevSquared)        'dblMW standard deviation
+             Stat(I, ustClassMWStDev) = Sqr(MassStDevSquared)        'dblMW standard deviation
              
              If MassMin = MassMax Or .ClassCount <= 1 Then
-                Stat(i, ustMassStDev) = 0
+                Stat(I, ustMassStDev) = 0
              Else
                 ' Compute the rigorous StDev of Mass
                 ' StDev:
                 MassStDevSquared = MassSumSq / CDbl(.ClassCount - 1) - MassSum ^ 2 / (CDbl(.ClassCount * (.ClassCount - 1)))
                 If MassStDevSquared < 0 Then MassStDevSquared = 0
-                Stat(i, ustMassStDev) = Sqr(MassStDevSquared)
+                Stat(I, ustMassStDev) = Sqr(MassStDevSquared)
                 
 '                ' StDevP:
 '                MassStDevSquared = .ClassCount * MassSumSq - MassSum ^ 2
@@ -1547,28 +1486,28 @@ With GelUMC(Ind)
              End If
              
              ' Class Intensity
-             Stat(i, ustClassIntensity) = .ClassAbundance           'no need to recalculate
+             Stat(I, ustClassIntensity) = .ClassAbundance           'no need to recalculate
              
              ' Minimum and Maximum Abundance
-             Stat(i, ustAbundanceMin) = AbuMin
-             Stat(i, ustAbundanceMax) = AbuMax
+             Stat(I, ustAbundanceMin) = AbuMin
+             Stat(I, ustAbundanceMax) = AbuMax
              
              ' Minimum and Maximum Charge
-             Stat(i, ustChargeMin) = ChargeMin
-             Stat(i, ustChargeMax) = ChargeMax
+             Stat(I, ustChargeMin) = ChargeMin
+             Stat(I, ustChargeMax) = ChargeMax
              
              ' Average, Minimum, and Maximum Fit
-             Stat(i, ustFitAverage) = FitSum / .ClassCount
-             Stat(i, ustFitMin) = FitMin
-             Stat(i, ustFitMax) = FitMax
+             Stat(I, ustFitAverage) = FitSum / .ClassCount
+             Stat(I, ustFitMin) = FitMin
+             Stat(I, ustFitMax) = FitMax
              
              If .ClassCount > 1 Then
                  ' Compute StDev of Fit
                  FitStDevSquared = FitSumSq / CDbl(.ClassCount - 1) - FitSum ^ 2 / (CDbl(.ClassCount * (.ClassCount - 1)))
                  If FitStDevSquared < 0 Then FitStDevSquared = 0
-                 Stat(i, ustFitStDev) = Sqr(FitStDevSquared)
+                 Stat(I, ustFitStDev) = Sqr(FitStDevSquared)
              Else
-                 Stat(i, ustFitStDev) = 0
+                 Stat(I, ustFitStDev) = 0
              End If
 
 '             FitStDevSquared = .ClassCount * FitSumSq - FitSum ^ 2
@@ -1580,11 +1519,11 @@ With GelUMC(Ind)
              
           Else     'this should not happen
              For j = 0 To UMC_STATISTICS1_MAX_INDEX
-                 Stat(i, j) = -1
+                 Stat(I, j) = -1
              Next j
           End If
         End With
-     Next i
+     Next I
      UMCStatistics1 = .UMCCnt
   Else
      UMCStatistics1 = -1
@@ -1619,7 +1558,7 @@ Public Function UMCStatistics2(ByVal Ind As Long, _
 'column 6 - class best fit
 'column 7 - index of best fit in class(index within the class)
 'column 8 - class count
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim ISF As Integer
 
 Dim MW As Double
@@ -1636,10 +1575,10 @@ With GelUMC(Ind)
   If .UMCCnt > 0 Then
      ReDim Stat(.UMCCnt - 1, 8)
      ISF = .def.MWField
-     For i = 0 To .UMCCnt - 1
-        With .UMCs(i)
-          Stat(i, 0) = i
-          Stat(i, 8) = .ClassCount
+     For I = 0 To .UMCCnt - 1
+        With .UMCs(I)
+          Stat(I, 0) = I
+          Stat(I, 8) = .ClassCount
           SumMW = 0
           SumAbu = 0
           SumFit = 0
@@ -1650,16 +1589,16 @@ With GelUMC(Ind)
              'first scan number
              Select Case .ClassMType(0)
              Case gldtCS
-               Stat(i, 2) = GelData(Ind).CSData(.ClassMInd(0)).ScanNumber
+               Stat(I, 2) = GelData(Ind).CSData(.ClassMInd(0)).ScanNumber
              Case gldtIS
-               Stat(i, 2) = GelData(Ind).IsoData(.ClassMInd(0)).ScanNumber
+               Stat(I, 2) = GelData(Ind).IsoData(.ClassMInd(0)).ScanNumber
              End Select
              'last scan number
              Select Case .ClassMType(.ClassCount - 1)
              Case gldtCS
-               Stat(i, 3) = GelData(Ind).CSData(.ClassMInd(.ClassCount - 1)).ScanNumber
+               Stat(I, 3) = GelData(Ind).CSData(.ClassMInd(.ClassCount - 1)).ScanNumber
              Case gldtIS
-               Stat(i, 3) = GelData(Ind).IsoData(.ClassMInd(.ClassCount - 1)).ScanNumber
+               Stat(I, 3) = GelData(Ind).IsoData(.ClassMInd(.ClassCount - 1)).ScanNumber
              End Select
              For j = 0 To .ClassCount - 1
                 If .ClassMType(j) = gldtCS Then
@@ -1679,18 +1618,18 @@ With GelUMC(Ind)
                    BestFitInd = j       'index within the class
                 End If
              Next j
-             Stat(i, 1) = SumMW / .ClassCount
-             Stat(i, 4) = SumAbu
-             Stat(i, 5) = SumFit / .ClassCount
-             Stat(i, 6) = BestFit
-             Stat(i, 7) = BestFitInd
+             Stat(I, 1) = SumMW / .ClassCount
+             Stat(I, 4) = SumAbu
+             Stat(I, 5) = SumFit / .ClassCount
+             Stat(I, 6) = BestFit
+             Stat(I, 7) = BestFitInd
           Else     'this should not happen
              For j = 0 To 8
-                 Stat(i, j) = -1
+                 Stat(I, j) = -1
              Next j
           End If
         End With
-     Next i
+     Next I
      UMCStatistics2 = .UMCCnt
   Else
      UMCStatistics2 = -1
@@ -1713,7 +1652,7 @@ Public Function GetCSScope(ByVal Ind As Long, _
 'fills CS data from GelData(Ind) currently in scope and
 'returns its number
 '---------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim Cnt As Long
 With GelDraw(Ind)
   If .CSCount > 0 Then
@@ -1721,25 +1660,25 @@ With GelDraw(Ind)
      Select Case Scope
      Case glScope.glSc_Current
        If GelBody(Ind).fgDisplay = glvDifferential Then
-          For i = 1 To .CSCount
-             If ((.CSID(i) > 0) And (.CSR(i) > 0) And (.CSER(i) >= 0)) Then
+          For I = 1 To .CSCount
+             If ((.CSID(I) > 0) And (.CSR(I) > 0) And (.CSER(I) >= 0)) Then
                 Cnt = Cnt + 1
-                CSInd(Cnt) = i
+                CSInd(Cnt) = I
              End If
-          Next i
+          Next I
        Else
-          For i = 1 To .CSCount
-             If ((.CSID(i) > 0) And (.CSR(i) > 0)) Then
+          For I = 1 To .CSCount
+             If ((.CSID(I) > 0) And (.CSR(I) > 0)) Then
                 Cnt = Cnt + 1
-                CSInd(Cnt) = i
+                CSInd(Cnt) = I
              End If
-          Next i
+          Next I
        End If
        If Cnt > 0 And Cnt < .CSCount Then ReDim Preserve CSInd(Cnt)
      Case glScope.glSc_All
-       For i = 1 To .CSCount
-          CSInd(i) = i
-       Next i
+       For I = 1 To .CSCount
+          CSInd(I) = I
+       Next I
        Cnt = .CSCount
      End Select
   Else
@@ -1758,7 +1697,7 @@ Public Function GetISScope(ByVal Ind As Long, _
 'fills Isotopic data from GelData(Ind) currently in scope
 'Returns number of points in ISInd(), which is a 1-based array
 '----------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim Cnt As Long
 With GelDraw(Ind)
   If .IsoCount > 0 Then
@@ -1766,25 +1705,25 @@ With GelDraw(Ind)
      Select Case Scope
      Case glScope.glSc_Current
        If GelBody(Ind).fgDisplay = glvDifferential Then
-          For i = 1 To .IsoCount
-            If ((.IsoID(i) > 0) And (.IsoR(i) > 0) And (.IsoER(i) >= 0)) Then
+          For I = 1 To .IsoCount
+            If ((.IsoID(I) > 0) And (.IsoR(I) > 0) And (.IsoER(I) >= 0)) Then
                Cnt = Cnt + 1
-               ISInd(Cnt) = i
+               ISInd(Cnt) = I
             End If
-          Next i
+          Next I
        Else
-          For i = 1 To .IsoCount
-            If ((.IsoID(i) > 0) And (.IsoR(i) > 0)) Then
+          For I = 1 To .IsoCount
+            If ((.IsoID(I) > 0) And (.IsoR(I) > 0)) Then
                Cnt = Cnt + 1
-               ISInd(Cnt) = i
+               ISInd(Cnt) = I
             End If
-          Next i
+          Next I
        End If
        If Cnt > 0 And Cnt < .IsoCount Then ReDim Preserve ISInd(Cnt)
      Case glScope.glSc_All
-       For i = 1 To .IsoCount
-          ISInd(i) = i
-       Next i
+       For I = 1 To .IsoCount
+          ISInd(I) = I
+       Next I
        Cnt = .IsoCount
      End Select
   Else
@@ -1804,7 +1743,7 @@ Public Function GetISScopeFilterByUMC(ByVal lngGelIndex As Long, _
 'and belonging to UMC given by UMCInd
 'Returns number of points in ISInd(), which is a 1-based array
 '----------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim Cnt As Long
 
 Dim lngUMCMemberCount As Long
@@ -1825,32 +1764,32 @@ With GelDraw(lngGelIndex)
         Select Case Scope
         Case glScope.glSc_Current
             If GelBody(lngGelIndex).fgDisplay = glvDifferential Then
-                For i = 1 To .IsoCount
-                    If ((.IsoID(i) > 0) And (.IsoR(i) > 0) And (.IsoER(i) >= 0)) Then
-                        If BinarySearchLng(lngUMCGelDataIndices, .IsoID(i)) >= 0 Then
+                For I = 1 To .IsoCount
+                    If ((.IsoID(I) > 0) And (.IsoR(I) > 0) And (.IsoER(I) >= 0)) Then
+                        If BinarySearchLng(lngUMCGelDataIndices, .IsoID(I)) >= 0 Then
                             Cnt = Cnt + 1
-                            ISInd(Cnt) = i
+                            ISInd(Cnt) = I
                         End If
                     End If
-                Next i
+                Next I
             Else
-                For i = 1 To .IsoCount
-                    If ((.IsoID(i) > 0) And (.IsoR(i) > 0)) Then
-                        If BinarySearchLng(lngUMCGelDataIndices, .IsoID(i)) >= 0 Then
+                For I = 1 To .IsoCount
+                    If ((.IsoID(I) > 0) And (.IsoR(I) > 0)) Then
+                        If BinarySearchLng(lngUMCGelDataIndices, .IsoID(I)) >= 0 Then
                             Cnt = Cnt + 1
-                            ISInd(Cnt) = i
+                            ISInd(Cnt) = I
                         End If
                     End If
-                Next i
+                Next I
             End If
             If Cnt > 0 And Cnt < .IsoCount Then ReDim Preserve ISInd(Cnt)
         Case glScope.glSc_All
-            For i = 1 To .IsoCount
-                If BinarySearchLng(lngUMCGelDataIndices, .IsoID(i)) >= 0 Then
-                    ISInd(i) = i
+            For I = 1 To .IsoCount
+                If BinarySearchLng(lngUMCGelDataIndices, .IsoID(I)) >= 0 Then
+                    ISInd(I) = I
                     Cnt = Cnt + 1
                 End If
-            Next i
+            Next I
          End Select
     Else
         Cnt = 0
@@ -2400,24 +2339,24 @@ Public Function UMCAverageMass(ByVal Ind As Long) As Boolean
 'sets masses of all members of a class to a class average
 'returns True if successful
 '--------------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim DInd As Long
 Dim UMCStat2() As Double
 On Error GoTo err_UMCAverageMass
 
 With GelUMC(Ind)
     If UMCStatistics2(Ind, UMCStat2()) <> .UMCCnt Then Exit Function
-    For i = 0 To .UMCCnt - 1
-        For j = 0 To .UMCs(i).ClassCount - 1
-            DInd = .UMCs(i).ClassMInd(j)
-            Select Case .UMCs(i).ClassMType(j)
+    For I = 0 To .UMCCnt - 1
+        For j = 0 To .UMCs(I).ClassCount - 1
+            DInd = .UMCs(I).ClassMInd(j)
+            Select Case .UMCs(I).ClassMType(j)
             Case glCSType
-                GelData(Ind).CSData(DInd).AverageMW = UMCStat2(i, 1)
+                GelData(Ind).CSData(DInd).AverageMW = UMCStat2(I, 1)
             Case glIsoType
-                SetIsoMass GelData(Ind).IsoData(DInd), .def.MWField, UMCStat2(i, 1)
+                SetIsoMass GelData(Ind).IsoData(DInd), .def.MWField, UMCStat2(I, 1)
             End Select
         Next j
-    Next i
+    Next I
 End With
 UMCAverageMass = True
 Exit Function
@@ -2425,100 +2364,19 @@ Exit Function
 err_UMCAverageMass:
 End Function
 
-' Unused function (August 2003)
-'Public Function fUMCScanRange(ByVal IndDis As Long, ByVal IndUMC As Long) As Long
-''--------------------------------------------------------------------------------
-''returns scan range for unique mass class IndUMC of display IndDis; -1 on error
-''--------------------------------------------------------------------------------
-'Dim FirstScan As Long, LastScan As Long, CurrScan As Long
-'Dim i As Long
-'On Error Resume Next
-'FirstScan = 100000:         LastScan = -100000
-'With GelUMC(IndDis).UMCs(IndUMC)
-'    For i = 0 To .ClassCount - 1
-'        Select Case .ClassMType(i)
-'        Case glCSType
-'             CurrScan = GelData(IndDis).CSData(.ClassMInd(i)).ScanNumber
-'        Case glIsoType
-'             CurrScan = GelData(IndDis).IsoData(.ClassMInd(i)).ScanNumber
-'        End Select
-'        If CurrScan < FirstScan Then FirstScan = CurrScan
-'        If CurrScan > LastScan Then LastScan = CurrScan
-'    Next i
-'End With
-'fUMCScanRange = LastScan - FirstScan + 1
-'Exit Function
-'
-'err_fUMCScanRange:
-'fUMCScanRange = -1
-'End Function
-'
-' Unused function (February 2005)
-'Public Function fUMCHiAbuInd(ByVal IndDis As Long, ByVal IndUMC As Long) As Long
-''-------------------------------------------------------------------------------
-''returns index in UMC of class member with highest abundance
-''-------------------------------------------------------------------------------
-'Dim i As Long
-'Dim HiAbu As Double
-'Dim HiAbuInd As Long
-'Dim CurrAbu As Double
-'On Error Resume Next
-'HiAbuInd = -1
-'With GelUMC(IndDis).UMCs(IndUMC)
-'    For i = 0 To .ClassCount - 1
-'        Select Case .ClassMType(i)
-'        Case glCSType
-'             CurrAbu = GelData(IndDis).CSData(.ClassMInd(i)).Abundance
-'        Case glIsoType
-'             CurrAbu = GelData(IndDis).IsoData(.ClassMInd(i)).Abundance
-'        End Select
-'        If CurrAbu > HiAbu Then
-'           HiAbu = CurrAbu
-'           HiAbuInd = i
-'        End If
-'    Next i
-'End With
-'fUMCHiAbuInd = HiAbuInd
-'End Function
-'
-' Unused function (February 2005)
-'Public Function fUMCHiAbu(ByVal IndDis As Long, ByVal IndUMC As Long) As Double
-''------------------------------------------------------------------------------
-''returns highest abundance in the class
-''------------------------------------------------------------------------------
-'Dim i As Long
-'Dim HiAbu As Double
-'Dim CurrAbu As Double
-'On Error Resume Next
-'HiAbu = -1
-'With GelUMC(IndDis).UMCs(IndUMC)
-'    For i = 0 To .ClassCount - 1
-'        Select Case .ClassMType(i)
-'        Case glCSType
-'             CurrAbu = GelData(IndDis).CSData(.ClassMInd(i)).Abundance
-'        Case glIsoType
-'             CurrAbu = GelData(IndDis).IsoData(.ClassMInd(i)).Abundance
-'        End Select
-'        If CurrAbu > HiAbu Then HiAbu = CurrAbu
-'    Next i
-'End With
-'fUMCHiAbu = HiAbu
-'End Function
-
-
 Public Function fUMCSpotsOnly(ByVal IndDis As Long) As Boolean
 '------------------------------------------------------------------
 'makes only spots belonging to the LC-MS Features visible; returns True if OK
 '------------------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 On Error GoTo exit_fUMCSpotsOnly
 'make all spots invisible
 Call GelCSExcludeAll(IndDis)
 Call GelIsoExcludeAll(IndDis)
 'now go and make all UMC spots visible
 With GelUMC(IndDis)
-  For i = 0 To .UMCCnt - 1
-      With .UMCs(i)
+  For I = 0 To .UMCCnt - 1
+      With .UMCs(I)
         For j = 0 To .ClassCount - 1
             Select Case .ClassMType(j)
             Case glCSType
@@ -2528,13 +2386,13 @@ With GelUMC(IndDis)
             End Select
         Next j
       End With
-  Next i
+  Next I
 End With
 
 If False Then
-    For i = 1 To GelDraw(IndDis).IsoCount
-        GelDraw(IndDis).IsoID(i) = -(GelDraw(IndDis).IsoID(i))
-    Next i
+    For I = 1 To GelDraw(IndDis).IsoCount
+        GelDraw(IndDis).IsoID(I) = -(GelDraw(IndDis).IsoID(I))
+    Next I
 End If
 
 fUMCSpotsOnly = True
@@ -2545,15 +2403,15 @@ Public Function ShowNetAdjUMCPoints(ByVal lngGelIndex As Long, ByVal lngUMCIndic
 '------------------------------------------------------------------
 'makes only spots belonging to LC-MS Features that were used for Net Adjustment visible; returns True if OK
 '------------------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 On Error GoTo exit_ShowNetAdjUMCPoints
 'make all spots invisible
 Call GelCSExcludeAll(lngGelIndex)
 Call GelIsoExcludeAll(lngGelIndex)
 'now go and make all UMC spots visible
 With GelUMC(lngGelIndex)
-  For i = 0 To .UMCCnt - 1
-      With .UMCs(i)
+  For I = 0 To .UMCCnt - 1
+      With .UMCs(I)
         If (.ClassStatusBits And lngUMCIndicatorBit) = lngUMCIndicatorBit Then
             For j = 0 To .ClassCount - 1
                 Select Case .ClassMType(j)
@@ -2565,7 +2423,7 @@ With GelUMC(lngGelIndex)
             Next j
         End If
       End With
-  Next i
+  Next I
 End With
 ShowNetAdjUMCPoints = True
 exit_ShowNetAdjUMCPoints:
@@ -2575,15 +2433,15 @@ Public Function ShowSplitUMCPoints(ByVal lngGelIndex As Long) As Boolean
 '------------------------------------------------------------------
 'makes only spots belonging to LC-MS Features that have been split visible; returns True if OK
 '------------------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 On Error GoTo exit_ShowSplitUMCPoints
 'make all spots invisible
 Call GelCSExcludeAll(lngGelIndex)
 Call GelIsoExcludeAll(lngGelIndex)
 'now go and make all UMC spots visible
 With GelUMC(lngGelIndex)
-  For i = 0 To .UMCCnt - 1
-      With .UMCs(i)
+  For I = 0 To .UMCCnt - 1
+      With .UMCs(I)
         If (.ClassStatusBits And UMC_INDICATOR_BIT_SPLIT_UMC) = UMC_INDICATOR_BIT_SPLIT_UMC Then
             For j = 0 To .ClassCount - 1
                 Select Case .ClassMType(j)
@@ -2595,7 +2453,7 @@ With GelUMC(lngGelIndex)
             Next j
         End If
       End With
-  Next i
+  Next I
 End With
 ShowSplitUMCPoints = True
 exit_ShowSplitUMCPoints:
@@ -2835,7 +2693,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
     Const MAX_CHARGE_STATE As Integer = 10             ' Any data with a charge state over this will be grouped with the 10+ charge state
     Const INITIAL_RESERVE_COUNT As Integer = 1000
     
-    Dim i As Long, j As Long
+    Dim I As Long, j As Long
     Dim lngMaxMemberIndex As Long
     Dim intTagIndex As Integer
     
@@ -2944,8 +2802,8 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
         
         ISMWField = .def.MWField
         If .UMCCnt > 0 Then
-           For i = 0 To .UMCCnt - 1
-               With .UMCs(i)
+           For I = 0 To .UMCCnt - 1
+               With .UMCs(I)
                    '
                    ' First, find the Min and Max scan numbers, the Min and Max MW,
                    ' and populate the UMCMembersMW, UMCMembersScan, etc. arrays
@@ -3043,36 +2901,36 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                End With
                
                If dblMinMW < glHugeDouble Then
-                    If (.UMCs(i).MinMW = 0 And .UMCs(i).MaxMW = 0) Or Not .def.LoadedPredefinedLCMSFeatures Then
-                        If (.UMCs(i).MinMW > 0 And dblMinMW = 0) Then
+                    If (.UMCs(I).MinMW = 0 And .UMCs(I).MaxMW = 0) Or Not .def.LoadedPredefinedLCMSFeatures Then
+                        If (.UMCs(I).MinMW > 0 And dblMinMW = 0) Then
                             ' Do not update .MinMW or MaxMW
                         Else
-                            If .UMCs(i).MinMW <> dblMinMW Then
-                                .UMCs(i).MinMW = dblMinMW
+                            If .UMCs(I).MinMW <> dblMinMW Then
+                                .UMCs(I).MinMW = dblMinMW
                             End If
                             
-                            If .UMCs(i).MaxMW <> dblMaxMW Then
-                                .UMCs(i).MaxMW = dblMaxMW
+                            If .UMCs(I).MaxMW <> dblMaxMW Then
+                                .UMCs(I).MaxMW = dblMaxMW
                             End If
                         End If
                     End If
                End If
                   
                If lngMinScan < glHugeLong Then
-                    If (.UMCs(i).MinScan = 0 And .UMCs(i).MaxScan = 0) Or Not .def.LoadedPredefinedLCMSFeatures Then
-                        If .UMCs(i).MinScan > 0 And lngMinScan = 0 Then
+                    If (.UMCs(I).MinScan = 0 And .UMCs(I).MaxScan = 0) Or Not .def.LoadedPredefinedLCMSFeatures Then
+                        If .UMCs(I).MinScan > 0 And lngMinScan = 0 Then
                             ' Do not update .MinScan or .MaxScan
                         Else
-                            If .UMCs(i).MinScan <> lngMinScan Then
+                            If .UMCs(I).MinScan <> lngMinScan Then
                                 ' 9/30/2010: How often does this happen??
                                 Debug.Assert False
-                                .UMCs(i).MinScan = lngMinScan
+                                .UMCs(I).MinScan = lngMinScan
                             End If
                             
-                            If .UMCs(i).MaxScan <> lngMaxScan Then
+                            If .UMCs(I).MaxScan <> lngMaxScan Then
                                 ' 9/30/2010: How often does this happen??
                                 Debug.Assert False
-                                .UMCs(i).MaxScan = lngMaxScan
+                                .UMCs(I).MaxScan = lngMaxScan
                             End If
                         End If
                     End If
@@ -3087,7 +2945,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                Next intChargeState
                
                ' Reset the charge state based stats
-               With .UMCs(i)
+               With .UMCs(I)
                     .ChargeStateStatsRepInd = 0
                     .ChargeStateCount = 0
                     
@@ -3098,7 +2956,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                     End If
                End With
                
-               If .UMCs(i).ClassCount > 0 Then
+               If .UMCs(I).ClassCount > 0 Then
                     ' Compute the charge state based stats
                     ' Step through UMCMembersCharge() and copy the MW, Abu, etc. values to the
                     '  appropriate place in the ChargeBasedStats arrays
@@ -3157,7 +3015,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                                 ' Compute the stats for this charge state group
                                 CalculateClassesComputeStats lngGelIndex, .def, ChargeStateMaxIndex, ChargeStateBasedMW(), ChargeStateBasedAbu(), ChargeStateBasedScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
     
-                                With .UMCs(i)
+                                With .UMCs(I)
                                     With .ChargeStateBasedStats(.ChargeStateCount)
                                         .Charge = intChargeState
                                         .Count = lngChargeStateValueCount
@@ -3176,7 +3034,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                         End If
                     Next intChargeState
     
-                    If .UMCs(i).ChargeStateCount <= 1 Then
+                    If .UMCs(I).ChargeStateCount <= 1 Then
                         ' The "Best" Charge State Index must be the only index: 0
                         ' Note that IMS data will always have just one charge state
                         intBestIndex = 0
@@ -3186,7 +3044,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                         Select Case .def.ChargeStateStatsRepType
                         Case UMCChargeStateGroupConstants.UMCCSGHighestSum
                             ' Find the charge state group with the highest Abundance Sum
-                            With .UMCs(i)
+                            With .UMCs(I)
                                 dblBestValue = -glHugeDouble
                                 intBestIndex = 0
                                 For intChargeState = 0 To .ChargeStateCount - 1
@@ -3198,7 +3056,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                             End With
                         Case UMCChargeStateGroupConstants.UMCCSGMostAbuMember
                             ' Find the charge state group containing the highest intensity ion in this UMC
-                            With .UMCs(i)
+                            With .UMCs(I)
                                 dblBestValue = -glHugeDouble
                                 intBestIndex = 0
                                 For intChargeState = 0 To .ChargeStateCount - 1
@@ -3218,7 +3076,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                             End With
                         Case UMCChargeStateGroupConstants.UMCCSGMostMembers
                             ' Find the charge state group with the most members
-                            With .UMCs(i)
+                            With .UMCs(I)
                                 dblBestValue = 0
                                 intBestIndex = 0
                                 For intChargeState = 0 To .ChargeStateCount - 1
@@ -3233,13 +3091,13 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                             Debug.Assert False
                         End Select
                     End If
-                    .UMCs(i).ChargeStateStatsRepInd = intBestIndex
+                    .UMCs(I).ChargeStateStatsRepInd = intBestIndex
     
                     If blnComputeClassMass Or blnComputeClassAbundance Then
                         
                         ' Populate .ClassMW, .ClassMWStD, and .ClassAbundance
                         If .def.UMCClassStatsUseStatsFromMostAbuChargeState Then
-                            With .UMCs(i)
+                            With .UMCs(I)
                                 If blnComputeClassMass Then
                                     .ClassMW = .ChargeStateBasedStats(.ChargeStateStatsRepInd).Mass
                                     .ClassMWStD = .ChargeStateBasedStats(.ChargeStateStatsRepInd).MassStD
@@ -3258,7 +3116,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                         Else
                             ' Lookup the Class Rep MW and Abu; needed for call to CalculateClassesComputeStats
                             ' Note that .ClassRepInd and .ClassRepType will have already been correctly defined
-                            With .UMCs(i)
+                            With .UMCs(I)
                                 Select Case .ClassRepType
                                 Case glCSType
                                      RepMW = GelData(lngGelIndex).CSData(.ClassRepInd).AverageMW
@@ -3272,7 +3130,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                             ' Compute the class stats
                             CalculateClassesComputeStats lngGelIndex, .def, UMCMembersMaxIndex, UMCMembersMW(), UMCMembersAbu(), UMCMembersScan(), RepMW, RepAbu, dblConglomerateMW, dblConglomerateMWStD, dblConglomerateAbu
                             
-                            With .UMCs(i)
+                            With .UMCs(I)
                                 If blnComputeClassMass Then
                                     .ClassMW = dblConglomerateMW
                                     .ClassMWStD = dblConglomerateMWStD
@@ -3287,11 +3145,11 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                     
                     If blnComputeIsoStats Then
                         ' Populate the .PercentMembersIReport values; these are used when finding pairs to force certain UMCs to only be heavy or only be light members of pairs
-                        .UMCs(i).PercentMembersIReportMonoPlus4 = CByte(UMCMemberIsoStats(irtIReportTagTypeConstants.irtMonoPlus4) * 100# / .UMCs(i).ClassCount)
-                        .UMCs(i).PercentMembersIReportMonoMinus4 = CByte(UMCMemberIsoStats(irtIReportTagTypeConstants.irtMonoMinus4) * 100# / .UMCs(i).ClassCount)
+                        .UMCs(I).PercentMembersIReportMonoPlus4 = CByte(UMCMemberIsoStats(irtIReportTagTypeConstants.irtMonoPlus4) * 100# / .UMCs(I).ClassCount)
+                        .UMCs(I).PercentMembersIReportMonoMinus4 = CByte(UMCMemberIsoStats(irtIReportTagTypeConstants.irtMonoMinus4) * 100# / .UMCs(I).ClassCount)
                     Else
-                        .UMCs(i).PercentMembersIReportMonoPlus4 = 0
-                        .UMCs(i).PercentMembersIReportMonoMinus4 = 0
+                        .UMCs(I).PercentMembersIReportMonoPlus4 = 0
+                        .UMCs(I).PercentMembersIReportMonoMinus4 = 0
                     End If
                     
                Else
@@ -3315,7 +3173,7 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                     If blnComputeClassMass Or blnComputeClassAbundance Then
                         ' Update the class values to be -1
                         ' This is important in case we adjusted the mass value of all of the features; we wouldn't want the .ClassMW values to still be wrong for these UMCs
-                        With .UMCs(i)
+                        With .UMCs(I)
                             If blnComputeClassMass Then
                                 .ClassMW = -1
                                 .ClassMWStD = -1
@@ -3330,14 +3188,14 @@ Public Function CalculateClasses(ByVal lngGelIndex As Long, _
                     End If
                End If
                
-               If i Mod 500 = 0 Then
+               If I Mod 500 = 0 Then
                   If blnShowProgressUsingFormCaption Then
-                      frmCallingForm.Caption = "Updating LC-MS Feature Stats: " & Trim(i) & " / " & (.UMCCnt)
+                      frmCallingForm.Caption = "Updating LC-MS Feature Stats: " & Trim(I) & " / " & (.UMCCnt)
                   ElseIf blnUseProgressForm Then
-                      frmProgress.UpdateSubtaskProgressBar i
+                      frmProgress.UpdateSubtaskProgressBar I
                   End If
                End If
-           Next i
+           Next I
         End If
     End With
     
@@ -3656,7 +3514,7 @@ Private Function CalculateClassesFindRepIndex(ByVal SrcDataMaxIndex As Long, ByR
     '
     ' Note that this Function is very similar to UMCIonNet->FindUMCClassRepIndex
     
-    Dim i As Long
+    Dim I As Long
     Dim BestInd As Long
     Dim BestValue As Double
     
@@ -3666,21 +3524,21 @@ On Error GoTo CalculateClassesFindRepIndexErrorHandler
     Case UMCFROMNet_REP_ABU
         BestInd = -1
         BestValue = -glHugeDouble
-        For i = 0 To SrcDataMaxIndex
-            If AbuList(i) > BestValue Then
-                BestValue = AbuList(i)
-                BestInd = i
+        For I = 0 To SrcDataMaxIndex
+            If AbuList(I) > BestValue Then
+                BestValue = AbuList(I)
+                BestInd = I
             End If
-        Next i
+        Next I
     Case UMCFROMNet_REP_FIT
         BestInd = -1
         BestValue = glHugeDouble
-        For i = 0 To SrcDataMaxIndex
-            If FitList(i) < BestValue Then
-               BestValue = FitList(i)
-               BestInd = i
+        For I = 0 To SrcDataMaxIndex
+            If FitList(I) < BestValue Then
+               BestValue = FitList(I)
+               BestInd = I
             End If
-        Next i
+        Next I
     Case UMCFROMNet_REP_FST_SCAN
         BestInd = 0
     Case UMCFROMNet_REP_LST_SCAN
@@ -3716,31 +3574,31 @@ Public Function GetUMCList(ByVal Ind As Long, _
 'window (Scan1, Scan2) x (MW1,MW2); returns number of it, -1 on any error
 '----------------------------------------------------------------------------------
 Dim Cnt As Long
-Dim i As Long
+Dim I As Long
 On Error GoTo err_GetUMCList
 With GelUMC(Ind)
      ReDim ResList(.UMCCnt - 1)             'reserve enough room
-     For i = 0 To .UMCCnt - 1
-         With .UMCs(i)
+     For I = 0 To .UMCCnt - 1
+         With .UMCs(I)
               If (.MinScan >= Scan1) And (.MinScan <= Scan2) Then
                  If (.MinMW >= MW1) And (.MinMW <= MW2) Then
                     Cnt = Cnt + 1
-                    ResList(Cnt - 1) = i
+                    ResList(Cnt - 1) = I
                  ElseIf (.MaxMW >= MW1) And (.MaxMW <= MW2) Then
                     Cnt = Cnt + 1
-                    ResList(Cnt - 1) = i
+                    ResList(Cnt - 1) = I
                  End If
               ElseIf (.MaxScan >= Scan1) And (.MaxScan <= Scan2) Then
                  If (.MinMW >= MW1) And (.MinMW <= MW2) Then
                     Cnt = Cnt + 1
-                    ResList(Cnt - 1) = i
+                    ResList(Cnt - 1) = I
                  ElseIf (.MaxMW >= MW1) And (.MaxMW <= MW2) Then
                     Cnt = Cnt + 1
-                    ResList(Cnt - 1) = i
+                    ResList(Cnt - 1) = I
                  End If
               End If
          End With
-     Next i
+     Next I
 End With
 If Cnt > 0 Then
    ReDim Preserve ResList(Cnt - 1)
@@ -3764,7 +3622,7 @@ Dim FileNam As String
 Dim sLine As String
 Dim Stat() As Double
 Dim lRows As Long
-Dim i As Long
+Dim I As Long
 Dim RepInd As Long
 Dim CSMOverZ As Double
 On Error GoTo exit_cmdReport_Click
@@ -3792,18 +3650,18 @@ If GelUMC(lngGelIndex).UMCCnt > 0 Then
               "Rep_m/z" & glARG_SEP & _
               "Rep_Abu"
       Print #FileNum, sLine
-      For i = 0 To lRows - 1
-          If Stat(i, 0) >= 0 Then
-             sLine = Stat(i, ustClassIndex) & glARG_SEP & _
-                     GelUMC(lngGelIndex).UMCs(i).ClassCount & glARG_SEP & _
-                     GelUMC(lngGelIndex).UMCs(i).ClassMW & glARG_SEP & _
-                     GelUMC(lngGelIndex).UMCs(i).ClassMWStD & glARG_SEP & _
-                     Stat(i, ustScanStart) & glARG_SEP & _
-                     Stat(i, ustScanEnd) & glARG_SEP & _
-                     Stat(i, ustClassIntensity) & glARG_SEP & _
-                     Stat(i, ustFitAverage)
-             RepInd = GelUMC(lngGelIndex).UMCs(i).ClassRepInd
-             Select Case GelUMC(lngGelIndex).UMCs(i).ClassRepType
+      For I = 0 To lRows - 1
+          If Stat(I, 0) >= 0 Then
+             sLine = Stat(I, ustClassIndex) & glARG_SEP & _
+                     GelUMC(lngGelIndex).UMCs(I).ClassCount & glARG_SEP & _
+                     GelUMC(lngGelIndex).UMCs(I).ClassMW & glARG_SEP & _
+                     GelUMC(lngGelIndex).UMCs(I).ClassMWStD & glARG_SEP & _
+                     Stat(I, ustScanStart) & glARG_SEP & _
+                     Stat(I, ustScanEnd) & glARG_SEP & _
+                     Stat(I, ustClassIntensity) & glARG_SEP & _
+                     Stat(I, ustFitAverage)
+             RepInd = GelUMC(lngGelIndex).UMCs(I).ClassRepInd
+             Select Case GelUMC(lngGelIndex).UMCs(I).ClassRepType
              Case glCSType
                 CSMOverZ = .CSData(RepInd).AverageMW / .CSData(RepInd).Charge + glMASS_CC
                 sLine = sLine & glARG_SEP & .CSData(RepInd).ScanNumber & glARG_SEP _
@@ -3815,10 +3673,10 @@ If GelUMC(lngGelIndex).UMCCnt > 0 Then
                     & glARG_SEP & .IsoData(RepInd).MZ & glARG_SEP & .IsoData(RepInd).Abundance
              End Select
           Else
-             sLine = "Error calculating statistic for class " & i
+             sLine = "Error calculating statistic for class " & I
           End If
           Print #FileNum, sLine
-      Next i
+      Next I
       Close FileNum
       DoEvents
       frmDataInfo.Tag = "UMC"

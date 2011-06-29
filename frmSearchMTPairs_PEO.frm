@@ -664,7 +664,7 @@ End Sub
 
 
 Private Sub mnuET_Click(Index As Integer)
-    Dim i As Long
+    Dim I As Long
     Dim intIndexToUse As Integer
 
     If GelData(CallerID).CustomNETsDefined Then
@@ -711,14 +711,14 @@ On Error Resume Next
          Exit Sub
       End If
     End Select
-    For i = mnuET.LBound To mnuET.UBound
-        If i = Index Then
-           mnuET(i).Checked = True
-           lblETType.Caption = "ET Type: " & mnuET(i).Caption
+    For I = mnuET.LBound To mnuET.UBound
+        If I = Index Then
+           mnuET(I).Checked = True
+           lblETType.Caption = "ET Type: " & mnuET(I).Caption
         Else
-           mnuET(i).Checked = False
+           mnuET(I).Checked = False
         End If
-    Next i
+    Next I
     Call txtNETFormula_LostFocus        'make sure expression evaluator is
                                         'initialized for this formula
 End Sub
@@ -858,12 +858,12 @@ Private Sub mnuPExcludeIdentified_Click()
 '----------------------------------------
 'exclude all identified pairs
 '----------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelP_D_L(CallerID)
-    For i = 0 To .PCnt - 1
-        If PIDCnt(i) > 0 Then .Pairs(i).STATE = glPAIR_Exc
-    Next i
+    For I = 0 To .PCnt - 1
+        If PIDCnt(I) > 0 Then .Pairs(I).STATE = glPAIR_Exc
+    Next I
 End With
 End Sub
 
@@ -871,12 +871,12 @@ Private Sub mnuPExcludeUnidentified_Click()
 '------------------------------------------
 'exclude all identified pairs
 '------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelP_D_L(CallerID)
-    For i = 0 To .PCnt - 1
-        If PIDCnt(i) <= 0 Then .Pairs(i).STATE = glPAIR_Exc
-    Next i
+    For I = 0 To .PCnt - 1
+        If PIDCnt(I) <= 0 Then .Pairs(I).STATE = glPAIR_Exc
+    Next I
 End With
 End Sub
 
@@ -884,16 +884,16 @@ Private Sub mnuPIncludeUnqIdentified_Click()
 '---------------------------------------------------
 'exclude everything that is not uniquelly identified
 '---------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelP_D_L(CallerID)
-    For i = 0 To .PCnt - 1
-        If PIDCnt(i) = 1 Then
-           .Pairs(i).STATE = glPAIR_Inc
+    For I = 0 To .PCnt - 1
+        If PIDCnt(I) = 1 Then
+           .Pairs(I).STATE = glPAIR_Inc
         Else
-           .Pairs(i).STATE = glPAIR_Exc
+           .Pairs(I).STATE = glPAIR_Exc
         End If
-    Next i
+    Next I
 End With
 End Sub
 
@@ -904,7 +904,7 @@ Private Sub mnuPSearch_Click()
 '--------------------------------------------------------
 Dim HitsCnt As Long
 Dim Respond As Long
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 
 If AMTCnt <= 0 Then
@@ -942,9 +942,9 @@ If PCount > 0 Then
         ReDim PIDInd2(PCount - 1)
         'set last index to -1 so that we know when there was
         'no identification if it doesn't change
-        For i = 0 To PCount - 1
-            PIDInd2(i) = -1
-        Next i
+        For I = 0 To PCount - 1
+            PIDInd2(I) = -1
+        Next I
         mgCnt = 0
         'reserve initial space for 10000 identifications
         ReDim mgPInd(10000)
@@ -952,19 +952,19 @@ If PCount > 0 Then
         ReDim mgScore(10000)
         'do identification pair by pair
         If bMTMod Then
-           For i = 0 To PCount - 1
-             If .Pairs(i).STATE <> glPAIR_Exc Then       'skip excluded pairs
-                UpdateStatus "Identifying pair " & (i + 1) & "/" & PCount
-                DoThePair_Mod (i)
+           For I = 0 To PCount - 1
+             If .Pairs(I).STATE <> glPAIR_Exc Then       'skip excluded pairs
+                UpdateStatus "Identifying pair " & (I + 1) & "/" & PCount
+                DoThePair_Mod (I)
              End If
-           Next i
+           Next I
         Else
-           For i = 0 To PCount - 1
-             If .Pairs(i).STATE <> glPAIR_Exc Then       'skip excluded pairs
-                UpdateStatus "Identifying pair " & (i + 1) & "/" & PCount
-                DoThePair_NotMod (i)
+           For I = 0 To PCount - 1
+             If .Pairs(I).STATE <> glPAIR_Exc Then       'skip excluded pairs
+                UpdateStatus "Identifying pair " & (I + 1) & "/" & PCount
+                DoThePair_NotMod (I)
              End If
-           Next i
+           Next I
         End If
         'truncate results
         If mgCnt > 0 Then
@@ -1023,7 +1023,7 @@ Private Sub mnuRAllPairsAndIDs_Click()
 '-------------------------------------
 'report pairs and identifications
 '-------------------------------------
-Dim i As Long
+Dim I As Long
 Dim Respond As Long
 If mgCnt <= 0 Then
    Respond = MsgBox("No identification found. Continue with generating report?", vbYesNo, glFGTU)
@@ -1033,9 +1033,9 @@ UpdateStatus "Generating report ..."
 Me.MousePointer = vbHourglass
 Set ts = fso.OpenTextFile(fname, ForWriting, True)
 WriteReportHeader "All pairs and identifications"
-For i = 0 To PCount - 1
-    ReportPair i
-Next i
+For I = 0 To PCount - 1
+    ReportPair I
+Next I
 ts.Close
 Set ts = Nothing
 Me.MousePointer = vbDefault
@@ -1052,16 +1052,16 @@ Private Sub mnuRIdentified_Click()
 '-------------------------------------
 'report identified pairs only
 '-------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 If mgCnt > 0 Then
    UpdateStatus "Generating report ..."
    Me.MousePointer = vbHourglass
    Set ts = fso.OpenTextFile(fname, ForWriting, True)
    WriteReportHeader "Identified pairs only"
-   For i = 0 To PCount - 1
-       If PIDCnt(i) > 0 Then ReportPair i
-   Next i
+   For I = 0 To PCount - 1
+       If PIDCnt(I) > 0 Then ReportPair I
+   Next I
    ts.Close
    Set ts = Nothing
    Me.MousePointer = vbDefault
@@ -1077,16 +1077,16 @@ Private Sub mnuRUnidentified_Click()
 '-------------------------------------
 'report unidentified pairs only
 '-------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 If PCount > 0 Then
    UpdateStatus "Generating report ..."
    Me.MousePointer = vbHourglass
    Set ts = fso.OpenTextFile(fname, ForWriting, True)
    WriteReportHeader "Unidentified pairs only"
-   For i = 0 To PCount - 1
-       If PIDCnt(i) <= 0 Then ReportPair i
-   Next i
+   For I = 0 To PCount - 1
+       If PIDCnt(I) <= 0 Then ReportPair I
+   Next I
    ts.Close
    Set ts = Nothing
    Me.MousePointer = vbDefault
@@ -1102,16 +1102,16 @@ Private Sub mnuRUnqIdentified_Click()
 '-------------------------------------
 'report uniquely identified pairs only
 '-------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 If mgCnt > 0 Then
    UpdateStatus "Generating report ..."
    Me.MousePointer = vbHourglass
    Set ts = fso.OpenTextFile(fname, ForWriting, True)
    WriteReportHeader "Uniquely identified pairs only"
-   For i = 0 To PCount - 1
-       If PIDCnt(i) = 1 Then ReportPair i
-   Next i
+   For I = 0 To PCount - 1
+       If PIDCnt(I) = 1 Then ReportPair I
+   Next I
    ts.Close
    Set ts = Nothing
    Me.MousePointer = vbDefault
@@ -1331,7 +1331,7 @@ Dim MW As Double            'mol. mass of current distribution
 Dim Scan As Long            'scan of current distribution
 Dim ET As Double
 Dim MWAbsErr As Double      'absolute value of error allowed
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim TmpCnt As Long
 Dim Hits() As Long
 
@@ -1353,14 +1353,14 @@ ReDim PairIDInd(100)     'should be more than enough; do not allow for
 CheckNETEquationStatus
 
 With GelUMC(CallerID).UMCs(ClsInd1)   'search all members of
-   For i = 0 To .ClassCount - 1       'light pair member class
-     Select Case .ClassMType(i)
+   For I = 0 To .ClassCount - 1       'light pair member class
+     Select Case .ClassMType(I)
      Case glCSType
-          MW = GelData(CallerID).CSData(.ClassMInd(i)).AverageMW
-          Scan = GelData(CallerID).CSData(.ClassMInd(i)).ScanNumber
+          MW = GelData(CallerID).CSData(.ClassMInd(I)).AverageMW
+          Scan = GelData(CallerID).CSData(.ClassMInd(I)).ScanNumber
      Case glIsoType
-          MW = GetIsoMass(GelData(CallerID).IsoData(.ClassMInd(i)), samtDef.MWField)
-          Scan = GelData(CallerID).IsoData(.ClassMInd(i)).ScanNumber
+          MW = GetIsoMass(GelData(CallerID).IsoData(.ClassMInd(I)), samtDef.MWField)
+          Scan = GelData(CallerID).IsoData(.ClassMInd(I)).ScanNumber
      End Select
      ET = ConvertScanToNET(Scan)
      'calculate absolute molecular mass tolerance
@@ -1399,7 +1399,7 @@ With GelUMC(CallerID).UMCs(ClsInd1)   'search all members of
             End If
         Next j
      End If
-   Next i
+   Next I
 End With
 '-----------------------------------------------------------------
 'all identifications for PairInd are collected; now order them in
@@ -1423,13 +1423,13 @@ If PairIDCnt > 0 Then
       PIDInd1(PairInd) = mgCnt            'first index
       'last index will remain -1 if no ids and PIDInd2(i)>=0
       'should always be checked when enumerating ids for pair
-      For i = 0 To PairIDCnt - 1
+      For I = 0 To PairIDCnt - 1
           mgCnt = mgCnt + 1
           mgPInd(mgCnt - 1) = PairInd
-          mgIDInd(mgCnt - 1) = PairIDInd(i)
-          mgScore(mgCnt - 1) = PairScore(i)
+          mgIDInd(mgCnt - 1) = PairIDInd(I)
+          mgScore(mgCnt - 1) = PairScore(I)
           PIDInd2(PairInd) = mgCnt - 1    'last index
-      Next i
+      Next I
    End If
 End If
 Exit Sub
@@ -1467,7 +1467,7 @@ Dim MW1 As Double           'assumed non modified mass
 Dim Scan As Long            'scan of current distribution
 Dim ET As Double
 Dim MWAbsErr As Double      'absolute value of error allowed
-Dim i As Long, j As Long, k As Long
+Dim I As Long, j As Long, k As Long
 Dim TmpCnt As Long
 Dim Hits() As Long
 
@@ -1490,14 +1490,14 @@ ReDim PairIDInd(100)     'should be more than enough; do not allow for
 CheckNETEquationStatus
 
 With GelUMC(CallerID).UMCs(ClsInd1)   'search all members of
-   For i = 0 To .ClassCount - 1       'light pair member class
-     Select Case .ClassMType(i)
+   For I = 0 To .ClassCount - 1       'light pair member class
+     Select Case .ClassMType(I)
      Case glCSType
-          MW = GelData(CallerID).CSData(.ClassMInd(i)).AverageMW
-          Scan = GelData(CallerID).CSData(.ClassMInd(i)).ScanNumber
+          MW = GelData(CallerID).CSData(.ClassMInd(I)).AverageMW
+          Scan = GelData(CallerID).CSData(.ClassMInd(I)).ScanNumber
      Case glIsoType
-          MW = GetIsoMass(GelData(CallerID).IsoData(.ClassMInd(i)), samtDef.MWField)
-          Scan = GelData(CallerID).IsoData(.ClassMInd(i)).ScanNumber
+          MW = GetIsoMass(GelData(CallerID).IsoData(.ClassMInd(I)), samtDef.MWField)
+          Scan = GelData(CallerID).IsoData(.ClassMInd(I)).ScanNumber
      End Select
      ET = ConvertScanToNET(Scan)
      'assume any reasonable number of labels
@@ -1539,7 +1539,7 @@ With GelUMC(CallerID).UMCs(ClsInd1)   'search all members of
           End If
         End If
      Next k
-   Next i
+   Next I
 End With
 '-----------------------------------------------------------------
 'all identifications for PairInd are collected; now order them in
@@ -1563,13 +1563,13 @@ If PairIDCnt > 0 Then
       PIDInd1(PairInd) = mgCnt            'first index
       'last index will remain -1 if no ids and PIDInd2(i)>=0
       'should always be checked when enumerating ids for pair
-      For i = 0 To PairIDCnt - 1
+      For I = 0 To PairIDCnt - 1
           mgCnt = mgCnt + 1
           mgPInd(mgCnt - 1) = PairInd
-          mgIDInd(mgCnt - 1) = PairIDInd(i)
-          mgScore(mgCnt - 1) = PairScore(i)
+          mgIDInd(mgCnt - 1) = PairIDInd(I)
+          mgScore(mgCnt - 1) = PairScore(I)
           PIDInd2(PairInd) = mgCnt - 1    'last index
-      Next i
+      Next I
    End If
 End If
 Exit Sub
@@ -1604,7 +1604,7 @@ Private Sub ScorePairIDs(ByRef PCnt As Long, _
 Dim UnqCnt As Long
 Dim TmpID() As Long
 Dim CurrID As Long
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 On Error Resume Next
 
 TmpID = PID     'copy ID data to temporary array
@@ -1613,8 +1613,8 @@ UnqCnt = 0
 ReDim PID(PCnt - 1)
 ReDim PScores(PCnt - 1)
 
-For i = 0 To PCnt - 1
-    CurrID = TmpID(i)
+For I = 0 To PCnt - 1
+    CurrID = TmpID(I)
     For j = 0 To UnqCnt - 1
         If CurrID = PID(j) Then
            PScores(j) = PScores(j) + 1
@@ -1626,7 +1626,7 @@ For i = 0 To PCnt - 1
        PID(UnqCnt - 1) = CurrID
        PScores(UnqCnt - 1) = 1
     End If
-Next i
+Next I
 'truncate the unique counts
 If UnqCnt > 0 Then
    PCnt = UnqCnt
@@ -1667,7 +1667,7 @@ Private Sub ReportPair(ByVal PairInd As Long)
 'writes lines of report(all identifications) for PairInd pair
 'if there is no identification for this pair just write pair info
 '----------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim SP As String                    'pair part of line
 Dim sID As String                   'ID part of line
 On Error Resume Next
@@ -1687,11 +1687,11 @@ If PIDCnt(PairInd) < 0 Then         'error during pair identification
 ElseIf PIDCnt(PairInd) = 0 Then     'no id for this pair
    ts.WriteLine SP & glARG_SEP & "Unidentified"
 Else                                'identified
-   For i = PIDInd1(PairInd) To PIDInd2(PairInd)
-       sID = glARG_SEP & Trim(AMTData(mgIDInd(i)).ID) & glARG_SEP _
-            & AMTData(mgIDInd(i)).MW & glARG_SEP & mgScore(i)
+   For I = PIDInd1(PairInd) To PIDInd2(PairInd)
+       sID = glARG_SEP & Trim(AMTData(mgIDInd(I)).ID) & glARG_SEP _
+            & AMTData(mgIDInd(I)).MW & glARG_SEP & mgScore(I)
        ts.WriteLine SP & sID
-   Next i
+   Next I
 End If
 End Sub
 
@@ -1723,273 +1723,11 @@ VarVals(3) = MaxFN
 Elution = MyExprEva.ExprVal(VarVals())
 End Function
 
-' September 2004: Unused Function
-''Public Function ExportIDPairsToMTDB(Optional ByRef lngErrorNumber As Long, Optional ByRef lngMDID As Long) As String
-'''---------------------------------------------------
-'''this is simple but long procedure of exporting data
-'''results to Organism MT tag database associated
-'''lngErrorNumber will contain the error number, if an error occurs
-'''---------------------------------------------------
-''Dim i As Long, j As Long, k As Long
-''Dim ExpCnt As Long
-'''ADO objects for stored procedure adding Match Making row
-''Dim cnNew As New ADODB.Connection
-'''ADO objects for stored procedure that adds FTICR peak rows
-''Dim cmdPutNewPeak As New ADODB.Command
-''Dim prmMMDID As New ADODB.Parameter
-''Dim prmFTICRID As New ADODB.Parameter
-''Dim prmFTICRType As New ADODB.Parameter
-''Dim prmScanNumber As New ADODB.Parameter
-''Dim prmChargeState As New ADODB.Parameter
-''Dim prmMonoisotopicMass As New ADODB.Parameter
-''Dim prmAbundance As New ADODB.Parameter
-''Dim prmFit As New ADODB.Parameter
-''Dim prmExpressionRatio As New ADODB.Parameter
-''Dim prmLckID As New ADODB.Parameter
-''Dim prmFreqShift As New ADODB.Parameter
-''Dim prmMassCorrection As New ADODB.Parameter
-''Dim prmMassTagID As New ADODB.Parameter
-''Dim prmResType As New ADODB.Parameter
-''Dim prmHitsCount As New ADODB.Parameter
-''Dim prmUMCInd As New ADODB.Parameter
-''Dim prmUMCFirstScan As New ADODB.Parameter
-''Dim prmUMCLastScan As New ADODB.Parameter
-''Dim prmUMCCount As New ADODB.Parameter
-''Dim prmUMCAbundance As New ADODB.Parameter
-''Dim prmUMCBestFit As New ADODB.Parameter
-''Dim prmUMCAvgMW As New ADODB.Parameter
-''Dim prmPairInd As New ADODB.Parameter
-''
-''Dim IndL As Long        'index in UMC of light pair member
-''Dim IndH As Long        'index in UMC of heavy pair member
-''Dim nInd As Long        'current numeric index - this is used only as a shortcut
-''
-''Dim UMCStat2() As Double        'UMC Statistics(needed for export function)
-''Dim UMCCnt2 As Long
-''
-''On Error GoTo err_ExportMTDB
-''
-''UpdateStatus "Calculating statistics for UMC ..."
-''UMCCnt2 = UMCStatistics2(CallerID, UMCStat2)
-''If UMCCnt2 <= 0 Then
-''   ExportIDPairsToMTDB = "Error calculating statistics for UMC. Export aborted."
-''   Exit Function
-''End If
-''
-''UpdateStatus "Exporting ..."
-''If Not EstablishConnection(cnNew, GelAnalysis(CallerID).MTDB.cn.ConnectionString, False) Then
-''    Debug.Assert False
-''    lngErrorNumber = -1
-''    ExportIDPairsToMTDB = "Error: Unable to establish a connection to the database"
-''    Exit Function
-''End If
-''
-'''first write new analysis in T_Match_Making_Description table
-''AddEntryToMatchMakingDescriptionTable cnNew, lngMDID, ExpAnalysisSPName, CallerID, mgCnt, GelData(CallerID).CustomNETsDefined, False, strIniFileName
-''
-''' MonroeMod
-''AddToAnalysisHistory CallerID, "Exported PEO Identification Pairs results to database (" & ExtractDBNameFromConnectionString(GelAnalysis(CallerID).MTDB.cn.ConnectionString) & "); MMD_ID = " & lngMDID
-''AddToAnalysisHistory CallerID, "Export to MMD table details: Reference Job = " & GelAnalysis(CallerID).MD_Reference_Job & "; MD_File = " & GelAnalysis(CallerID).MD_file
-''
-''' Initialize the SP
-''InitializeSPCommand cmdPutNewPeak, cnNew, ExpPeakSPName
-''
-''Set prmMMDID = cmdPutNewPeak.CreateParameter("MMDID", adInteger, adParamInput, , lngMDID)
-''cmdPutNewPeak.Parameters.Append prmMMDID
-''Set prmFTICRID = cmdPutNewPeak.CreateParameter("FTICRID", adVarChar, adParamInput, 50, Null)
-''cmdPutNewPeak.Parameters.Append prmFTICRID
-''Set prmFTICRType = cmdPutNewPeak.CreateParameter("FTICRType", adTinyInt, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmFTICRType
-''Set prmScanNumber = cmdPutNewPeak.CreateParameter("ScanNumber", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmScanNumber
-''Set prmChargeState = cmdPutNewPeak.CreateParameter("ChargeState", adSmallInt, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmChargeState
-''Set prmMonoisotopicMass = cmdPutNewPeak.CreateParameter("MonoisotopicMass", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmMonoisotopicMass
-''Set prmAbundance = cmdPutNewPeak.CreateParameter("Abundance", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmAbundance
-''Set prmFit = cmdPutNewPeak.CreateParameter("Fit", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmFit
-''Set prmExpressionRatio = cmdPutNewPeak.CreateParameter("ExpressionRatio", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmExpressionRatio
-''Set prmLckID = cmdPutNewPeak.CreateParameter("LckID", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmLckID
-''Set prmFreqShift = cmdPutNewPeak.CreateParameter("FreqShift", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmFreqShift
-''Set prmMassCorrection = cmdPutNewPeak.CreateParameter("MassCorrection", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmMassCorrection
-''Set prmMassTagID = cmdPutNewPeak.CreateParameter("MassTagID", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmMassTagID
-''Set prmResType = cmdPutNewPeak.CreateParameter("Type", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmResType
-''Set prmHitsCount = cmdPutNewPeak.CreateParameter("HitCount", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmHitsCount
-''Set prmUMCInd = cmdPutNewPeak.CreateParameter("UMCInd", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCInd
-''Set prmUMCFirstScan = cmdPutNewPeak.CreateParameter("UMCFirstScan", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCFirstScan
-''Set prmUMCLastScan = cmdPutNewPeak.CreateParameter("UMCLastScan", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCLastScan
-''Set prmUMCCount = cmdPutNewPeak.CreateParameter("UMCCount", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCCount
-''Set prmUMCAbundance = cmdPutNewPeak.CreateParameter("UMCAbundance", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCAbundance
-''Set prmUMCBestFit = cmdPutNewPeak.CreateParameter("UMCBestFit", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCBestFit
-''Set prmUMCAvgMW = cmdPutNewPeak.CreateParameter("UMCAvgMW", adDouble, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmUMCAvgMW
-''Set prmPairInd = cmdPutNewPeak.CreateParameter("PairInd", adInteger, adParamInput, , 0)
-''cmdPutNewPeak.Parameters.Append prmPairInd
-''
-'''now export data; there are some pairs if we are here
-''ExpCnt = 0
-''For i = 0 To PCount - 1
-''    If PIDCnt(i) > 0 Then       'this pair is identified
-''       IndL = GelP_D_L(CallerID).Pairs(i).P1
-''       IndH = GelP_D_L(CallerID).Pairs(i).P2
-''       'common values for all peaks
-''       prmExpressionRatio.value = GelP_D_L(CallerID).Pairs(i).ER
-''
-''       prmPairInd.value = i
-''       prmHitsCount.value = PIDCnt(i)   'number of different identifications
-''
-''       'report peaks from class IndL as light and ...
-''       prmUMCInd.value = IndL
-''       prmResType.value = FPR_Type_N14_N15_L
-''       prmUMCFirstScan.value = UMCStat2(IndL, 2)
-''       prmUMCLastScan.value = UMCStat2(IndL, 3)
-''       prmUMCCount.value = UMCStat2(IndL, 8)
-''       prmUMCAbundance.value = UMCStat2(IndL, 4)
-''       prmUMCBestFit.value = UMCStat2(IndL, 6)
-''       prmUMCAvgMW.value = UMCStat2(IndL, 1)
-''
-''       With GelUMC(CallerID).UMCs(IndL)
-''           For j = 0 To .ClassCount - 1
-''               nInd = .ClassMInd(j)
-''               prmFTICRID.value = nInd
-''               prmFTICRType.value = .ClassMType(j)
-''               Select Case .ClassMType(j)
-''               Case glCSType
-''                 With GelData(CallerID)
-''                    prmScanNumber.value = .CSData(nInd).ScanNumber
-''                    prmChargeState.value = .CSData(nInd).Charge
-''                    prmMonoisotopicMass.value = .CSData(nInd).AverageMW
-''                    prmAbundance.value = .CSData(nInd).Abundance
-''                    prmFit.value = .CSData(nInd).MassStDev     'standard deviation
-''                    With GelLM(CallerID)
-''                      If .CSCnt > 0 Then
-''                         prmLckID.value = .CSLckID(nInd)
-''                         prmFreqShift.value = .CSFreqShift(nInd)
-''                         prmMassCorrection.value = .CSMassCorrection(nInd)
-''                      End If
-''                    End With
-''                 End With
-''               Case glIsoType
-''                 With GelData(CallerID)
-''                    prmScanNumber.value = .IsoData(nInd).ScanNumber
-''                    prmChargeState.value = .IsoData(nInd).Charge
-''                    prmMonoisotopicMass.value = .IsoData(nInd).MonoisotopicMW
-''                    prmAbundance.value = .IsoData(nInd).Abundance
-''                    prmFit.value = .IsoData(nInd).Fit
-''                    With GelLM(CallerID)
-''                      If .IsoCnt > 0 Then
-''                        prmLckID.value = .IsoLckID(nInd)
-''                        prmFreqShift.value = .IsoFreqShift(nInd)
-''                        prmMassCorrection.value = .IsoMassCorrection(nInd)
-''                      End If
-''                    End With
-''                 End With
-''               End Select
-''
-''               'export all identifications
-''               For k = PIDInd1(i) To PIDInd2(i)
-''                   prmMassTagID = AMTData(mgIDInd(k)).ID     'MT tag ID
-''                   cmdPutNewPeak.Execute
-''                   ExpCnt = ExpCnt + 1
-''               Next k
-''           Next j
-''       End With
-''
-''       '...all from IndH as heavy members
-''       prmUMCInd.value = IndH
-''       prmResType.value = FPR_Type_N14_N15_H
-''       prmUMCFirstScan.value = UMCStat2(IndH, 2)
-''       prmUMCLastScan.value = UMCStat2(IndH, 3)
-''       prmUMCCount.value = UMCStat2(IndH, 8)
-''       prmUMCAbundance.value = UMCStat2(IndH, 4)
-''       prmUMCBestFit.value = UMCStat2(IndH, 6)
-''       prmUMCAvgMW.value = UMCStat2(IndH, 1)
-''
-''       With GelUMC(CallerID).UMCs(IndH)
-''           For j = 0 To .ClassCount - 1
-''               nInd = .ClassMInd(j)
-''               prmFTICRID.value = nInd
-''               prmFTICRType.value = .ClassMType(j)
-''               Select Case .ClassMType(j)
-''               Case glCSType
-''                 With GelData(CallerID)
-''                    prmScanNumber.value = .CSData(nInd).ScanNumber
-''                    prmChargeState.value = .CSData(nInd).Charge
-''                    prmMonoisotopicMass.value = .CSData(nInd).AverageMW
-''                    prmAbundance.value = .CSData(nInd).Abundance
-''                    prmFit.value = .CSData(nInd).MassStDev     'standard deviation
-''                    With GelLM(CallerID)
-''                      If .CSCnt > 0 Then
-''                         prmLckID.value = .CSLckID(nInd)
-''                         prmFreqShift.value = .CSFreqShift(nInd)
-''                         prmMassCorrection.value = .CSMassCorrection(nInd)
-''                      End If
-''                    End With
-''                 End With
-''               Case glIsoType
-''                 With GelData(CallerID)
-''                    prmScanNumber.value = .IsoData(nInd).ScanNumber
-''                    prmChargeState.value = .IsoData(nInd).Charge
-''                    prmMonoisotopicMass.value = .IsoData(nInd).MonoisotopicMW
-''                    prmAbundance.value = .IsoData(nInd).Abundance
-''                    prmFit.value = .IsoData(nInd).Fit
-''                    With GelLM(CallerID)
-''                      If .IsoCnt > 0 Then
-''                        prmLckID.value = .IsoLckID(nInd)
-''                        prmFreqShift.value = .IsoFreqShift(nInd)
-''                        prmMassCorrection.value = .IsoMassCorrection(nInd)
-''                      End If
-''                    End With
-''                 End With
-''               End Select
-''
-''               'export all identifications
-''               For k = PIDInd1(i) To PIDInd2(i)
-''                   prmMassTagID = AMTData(mgIDInd(k)).ID     'MT tag ID
-''                   cmdPutNewPeak.Execute
-''                   ExpCnt = ExpCnt + 1
-''               Next k
-''           Next j
-''       End With
-''    End If
-''Next i
-''
-''' MonroeMod
-''AddToAnalysisHistory CallerID, "Export to Peak Results table details: Pairs Match Count = " & ExpCnt
-''
-''UpdateStatus "Export done."
-''ExportIDPairsToMTDB = ExpCnt & " associations between MT tags and FTICR peaks exported."
-''Set cmdPutNewPeak.ActiveConnection = Nothing
-''cnNew.Close
-''lngErrorNumber = 0
-''Exit Function
-''
-''err_ExportMTDB:
-''ExportIDPairsToMTDB = "Error: " & Err.Number & vbCrLf & Err.Description
-''lngErrorNumber = Err.Number
-''If Not cnNew Is Nothing Then cnNew.Close
-''End Function
-
 Private Sub PickParameters()
-Call txtLblMass_LostFocus
-Call txtMaxLbls_LostFocus
-Call txtMinLbls_LostFocus
-Call txtMWTol_LostFocus
-Call txtNETTol_LostFocus
-Call txtNETFormula_LostFocus
+    Call txtLblMass_LostFocus
+    Call txtMaxLbls_LostFocus
+    Call txtMinLbls_LostFocus
+    Call txtMWTol_LostFocus
+    Call txtNETTol_LostFocus
+    Call txtNETFormula_LostFocus
 End Sub

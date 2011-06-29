@@ -1,5 +1,9 @@
 VIPER Change Log
 
+Verion 3.48 - Build 445; June 29, 2011
+	- Added support for table T_Mass_Tag_Conformers_Observed in legacy MTDBs (Microsoft Access files) 
+	- Removed old, unused code and forms
+
 Version 3.48 - Build 445; June 27, 2011
 	- New version of STAC Console
 		- Fixes bug counting number of unique conformers

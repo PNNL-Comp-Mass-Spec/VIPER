@@ -1,6 +1,6 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl.ocx"
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
 Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmSearchForNETAdjustmentUMC 
    Caption         =   "Search MT Tag Database For NET Adjustment"
@@ -132,18 +132,18 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
       TabCaption(0)   =   "Robust NET Options"
       TabPicture(0)   =   "frmSearchForNETAdjustmentUMC.frx":0000
       Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "fraMassShiftPPMRange"
-      Tab(0).Control(1)=   "fraNETInterceptRange"
+      Tab(0).Control(0)=   "lblRobustNETPredictedIterationCount"
+      Tab(0).Control(1)=   "lblRobustNETCurrentSettings"
       Tab(0).Control(2)=   "fraNETSlopeRange"
-      Tab(0).Control(3)=   "lblRobustNETCurrentSettings"
-      Tab(0).Control(4)=   "lblRobustNETPredictedIterationCount"
+      Tab(0).Control(3)=   "fraNETInterceptRange"
+      Tab(0).Control(4)=   "fraMassShiftPPMRange"
       Tab(0).ControlCount=   5
       TabCaption(1)   =   "Addnl NET Options"
       TabPicture(1)   =   "frmSearchForNETAdjustmentUMC.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "fraToleranceRefinementPeakCriteria"
+      Tab(1).Control(0)=   "fraOptionFrame(50)"
       Tab(1).Control(1)=   "fraSlopeAndInterceptWarningTolerances"
-      Tab(1).Control(2)=   "fraOptionFrame(50)"
+      Tab(1).Control(2)=   "fraToleranceRefinementPeakCriteria"
       Tab(1).ControlCount=   3
       TabCaption(2)   =   "Misc. Adv. Options"
       TabPicture(2)   =   "frmSearchForNETAdjustmentUMC.frx":0038
@@ -808,7 +808,6 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          _ExtentX        =   9551
          _ExtentY        =   3889
          _Version        =   393217
-         Enabled         =   -1  'True
          ScrollBars      =   2
          TextRTF         =   $"frmSearchForNETAdjustmentUMC.frx":0054
       End
@@ -2012,7 +2011,7 @@ Dim NETTolVarChange As Double
 Dim CurrNET1 As Double, CurrNET2 As Double      'NET for first and last point calculated with last slope,int.
 Dim PrevNET1 As Double, PrevNET2 As Double      'this is used as stop criteria for iteration of type 4
 Dim blnProceed As Boolean
-Dim i As Long
+Dim I As Long
 
 On Error GoTo CalculateIterationWorkErrorHandler
 
@@ -2049,11 +2048,11 @@ Do While Not bDone
    Else
       ' On subsequent iterations, simply clear the ID arrays and reset the Hit bit
       ClearIDArrays
-      For i = 0 To GelUMC(CallerID).UMCCnt - 1
-         With GelUMC(CallerID).UMCs(i)
+      For I = 0 To GelUMC(CallerID).UMCCnt - 1
+         With GelUMC(CallerID).UMCs(I)
             .ClassStatusBits = .ClassStatusBits And Not UMC_INDICATOR_BIT_NET_ADJ_DB_HIT
          End With
-      Next i
+      Next I
       blnProceed = True
    End If
    
@@ -3084,26 +3083,26 @@ Dim SumY As Double
 Dim SumX As Double
 Dim SumXY As Double
 Dim SumXX As Double
-Dim i As Long
+Dim I As Long
 UpdateStatus "Calculating Slope & Intercept"
 SumY = 0
 SumX = 0
 SumXY = 0
 SumXX = 0
 ' Loop through all the selected identifications
-For i = 0 To IDCnt - 1
-    SumX = SumX + IDScan(i)
+For I = 0 To IDCnt - 1
+    SumX = SumX + IDScan(I)
     If IDsAreInternalStandards Then
-        With UMCInternalStandards.InternalStandards(ID(i))
+        With UMCInternalStandards.InternalStandards(ID(I))
             SumY = SumY + .NET
-            SumXY = SumXY + IDScan(i) * .NET
+            SumXY = SumXY + IDScan(I) * .NET
         End With
     Else
-        SumY = SumY + AMTData(ID(i)).NET
-        SumXY = SumXY + IDScan(i) * AMTData(ID(i)).NET
+        SumY = SumY + AMTData(ID(I)).NET
+        SumXY = SumXY + IDScan(I) * AMTData(ID(I)).NET
     End If
-    SumXX = SumXX + CDbl(IDScan(i)) ^ 2
-Next i
+    SumXX = SumXX + CDbl(IDScan(I)) ^ 2
+Next I
 AdjSlp = (IDCnt * SumXY - SumX * SumY) / (IDCnt * SumXX - SumX * SumX)
 AdjInt = (SumY - AdjSlp * SumX) / IDCnt
 Call CalculateAvgDev
@@ -3120,21 +3119,21 @@ End Sub
 
 
 Private Sub CalculateAvgDev()
-Dim i As Long
+Dim I As Long
 Dim TtlDist As Double
 On Error GoTo err_CalculateAvgDev
 TtlDist = 0
 
 If IDsAreInternalStandards Then
     With UMCInternalStandards
-        For i = 0 To IDCnt - 1
-            TtlDist = TtlDist + (AdjSlp * IDScan(i) + AdjInt - .InternalStandards(ID(i)).NET) ^ 2
-        Next i
+        For I = 0 To IDCnt - 1
+            TtlDist = TtlDist + (AdjSlp * IDScan(I) + AdjInt - .InternalStandards(ID(I)).NET) ^ 2
+        Next I
     End With
 Else
-    For i = 0 To IDCnt - 1
-        TtlDist = TtlDist + (AdjSlp * IDScan(i) + AdjInt - AMTData(ID(i)).NET) ^ 2
-    Next i
+    For I = 0 To IDCnt - 1
+        TtlDist = TtlDist + (AdjSlp * IDScan(I) + AdjInt - AMTData(ID(I)).NET) ^ 2
+    Next I
 End If
 
 AdjAvD = TtlDist / IDCnt
@@ -3165,7 +3164,7 @@ Private Sub CleanIdentifications()
 '-------------------------------------------------------------
 'removes identifications that will not be used from the arrays
 '-------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim NewCnt As Long
 Dim UMCUsed() As Boolean
 
@@ -3174,18 +3173,18 @@ On Error GoTo CleanIdentificationsErrorHandler
 ReDim UMCUsed(GelUMC(CallerID).UMCCnt)
 
 UpdateStatus "Restructuring data ..."
-For i = 0 To IDCnt - 1
-    If IDState(i) = 0 Then
+For I = 0 To IDCnt - 1
+    If IDState(I) = 0 Then
        NewCnt = NewCnt + 1
-       ID(NewCnt - 1) = ID(i)
-       IDMatchingUMCInd(NewCnt - 1) = IDMatchingUMCInd(i)
-       IDMatchAbu(NewCnt - 1) = IDMatchAbu(i)
-       IDIsoFit(NewCnt - 1) = IDIsoFit(i)
-       IDScan(NewCnt - 1) = IDScan(i)
+       ID(NewCnt - 1) = ID(I)
+       IDMatchingUMCInd(NewCnt - 1) = IDMatchingUMCInd(I)
+       IDMatchAbu(NewCnt - 1) = IDMatchAbu(I)
+       IDIsoFit(NewCnt - 1) = IDIsoFit(I)
+       IDScan(NewCnt - 1) = IDScan(I)
        
-       UMCUsed(IDMatchingUMCInd(i)) = True
+       UMCUsed(IDMatchingUMCInd(I)) = True
     End If
-Next i
+Next I
 If NewCnt > 0 Then
     ReDim Preserve ID(NewCnt - 1)
     ReDim Preserve IDMatchingUMCInd(NewCnt - 1)
@@ -3206,12 +3205,12 @@ If NewCnt < IDCnt Then
     PeakCntWithMatches = 0
     UMCTotalPointsMatching = 0
     With GelUMC(CallerID)
-        For i = 0 To .UMCCnt - 1
-            If UMCUsed(i) Then
+        For I = 0 To .UMCCnt - 1
+            If UMCUsed(I) Then
                 PeakCntWithMatches = PeakCntWithMatches + 1
-                UMCTotalPointsMatching = UMCTotalPointsMatching + .UMCs(i).ClassCount
+                UMCTotalPointsMatching = UMCTotalPointsMatching + .UMCs(I).ClassCount
             End If
-        Next i
+        Next I
     End With
 
 End If
@@ -3277,10 +3276,10 @@ Private Sub ClearTheGRID()
     '--------------------------------------------
     'destroys GRID data structure
     '--------------------------------------------
-    Dim i As Long
-    For i = 0 To UBound(GRID)
-        If GRID(i).Count > 0 Then Erase GRID(i).Members
-    Next i
+    Dim I As Long
+    For I = 0 To UBound(GRID)
+        If GRID(I).Count > 0 Then Erase GRID(I).Members
+    Next I
     Erase GRID
 End Sub
 
@@ -3860,7 +3859,7 @@ Private Function FillTheGRID() As Boolean
     'fills GRID arrays with ID information
     'For each AMT, records the indices in ID() that matched the AMT
     '----------------------------------------
-    Dim i As Long
+    Dim I As Long
     Dim GRIDCount As Long
     
     Dim DummyInd() As Long      'dummy array(empty) will allow us to
@@ -3877,22 +3876,22 @@ Private Function FillTheGRID() As Boolean
     
     If IDCnt > 0 And GRIDCount > 0 Then
        ReDim GRID(GRIDCount)      'AMT arrays are 1-based
-       For i = 0 To IDCnt - 1
-           With GRID(ID(i))
+       For I = 0 To IDCnt - 1
+           With GRID(ID(I))
                ReDim Preserve .Members(.Count)
-               .Members(.Count) = i
+               .Members(.Count) = I
                .Count = .Count + 1
            End With
-       Next i
+       Next I
        
        'order members of each group on ID number
-       For i = 0 To GRIDCount
-           If GRID(i).Count > 1 Then
+       For I = 0 To GRIDCount
+           If GRID(I).Count > 1 Then
               Set QSL = New QSLong
-              If Not QSL.QSAsc(GRID(i).Members, DummyInd) Then GoTo err_FillTheGRID
+              If Not QSL.QSAsc(GRID(I).Members, DummyInd) Then GoTo err_FillTheGRID
               Set QSL = Nothing
            End If
-       Next i
+       Next I
        FillTheGRID = True
        UpdateStatus ""
     Else
@@ -3995,19 +3994,6 @@ If Err.Number = 9 Then
 End If
 End Sub
 
-' Unused Function (March 2003)
-'''Private Function GetUnqIDCntUsed() As Long
-''''------------------------------------------------
-''''returns number of unique IDs used in calculation
-''''------------------------------------------------
-'''Dim i As Long, Cnt As Long
-'''On Error Resume Next
-'''For i = 0 To UBound(GRID)
-'''    If GRID(i).Count > 0 Then Cnt = Cnt + 1
-'''Next i
-'''GetUnqIDCntUsed = Cnt
-'''End Function
-
 Private Sub IncrementRobustNETSetting(ByRef sngSetting As Single, ByVal eIncrementMode As UMCRobustNETIncrementConstants, ByVal sngIncrementOrFactor As Single)
 
     If eIncrementMode = UMCRobustNETIncrementConstants.UMCRobustNETIncrementLinear Then
@@ -4027,7 +4013,7 @@ Private Sub IncrementRobustNETSetting(ByRef sngSetting As Single, ByVal eIncreme
 End Sub
 
 Private Sub InitializeForm(Optional blnUpdateControlsOnly As Boolean = False)
-    Dim i As Long
+    Dim I As Long
     
     On Error GoTo InitializeFormErrorHandler
     
@@ -4067,13 +4053,13 @@ Private Sub InitializeForm(Optional blnUpdateControlsOnly As Boolean = False)
            chkUMCUseTopAbu.Value = vbUnchecked
         End If
 
-        For i = 0 To UBound(.PeakCSSelection)
-            If .PeakCSSelection(i) Then
-               chkCS(i).Value = vbChecked
+        For I = 0 To UBound(.PeakCSSelection)
+            If .PeakCSSelection(I) Then
+               chkCS(I).Value = vbChecked
             Else
-               chkCS(i).Value = vbUnchecked
+               chkCS(I).Value = vbUnchecked
             End If
-        Next i
+        Next I
         SetCheckBox chkEliminateConflictingIDs, .UseMultiIDMaxNETDist
         txtMultiIDMaxNETDist.Text = .MultiIDMaxNETDist
         txtNETFormula.Text = .NETFormula
@@ -4517,15 +4503,15 @@ Private Sub MarkIDsWithBadNET()
 '-----------------------------------------------------------------------
 'sets state of all identifications with bad NET numbers to STATE_BAD_NET
 '-----------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 UpdateStatus "Eliminating IDs with bad elution ..."
 If Not IDsAreInternalStandards Then
-    For i = 0 To IDCnt - 1
-        If AMTData(ID(i)).NET < 0 Or AMTData(ID(i)).NET > 1 Then
-           IDState(i) = IDState(i) + STATE_BAD_NET
+    For I = 0 To IDCnt - 1
+        If AMTData(ID(I)).NET < 0 Or AMTData(ID(I)).NET > 1 Then
+           IDState(I) = IDState(I) + STATE_BAD_NET
         End If
-    Next i
+    Next I
 End If
 UpdateStatus ""
 End Sub
@@ -4746,7 +4732,7 @@ Private Sub ReportAdjustments()
     Dim fso As New FileSystemObject
     Dim ts As TextStream
     Dim fname As String
-    Dim i As Long
+    Dim I As Long
     On Error Resume Next
     UpdateStatus "Generating report ..."
     fname = GetTempFolder() & RawDataTmpFile
@@ -4763,16 +4749,16 @@ Private Sub ReportAdjustments()
     ts.WriteLine "ID" & glARG_SEP & "ID_NET" & glARG_SEP & "Scan"
     If IDsAreInternalStandards Then
         With UMCInternalStandards
-            For i = 0 To IDCnt - 1
-                With .InternalStandards(ID(i))
-                    ts.WriteLine .SeqID & glARG_SEP & .NET & glARG_SEP & IDScan(i)
+            For I = 0 To IDCnt - 1
+                With .InternalStandards(ID(I))
+                    ts.WriteLine .SeqID & glARG_SEP & .NET & glARG_SEP & IDScan(I)
                 End With
-            Next i
+            Next I
         End With
     Else
-        For i = 0 To IDCnt - 1
-            ts.WriteLine Trim(AMTData(ID(i)).ID) & glARG_SEP & AMTData(ID(i)).NET & glARG_SEP & IDScan(i)
-        Next i
+        For I = 0 To IDCnt - 1
+            ts.WriteLine Trim(AMTData(ID(I)).ID) & glARG_SEP & AMTData(ID(I)).NET & glARG_SEP & IDScan(I)
+        Next I
     End If
     
     ts.Close
@@ -4849,11 +4835,11 @@ Private Function ResetProcedure() As Boolean
     '----------------------------------------------------------------------
     'resets all arguments and parameters so that we can restart calculation
     '----------------------------------------------------------------------
-    Dim i As Long
+    Dim I As Long
     ReDim UseUMC(GelUMC(CallerID).UMCCnt - 1)       'initially use all LC-MS Features
-    For i = 0 To UBound(UseUMC)
-        UseUMC(i) = True
-    Next i
+    For I = 0 To UBound(UseUMC)
+        UseUMC(I) = True
+    Next I
     Call ClearIDArrays                              'reset arrays with identifications
     Call ClearPeakArrays
     
@@ -4970,31 +4956,31 @@ Private Function ScoreIDs() As Boolean
 Dim ScoreOrder() As Long
 Dim Score() As Double
 Dim qsd As New QSDouble
-Dim i As Long
+Dim I As Long
 On Error GoTo err_ScoreIDs
 
 ReDim ScoreOrder(IDCnt - 1)
 ReDim Score(IDCnt - 1)
 With GelData(CallerID)
-    For i = 0 To IDCnt - 1
-        ScoreOrder(i) = i
-        Score(i) = (Log(IDMatchAbu(i)) / Log(10)) - IDIsoFit(i)
-    Next i
+    For I = 0 To IDCnt - 1
+        ScoreOrder(I) = I
+        Score(I) = (Log(IDMatchAbu(I)) / Log(10)) - IDIsoFit(I)
+    Next I
 End With
 If Not qsd.QSDesc(Score(), ScoreOrder()) Then GoTo err_ScoreIDs
 Set qsd = Nothing
 
 If IDCnt > UMCNetAdjDef.MaxIDToUse Then
-   For i = 0 To UMCNetAdjDef.MaxIDToUse - 1
-       IDState(ScoreOrder(i)) = 0
-   Next i
-   For i = UMCNetAdjDef.MaxIDToUse To IDCnt - 1
-       IDState(ScoreOrder(i)) = IDState(ScoreOrder(i)) + STATE_OUTSCORED
-   Next i
+   For I = 0 To UMCNetAdjDef.MaxIDToUse - 1
+       IDState(ScoreOrder(I)) = 0
+   Next I
+   For I = UMCNetAdjDef.MaxIDToUse To IDCnt - 1
+       IDState(ScoreOrder(I)) = IDState(ScoreOrder(I)) + STATE_OUTSCORED
+   Next I
 Else
-   For i = 0 To IDCnt - 1
-       IDState(ScoreOrder(i)) = 0
-   Next i
+   For I = 0 To IDCnt - 1
+       IDState(ScoreOrder(I)) = 0
+   Next I
 End If
 ScoreIDs = True
 Exit Function
@@ -5009,7 +4995,7 @@ Private Function SearchForUMCsMatchingPMTs(blnForceSelectUMCs As Boolean) As Boo
     
     Static lngTopAbuPct As Long
     
-    Dim i As Integer
+    Dim I As Integer
     
     Dim blnUpdateUMCs As Boolean
     Dim blnProceed As Boolean
@@ -5037,11 +5023,11 @@ Private Function SearchForUMCsMatchingPMTs(blnForceSelectUMCs As Boolean) As Boo
     Else
         ' Simply clear the ID arrays and reset the Hit bit
         ClearIDArrays
-        For i = 0 To GelUMC(CallerID).UMCCnt - 1
-           With GelUMC(CallerID).UMCs(i)
+        For I = 0 To GelUMC(CallerID).UMCCnt - 1
+           With GelUMC(CallerID).UMCs(I)
               .ClassStatusBits = .ClassStatusBits And Not UMC_INDICATOR_BIT_NET_ADJ_DB_HIT
            End With
-        Next i
+        Next I
         blnProceed = True
     End If
     
@@ -5099,7 +5085,7 @@ Private Function SearchMassTagsMW() As Boolean
 'searches MT tags for matching masses and returns True if
 'OK, False if any error or user canceled the whole thing
 '----------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim eResponse As VbMsgBoxResult
 Dim TmpCnt As Long
 Dim Hits() As Long
@@ -5118,10 +5104,10 @@ ReDim IDScan(MAX_ID_CNT - 1)
 ReDim IDState(MAX_ID_CNT - 1)
 IDsAreInternalStandards = False
 
-For i = 0 To PeakCnt - 1
+For I = 0 To PeakCnt - 1
     Select Case UMCNetAdjDef.MWTolType
     Case gltPPM
-        MWAbsErr = PeakMW(i) * UMCNetAdjDef.MWTol * glPPM
+        MWAbsErr = PeakMW(I) * UMCNetAdjDef.MWTol * glPPM
     Case gltABS
         MWAbsErr = UMCNetAdjDef.MWTol
     Case Else
@@ -5129,28 +5115,28 @@ For i = 0 To PeakCnt - 1
     End Select
     Select Case UMCNetAdjDef.NETorRT
     Case glAMT_NET
-        TmpCnt = GetMTHits1(PeakMW(i), MWAbsErr, -1, -1, Hits())
+        TmpCnt = GetMTHits1(PeakMW(I), MWAbsErr, -1, -1, Hits())
     Case glAMT_RT_or_PNET
-        TmpCnt = GetMTHits2(PeakMW(i), MWAbsErr, -1, -1, Hits())
+        TmpCnt = GetMTHits2(PeakMW(I), MWAbsErr, -1, -1, Hits())
     End Select
     If TmpCnt > 0 Then
-        With GelUMC(CallerID).UMCs(PeakUMCInd(i))
+        With GelUMC(CallerID).UMCs(PeakUMCInd(I))
             PeakCntWithMatches = PeakCntWithMatches + 1
             UMCTotalPointsMatching = UMCTotalPointsMatching + .ClassCount
             
             For j = 0 To TmpCnt - 1
                 ID(IDCnt) = Hits(j)
-                IDMatchingUMCInd(IDCnt) = PeakUMCInd(i)
+                IDMatchingUMCInd(IDCnt) = PeakUMCInd(I)
                 IDMatchAbu(IDCnt) = .ClassAbundance
-                IDIsoFit(IDCnt) = PeakIsoFit(i)
-                IDScan(IDCnt) = PeakScan(i)
+                IDIsoFit(IDCnt) = PeakIsoFit(I)
+                IDScan(IDCnt) = PeakScan(I)
                 IDState(IDCnt) = 0
                 IDCnt = IDCnt + 1   'if reaches limit we will have correct results by doing increase at the end
             Next j
             .ClassStatusBits = .ClassStatusBits Or UMC_INDICATOR_BIT_NET_ADJ_DB_HIT
         End With
     End If
-Next i
+Next I
 
 If IDCnt > 0 Then
    ReDim Preserve ID(IDCnt - 1)
@@ -5201,7 +5187,7 @@ Private Function SearchMassTagsMWNET() As Boolean
 'searches MT tags for matching masses and returns True if
 'OK, False if any error or user canceled the whole thing
 '----------------------------------------------------------
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim eResponse As VbMsgBoxResult
 Dim TmpCnt As Long
 Dim Hits() As Long
@@ -5221,18 +5207,18 @@ ReDim IDScan(MAX_ID_CNT - 1)
 ReDim IDState(MAX_ID_CNT - 1)
 IDsAreInternalStandards = False
 
-For i = 0 To PeakCnt - 1
+For I = 0 To PeakCnt - 1
     Select Case UMCNetAdjDef.MWTolType
     Case gltPPM
-        MWAbsErr = PeakMW(i) * UMCNetAdjDef.MWTol * glPPM
+        MWAbsErr = PeakMW(I) * UMCNetAdjDef.MWTol * glPPM
     Case gltABS
         MWAbsErr = UMCNetAdjDef.MWTol
     End Select
     Select Case UMCNetAdjDef.NETorRT
     Case glAMT_NET
-        TmpCnt = GetMTHits1(PeakMW(i), MWAbsErr, ConvertScanToNET(PeakScan(i)), UMCNetAdjDef.NETTolIterative, Hits())
+        TmpCnt = GetMTHits1(PeakMW(I), MWAbsErr, ConvertScanToNET(PeakScan(I)), UMCNetAdjDef.NETTolIterative, Hits())
     Case glAMT_RT_or_PNET
-        TmpCnt = GetMTHits2(PeakMW(i), MWAbsErr, ConvertScanToNET(PeakScan(i)), UMCNetAdjDef.NETTolIterative, Hits())
+        TmpCnt = GetMTHits2(PeakMW(I), MWAbsErr, ConvertScanToNET(PeakScan(I)), UMCNetAdjDef.NETTolIterative, Hits())
     End Select
     If TmpCnt > 0 Then
     
@@ -5253,7 +5239,7 @@ For i = 0 To PeakCnt - 1
        End If
        
        If TmpCnt > 0 Then
-            With GelUMC(CallerID).UMCs(PeakUMCInd(i))
+            With GelUMC(CallerID).UMCs(PeakUMCInd(I))
                 PeakCntWithMatches = PeakCntWithMatches + 1
                 UMCTotalPointsMatching = UMCTotalPointsMatching + .ClassCount
                 
@@ -5271,10 +5257,10 @@ For i = 0 To PeakCnt - 1
                     
                     If blnAddMassTag Then
                         ID(IDCnt) = Hits(j)
-                        IDMatchingUMCInd(IDCnt) = PeakUMCInd(i)
+                        IDMatchingUMCInd(IDCnt) = PeakUMCInd(I)
                         IDMatchAbu(IDCnt) = .ClassAbundance
-                        IDIsoFit(IDCnt) = PeakIsoFit(i)
-                        IDScan(IDCnt) = PeakScan(i)
+                        IDIsoFit(IDCnt) = PeakIsoFit(I)
+                        IDScan(IDCnt) = PeakScan(I)
                         IDState(IDCnt) = 0
                         IDCnt = IDCnt + 1   'if reaches limit we will have correct results by doing increase at the end
                     End If
@@ -5285,7 +5271,7 @@ For i = 0 To PeakCnt - 1
             
        End If
     End If
-Next i
+Next I
 
 If IDCnt > 0 Then
    ReDim Preserve ID(IDCnt - 1)
@@ -5336,7 +5322,7 @@ Private Function SearchInternalStandards() As Boolean
 'Searches Internal Standards for matching masses
 'Returns True if success, or False if an error
 '----------------------------------------------------------
-    Dim i As Long, j As Long
+    Dim I As Long, j As Long
     Dim Ind1 As Long, Ind2 As Long
     
     Dim lngHitCount As Long
@@ -5361,20 +5347,20 @@ On Error GoTo SearchInternalStandardsErrorHandler
     ReDim IDState(PeakCnt)
     IDsAreInternalStandards = True
 
-    For i = 0 To PeakCnt - 1
+    For I = 0 To PeakCnt - 1
         Select Case UMCNetAdjDef.MWTolType
         Case gltPPM
-            MWAbsErr = PeakMW(i) * UMCNetAdjDef.MWTol * glPPM
+            MWAbsErr = PeakMW(I) * UMCNetAdjDef.MWTol * glPPM
         Case gltABS
             MWAbsErr = UMCNetAdjDef.MWTol
         End Select
         
-        dblNetToMatch = ConvertScanToNET(PeakScan(i))
+        dblNetToMatch = ConvertScanToNET(PeakScan(I))
         
         lngHitCount = 0
         
         ' Note: objInternalStandardSearchUtil should have been filled with the Internal Standard masses, sorted ascending
-        If objInternalStandardSearchUtil.FindIndexRange(PeakMW(i), MWAbsErr, Ind1, Ind2) Then
+        If objInternalStandardSearchUtil.FindIndexRange(PeakMW(I), MWAbsErr, Ind1, Ind2) Then
             If Ind2 >= Ind1 Then
                 lngHitCountDimmed = 100
                 ReDim Hits(lngHitCountDimmed)
@@ -5389,11 +5375,11 @@ On Error GoTo SearchInternalStandardsErrorHandler
                             blnValidHit = True
                             With .InternalStandards(mInternalStandardIndexPointers(j))
                                 ' Make sure at least one of the charges for this Internal Standard is present in the UMC
-                                If mUMCClsStats(PeakUMCInd(i), ustChargeMin) >= .ChargeMinimum And _
-                                   mUMCClsStats(PeakUMCInd(i), ustChargeMin) <= .ChargeMaximum Then
+                                If mUMCClsStats(PeakUMCInd(I), ustChargeMin) >= .ChargeMinimum And _
+                                   mUMCClsStats(PeakUMCInd(I), ustChargeMin) <= .ChargeMaximum Then
                                    ' Valid Charge
-                                ElseIf mUMCClsStats(PeakUMCInd(i), ustChargeMax) >= .ChargeMinimum And _
-                                       mUMCClsStats(PeakUMCInd(i), ustChargeMax) <= .ChargeMaximum Then
+                                ElseIf mUMCClsStats(PeakUMCInd(I), ustChargeMax) >= .ChargeMinimum And _
+                                       mUMCClsStats(PeakUMCInd(I), ustChargeMax) <= .ChargeMaximum Then
                                     ' Valid Charge
                                 Else
                                     blnValidHit = False
@@ -5435,17 +5421,17 @@ On Error GoTo SearchInternalStandardsErrorHandler
             End If
             
             If lngHitCount > 0 Then
-                With GelUMC(CallerID).UMCs(PeakUMCInd(i))
+                With GelUMC(CallerID).UMCs(PeakUMCInd(I))
                     PeakCntWithMatches = PeakCntWithMatches + 1
                     UMCTotalPointsMatching = UMCTotalPointsMatching + .ClassCount
                 
                     For j = 0 To lngHitCount - 1
-                        IDMatchingUMCInd(IDCnt) = PeakUMCInd(i)
+                        IDMatchingUMCInd(IDCnt) = PeakUMCInd(I)
                         IDMatchAbu(IDCnt) = .ClassAbundance
-                        IDIsoFit(IDCnt) = PeakIsoFit(i)
+                        IDIsoFit(IDCnt) = PeakIsoFit(I)
                         ID(IDCnt) = Hits(j)
                         IDState(IDCnt) = 0
-                        IDScan(IDCnt) = PeakScan(i)
+                        IDScan(IDCnt) = PeakScan(I)
                         IDCnt = IDCnt + 1
                     Next j
                     
@@ -5454,7 +5440,7 @@ On Error GoTo SearchInternalStandardsErrorHandler
                 End With
             End If
         End If
-    Next i
+    Next I
     
     If IDCnt > 0 Then
        ReDim Preserve ID(IDCnt - 1)
@@ -5485,15 +5471,15 @@ Private Function SelectPeaksToUse() As Long
 'NOTE: peaks are selected only from LC-MS Features marked to be used
 'Furthermore, we're only selecting one point from each UMC, not every point in every UMC
 '------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error GoTo exit_SelectPeaksToUse
 SelectPeaksToUse = -1
-For i = 0 To UBound(UseUMC)
-    If UseUMC(i) Then
+For I = 0 To UBound(UseUMC)
+    If UseUMC(I) Then
        ' Always use UMCNetConstants.UMCNetAt
-        Call GetUMCPeak_At(i)
+        Call GetUMCPeak_At(I)
     End If
-Next i
+Next I
 If PeakCnt > 0 Then
    ReDim Preserve PeakUMCInd(PeakCnt - 1)
    ReDim Preserve PeakMW(PeakCnt - 1)

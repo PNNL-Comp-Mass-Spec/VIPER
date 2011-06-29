@@ -21,34 +21,34 @@ Private Const glRES_ERR = "Error"
 
 Public Sub ExcludeAllButSelection(ByVal Ind As Long)
 'Excludes and clears all points except those selected from the visible graph
-Dim i As Long, iSel As Long
+Dim I As Long, iSel As Long
 
 'On Error Resume Next
 With GelBody(Ind).GelSel
   If .CSSelCnt > 0 Then
     ' First exclude all of the points
-    For i = 1 To GelDraw(Ind).CSCount
-        GelDraw(Ind).CSID(i) = -Abs(GelDraw(Ind).CSID(i))
-    Next i
+    For I = 1 To GelDraw(Ind).CSCount
+        GelDraw(Ind).CSID(I) = -Abs(GelDraw(Ind).CSID(I))
+    Next I
     
     ' Now show the selected ones
-    For i = 1 To .CSSelCnt
-        iSel = .value(i, glCSType)
+    For I = 1 To .CSSelCnt
+        iSel = .Value(I, glCSType)
         GelDraw(Ind).CSID(iSel) = Abs(GelDraw(Ind).CSID(iSel))
-    Next i
+    Next I
   End If
   
   If .IsoSelCnt > 0 Then
     ' First exclude all of the points
-    For i = 1 To GelDraw(Ind).IsoCount
-        GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
-    Next i
+    For I = 1 To GelDraw(Ind).IsoCount
+        GelDraw(Ind).IsoID(I) = -Abs(GelDraw(Ind).IsoID(I))
+    Next I
     
     ' Now show the selected ones
-    For i = 1 To .IsoSelCnt
-        iSel = .value(i, glIsoType)
+    For I = 1 To .IsoSelCnt
+        iSel = .Value(I, glIsoType)
         GelDraw(Ind).IsoID(iSel) = Abs(GelDraw(Ind).IsoID(iSel))
-    Next i
+    Next I
   End If
   .Clear
 End With
@@ -56,21 +56,21 @@ End Sub
 
 Public Sub ExcludeSelection(ByVal Ind As Long)
 'exclude and clears selection from the visible graph
-Dim i As Long, iSel As Long
+Dim I As Long, iSel As Long
 
 On Error Resume Next
 With GelBody(Ind).GelSel
   If .CSSelCnt > 0 Then
-     For i = 1 To .CSSelCnt
-         iSel = .value(i, glCSType)
+     For I = 1 To .CSSelCnt
+         iSel = .Value(I, glCSType)
          GelDraw(Ind).CSID(iSel) = -Abs(GelDraw(Ind).CSID(iSel))
-     Next i
+     Next I
   End If
   If .IsoSelCnt > 0 Then
-     For i = 1 To .IsoSelCnt
-         iSel = .value(i, glIsoType)
+     For I = 1 To .IsoSelCnt
+         iSel = .Value(I, glIsoType)
          GelDraw(Ind).IsoID(iSel) = -Abs(GelDraw(Ind).IsoID(iSel))
-     Next i
+     Next I
   End If
   .Clear
 End With
@@ -83,7 +83,7 @@ Public Function GetSelectionFieldNumeric(ByVal Ind As Long, _
 'Field - field we need to fill
 'Values - array to be filled
 'fills Values with numbers from GelData and returns total number of selected points
-Dim i As Long, ID As Long
+Dim I As Long, ID As Long
 Dim SelCnt As Long
 On Error Resume Next
 
@@ -91,11 +91,11 @@ SelCnt = 0
 With GelBody(Ind).GelSel
    If .CSSelCnt > 0 Then
       ReDim Values(1 To .CSSelCnt)
-      For i = 1 To .CSSelCnt
-         ID = .value(i, glCSType)
+      For I = 1 To .CSSelCnt
+         ID = .Value(I, glCSType)
          SelCnt = SelCnt + 1
          Values(SelCnt) = GetIsoOrCSDataByField(Ind, GelData(Ind).CSData(ID), Field, True)
-      Next i
+      Next I
    End If
    If .IsoSelCnt > 0 Then
       If UBound(Values) > 0 Then
@@ -107,11 +107,11 @@ With GelBody(Ind).GelSel
          Err.Clear
          ReDim Values(1 To .IsoSelCnt)
       End If
-      For i = 1 To .IsoSelCnt
-         ID = .value(i, glIsoType)
+      For I = 1 To .IsoSelCnt
+         ID = .Value(I, glIsoType)
          SelCnt = SelCnt + 1
          Values(SelCnt) = GetIsoOrCSDataByField(Ind, GelData(Ind).IsoData(ID), Field, False)
-      Next i
+      Next I
    End If
 End With
 If SelCnt > 0 Then
@@ -127,7 +127,7 @@ Public Function GetSelectionFieldMatchingIDs(ByVal Ind As Long, _
 'Field - field we need to fill
 'Values - array to be filled
 'fills Values with matching identifications from GelData.IsoData().MTID and returns total number of selected points
-Dim i As Long, ID As Long
+Dim I As Long, ID As Long
 Dim SelCnt As Long
 On Error Resume Next
 
@@ -138,11 +138,11 @@ SelCnt = 0
 With GelBody(Ind).GelSel
    If .CSSelCnt > 0 Then
       ReDim Values(1 To .CSSelCnt)
-      For i = 1 To .CSSelCnt
-         ID = .value(i, glCSType)
+      For I = 1 To .CSSelCnt
+         ID = .Value(I, glCSType)
          SelCnt = SelCnt + 1
          Values(SelCnt) = GelData(Ind).CSData(ID).MTID
-      Next i
+      Next I
    End If
    If .IsoSelCnt > 0 Then
       If UBound(Values) > 0 Then
@@ -154,11 +154,11 @@ With GelBody(Ind).GelSel
          Err.Clear
          ReDim Values(1 To .IsoSelCnt)
       End If
-      For i = 1 To .IsoSelCnt
-         ID = .value(i, glIsoType)
+      For I = 1 To .IsoSelCnt
+         ID = .Value(I, glIsoType)
          SelCnt = SelCnt + 1
          Values(SelCnt) = GelData(Ind).IsoData(ID).MTID
-      Next i
+      Next I
    End If
 End With
 If SelCnt > 0 Then
@@ -166,58 +166,6 @@ If SelCnt > 0 Then
 End If
 GetSelectionFieldMatchingIDs = SelCnt
 End Function
-
-' Unused function (February 2005)
-''Public Function GetSelectionFieldTextAsNumeric(ByVal Ind As Long, _
-''                                               ByVal Field As Integer, _
-''                                               ByRef Values() As Double) As Long
-'''Ind - GelBody index
-'''Field - field we need to fill
-'''Values - array to be filled
-'''fills Values with numbers from GelData and returns total number of selected points
-''Dim CSFld As Integer
-''Dim IsoFld As Integer
-''Dim i As Long, ID As Long
-''Dim SelCnt As Long
-''On Error Resume Next
-''
-''GetFieldIndexes Ind, Field, CSFld, IsoFld
-''SelCnt = 0
-''With GelBody(Ind).GelSel
-''   If .CSSelCnt > 0 Then
-''      ReDim Values(1 To .CSSelCnt)
-''      For i = 1 To .CSSelCnt
-''         ID = .value(i, glCSType)
-''         If IsNumeric(GelData(Ind).CSVar(ID, CSFld)) Then
-''            SelCnt = SelCnt + 1
-''            Values(SelCnt) = CDbl(GelData(Ind).CSVar(ID, CSFld))
-''         End If
-''      Next i
-''   End If
-''   If .IsoSelCnt > 0 Then
-''      If UBound(Values) > 0 Then
-''         ReDim Preserve Values(1 To UBound(Values) + .IsoSelCnt)
-''      Else
-''         ReDim Values(1 To .IsoSelCnt)
-''      End If
-''      If Err.Number = 9 Then    'subscript out of range
-''         Err.Clear
-''         ReDim Values(1 To .IsoSelCnt)
-''      End If
-''      For i = 1 To .IsoSelCnt
-''         ID = .value(i, glIsoType)
-''         If IsNumeric(GelData(Ind).IsoVar(ID, IsoFld)) Then
-''            SelCnt = SelCnt + 1
-''            Values(SelCnt) = CDbl(GelData(Ind).IsoVar(ID, IsoFld))
-''         End If
-''      Next i
-''   End If
-''End With
-''If SelCnt > 0 Then
-''   ReDim Preserve Values(1 To SelCnt)
-''End If
-''GetSelectionFieldTextAsNumeric = SelCnt
-''End Function
 
 Public Sub SelStatsCompute(ByVal Ind As Long, _
                             ByVal SearchField As Integer, _
@@ -236,7 +184,7 @@ Dim lngIsoValuesCountDimmed As Long
 
 Dim CSCnt As Long
 Dim IsoCnt As Long
-Dim i As Long
+Dim I As Long
 
 Dim objCSStats As New StatDoubles
 Dim objIsoStats As New StatDoubles
@@ -256,10 +204,10 @@ With GelBody(Ind).GelSel
             ReDim dblCSValues(0 To lngCSValuesCountDimmed - 1)
             
             With GelData(Ind)
-                For i = 1 To SelCnt
+                For I = 1 To SelCnt
                     CSCnt = CSCnt + 1
-                    dblCSValues(CSCnt - 1) = GetIsoOrCSDataByField(Ind, .CSData(Sel(i)), SearchField, True)
-                Next i
+                    dblCSValues(CSCnt - 1) = GetIsoOrCSDataByField(Ind, .CSData(Sel(I)), SearchField, True)
+                Next I
             End With
             If CSCnt > 0 Then
                 ReDim Preserve dblCSValues(0 To CSCnt - 1)
@@ -295,10 +243,10 @@ With GelBody(Ind).GelSel
             ReDim dblIsoValues(0 To lngIsoValuesCountDimmed - 1)
             
             With GelData(Ind)
-                For i = 1 To SelCnt
+                For I = 1 To SelCnt
                     IsoCnt = IsoCnt + 1
-                    dblIsoValues(IsoCnt - 1) = GetIsoOrCSDataByField(Ind, .IsoData(Sel(i)), SearchField, False)
-                Next i
+                    dblIsoValues(IsoCnt - 1) = GetIsoOrCSDataByField(Ind, .IsoData(Sel(I)), SearchField, False)
+                Next I
             End With
             If IsoCnt > 0 Then
                 ReDim Preserve dblIsoValues(0 To IsoCnt - 1)
@@ -351,9 +299,9 @@ With udtResults
                     If CSCnt + IsoCnt > 0 Then
                         ' Need to combine the CS and ER data; we'll copy the IsoValues data to the CSValues array
                         ReDim Preserve dblCSValues(0 To CSCnt + IsoCnt - 1)
-                        For i = 0 To IsoCnt - 1
-                            dblCSValues(CSCnt + i) = dblIsoValues(i)
-                        Next i
+                        For I = 0 To IsoCnt - 1
+                            dblCSValues(CSCnt + I) = dblIsoValues(I)
+                        Next I
                         objCSStats.Fill dblCSValues()
                         Select Case eFormat
                         Case ssrfAverage

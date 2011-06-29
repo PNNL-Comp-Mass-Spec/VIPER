@@ -203,54 +203,6 @@ Dim StatTop10() As Long     'indexes and counts of top 10 bins
 
 Dim fso As New FileSystemObject
 
-' Unused Function (May 2003)
-'''Private Sub cmdCalcER_Click()
-''''----------------------------------------------
-''''calculate expression ratios for existing pairs
-''''----------------------------------------------
-'''Dim UserRes As Long
-'''Dim i As Long
-'''Dim LtAbu As Double
-'''Dim HvAbu As Double
-'''On Error Resume Next
-'''
-'''Me.MousePointer = vbHourglass
-'''With GelP_D_L(CallerID)
-'''    If .SearchDef.ERCalcType <> glER_NONE Then
-'''       UserRes = MsgBox("Overwrite existing expression ratios?", vbYesNo, glFGTU)
-'''       If UserRes <> vbYes Then Exit Sub
-'''    End If
-'''    InitDltLblPairsER CallerID
-'''    .SearchDef.ERCalcType = TmpERType
-'''    Select Case .SearchDef.ERCalcType
-'''    Case glER_SOLO_RAT
-'''        For i = 0 To .PCnt - 1
-'''            LtAbu = GelData(CallerID).IsoData(.Pairs(i).P1).Abundance
-'''            HvAbu = GelData(CallerID).IsoData(.Pairs(i).P2).Abundance
-'''            .pairs(i).er = ComputeRatioER(LtAbu, HvAbu)
-'''            .Pairs(i).ERMemberBasisCount = 1
-'''        Next i
-'''    Case glER_SOLO_LOG
-'''        For i = 0 To .PCnt - 1
-'''            LtAbu = GelData(CallerID).IsoData(.Pairs(i).P1).Abundance
-'''            HvAbu = GelData(CallerID).IsoData(.Pairs(i).P2).Abundance
-'''            .pairs(i).er = ComputeLogER(LtAbu, HvAbu)
-'''            .Pairs(i).ERMemberBasisCount = 1
-'''        Next i
-'''    Case glER_SOLO_ALT
-'''        For i = 0 To .PCnt - 1
-'''            LtAbu = GelData(CallerID).IsoData(.Pairs(i).P1).Abundance
-'''            HvAbu = GelData(CallerID).IsoData(.Pairs(i).P2).Abundance
-'''            .pairs(i).er = ComputeAltER(LtAbu, HvAbu)
-'''            .Pairs(i).ERMemberBasisCount = 1
-'''        Next i
-'''    Case Else
-'''        MsgBox "Unknown ER calculation type", vbOKOnly, glFGTU
-'''    End Select
-'''End With
-'''Me.MousePointer = vbDefault
-'''End Sub
-
 
 Private Sub cmdClose_Click()
 Unload Me
@@ -315,7 +267,7 @@ Private Function GenerateERStatistic() As Boolean
 '------------------------------------------------------
 'actual statistics calculation; returns True on success
 '------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim CurrBin As Long
 On Error GoTo err_GenerateERStatistic
 With GelP_D_L(CallerID)
@@ -337,46 +289,46 @@ With GelP_D_L(CallerID)
     Select Case .SearchDef.ERCalcType
     Case glER_SOLO_RAT  'symmetric around 1; not equidistant
       StatERMin = 1 / StatERMax
-      For i = 0 To HalfBinCnt - 1
-          StatBinInd(HalfBinCnt + i) = HalfBinCnt + i
-          StatBinInd(HalfBinCnt - i - 1) = HalfBinCnt - i - 1
-          StatBinMin(HalfBinCnt + i) = 1 + i * StatBinWidth
-          StatBinMax(HalfBinCnt + i) = StatBinMin(HalfBinCnt + i) + StatBinWidth
-          StatBinMin(HalfBinCnt - i - 1) = 1 / StatBinMax(HalfBinCnt + i)
-          StatBinMax(HalfBinCnt - i - 1) = 1 / StatBinMin(HalfBinCnt + i)
-      Next i
+      For I = 0 To HalfBinCnt - 1
+          StatBinInd(HalfBinCnt + I) = HalfBinCnt + I
+          StatBinInd(HalfBinCnt - I - 1) = HalfBinCnt - I - 1
+          StatBinMin(HalfBinCnt + I) = 1 + I * StatBinWidth
+          StatBinMax(HalfBinCnt + I) = StatBinMin(HalfBinCnt + I) + StatBinWidth
+          StatBinMin(HalfBinCnt - I - 1) = 1 / StatBinMax(HalfBinCnt + I)
+          StatBinMax(HalfBinCnt - I - 1) = 1 / StatBinMin(HalfBinCnt + I)
+      Next I
       StatBinMin(0) = 0
       StatBinMax(StatBinCnt - 1) = -ER_CALC_ERR
     Case glER_SOLO_LOG, glER_SOLO_ALT   'symmetric around 0
       StatERMin = -StatERMax
-      For i = 0 To StatBinCnt - 1
-          StatBinInd(i) = i
-          StatBinMin(i) = StatERMin + (i - 1) * StatBinWidth
-          StatBinMax(i) = StatBinMin(i) + StatBinWidth
-      Next i
+      For I = 0 To StatBinCnt - 1
+          StatBinInd(I) = I
+          StatBinMin(I) = StatERMin + (I - 1) * StatBinWidth
+          StatBinMax(I) = StatBinMin(I) + StatBinWidth
+      Next I
       StatBinMin(0) = ER_CALC_ERR    'some huge negative number
       StatBinMax(StatBinCnt - 1) = -StatBinMin(0) 'some huge positive number
     End Select
     'do count for each bin
     Select Case .SearchDef.ERCalcType
     Case glER_SOLO_RAT  'symmetric around 1; not equidistant
-         For i = 0 To .PCnt - 1
-            CurrBin = GetCurrentBin_Rat(.Pairs(i).ER)
+         For I = 0 To .PCnt - 1
+            CurrBin = GetCurrentBin_Rat(.Pairs(I).ER)
             If CurrBin >= 0 Then
                StatBinHits(CurrBin) = StatBinHits(CurrBin) + 1
             Else
                StatBadERCnt = StatBadERCnt + 1
             End If
-         Next i
+         Next I
     Case glER_SOLO_LOG, glER_SOLO_ALT   'symmetric around 0
-         For i = 0 To .PCnt - 1
-            CurrBin = GetCurrentBin_Log_Alt(.Pairs(i).ER)
+         For I = 0 To .PCnt - 1
+            CurrBin = GetCurrentBin_Log_Alt(.Pairs(I).ER)
             If CurrBin >= 0 Then
                StatBinHits(CurrBin) = StatBinHits(CurrBin) + 1
             Else
                StatBadERCnt = StatBadERCnt + 1
             End If
-         Next i
+         Next I
     End Select
 End With
 GenerateERStatistic = True
@@ -393,7 +345,7 @@ Private Sub ReportERStatistic()
 '------------------------------------------------------
 Dim tsTmpStat As TextStream
 Dim TmpFName As String
-Dim i As Long
+Dim I As Long
 Dim sLine As String, sHeader As String
 On Error GoTo err_ReportERStatistic
 TmpFName = GetTempFolder() & RawDataTmpFile
@@ -421,22 +373,22 @@ With tsTmpStat
       If StatBinCnt > 10 Then
          .WriteLine "Top 10 - Why Lady Sings Gaudeamus Igitur?"
          .WriteLine sHeader
-         For i = 0 To 9
-           sLine = i & glARG_SEP & StatBinMin(StatBinInd(i)) & glARG_SEP _
-                & StatBinMax(StatBinInd(i)) & glARG_SEP & StatBinHits(StatBinInd(i))
+         For I = 0 To 9
+           sLine = I & glARG_SEP & StatBinMin(StatBinInd(I)) & glARG_SEP _
+                & StatBinMax(StatBinInd(I)) & glARG_SEP & StatBinHits(StatBinInd(I))
            .WriteLine sLine
-         Next i
+         Next I
       End If
    Else
       If StatBinCnt > 10 Then .WriteLine "High scores function failed."
    End If
    .WriteLine
    .WriteLine sHeader
-   For i = 0 To StatBinCnt - 1
-     sLine = StatBinInd(i) & glARG_SEP & StatBinMin(i) & glARG_SEP _
-             & StatBinMax(i) & glARG_SEP & StatBinHits(i)
+   For I = 0 To StatBinCnt - 1
+     sLine = StatBinInd(I) & glARG_SEP & StatBinMin(I) & glARG_SEP _
+             & StatBinMax(I) & glARG_SEP & StatBinHits(I)
      .WriteLine sLine
-   Next i
+   Next I
 End With
 tsTmpStat.Close
 frmDataInfo.Tag = "ER_STAT"

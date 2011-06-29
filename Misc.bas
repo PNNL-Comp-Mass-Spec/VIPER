@@ -944,50 +944,6 @@ err_GoPrint:
 GoPrint = -1
 End Function
 
-'  Unused Functions
-'''Public Sub GetpICooSysRange(ByVal Ind As Long, X1 As Double, x2 As Double, Y1 As Double, Y2 As Double, ByVal XOrient As Integer, ByVal YOrient As Integer)
-'''With GelData(Ind)
-'''    Select Case XOrient
-'''    Case glNormal
-'''         X1 = .DFPI(UBound(.DFPI))
-'''         x2 = .DFPI(1)
-'''    Case glReverse
-'''         X1 = .DFPI(1)
-'''         x2 = .DFPI(UBound(.DFPI))
-'''    End Select
-'''    Select Case YOrient
-'''    Case glNormal
-'''         Y1 = .minMW
-'''         Y2 = .maxMW
-'''    Case glReverse
-'''         Y1 = .maxMW
-'''         Y2 = .minMW
-'''    End Select
-'''End With
-'''End Sub
-'''
-'''
-'''Public Sub GetFNCooSysRange(ByVal Ind As Long, X1 As Double, x2 As Double, Y1 As Double, Y2 As Double, ByVal XOrient As Integer, ByVal YOrient As Integer)
-'''With GelData(Ind)
-'''    Select Case XOrient
-'''    Case glNormal
-'''         X1 = .ScanInfo(UBound(.ScanInfo)).ScanNumber
-'''         x2 = .ScanInfo(1).ScanNumber
-'''    Case glReverse
-'''         X1 = .ScanInfo(1).ScanNumber
-'''         x2 = .ScanInfo(UBound(.ScanInfo)).ScanNumber
-'''    End Select
-'''    Select Case YOrient
-'''    Case glNormal
-'''         Y1 = .minMW
-'''         Y2 = .maxMW
-'''    Case glReverse
-'''         Y1 = .maxMW
-'''         Y2 = .minMW
-'''    End Select
-'''End With
-'''End Sub
-
 Public Sub PrintFileInfo(Ind As Long, InfoType As Integer)
 Dim aInfo As Variant
 Dim iLinesCount As Integer
@@ -1063,57 +1019,6 @@ For I = 1 To CLng(X / 2)
 Next I
 FactorN = CurrFacN
 End Function
-
-' Unused Function (March 2003)
-'''Public Function GetKeyValue(lKey As Long, KeyName As String, SubKey As String) As String
-'''Dim Res As Long, i As Long
-'''Dim hKey As Long
-'''Dim KeyValType As Long
-'''Dim KeyValSize As Long
-'''Dim tmpVal As String
-'''Dim tmpVal1 As String
-'''Dim tmpVal2 As String
-'''
-'''Res = RegOpenKeyEx(lKey, KeyName, 0, KEY_QUERY_VALUE, hKey)
-'''
-'''If Res <> ERROR_SUCCESS Then GoTo err_GetKeyValue
-'''tmpVal = String$(1024, 0)
-'''KeyValSize = 1024
-'''
-'''Res = RegQueryValueEx(hKey, SubKey, 0, KeyValType, tmpVal, KeyValSize)
-'''If Res <> ERROR_SUCCESS Then GoTo err_GetKeyValue
-'''
-'''If (Asc(Mid(tmpVal, KeyValSize, 1)) = 0) And KeyValType <> REG_BINARY Then
-'''   tmpVal = Left(tmpVal, KeyValSize - 1)    'Win95 Adds Null Terminated string
-'''Else
-'''   tmpVal = Left(tmpVal, KeyValSize)        'WinNt doesnt Null terminate
-'''End If
-'''
-'''Select Case KeyValType
-'''Case REG_SZ
-'''     GetKeyValue = tmpVal
-'''Case REG_BINARY
-'''     tmpVal1 = ""
-'''     For i = 1 To KeyValSize
-'''         tmpVal2 = Hex(Asc(Mid(tmpVal, i, 1)))
-'''         If Len(tmpVal2) = 1 Then tmpVal2 = "0" & tmpVal2
-'''         tmpVal1 = tmpVal1 & " " & tmpVal2
-'''     Next
-'''     GetKeyValue = Trim(tmpVal1)
-'''Case REG_DWORD
-'''     tmpVal1 = ""
-'''     For i = Len(tmpVal) To 1 Step -1
-'''         tmpVal1 = tmpVal1 & Hex(Asc(Mid(tmpVal, i, 1)))
-'''     Next
-'''     GetKeyValue = Format$("&h" + tmpVal1)
-'''End Select
-'''Res = RegCloseKey(hKey)
-'''Exit Function
-'''
-'''err_GetKeyValue:
-'''GetKeyValue = ""
-'''Res = RegCloseKey(hKey)
-'''End Function
 
 Public Function WriteRawDataFile(ByVal Ind As Long) As Boolean
 Dim sFileName As String
@@ -1692,14 +1597,17 @@ With sorfDef
     .MWTolType = gltPPM
     Set .Mods = New Collection
 End With
-With amtlmDef
-    .lmScope = 0        'all data
-    .lmPropagate = glLM_PROPAGATE_NO
-    .lmIsoField = 7     'monoisotopic
-    .lmMultiCandidates = glLM_MULTI_INTENSITY
-    .lmMultiAMTHits = glLM_AMT_MULTI_FIT
-    .lmSaveResults = glLM_SAVE_ORIGINAL
-End With
+
+' Unused code (Lock Mass related, not used since 2003)
+'With amtlmDef
+'    .lmScope = 0        'all data
+'    .lmPropagate = glLM_PROPAGATE_NO
+'    .lmIsoField = 7     'monoisotopic
+'    .lmMultiCandidates = glLM_MULTI_INTENSITY
+'    .lmMultiAMTHits = glLM_AMT_MULTI_FIT
+'    .lmSaveResults = glLM_SAVE_ORIGINAL
+'End With
+
 With PairDef
     .Case2500 = True
     .Delta = glN14N15_DELTA
@@ -1880,126 +1788,6 @@ For I = 0 To UBound(bSeq) Step BPC
 Next I
 End Function
 
-' Unused Function (July 2003)
-'''Public Function ELCount(ByVal Seq As String, _
-'''                        ByVal EL As String) As Long
-''''--------------------------------------------------------
-''''returns number of occurences of element in Seq; function
-''''uses ICR-2LS methods to retrieve individual counts
-''''--------------------------------------------------------
-'''Dim MSeq As String         'protein sequence converted to molecular formula
-'''Dim mCnt As Long           'number of elements in formula
-'''Dim SeqM() As String
-'''Dim SeqMCnt() As Long
-'''Dim TmpCnt As Long
-'''Dim i As Long
-'''On Error Resume Next
-'''MSeq = objICR2LS.GetMF(Seq) 'use ICR-2LS services here
-''''MSeq contains formula in form something like N14 H25 C33
-'''mCnt = SplitMolFormula(MSeq, SeqM(), SeqMCnt())
-'''If mCnt > 0 Then
-'''   For i = 0 To mCnt - 1
-'''       If EL = Left$(SeqM(i), Len(EL)) Then
-'''          TmpCnt = TmpCnt + SeqMCnt(i)
-'''       End If
-'''   Next i
-'''End If
-'''ELCount = TmpCnt
-'''End Function
-
-' Unused Function (July 2003)
-'''Public Function SplitMolFormula(ByVal MF As String, _
-'''                                MFEL() As String, _
-'''                                MFELCnt() As Long) As Long
-''''-------------------------------------------------------------
-''''splits molecular formula MF from form N12 C25 H11 to arrays
-''''MFEL that contains elements of formula, and MFELCnt with
-''''their count; elements in original formula are space delimited
-''''function returns number of elements
-''''-------------------------------------------------------------
-'''Dim Tmp() As String
-'''Dim TmpCnt As Long
-'''Dim Num As Double
-'''Dim Wrd As String
-'''Dim i As Long
-'''On Error Resume Next
-'''Tmp = Split(MF, Chr$(32))
-'''TmpCnt = UBound(Tmp) + 1
-'''If TmpCnt > 0 Then
-'''   ReDim MFEL(TmpCnt - 1)
-'''   ReDim MFELCnt(TmpCnt - 1)
-'''   For i = 0 To TmpCnt - 1
-'''       Num = 0
-'''       Wrd = ""
-'''       Select Case GetNumberWord(Tmp(i), Num, Wrd)
-'''       Case nwEmpty, nwNumOnly  'can't do anything here
-'''            MFEL(i) = ""
-'''            MFELCnt(i) = -1
-'''       Case nwWordOnly          'means num=1
-'''            MFEL(i) = Trim$(Wrd)
-'''            MFELCnt(i) = -1
-'''       Case nwNumWord
-'''            MFEL(i) = Trim$(Wrd)
-'''            MFELCnt(i) = CLng(Num)
-'''       End Select
-'''   Next i
-'''End If
-'''SplitMolFormula = TmpCnt
-'''End Function
-
-' Unused Function (July 2003)
-'''Public Function GetNumberWord(ByVal sNumWrd As String, _
-'''                              ByRef dNumber As Double, _
-'''                              ByRef sWord As String) As glNumWord
-''''----------------------------------------------------------------
-''''puts number in Number and word in Word; returns result from
-''''enum. glNumWord (nwEmpty, nwNumOnly, nwWordOnly, nwNumWord)
-''''----------------------------------------------------------------
-'''Dim bNumWrd() As Byte
-'''Dim bTmp() As Byte
-'''Dim sTmp As String
-'''Dim bCnt As Long
-'''Dim i As Long
-'''Dim BPC As Long            'bytes per character
-'''Dim FirstNumPos As Long
-'''On Error Resume Next
-''''load everything in byte array(it will work faster)
-'''bNumWrd = sNumWrd
-'''BPC = LenB("A")
-'''bCnt = UBound(bNumWrd) + 1
-'''FirstNumPos = -1
-'''If bCnt > 0 Then
-'''   'go find first numeric byte after which all bytes are numeric (characters)
-'''   For i = 0 To bCnt - BPC + 1 Step BPC
-'''     If (bNumWrd(i) >= 48 And bNumWrd(i) <= 57) Then  'Chr$(48)="0"
-'''        If FirstNumPos < 0 Then FirstNumPos = i       'Chr$(57)="9"
-'''     Else                           'non-numeric byte - have to reset
-'''        FirstNumPos = -1
-'''     End If
-'''   Next i
-'''   If FirstNumPos < 0 Then                       'word only
-'''      sWord = sNumWrd
-'''      GetNumberWord = nwWordOnly
-'''   ElseIf FirstNumPos = 0 Then                   'number only
-'''      dNumber = CDbl(sNumWrd)
-'''      GetNumberWord = nwNumOnly
-'''   Else                                 'number word
-'''      ReDim bTmp(bCnt - 1)
-'''      CopyMemory bTmp(0), bNumWrd(FirstNumPos), bCnt - FirstNumPos
-'''      ReDim Preserve bTmp(bCnt - FirstNumPos - 1)
-'''      sTmp = CStr(bTmp)
-'''      dNumber = CDbl(sTmp)
-'''      'trim number from word
-'''      ReDim Preserve bNumWrd(FirstNumPos - 1)
-'''      sWord = bNumWrd
-'''      GetNumberWord = nwNumWord
-'''   End If
-'''Else
-'''    GetNumberWord = nwEmpty
-'''End If
-'''End Function
-
-
 Private Sub InitChargeStateMap()
 Dim I As Long
 For I = 1 To 5
@@ -2027,29 +1815,6 @@ PresentDisplay0Type = glCSType
 Display0MinScan = 1
 Display0MaxScan = 1000
 End Sub
-
-' Unused Function (March 2003)
-'''Public Function FormatStringA(sS As String, lChCnt As Long, algA As glAlignment) As String
-''''-----------------------------------------------------------------------------------------
-''''returns aligned string sText with exactly lCharCnt characters
-''''-----------------------------------------------------------------------------------------
-'''Dim ExtraCnt As Long, LeftExtraCnt As Long
-'''On Error Resume Next
-'''ExtraCnt = lChCnt - Len(sS)
-'''If ExtraCnt > 0 Then
-'''   Select Case algA
-'''   Case algLeft
-'''        FormatStringA = sS & Space$(ExtraCnt)
-'''   Case algRight
-'''        FormatStringA = Space$(ExtraCnt) & sS
-'''   Case algCenter
-'''        LeftExtraCnt = CLng(ExtraCnt / 2)
-'''        FormatStringA = Space$(LeftExtraCnt) & sS & Space$(ExtraCnt - LeftExtraCnt)
-'''   End Select
-'''Else                            'return original string
-'''   FormatStringA = sS
-'''End If
-'''End Function
 
 Public Function LongToSignedShort(ByVal dwUnsigned As Long) As Integer
 '----------------------------------------------------------------------------------------

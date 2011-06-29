@@ -202,14 +202,14 @@ Private Function OnRecentFilesList(strFilePath As String) As Integer
 ' If found, returns the index of the file in glbRecentFiles
 ' Otherwise, returns -1
 
-Dim i As Integer
+Dim I As Integer
 
-For i = 0 To glbRecentFiles.FileCount - 1
-    If UCase(glbRecentFiles.Files(i).FullFilePath) = UCase(strFilePath) Then
-       OnRecentFilesList = i
+For I = 0 To glbRecentFiles.FileCount - 1
+    If UCase(glbRecentFiles.Files(I).FullFilePath) = UCase(strFilePath) Then
+       OnRecentFilesList = I
        Exit Function
     End If
-Next i
+Next I
 OnRecentFilesList = -1
 
 End Function
@@ -275,24 +275,24 @@ End Function
 
 Public Sub SyncMenuCmdToolbar(ByVal bChecked As Boolean)
 'synchronization of Toolbar menu command on all opened gels
-Dim i As Integer
+Dim I As Integer
 On Error Resume Next
-For i = 1 To UBound(GelBody)
-   If Not GelStatus(i).Deleted Then
-      GelBody(i).mnuViewToolbar.Checked = bChecked
+For I = 1 To UBound(GelBody)
+   If Not GelStatus(I).Deleted Then
+      GelBody(I).mnuViewToolbar.Checked = bChecked
    End If
-Next i
+Next I
 End Sub
 
 Public Sub SyncMenuCmdTracker(ByVal bChecked As Boolean)
 'synchronization of Toolbar menu command on all opened gels
-Dim i As Integer
+Dim I As Integer
 On Error Resume Next
-For i = 1 To UBound(GelBody)
-   If Not GelStatus(i).Deleted Then
-      GelBody(i).mnuViewTracker.Checked = bChecked
+For I = 1 To UBound(GelBody)
+   If Not GelStatus(I).Deleted Then
+      GelBody(I).mnuViewTracker.Checked = bChecked
    End If
-Next i
+Next I
 End Sub
 
 Public Sub StopTracking()
@@ -376,141 +376,6 @@ With frmTracker
   .lblUMCIndex = sUMCIndices
 End With
 End Sub
-
-''' Unused Function (March 2003)
-'''Public Function MakeNewGelData(ByVal ParentInd As Long, vDataInd As Variant) As Long
-''''------------------------------------------------------------------------------
-''''returns index of new gel in the GelData array, fills GelData element
-''''ParentInd is the index of the parent Gel, vDataInd is variant array
-''''(i,0) - data type, (i,1) - index in CS or ISO array
-''''------------------------------------------------------------------------------
-'''Dim iNewInd As Long
-'''Dim tmpDataLines As Long
-'''Dim tmpCSlines As Long, tmpIsoLines As Long
-'''Dim tmpMWMin As Double, tmpMWMax As Double
-'''Dim tmpAbuMin As Double, tmpAbuMax As Double
-'''Dim tmpFN(100000) As Long   'limit of the whole gel file
-'''Dim lCSCount As Long, lIsoCount As Long
-'''Dim LastFN As Long
-'''Dim DFIndex As Long
-'''Dim lFNCount As Long
-'''Dim i As Long, k As Long, m As Long
-'''On Error GoTo err_MakeNewGelData
-'''
-'''MakeNewGelData = -1
-'''iNewInd = FindFreeIndex()
-'''With GelData(iNewInd)
-'''   .Certificate = GelData(ParentInd).Certificate
-'''   .Fileinfo = UMRFileInfo
-'''   .PathtoDatabase = GelData(ParentInd).PathtoDatabase
-'''   .PathtoDataFiles = GelData(ParentInd).PathtoDataFiles
-'''   .Preferences = GelData(ParentInd).Preferences
-'''   .pICooSysEnabled = GelData(ParentInd).pICooSysEnabled
-'''   For i = 1 To MAX_FILTER_COUNT
-'''      For k = 0 To 2
-'''         .DataFilter(i, k) = GelData(ParentInd).DataFilter(i, k)
-'''      Next k
-'''   Next i
-'''End With
-'''If IsArray(vDataInd) Then
-'''   tmpDataLines = UBound(vDataInd)
-'''Else
-'''   tmpDataLines = 0
-'''End If
-'''tmpCSlines = 0
-'''tmpIsoLines = 0
-'''tmpMWMin = glHugeOverExp
-'''tmpMWMax = 0
-'''tmpAbuMin = glHugeOverExp
-'''tmpAbuMax = 0
-'''With GelData(ParentInd)
-'''   If tmpDataLines > 0 Then
-'''      For i = 1 To tmpDataLines
-'''         Select Case vDataInd(i, 0)
-'''         Case glCSType
-'''            tmpCSlines = tmpCSlines + 1
-'''         Case glIsoType
-'''            tmpIsoLines = tmpIsoLines + 1
-'''         End Select
-'''      Next i
-'''   End If
-'''End With
-'''With GelData(iNewInd)
-'''   .DataLines = tmpDataLines
-'''   .LinesRead = tmpDataLines
-'''   .CSLines = tmpCSlines
-'''   .IsoLines = tmpIsoLines
-'''   If .CSLines > 0 Then
-'''      ReDim .CSNum(.CSLines, CSNUM_FIELD_COUNT)
-'''      ReDim .CSVar(.CSLines, CSVAR_FIELD_COUNT)
-'''   End If
-'''   If .IsoLines > 0 Then
-'''      ReDim .IsoData(.IsoLines, ISONUM_FIELD_COUNT)
-'''   End If
-'''   lCSCount = 0
-'''   lIsoCount = 0
-'''   lFNCount = 0
-'''   LastFN = -1
-'''   If tmpDataLines > 0 Then
-'''      For i = 1 To tmpDataLines
-'''         Select Case CInt(vDataInd(i, 0))
-'''         Case glCSType
-'''            lCSCount = lCSCount + 1
-'''            For k = 1 To CSNUM_FIELD_COUNT
-'''               .CSNum(lCSCount, k) = GelData(ParentInd).CSNum(vDataInd(i, 1), k)
-'''            Next k
-'''            For k = 1 To CSVAR_FIELD_COUNT
-'''               .CSVar(lCSCount, k) = GelData(ParentInd).CSVar(vDataInd(i, 1), k)
-'''            Next k
-'''            If CLng(.CSNum(lCSCount, 1)) <> LastFN Then
-'''               lFNCount = lFNCount + 1
-'''               LastFN = CLng(.CSNum(lCSCount).ScanNumber)
-'''               tmpFN(lFNCount) = LastFN
-'''            End If
-'''            If .CSNum(lCSCount).AverageMW < tmpMWMin Then tmpMWMin = .CSNum(lCSCount).AverageMW
-'''            If .CSNum(lCSCount).AverageMW > tmpMWMax Then tmpMWMax = .CSNum(lCSCount).AverageMW
-'''            If .CSNum(lCSCount).Abundance < tmpAbuMin Then tmpAbuMin = .CSNum(lCSCount).Abundance
-'''            If .CSNum(lCSCount).Abundance > tmpAbuMax Then tmpAbuMax = .CSNum(lCSCount).Abundance
-'''         Case glIsoType
-'''            lIsoCount = lIsoCount + 1
-'''            For k = 1 To ISONUM_FIELD_COUNT
-'''               .IsoNum(lIsoCount, k) = GelData(ParentInd).IsoNum(vDataInd(i, 1), k)
-'''            Next k
-'''            For k = 1 To ISOVAR_FIELD_COUNT
-'''                .IsoVar(lIsoCount, k) = GelData(ParentInd).IsoVar(vDataInd(i, 1), k)
-'''            Next k
-'''            If .IsoData(lIsoCount).ScanNumber <> LastFN Then
-'''               lFNCount = lFNCount + 1
-'''               LastFN = .IsoData(lIsoCount).ScanNumber
-'''               tmpFN(lFNCount) = LastFN
-'''            End If
-'''            FindMWExtremes .IsoNum(lIsoCount), tmpmwmin, tmpmwmax
-'''            If .IsoData(lIsoCount).Abundance < tmpAbuMin Then tmpAbuMin = .IsoData(lIsoCount).Abundance
-'''            If .IsoData(lIsoCount).Abundance > tmpAbuMax Then tmpAbuMax = .IsoData(lIsoCount).Abundance
-'''         End Select
-'''       Next i
-'''   End If
-'''   .minMW = tmpMWMin
-'''   .maxMW = tmpMWMax
-'''   .MinAbu = tmpAbuMin
-'''   .MaxAbu = tmpAbuMax
-'''   If lFNCount > 0 Then
-'''      ReDim .ScanInfo(lFNCount)
-'''      For i = 1 To lFNCount
-'''         DFIndex = GetDFIndex(ParentInd, tmpfn(i))
-'''         .ScanInfo(i).ScanNumber = tmpfn(i)
-'''         .ScanInfo(i).ScanFileName = GelData(ParentInd).DFN(DFIndex)
-'''         .ScanInfo(i).ScanPI = GelData(ParentInd).DFPI(DFIndex)
-'''      Next i
-'''   End If
-'''End With
-'''MakeNewGelData = iNewInd
-'''Exit Function
-'''
-'''err_MakeNewGelData:
-''''mark as deleted if error
-'''If iNewInd > 0 Then GelStatus(iNewInd).Deleted = True
-'''End Function
 
 Public Function OpenFileAPIDlg(ByVal Ownerhwnd As Long, _
                                ByVal sFilter As String, _
@@ -627,7 +492,7 @@ End Sub
 
 Public Function InitDrawData(ByVal Ind As Long) As Boolean
 'initialize data drawing structure; it is called only once
-Dim i As Long
+Dim I As Long
 Dim IsoField As Integer
 IsoField = GelData(Ind).Preferences.IsoDataField
 On Error GoTo err_InitDrawData
@@ -642,9 +507,9 @@ With GelDraw(Ind)
        ReDim .CSER(1 To .CSCount)
        ReDim .CSERClr(1 To .CSCount)
        .CSVisible = True
-       For i = 1 To .CSCount
-           .CSID(i) = i
-       Next i
+       For I = 1 To .CSCount
+           .CSID(I) = I
+       Next I
     Else
        .CSVisible = False
     End If
@@ -658,9 +523,9 @@ With GelDraw(Ind)
        ReDim .IsoER(1 To .IsoCount)
        ReDim .IsoERClr(1 To .IsoCount)
        .IsoVisible = True
-       For i = 1 To .IsoCount
-           .IsoID(i) = i
-       Next i
+       For I = 1 To .IsoCount
+           .IsoID(I) = I
+       Next I
     Else
        .IsoVisible = False
     End If
@@ -786,30 +651,30 @@ End Sub
 
 Public Sub InitDrawER(ByVal Ind As Long)
 'this procedure is called only when building graph
-Dim i As Long
+Dim I As Long
 Dim dblER As Double
 On Error GoTo InitDrawERErrorHandler
 
 With GelData(Ind)
   If .CSLines > 0 Then
-     For i = 1 To .CSLines
-        dblER = LookupExpressionRatioValue(Ind, i, False, -1)
+     For I = 1 To .CSLines
+        dblER = LookupExpressionRatioValue(Ind, I, False, -1)
         If Abs(dblER) > 1E+38 Then
             If dblER > 0 Then dblER = 1E+38 Else dblER = -1E+38
         End If
             
-        GelDraw(Ind).CSER(i) = dblER
-     Next i
+        GelDraw(Ind).CSER(I) = dblER
+     Next I
   End If
   If .IsoLines > 0 Then
-     For i = 1 To .IsoLines
-        dblER = LookupExpressionRatioValue(Ind, i, True, -1)
+     For I = 1 To .IsoLines
+        dblER = LookupExpressionRatioValue(Ind, I, True, -1)
         If Abs(dblER) > 1E+38 Then
             If dblER > 0 Then dblER = 1E+38 Else dblER = -1E+38
         End If
          
-        GelDraw(Ind).IsoER(i) = dblER
-     Next i
+        GelDraw(Ind).IsoER(I) = dblER
+     Next I
   End If
 End With
 InitDrawERColors Ind
@@ -824,47 +689,47 @@ Public Sub InitDrawERColors(ByVal Ind As Long)
 '--------------------------------------------------------------------
 'this is called whenever differential display is requested
 '--------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelDraw(Ind)
   Select Case GelData(Ind).Preferences.DRDefinition
   Case glNormal
     If .CSCount > 0 Then
-      For i = 1 To .CSCount
-          If .CSER(i) >= 0 Then
-             .CSERClr(i) = GetERClrInd(.CSER(i))
+      For I = 1 To .CSCount
+          If .CSER(I) >= 0 Then
+             .CSERClr(I) = GetERClrInd(.CSER(I))
           Else
-             .CSERClr(i) = glDONT_DISPLAY
+             .CSERClr(I) = glDONT_DISPLAY
           End If
-      Next i
+      Next I
     End If
     If .IsoCount > 0 Then
-      For i = 1 To .IsoCount
-          If .IsoER(i) >= 0 Then
-             .IsoERClr(i) = GetERClrInd(.IsoER(i))
+      For I = 1 To .IsoCount
+          If .IsoER(I) >= 0 Then
+             .IsoERClr(I) = GetERClrInd(.IsoER(I))
           Else
-             .IsoERClr(i) = glDONT_DISPLAY
+             .IsoERClr(I) = glDONT_DISPLAY
           End If
-      Next i
+      Next I
     End If
   Case glReverse
     If .CSCount > 0 Then
-      For i = 1 To .CSCount
-          If .CSER(i) >= 0 Then
-             .CSERClr(i) = -GetERClrInd(.CSER(i))
+      For I = 1 To .CSCount
+          If .CSER(I) >= 0 Then
+             .CSERClr(I) = -GetERClrInd(.CSER(I))
           Else
-             .CSERClr(i) = glDONT_DISPLAY
+             .CSERClr(I) = glDONT_DISPLAY
           End If
-      Next i
+      Next I
     End If
     If .IsoCount > 0 Then
-      For i = 1 To .IsoCount
-          If .IsoER(i) >= 0 Then
-             .IsoERClr(i) = -GetERClrInd(.IsoER(i))
+      For I = 1 To .IsoCount
+          If .IsoER(I) >= 0 Then
+             .IsoERClr(I) = -GetERClrInd(.IsoER(I))
           Else
-             .IsoERClr(i) = glDONT_DISPLAY
+             .IsoERClr(I) = glDONT_DISPLAY
           End If
-      Next i
+      Next I
     End If
   End Select
 End With
@@ -875,17 +740,17 @@ Public Sub InitDrawChargeStateMap(ByVal Ind As Long)
 '--------------------------------------------------------------------
 'this is called whenever charge state map display is requested
 '--------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 With GelData(Ind)
     If .CSLines > 0 Then
-       For i = 1 To .CSLines
-           GelDraw(Ind).CSERClr(i) = 50 + GetChargeStateMapIndex(.CSData(i).Charge)
-       Next i
+       For I = 1 To .CSLines
+           GelDraw(Ind).CSERClr(I) = 50 + GetChargeStateMapIndex(.CSData(I).Charge)
+       Next I
     End If
     If .IsoLines > 0 Then
-       For i = 1 To .IsoLines
-           GelDraw(Ind).IsoERClr(i) = 50 + GetChargeStateMapIndex(.IsoData(i).Charge)
-       Next i
+       For I = 1 To .IsoLines
+           GelDraw(Ind).IsoERClr(I) = 50 + GetChargeStateMapIndex(.IsoData(I).Charge)
+       Next I
     End If
 End With
 End Sub
@@ -893,31 +758,31 @@ End Sub
 
 Public Sub InitDrawCSLogMW(ByVal Ind As Long)
 Dim MW As Double                    'can not come here if not CSCount>0
-Dim i As Long
+Dim I As Long
 With GelDraw(Ind)
-     For i = 1 To .CSCount
-         MW = GelData(Ind).CSData(i).AverageMW
+     For I = 1 To .CSCount
+         MW = GelData(Ind).CSData(I).AverageMW
          If MW > 0 Then
-            .CSLogMW(i) = CSng(Log(MW) / Log(10#))
+            .CSLogMW(I) = CSng(Log(MW) / Log(10#))
          Else
-            .CSLogMW(i) = -glHugeOverExp
+            .CSLogMW(I) = -glHugeOverExp
          End If
-     Next i
+     Next I
 End With
 End Sub
 
 Public Sub InitDrawIsoLogMW(ByVal Ind As Long)
 Dim MW As Double                    'can not come here if not IsoCount>0
-Dim i As Long
+Dim I As Long
 With GelDraw(Ind)
-     For i = 1 To .IsoCount
-         MW = GetIsoMass(GelData(Ind).IsoData(i), GelData(Ind).Preferences.IsoDataField)
+     For I = 1 To .IsoCount
+         MW = GetIsoMass(GelData(Ind).IsoData(I), GelData(Ind).Preferences.IsoDataField)
          If MW > 0 Then
-            .IsoLogMW(i) = CSng(Log(MW) / Log(10#))
+            .IsoLogMW(I) = CSng(Log(MW) / Log(10#))
          Else
-            .IsoLogMW(i) = -glHugeOverExp
+            .IsoLogMW(I) = -glHugeOverExp
          End If
-     Next i
+     Next I
 End With
 End Sub
 
@@ -928,7 +793,7 @@ Public Sub GetHotSpot(ByVal Ind As Long, ByVal lx As Long, ByVal ly As Long, _
 'this is arranged for performance reasons
 '--------------------------------------------------------------------------------
 Dim ar As Double
-Dim i As Long
+Dim I As Long
 ar = GelData(Ind).Preferences.AbuAspectRatio
 HotType = glNoType
 Select Case GelBody(Ind).fgDisplay
@@ -939,29 +804,29 @@ Case glNormalDisplay
   'go with reverse loop to find always the spot on top
     With GelDraw(Ind)
       If .CSCount > 0 And .CSVisible Then
-         For i = .CSCount To 1 Step -1
-           If .CSID(i) > 0 And .CSR(i) > 0 Then 'search only among visible
-              If (Abs(lx - .CSX(i)) < .CSR(i) / 2) And _
-                 (Abs(ly - .CSY(i)) < .CSR(i) / (2 * ar)) Then
+         For I = .CSCount To 1 Step -1
+           If .CSID(I) > 0 And .CSR(I) > 0 Then 'search only among visible
+              If (Abs(lx - .CSX(I)) < .CSR(I) / 2) And _
+                 (Abs(ly - .CSY(I)) < .CSR(I) / (2 * ar)) Then
                  HotType = glCSType
-                 HotID = i
+                 HotID = I
                  Exit For
               End If
            End If
-         Next i
+         Next I
       End If
       If HotType = glNoType Then
          If .IsoCount > 0 And .IsoVisible Then
-            For i = .IsoCount To 1 Step -1
-              If .IsoID(i) > 0 And .IsoR(i) > 0 Then 'search only among visible
-                 If (Abs(lx - .IsoX(i)) < .IsoR(i) / 2) And _
-                    (Abs(ly - .IsoY(i)) < .IsoR(i) / (2 * ar)) Then
+            For I = .IsoCount To 1 Step -1
+              If .IsoID(I) > 0 And .IsoR(I) > 0 Then 'search only among visible
+                 If (Abs(lx - .IsoX(I)) < .IsoR(I) / 2) And _
+                    (Abs(ly - .IsoY(I)) < .IsoR(I) / (2 * ar)) Then
                     HotType = glIsoType
-                    HotID = i
+                    HotID = I
                     Exit For
                  End If
               End If
-           Next i
+           Next I
          End If
       End If
     End With
@@ -969,29 +834,29 @@ Case glNormalDisplay
   'look first among Iso; if not there check among CS
     With GelDraw(Ind)
       If .IsoCount > 0 And .IsoVisible Then
-         For i = .IsoCount To 1 Step -1
-           If .IsoID(i) > 0 And .IsoR(i) > 0 Then 'search only among visible
-              If (Abs(lx - .IsoX(i)) < .IsoR(i) / 2) And _
-                 (Abs(ly - .IsoY(i)) < .IsoR(i) / (2 * ar)) Then
+         For I = .IsoCount To 1 Step -1
+           If .IsoID(I) > 0 And .IsoR(I) > 0 Then 'search only among visible
+              If (Abs(lx - .IsoX(I)) < .IsoR(I) / 2) And _
+                 (Abs(ly - .IsoY(I)) < .IsoR(I) / (2 * ar)) Then
                  HotType = glIsoType
-                 HotID = i
+                 HotID = I
                  Exit For
               End If
            End If
-         Next i
+         Next I
       End If
       If HotType = glNoType Then
          If .CSCount > 0 And .CSVisible Then
-            For i = .CSCount To 1 Step -1
-              If .CSID(i) > 0 And .CSR(i) > 0 Then 'search only among visible
-                 If (Abs(lx - .CSX(i)) < .CSR(i) / 2) And _
-                    (Abs(ly - .CSY(i)) < .CSR(i) / (2 * ar)) Then
+            For I = .CSCount To 1 Step -1
+              If .CSID(I) > 0 And .CSR(I) > 0 Then 'search only among visible
+                 If (Abs(lx - .CSX(I)) < .CSR(I) / 2) And _
+                    (Abs(ly - .CSY(I)) < .CSR(I) / (2 * ar)) Then
                     HotType = glCSType
-                    HotID = i
+                    HotID = I
                     Exit For
                  End If
               End If
-            Next i
+            Next I
          End If
        End If
     End With
@@ -1003,29 +868,29 @@ Case glDifferentialDisplay, glChargeStateMapDisplay
   'go with reverse loop to find always the spot on top
     With GelDraw(Ind)
       If .CSCount > 0 And .CSVisible Then
-         For i = .CSCount To 1 Step -1
-           If .CSID(i) > 0 And .CSR(i) > 0 And .CSERClr(i) <> glDONT_DISPLAY Then
-              If (Abs(lx - .CSX(i)) < .CSR(i) / 2) And _
-                 (Abs(ly - .CSY(i)) < .CSR(i) / (2 * ar)) Then
+         For I = .CSCount To 1 Step -1
+           If .CSID(I) > 0 And .CSR(I) > 0 And .CSERClr(I) <> glDONT_DISPLAY Then
+              If (Abs(lx - .CSX(I)) < .CSR(I) / 2) And _
+                 (Abs(ly - .CSY(I)) < .CSR(I) / (2 * ar)) Then
                  HotType = glCSType
-                 HotID = i
+                 HotID = I
                  Exit For
               End If
            End If
-         Next i
+         Next I
       End If
       If HotType = glNoType Then
          If .IsoCount > 0 And .IsoVisible Then
-            For i = .IsoCount To 1 Step -1
-              If .IsoID(i) > 0 And .IsoR(i) > 0 And .IsoERClr(i) <> glDONT_DISPLAY Then
-                 If (Abs(lx - .IsoX(i)) < .IsoR(i) / 2) And _
-                    (Abs(ly - .IsoY(i)) < .IsoR(i) / (2 * ar)) Then
+            For I = .IsoCount To 1 Step -1
+              If .IsoID(I) > 0 And .IsoR(I) > 0 And .IsoERClr(I) <> glDONT_DISPLAY Then
+                 If (Abs(lx - .IsoX(I)) < .IsoR(I) / 2) And _
+                    (Abs(ly - .IsoY(I)) < .IsoR(I) / (2 * ar)) Then
                     HotType = glIsoType
-                    HotID = i
+                    HotID = I
                     Exit For
                  End If
               End If
-           Next i
+           Next I
          End If
       End If
     End With
@@ -1033,29 +898,29 @@ Case glDifferentialDisplay, glChargeStateMapDisplay
   'look first among Iso; if not there check among CS
     With GelDraw(Ind)
       If .IsoCount > 0 And .IsoVisible Then
-         For i = .IsoCount To 1 Step -1
-           If .IsoID(i) > 0 And .IsoR(i) > 0 And .IsoERClr(i) <> glDONT_DISPLAY Then
-              If (Abs(lx - .IsoX(i)) < .IsoR(i) / 2) And _
-                 (Abs(ly - .IsoY(i)) < .IsoR(i) / (2 * ar)) Then
+         For I = .IsoCount To 1 Step -1
+           If .IsoID(I) > 0 And .IsoR(I) > 0 And .IsoERClr(I) <> glDONT_DISPLAY Then
+              If (Abs(lx - .IsoX(I)) < .IsoR(I) / 2) And _
+                 (Abs(ly - .IsoY(I)) < .IsoR(I) / (2 * ar)) Then
                  HotType = glIsoType
-                 HotID = i
+                 HotID = I
                  Exit For
               End If
            End If
-         Next i
+         Next I
       End If
       If HotType = glNoType Then
          If .CSCount > 0 And .CSVisible Then
-            For i = .CSCount To 1 Step -1
-              If .CSID(i) > 0 And .CSR(i) > 0 And .CSERClr(i) <> glDONT_DISPLAY Then
-                 If (Abs(lx - .CSX(i)) < .CSR(i) / 2) And _
-                    (Abs(ly - .CSY(i)) < .CSR(i) / (2 * ar)) Then
+            For I = .CSCount To 1 Step -1
+              If .CSID(I) > 0 And .CSR(I) > 0 And .CSERClr(I) <> glDONT_DISPLAY Then
+                 If (Abs(lx - .CSX(I)) < .CSR(I) / 2) And _
+                    (Abs(ly - .CSY(I)) < .CSR(I) / (2 * ar)) Then
                     HotType = glCSType
-                    HotID = i
+                    HotID = I
                     Exit For
                  End If
               End If
-            Next i
+            Next I
          End If
        End If
     End With
@@ -1064,62 +929,62 @@ End Select
 End Sub
 
 Public Sub GelCSIncludeAll(ByVal Ind As Long)
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelDraw(Ind)
-    For i = 1 To .CSCount
-        .CSID(i) = Abs(.CSID(i))
-    Next i
+    For I = 1 To .CSCount
+        .CSID(I) = Abs(.CSID(I))
+    Next I
 End With
 End Sub
 
 Public Sub GelCSInvertVisible(ByVal Ind As Long)
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelDraw(Ind)
-    For i = 1 To .CSCount
-        .CSID(i) = -.CSID(i)
-    Next i
+    For I = 1 To .CSCount
+        .CSID(I) = -.CSID(I)
+    Next I
 End With
 End Sub
 
 Public Sub GelCSExcludeAll(ByVal Ind As Long)
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelDraw(Ind)
-    For i = 1 To .CSCount
-        .CSID(i) = -Abs(.CSID(i))
-    Next i
+    For I = 1 To .CSCount
+        .CSID(I) = -Abs(.CSID(I))
+    Next I
 End With
 End Sub
 
 Public Sub GelIsoIncludeAll(ByVal Ind As Long)
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelDraw(Ind)
-    For i = 1 To .IsoCount
-        .IsoID(i) = Abs(.IsoID(i))
-    Next i
+    For I = 1 To .IsoCount
+        .IsoID(I) = Abs(.IsoID(I))
+    Next I
 End With
 End Sub
 
 Public Sub GelIsoInvertVisible(ByVal Ind As Long)
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelDraw(Ind)
-    For i = 1 To .IsoCount
-        .IsoID(i) = -.IsoID(i)
-    Next i
+    For I = 1 To .IsoCount
+        .IsoID(I) = -.IsoID(I)
+    Next I
 End With
 End Sub
 
 Public Sub GelIsoExcludeAll(ByVal Ind As Long)
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelDraw(Ind)
-    For i = 1 To .IsoCount
-        .IsoID(i) = -Abs(.IsoID(i))
-    Next i
+    For I = 1 To .IsoCount
+        .IsoID(I) = -Abs(.IsoID(I))
+    Next I
 End With
 End Sub
 
@@ -1127,34 +992,34 @@ Public Sub GelCSExcludeAbuRange(ByVal Ind As Long)
 'exclude CS data out of [MinAbu,MaxAbu] range
 Dim MinAbu As Double
 Dim MaxAbu As Double
-Dim i As Long
+Dim I As Long
 With GelData(Ind)
     MinAbu = CDbl(.DataFilter(fltCSAbu, 1))
     MaxAbu = CDbl(.DataFilter(fltCSAbu, 2))
     If .CSLines > 0 Then
-       For i = 1 To .CSLines
-           If .CSData(i).Abundance < MinAbu Or .CSData(i).Abundance > MaxAbu Then
-              GelDraw(Ind).CSID(i) = -Abs(GelDraw(Ind).CSID(i))
+       For I = 1 To .CSLines
+           If .CSData(I).Abundance < MinAbu Or .CSData(I).Abundance > MaxAbu Then
+              GelDraw(Ind).CSID(I) = -Abs(GelDraw(Ind).CSID(I))
            End If
-       Next i
+       Next I
     End If
 End With
 End Sub
 
 Public Sub GelIsoExcludeAbuRange(ByVal Ind As Long)
 'exclude Iso data out of [MinAbu,MaxAbu] range
-Dim i As Long
+Dim I As Long
 Dim MinAbu As Double
 Dim MaxAbu As Double
 With GelData(Ind)
     MinAbu = CDbl(.DataFilter(fltIsoAbu, 1))
     MaxAbu = CDbl(.DataFilter(fltIsoAbu, 2))
     If .IsoLines > 0 Then
-       For i = 1 To .IsoLines
-           If .IsoData(i).Abundance < MinAbu Or .IsoData(i).Abundance > MaxAbu Then
-              GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
+       For I = 1 To .IsoLines
+           If .IsoData(I).Abundance < MinAbu Or .IsoData(I).Abundance > MaxAbu Then
+              GelDraw(Ind).IsoID(I) = -Abs(GelDraw(Ind).IsoID(I))
            End If
-       Next i
+       Next I
     End If
 End With
 End Sub
@@ -1164,16 +1029,16 @@ Public Sub GelCSExcludeMWRange(ByVal Ind As Long)
 'exclude CS data out of [MinMW,MaxMW] range
 '-----------------------------------------------------------------
 Dim MinMW As Double, MaxMW As Double
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelData(Ind)
     MinMW = CDbl(.DataFilter(fltCSMW, 1))
     MaxMW = CDbl(.DataFilter(fltCSMW, 2))
-    For i = 1 To .CSLines
-        If ((.CSData(i).AverageMW < MinMW) Or (.CSData(i).AverageMW > MaxMW)) Then
-           GelDraw(Ind).CSID(i) = -Abs(GelDraw(Ind).CSID(i))
+    For I = 1 To .CSLines
+        If ((.CSData(I).AverageMW < MinMW) Or (.CSData(I).AverageMW > MaxMW)) Then
+           GelDraw(Ind).CSID(I) = -Abs(GelDraw(Ind).CSID(I))
         End If
-    Next i
+    Next I
 End With
 End Sub
 
@@ -1181,18 +1046,18 @@ Public Sub GelIsoExcludeMWRange(ByVal Ind As Long)
 '------------------------------------------------------------------
 'exclude Iso data out of [MinMW,MaxMW] range
 '------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim MinMW As Double, MaxMW As Double
 On Error GoTo GelIsoExcludeMWRangeErrorHandler
 With GelData(Ind)
     MinMW = CDbl(.DataFilter(fltIsoMW, 1))
     MaxMW = CDbl(.DataFilter(fltIsoMW, 2))
-    For i = 1 To .IsoLines
-        If ((GetIsoMass(.IsoData(i), .Preferences.IsoDataField) < MinMW) Or _
-            (GetIsoMass(.IsoData(i), .Preferences.IsoDataField) > MaxMW)) Then
-                GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
+    For I = 1 To .IsoLines
+        If ((GetIsoMass(.IsoData(I), .Preferences.IsoDataField) < MinMW) Or _
+            (GetIsoMass(.IsoData(I), .Preferences.IsoDataField) > MaxMW)) Then
+                GelDraw(Ind).IsoID(I) = -Abs(GelDraw(Ind).IsoID(I))
         End If
-    Next i
+    Next I
 End With
 Exit Sub
 
@@ -1206,17 +1071,17 @@ Public Sub GelIsoExcludeCSRange(ByVal Ind As Long)
 '------------------------------------------------------------------
 'exclude Iso data out of [MinCS,MaxCS] range
 '------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim MinCS As Double, MaxCS As Double
 On Error GoTo GelIsoExcludeCSRangeErrorHandler
 With GelData(Ind)
     MinCS = CDbl(.DataFilter(fltIsoCS, 1))
     MaxCS = CDbl(.DataFilter(fltIsoCS, 2))
-    For i = 1 To .IsoLines
-        If ((.IsoData(i).Charge < MinCS) Or (.IsoData(i).Charge > MaxCS)) Then
-            GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
+    For I = 1 To .IsoLines
+        If ((.IsoData(I).Charge < MinCS) Or (.IsoData(I).Charge > MaxCS)) Then
+            GelDraw(Ind).IsoID(I) = -Abs(GelDraw(Ind).IsoID(I))
         End If
-    Next i
+    Next I
 End With
 Exit Sub
 
@@ -1230,7 +1095,7 @@ Public Sub GelIsoExcludeMZRange(ByVal Ind As Long)
 '------------------------------------------------------------------
 'exclude Iso data out of [MinMZ,MaxMZ] range
 '------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim MinMZ As Double, MaxMZ As Double
 Dim intCharge As Integer
 Dim TestMZ As Double
@@ -1238,20 +1103,20 @@ On Error GoTo GelIsoExcludeMZRangeErrorHandler
 With GelData(Ind)
     MinMZ = CDbl(.DataFilter(fltIsoMZ, 1))
     MaxMZ = CDbl(.DataFilter(fltIsoMZ, 2))
-    For i = 1 To .IsoLines
-        intCharge = val(.IsoData(i).Charge)
+    For I = 1 To .IsoLines
+        intCharge = val(.IsoData(I).Charge)
         
         If intCharge > 0 Then
-            TestMZ = (GetIsoMass(.IsoData(i), .Preferences.IsoDataField) + intCharge) / intCharge
+            TestMZ = (GetIsoMass(.IsoData(I), .Preferences.IsoDataField) + intCharge) / intCharge
             If ((TestMZ < MinMZ) Or (TestMZ > MaxMZ)) Then
-                GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
+                GelDraw(Ind).IsoID(I) = -Abs(GelDraw(Ind).IsoID(I))
             End If
         Else
             ' Charge is 0; error may have occurred while loading the PEK/CSV/mzXML/mzData file
             ' Or, the PEK/CSV/mzXML/mzData file could be wrong
             Debug.Assert False
         End If
-    Next i
+    Next I
 End With
 Exit Sub
 
@@ -1262,7 +1127,7 @@ LogErrors Err.Number, "GelIsoExcludeMZRange"
 End Sub
 
 Public Sub GelExcludeEvenOddScans(ByVal Ind As Long)
-Dim i As Long
+Dim I As Long
 Dim intScan As Integer
 Dim intEvenOddModCompareVal As Integer
 
@@ -1275,23 +1140,23 @@ With GelData(Ind)
             intEvenOddModCompareVal = 1
         End If
     
-        For i = 1 To .CSLines
-            intScan = val(.CSData(i).ScanNumber)
+        For I = 1 To .CSLines
+            intScan = val(.CSData(I).ScanNumber)
             
             ' Use Modulo division to check if odd or even
             If intScan Mod 2 = intEvenOddModCompareVal Then
-                GelDraw(Ind).CSID(i) = -Abs(GelDraw(Ind).CSID(i))
+                GelDraw(Ind).CSID(I) = -Abs(GelDraw(Ind).CSID(I))
             End If
-        Next i
+        Next I
     
-        For i = 1 To .IsoLines
-            intScan = val(.IsoData(i).ScanNumber)
+        For I = 1 To .IsoLines
+            intScan = val(.IsoData(I).ScanNumber)
             
             ' Use Modulo division to check if odd or even
             If intScan Mod 2 = intEvenOddModCompareVal Then
-                GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
+                GelDraw(Ind).IsoID(I) = -Abs(GelDraw(Ind).IsoID(I))
             End If
-        Next i
+        Next I
     End If
 End With
 Exit Sub
@@ -1305,7 +1170,7 @@ End Sub
 
 Public Sub GelCSExcludeER(ByVal Ind As Long)
 Dim ERExclusionOption As Integer
-Dim i As Long
+Dim I As Long
 Dim PartSum As Integer
 If GelData(Ind).CSLines > 0 Then
    ERExclusionOption = CInt(GelData(Ind).DataFilter(fltAR, 0))
@@ -1320,13 +1185,13 @@ If GelData(Ind).CSLines > 0 Then
         CSExcludeERBase Ind, 1
    Case Else
         PartSum = ERExclusionOption
-        i = 4
+        I = 4
         Do While PartSum > 0
-           If PartSum >= 2 ^ i Then
-              PartSum = PartSum - 2 ^ i
-              CSExcludeERBase Ind, 2 ^ i
+           If PartSum >= 2 ^ I Then
+              PartSum = PartSum - 2 ^ I
+              CSExcludeERBase Ind, 2 ^ I
            End If
-           i = i - 1
+           I = I - 1
         Loop
    End Select
 End If
@@ -1335,7 +1200,7 @@ End Sub
 Private Sub CSExcludeERBase(ByVal Ind As Long, ByVal EROption As Integer)
 Dim ERMin As Double         'this is never going to be called if not CSLines>0
 Dim ERMax As Double
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelData(Ind)
    ERMin = CDbl(.DataFilter(fltAR, 1))
@@ -1344,54 +1209,54 @@ End With
 With GelDraw(Ind)
    Select Case EROption
    Case 1          'exclude with ER
-        For i = 1 To .CSCount
-            If .CSER(i) >= 0 Then
-               .CSID(i) = -Abs(.CSID(i))
+        For I = 1 To .CSCount
+            If .CSER(I) >= 0 Then
+               .CSID(I) = -Abs(.CSID(I))
             End If
-        Next i
+        Next I
    Case 2          'exclude without ER
-        For i = 1 To .CSCount
-            If .CSER(i) < 0 Then
-               .CSID(i) = -Abs(.CSID(i))
+        For I = 1 To .CSCount
+            If .CSER(I) < 0 Then
+               .CSID(I) = -Abs(.CSID(I))
             End If
-        Next i
+        Next I
    Case 4          'exclude Huge Underexpressed
-        For i = 1 To .CSCount
-            If .CSER(i) = glHugeUnderExp Then
-               .CSID(i) = -Abs(.CSID(i))
+        For I = 1 To .CSCount
+            If .CSER(I) = glHugeUnderExp Then
+               .CSID(I) = -Abs(.CSID(I))
             End If
-        Next i
+        Next I
    Case 8          'exclude Huge Overexpressed
-        For i = 1 To .CSCount
-            If .CSER(i) = glHugeOverExp Then
-               .CSID(i) = -Abs(.CSID(i))
+        For I = 1 To .CSCount
+            If .CSER(I) = glHugeOverExp Then
+               .CSID(I) = -Abs(.CSID(I))
             End If
-        Next i
+        Next I
     Case 16         'exclude by ER range
         If ERMin <= 0 And ERMax >= 0 Then
-           For i = 1 To .CSCount
-               If .CSER(i) > ERMax Then
-                  .CSID(i) = -Abs(.CSID(i))
+           For I = 1 To .CSCount
+               If .CSER(I) > ERMax Then
+                  .CSID(I) = -Abs(.CSID(I))
                End If
-           Next i
+           Next I
         ElseIf ERMin >= 0 And ERMax < 0 Then
-           For i = 1 To .CSCount
-               If .CSER(i) < ERMin Then
-                  .CSID(i) = -Abs(.CSID(i))
+           For I = 1 To .CSCount
+               If .CSER(I) < ERMin Then
+                  .CSID(I) = -Abs(.CSID(I))
                End If
-           Next i
+           Next I
         ElseIf ERMin < ERMax And ERMax > 0 Then
-           For i = 1 To .CSCount
-               If (.CSER(i) < ERMin) Or (.CSER(i) > ERMax) Then
-                  .CSID(i) = -Abs(.CSID(i))
+           For I = 1 To .CSCount
+               If (.CSER(I) < ERMin) Or (.CSER(I) > ERMax) Then
+                  .CSID(I) = -Abs(.CSID(I))
                End If
-           Next i
+           Next I
         ElseIf ERMin = ERMax And ERMax >= 0 Then
-           For i = 1 To .CSCount
-               If (.CSER(i) = ERMax) Then
-                  .CSID(i) = -Abs(.CSID(i))
+           For I = 1 To .CSCount
+               If (.CSER(I) = ERMax) Then
+                  .CSID(I) = -Abs(.CSID(I))
                End If
-           Next i
+           Next I
         ElseIf ERMin < 0 And ERMax < 0 Then
             GelCSExcludeAll Ind
         End If
@@ -1402,7 +1267,7 @@ End Sub
 
 Public Sub GelIsoExcludeER(ByVal Ind As Long)
 Dim ERExclusionOption As Integer
-Dim i As Long
+Dim I As Long
 Dim PartSum As Integer
 
 If GelData(Ind).IsoLines > 0 Then
@@ -1418,13 +1283,13 @@ If GelData(Ind).IsoLines > 0 Then
         IsoExcludeERBase Ind, 1
    Case Else
         PartSum = ERExclusionOption
-        i = 4
+        I = 4
         Do While PartSum > 0
-           If PartSum >= 2 ^ i Then
-              PartSum = PartSum - 2 ^ i
-              IsoExcludeERBase Ind, 2 ^ i
+           If PartSum >= 2 ^ I Then
+              PartSum = PartSum - 2 ^ I
+              IsoExcludeERBase Ind, 2 ^ I
            End If
-           i = i - 1
+           I = I - 1
         Loop
    End Select
 End If
@@ -1433,7 +1298,7 @@ End Sub
 Private Sub IsoExcludeERBase(ByVal Ind As Long, ByVal EROption As Integer)
 Dim ERMin As Double             'this is never going to be called if not IsoLines>0
 Dim ERMax As Double
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelData(Ind)
    ERMin = CDbl(.DataFilter(fltAR, 1))
@@ -1442,54 +1307,54 @@ End With
 With GelDraw(Ind)
    Select Case EROption
    Case 1          'exclude with ER
-        For i = 1 To .IsoCount
-            If .IsoER(i) >= 0 Then
-               .IsoID(i) = -Abs(.IsoID(i))
+        For I = 1 To .IsoCount
+            If .IsoER(I) >= 0 Then
+               .IsoID(I) = -Abs(.IsoID(I))
             End If
-        Next i
+        Next I
    Case 2          'exclude without ER
-        For i = 1 To .IsoCount
-            If .IsoER(i) < 0 Then
-               .IsoID(i) = -Abs(.IsoID(i))
+        For I = 1 To .IsoCount
+            If .IsoER(I) < 0 Then
+               .IsoID(I) = -Abs(.IsoID(I))
             End If
-        Next i
+        Next I
    Case 4          'exclude Huge Underexpressed
-        For i = 1 To .IsoCount
-            If .IsoER(i) = glHugeUnderExp Then
-               .IsoID(i) = -Abs(.IsoID(i))
+        For I = 1 To .IsoCount
+            If .IsoER(I) = glHugeUnderExp Then
+               .IsoID(I) = -Abs(.IsoID(I))
             End If
-        Next i
+        Next I
    Case 8          'exclude Huge Overexpressed
-        For i = 1 To .IsoCount
-            If .IsoER(i) = glHugeOverExp Then
-               .IsoID(i) = -Abs(.IsoID(i))
+        For I = 1 To .IsoCount
+            If .IsoER(I) = glHugeOverExp Then
+               .IsoID(I) = -Abs(.IsoID(I))
             End If
-        Next i
+        Next I
     Case 16         'exclude by ER range
         If ERMin <= 0 And ERMax >= 0 Then
-           For i = 1 To .IsoCount
-               If .IsoER(i) > ERMax Then
-                  .IsoID(i) = -Abs(.IsoID(i))
+           For I = 1 To .IsoCount
+               If .IsoER(I) > ERMax Then
+                  .IsoID(I) = -Abs(.IsoID(I))
                End If
-           Next i
+           Next I
         ElseIf ERMin >= 0 And ERMax < 0 Then
-           For i = 1 To .IsoCount
-               If .IsoER(i) < ERMin Then
-                  .IsoID(i) = -Abs(.IsoID(i))
+           For I = 1 To .IsoCount
+               If .IsoER(I) < ERMin Then
+                  .IsoID(I) = -Abs(.IsoID(I))
                End If
-           Next i
+           Next I
         ElseIf ERMin < ERMax And ERMax > 0 Then
-           For i = 1 To .IsoCount
-               If (.IsoER(i) < ERMin) Or (.IsoER(i) > ERMax) Then
-                  .IsoID(i) = -Abs(.IsoID(i))
+           For I = 1 To .IsoCount
+               If (.IsoER(I) < ERMin) Or (.IsoER(I) > ERMax) Then
+                  .IsoID(I) = -Abs(.IsoID(I))
                End If
-           Next i
+           Next I
         ElseIf ERMin = ERMax And ERMax >= 0 Then
-           For i = 1 To .IsoCount
-               If (.IsoER(i) = ERMax) Then
-                  .IsoID(i) = -Abs(.IsoID(i))
+           For I = 1 To .IsoCount
+               If (.IsoER(I) = ERMax) Then
+                  .IsoID(I) = -Abs(.IsoID(I))
                End If
-           Next i
+           Next I
         ElseIf ERMin < 0 And ERMax < 0 Then
             GelIsoExcludeAll Ind
         End If
@@ -1499,23 +1364,23 @@ End Sub
 
 Public Sub GelCSExcludeIdentity(ByVal Ind As Long)
 Dim IdentityOption As Integer
-Dim i As Long
+Dim I As Long
 With GelData(Ind)
      IdentityOption = CInt(.DataFilter(fltID, 1))
      Select Case IdentityOption
      Case 0         'should not happen
      Case 1         'exclude identified
-        For i = 1 To .CSLines
-            If Not AllUnidentified(.CSData(i).MTID) Then
-               GelDraw(Ind).CSID(i) = -Abs(GelDraw(Ind).CSID(i))
+        For I = 1 To .CSLines
+            If Not AllUnidentified(.CSData(I).MTID) Then
+               GelDraw(Ind).CSID(I) = -Abs(GelDraw(Ind).CSID(I))
             End If
-        Next i
+        Next I
      Case 2         'exclude unidentified
-        For i = 1 To .CSLines
-            If AllUnidentified(.CSData(i).MTID) Then
-               GelDraw(Ind).CSID(i) = -Abs(GelDraw(Ind).CSID(i))
+        For I = 1 To .CSLines
+            If AllUnidentified(.CSData(I).MTID) Then
+               GelDraw(Ind).CSID(I) = -Abs(GelDraw(Ind).CSID(I))
             End If
-        Next i
+        Next I
      Case Else      'exclude all
         GelIsoExcludeAll Ind
      End Select
@@ -1524,23 +1389,23 @@ End Sub
 
 Public Sub GelIsoExcludeIdentity(ByVal Ind As Long)
 Dim IdentityOption As Integer
-Dim i As Long
+Dim I As Long
 With GelData(Ind)
      IdentityOption = CInt(.DataFilter(fltID, 1))
      Select Case IdentityOption
      Case 0         'should not happen
      Case 1         'exclude identified
-        For i = 1 To .IsoLines
-            If Not AllUnidentified(.IsoData(i).MTID) Then
-               GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
+        For I = 1 To .IsoLines
+            If Not AllUnidentified(.IsoData(I).MTID) Then
+               GelDraw(Ind).IsoID(I) = -Abs(GelDraw(Ind).IsoID(I))
             End If
-        Next i
+        Next I
      Case 2         'exclude unidentified
-        For i = 1 To .IsoLines
-            If AllUnidentified(.IsoData(i).MTID) Then
-               GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
+        For I = 1 To .IsoLines
+            If AllUnidentified(.IsoData(I).MTID) Then
+               GelDraw(Ind).IsoID(I) = -Abs(GelDraw(Ind).IsoID(I))
             End If
-        Next i
+        Next I
      Case Else      'exclude all
         GelIsoExcludeAll Ind
      End Select
@@ -1816,7 +1681,7 @@ End Function
 Private Function ReadGelData2003(ByVal FileName As String, ByVal Ind As Long, Optional blnInformUserOnError As Boolean = True) As Boolean
 Dim tmp As DocumentData2003
 Dim MaxInd As Long
-Dim i As Long, j As Long
+Dim I As Long, j As Long
 Dim hfile As Long
 
 On Error GoTo exit_ReadGelData2003
@@ -1851,31 +1716,31 @@ With GelData(Ind)
     MaxInd = UBound(tmp.DFFN)   'first index is always 1
     If MaxInd > 0 Then
        ReDim .ScanInfo(MaxInd)
-       For i = 1 To MaxInd
-           With .ScanInfo(i)
-              .ScanNumber = tmp.DFFN(i)
-              .ScanFileName = tmp.DFN(i)
-              .ScanPI = tmp.DFPI(i)
+       For I = 1 To MaxInd
+           With .ScanInfo(I)
+              .ScanNumber = tmp.DFFN(I)
+              .ScanFileName = tmp.DFN(I)
+              .ScanPI = tmp.DFPI(I)
            End With
-       Next i
+       Next I
     End If
-    For i = 1 To MAX_FILTER_COUNT_2003
+    For I = 1 To MAX_FILTER_COUNT_2003
         For j = 0 To 2
-            .DataFilter(i, j) = tmp.DataFilter(i, j)
+            .DataFilter(I, j) = tmp.DataFilter(I, j)
         Next j
-    Next i
+    Next I
     
     If .CSLines > 0 Then
        ReDim .CSData(.CSLines)
-       For i = 1 To .CSLines
-            CopyLegacyCSToIsoData .CSData(i), tmp.CSNum, tmp.CSVar, i
-       Next i
+       For I = 1 To .CSLines
+            CopyLegacyCSToIsoData .CSData(I), tmp.CSNum, tmp.CSVar, I
+       Next I
     End If
     If .IsoLines > 0 Then
        ReDim .IsoData(.IsoLines)
-       For i = 1 To .IsoLines
-            CopyLegacyIsoToIsoData .IsoData(i), tmp.IsoNum, tmp.IsoVar, i
-       Next i
+       For I = 1 To .IsoLines
+            CopyLegacyIsoToIsoData .IsoData(I), tmp.IsoNum, tmp.IsoVar, I
+       Next I
     End If
 End With
 
@@ -1886,203 +1751,22 @@ exit_ReadGelData2003:
 Close hfile
 End Function
 
-''Unused functions (March 2006); no longer supported
-''Private Function ReadGelData2000(ByVal FileName As String, _
-''                                 ByVal Ind As Long) As Boolean
-''Dim tmp As DocumentData2000
-''Dim nFileNum As Long
-''Dim MaxInd As Long
-''Dim i As Long, j As Long
-''On Error GoTo exit_ReadGelData2000
-''
-''nFileNum = FreeFile
-''Open FileName For Binary Access Read As nFileNum
-''If Err Then
-''   MsgBox "Can't open file: " & FileName, vbOKOnly, glFGTU
-''   LogErrors Err.Number, "OpenFile"
-''   Exit Function
-''End If
-''Get #nFileNum, 1, tmp
-'''transfer old structure to the new structure
-''With GelData(Ind)
-''    .Certificate = glCERT2003
-''    .Comment = tmp.Comment
-''    .FileName = tmp.FileName
-''    .Fileinfo = tmp.Fileinfo
-''    .PathtoDataFiles = tmp.PathtoDataFiles
-''    .PathtoDatabase = tmp.PathtoDatabase
-''    .LinesRead = tmp.LinesRead
-''    .DataLines = tmp.DataLines
-''    .CSLines = tmp.CSLines
-''    .IsoLines = tmp.IsoLines
-''    .MinMW = tmp.MinMW
-''    .MaxMW = tmp.MaxMW
-''    .MinAbu = tmp.MinAbu
-''    .MaxAbu = tmp.MaxAbu
-''    .Preferences = tmp.Preferences
-''    .pICooSysEnabled = tmp.pICooSysEnabled
-''    MaxInd = UBound(tmp.DFFN)   'first index is always 1
-''    If MaxInd > 0 Then
-''       ReDim .ScanInfo(MaxInd)
-''       For i = 1 To MaxInd
-''           With .ScanInfo(i)
-''              .ScanNumber = tmp.DFFN(i)
-''              .ScanFileName = tmp.DFN(i)
-''              .ScanPI = tmp.DFPI(i)
-''           End With
-''       Next i
-''    End If
-''    For i = 1 To 8                                      'copy old filter
-''        For j = 0 To 2
-''            .DataFilter(i, j) = tmp.DataFilter(i, j)
-''        Next j
-''    Next i
-''    'add missing filters
-''    .DataFilter(fltCSMW, 0) = False
-''    .DataFilter(fltCSMW, 1) = 0
-''    .DataFilter(fltCSMW, 2) = .MaxMW
-''    .DataFilter(fltIsoMW, 0) = False
-''    .DataFilter(fltIsoMW, 1) = 0
-''    .DataFilter(fltIsoMW, 2) = .MaxMW
-''    .DataFilter(fltIsoCS, 0) = False
-''    .DataFilter(fltIsoCS, 1) = 0
-''    .DataFilter(fltIsoCS, 2) = 1000
-''    .DataFilter(fltCSStDev, 1) = 1
-''    If .CSLines > 0 Then
-''       ReDim .CSData(.CSLines)
-''       For i = 1 To .CSLines
-''            CopyLegacyCSToIsoData .CSData(i), tmp.CSNum, tmp.CSVar, i
-''       Next i
-''    End If
-''    If .IsoLines > 0 Then
-''       ReDim .IsoData(.IsoLines)
-''       For i = 1 To .IsoLines
-''            CopyLegacyIsoToIsoData .IsoData(i), tmp.IsoNum, tmp.IsoVar, i
-''       Next i
-''    End If
-''End With
-''AddToAnalysisHistory Ind, "Opened data file with old format; will be updated to new format when saved."
-''ReadGelData2000 = True
-''
-''exit_ReadGelData2000:
-''Close nFileNum
-''End Function
-''
-''Private Function ReadGelData1999(ByVal FileName As String, _
-''                                 ByVal Ind As Long) As Boolean
-''Dim tmp As DocumentData1999
-''Dim nFileNum As Long
-''Dim MaxInd As Long
-''Dim i As Long, j As Long
-''Dim dblData() As Double
-''On Error GoTo exit_ReadGelData1999
-''
-''nFileNum = FreeFile
-''Open FileName For Binary Access Read As nFileNum
-''If Err Then
-''   MsgBox "Can't open file: " & FileName, vbOKOnly, glFGTU
-''   LogErrors Err.Number, "OpenFile"
-''   Exit Function
-''End If
-''Get #nFileNum, 1, tmp
-'''transfer old structure to the new structure
-''With GelData(Ind)
-''    .Certificate = glCERT2003
-''    .Comment = tmp.Comment
-''    .FileName = tmp.FileName
-''    .Fileinfo = tmp.Fileinfo
-''    .PathtoDataFiles = tmp.PathtoDataFiles
-''    .PathtoDatabase = tmp.PathtoDatabase
-''    .LinesRead = tmp.LinesRead
-''    .DataLines = tmp.DataLines
-''    .CSLines = tmp.CSLines
-''    .IsoLines = tmp.IsoLines
-''    .MinMW = tmp.MinMW
-''    .MaxMW = tmp.MaxMW
-''    .MinAbu = tmp.MinAbu
-''    .MaxAbu = tmp.MaxAbu
-''    .Preferences = glPreferences
-''    .pICooSysEnabled = tmp.pICooSysEnabled
-''    MaxInd = UBound(tmp.DFFN)   'first index is always 1
-''    If MaxInd > 0 Then
-''       ReDim .ScanInfo(MaxInd)
-''       For i = 1 To MaxInd
-''           With .ScanInfo(i)
-''              .ScanNumber = tmp.DFFN(i)
-''              .ScanFileName = tmp.DFN(i)
-''              .ScanPI = tmp.DFPI(i)
-''           End With
-''       Next i
-''    End If
-''    For i = 1 To 8
-''        For j = 0 To 2
-''            .DataFilter(i, j) = tmp.DataFilter(i, j)
-''        Next j
-''    Next i
-''    'add missing filters
-''    .DataFilter(fltCSMW, 0) = False
-''    .DataFilter(fltCSMW, 1) = 0
-''    .DataFilter(fltCSMW, 2) = .MaxMW
-''    .DataFilter(fltIsoMW, 0) = False
-''    .DataFilter(fltIsoMW, 1) = 0
-''    .DataFilter(fltIsoMW, 2) = .MaxMW
-''    .DataFilter(fltIsoCS, 0) = False
-''    .DataFilter(fltIsoCS, 1) = 0
-''    .DataFilter(fltIsoCS, 2) = 1000
-''    .DataFilter(fltCSStDev, 1) = 1
-''    If .CSLines > 0 Then
-''        ReDim .CSData(.CSLines)
-''
-''        ' Populate dblData with the .CSNum data
-''        ReDim dblData(1 To .CSLines, CSNUM_FIELD_COUNT)
-''        For i = 1 To .CSLines
-''            For j = 1 To 3
-''                dblData(i, j) = tmp.CSNum(i, j)
-''            Next j
-''        Next i
-''
-''        For i = 1 To .CSLines
-''             CopyLegacyCSToIsoData .CSData(i), dblData, tmp.CSVar, i
-''        Next i
-''    End If
-''    If .IsoLines > 0 Then
-''        ReDim .IsoData(.IsoLines)
-''
-''        ' Populate dblData with the .IsoNum data
-''        ReDim dblData(1 To .IsoLines, ISONUM_FIELD_COUNT)
-''        For i = 1 To .IsoLines
-''            For j = 1 To 10
-''                dblData(i, j) = tmp.IsoNum(i, j)
-''            Next j
-''        Next i
-''
-''        For i = 1 To .IsoLines
-''            CopyLegacyIsoToIsoData .IsoData(i), dblData, tmp.IsoVar, i
-''        Next i
-''    End If
-''End With
-''ReadGelData1999 = True
-''
-''exit_ReadGelData1999:
-''Close nFileNum
-''End Function
-
 Public Function FindFreeIndex() As Long
 '---------------------------------------------------------
 'return first free index in document array
 '(if any is deleted(closed) take that one to fill the gap)
 '---------------------------------------------------------
-Dim ArrayCnt As Long, i As Long
+Dim ArrayCnt As Long, I As Long
 On Error Resume Next
 ArrayCnt = UBound(GelBody)
 If ArrayCnt > 0 Then
-   For i = 1 To ArrayCnt                   'can not use 0
-       If GelStatus(i).Deleted Then
-          InitializeGelDataStructures i
-          FindFreeIndex = i
+   For I = 1 To ArrayCnt                   'can not use 0
+       If GelStatus(I).Deleted Then
+          InitializeGelDataStructures I
+          FindFreeIndex = I
           Exit Function
        End If
-   Next i
+   Next I
 End If
 'none deleted; increase upper bound for arrays
 ArrayCnt = ArrayCnt + 1
@@ -2264,7 +1948,7 @@ Public Sub GetRecentFiles()
 'Procedure returns an array of values from the application's Ini File
 'Stores the files in glbRecentFiles
 'Displays shortened file names on the menus, but keeps track of the full file name in glbRecentFiles
-Dim i As Integer
+Dim I As Integer
 Dim j As Integer
 Dim IniStuff As New clsIniStuff
 Dim strFilePath As String
@@ -2296,9 +1980,9 @@ On Error GoTo GetRecentFilesErrorHandler
     If lngFileCount > 0 Then
         'update menus on MDI form and each visible child form
         glbRecentFiles.FileCount = 0
-        For i = 0 To lngFileCount - 1
+        For I = 0 To lngFileCount - 1
             ' Need to add 1 to i since first recent file is RecentFile1
-            strFilePath = GetIniFileSetting(IniStuff, INI_SECTION_RECENT_FILES, INI_KEY_RECENT_FILE_PREFIX & Trim(CStr(i + 1)), "")
+            strFilePath = GetIniFileSetting(IniStuff, INI_SECTION_RECENT_FILES, INI_KEY_RECENT_FILE_PREFIX & Trim(CStr(I + 1)), "")
             
             If Len(strFilePath) > 0 Then
                 ' Add the file to glbRecentFiles.Files(), provided it's not already in the list
@@ -2332,22 +2016,22 @@ On Error GoTo GetRecentFilesErrorHandler
                 End If
             End If
           
-        Next i
+        Next I
     End If
     
     ' Hide the remaining menus
-    For i = glbRecentFiles.FileCount + 1 To MAX_RECENT_FILE_COUNT
-        MDIForm1.mnuRecentFiles(i).Caption = ""
-        MDIForm1.mnuRecentFiles(i).Visible = False
+    For I = glbRecentFiles.FileCount + 1 To MAX_RECENT_FILE_COUNT
+        MDIForm1.mnuRecentFiles(I).Caption = ""
+        MDIForm1.mnuRecentFiles(I).Visible = False
           
         For j = 1 To UBound(GelBody)
             If Not GelStatus(j).Deleted Then
                 GelBody(j).mnuRecentFiles(0).Visible = False
-                GelBody(j).mnuRecentFiles(i).Caption = ""
-                GelBody(j).mnuRecentFiles(i).Visible = False
+                GelBody(j).mnuRecentFiles(I).Caption = ""
+                GelBody(j).mnuRecentFiles(I).Visible = False
             End If
         Next j
-    Next i
+    Next I
     
     Set IniStuff = Nothing
 
@@ -2575,7 +2259,7 @@ Dim StructureSize As Long
 Dim TmpCnt As Long
 Dim ScopeInd() As Long
 Dim lngIsoIndexNew() As Long            ' This array holds the new index values for all of the points; necessary for updating LC-MS Features
-Dim i As Long, j As Long, k As Long
+Dim I As Long, j As Long, k As Long
 
 Dim lngUMCCountNew As Long
 Dim udtUMCListSaved As UMCListType
@@ -2617,28 +2301,28 @@ With GelData(Ind)
     ' TmpGD.DataLines, .CSLines, and .IsoLines are filled in below
     
     TmpGD.CalEquation = .CalEquation
-    For i = LBound(.CalArg) To UBound(.CalArg)
-        TmpGD.CalArg(i) = .CalArg(i)
-    Next i
+    For I = LBound(.CalArg) To UBound(.CalArg)
+        TmpGD.CalArg(I) = .CalArg(I)
+    Next I
     
     TmpGD.Preferences = .Preferences
     TmpGD.pICooSysEnabled = .pICooSysEnabled
     TmpGD.DataStatusBits = .DataStatusBits
     
     ' Copy the data filters
-    For i = 1 To MAX_FILTER_COUNT
+    For I = 1 To MAX_FILTER_COUNT
         For j = 0 To 2
-            TmpGD.DataFilter(i, j) = .DataFilter(i, j)
+            TmpGD.DataFilter(I, j) = .DataFilter(I, j)
         Next j
-    Next i
+    Next I
     
     TmpGD.CustomNETsDefined = .CustomNETsDefined
     
     ' Copy the scan info
     ReDim TmpGD.ScanInfo(1 To UBound(.ScanInfo))
-    For i = 1 To UBound(.ScanInfo)
-        TmpGD.ScanInfo(i) = .ScanInfo(i)
-    Next i
+    For I = 1 To UBound(.ScanInfo)
+        TmpGD.ScanInfo(I) = .ScanInfo(I)
+    Next I
     
     ' Copy the actual data; first CS data
     TmpGD.MinAbu = glHugeOverExp
@@ -2649,15 +2333,15 @@ With GelData(Ind)
     If TmpCnt > 0 Then
        TmpGD.CSLines = TmpCnt
        ReDim TmpGD.CSData(TmpCnt)
-       For i = 1 To TmpCnt
-           k = ScopeInd(i)
-           TmpGD.CSData(i) = .CSData(k)
+       For I = 1 To TmpCnt
+           k = ScopeInd(I)
+           TmpGD.CSData(I) = .CSData(k)
             
            If .CSData(k).Abundance < TmpGD.MinAbu Then TmpGD.MinAbu = .CSData(k).Abundance
            If .CSData(k).Abundance > TmpGD.MaxAbu Then TmpGD.MaxAbu = .CSData(k).Abundance
            
-           FindMWExtremes TmpGD.CSData(i), TmpGD.MinMW, TmpGD.MaxMW, 0
-       Next i
+           FindMWExtremes TmpGD.CSData(I), TmpGD.MinMW, TmpGD.MaxMW, 0
+       Next I
     Else
        TmpGD.CSLines = 0
     End If
@@ -2669,17 +2353,17 @@ With GelData(Ind)
       
        TmpGD.IsoLines = TmpCnt
        ReDim TmpGD.IsoData(TmpCnt)
-       For i = 1 To TmpCnt
-            k = ScopeInd(i)
-            lngIsoIndexNew(k) = i
+       For I = 1 To TmpCnt
+            k = ScopeInd(I)
+            lngIsoIndexNew(k) = I
             
-            TmpGD.IsoData(i) = .IsoData(k)
+            TmpGD.IsoData(I) = .IsoData(k)
        
             If .IsoData(k).Abundance < TmpGD.MinAbu Then TmpGD.MinAbu = .IsoData(k).Abundance
             If .IsoData(k).Abundance > TmpGD.MaxAbu Then TmpGD.MaxAbu = .IsoData(k).Abundance
         
-            FindMWExtremes TmpGD.IsoData(i), TmpGD.MinMW, TmpGD.MaxMW, 0
-       Next i
+            FindMWExtremes TmpGD.IsoData(I), TmpGD.MinMW, TmpGD.MaxMW, 0
+       Next I
     Else
        TmpGD.IsoLines = 0
     End If
@@ -2695,33 +2379,33 @@ With GelUMC(Ind)
         .UMCCnt = 0
         ReDim .UMCs(0)
     Else
-        For i = 0 To .UMCCnt - 1
-            .UMCs(i).ClassRepInd = lngIsoIndexNew(.UMCs(i).ClassRepInd)
-            For j = 0 To .UMCs(i).ClassCount - 1
-                If .UMCs(i).ClassRepInd = 0 Or lngIsoIndexNew(.UMCs(i).ClassMInd(j)) = 0 Then
+        For I = 0 To .UMCCnt - 1
+            .UMCs(I).ClassRepInd = lngIsoIndexNew(.UMCs(I).ClassRepInd)
+            For j = 0 To .UMCs(I).ClassCount - 1
+                If .UMCs(I).ClassRepInd = 0 Or lngIsoIndexNew(.UMCs(I).ClassMInd(j)) = 0 Then
                     ' Class contains one or more invalid members; set ClassCount to 0
-                    .UMCs(i).ClassCount = 0
-                    .UMCs(i).ClassAbundance = 0
-                    .UMCs(i).ClassMW = 0
-                    .UMCs(i).ClassStatusBits = 0
-                    .UMCs(i).ClassRepInd = 1
-                    ReDim .UMCs(i).ClassMInd(0)
+                    .UMCs(I).ClassCount = 0
+                    .UMCs(I).ClassAbundance = 0
+                    .UMCs(I).ClassMW = 0
+                    .UMCs(I).ClassStatusBits = 0
+                    .UMCs(I).ClassRepInd = 1
+                    ReDim .UMCs(I).ClassMInd(0)
                     Exit For
                 Else
                     ' Update the index for this member
-                    .UMCs(i).ClassMInd(j) = lngIsoIndexNew(.UMCs(i).ClassMInd(j))
+                    .UMCs(I).ClassMInd(j) = lngIsoIndexNew(.UMCs(I).ClassMInd(j))
                 End If
             Next j
-        Next i
+        Next I
         
         ' Compress .UMCs, copying in place
         lngUMCCountNew = 0
-        For i = 0 To .UMCCnt - 1
-            If .UMCs(i).ClassCount > 0 Then
-                .UMCs(lngUMCCountNew) = .UMCs(i)
+        For I = 0 To .UMCCnt - 1
+            If .UMCs(I).ClassCount > 0 Then
+                .UMCs(lngUMCCountNew) = .UMCs(I)
                 lngUMCCountNew = lngUMCCountNew + 1
             End If
-        Next i
+        Next I
         If lngUMCCountNew < .UMCCnt Then
             .UMCCnt = lngUMCCountNew
             If .UMCCnt = 0 Then
@@ -2759,7 +2443,7 @@ Public Function GetScopeCS(ByVal Ind As Long, ByRef CS() As Long) As Long
 'current scope of gel(index, zoom) and returns number of it(-1 if error)
 '------------------------------------------------------------------------
 Dim TmpCnt As Long
-Dim i As Long
+Dim I As Long
 On Error GoTo err_GetScopeCS
 
 With GelDraw(Ind)
@@ -2768,19 +2452,19 @@ With GelDraw(Ind)
      TmpCnt = 0
      Select Case GelBody(Ind).fgDisplay
      Case glNormalDisplay
-        For i = 1 To .CSCount
-            If .CSID(i) > 0 And .CSR(i) > 0 Then
+        For I = 1 To .CSCount
+            If .CSID(I) > 0 And .CSR(I) > 0 Then
                TmpCnt = TmpCnt + 1
-               CS(TmpCnt) = i
+               CS(TmpCnt) = I
             End If
-        Next i
+        Next I
      Case glDifferentialDisplay
-        For i = 1 To .CSCount
-            If (.CSER(i) >= 0 And .CSID(i) > 0 And .CSR(i) > 0) Then
+        For I = 1 To .CSCount
+            If (.CSER(I) >= 0 And .CSID(I) > 0 And .CSR(I) > 0) Then
                TmpCnt = TmpCnt + 1
-               CS(TmpCnt) = i
+               CS(TmpCnt) = I
             End If
-        Next i
+        Next I
      End Select
      If TmpCnt > 0 Then
         ReDim Preserve CS(1 To TmpCnt)
@@ -2805,7 +2489,7 @@ Public Function GetScopeIso(ByVal Ind As Long, ByRef Iso() As Long) As Long
 'current scope of gel(index, zoom) and returns number of it(-1 if error)
 '--------------------------------------------------------------------------
 Dim TmpCnt As Long
-Dim i As Long
+Dim I As Long
 On Error GoTo err_GetScopeIso
 
 With GelDraw(Ind)
@@ -2814,19 +2498,19 @@ With GelDraw(Ind)
      TmpCnt = 0
      Select Case GelBody(Ind).fgDisplay
      Case glNormalDisplay
-        For i = 1 To .IsoCount
-            If .IsoID(i) > 0 And .IsoR(i) > 0 Then
+        For I = 1 To .IsoCount
+            If .IsoID(I) > 0 And .IsoR(I) > 0 Then
                TmpCnt = TmpCnt + 1
-               Iso(TmpCnt) = i
+               Iso(TmpCnt) = I
             End If
-        Next i
+        Next I
      Case glDifferentialDisplay
-        For i = 1 To .IsoCount
-            If (.IsoER(i) >= 0 And .IsoID(i) > 0 And .IsoR(i) > 0) Then
+        For I = 1 To .IsoCount
+            If (.IsoER(I) >= 0 And .IsoID(I) > 0 And .IsoR(I) > 0) Then
                TmpCnt = TmpCnt + 1
-               Iso(TmpCnt) = i
+               Iso(TmpCnt) = I
             End If
-        Next i
+        Next I
      End Select
      If TmpCnt > 0 Then
         ReDim Preserve Iso(1 To TmpCnt)
@@ -2845,74 +2529,12 @@ LogErrors Err.Number, "GetScopeIso"
 GetScopeIso = -1
 End Function
 
-' Unused function (February 2005)
-''Public Sub FilterIsoComExclusive(ByVal Ind As Long, ExcList() As String)
-'''-----------------------------------------------------------------------
-'''excludes data points deconvoluted as isotopic composition from the list
-'''-----------------------------------------------------------------------
-''Dim i As Long, j As Long
-''Dim ListCnt As Long
-''On Error GoTo err_FilterIsoComExclusive
-''ListCnt = UBound(ExcList) + 1
-''With GelData(Ind)
-''    For i = 1 To .CSLines
-''        For j = 0 To ListCnt - 1
-''            If InStr(1, .CSVar(i, csvfMTDDRatio), ExcList(j)) > 0 Then
-''               GelDraw(Ind).CSID(i) = -Abs(GelDraw(Ind).CSID(i))
-''            End If
-''        Next j
-''    Next i
-''    For i = 1 To .IsoLines
-''        For j = 0 To ListCnt - 1
-''            If InStr(1, .IsoVar(i, isvfMTDDRatio), ExcList(j)) > 0 Then
-''               GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
-''            End If
-''        Next j
-''    Next i
-''End With
-''Exit Sub
-''
-''err_FilterIsoComExclusive:
-''End Sub
-''
-' Unused function (February 2005)
-''Public Sub FilterIsoComInclusive(ByVal Ind As Long, ExcList() As String)
-'''---------------------------------------------------------------------------
-'''excludes data points not deconvoluted as isotopic composition from the list
-'''---------------------------------------------------------------------------
-''Dim i As Long, j As Long
-''Dim ListCnt As Long
-''Dim FoundAny As Boolean
-''On Error GoTo err_FilterIsoComInclusive
-''ListCnt = UBound(ExcList) + 1
-''With GelData(Ind)
-''    For i = 1 To .CSLines
-''        FoundAny = False
-''        For j = 0 To ListCnt - 1
-''            If InStr(1, .CSVar(i, csvfMTDDRatio), ExcList(j)) > 0 Then FoundAny = True
-''        Next j
-''        If Not FoundAny Then GelDraw(Ind).CSID(i) = -Abs(GelDraw(Ind).CSID(i))
-''    Next i
-''    For i = 1 To .IsoLines
-''        FoundAny = False
-''        For j = 0 To ListCnt - 1
-''            If InStr(1, .IsoVar(i, isvfMTDDRatio), ExcList(j)) > 0 Then FoundAny = True
-''        Next j
-''        If Not FoundAny Then GelDraw(Ind).IsoID(i) = -Abs(GelDraw(Ind).IsoID(i))
-''    Next i
-''End With
-''Exit Sub
-''
-''err_FilterIsoComInclusive:
-''End Sub
-
-
 Public Function InitDrawUMC(ByVal Ind As Long) As Boolean
 '--------------------------------------------------------------------------------
 'initialize structure for drawing Unique Mass Classes; returns True if successful
 'this function has to be called every time Unique Mass Classes are calculated
 '--------------------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 On Error GoTo exit_InitDrawUMC
 With GelUMCDraw(Ind)
     .Count = GelUMC(Ind).UMCCnt
@@ -2920,10 +2542,10 @@ With GelUMCDraw(Ind)
         ReDim .ClassID(.Count - 1)
         ReDim .X1(.Count - 1):        ReDim .Y1(.Count - 1)
         ReDim .x2(.Count - 1):        ReDim .Y2(.Count - 1)
-        For i = 0 To .Count - 1
-            .ClassID(i) = i + 1       'so that we can use negative indexes for
+        For I = 0 To .Count - 1
+            .ClassID(I) = I + 1       'so that we can use negative indexes for
                                       'classes that don't have to be drawn
-        Next i
+        Next I
     Else
         Erase .ClassID
         Erase .X1:           Erase .Y1
@@ -2949,19 +2571,19 @@ Public Function GetWindowCS(ByVal Ind As Long, CSRes() As Long, _
 '(Scan1,Scan2) x (MW1,MW2) and returns number of it; -1 on any error
 '-------------------------------------------------------------------------
 Dim TmpCnt As Long
-Dim i As Long
+Dim I As Long
 On Error GoTo err_GetWindowCS
 
 With GelData(Ind)
      ReDim CSRes(.CSLines - 1)
-     For i = 1 To .CSLines
-         If ((.CSData(i).ScanNumber >= Scan1) And (.CSData(i).ScanNumber <= Scan2)) Then
-            If ((.CSData(i).AverageMW >= MW1) And (.CSData(i).AverageMW <= MW2)) Then
+     For I = 1 To .CSLines
+         If ((.CSData(I).ScanNumber >= Scan1) And (.CSData(I).ScanNumber <= Scan2)) Then
+            If ((.CSData(I).AverageMW >= MW1) And (.CSData(I).AverageMW <= MW2)) Then
                TmpCnt = TmpCnt + 1
-               CSRes(TmpCnt - 1) = i
+               CSRes(TmpCnt - 1) = I
             End If
          End If
-     Next i
+     Next I
 End With
 If TmpCnt > 0 Then
    ReDim Preserve CSRes(TmpCnt - 1)
@@ -2986,19 +2608,19 @@ Public Function GetWindowIso(ByVal Ind As Long, FMW As Integer, IsoRes() As Long
 'fMW is column from which we need to extract molecular masses
 '-------------------------------------------------------------------------------
 Dim TmpCnt As Long
-Dim i As Long
+Dim I As Long
 On Error GoTo err_GetWindowIso
 
 With GelData(Ind)
      ReDim IsoRes(.IsoLines - 1)
-     For i = 1 To .IsoLines
-         If ((.IsoData(i).ScanNumber >= Scan1) And (.IsoData(i).ScanNumber <= Scan2)) Then
-            If ((GetIsoMass(.IsoData(i), FMW) >= MW1) And (GetIsoMass(.IsoData(i), FMW) <= MW2)) Then
+     For I = 1 To .IsoLines
+         If ((.IsoData(I).ScanNumber >= Scan1) And (.IsoData(I).ScanNumber <= Scan2)) Then
+            If ((GetIsoMass(.IsoData(I), FMW) >= MW1) And (GetIsoMass(.IsoData(I), FMW) <= MW2)) Then
                TmpCnt = TmpCnt + 1
-               IsoRes(TmpCnt - 1) = i
+               IsoRes(TmpCnt - 1) = I
             End If
          End If
-     Next i
+     Next I
 End With
 If TmpCnt > 0 Then
    ReDim Preserve IsoRes(TmpCnt - 1)
@@ -3013,58 +2635,3 @@ If Err.Number <> 9 Then LogErrors Err.Number, "GetWindowIso"
 GetWindowIso = -1
 End Function
 
-
-' Unused Function (July 2003)
-'''Public Function GetUMCListData(ByVal Ind As Long, UMCList() As Long, _
-'''                               DataList() As Long, DataListType() As Long) As Long
-''''---------------------------------------------------------------------------------------
-''''fills data lists arrays with indexes and types of data for all data points belonging to
-''''the LC-MS Features from the list; returns number of data; -1 on any error
-''''NOTE: if UMC can share data remove redundancy; data is returned in no particular order
-''''---------------------------------------------------------------------------------------
-'''Dim ClassCnt As Long
-'''Dim DataCnt As Long
-'''Dim i As Long, j As Long, k As Long
-'''Dim IsNew As Boolean
-'''On Error GoTo err_GetUMCListData
-'''ClassCnt = UBound(UMCList) + 1
-'''If ClassCnt > 0 Then
-'''   For i = 0 To ClassCnt - 1
-'''     With GelUMC(Ind).UMCs(i)
-'''        For j = 0 To .ClassCount - 1
-'''          IsNew = True
-'''          If GelUMC(Ind).def.UMCSharing Then    'if members could be shared between classes
-'''             If DataCnt > 0 Then                'check do we already have this spot listed
-'''                For k = 0 To DataCnt - 1
-'''                  If .ClassMInd(j) = DataList(k) Then
-'''                     If .ClassMType(j) = DataList(k) Then
-'''                        IsNew = False
-'''                        Exit For
-'''                     End If
-'''                  End If
-'''                Next k
-'''             End If
-'''          End If
-'''          If IsNew Then
-'''             DataCnt = DataCnt + 1
-'''             DataList(DataCnt - 1) = .ClassMInd(j)
-'''             DataListType(DataCnt - 1) = .ClassMType(j)
-'''          End If
-'''        Next j
-'''     End With
-'''   Next i
-'''End If
-'''If DataCnt > 0 Then
-'''   ReDim Preserve DataList(DataCnt - 1)
-'''   ReDim Preserve DataListType(DataCnt - 1)
-'''Else
-'''   Erase DataList
-'''   Erase DataListType
-'''End If
-'''GetUMCListData = DataCnt
-'''Exit Function
-'''
-'''err_GetUMCListData:
-'''GetUMCListData = -1
-'''End Function
-'''
