@@ -1,3 +1,6 @@
+-- These queries are not up-to-date
+-- See Sql_Queries_for_Exporting_AMTs_ExpandedFormat.sql for more expanded queries
+
 -- Data for T_Mass_Tags
 SELECT Mass_Tag_ID, Peptide, Monoisotopic_Mass, 
     Multiple_Proteins, Created, Last_Affected, 

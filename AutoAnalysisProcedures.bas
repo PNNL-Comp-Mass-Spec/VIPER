@@ -2591,6 +2591,7 @@ Private Function AutoAnalysisLoadInputFile(ByRef udtWorkingParams As udtAutoAnal
     Dim intFileExtensionsPrefListCount As Integer, intExtensionLength As Integer
     Dim strFileExtensionsPrefList(MAX_FILE_EXTENSIONS_PREF_LIST_COUNT) As String        ' 0-based array
     Dim strSubstring As String
+    Dim strSwapValue As String
     
     Dim strKeyValue As String
     Dim strDefault As String
@@ -2620,6 +2621,7 @@ Private Function AutoAnalysisLoadInputFile(ByRef udtWorkingParams As udtAutoAnal
     Dim lngHistoryIndexLastMatch As Long
     
     Dim intExtensionIndex As Integer, intWildCardFileIndex As Integer
+    Dim intSwapIndex As Integer
 
     Dim intAutoAnalysisSearchModeCount As Integer, intIndex As Integer
     
@@ -2705,6 +2707,7 @@ On Error GoTo LoadInputFileErrorHandler
             
             ' First make sure the folder exists
             strParentFolderPath = fso.GetParentFolderName(udtAutoParams.FilePaths.InputFilePath)
+            
             If Len(strParentFolderPath) > 0 And Not fso.FolderExists(strParentFolderPath) Then
                 blnInvalidFolder = True
                 AutoAnalysisLog udtAutoParams, udtWorkingParams, "Error - File not found (invalid folder path): " & udtAutoParams.FilePaths.InputFilePath
@@ -2722,6 +2725,24 @@ On Error GoTo LoadInputFileErrorHandler
                     strWildcardFileMatch = strWildcardFileMatches(0)
                 ElseIf intWildcardFileMatchesCount > 1 Then
                     ' Find the best matching file
+                    
+                    ' First make sure any files that start with x_ are at the end of the list in strWildcardFileMatch()
+                    For intWildCardFileIndex = 0 To intWildcardFileMatchesCount - 1
+                        If Left(strWildcardFileMatches(intWildCardFileIndex), 2) = "x_" Then
+                            ' Swap this entry with one at the end
+                            
+                            For intSwapIndex = intWildcardFileMatchesCount - 1 To intWildCardFileIndex + 1 Step -1
+                                If Left(strWildcardFileMatches(intSwapIndex), 2) <> "x_" Then
+                                    ' Swap intWildCardFileIndex with intSwapIndex
+                                    strSwapValue = strWildcardFileMatches(intSwapIndex)
+                                    strWildcardFileMatches(intSwapIndex) = strWildcardFileMatches(intWildCardFileIndex)
+                                    strWildcardFileMatches(intWildCardFileIndex) = strSwapValue
+                                    Exit For
+                                End If
+                            Next intSwapIndex
+                        End If
+                    Next intWildCardFileIndex
+                    
                     ' First parse PEKFileExtensionPreferenceOrder
                     intFileExtensionsPrefListCount = ParseString(glbPreferencesExpanded.AutoAnalysisOptions.PEKFileExtensionPreferenceOrder, strFileExtensionsPrefList(), MAX_FILE_EXTENSIONS_PREF_LIST_COUNT, ",", "", True, False, False)
                     

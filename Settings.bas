@@ -891,6 +891,7 @@ On Error GoTo LoadSettingsFileHandler
         .UseMassTagsWithNullNET = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseMassTagsWithNullNET", .UseMassTagsWithNullNET)
         .UseSTAC = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseSTAC", .UseSTAC)
         .STACUsesPriorProbability = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "STACUsesPriorProbability", .STACUsesPriorProbability)
+        .KeepTempSTACFiles = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "KeepTempSTACFiles", .KeepTempSTACFiles)
         
         .IReportAutoAddMonoPlus4AndMinus4Data = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data)
         
@@ -2023,6 +2024,7 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullNET", .UseMassTagsWithNullNET
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseSTAC", .UseSTAC
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "STACUsesPriorProbability", .STACUsesPriorProbability
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "KeepTempSTACFiles", .KeepTempSTACFiles
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseUMCConglomerateNET", .UseUMCConglomerateNET
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "NetAdjustmentUsesN15AMTMasses", .NetAdjustmentUsesN15AMTMasses
@@ -3431,6 +3433,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
             
             .UseSTAC = True
             .STACUsesPriorProbability = True
+            .KeepTempSTACFiles = False
             
             .IReportAutoAddMonoPlus4AndMinus4Data = True
             

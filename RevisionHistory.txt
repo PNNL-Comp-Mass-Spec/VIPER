@@ -1,6 +1,12 @@
 VIPER Change Log
 
-Verion 3.48 - Build 445; June 29, 2011
+Version 3.48 - Build 447; July 19, 2011
+	- Updated auto-analysis to preferentially choose files that do not start with x_ since x_ is used to denote old files in the EMSL archive
+
+Version 3.48 - Build 446; July 11, 2011
+	- Fixed bug that failed to write out MassTagID values for internal standards when running STAC
+
+Version 3.48 - Build 445; June 29, 2011
 	- Added support for table T_Mass_Tag_Conformers_Observed in legacy MTDBs (Microsoft Access files) 
 	- Removed old, unused code and forms
 

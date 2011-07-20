@@ -1539,7 +1539,7 @@ Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False
             End If
         Else
             fraDriftTime.Visible = False
-            fraMods.Top = fraNet.Top + fraNet.Height + 10
+            fraMods.Top = fraNET.Top + fraNET.Height + 10
             If Me.UseSTAC Then
                 lngMinimumHeight = 8500
             Else
@@ -5833,15 +5833,17 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
     mSTACAMTFilePath = fso.BuildPath(mSTACTempFolderPath, "STAC_AMT_DB" & mSTACSessionID & ".txt")
     mSTACUMCFilePath = fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & ".txt")
     
-    ' Add the STAC input files to mTempFilesToDelete
-    AddFileToDelete mSTACAMTFilePath
-    AddFileToDelete mSTACUMCFilePath
+    If Not glbPreferencesExpanded.KeepTempSTACFiles Then
+        ' Add the STAC input files to mTempFilesToDelete
+        AddFileToDelete mSTACAMTFilePath
+        AddFileToDelete mSTACUMCFilePath
     
-    ' Add the STAC result files to mTempFilesToDelete
-    AddFileToDelete fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & "_FDR.csv")
-    AddFileToDelete fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & "_STAC.csv")
-    AddFileToDelete fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & "_Log.txt")
-        
+        ' Add the STAC result files to mTempFilesToDelete
+        AddFileToDelete fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & "_FDR.csv")
+        AddFileToDelete fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & "_STAC.csv")
+        AddFileToDelete fso.BuildPath(mSTACTempFolderPath, "STAC_UMCs" & mSTACSessionID & "_Log.txt")
+    End If
+    
         
     ' Write out the AMTs in the mMT arrays
     Set ts = fso.OpenTextFile(mSTACAMTFilePath, ForWriting, True)
@@ -5921,6 +5923,7 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
         For I = 0 To UMCInternalStandards.Count - 1
             dblMass = UMCInternalStandards.InternalStandards(mInternalStdIndexPointers(I)).MonoisotopicMass
             dblNET = UMCInternalStandards.InternalStandards(mInternalStdIndexPointers(I)).NET
+            lngInternalStdID = UMCInternalStandards.InternalStandards(mInternalStdIndexPointers(I)).SeqID
 
             ' Using fixed values for probability and Cnt_GANET
             sngInternalStdPepProphetProbability = 0.99
@@ -5930,7 +5933,8 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
                          dblMass & vbTab & _
                          dblNET & vbTab & _
                          sngInternalStdPepProphetProbability & vbTab & _
-                         lngInternalStdNETCount
+                         lngInternalStdNETCount & vbTab & _
+                         lngInternalStdID
                           
             If blnUseDriftTime Then
                 strLineOut = strLineOut & vbTab & _
@@ -6320,6 +6324,8 @@ Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean
     End If
     
     Me.STACUsesPriorProbability = True
+    
+    glbPreferencesExpanded.KeepTempSTACFiles = False
     
     cboAMTSearchResultsBehavior.ListIndex = asrbAMTSearchResultsBehaviorConstants.asrbAutoRemoveExisting
     

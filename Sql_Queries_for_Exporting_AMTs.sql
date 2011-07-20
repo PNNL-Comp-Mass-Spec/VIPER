@@ -1,3 +1,6 @@
+-- These queries are for populating an Access DB with just three tables:
+-- AMT, AMT_Proteins, and AMT_to_Protein_Map
+
 -- Connect to server Elmer
 USE MT_Human_Sarcopenia_P676
 
