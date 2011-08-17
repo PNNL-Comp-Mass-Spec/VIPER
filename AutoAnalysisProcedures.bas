@@ -322,7 +322,7 @@ On Error GoTo AutoAnalysis_ErrorHandler
         
     ' 7. Possibly filter the data
         If blnPrintDebugInfo Then Debug.Print Now() & " = " & "Filter Data"
-        AutoAnalysisFilterData udtWorkingParams, udtAutoParams
+        AutoAnalysisFilterData udtWorkingParams, udtAutoParams, True
     
     ' 8. Possibly filter out noise streaks
         AutoAnalysisFilterNoiseStreaks udtWorkingParams, udtAutoParams
@@ -744,7 +744,7 @@ AutoAnalysisDefineFilePathsErrorHandler:
     
 End Sub
 
-Private Sub AutoAnalysisFilterData(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, Optional blnUpdateLog As Boolean = True)
+Private Sub AutoAnalysisFilterData(ByRef udtWorkingParams As udtAutoAnalysisWorkingParamsType, ByRef udtAutoParams As udtAutoAnalysisParametersType, blnUpdateLog As Boolean)
     
     Dim lngGelScanNumberMin As Long, lngGelScanNumberMax As Long
     Dim strMessage As String
@@ -752,15 +752,41 @@ Private Sub AutoAnalysisFilterData(ByRef udtWorkingParams As udtAutoAnalysisWork
 On Error GoTo FilterDataErrorHandler
         
     With glbPreferencesExpanded
-        ' Rather than check whether or not filtering is enabled, simply set all of the
-        '  options in GelData(udtWorkingParams.GelIndex)
-        ApplyAutoAnalysisFilter .AutoAnalysisFilterPrefs, udtWorkingParams.GelIndex, blnUpdateLog
+        If (GelData(udtWorkingParams.GelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA) = GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA Then
+            If blnUpdateLog Then
+                Dim strPrefix As String
+                
+                strPrefix = "Since LC-MS Features were loaded from an _LCMSFeatures.txt file,"
+             
+                With .AutoAnalysisFilterPrefs
+                    If .ExcludeDuplicates Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude Duplicates filter is ignored"
+                    If .ExcludeIsoByFit Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude by Isotopic Fit filter is ignored"
+                    If .ExcludeIsoSecondGuess Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude Second Guess filter is ignored"
+                    If .ExcludeIsoLessLikelyGuess Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude Less Likely Guess filter is ignored"
+                    If .ExcludeCSByStdDev Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude CS by Std Dev filter is ignored"
+                    If .RestrictIsoByAbundance Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict Iso by Abundance filter is ignored"
+                    If .RestrictIsoByMass Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict Iso by Mass filter is ignored"
+                    If .RestrictIsoByMZ Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict Iso by m/z filter is ignored"
+                    If .RestrictIsoByChargeState Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict Iso by Charge State filter is ignored"
+                    If .RestrictCSByAbundance Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict CS by Abundance filter is ignored"
+                    If .RestrictCSByMass Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict CS by Mass filter is ignored"
+                    If .RestrictToEvenScanNumbersOnly Or .RestrictToOddScanNumbersOnly Then
+                        AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict data by even/odd scan number is ignored"
+                    End If
+                End With
+            End If
+        Else
         
-        ' Assign udtWorkingParams.GelIndex to frmFilter.Tag, then call .InitializeControls
-        ' Since glbPreferencesExpanded.AutoAnalysisStatus.Enabled = True, will
-        '  automatically unload the form after the filter is applied
-        frmFilter.Tag = udtWorkingParams.GelIndex
-        frmFilter.InitializeControls True
+            ' Rather than check whether or not filtering is enabled, simply set all of the
+            '  options in GelData(udtWorkingParams.GelIndex)
+            ApplyAutoAnalysisFilter .AutoAnalysisFilterPrefs, udtWorkingParams.GelIndex, blnUpdateLog
+            
+            ' Assign udtWorkingParams.GelIndex to frmFilter.Tag, then call .InitializeControls
+            ' Since glbPreferencesExpanded.AutoAnalysisStatus.Enabled = True, will
+            '  automatically unload the form after the filter is applied
+            frmFilter.Tag = udtWorkingParams.GelIndex
+            frmFilter.InitializeControls True
+        End If
         
         ' If filtering by scan range, then apply that filter now
         With .AutoAnalysisFilterPrefs
@@ -6450,7 +6476,7 @@ On Error GoTo AutoGenerateQCPlotsErrorHandler
 
             
     ' Apply the default filters to the data
-    AutoAnalysisFilterData udtWorkingParams, udtAutoParams
+    AutoAnalysisFilterData udtWorkingParams, udtAutoParams, True
     
     If AMTCnt = 0 And udtAutoParams.ShowMessages Then
         eResponse = MsgBox("MT tags not in memory.  Load from the database?", vbQuestion + vbYesNoCancel + vbDefaultButton1, "Load MT tags")

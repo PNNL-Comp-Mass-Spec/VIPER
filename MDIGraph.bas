@@ -1251,7 +1251,7 @@ Public Sub Display0()
 'displays loaded MT tags as a 2D display
 'LoadType glCSType - load them as Charge State data; glIsoType as IS
 '-----------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim ScanRange As Long
 'for practical reasons use only NETs between 0 and 1(not included)
 Dim PracMinNET As Double, PracMaxNET As Double
@@ -1274,13 +1274,13 @@ With GelData(0)
      ResetDataFilters 0, glPreferences
      
      ReDim .ScanInfo(ScanRange)
-     For i = Display0MinScan To Display0MaxScan
-         With .ScanInfo(i)
-            .ScanNumber = i
-            .ScanFileName = "MTD" & Format$(i, "00000")
-            .ElutionTime = i / Display0MaxScan
+     For I = Display0MinScan To Display0MaxScan
+         With .ScanInfo(I)
+            .ScanNumber = I
+            .ScanFileName = "MTD" & Format$(I, "00000")
+            .ElutionTime = I / Display0MaxScan
         End With
-     Next i
+     Next I
      .MaxAbu = 0:                       .MinAbu = glHugeOverExp
      .MinMW = glHugeOverExp:            .MaxMW = 0
      PracMinNET = glHugeOverExp:        PracMaxNET = -glHugeOverExp
@@ -1288,59 +1288,59 @@ With GelData(0)
      Case glCSType
         .CSLines = AMTCnt
         ReDim .CSData(.CSLines)
-        For i = 1 To AMTCnt
-            With .CSData(i)
-                .ScanNumber = Display0MinScan + CLng(AMTData(i).NET * ScanRange)
+        For I = 1 To AMTCnt
+            With .CSData(I)
+                .ScanNumber = Display0MinScan + CLng(AMTData(I).NET * ScanRange)
                 .Charge = 1
                 .ChargeCount = 1
                 .Abundance = 1000000
-                .AverageMW = AMTData(i).MW
+                .AverageMW = AMTData(I).MW
                 .ExpressionRatio = 0                ' Legacy: stored AMTData(i).NET here
-                .MTID = "MT: " & Trim(AMTData(i).ID)
+                .MTID = "MT: " & Trim(AMTData(I).ID)
             End With
-            If AMTData(i).MW < .MinMW Then .MinMW = AMTData(i).MW
-            If AMTData(i).MW > .MaxMW Then .MaxMW = AMTData(i).MW
-            If .CSData(i).Abundance < .MinAbu Then .MinAbu = .CSData(i).Abundance
-            If .CSData(i).Abundance > .MaxAbu Then .MaxAbu = .CSData(i).Abundance
-            If AMTData(i).NET > 0 And AMTData(i).NET < 1 Then
-               If AMTData(i).NET < PracMinNET Then
-                  PracMinNET = AMTData(i).NET:   PracMinScan = .CSData(i).ScanNumber
+            If AMTData(I).MW < .MinMW Then .MinMW = AMTData(I).MW
+            If AMTData(I).MW > .MaxMW Then .MaxMW = AMTData(I).MW
+            If .CSData(I).Abundance < .MinAbu Then .MinAbu = .CSData(I).Abundance
+            If .CSData(I).Abundance > .MaxAbu Then .MaxAbu = .CSData(I).Abundance
+            If AMTData(I).NET > 0 And AMTData(I).NET < 1 Then
+               If AMTData(I).NET < PracMinNET Then
+                  PracMinNET = AMTData(I).NET:   PracMinScan = .CSData(I).ScanNumber
                End If
-               If AMTData(i).NET > PracMaxNET Then
-                  PracMaxNET = AMTData(i).NET:   PracMaxScan = .CSData(i).ScanNumber
+               If AMTData(I).NET > PracMaxNET Then
+                  PracMaxNET = AMTData(I).NET:   PracMaxScan = .CSData(I).ScanNumber
                End If
             End If
-        Next i
+        Next I
      Case glIsoType
         .IsoLines = AMTCnt
         ReDim .IsoData(.IsoLines)
-        For i = 1 To AMTCnt
+        For I = 1 To AMTCnt
             
-            With .IsoData(i)
-                .ScanNumber = Display0MaxScan + CLng(AMTData(i).NET * ScanRange)
+            With .IsoData(I)
+                .ScanNumber = Display0MaxScan + CLng(AMTData(I).NET * ScanRange)
                 .Charge = 1
-                .MZ = AMTData(i).MW / .Charge + glMASS_CC
+                .MZ = AMTData(I).MW / .Charge + glMASS_CC
                 .Abundance = 1000000
-                .MonoisotopicMW = AMTData(i).MW
-                .AverageMW = AMTData(i).MW
-                .MostAbundantMW = AMTData(i).MW
+                .MonoisotopicMW = AMTData(I).MW
+                .AverageMW = AMTData(I).MW
+                .MostAbundantMW = AMTData(I).MW
                 .ExpressionRatio = 0                       ' Legacy: stored AMTData(i).NET here
-                .MTID = "MT: " & Trim(AMTData(i).ID)
+                .MTID = "MT: " & Trim(AMTData(I).ID)
             End With
             
-            If AMTData(i).MW < .MinMW Then .MinMW = AMTData(i).MW
-            If AMTData(i).MW > .MaxMW Then .MaxMW = AMTData(i).MW
-            If .IsoData(i).Abundance < .MinAbu Then .MinAbu = .IsoData(i).Abundance
-            If .IsoData(i).Abundance > .MaxAbu Then .MaxAbu = .IsoData(i).Abundance
-            If AMTData(i).NET > 0 And AMTData(i).NET < 1 Then
-               If AMTData(i).NET < PracMinNET Then
-                  PracMinNET = AMTData(i).NET:   PracMinScan = .IsoData(i).ScanNumber
+            If AMTData(I).MW < .MinMW Then .MinMW = AMTData(I).MW
+            If AMTData(I).MW > .MaxMW Then .MaxMW = AMTData(I).MW
+            If .IsoData(I).Abundance < .MinAbu Then .MinAbu = .IsoData(I).Abundance
+            If .IsoData(I).Abundance > .MaxAbu Then .MaxAbu = .IsoData(I).Abundance
+            If AMTData(I).NET > 0 And AMTData(I).NET < 1 Then
+               If AMTData(I).NET < PracMinNET Then
+                  PracMinNET = AMTData(I).NET:   PracMinScan = .IsoData(I).ScanNumber
                End If
-               If AMTData(i).NET > PracMaxNET Then
-                  PracMaxNET = AMTData(i).NET:   PracMaxScan = .IsoData(i).ScanNumber
+               If AMTData(I).NET > PracMaxNET Then
+                  PracMaxNET = AMTData(I).NET:   PracMaxScan = .IsoData(I).ScanNumber
                End If
             End If
-        Next i
+        Next I
      End Select
      .DataFilter(fltCSAbu, 2) = .MaxAbu             'put initial filters on max
      .DataFilter(fltIsoAbu, 2) = .MaxAbu

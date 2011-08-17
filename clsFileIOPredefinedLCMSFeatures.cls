@@ -925,7 +925,6 @@ Public Function CachePredefinedLCMSFeatures(ByVal lngGelIndex As Long, _
     Dim dblInterferenceScore As Double
     
     Dim dblConformerScoreToFilterOn As Double
-
             
 On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
     
@@ -1389,7 +1388,7 @@ Private Function InitializeSearchIndices() As Boolean
     Dim MaxCnt As Long
     Dim CSInd() As Long
     Dim ISInd() As Long
-    Dim i As Long
+    Dim I As Long
     
     On Error GoTo InitializeSearchIndicesErrorHandler
     
@@ -1406,25 +1405,25 @@ Private Function InitializeSearchIndices() As Boolean
        
        O_Cnt = 0
        With GelData(mGelIndex)
-         For i = 1 To .CSLines
-            O_Index(O_Cnt) = i
+         For I = 1 To .CSLines
+            O_Index(O_Cnt) = I
             O_Type(O_Cnt) = gldtCS
-            O_MW(O_Cnt) = .CSData(i).AverageMW
+            O_MW(O_Cnt) = .CSData(I).AverageMW
             ''O_Charge(O_Cnt) = .CSData(i).Charge
-            O_Scan(O_Cnt) = .CSData(i).ScanNumber
+            O_Scan(O_Cnt) = .CSData(I).ScanNumber
             ''O_Order(O_Cnt) = .CSData(i).Abundance
             O_Cnt = O_Cnt + 1
-         Next i
+         Next I
          
-         For i = 1 To .IsoLines
-            O_Index(O_Cnt) = i
+         For I = 1 To .IsoLines
+            O_Index(O_Cnt) = I
             O_Type(O_Cnt) = gldtIS
-            O_MW(O_Cnt) = GetIsoMass(.IsoData(i), UMCDef.MWField)
+            O_MW(O_Cnt) = GetIsoMass(.IsoData(I), UMCDef.MWField)
             ''O_Charge(O_Cnt) = .IsoData(i).Charge
-            O_Scan(O_Cnt) = .IsoData(i).ScanNumber
+            O_Scan(O_Cnt) = .IsoData(I).ScanNumber
             ''O_Order(O_Cnt) = .IsoData(i).Abundance
             O_Cnt = O_Cnt + 1
-         Next i
+         Next I
          
        End With
     End If
@@ -1448,10 +1447,10 @@ InitializeSearchIndicesErrorHandlerExit:
        ReDim IndMW(O_Cnt - 1)
        ''ReDim IndOrder(O_Cnt - 1)
        
-       For i = 0 To O_Cnt - 1
-           IndMW(i) = i
+       For I = 0 To O_Cnt - 1
+           IndMW(I) = I
            ''IndOrder(i) = i
-       Next i
+       Next I
        ReDim IsMatched(O_Cnt - 1)
        InitializeSearchIndices = True
     Else

@@ -1,8 +1,9 @@
 VIPER Change Log
 
-Version 3.48 - Build 448; August 8, 2011
+Version 3.48 - Build 448; August 17, 2011
 	- Recompiled due to new computer OS
 	- New version of STACConsole.exe (v1.1.9491)
+	- When loading _LCMSFeatures.txt files, now logging that the various isotopic-based filters do not apply 
 
 Version 3.48 - Build 447; July 19, 2011
 	- Updated auto-analysis to preferentially choose files that do not start with x_ since x_ is used to denote old files in the EMSL archive
