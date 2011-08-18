@@ -184,6 +184,72 @@ Dim LckTypeName() As String
 
 Public Event DialogClosed()     'public event raised when this dialog is closed
 
+Public Function GetLockerTypes(ByVal ConnStr As String, _
+                               ByVal LT_SQL As String, _
+                               ByRef LT_ID() As Long, _
+                               ByRef LT_Name() As String) As Long
+                               
+    '----------------------------------------------------------------
+    'retrieves information about existing locker types
+    'connection string for database to search and SQL to retrieve
+    'subsets list are input parameters
+    'Assumtpion is that first returned column will be of type integer
+    'and will contain ID, second column should list locker type names
+    'returns 0 if OK; error number if not
+    '----------------------------------------------------------------
+    Dim NewCn As adodb.Connection
+    Dim NewRs As adodb.Recordset
+    Dim Res As Long
+    Dim LT_Cnt As Long
+    On Error GoTo err_GetLockerTypes
+    
+    ReDim LT_ID(141)    'should be plenty
+    ReDim LT_Name(141)
+    
+    If Len(LT_SQL) > 0 Then
+       Set NewCn = New adodb.Connection
+       NewCn.Open ConnStr
+    
+       Set NewRs = New adodb.Recordset
+       NewRs.CursorLocation = adUseClient
+       NewRs.Open LT_SQL, NewCn, adOpenStatic, adLockReadOnly
+          
+       Do Until NewRs.EOF
+          LT_Cnt = LT_Cnt + 1
+          LT_ID(LT_Cnt - 1) = NewRs.Fields(0).Value
+          LT_Name(LT_Cnt - 1) = NewRs.Fields(1).Value
+          NewRs.MoveNext
+       Loop
+    End If
+    
+    If LT_Cnt > 0 Then
+       ReDim Preserve LT_ID(LT_Cnt - 1)
+       ReDim Preserve LT_Name(LT_Cnt - 1)
+    Else
+       Erase LT_ID
+       Erase LT_Name
+    End If
+    
+exit_GetLockerTypes:
+    NewRs.ActiveConnection = Nothing
+    Set NewRs = Nothing
+    If NewCn.STATE <> adStateClosed Then NewCn.Close
+    Set NewCn = Nothing
+    Exit Function
+    
+err_GetLockerTypes:
+    Select Case Err.Number
+    Case 9           'subscript out of range
+       ReDim Preserve LT_ID(LT_Cnt + 100)
+       ReDim Preserve LT_Name(LT_Cnt + 100)
+       Resume
+    Case 13, 94      'type mismatch, invalid use of null
+       Resume Next
+    Case Else        'something else
+       GetLockerTypes = Err.Number
+       GoTo exit_GetLockerTypes
+    End Select
+End Function
 
 Private Sub InitSettings()
 '-------------------------------------------------------
@@ -260,7 +326,7 @@ If Err Then
    Set nv = New NameValue
    nv.Name = PairName
    nv.Value = NewValue
-   MyStuff.Add nv, nv.Name
+   MyStuff.add nv, nv.Name
 End If
 End Sub
 
@@ -287,7 +353,7 @@ If IsNumeric(TmpMinScore) Then
    Lck_Min_Score = TmpMinScore
 Else
    If Len(TmpMinScore) > 0 Then     'can not accept
-      MsgBox "This argument should be numeric! Leave it blank to ignore this parametar!", vbOKOnly, MyName
+      MsgBox "This argument should be numeric! Leave it blank to ignore this parametar!", vbOKOnly, glFGTU
       txtMinScore.SetFocus
    Else         'blank; put some realy negative number to ignore
       Lck_Min_Score = CStr(VERY_LOW_SCORE)

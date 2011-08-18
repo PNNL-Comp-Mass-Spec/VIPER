@@ -10,7 +10,7 @@ Attribute VB_Name = "LaMTDB"
 Attribute VB_GlobalNameSpace = True
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 '-----------------------------------------------------------
 'database class; includes connection and access data
 '-----------------------------------------------------------
@@ -48,12 +48,39 @@ Private Sub Class_Terminate()
 'close connection if open
 '--------------------------------------
 On Error GoTo err_Terminate
-If (cn.State And adStateClosed) = 0 Then cn.Close
+If cn.STATE <> 0 And (cn.STATE And adStateClosed) = 0 Then cn.Close
 Exit Sub
 
 err_Terminate:
 Resume Next
 End Sub
+
+Public Function GetMTSMasterConnectionString(ByVal InitFileName As String) As String
+
+    Dim MTSMasterSec() As String
+    Dim SecCnt As Long
+    Dim MyInit As New InitFile
+    Dim strConnectionString As String
+    
+    On Error GoTo err_GetMTSMasterConnectionString
+    
+    SecCnt = MyInit.GetSection(InitFileName, MyGl.SECTION_MTS_Master_DB, MTSMasterSec())
+    Set MyInit = Nothing
+    If SecCnt >= 1 Then
+       strConnectionString = MTSMasterSec(MTSMasterConnStr)
+    Else
+        ' Missing section, use the default value
+       strConnectionString = MyGl.DEFAULT_MTS_MASTER_CONN_STRING
+    End If
+    
+    GetMTSMasterConnectionString = strConnectionString
+    Exit Function
+    
+err_GetMTSMasterConnectionString:
+       GetMTSMasterConnectionString = ""
+    
+End Function
+
 
 Public Function SetDBStuff(NewNames() As String, _
                            NewValues() As String)
@@ -61,21 +88,21 @@ Public Function SetDBStuff(NewNames() As String, _
 'destroys old DBStuff collection and creates new
 'from referenced arrays
 '-------------------------------------------------
-Dim NewCnt As Long, i As Long
+Dim NewCnt As Long, I As Long
 Dim nv As NameValue
 On Error Resume Next
 NewCnt = UBound(NewNames) + 1
 If NewCnt > 0 Then
    DestroyDBStuff
    Set DBStuff = New Collection
-   For i = 1 To NewCnt
-       If Len(NewNames(i)) > 0 Then
+   For I = 1 To NewCnt
+       If Len(NewNames(I)) > 0 Then
           Set nv = New NameValue
-          nv.Name = NewNames(i - 1)
-          nv.Value = NewValues(i - 1)
-          DBStuff.Add nv, NewNames(i - 1)
+          nv.Name = NewNames(I - 1)
+          nv.Value = NewValues(I - 1)
+          DBStuff.add nv, NewNames(I - 1)
        End If
-   Next i
+   Next I
 End If
 End Function
 
@@ -83,26 +110,26 @@ Public Function DestroyDBStuff()
 '-------------------------------
 'destroys DBStuff collection
 '-------------------------------
-Dim i As Long
+Dim I As Long
 On Error Resume Next
-For i = 1 To DBStuff.Count
+For I = 1 To DBStuff.Count
     DBStuff.Remove 1
-Next i
+Next I
 End Function
 
 Public Function WriteDBStuffToFile(ByVal FileName As String) As Boolean
 '----------------------------------------------------------------------
 'appends content of the DBStuff collection to the file FileName
 '----------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim fso As New FileSystemObject
 Dim ts As TextStream
 On Error GoTo err_WriteDBBlaBla
 Set ts = fso.OpenTextFile(FileName, ForAppending, False)
 ts.WriteLine MTDBStartLineToken & " - Almissa Gloria Victoria Fili Est"
-For i = 1 To DBStuff.Count
-    ts.WriteLine DBStuff(i).Name & "=" & DBStuff(i).Value
-Next i
+For I = 1 To DBStuff.Count
+    ts.WriteLine DBStuff(I).Name & "=" & DBStuff(I).Value
+Next I
 ts.Close
 WriteDBStuffToFile = True
 Exit Function
@@ -117,7 +144,7 @@ Public Function ReadDBStuffFromFile(ByVal FileName As String) As Boolean
 'line containing token is found and everything beyound is considered
 'to be stuff that needs to be loaded
 '-----------------------------------------------------------------------
-Dim i As Long
+Dim I As Long
 Dim fso As New FileSystemObject
 Dim ts As TextStream
 On Error GoTo err_ReadDBBlaBla
@@ -129,20 +156,20 @@ err_ReadDBBlaBla:
 End Function
 
 
-Public Sub EditAddName(ByVal PairName As String, ByVal NewValue As String)
-'-------------------------------------------------------------------------
-'modifies value of name value pair; if pair does not exist adds it
-'-------------------------------------------------------------------------
-Dim nv As NameValue
-On Error Resume Next
-DBStuff.Item(PairName).Value = NewValue
-If Err Then
-   Set nv = New NameValue
-   nv.Name = PairName
-   nv.Value = NewValue
-   DBStuff.Add nv, nv.Name
-End If
-End Sub
+'Public Sub EditAddName(ByVal PairName As String, ByVal NewValue As String)
+''-------------------------------------------------------------------------
+''modifies value of name value pair; if pair does not exist adds it
+''-------------------------------------------------------------------------
+'Dim nv As NameValue
+'On Error Resume Next
+'DBStuff.Item(PairName).Value = NewValue
+'If Err Then
+'   Set nv = New NameValue
+'   nv.Name = PairName
+'   nv.Value = NewValue
+'   DBStuff.add nv, nv.Name
+'End If
+'End Sub
 
 ''
 ''Private Sub LckSelectionDialog_DialogClosed()
@@ -170,7 +197,7 @@ On Error Resume Next
 If Not MTSelectionDialog.MyCancel Then
    DestroyDBStuff
    For Each nv In MTSelectionDialog.MyStuff
-       DBStuff.Add nv, nv.Name
+       DBStuff.add nv, nv.Name
    Next
 End If
 Unload MTSelectionDialog
@@ -190,7 +217,7 @@ MTSelectionDialog.MTSMasterConnString = GetMTSMasterConnectionString(InitFileNam
 
 Set MTSelectionDialog.MyStuff = New Collection
 For Each nv In DBStuff
-    MTSelectionDialog.MyStuff.Add nv, nv.Name
+    MTSelectionDialog.MyStuff.add nv, nv.Name
 Next
 MTSelectionDialog.Show
 End Sub

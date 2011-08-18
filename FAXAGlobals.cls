@@ -10,7 +10,7 @@ Attribute VB_Name = "FAXAGlobals"
 Attribute VB_GlobalNameSpace = True
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 'global declaration, procedures and functions
 'for FAXA componenet
 'created: 06/17/2001 nt

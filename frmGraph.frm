@@ -1183,14 +1183,14 @@ picGraph.Refresh
 End Sub
 
 Private Sub PointVisiblilityShowAll()
-    Dim I As Integer
+    Dim i As Integer
     lAction = glNoAction
     
     ' Set all points to visible (positive ids) and clear selection
     With GelData(nMyIndex)
-         For I = 1 To MAX_FILTER_COUNT
-            .DataFilter(I, 0) = False
-         Next I
+         For i = 1 To MAX_FILTER_COUNT
+            .DataFilter(i, 0) = False
+         Next i
          .DataFilter(fltID, 1) = 0      'identity
          
          GelCSIncludeAll (nMyIndex)
@@ -1211,14 +1211,14 @@ Private Sub PointVisibilityShowUMCPoints()
 End Sub
 
 Private Sub PointVisiblilityInvert()
-    Dim I As Integer
+    Dim i As Integer
     lAction = glNoAction
     
     ' Invert the visible points and clear selection
     With GelData(nMyIndex)
-         For I = 1 To MAX_FILTER_COUNT
-            .DataFilter(I, 0) = False
-         Next I
+         For i = 1 To MAX_FILTER_COUNT
+            .DataFilter(i, 0) = False
+         Next i
          .DataFilter(fltID, 1) = 0      'identity
          
          GelCSInvertVisible (nMyIndex)
@@ -2455,7 +2455,7 @@ End Sub
 
 Private Sub mnu2lsOptions_Click()
 Dim blnAutoAdjSizeSaved As Boolean
-Dim I As Integer
+Dim i As Integer
 
 frmOptions.Tag = nMyIndex
 If IsWinLoaded(TrackerCaption) Then frmTracker.Hide
@@ -2501,11 +2501,11 @@ csMyCooSys.ZoomInR lngXMin, dblYMin, lngXMax, dblYMax
 
 If Abs(vWhatever) >= 2 Then
     ' Need to call Coordinate draw for the other Gels (it gets called for this gel in the above call to .ZoomInR
-    For I = 1 To UBound(GelBody)
-        If I <> nMyIndex And Not GelStatus(I).Deleted Then
-            GelBody(I).csMyCooSys.CoordinateDraw
+    For i = 1 To UBound(GelBody)
+        If i <> nMyIndex And Not GelStatus(i).Deleted Then
+            GelBody(i).csMyCooSys.CoordinateDraw
         End If
-    Next I
+    Next i
 End If
 
 bNeedToUpdate = True
@@ -3645,7 +3645,7 @@ End Sub
 
 Public Sub CopyAllPointsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1, Optional blnPromptForFileToExportTo As Boolean = False, Optional strFilePathForce As String = "")
     
-    Dim I As Long, j As Long
+    Dim i As Long, j As Long
     Dim dblMW As Double, dblMtoZ As Double, dblAbu As Double
     Dim dblAbuIReportMWMono As Double, dblAbuIReport2Da As Double
     Dim dblNET As Double
@@ -3831,11 +3831,11 @@ On Error GoTo CopyAllPointsInViewErrorHandler
         If Len(strFilePath) > 0 Then Print #OutFileNum, strExport(0)
         
         lngExportCount = 1
-        For I = 1 To lngIonCount
+        For i = 1 To lngIonCount
             If blnCSPoints Then
-                lngFN = .CSData(lngIonPointerArray(I)).ScanNumber
+                lngFN = .CSData(lngIonPointerArray(i)).ScanNumber
             Else
-                lngFN = .IsoData(lngIonPointerArray(I)).ScanNumber
+                lngFN = .IsoData(lngIonPointerArray(i)).ScanNumber
             End If
             
             If lngFN > lngFNPrevious Then
@@ -3854,7 +3854,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 lngFNPrevious = lngFN
             End If
             
-            lngIonIndex = lngIonPointerArray(I)
+            lngIonIndex = lngIonPointerArray(i)
             If blnCSPoints Then
                 dblAbu = .CSData(lngIonIndex).Abundance
                 intCharge = .CSData(lngIonIndex).Charge
@@ -3987,11 +3987,11 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 End If
             Loop While Len(strDBMatchList) > 0
             
-            If I Mod 100 = 0 Then
-                frmProgress.UpdateProgressBar I
+            If i Mod 100 = 0 Then
+                frmProgress.UpdateProgressBar i
                 If KeyPressAbortProcess > 1 Then Exit For
             End If
-        Next I
+        Next i
     End With
     
     If Len(strFilePath) > 0 Then

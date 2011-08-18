@@ -10,7 +10,7 @@ Attribute VB_Name = "FTICRAnalysis"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 Option Explicit
 
 '-----------------------------------------------------------------
@@ -67,7 +67,7 @@ Public Storage_Path As String
 Public Dataset_Folder As String
 Public Results_Folder As String
 Public Created As String
-Public State As Long
+Public STATE As Long
 Public NET_TICFit As Double         ' Not used in DB Schema Version 2
 Public NET_Slope As Double          ' Not used in DB Schema Version 2
 Public NET_Intercept As Double      ' Not used in DB Schema Version 2
@@ -80,7 +80,7 @@ Public DB_Schema_Version As Single
 
 'fields that will go to T_Match_Making_Description table
 Public MD_Reference_Job As Long
-Public MD_File As String            'have to use for legacy
+Public MD_file As String            'have to use for legacy
 Public MD_Type As Long
 Public MD_Parameters As String
 Public MD_Date As String
@@ -104,6 +104,24 @@ Private Sub Class_Terminate()
 Set MTDB = Nothing
 End Sub
 
+Public Sub AddFolderSeparator(SP As String)
+    '--------------------------------------------------------
+    'adds folder separator if it's not at the end of the SP
+    'except if sP is empty string in which case it returns ""
+    '--------------------------------------------------------
+    Dim sCoolString
+    sCoolString = Trim$(SP)
+    If Len(sCoolString) > 0 Then
+       If Right$(sCoolString, 1) <> "\" Then
+          SP = sCoolString & "\"
+       Else
+          SP = sCoolString
+       End If
+    Else
+       SP = ""
+    End If
+End Sub
+
 Public Function GetJobInfo() As String
 '--------------------------------------------
 'returns job info based on current properties
@@ -123,7 +141,7 @@ tmp = tmp & FLD_Settings_File_Name & "=" & Settings_File_Name & vbCrLf
 tmp = tmp & FLD_Organism_DB_Name & "=" & Organism_DB_Name & vbCrLf
 tmp = tmp & "Data folder=" & Desc_DataFolder & vbCrLf
 tmp = tmp & FLD_Created & "=" & Created & vbCrLf
-tmp = tmp & "State" & "=" & State & vbCrLf
+tmp = tmp & "State" & "=" & STATE & vbCrLf
 If DB_Schema_Version < 2 Then
     tmp = tmp & FLD_NET_TICFit & "=" & NET_TICFit & vbCrLf
     tmp = tmp & FLD_NET_Slope & "=" & NET_Slope & vbCrLf
@@ -205,7 +223,7 @@ If rsJob.EOF Then
     Storage_Path = ""
     Dataset_Folder = ""
     Results_Folder = ""
-    State = 0
+    STATE = 0
         
     NET_TICFit = 0
     NET_Slope = 0
@@ -219,8 +237,8 @@ If rsJob.EOF Then
     
     Desc_DataFolder = ""
 Else
-    'following line is not neccessary but I want to trigger error if
-    Job = rsJob.Fields(FLD_Job).Value     'no records is returned
+    'following line is not neccessary but I want to trigger error if no records are returned
+    Job = rsJob.Fields(FLD_Job).Value
     On Error Resume Next
     With rsJob
         Dataset = .Fields(FLD_Dataset).Value
@@ -237,7 +255,7 @@ Else
         Storage_Path = .Fields(FLD_Storage_Path).Value
         Dataset_Folder = .Fields(FLD_Dataset_Folder).Value
         Results_Folder = .Fields(FLD_Results_Folder).Value
-        State = .Fields(FLD_State).Value
+        STATE = .Fields(FLD_State).Value
             
         If DB_Schema_Version < 2 Then
             NET_TICFit = .Fields(FLD_NET_TICFit).Value

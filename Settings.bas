@@ -474,7 +474,7 @@ Public Sub IniFileLoadSettings(ByRef udtPrefsExpanded As udtPreferencesExpandedT
     'Loads up settings from an .ini file
     Dim IniStuff As New clsIniStuff
     Dim intIndex As Integer, intAutoSearchModeIndex As Integer
-    Dim intInternalStandardcount As Integer
+    Dim intInternalStandardCount As Integer
     Dim intInternalStandardIndex As Integer
     Dim udtDBSettingsSingle As udtDBSettingsType
     
@@ -733,13 +733,13 @@ On Error GoTo LoadSettingsFileHandler
     End With
      
     With udtUMCInternalStandards
-        intInternalStandardcount = GetIniFileSettingInt(IniStuff, "UMCInternalStandards", "Count", -1)
+        intInternalStandardCount = GetIniFileSettingInt(IniStuff, "UMCInternalStandards", "Count", -1)
         
-        If intInternalStandardcount = 0 Then
+        If intInternalStandardCount = 0 Then
             .StandardsAreFromDB = False
             .Count = 0
             ReDim .InternalStandards(0)
-        ElseIf intInternalStandardcount < 0 Then
+        ElseIf intInternalStandardCount < 0 Then
             If .StandardsAreFromDB Then
                 ' Leave the existing internal standards defined
             Else
@@ -751,9 +751,9 @@ On Error GoTo LoadSettingsFileHandler
             ' First, initialize to having no internal standards
             .StandardsAreFromDB = False
             .Count = 0
-            ReDim .InternalStandards(0 To intInternalStandardcount - 1)
+            ReDim .InternalStandards(0 To intInternalStandardCount - 1)
             
-            For intInternalStandardIndex = 0 To intInternalStandardcount - 1
+            For intInternalStandardIndex = 0 To intInternalStandardCount - 1
                 strSectionName = "UMCInternalStandard" & Trim(intInternalStandardIndex + 1)
                 
                 dblInternalStandardMass = GetIniFileSettingDbl(IniStuff, strSectionName, "MonoisotopicMass", 0)
@@ -1499,6 +1499,9 @@ On Error GoTo LoadSettingsFileHandler
         
         ' Now attempt to load the database connection info
         .AutoAnalysisDBInfoIsValid = IniFileReadSingleDBConnection(IniStuff, "AutoAnalysisDBInfo", udtDBSettingsSingle)
+        If .AutoAnalysisDBInfoIsValid Then
+            .AutoAnalysisDBInfoIsValid = .AutoAnalysisDBInfo.ValidAnalysisDataPresent
+        End If
         
         If udtDBSettingsSingle.IsDeleted Then .AutoAnalysisDBInfoIsValid = False
         
@@ -2760,6 +2763,7 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
     Dim strMassTagSubsetID As String
     
     Dim strTraceLocation As String
+    Dim strPrevStep As String
     
     Dim udtDefaultGelAnalysisInfo As udtGelAnalysisInfoType
 
@@ -2931,17 +2935,23 @@ Private Function IniFileReadSingleDBConnection(objIniStuff As clsIniStuff, strSe
                     .DBSchemaVersion = LookupDBSchemaVersionViaCNString(.ConnectionString)
                 End If
 
+                strTraceLocation = strTraceLocation & " = " & .DBSchemaVersion
             End With
             
+            strPrevStep = "Successfully populated udtDBSettingsSingle; last trace was " & strTraceLocation
         Else
             blnSuccess = False
+            strPrevStep = "Error calling objIniStuff.ReadSection() for " & strSectionName
         End If
         
     Else
         blnSuccess = False
+        strPrevStep = "lngInfoVersion (" & lngInfoVersion & ") <> RECENT_DB_CONNECTION_INFOVERSION (" & RECENT_DB_CONNECTION_INFOVERSION & ")"
     End If
     
-    strTraceLocation = "Destroy objMTDBInfoRetriever"
+    strTraceLocation = "Destroy objMTDBInfoRetriever: " & strPrevStep
+    ' Note: Encountered error "Class does not support Automation or does not support expected interface" in August 2011 due to issue described at http://support.microsoft.com/kb/2517589
+    ' The fix was to remove the reference to "Microsoft ActiveX Data Objects 2.7" and replace with "ActiveX Data Objects 6.0 BackCompat Library"
     If Not objMTDBInfoRetriever Is Nothing Then Set objMTDBInfoRetriever = Nothing
 
     udtDBSettingsSingle.IsDeleted = Not blnSuccess

@@ -10,7 +10,7 @@ Attribute VB_Name = "DummyAnalysisInitiator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 '------------------------------------------------------
 'initiator of dummy FTICR analysis
 'this is neccessary to do Out-Of-System analysis

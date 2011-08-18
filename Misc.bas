@@ -17,6 +17,9 @@ Public glPreferences As GelPrefs
 'ICR2LS
 Public sICR2LSCommand As String         'Path to ICR2Ls exec file
 
+' MassTagsAccess globals
+Public MyGl As INFTAXGlobals      'globals
+
 ' No longer supported (March 2006)
 ''Public sFTICR_AMTPath As String         'path to FTICR_AMT database
 
@@ -300,6 +303,8 @@ Public Sub Initialize()
 glInitFile = App.Path & "\" & INIT_FILE_NAME        ' This is the FAXA.Init file, not the .Ini settings file
 glWriteFreqShift = False    'no by default
 glbPreferencesExpanded.PairSearchOptions.SearchDef.ERCalcType = ectER_RAT     'ratio(by Big Kahuna decision)
+Set MyGl = New INFTAXGlobals
+
 InitSelectMatrices
 InitJobMatrices
 InitChargeStateMap

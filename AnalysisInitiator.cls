@@ -10,7 +10,7 @@ Attribute VB_Name = "AnalysisInitiator"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 '------------------------------------------------------
 'initiator of analysis dialog - opens dialog and raises
 'event when dialog is closed

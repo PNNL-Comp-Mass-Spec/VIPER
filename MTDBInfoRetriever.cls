@@ -10,7 +10,7 @@ Attribute VB_Name = "MTDBInfoRetriever"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 Option Explicit
 
 Private MyInit As InitFile         'object that deals with initialization file
@@ -30,27 +30,27 @@ Dim ArgCnt As Long
 Dim MTName As String, MTValue As String
 Dim MTValuePos As Long
 Dim nv As NameValue
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 
 ArgCnt = MyInit.GetSection(mInitFilePath, MyGl.SECTION_MTDB_Schema, Arg())
 If ArgCnt > 0 Then
-   For i = 0 To ArgCnt - 1
-       MTValuePos = InStr(1, Arg(i), MyGl.INIT_Value)
+   For I = 0 To ArgCnt - 1
+       MTValuePos = InStr(1, Arg(I), MyGl.INIT_Value)
        If MTValuePos > 0 Then
-          MTName = Trim(Left$(Arg(i), MTValuePos - 1))
-          MTValue = Trim$(Right$(Arg(i), Len(Arg(i)) - MTValuePos))
+          MTName = Trim(Left$(Arg(I), MTValuePos - 1))
+          MTValue = Trim$(Right$(Arg(I), Len(Arg(I)) - MTValuePos))
        Else     'everything is a name
-          MTName = Trim(Arg(i))
+          MTName = Trim(Arg(I))
           MTValue = ""
        End If
        If Len(MTName) > 0 Then
           Set nv = New NameValue
           nv.Name = MTName
           nv.Value = MTValue
-          fAnalysis.MTDB.DBStuff.Add nv, nv.Name
+          fAnalysis.MTDB.DBStuff.add nv, nv.Name
        End If   'do nothing if name is missing
-   Next i
+   Next I
 End If
 End Sub
 

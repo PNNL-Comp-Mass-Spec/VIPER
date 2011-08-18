@@ -754,24 +754,24 @@ On Error GoTo FilterDataErrorHandler
     With glbPreferencesExpanded
         If (GelData(udtWorkingParams.GelIndex).DataStatusBits And GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA) = GEL_DATA_STATUS_BIT_LCMSFEATURES_DATA Then
             If blnUpdateLog Then
-                Dim strPrefix As String
+                Dim strSuffix As String
                 
-                strPrefix = "Since LC-MS Features were loaded from an _LCMSFeatures.txt file,"
+                strSuffix = " because LC-MS Features were loaded from an _LCMSFeatures.txt file"
              
                 With .AutoAnalysisFilterPrefs
-                    If .ExcludeDuplicates Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude Duplicates filter is ignored"
-                    If .ExcludeIsoByFit Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude by Isotopic Fit filter is ignored"
-                    If .ExcludeIsoSecondGuess Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude Second Guess filter is ignored"
-                    If .ExcludeIsoLessLikelyGuess Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude Less Likely Guess filter is ignored"
-                    If .ExcludeCSByStdDev Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Exclude CS by Std Dev filter is ignored"
-                    If .RestrictIsoByAbundance Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict Iso by Abundance filter is ignored"
-                    If .RestrictIsoByMass Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict Iso by Mass filter is ignored"
-                    If .RestrictIsoByMZ Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict Iso by m/z filter is ignored"
-                    If .RestrictIsoByChargeState Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict Iso by Charge State filter is ignored"
-                    If .RestrictCSByAbundance Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict CS by Abundance filter is ignored"
-                    If .RestrictCSByMass Then AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict CS by Mass filter is ignored"
+                    If .ExcludeDuplicates Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Exclude Duplicates filter is ignored" & strSuffix
+                    If .ExcludeIsoByFit Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Exclude by Isotopic Fit filter is ignored" & strSuffix
+                    If .ExcludeIsoSecondGuess Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Exclude Second Guess filter is ignored" & strSuffix
+                    If .ExcludeIsoLessLikelyGuess Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Exclude Less Likely Guess filter is ignored" & strSuffix
+                    If .ExcludeCSByStdDev Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Exclude CS by Std Dev filter is ignored" & strSuffix
+                    If .RestrictIsoByAbundance Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Restrict Iso by Abundance filter is ignored" & strSuffix
+                    If .RestrictIsoByMass Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Restrict Iso by Mass filter is ignored" & strSuffix
+                    If .RestrictIsoByMZ Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Restrict Iso by m/z filter is ignored" & strSuffix
+                    If .RestrictIsoByChargeState Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Restrict Iso by Charge State filter is ignored" & strSuffix
+                    If .RestrictCSByAbundance Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Restrict CS by Abundance filter is ignored" & strSuffix
+                    If .RestrictCSByMass Then AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Restrict CS by Mass filter is ignored" & strSuffix
                     If .RestrictToEvenScanNumbersOnly Or .RestrictToOddScanNumbersOnly Then
-                        AddToAnalysisHistory udtWorkingParams.GelIndex, strPrefix & ", Restrict data by even/odd scan number is ignored"
+                        AddToAnalysisHistory udtWorkingParams.GelIndex, "Note: Restrict data by even/odd scan number is ignored" & strSuffix
                     End If
                 End With
             End If
@@ -2481,23 +2481,25 @@ On Error GoTo LoadOptionsErrorHandler
         If Not GelAnalysis(udtWorkingParams.GelIndex) Is Nothing Then
             With GelAnalysis(udtWorkingParams.GelIndex)
                 With .MTDB
-                    .DBStuff(NAME_SUBSET).Value = udtAutoParams.MTDBOverride.MTSubsetID
-                    .DBStuff(NAME_INC_LIST).Value = udtAutoParams.MTDBOverride.ModList
-                    .DBStuff(NAME_CONFIRMED_ONLY).Value = udtAutoParams.MTDBOverride.ConfirmedOnly
-                    .DBStuff(NAME_ACCURATE_ONLY).Value = udtAutoParams.MTDBOverride.AMTsOnly
-                    .DBStuff(NAME_LOCKERS_ONLY).Value = udtAutoParams.MTDBOverride.LockersOnly
-                    .DBStuff(NAME_LIMIT_TO_PMTS_FROM_DATASET).Value = udtAutoParams.MTDBOverride.LimitToPMTsFromDataset
+                    AddUpdateNameValueEntry .DBStuff, NAME_SUBSET, udtAutoParams.MTDBOverride.MTSubsetID
+                    AddUpdateNameValueEntry .DBStuff, NAME_INC_LIST, udtAutoParams.MTDBOverride.ModList
+                    AddUpdateNameValueEntry .DBStuff, NAME_CONFIRMED_ONLY, udtAutoParams.MTDBOverride.ConfirmedOnly
                     
-                    .DBStuff(NAME_MINIMUM_HIGH_NORMALIZED_SCORE).Value = udtAutoParams.MTDBOverride.MinimumHighNormalizedScore
-                    .DBStuff(NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE).Value = udtAutoParams.MTDBOverride.MinimumHighDiscriminantScore
-                    .DBStuff(NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY).Value = udtAutoParams.MTDBOverride.MinimumPeptideProphetProbability
-                    .DBStuff(NAME_MINIMUM_PMT_QUALITY_SCORE).Value = udtAutoParams.MTDBOverride.MinimumPMTQualityScore
+                    AddUpdateNameValueEntry .DBStuff, NAME_ACCURATE_ONLY, udtAutoParams.MTDBOverride.AMTsOnly
+                    AddUpdateNameValueEntry .DBStuff, NAME_LOCKERS_ONLY, udtAutoParams.MTDBOverride.LockersOnly
+                    AddUpdateNameValueEntry .DBStuff, NAME_LIMIT_TO_PMTS_FROM_DATASET, udtAutoParams.MTDBOverride.LimitToPMTsFromDataset
                     
-                    .DBStuff(NAME_EXPERIMENT_INCLUSION_FILTER).Value = udtAutoParams.MTDBOverride.ExperimentInclusionFilter
-                    .DBStuff(NAME_EXPERIMENT_EXCLUSION_FILTER).Value = udtAutoParams.MTDBOverride.ExperimentExclusionFilter
-                    .DBStuff(NAME_INTERNAL_STANDARD_EXPLICIT).Value = udtAutoParams.MTDBOverride.InternalStandardExplicit
+                    AddUpdateNameValueEntry .DBStuff, NAME_MINIMUM_HIGH_NORMALIZED_SCORE, udtAutoParams.MTDBOverride.MinimumHighNormalizedScore
+                    AddUpdateNameValueEntry .DBStuff, NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE, udtAutoParams.MTDBOverride.MinimumHighDiscriminantScore
+                    AddUpdateNameValueEntry .DBStuff, NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY, udtAutoParams.MTDBOverride.MinimumPeptideProphetProbability
+                    AddUpdateNameValueEntry .DBStuff, NAME_MINIMUM_PMT_QUALITY_SCORE, udtAutoParams.MTDBOverride.MinimumPMTQualityScore
                     
-                    .DBStuff(NAME_NET_VALUE_TYPE).Value = udtAutoParams.MTDBOverride.NETValueType
+                    AddUpdateNameValueEntry .DBStuff, NAME_EXPERIMENT_INCLUSION_FILTER, udtAutoParams.MTDBOverride.ExperimentInclusionFilter
+                    AddUpdateNameValueEntry .DBStuff, NAME_EXPERIMENT_EXCLUSION_FILTER, udtAutoParams.MTDBOverride.ExperimentExclusionFilter
+                    AddUpdateNameValueEntry .DBStuff, NAME_INTERNAL_STANDARD_EXPLICIT, udtAutoParams.MTDBOverride.InternalStandardExplicit
+                    
+                    AddUpdateNameValueEntry .DBStuff, NAME_NET_VALUE_TYPE, udtAutoParams.MTDBOverride.NETValueType
+                    
                     .cn.ConnectionString = udtAutoParams.MTDBOverride.ConnectionString
                 End With
                 
@@ -7457,17 +7459,17 @@ Private Function LookupMatchStatsForPeakMatchingTask(ByVal strServerName As Stri
     ' Call GetPeakMatchingTaskResultStats in database strMTDBName
     ' Returns True if success, false if an error
     
-    Dim cnnConnection As ADODB.Connection
+    Dim cnnConnection As adodb.Connection
     
-    Dim cmdGetPMStats As New ADODB.Command
+    Dim cmdGetPMStats As New adodb.Command
     
-    Dim prmPeakMatchingTaskID As New ADODB.Parameter
-    Dim prmJobNumber  As New ADODB.Parameter
-    Dim prmNonUniqueHitsCount As New ADODB.Parameter
-    Dim prmUMCCount As New ADODB.Parameter
-    Dim prmUMCCountWithHits As New ADODB.Parameter
-    Dim prmUniqueMassTagHitCount As New ADODB.Parameter
-    Dim prmMessage As New ADODB.Parameter
+    Dim prmPeakMatchingTaskID As New adodb.Parameter
+    Dim prmJobNumber  As New adodb.Parameter
+    Dim prmNonUniqueHitsCount As New adodb.Parameter
+    Dim prmUMCCount As New adodb.Parameter
+    Dim prmUMCCountWithHits As New adodb.Parameter
+    Dim prmUniqueMassTagHitCount As New adodb.Parameter
+    Dim prmMessage As New adodb.Parameter
     
     Dim strConnectionString As String
     Dim strSPName As String

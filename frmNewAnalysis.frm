@@ -472,6 +472,10 @@ Const INIT_Dataset_Info_URL = "URL_Dataset_Details"
 Const INIT_Analysis_Info_URL = "URL_Analysis_Details"
 Const INIT_Experiment_Info_URL = "URL_Experiment_Details"
 
+Private Const SW_SHOWNORMAL As Long = 1
+Private Const SW_SHOWMAXIMIZED As Long = 3
+Private Const SW_SHOWDEFAULT As Long = 10
+
 Dim FirstFill As String         'initial fill method
 Dim sqlShowAll As String
 Dim sqlShowNew As String
@@ -487,12 +491,13 @@ Dim MyInit As New InitFile         'object that deals with initialization file
 Public InitFileName As String       'full path to init file
 Public fAnalysis As FTICRAnalysis   'FTICR Analysis object
 Attribute fAnalysis.VB_VarHelpID = -1
+Public fAnalysisConnectionString As String
 
 Public Event AnalysisDialogClose()
 
 Private MTDBInd As Long                     'index of currently selected db
 Private MTDBCnt As Long                     'count of mass tag databases
-Private MTDBInfo() As udtMTDBInfoType       ' 0-based array
+Private MTDBInfo() As udtMassTagsAccessMTDBInfoType       ' 0-based array
 
 Private MTDBCntVisible As Long
 Private MTDBNameListPointers() As Long      ' Used to display database names sorted properly; 0-based array
@@ -507,9 +512,39 @@ Dim BaseURLDataset As String
 Dim BaseURLAnalysis As String
 Dim BaseURLExperiment As String
 
+Private Sub AddDBStuffItemIfMissing(ByRef objDBStuff As Collection, ByVal strItemName As String, ByVal strItemValue As String)
+    
+    Dim strTemp As String
+    Dim intIndex As Integer
+
+    On Error Resume Next
+    
+    strTemp = objDBStuff.Item(strItemName).Value
+    
+    If Err Then
+        
+On Error GoTo AddItemErrorHandler
+        
+        Dim nv As New NameValue
+        
+        nv.Name = strItemName
+        nv.Value = strItemValue
+              
+        objDBStuff.add nv, nv.Name
+        Exit Sub
+    End If
+
+    Exit Sub
+
+AddItemErrorHandler:
+    Debug.Print "Error validating " & strItemName & " in collection: " & Err.Description
+    Debug.Assert False
+    
+End Sub
+
 Private Sub HighlightDBByName(ByVal strTextToFind As String, ByVal intIndexStart)
     
-    Dim i As Integer
+    Dim I As Integer
     Dim intCharLoc As Integer
     
     If Len(strTextToFind) > 0 And lstOrgMTDBNames.ListCount > 0 Then
@@ -521,28 +556,28 @@ Private Sub HighlightDBByName(ByVal strTextToFind As String, ByVal intIndexStart
             intIndexStart = lstOrgMTDBNames.ListCount - 1
         End If
 
-        i = intIndexStart
+        I = intIndexStart
         Do
-            i = i + 1
-            If i > lstOrgMTDBNames.ListCount - 1 Then
-                i = 0
+            I = I + 1
+            If I > lstOrgMTDBNames.ListCount - 1 Then
+                I = 0
             End If
 
-            intCharLoc = InStr(LCase(lstOrgMTDBNames.List(i)), strTextToFind)
+            intCharLoc = InStr(LCase(lstOrgMTDBNames.List(I)), strTextToFind)
             
             If intCharLoc > 0 Then
-                lstOrgMTDBNames.ListIndex = i
+                lstOrgMTDBNames.ListIndex = I
                 Exit Do
             End If
 
-        Loop While i <> intIndexStart
+        Loop While I <> intIndexStart
         
     End If
     
 End Sub
 
 Private Sub PopulateDatabaseCombobox()
-    Dim i As Long
+    Dim I As Long
     Dim blnShowFrozenDBs As Boolean
     Dim blnShowUnusedDBs As Boolean     ' Forced to False if blnShowFrozenDBs = False
     Dim strDatabaseNameSaved As String
@@ -569,12 +604,12 @@ On Error GoTo PopulateDatabaseComboboxErrorHandler
         
         MTDBCntVisible = UBound(MTDBNameListPointers) + 1
         
-        For i = 0 To MTDBCntVisible - 1
-            lstOrgMTDBNames.AddItem MTDBInfo(MTDBNameListPointers(i)).Name
-            If MTDBInfo(MTDBNameListPointers(i)).Name = strDatabaseNameSaved Then
+        For I = 0 To MTDBCntVisible - 1
+            lstOrgMTDBNames.AddItem MTDBInfo(MTDBNameListPointers(I)).Name
+            If MTDBInfo(MTDBNameListPointers(I)).Name = strDatabaseNameSaved Then
                 lstOrgMTDBNames.ListIndex = lstOrgMTDBNames.ListCount - 1
             End If
-        Next i
+        Next I
         
         If lstOrgMTDBNames.ListIndex < 0 And lstOrgMTDBNames.ListCount > 0 Then
             lstOrgMTDBNames.ListIndex = 0
@@ -660,7 +695,7 @@ If fAnalysis.Job > 0 Then
    AnalysisURL = BaseURLAnalysis & fAnalysis.Job
    RunShellExecute "open", AnalysisURL, 0&, 0&, SW_SHOWNORMAL
 Else
-   MsgBox "Select ICR-2LS job first!", vbOKOnly, MyName
+   MsgBox "Select ICR-2LS job first!", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -682,14 +717,17 @@ With MyAdvancedDBForm
     Set .ThisCN = fAnalysis.MTDB.cn
     CopyPairsCollection fAnalysis.MTDB.DBStuff, .ThisStuff
     .Show vbModal
-    If .AcceptChanges Then Set fAnalysis.MTDB.cn = .ThisCN
+    If .AcceptChanges Then
+        Set fAnalysis.MTDB.cn = .ThisCN
+        fAnalysisConnectionString = fAnalysis.MTDB.cn.ConnectionString
+    End If
 End With
 Unload MyAdvancedDBForm
 Set MyAdvancedDBForm = Nothing
 Exit Sub
 
 err_cmdConfigure:
-MsgBox "Error: " & Err.Number & vbCrLf & Err.Description, vbOKOnly, MyName
+MsgBox "Error: " & Err.Number & vbCrLf & Err.Description, vbOKOnly, glFGTU
 End Sub
 
 
@@ -700,7 +738,7 @@ If Len(fAnalysis.Dataset) > 0 Then
    DatasetURL = BaseURLDataset & fAnalysis.Dataset & "&" & "database_name=" & MTDBInfo(MTDBInd).Name
    RunShellExecute "open", DatasetURL, 0&, 0&, SW_SHOWNORMAL
 Else
-   MsgBox "Select ICR-2LS job first!", vbOKOnly, MyName
+   MsgBox "Select ICR-2LS job first!", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -711,16 +749,16 @@ If fAnalysis.Job > 0 Then
    ExperimentURL = BaseURLExperiment & fAnalysis.Experiment
    RunShellExecute "open", ExperimentURL, 0&, 0&, SW_SHOWNORMAL
 Else
-   MsgBox "Select ICR-2LS job first!", vbOKOnly, MyName
+   MsgBox "Select ICR-2LS job first!", vbOKOnly, glFGTU
 End If
 End Sub
 
 Private Sub cmdGANETInfo_Click()
 On Error Resume Next
 If fAnalysis.Job > 0 Then
-   MsgBox fAnalysis.GetJobInfoGANET, vbOKOnly, MyName
+   MsgBox fAnalysis.GetJobInfoGANET, vbOKOnly, glFGTU
 Else
-   MsgBox "Select ICR-2LS job first!", vbOKOnly, MyName
+   MsgBox "Select ICR-2LS job first!", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -729,9 +767,9 @@ Private Sub cmdInfo_Click()
 'display info about currently selected job
 '-----------------------------------------------
 If fAnalysis.Job <> 0 Then
-   MsgBox fAnalysis.GetJobInfo, vbOKOnly, MyName
+   MsgBox fAnalysis.GetJobInfo, vbOKOnly, glFGTU
 Else
-   MsgBox "No item selected!", vbOKOnly, MyName
+   MsgBox "No item selected!", vbOKOnly, glFGTU
 End If
 End Sub
 
@@ -820,7 +858,7 @@ End Sub
 ''       Printer.Print sList
 ''       Printer.EndDoc
 ''    Else
-''       MsgBox "No items found in list!", vbOKOnly, MyName
+''       MsgBox "No items found in list!", vbOKOnly, glFGTU
 ''    End If
 ''End With
 ''End Sub
@@ -876,14 +914,14 @@ End Sub
 Private Sub cmdTICAlignment_Click()
 On Error Resume Next
 If fAnalysis.Job > 0 Then
-   MsgBox fAnalysis.GetJobInfoTIC, vbOKOnly, MyName
+   MsgBox fAnalysis.GetJobInfoTIC, vbOKOnly, glFGTU
 Else
-   MsgBox "Select ICR-2LS job first!", vbOKOnly, MyName
+   MsgBox "Select ICR-2LS job first!", vbOKOnly, glFGTU
 End If
 End Sub
 
 Private Sub lbFileList_Click()
-fAnalysis.MD_File = lbFileList.FileName
+fAnalysis.MD_file = lbFileList.FileName
 lblSelectedFile.Caption = lbFileList.FileName
 End Sub
 
@@ -932,8 +970,14 @@ TxtViewOrigTop = txtShowTextFile.Top
 TxtViewOrigHeight = txtShowTextFile.Height
 
 Set fAnalysis = New FTICRAnalysis
+fAnalysisConnectionString = ""
+
 fAnalysis.ProcessingType = fptMassMatch
+
+VerifyAMTFiltersDefined fAnalysis.MTDB.DBStuff
+
 MTDBInd = -1
+
 ' 12/12/2004 mem - Switched from using MT_Main to MTS_Master to retrieve DB info
 Res = GetMTSMasterDirectoryData(InitFileName, MTDBInfo)
 If Res <> 0 Then
@@ -961,7 +1005,7 @@ Dim MTName As String, MTValue As String
 Dim MTValuePos As Long
 Dim nv As NameValue
 Dim spGetDBSchemaVersion As String
-Dim i As Long
+Dim I As Long
 On Error GoTo err_InitDBConnection
 
 lblMTDBDesc.Caption = ""
@@ -969,8 +1013,9 @@ If MTDBInd < 0 Then Exit Function
 lblMTDBDesc.Caption = MTDBInfo(MTDBInd).Description & vbCrLf & "State: " & MTDBInfo(MTDBInd).DBState & vbCrLf & "Server: " & MTDBInfo(MTDBInd).Server
 
 With fAnalysis.MTDB.cn
-   If .State <> adStateClosed Then .Close
+   If .STATE <> adStateClosed Then .Close
    .ConnectionString = MTDBInfo(MTDBInd).CnStr
+   fAnalysisConnectionString = .ConnectionString
    .ConnectionTimeout = 30
 End With
 
@@ -987,6 +1032,8 @@ With fAnalysis
     End If
     .DB_Schema_Version = MTDBInfo(MTDBInd).DBSchemaVersion
 End With
+
+VerifyAMTFiltersDefined fAnalysis.MTDB.DBStuff
 
 On Error GoTo err_InitDBConnection
 
@@ -1008,7 +1055,7 @@ With lstICR2LSJobs
     lblSelectionDatasetAnalysis.Caption = .List(.ListIndex)
     'fill all records for selected job
     fAnalysis.FillFADRecord
-    fAnalysis.MD_File = ""
+    fAnalysis.MD_file = ""
 End With
 UpdateDatasetPath
 End Sub
@@ -1040,15 +1087,19 @@ Private Function FillAnalysisList(ByVal FillSQL As String) As Boolean
 'retrieves rows and fills list; this procedures expects recordset
 'with two fields; 1st field is PrimaryKey; 2nd is name to go in list
 '--------------------------------------------------------------------
-Dim rsDatasets As ADODB.Recordset
+Dim rsDatasets As adodb.Recordset
 Dim ListRows() As Variant
-Dim i As Long
+Dim I As Long
 Dim lngMaxIndex As Long
+Dim strConnectionStringSaved As String
+
 On Error GoTo err_FillAnalysisList
+
+strConnectionStringSaved = fAnalysis.MTDB.cn.ConnectionString
 
 'retrieve records
 fAnalysis.MTDB.cn.Open
-Set rsDatasets = New ADODB.Recordset
+Set rsDatasets = New adodb.Recordset
 Set rsDatasets.ActiveConnection = fAnalysis.MTDB.cn
 rsDatasets.CursorLocation = adUseClient
 rsDatasets.CursorType = adOpenForwardOnly
@@ -1063,13 +1114,14 @@ lngMaxIndex = UBound(ListRows, 2)
 On Error GoTo err_FillAnalysisList
 rsDatasets.Close
 fAnalysis.MTDB.cn.Close
+
 'fill the list(GetRows returns transposed rows/columns)
 lstICR2LSJobs.Clear
 With lstICR2LSJobs
-   For i = 0 To lngMaxIndex
-     .AddItem ListRows(1, i)
-     .ItemData(.NewIndex) = ListRows(0, i)
-   Next i
+   For I = 0 To lngMaxIndex
+     .AddItem ListRows(1, I)
+     .ItemData(.NewIndex) = ListRows(0, I)
+   Next I
 End With
 If lstICR2LSJobs.ListCount >= 1 Then
     lstICR2LSJobs.Selected(0) = True
@@ -1079,21 +1131,24 @@ Else
     lblSelectionDatasetAnalysis.Caption = ""
     'fill all records for selected job
     fAnalysis.FillFADRecord
-    fAnalysis.MD_File = ""
+    fAnalysis.MD_file = ""
     UpdateDatasetPath
 End If
 FillAnalysisList = True
 
 exit_FillAnalysisList:
+
 Set rsDatasets = Nothing
 With fAnalysis.MTDB.cn
-    If .State <> adStateClosed Then .Close
+    If .STATE <> adStateClosed Then .Close
 End With
+fAnalysis.MTDB.cn.ConnectionString = strConnectionStringSaved
+
 Exit Function
 
 err_FillAnalysisList:
-LogMessages "Error in FillAnalysisList: " & Err.Number & " - " & Err.Description
-Resume exit_FillAnalysisList:
+    LogErrors Err.Number, "FillAnalysisList", Err.Description
+    Resume exit_FillAnalysisList:
 End Function
 
 Private Function FillAnalysisTypesCombo() As Boolean
@@ -1101,16 +1156,20 @@ Private Function FillAnalysisTypesCombo() As Boolean
 'retrieves rows and fills list; this procedures expects recordset
 'with two fields; 1st field is PrimaryKey; 2nd is name to go in the list
 '-----------------------------------------------------------------------
-Dim rsDatasets As ADODB.Recordset
+Dim rsDatasets As adodb.Recordset
 Dim ListRows()
-Dim i As Long
+Dim I As Long
 Dim FillSQL As String
+Dim strConnectionStringSaved As String
+
 On Error GoTo err_FillAnalysisTypesCombo
+
+strConnectionStringSaved = fAnalysis.MTDB.cn.ConnectionString
 
 'retrieve records
 FillSQL = "SELECT * FROM " & AnalysisTypeTable
 fAnalysis.MTDB.cn.Open
-Set rsDatasets = New ADODB.Recordset
+Set rsDatasets = New adodb.Recordset
 Set rsDatasets.ActiveConnection = fAnalysis.MTDB.cn
 rsDatasets.CursorLocation = adUseClient
 rsDatasets.CursorType = adOpenForwardOnly
@@ -1119,19 +1178,22 @@ ListRows = rsDatasets.GetRows
 'fill combo(GetRows returns transposed rows/columns)
 cmbAnalysisType.Clear
 With cmbAnalysisType
-   For i = 0 To UBound(ListRows, 2)
-     .AddItem ListRows(1, i)
-     .ItemData(.NewIndex) = ListRows(0, i)
-   Next i
+   For I = 0 To UBound(ListRows, 2)
+     .AddItem ListRows(1, I)
+     .ItemData(.NewIndex) = ListRows(0, I)
+   Next I
    If .ListCount > 0 Then .ListIndex = 0
 End With
 FillAnalysisTypesCombo = True
 
 exit_FillAnalysisTypesCombo:
+
 Set rsDatasets = Nothing
 With fAnalysis.MTDB.cn
-    If .State <> adStateClosed Then .Close
+    If .STATE <> adStateClosed Then .Close
 End With
+fAnalysis.MTDB.cn.ConnectionString = strConnectionStringSaved
+
 Exit Function
 
 err_FillAnalysisTypesCombo:
@@ -1166,7 +1228,7 @@ Dim SecCnt As Long
 Dim SecNames() As String
 Dim Pars() As String
 Dim ParsCnt As Long
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 
 Select Case fAnalysis.ProcessingType
@@ -1175,12 +1237,12 @@ Case fptMassLock
   If ParsCnt > 0 Then FillParameters Pars(), False
 Case fptMassMatch
   SecCnt = MyInit.GetSectionNames(InitFileName, SecNames())
-  For i = 0 To SecCnt - 1
-    If InStr(1, SecNames(i), MyGl.SECTION_Parameters_Match_Any) > 0 Then
-       ParsCnt = MyInit.GetSection(InitFileName, SecNames(i), Pars())
+  For I = 0 To SecCnt - 1
+    If InStr(1, SecNames(I), MyGl.SECTION_Parameters_Match_Any) > 0 Then
+       ParsCnt = MyInit.GetSection(InitFileName, SecNames(I), Pars())
        If ParsCnt > 0 Then FillParameters Pars(), False
     End If
-  Next i
+  Next I
 End Select
 End Sub
 
@@ -1208,28 +1270,28 @@ Dim ValuePos As Long
 Dim ParName As String
 Dim ParValue As String
 Dim nv As NameValue
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 ParsCnt = UBound(Pars) + 1
 If ParsCnt > 0 Then
    With fAnalysis
      If Destroy Then .DestroyParameters
-     For i = 0 To ParsCnt - 1
-       If Len(Trim$(Pars(i))) > 0 Then
-         ValuePos = InStr(1, Pars(i), MyGl.INIT_Value)
+     For I = 0 To ParsCnt - 1
+       If Len(Trim$(Pars(I))) > 0 Then
+         ValuePos = InStr(1, Pars(I), MyGl.INIT_Value)
          If ValuePos > 0 Then
-            ParName = Trim(Left$(Pars(i), ValuePos - 1))
-            ParValue = Trim$(Right$(Pars(i), Len(Pars(i)) - ValuePos))
+            ParName = Trim(Left$(Pars(I), ValuePos - 1))
+            ParValue = Trim$(Right$(Pars(I), Len(Pars(I)) - ValuePos))
          Else     'everything is a name
-            ParName = Trim(Pars(i))
+            ParName = Trim(Pars(I))
             ParValue = ""
          End If
          Set nv = New NameValue
          nv.Name = ParName
          nv.Value = ParValue
-         .Parameters.Add nv, nv.Name
+         .Parameters.add nv, nv.Name
        End If
-     Next i
+     Next I
    End With
 End If
 End Sub
@@ -1247,27 +1309,27 @@ Dim ArgCnt As Long
 Dim MTName As String, MTValue As String
 Dim MTValuePos As Long
 Dim nv As NameValue
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 
 ArgCnt = MyInit.GetSection(InitFileName, MyGl.SECTION_MTDB_Schema, Arg())
 If ArgCnt > 0 Then
-   For i = 0 To ArgCnt - 1
-       MTValuePos = InStr(1, Arg(i), MyGl.INIT_Value)
+   For I = 0 To ArgCnt - 1
+       MTValuePos = InStr(1, Arg(I), MyGl.INIT_Value)
        If MTValuePos > 0 Then
-          MTName = Trim(Left$(Arg(i), MTValuePos - 1))
-          MTValue = Trim$(Right$(Arg(i), Len(Arg(i)) - MTValuePos))
+          MTName = Trim(Left$(Arg(I), MTValuePos - 1))
+          MTValue = Trim$(Right$(Arg(I), Len(Arg(I)) - MTValuePos))
        Else     'everything is a name
-          MTName = Trim(Arg(i))
+          MTName = Trim(Arg(I))
           MTValue = ""
        End If
        If Len(MTName) > 0 Then
           Set nv = New NameValue
           nv.Name = MTName
           nv.Value = MTValue
-          fAnalysis.MTDB.DBStuff.Add nv, nv.Name
+          fAnalysis.MTDB.DBStuff.add nv, nv.Name
        End If   'do nothing if name is missing
-   Next i
+   Next I
 End If
 'do some checks and enable/disable some functions
 'check what list filling procedures are available
@@ -1320,13 +1382,13 @@ TxtViewMax = Not TxtViewMax
 End Sub
 
 Private Sub txtShowTextFile_DragDrop(Source As Control, X As Single, Y As Single)
-Dim FName As String
+Dim fname As String
 Dim fso As New FileSystemObject
 On Error GoTo err_DD
 If TypeOf Source Is FileListBox Then
-   FName = fAnalysis.Desc_DataFolder & Source.FileName
-   If FileLen(FName) <= SMALL_FILE_MAX_SIZE Then
-      txtShowTextFile.Text = fso.OpenTextFile(FName, ForReading).ReadAll
+   fname = fAnalysis.Desc_DataFolder & Source.FileName
+   If FileLen(fname) <= SMALL_FILE_MAX_SIZE Then
+      txtShowTextFile.Text = fso.OpenTextFile(fname, ForReading).ReadAll
    Else
       MsgBox "Only small files (up to 30KB) could be viewed in this panel!", vbOKOnly, App.Title
    End If
@@ -1341,6 +1403,20 @@ Private Sub EnableDisableControls()
     chkShowUnusedDBs.Enabled = (chkShowFrozenDBs.Value = vbChecked)
 End Sub
 
+Public Sub CopyPairsCollection(SourceCol As Collection, _
+                               TargetCol As Collection)
+    '--------------------------------------------------------
+    'copies items from Source collection to Target collection
+    '--------------------------------------------------------
+    Dim I As Long
+    Dim nv As NameValue
+    On Error Resume Next
+    For I = 1 To SourceCol.Count
+        Set nv = SourceCol.Item(I)
+        TargetCol.add nv, nv.Name
+    Next I
+End Sub
+
 Public Sub GetDMSURLs()
 '------------------------------------------------------
 'extracts URLs information from the initialization file
@@ -1349,18 +1425,18 @@ Dim Arg() As String
 Dim ArgCnt As Long
 Dim MTName As String, MTValue As String
 Dim MTValuePos As Long
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 
 ArgCnt = MyInit.GetSection(InitFileName, MyGl.SECTION_URL, Arg())
 If ArgCnt > 0 Then
-   For i = 0 To ArgCnt - 1
-       MTValuePos = InStr(1, Arg(i), MyGl.INIT_Value)
+   For I = 0 To ArgCnt - 1
+       MTValuePos = InStr(1, Arg(I), MyGl.INIT_Value)
        If MTValuePos > 0 Then
-          MTName = Trim(Left$(Arg(i), MTValuePos - 1))
-          MTValue = Trim$(Right$(Arg(i), Len(Arg(i)) - MTValuePos))
+          MTName = Trim(Left$(Arg(I), MTValuePos - 1))
+          MTValue = Trim$(Right$(Arg(I), Len(Arg(I)) - MTValuePos))
        Else     'everything is a name
-          MTName = Trim(Arg(i))
+          MTName = Trim(Arg(I))
           MTValue = ""
        End If
        Select Case MTName
@@ -1371,7 +1447,7 @@ If ArgCnt > 0 Then
        Case INIT_Experiment_Info_URL
             BaseURLExperiment = MTValue
        End Select
-   Next i
+   Next I
 End If
 If Len(BaseURLDataset) > 0 Then
    cmdDatasetInfo.Enabled = True
@@ -1383,6 +1459,32 @@ If Len(BaseURLExperiment) > 0 Then
    cmdExperimentInfo.Enabled = True
 End If
 End Sub
+
+Private Sub RunShellExecute(sTopic As String, _
+                            sFile As Variant, _
+                            sParams As Variant, _
+                            sDirectory As Variant, _
+                            nShowCmd As Long)
+
+   Dim hWndDesk As Long
+   Dim success As Long
+  
+  'the desktop will be the
+  'default for error messages
+   hWndDesk = GetDesktopWindow()
+  
+  'execute the passed operation
+   success = ShellExecute(hWndDesk, sTopic, sFile, sParams, sDirectory, nShowCmd)
+
+  'This is optional. Uncomment the three lines
+  'below to have the "Open With.." dialog appear
+  'when the ShellExecute API call fails
+  'If success = SE_ERR_NOASSOC Then
+  '   Call Shell("rundll32.exe shell32.dll,OpenAs_RunDLL " & sFile, vbNormalFocus)
+  'End If
+   
+End Sub
+
 
 Private Sub UpdateDatasetPath()
     Dim intExtensionIndex As Integer
@@ -1471,3 +1573,12 @@ UpdateInfoForSelectedDBErrorHandler:
     Resume ExitUpdateInfoForSelectedDB
     
 End Sub
+
+Private Sub VerifyAMTFiltersDefined(ByRef objDBStuff As Collection)
+    AddDBStuffItemIfMissing objDBStuff, NAME_MINIMUM_HIGH_NORMALIZED_SCORE, "0"
+    AddDBStuffItemIfMissing objDBStuff, NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE, "0"
+    AddDBStuffItemIfMissing objDBStuff, NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY, "0"
+    AddDBStuffItemIfMissing objDBStuff, NAME_MINIMUM_PMT_QUALITY_SCORE, "1"
+    AddDBStuffItemIfMissing objDBStuff, NAME_INC_LIST, "-1"
+End Sub
+

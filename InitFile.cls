@@ -10,7 +10,7 @@ Attribute VB_Name = "InitFile"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 '-----------------------------------------------------------
 'initialization file class
 'initialization file contains set of blocks of type
@@ -33,7 +33,41 @@ Const faxa_MAX_FILE_SIZE = 100000   'maximum size of editable file
 
 Dim fs As New FileSystemObject
 
-Public Function WriteSection(ByVal FName As String, _
+Public Function CleanComments(ByRef StrArr() As String) As Long
+    '--------------------------------------------------------------
+    'removes comments from StrArr array (if after removing comments
+    'nothing is left array member is deleted; returns number of
+    '"good lines" or faxa_INIT_FILE_ANY_ERROR on any error
+    'comment can take full line or be at the line end in which case
+    'line does not have to be deleted, just cleaned
+    '--------------------------------------------------------------
+    On Error GoTo err_CleanComments
+    Dim i As Long
+    Dim OKCount As Long
+    Dim CommentPos As Long
+    OKCount = 0
+    For i = 0 To UBound(StrArr)    'delete comments from each line
+        CommentPos = InStr(1, StrArr(i), MyGl.INIT_Comment)
+        If CommentPos > 0 Then StrArr(i) = Trim$(Left$(StrArr(i), CommentPos - 1))
+        If Len(StrArr(i)) > 0 Then
+           OKCount = OKCount + 1
+           StrArr(OKCount - 1) = StrArr(i)
+        End If
+    Next i
+    If OKCount > 0 Then
+       If OKCount - 1 < UBound(StrArr) Then ReDim Preserve StrArr(OKCount - 1)
+    Else
+       Erase StrArr
+    End If
+    CleanComments = OKCount
+    Exit Function
+    
+err_CleanComments:
+    CleanComments = faxa_INIT_FILE_ANY_ERROR
+End Function
+
+
+Public Function WriteSection(ByVal fname As String, _
                              ByVal SecName As String, _
                              ByRef NewValue As String) As Long
 '--------------------------------------------------------------
@@ -49,7 +83,7 @@ Dim tsIn As TextStream
 Dim tsOut As TextStream
 On Error GoTo err_WriteSection
 
-Set tsIn = fs.OpenTextFile(FName, ForReading, False)
+Set tsIn = fs.OpenTextFile(fname, ForReading, False)
 sFile = tsIn.ReadAll
 tsIn.Close
 SecStartPos = InStr(1, sFile, SecName)
@@ -70,7 +104,7 @@ With MyGl
    End If
 End With
 
-Set tsOut = fs.CreateTextFile(FName, True)
+Set tsOut = fs.CreateTextFile(fname, True)
 tsOut.Write sFile
 tsOut.Close
 WriteSection = 0
@@ -81,7 +115,7 @@ WriteSection = Err.Number
 End Function
 
 
-Public Function GetSection(ByVal FName As String, _
+Public Function GetSection(ByVal fname As String, _
                            ByVal Section As String, _
                            ByRef Sec() As String) As Long
 '------------------------------------------------------------
@@ -97,7 +131,7 @@ Dim sLine As String
 Dim ts As TextStream
 On Error GoTo err_GetSection
 
-Set ts = fs.OpenTextFile(FName, ForReading, False)
+Set ts = fs.OpenTextFile(fname, ForReading, False)
 
 ReDim Sec(100)      'it is not very likely that section will need more space
 Do Until BOS
@@ -150,7 +184,7 @@ End Select
 End Function
 
 
-Public Function GetResolvedSection(ByVal FName As String, _
+Public Function GetResolvedSection(ByVal fname As String, _
                                    ByVal SectionName As String, _
                                    ByRef SecNames() As String, _
                                    ByRef SecValues() As String) As Long
@@ -165,7 +199,7 @@ Dim ValPos As Long
 Dim i As Long
 On Error GoTo err_GetResolvedSection
 
-SecLnCnt = GetSection(FName, SectionName, Section())
+SecLnCnt = GetSection(fname, SectionName, Section())
 If SecLnCnt > 0 Then
    SecLnCnt = CleanComments(Section())
    If SecLnCnt > 0 Then
@@ -196,7 +230,7 @@ Set fs = Nothing
 End Sub
 
 
-Public Function GetSectionNames(ByVal FName As String, _
+Public Function GetSectionNames(ByVal fname As String, _
                                 ByRef SecNames() As String) As Long
 '------------------------------------------------------------------
 'retrieves names of all sections in FName; returns number of it
@@ -206,7 +240,7 @@ Dim sLine As String
 Dim ts As TextStream
 On Error GoTo err_GetSectionNames
 
-Set ts = fs.OpenTextFile(FName, ForReading, False)
+Set ts = fs.OpenTextFile(fname, ForReading, False)
 ReDim SecNames(100)   'it is not very likely there will be more sections
 SecCnt = 0
 Do Until ts.AtEndOfStream

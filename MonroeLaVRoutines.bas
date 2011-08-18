@@ -53,7 +53,6 @@ Private Enum glDocDataISVarFields
     isvfMTID = 3            'MT tag ID description (could contain multiple ID's, of the form AMT:12345); can also contain NETLK: entries
 End Enum
 
-
 Public Sub AddOrUpdateCollectionArrayItem(ByRef udtCollectionArray() As udtCollectionArrayType, ByRef lngCollectionArrayCount As Long, strNameToUpdate As String, strValue As String, Optional blnAddIfMissingButDoNotUpdate As Boolean = False)
     ' Look in udtCollectionArray() for an entry with .Name = strNameToUpdate
     ' If found, update the value to strValue
@@ -1393,8 +1392,8 @@ End Function
 ''
 ''End Sub
 
-Public Function InitializeSPCommand(cmdSPCommand As ADODB.Command, _
-                                    cnnConnection As ADODB.Connection, _
+Public Function InitializeSPCommand(cmdSPCommand As adodb.Command, _
+                                    cnnConnection As adodb.Connection, _
                                     strSPName As String) As Boolean
                                     
     ' Returns True if success, False if an error
@@ -3926,26 +3925,26 @@ Public Function GetMassTagMatchCount(ByRef udtDBSettings As udtDBSettingsType, B
     ' Returns the count if successful, 0 if no matching records, and 0 if an error
 
     Dim intDBConnectionTimeOutSeconds As Integer
-    Dim cnnConnection As ADODB.Connection
-    Dim rstRecordset As New ADODB.Recordset
+    Dim cnnConnection As adodb.Connection
+    Dim rstRecordset As New adodb.Recordset
 
     Dim sngDBSchemaVersion As Single
 
     Dim sCommand As String
-    Dim cmdGetMassTagMatchCount As New ADODB.Command
+    Dim cmdGetMassTagMatchCount As New adodb.Command
 
     ' Stored procedure parameters
-    Dim prmMTsubsetID As ADODB.Parameter
-    Dim prmAMTsOnly As ADODB.Parameter
-    Dim prmConfirmedOnly As ADODB.Parameter
-    Dim prmLockersOnly As ADODB.Parameter
-    Dim prmMinimumPMTQualityScore As ADODB.Parameter
-    Dim prmMinimumHighNormalizedScore As ADODB.Parameter
-    Dim prmMinimumHighDiscriminantScore As ADODB.Parameter
-    Dim prmExperimentInclusionFilter As ADODB.Parameter
-    Dim prmExperimentExclusionFilter As ADODB.Parameter
-    Dim prmJobToFilterOnByDataset As ADODB.Parameter
-    Dim prmMinimumPeptideProphetProbability As ADODB.Parameter
+    Dim prmMTsubsetID As adodb.Parameter
+    Dim prmAMTsOnly As adodb.Parameter
+    Dim prmConfirmedOnly As adodb.Parameter
+    Dim prmLockersOnly As adodb.Parameter
+    Dim prmMinimumPMTQualityScore As adodb.Parameter
+    Dim prmMinimumHighNormalizedScore As adodb.Parameter
+    Dim prmMinimumHighDiscriminantScore As adodb.Parameter
+    Dim prmExperimentInclusionFilter As adodb.Parameter
+    Dim prmExperimentExclusionFilter As adodb.Parameter
+    Dim prmJobToFilterOnByDataset As adodb.Parameter
+    Dim prmMinimumPeptideProphetProbability As adodb.Parameter
     
     Dim strConnectionString As String
     Dim strCaptionSaved As String
@@ -3990,7 +3989,23 @@ On Error GoTo GetMassTagMatchCountErrorHandler
     strCaptionSaved = frmCallingForm.Caption
     strCaptionBase = "Counting number of matching MT tags: Connecting to database"
     frmCallingForm.Caption = strCaptionBase
-        
+    
+    Const USERID_MTUSER As String = "User ID=MTUser;"
+    
+    If Len(strConnectionString) > Len(USERID_MTUSER) Then
+        If InStr(strConnectionString, USERID_MTUSER) > 0 Then
+            
+            Dim intPasswordLoc As Integer
+            intPasswordLoc = InStr(strConnectionString, "Password=")
+            If intPasswordLoc = 0 Then
+                ' Need to define the password for the MTUser user
+                Debug.Assert False
+                strConnectionString = strConnectionString & ";Password=mt4fun"
+            End If
+            
+        End If
+    End If
+    
     If Not EstablishConnection(cnnConnection, strConnectionString, False) Then
         Debug.Assert False
         frmCallingForm.Caption = strCaptionSaved
@@ -4556,7 +4571,9 @@ On Error GoTo ParseCommandLineErrorHandler
             End If
         Else
             If intSwitchCount > 0 And Not (blnAutoProcess Or blnGenerateIndexHtmlFiles Or blnPRISMAutomationMode) Then
-                blnShowHelp = True
+                If strSwitches(0) <> "T" Then
+                    blnShowHelp = True
+                End If
             End If
         End If
     End If

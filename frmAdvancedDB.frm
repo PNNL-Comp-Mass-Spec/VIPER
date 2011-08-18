@@ -159,7 +159,7 @@ Dim StuffChanged As Boolean               'indicates if stuff text changed
 
 'public properties
 Public AcceptChanges As Boolean
-Public ThisCN As ADODB.Connection         'working connection
+Public ThisCN As adodb.Connection         'working connection
 Public ThisStuff As New Collection        'working stuff
 
 Private Sub cmdCancel_Click()
@@ -182,7 +182,7 @@ Private Sub cmdNewConnectString_Click()
 'asks for new connection string for selected database
 '----------------------------------------------------
 Dim dl As New DataLinks
-Dim NewCn As ADODB.Connection
+Dim NewCn As adodb.Connection
 Set NewCn = dl.PromptNew()
 If Not NewCn Is Nothing Then
    Set ThisCN = NewCn
@@ -227,30 +227,80 @@ Private Sub txtThingees_Change()
 StuffChanged = True
 End Sub
 
-Private Sub StuffRebuild()
-'---------------------------------------------------------
-'rebuilds ThisStuff collection from the Thingees text box
-'---------------------------------------------------------
-Dim i As Long
-On Error Resume Next
-Dim PairsCount As Long
-Dim MyNames() As String
-Dim MyValues() As String
-Dim nv As NameValue
+Private Sub EmptyCollection(SourceCol As Collection)
+    '--------------------------------------------------
+    'removes all items from the collection
+    '--------------------------------------------------
+    Dim i As Long
+    On Error Resume Next
+    For i = 1 To SourceCol.Count
+        SourceCol.Remove 1
+    Next i
+End Sub
 
-'remove whatever is in it
-EmptyCollection ThisStuff
-'rebuild from text box
-PairsCount = GetNamesValues(txtThingees.Text, MyNames(), MyValues())
-If PairsCount > 0 Then
-   Set ThisStuff = New Collection
-   For i = 1 To PairsCount
-       If Len(MyNames(i - 1)) > 0 Then
-          Set nv = New NameValue
-          nv.Name = MyNames(i - 1)
-          nv.Value = MyValues(i - 1)
-          ThisStuff.Add nv, MyNames(i - 1)
-       End If
-   Next i
-End If
+Public Function GetNamesValues(ByVal sText As String, _
+                               ByRef Names() As String, _
+                               ByRef Values() As String) As Long
+    '----------------------------------------------------------------------
+    'resolves sText in lines and then in names and values
+    'sText in arrays of Names and Values separated in lines; returns number
+    'of it/-1 on error; if no "=" is found value is considered to be "None"
+    '----------------------------------------------------------------------
+    Dim Lns() As String
+    Dim LnsCnt As Long
+    Dim ValPos As Long
+    Dim i As Long
+    On Error GoTo err_GetNamesValues
+    
+    Lns = Split(sText, vbCrLf)
+    LnsCnt = UBound(Lns) + 1
+    If LnsCnt > 0 Then
+       ReDim Names(LnsCnt - 1)
+       ReDim Values(LnsCnt - 1)
+       For i = 0 To LnsCnt - 1
+           ValPos = InStr(1, Lns(i), MyGl.INIT_Value)
+           If ValPos > 0 Then
+              Names(i) = Trim(Left$(Lns(i), ValPos - 1))
+              Values(i) = Trim$(Right$(Lns(i), Len(Lns(i)) - ValPos))
+           Else      'everything is name; value is ""
+              Names(i) = Trim(Lns(i))
+              Values(i) = ""
+           End If
+       Next i
+    End If
+    GetNamesValues = LnsCnt
+    Exit Function
+    
+err_GetNamesValues:
+    GetNamesValues = faxa_ANY_ERROR
+    
+End Function
+
+Private Sub StuffRebuild()
+    '---------------------------------------------------------
+    'rebuilds ThisStuff collection from the Thingees text box
+    '---------------------------------------------------------
+    Dim i As Long
+    On Error Resume Next
+    Dim PairsCount As Long
+    Dim MyNames() As String
+    Dim MyValues() As String
+    Dim nv As NameValue
+    
+    'remove whatever is in it
+    EmptyCollection ThisStuff
+    
+    'rebuild from text box
+    PairsCount = GetNamesValues(txtThingees.Text, MyNames(), MyValues())
+    If PairsCount > 0 Then
+       Set ThisStuff = New Collection
+       For i = 1 To PairsCount
+           If Len(MyNames(i - 1)) > 0 Then
+              Set nv = New NameValue
+              nv.Name = MyNames(i - 1)
+              nv.Value = MyValues(i - 1)
+              ThisStuff.add nv, MyNames(i - 1)
+           End If
+       Next i
+    End If
 End Sub

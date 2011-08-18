@@ -151,29 +151,14 @@ Public Event AnalysisDialogClose()
 
 Private MTDBInd As Long                     'index of currently selected db
 Private MTDBCnt As Long                     'count of mass tag databases
-Private MTDBInfo() As udtMTDBInfoType
+Private MTDBInfo() As udtMassTagsAccessMTDBInfoType
 
 Private MTDBCntVisible As Long
 Private MTDBNameListPointers() As Long          ' Used to display database names sorted properly
 
-Private Sub EditAddName(ByRef objCol As Collection, ByVal PairName As String, ByVal NewValue As String)
-'-------------------------------------------------------------------------
-'modifies value of name value pair; if pair does not exist adds it
-'-------------------------------------------------------------------------
-Dim nv As NameValue
-On Error Resume Next
-objCol.Item(PairName).Value = NewValue
-If Err Then
-   Set nv = New NameValue
-   nv.Name = PairName
-   nv.Value = NewValue
-   objCol.Add nv, nv.Name
-End If
-End Sub
-
 Private Sub HighlightDBByName(ByVal strTextToFind As String, ByVal intIndexStart)
     
-    Dim i As Integer
+    Dim I As Integer
     Dim intCharLoc As Integer
     
     If Len(strTextToFind) > 0 And lstOrgMTDBNames.ListCount > 0 Then
@@ -185,28 +170,28 @@ Private Sub HighlightDBByName(ByVal strTextToFind As String, ByVal intIndexStart
             intIndexStart = lstOrgMTDBNames.ListCount - 1
         End If
 
-        i = intIndexStart
+        I = intIndexStart
         Do
-            i = i + 1
-            If i > lstOrgMTDBNames.ListCount - 1 Then
-                i = 0
+            I = I + 1
+            If I > lstOrgMTDBNames.ListCount - 1 Then
+                I = 0
             End If
 
-            intCharLoc = InStr(LCase(lstOrgMTDBNames.List(i)), strTextToFind)
+            intCharLoc = InStr(LCase(lstOrgMTDBNames.List(I)), strTextToFind)
             
             If intCharLoc > 0 Then
-                lstOrgMTDBNames.ListIndex = i
+                lstOrgMTDBNames.ListIndex = I
                 Exit Do
             End If
 
-        Loop While i <> intIndexStart
+        Loop While I <> intIndexStart
         
     End If
     
 End Sub
 
 Private Sub PopulateDatabaseCombobox()
-    Dim i As Long
+    Dim I As Long
     Dim blnShowFrozenDBs As Boolean
     Dim blnShowUnusedDBs As Boolean     ' Forced to False if blnShowFrozenDBs = False
     Dim strDatabaseNameSaved As String
@@ -233,12 +218,12 @@ On Error GoTo PopulateDatabaseComboboxErrorHandler
         
         MTDBCntVisible = UBound(MTDBNameListPointers) + 1
         
-        For i = 0 To MTDBCntVisible - 1
-            lstOrgMTDBNames.AddItem MTDBInfo(MTDBNameListPointers(i)).Name
-            If MTDBInfo(MTDBNameListPointers(i)).Name = strDatabaseNameSaved Then
+        For I = 0 To MTDBCntVisible - 1
+            lstOrgMTDBNames.AddItem MTDBInfo(MTDBNameListPointers(I)).Name
+            If MTDBInfo(MTDBNameListPointers(I)).Name = strDatabaseNameSaved Then
                 lstOrgMTDBNames.ListIndex = lstOrgMTDBNames.ListCount - 1
             End If
-        Next i
+        Next I
         
         If lstOrgMTDBNames.ListIndex < 0 And lstOrgMTDBNames.ListCount > 0 Then
             lstOrgMTDBNames.ListIndex = 0
@@ -298,6 +283,7 @@ DoEvents
 Set fAnalysis = New FTICRAnalysis
 fAnalysis.ProcessingType = fptDummy
 MTDBInd = -1
+
 ' 12/12/2004 mem - Switched from using MT_Main to MTS_Master to retrieve DB info
 Res = GetMTSMasterDirectoryData(InitFileName, MTDBInfo)
 If Res <> 0 Then
@@ -325,31 +311,32 @@ Dim ArgCnt As Long
 Dim MTName As String, MTValue As String
 Dim MTValuePos As Long
 Dim nv As NameValue
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 
 ArgCnt = MyInit.GetSection(InitFileName, MyGl.SECTION_MTDB_Schema, Arg())
 If ArgCnt > 0 Then
-   For i = 0 To ArgCnt - 1
-       MTValuePos = InStr(1, Arg(i), MyGl.INIT_Value)
+   For I = 0 To ArgCnt - 1
+       MTValuePos = InStr(1, Arg(I), MyGl.INIT_Value)
        If MTValuePos > 0 Then
-          MTName = Trim(Left$(Arg(i), MTValuePos - 1))
-          MTValue = Trim$(Right$(Arg(i), Len(Arg(i)) - MTValuePos))
+          MTName = Trim(Left$(Arg(I), MTValuePos - 1))
+          MTValue = Trim$(Right$(Arg(I), Len(Arg(I)) - MTValuePos))
        Else     'everything is a name
-          MTName = Trim(Arg(i))
+          MTName = Trim(Arg(I))
           MTValue = ""
        End If
        If Len(MTName) > 0 Then
           Set nv = New NameValue
           nv.Name = MTName
           nv.Value = MTValue
-          fAnalysis.MTDB.DBStuff.Add nv, nv.Name
+          fAnalysis.MTDB.DBStuff.add nv, nv.Name
        End If   'do nothing if name is missing
-   Next i
+   Next I
 End If
 
 Const NAME_MINIMUM_PMT_QUALITY_SCORE As String = "MinimumPMTQualityScore"
-EditAddName fAnalysis.MTDB.DBStuff, NAME_MINIMUM_PMT_QUALITY_SCORE, "1"
+
+AddUpdateNameValueEntry fAnalysis.MTDB.DBStuff, NAME_MINIMUM_PMT_QUALITY_SCORE, "1"
 
 End Sub
 
@@ -364,7 +351,7 @@ lblMTDBDesc.Caption = ""
 If MTDBInd < 0 Then Exit Function
 lblMTDBDesc.Caption = MTDBInfo(MTDBInd).Description & vbCrLf & "State: " & MTDBInfo(MTDBInd).DBState & vbCrLf & "Server: " & MTDBInfo(MTDBInd).Server
 With fAnalysis.MTDB.cn
-   If .State <> adStateClosed Then .Close
+   If .STATE <> adStateClosed Then .Close
    .ConnectionString = MTDBInfo(MTDBInd).CnStr
 End With
 fAnalysis.Job = -1      'this is dummy analysis
@@ -385,3 +372,4 @@ If Not InitDBConnection() Then
    lblMTDBDesc.Caption = "Error retrieving database connection information!"
 End If
 End Sub
+

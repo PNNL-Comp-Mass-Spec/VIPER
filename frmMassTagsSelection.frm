@@ -551,6 +551,223 @@ Dim bLoading As Boolean         'True until the first activation of form
 
 Public Event DialogClosed()     'public event raised when this dialog is closed
 
+Public Function GetGlobMods(ByVal ConnStr As String, _
+                            ByVal GlobModViewName As String, _
+                            ByRef GlobModID() As Long, _
+                            ByRef GlobModName() As String, _
+                            ByRef GlobModDesc() As String) As Long
+    '------------------------------------------------------------------
+    'retrieves information about global modifications associated with
+    'current mass tag database
+    'Assumption is that 1st column will be of type long and will contain
+    'ID, second column should list mods names third mods description
+    'returns 0 if OK; error number if not
+    'NOTE: this still works although Dynamic and Static modifications
+    'are now separated
+    '------------------------------------------------------------------
+    Dim NewCn As adodb.Connection
+    Dim NewRs As adodb.Recordset
+    Dim Res As Long
+    Dim GlobModCnt As Long
+    On Error GoTo err_GetGlobMods
+    
+    ReDim GlobModID(141)    'should be plenty
+    ReDim GlobModName(141)
+    ReDim GlobModDesc(141)
+    
+    If Len(GlobModViewName) > 0 Then
+       Set NewCn = New adodb.Connection
+       NewCn.Open ConnStr
+    
+       Set NewRs = New adodb.Recordset
+       NewRs.CursorLocation = adUseClient
+       NewRs.Open GlobModViewName, NewCn, adOpenStatic, adLockReadOnly
+          
+       Do Until NewRs.EOF
+          GlobModCnt = GlobModCnt + 1
+          GlobModID(GlobModCnt - 1) = NewRs.Fields(0).Value
+          GlobModName(GlobModCnt - 1) = Trim$(NewRs.Fields(1).Value)
+          GlobModDesc(GlobModCnt - 1) = NewRs.Fields(2).Value
+          NewRs.MoveNext
+       Loop
+    End If
+    
+    If GlobModCnt > 0 Then
+       ReDim Preserve GlobModID(GlobModCnt - 1)
+       ReDim Preserve GlobModName(GlobModCnt - 1)
+       ReDim Preserve GlobModDesc(GlobModCnt - 1)
+    Else
+       Erase GlobModID
+       Erase GlobModName
+       Erase GlobModDesc
+    End If
+    
+exit_GetGlobMods:
+    NewRs.ActiveConnection = Nothing
+    Set NewRs = Nothing
+    If NewCn.STATE <> adStateClosed Then NewCn.Close
+    Set NewCn = Nothing
+    Exit Function
+    
+err_GetGlobMods:
+    Select Case Err.Number
+    Case 9           'subscript out of range
+       ReDim Preserve GlobModID(GlobModCnt + 100)
+       ReDim Preserve GlobModName(GlobModCnt + 100)
+       ReDim Preserve GlobModDesc(GlobModCnt + 100)
+       Resume
+    Case 13, 94      'type mismatch, invalid use of null
+       Resume Next
+    Case Else        'something else
+       Erase GlobModID
+       Erase GlobModName
+       Erase GlobModDesc
+       GetGlobMods = Err.Number
+       GoTo exit_GetGlobMods
+    End Select
+End Function
+
+Public Function GetInternalStandardNames(ByVal ConnStr As String, _
+                                         ByVal InternalStdsViewName As String, _
+                                         ByRef intInternalStandardCount As Integer, _
+                                         ByRef strInternalStandardNames() As String) As Long
+    
+    '------------------------------------------------------------------
+    ' Retrieves information about Internal Standards defined
+    '  Assumption is that 1st column will be of type long and will contain
+    '  ID, second column should list internal standard name, and third the description
+    '  Populates strInternalStandardNames() with the names
+    '
+    ' Returns 0 if OK; error number if not
+    '------------------------------------------------------------------
+    
+    Dim NewCn As adodb.Connection
+    Dim NewRs As adodb.Recordset
+    Dim Res As Long
+    
+On Error GoTo GetInternalStandardNamesErrorHandler
+    
+    ' Initially reserve space for 100 internal standards
+    intInternalStandardCount = 0
+    ReDim strInternalStandardNames(100)
+    
+    If Len(InternalStdsViewName) > 0 Then
+       Set NewCn = New adodb.Connection
+       NewCn.Open ConnStr
+    
+       Set NewRs = New adodb.Recordset
+       NewRs.CursorLocation = adUseClient
+       NewRs.Open InternalStdsViewName, NewCn, adOpenStatic, adLockReadOnly
+          
+       Do Until NewRs.EOF
+          strInternalStandardNames(intInternalStandardCount) = Trim(NewRs.Fields(1).Value)
+          intInternalStandardCount = intInternalStandardCount + 1
+          NewRs.MoveNext
+       Loop
+    End If
+    
+    If intInternalStandardCount > 0 Then
+       ReDim Preserve strInternalStandardNames(intInternalStandardCount - 1)
+    Else
+       Erase strInternalStandardNames
+    End If
+    
+GetInternalStandardNamesExit:
+    NewRs.ActiveConnection = Nothing
+    Set NewRs = Nothing
+    If NewCn.STATE <> adStateClosed Then NewCn.Close
+    Set NewCn = Nothing
+    Exit Function
+    
+GetInternalStandardNamesErrorHandler:
+    Select Case Err.Number
+    Case 9           'subscript out of range
+       ReDim Preserve strInternalStandardNames(intInternalStandardCount + 100)
+       Resume
+    Case 13, 94      'type mismatch, invalid use of null
+       Resume Next
+    Case Else        'something else
+       Erase strInternalStandardNames
+       GetInternalStandardNames = Err.Number
+       Resume GetInternalStandardNamesExit
+    End Select
+
+End Function
+
+
+Public Function GetMTSubsets(ByVal ConnStr As String, _
+                             ByVal MTSSSQL As String, _
+                             ByRef MTSSID() As Long, _
+                             ByRef MTSSName() As String, _
+                             ByRef MTSSDesc() As String) As Long
+                             
+    '---------------------------------------------------------------
+    'retrieves information about existing Mass Tag database subsets
+    'connection string for database to search and SQL to retrieve
+    'subsets list are input parameters
+    'Assumption is that first returned column will be of type integer
+    'and will contain ID, second column should list subsets names
+    'and third subset description
+    'returns 0 if OK; error number if not
+    '---------------------------------------------------------------
+    Dim NewCn As adodb.Connection
+    Dim NewRs As adodb.Recordset
+    Dim Res As Long
+    Dim MTSSCnt As Long
+    On Error GoTo err_GetMTSubsets
+    
+    ReDim MTSSID(141)    'should be plenty
+    ReDim MTSSName(141)
+    ReDim MTSSDesc(141)
+    
+    If Len(MTSSSQL) > 0 Then
+       Set NewCn = New adodb.Connection
+       NewCn.Open ConnStr
+    
+       Set NewRs = New adodb.Recordset
+       NewRs.CursorLocation = adUseClient
+       NewRs.Open MTSSSQL, NewCn, adOpenStatic, adLockReadOnly
+          
+       Do Until NewRs.EOF
+          MTSSCnt = MTSSCnt + 1
+          MTSSID(MTSSCnt - 1) = NewRs.Fields(0).Value
+          MTSSName(MTSSCnt - 1) = NewRs.Fields(1).Value
+          MTSSDesc(MTSSCnt - 1) = NewRs.Fields(2).Value
+          NewRs.MoveNext
+       Loop
+    End If
+    
+    If MTSSCnt > 0 Then
+       ReDim Preserve MTSSID(MTSSCnt - 1)
+       ReDim Preserve MTSSName(MTSSCnt - 1)
+       ReDim Preserve MTSSDesc(MTSSCnt - 1)
+    Else
+       Erase MTSSID
+       Erase MTSSName
+       Erase MTSSDesc
+    End If
+    
+exit_GetMTSubsets:
+    NewRs.ActiveConnection = Nothing
+    Set NewRs = Nothing
+    If NewCn.STATE <> adStateClosed Then NewCn.Close
+    Set NewCn = Nothing
+    Exit Function
+    
+err_GetMTSubsets:
+    Select Case Err.Number
+    Case 9           'subscript out of range
+       ReDim Preserve MTSSID(MTSSCnt + 100)
+       ReDim Preserve MTSSName(MTSSCnt + 100)
+       ReDim Preserve MTSSDesc(MTSSCnt + 100)
+       Resume
+    Case 13, 94      'type mismatch, invalid use of null
+       Resume Next
+    Case Else        'something else
+       GetMTSubsets = Err.Number
+       GoTo exit_GetMTSubsets
+    End Select
+End Function
 
 Private Sub InitDBSchemaVersion()
     ' Query the database to determine the schema version
@@ -864,7 +1081,7 @@ Dim actIncItem As String    'actual inclusion list item
 Dim DName As String
 Dim DID As Long
 Dim SName As String
-Dim SID As Long
+Dim sID As Long
 Dim lDPart As String        ' dynamic part that goes to user interface
 Dim aDPart As String        ' actual dynamic part
 Dim lSPart As String
@@ -897,19 +1114,19 @@ If DBSchemaVersion < 2 Then
     End Select
     'resolve static modifications selection
     SName = cmbSMod.Text
-    SID = GetIDFromNameS(SName)
+    sID = GetIDFromNameS(SName)
     Select Case SIsIsNotAny
     Case l_Is
-         If SID >= 0 Then
+         If sID >= 0 Then
             lSPart = VC_Static & Chr$(32) & SName
-            aSPart = VC_Static & Chr$(32) & SID
+            aSPart = VC_Static & Chr$(32) & sID
          Else
             GoTo err_cmdInclude_Click
          End If
     Case l_IsNot
-         If SID >= 0 Then
+         If sID >= 0 Then
             lSPart = VC_Static & Chr$(32) & VC_Not & Chr$(32) & SName
-            aSPart = VC_Static & Chr$(32) & VC_Not & Chr$(32) & SID
+            aSPart = VC_Static & Chr$(32) & VC_Not & Chr$(32) & sID
          Else
             GoTo err_cmdInclude_Click
          End If
@@ -1096,7 +1313,7 @@ If Err Then
    Set nv = New NameValue
    nv.Name = PairName
    nv.Value = NewValue
-   MyStuff.Add nv, nv.Name
+   MyStuff.add nv, nv.Name
 End If
 End Sub
 
@@ -1390,7 +1607,7 @@ For i = 0 To SGlobModCnt - 1
 Next i
 End Function
 
-Public Function GetNameFromIDS(ByVal SID As Long) As String
+Public Function GetNameFromIDS(ByVal sID As Long) As String
 '------------------------------------------------------------
 'returns name of static modification for specified ID
 'empty string if err or not found
@@ -1398,7 +1615,7 @@ Public Function GetNameFromIDS(ByVal SID As Long) As String
 Dim i As Long
 On Error Resume Next
 For i = 0 To SGlobModCnt - 1
-    If SGlobModID(i) = SID Then
+    If SGlobModID(i) = sID Then
        GetNameFromIDS = SGlobModName(i)
        Exit Function
     End If
@@ -1470,7 +1687,7 @@ ShowHideControls
 TmpVal = ""
 TmpVal = MyStuff.Item(NAME_MINIMUM_HIGH_NORMALIZED_SCORE).Value
 If IsNumeric(TmpVal) Then
-    If Val(TmpVal) < 0 Or Val(TmpVal) > 10000 Then
+    If val(TmpVal) < 0 Or val(TmpVal) > 10000 Then
         TmpVal = "0"
     End If
     txtMinimumHighNormalizedScore = TmpVal
@@ -1481,7 +1698,7 @@ End If
 TmpVal = ""
 TmpVal = MyStuff.Item(NAME_MINIMUM_HIGH_DISCRIMINANT_SCORE).Value
 If IsNumeric(TmpVal) Then
-    If Val(TmpVal) < 0 Or Val(TmpVal) > 10000 Then
+    If val(TmpVal) < 0 Or val(TmpVal) > 10000 Then
         TmpVal = "0"
     End If
     txtMinimumHighDiscriminantScore = TmpVal
@@ -1492,7 +1709,7 @@ End If
 TmpVal = ""
 TmpVal = MyStuff.Item(NAME_MINIMUM_PEPTIDE_PROPHET_PROBABILITY).Value
 If IsNumeric(TmpVal) Then
-    If Val(TmpVal) < 0 Or Val(TmpVal) > 10000 Then
+    If val(TmpVal) < 0 Or val(TmpVal) > 10000 Then
         TmpVal = "0"
     End If
     txtMinimumPeptideProphetProbability = TmpVal
@@ -1503,7 +1720,7 @@ End If
 TmpVal = ""
 TmpVal = MyStuff.Item(NAME_MINIMUM_PMT_QUALITY_SCORE).Value
 If IsNumeric(TmpVal) Then
-    If Val(TmpVal) < 0 Or Val(TmpVal) > 10000 Then
+    If val(TmpVal) < 0 Or val(TmpVal) > 10000 Then
         TmpVal = "1"
     End If
     txtMinimumPMTQualityScore = TmpVal
@@ -1534,10 +1751,10 @@ Next intIndex
 TmpVal = ""
 TmpVal = MyStuff.Item(NAME_NET_VALUE_TYPE).Value
 If IsNumeric(TmpVal) Then
-    If Val(TmpVal) < nvtGANET Or Val(TmpVal) > nvtTheoreticalNET Then
+    If val(TmpVal) < nvtGANET Or val(TmpVal) > nvtTheoreticalNET Then
         TmpVal = CStr(nvtGANET)
     End If
-    cboNETValueType.ListIndex = Val(TmpVal)
+    cboNETValueType.ListIndex = val(TmpVal)
 Else
     cboNETValueType.ListIndex = nvtGANET
 End If
@@ -1546,9 +1763,9 @@ End Sub
 
 Private Sub txtMinimumHighDiscriminantScore_LostFocus()
   If IsNumeric(txtMinimumHighDiscriminantScore) Then
-        If Val(txtMinimumHighDiscriminantScore) < 0 Then
+        If val(txtMinimumHighDiscriminantScore) < 0 Then
             txtMinimumHighDiscriminantScore = "0"
-        ElseIf Val(txtMinimumHighDiscriminantScore) > 1 Then
+        ElseIf val(txtMinimumHighDiscriminantScore) > 1 Then
             txtMinimumHighDiscriminantScore = ".999"
         End If
     Else
@@ -1558,9 +1775,9 @@ End Sub
 
 Private Sub txtMinimumHighNormalizedScore_LostFocus()
     If IsNumeric(txtMinimumHighNormalizedScore) Then
-        If Val(txtMinimumHighNormalizedScore) < 0 Then
+        If val(txtMinimumHighNormalizedScore) < 0 Then
             txtMinimumHighNormalizedScore = "0"
-        ElseIf Val(txtMinimumHighNormalizedScore) > 1000 Then
+        ElseIf val(txtMinimumHighNormalizedScore) > 1000 Then
             txtMinimumHighNormalizedScore = "4"
         End If
     Else
@@ -1570,9 +1787,9 @@ End Sub
 
 Private Sub txtMinimumPeptideProphetProbability_LostFocus()
     If IsNumeric(txtMinimumPeptideProphetProbability) Then
-        If Val(txtMinimumPeptideProphetProbability) < 0 Then
+        If val(txtMinimumPeptideProphetProbability) < 0 Then
             txtMinimumPeptideProphetProbability = "0"
-        ElseIf Val(txtMinimumPeptideProphetProbability) > 1 Then
+        ElseIf val(txtMinimumPeptideProphetProbability) > 1 Then
             txtMinimumPeptideProphetProbability = ".999"
         End If
     Else
@@ -1583,7 +1800,7 @@ End Sub
 
 Private Sub txtMinimumPMTQualityScore_LostFocus()
     If IsNumeric(txtMinimumPMTQualityScore) Then
-        If Val(txtMinimumPMTQualityScore) < 0 Or Val(txtMinimumPMTQualityScore) > 1000 Then
+        If val(txtMinimumPMTQualityScore) < 0 Or val(txtMinimumPMTQualityScore) > 1000 Then
             txtMinimumPMTQualityScore = "1"
         End If
     Else
