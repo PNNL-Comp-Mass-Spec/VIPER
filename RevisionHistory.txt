@@ -1,5 +1,9 @@
 VIPER Change Log
 
+Version 3.48 - Build 450; August 30, 2011
+	- Fixed bug that occurred when reading the .Ini file after invoking VIPER.exe with a command line call using /I 
+	  (for example VIPER.Exe /i:F:\Temp\InputFile_LCMSFeatures.txt /n:F:\Temp\ViperDT\IMS_PredefinedFeatures.ini)
+
 Version 3.48 - Build 449; August 17, 2011
 	- When loading _LCMSFeatures.txt files, now logging that the various isotopic-based filters do not apply 
 	- No longer using MassTagsAccess.dll

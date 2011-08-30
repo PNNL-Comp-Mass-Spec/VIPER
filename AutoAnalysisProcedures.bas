@@ -2515,6 +2515,8 @@ On Error GoTo LoadOptionsErrorHandler
     End If
     
     If Not udtAutoParams.MTDBOverride.Enabled Then
+        VerifyNameDefined GelAnalysis(udtWorkingParams.GelIndex).MTDB.DBStuff, NAME_INC_LIST, "-1"
+        
         If Len(GelAnalysis(udtWorkingParams.GelIndex).MTDB.DBStuff(NAME_INC_LIST).Value) = 0 Then
             ' It is important that Name_Inc_List not be blank for DB Schema Version < 2
             ' Change to -1
@@ -2595,6 +2597,7 @@ On Error GoTo LoadOptionsErrorHandler
     
 LoadOptionsErrorHandler:
     Debug.Assert False
+    
     strMessage = "Error - An error has occurred while loading/setting options during auto analysis: " & Err.Description
     If udtWorkingParams.ts Is Nothing And udtAutoParams.ShowMessages Then
         MsgBox strMessage, vbExclamation + vbOKOnly, "Error"
@@ -7459,17 +7462,17 @@ Private Function LookupMatchStatsForPeakMatchingTask(ByVal strServerName As Stri
     ' Call GetPeakMatchingTaskResultStats in database strMTDBName
     ' Returns True if success, false if an error
     
-    Dim cnnConnection As adodb.Connection
+    Dim cnnConnection As ADODB.Connection
     
-    Dim cmdGetPMStats As New adodb.Command
+    Dim cmdGetPMStats As New ADODB.Command
     
-    Dim prmPeakMatchingTaskID As New adodb.Parameter
-    Dim prmJobNumber  As New adodb.Parameter
-    Dim prmNonUniqueHitsCount As New adodb.Parameter
-    Dim prmUMCCount As New adodb.Parameter
-    Dim prmUMCCountWithHits As New adodb.Parameter
-    Dim prmUniqueMassTagHitCount As New adodb.Parameter
-    Dim prmMessage As New adodb.Parameter
+    Dim prmPeakMatchingTaskID As New ADODB.Parameter
+    Dim prmJobNumber  As New ADODB.Parameter
+    Dim prmNonUniqueHitsCount As New ADODB.Parameter
+    Dim prmUMCCount As New ADODB.Parameter
+    Dim prmUMCCountWithHits As New ADODB.Parameter
+    Dim prmUniqueMassTagHitCount As New ADODB.Parameter
+    Dim prmMessage As New ADODB.Parameter
     
     Dim strConnectionString As String
     Dim strSPName As String

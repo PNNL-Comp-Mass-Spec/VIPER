@@ -21,7 +21,7 @@ Option Explicit
 
 Const MTDBStartLineToken = "LaORFDB"
 
-Public WithEvents cn As adodb.Connection
+Public WithEvents cn As ADODB.Connection
 Attribute cn.VB_VarHelpID = -1
 
 Public DBStuff As New Collection
@@ -31,7 +31,7 @@ Private Sub Class_Initialize()
 '--------------------------------------
 'create new ADO connection
 '--------------------------------------
-Set cn = New adodb.Connection
+Set cn = New ADODB.Connection
 DBStatus = dbsNotReady
 End Sub
 
