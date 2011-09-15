@@ -13,7 +13,7 @@ Public DB_CONNECTION_TIMEOUT As Long        ' Default 120
 Private Const SECONDS_PER_DAY = 86400
 
 
-Public Function EstablishConnection(cnnConnection As ADODB.Connection, strConnectionString As String, Optional blnUseFormProgress As Boolean = True, Optional lngTimeoutOverrideSeconds As Long = 0) As Boolean
+Public Function EstablishConnection(cnnConnection As adodb.Connection, strConnectionString As String, Optional blnUseFormProgress As Boolean = True, Optional lngTimeoutOverrideSeconds As Long = 0) As Boolean
     ' If lngTimeoutOverrideSeconds is > 0, then that value overrides .DBConnectionTimeoutSeconds
     
     Dim lngSecElapsed As Long
@@ -23,7 +23,7 @@ On Error GoTo EstablishConnectionResume
 
     TraceLog 3, "EstablishConnection", "Set cnnConnection = New ADODB.Connection"
 
-    Set cnnConnection = New ADODB.Connection
+    Set cnnConnection = New adodb.Connection
     
     If lngTimeoutOverrideSeconds > 0 Then
         DB_CONNECTION_TIMEOUT = lngTimeoutOverrideSeconds

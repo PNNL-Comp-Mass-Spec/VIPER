@@ -4000,7 +4000,12 @@ On Error GoTo GetMassTagMatchCountErrorHandler
             If intPasswordLoc = 0 Then
                 ' Need to define the password for the MTUser user
                 Debug.Assert False
-                strConnectionString = strConnectionString & ";Password=mt4fun"
+                strConnectionString = Trim(strConnectionString)
+                If Right(strConnectionString, 1) <> ";" Then strConnectionString = strConnectionString & ";"
+                strConnectionString = strConnectionString & "Password=mt4fun"
+                
+                udtDBSettings.AnalysisInfo.MTDB.ConnectionString = strConnectionString
+                udtDBSettings.ConnectionString = strConnectionString
             End If
             
         End If

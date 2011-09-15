@@ -2394,9 +2394,11 @@ Exit Function
 
 err_ExportMTDBbyUMC:
 Debug.Assert False
-LogErrors Err.Number, "ExportMTDBbyUMCToUMCResultsTable"
+LogErrors Err.Number, "ExportMTDBbyUMCToUMCResultsTable (Job " & GelAnalysis(CallerID).MD_Reference_Job & ", MD_ID " & lngMDID & ")"
 If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
     MsgBox "Error exporting matches to the LC-MS Feature results table: " & Err.Description, vbExclamation + vbOKOnly, glFGTU
+Else
+    AddToAnalysisHistory CallerID, "Error exporting to LC-MS Feature Results table (occurred at " & lngPointer & "/" & mMatchStatsCount & "; MDID is " & lngMDID & "): " & Err.Description
 End If
 
 err_Cleanup:
@@ -2428,8 +2430,10 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
         udtPutUMCInternalStdMatchParams.MatchScore.Value = mUMCMatchStats(lngPointer).StacOrSLiC
         udtPutUMCInternalStdMatchParams.ExpectedNET.Value = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).NET
         udtPutUMCInternalStdMatchParams.DelMatchScore.Value = mUMCMatchStats(lngPointer).DelScore
-        udtPutUMCInternalStdMatchParams.UniquenessProbability.Value = CSng(mUMCMatchStats(lngPointer).UniquenessProbability)
-        udtPutUMCInternalStdMatchParams.FDRThreshold.Value = CSng(mUMCMatchStats(lngPointer).FDRThreshold)
+        
+        ' Use CSqlReal instead of CSng to avoid transport errors for values between 1E-45 and 1.1E-38
+        udtPutUMCInternalStdMatchParams.UniquenessProbability.Value = CSqlReal(mUMCMatchStats(lngPointer).UniquenessProbability)
+        udtPutUMCInternalStdMatchParams.FDRThreshold.Value = CSqlReal(mUMCMatchStats(lngPointer).FDRThreshold)
         
         cmdPutNewUMCInternalStdMatch.Execute
         
@@ -2447,15 +2451,15 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
         If Len(mMTMods(lngMassTagIndexPointer)) > 0 Then
             strMassMods = strMassMods & " " & Trim(mMTMods(lngMassTagIndexPointer))
             If NTypeStr = MOD_TKN_N14 Then
-                udtPutUMCMatchParams.MassTagModMass.Value = CSng(mMTMWN14(mUMCMatchStats(lngPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW)
+                udtPutUMCMatchParams.MassTagModMass.Value = CSqlReal(mMTMWN14(mUMCMatchStats(lngPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW)
             Else
-                udtPutUMCMatchParams.MassTagModMass.Value = CSng(mMTMWN15(mUMCMatchStats(lngPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW)
+                udtPutUMCMatchParams.MassTagModMass.Value = CSqlReal(mMTMWN15(mUMCMatchStats(lngPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW)
             End If
         Else
             If NTypeStr = MOD_TKN_N14 Then
                 udtPutUMCMatchParams.MassTagModMass.Value = 0
             Else
-                udtPutUMCMatchParams.MassTagModMass.Value = CSng(glN14N15_DELTA * AMTData(lngMassTagIndexOriginal).CNT_N)
+                udtPutUMCMatchParams.MassTagModMass.Value = CSqlReal(glN14N15_DELTA * AMTData(lngMassTagIndexOriginal).CNT_N)
             End If
         End If
         
@@ -3404,6 +3408,8 @@ Private Function LoadSTACResults(ByRef fso As FileSystemObject, _
     Dim MWTolAbsFinal As Double
     Dim NETTolFinal As Double
     
+    Dim lngMassDiffWarningCount As Long
+    
 On Error GoTo LoadSTACResultsErrorHandler
 
     If Not ManageCurrID(MNG_RESET) Then
@@ -3421,6 +3427,7 @@ On Error GoTo LoadSTACResultsErrorHandler
     Set ts = fso.OpenTextFile(strSTACDataFilePath, ForReading, False)
    
     lngUMCIndexSaved = -1
+    lngMassDiffWarningCount = 0
     
     Do While Not ts.AtEndOfStream
         strLineIn = ts.ReadLine
@@ -3508,7 +3515,7 @@ On Error GoTo LoadSTACResultsErrorHandler
                     
                     mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned = dblFeatureDriftTimeAligned
                     
-                    If Not mCurrIDMatches(mCurrIDCnt).IDIsInternalStd And samtDef.UseDriftTime Then
+                    If Not mCurrIDMatches(mCurrIDCnt).IDIsInternalStd And mMTListContainsConformers And samtDef.UseDriftTime Then
                         lngMassTagIndexPointer = mMTInd(mCurrIDMatches(mCurrIDCnt).IDInd)
                         lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
                         
@@ -3538,7 +3545,12 @@ On Error GoTo LoadSTACResultsErrorHandler
                         dblMatchNET = AMTData(lngMassTagIndexOriginal).NET
                         
                         ' Unless something wacky is going on, the difference in mass between the UMC and the MT Tag should be less than 1 Da
-                        Debug.Assert Abs(GelUMC(CallerID).UMCs(lngUMCIndex).ClassMW - dblMatchMass) < 1
+                        If Abs(GelUMC(CallerID).UMCs(lngUMCIndex).ClassMW - dblMatchMass) >= 1 Then
+                            lngMassDiffWarningCount = lngMassDiffWarningCount + 1
+                            If lngMassDiffWarningCount < 5 Then
+                                Debug.Assert False
+                            End If
+                        End If
                     End If
                     
                     mCurrIDCnt = mCurrIDCnt + 1
@@ -4966,7 +4978,7 @@ Private Sub RecordSearchResultsInData()
 
 On Error GoTo RecordSearchResultsInDataErrorHandler
 
-    If samtDef.UseDriftTime And samtDef.DriftTimeTol >= 0 Then
+    If mMTListContainsConformers And samtDef.UseDriftTime And samtDef.DriftTimeTol >= 0 Then
         blnDriftTimesWereUsed = True
     Else
         blnDriftTimesWereUsed = False
@@ -5356,7 +5368,7 @@ If ManageCurrID(MNG_RESET) Then
     End If
     
     Dim dblDriftTimeTol
-    If GelContainsIMSData() And samtDef.UseDriftTime Then
+    If mMTListContainsConformers And GelContainsIMSData() And samtDef.UseDriftTime Then
         dblDriftTimeTol = samtDef.DriftTimeTol
     Else
         dblDriftTimeTol = -1
@@ -5662,7 +5674,7 @@ Private Function SearchUMCsUsingSTAC(ByVal eSearchMode As eSearchModeConstants) 
     If sngMaxProcessingTimeMinutes < 1 Then sngMaxProcessingTimeMinutes = 1
     If sngMaxProcessingTimeMinutes > 300 Then sngMaxProcessingTimeMinutes = 300
     
-    If GelContainsIMSData() And samtDef.UseDriftTime Then
+    If mMTListContainsConformers And GelContainsIMSData() And samtDef.UseDriftTime Then
         blnUseDriftTime = True
     Else
         blnUseDriftTime = False
@@ -7368,10 +7380,15 @@ On Error GoTo UpdateSTACPlotErrorHandler
         lngTargetIndex = STACStatsCount - 1 - lngIndex
         
         varMatches(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
-        varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueAMTs
-        
         varMatchesFiltered(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
-        varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueAMTs
+        
+        If mMTListContainsConformers Then
+            varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueConformers
+            varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueConformers
+        Else
+            varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueAMTs
+            varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueAMTs
+        End If
 
         varFDR(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
         If blnUPFilteredFDR Then
@@ -7411,12 +7428,22 @@ Private Sub UpdateSTACPlotLayout()
     
     Dim strCaption As String
     
-    strCaption = "STAC Trends -- Red=FDR, Blue=Unique AMTs, Green=UP Filtered AMTs"
+    If mMTListContainsConformers Then
+        strCaption = "STAC Trends -- Red=FDR, Blue=Unique Conf, Green=UP Filtered Conf"
+    Else
+        strCaption = "STAC Trends -- Red=FDR, Blue=Unique AMTs, Green=UP Filtered AMTs"
+    End If
+    
     
     ctlSTACStats.Caption = strCaption
     
     ctlSTACStats.Axes(1).Caption = "STAC Threshold"
-    ctlSTACStats.Axes(2).Caption = "Unique AMTs"
+    
+    If mMTListContainsConformers Then
+        ctlSTACStats.Axes(2).Caption = "Unique Conformers"
+    Else
+        ctlSTACStats.Axes(2).Caption = "Unique AMTs"
+    End If
     
     If Me.PlotUPFilteredFDR Then
         ctlSTACStats.Axes(3).Caption = "FDR, UP > 0.5"

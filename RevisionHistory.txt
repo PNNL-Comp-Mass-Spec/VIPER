@@ -1,5 +1,18 @@
 VIPER Change Log
 
+Version 3.48 - Build 453; September 14, 2011
+	- Fixed bug that failed to plot UP-Filtered Unique AMTs on the STAC plot
+	- New version of STAC
+		- Fixes indexing bug that was observed when searching paired-features only or Light Members plus Unpaired features
+
+Version 3.48 - Build 452; September 12, 2011
+	- Tweaks in Conglomerate UMC Search form
+		- Now labeling axes as "Unique Conformers" instead of "Unique AMTs" if conformers were searched
+
+Version 3.48 - Build 451; September 12, 2011
+	- Fixed bug that led to a transport error when passing values between 1E-45 and 1.1E-38	to a stored procedure parameter of type real 
+		- Primarily affects AddFTICRUmcMatch and AddFTICRUmcInternalStdMatch
+
 Version 3.48 - Build 450; August 30, 2011
 	- Fixed bug that occurred when reading the .Ini file after invoking VIPER.exe with a command line call using /I 
 	  (for example VIPER.Exe /i:F:\Temp\InputFile_LCMSFeatures.txt /n:F:\Temp\ViperDT\IMS_PredefinedFeatures.ini)

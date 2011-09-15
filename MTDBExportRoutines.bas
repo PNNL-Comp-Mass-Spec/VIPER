@@ -2,42 +2,42 @@ Attribute VB_Name = "MTDBExportRoutines"
 Option Explicit
 
 Public Type udtPutUMCParamsListType
-    MDID As ADODB.Parameter
-    UMCInd As ADODB.Parameter
-    MemberCount As ADODB.Parameter
-    MemberCountUsedForAbu As ADODB.Parameter
-    UMCScore As ADODB.Parameter
-    ScanFirst As ADODB.Parameter
-    ScanLast As ADODB.Parameter
-    ScanMaxAbundance As ADODB.Parameter
-    ClassMass As ADODB.Parameter
-    MonoisotopicMassMin As ADODB.Parameter
-    MonoisotopicMassMax As ADODB.Parameter
-    MonoisotopicMassStDev As ADODB.Parameter
-    MonoisotopicMassMaxAbu As ADODB.Parameter
-    ClassAbundance As ADODB.Parameter
-    AbundanceMin As ADODB.Parameter
-    AbundanceMax As ADODB.Parameter
-    ChargeStateMin As ADODB.Parameter
-    ChargeStateMax As ADODB.Parameter
-    ChargeStateMaxAbu As ADODB.Parameter
-    FitAverage As ADODB.Parameter
-    FitMin As ADODB.Parameter
-    FitMax As ADODB.Parameter
-    FitStDev As ADODB.Parameter
-    ElutionTime As ADODB.Parameter
-    ExpressionRatio As ADODB.Parameter
-    ExpressionRatioStDev As ADODB.Parameter
-    ExpressionRatioChargeStateBasisCount As ADODB.Parameter
-    ExpressionRatioMemberBasisCount As ADODB.Parameter
-    PeakFPRType As ADODB.Parameter                  ' 0 = Standard, 1 = Pair - N14/N15 - Light, 2 = Pair - N14/N15 - Heavy, etc.
-    MassTagHitCount As ADODB.Parameter
-    PairUMCInd As ADODB.Parameter                   ' Index of the pair that this UMC belongs to; -1 if not a menber of a pair
-    UMCResultsIDReturn As ADODB.Parameter           ' Return value of the index of the row just added
-    ClassStatsChargeBasis As ADODB.Parameter        ' Charge state of the charge group used for determing Class Mass and Class Abundance when GelUMC().def.UMCClassStatsUseStatsFromMostAbuChargeState = True; Otherwise use 0
-    InternalStdCount As ADODB.Parameter             ' The number of Internal Standards that this UMC matched
-    DriftTime As ADODB.Parameter                    ' IMS Drift Time (reported on instrument)
-    DriftTimeAligned As ADODB.Parameter             ' IMS Drift Time (aligned by STAC to the AMT tags loaded in memory)
+    MDID As adodb.Parameter
+    UMCInd As adodb.Parameter
+    MemberCount As adodb.Parameter
+    MemberCountUsedForAbu As adodb.Parameter
+    UMCScore As adodb.Parameter
+    ScanFirst As adodb.Parameter
+    ScanLast As adodb.Parameter
+    ScanMaxAbundance As adodb.Parameter
+    ClassMass As adodb.Parameter
+    MonoisotopicMassMin As adodb.Parameter
+    MonoisotopicMassMax As adodb.Parameter
+    MonoisotopicMassStDev As adodb.Parameter
+    MonoisotopicMassMaxAbu As adodb.Parameter
+    ClassAbundance As adodb.Parameter
+    AbundanceMin As adodb.Parameter
+    AbundanceMax As adodb.Parameter
+    ChargeStateMin As adodb.Parameter
+    ChargeStateMax As adodb.Parameter
+    ChargeStateMaxAbu As adodb.Parameter
+    FitAverage As adodb.Parameter
+    FitMin As adodb.Parameter
+    FitMax As adodb.Parameter
+    FitStDev As adodb.Parameter
+    ElutionTime As adodb.Parameter
+    ExpressionRatio As adodb.Parameter
+    ExpressionRatioStDev As adodb.Parameter
+    ExpressionRatioChargeStateBasisCount As adodb.Parameter
+    ExpressionRatioMemberBasisCount As adodb.Parameter
+    PeakFPRType As adodb.Parameter                  ' 0 = Standard, 1 = Pair - N14/N15 - Light, 2 = Pair - N14/N15 - Heavy, etc.
+    MassTagHitCount As adodb.Parameter
+    PairUMCInd As adodb.Parameter                   ' Index of the pair that this UMC belongs to; -1 if not a menber of a pair
+    UMCResultsIDReturn As adodb.Parameter           ' Return value of the index of the row just added
+    ClassStatsChargeBasis As adodb.Parameter        ' Charge state of the charge group used for determing Class Mass and Class Abundance when GelUMC().def.UMCClassStatsUseStatsFromMostAbuChargeState = True; Otherwise use 0
+    InternalStdCount As adodb.Parameter             ' The number of Internal Standards that this UMC matched
+    DriftTime As adodb.Parameter                    ' IMS Drift Time (reported on instrument)
+    DriftTimeAligned As adodb.Parameter             ' IMS Drift Time (aligned by STAC to the AMT tags loaded in memory)
 ' Future parameters
 ''    LabellingEfficiencyF As ADODB.Parameter
 ''    LogERCorrectedForF As ADODB.Parameter           ' Base-2 log
@@ -45,70 +45,70 @@ Public Type udtPutUMCParamsListType
 End Type
 
 Public Type udtPutUMCMemberParamsListType
-    UMCResultsID As ADODB.Parameter
-    MemberTypeID As ADODB.Parameter
-    IndexInUMC As ADODB.Parameter
-    ScanNumber As ADODB.Parameter
-    MZ As ADODB.Parameter
-    ChargeState As ADODB.Parameter
-    MonoisotopicMass As ADODB.Parameter
-    Abundance As ADODB.Parameter
-    IsotopicFit As ADODB.Parameter
-    ElutionTime As ADODB.Parameter
-    IsChargeStateRep As ADODB.Parameter
+    UMCResultsID As adodb.Parameter
+    MemberTypeID As adodb.Parameter
+    IndexInUMC As adodb.Parameter
+    ScanNumber As adodb.Parameter
+    MZ As adodb.Parameter
+    ChargeState As adodb.Parameter
+    MonoisotopicMass As adodb.Parameter
+    Abundance As adodb.Parameter
+    IsotopicFit As adodb.Parameter
+    ElutionTime As adodb.Parameter
+    IsChargeStateRep As adodb.Parameter
 End Type
 
 Public Const PUT_UMC_MATCH_MAX_MODSTRING_LENGTH = 50            ' Maximum length of .MassTagMods
 Public Type udtPutUMCMatchParamsListType
-    UMCResultsID As ADODB.Parameter
-    MassTagID As ADODB.Parameter
-    MatchingMemberCount As ADODB.Parameter
-    MatchScore As ADODB.Parameter
-    MatchState As ADODB.Parameter
-    SetIsConfirmedForMT As ADODB.Parameter
-    MassTagMods As ADODB.Parameter
-    MassTagModMass As ADODB.Parameter
-    DelMatchScore As ADODB.Parameter
-    UniquenessProbability As ADODB.Parameter
-    FDRThreshold As ADODB.Parameter                             ' Value between 0 and 1
-    ConformerID As ADODB.Parameter
+    UMCResultsID As adodb.Parameter
+    MassTagID As adodb.Parameter
+    MatchingMemberCount As adodb.Parameter
+    MatchScore As adodb.Parameter
+    MatchState As adodb.Parameter
+    SetIsConfirmedForMT As adodb.Parameter
+    MassTagMods As adodb.Parameter
+    MassTagModMass As adodb.Parameter
+    DelMatchScore As adodb.Parameter
+    UniquenessProbability As adodb.Parameter
+    FDRThreshold As adodb.Parameter                             ' Value between 0 and 1
+    ConformerID As adodb.Parameter
 End Type
 
 Public Type udtPutUMCInternalStdMatchParamsListType
-    UMCResultsID As ADODB.Parameter
-    SeqID As ADODB.Parameter
-    MatchingMemberCount As ADODB.Parameter
-    MatchScore As ADODB.Parameter
-    MatchState As ADODB.Parameter
-    ExpectedNET As ADODB.Parameter
-    DelMatchScore As ADODB.Parameter
-    UniquenessProbability As ADODB.Parameter
-    FDRThreshold As ADODB.Parameter
+    UMCResultsID As adodb.Parameter
+    SeqID As adodb.Parameter
+    MatchingMemberCount As adodb.Parameter
+    MatchScore As adodb.Parameter
+    MatchState As adodb.Parameter
+    ExpectedNET As adodb.Parameter
+    DelMatchScore As adodb.Parameter
+    UniquenessProbability As adodb.Parameter
+    FDRThreshold As adodb.Parameter
 End Type
 
 Public Type udtPutUMCCSStatsParamsListType
-    UMCResultsID As ADODB.Parameter
-    ChargeState As ADODB.Parameter
-    MemberCount As ADODB.Parameter
-    MonoisotopicMass As ADODB.Parameter
-    Abundance As ADODB.Parameter
-    ElutionTime As ADODB.Parameter
-    DriftTime As ADODB.Parameter
+    UMCResultsID As adodb.Parameter
+    ChargeState As adodb.Parameter
+    MemberCount As adodb.Parameter
+    MonoisotopicMass As adodb.Parameter
+    Abundance As adodb.Parameter
+    ElutionTime As adodb.Parameter
+    DriftTime As adodb.Parameter
 End Type
 
 Public Type udtStoreSTACStatsParamsListType
-    MDID As ADODB.Parameter
-    STACCutoff As ADODB.Parameter
-    UniqueAMTs As ADODB.Parameter
-    UniqueConformers As ADODB.Parameter
-    FDR As ADODB.Parameter
+    MDID As adodb.Parameter
+    STACCutoff As adodb.Parameter
+    UniqueAMTs As adodb.Parameter
+    UniqueConformers As adodb.Parameter
+    FDR As adodb.Parameter
     ' Deprecated in June 2011: Matches As ADODB.Parameter
-    Errors As ADODB.Parameter
-    UPFilteredUniqueAMTs As ADODB.Parameter
-    UPFilteredUniqueConformers As ADODB.Parameter
-    UPFilteredFDR As ADODB.Parameter
+    Errors As adodb.Parameter
+    UPFilteredUniqueAMTs As adodb.Parameter
+    UPFilteredUniqueConformers As adodb.Parameter
+    UPFilteredFDR As adodb.Parameter
     ' Deprecated in June 2011: UPFilteredMatches As ADODB.Parameter
-    UPFilteredErrors As ADODB.Parameter
+    UPFilteredErrors As adodb.Parameter
 End Type
 
 Private Const MASS_PRECISION = 6
@@ -173,7 +173,7 @@ Private Const NET_PRECISION = 5
 'End Function
 
 
-Public Function AddEntryToMatchMakingDescriptionTableEx(ByRef cnNew As ADODB.Connection, _
+Public Function AddEntryToMatchMakingDescriptionTableEx(ByRef cnNew As adodb.Connection, _
                                                         ByRef lngMDID As Long, _
                                                         ByVal ExpAnalysisSPName As String, _
                                                         ByVal lngGelIndex As Long, _
@@ -196,66 +196,66 @@ Public Function AddEntryToMatchMakingDescriptionTableEx(ByRef cnNew As ADODB.Con
                                                       
     ' Returns 0 if success, the error number if an error
     
-    Dim cmdPutNewMM As New ADODB.Command
-    Dim prmRefJob As New ADODB.Parameter        'reference job
-    Dim prmFile As New ADODB.Parameter          'file name
-    Dim prmType As New ADODB.Parameter          'type of analysis
-    Dim prmParameters As New ADODB.Parameter    'analysis parameters
-    Dim prmPeaksCount As New ADODB.Parameter    'count of peaks to be exported
-    Dim prmIDVal As New ADODB.Parameter         'ID returned from stored procedure
-    Dim prmToolVersion As New ADODB.Parameter   'Viper version string
+    Dim cmdPutNewMM As New adodb.Command
+    Dim prmRefJob As New adodb.Parameter        'reference job
+    Dim prmFile As New adodb.Parameter          'file name
+    Dim prmType As New adodb.Parameter          'type of analysis
+    Dim prmParameters As New adodb.Parameter    'analysis parameters
+    Dim prmPeaksCount As New adodb.Parameter    'count of peaks to be exported
+    Dim prmIDVal As New adodb.Parameter         'ID returned from stored procedure
+    Dim prmToolVersion As New adodb.Parameter   'Viper version string
     
-    Dim prmComparisonMassTagCount As New ADODB.Parameter        ' Number of MT tags loaded from database
-    Dim prmUMCTolerancePPM As New ADODB.Parameter               ' Tolerance for finding LC-MS Features
-    Dim prmUMCCount As New ADODB.Parameter                      ' Number of LC-MS Features (after filtering and refinement, if applicable)
-    Dim prmNetAdjTolerancePPM As New ADODB.Parameter            ' NET Adjustment mass tolerance
-    Dim prmNetAdjNETMin As New ADODB.Parameter                  ' NET Adjustment result: NET value of first scan
-    Dim prmNetAdjNETMax As New ADODB.Parameter                  ' NET Adjustment result: NET value of last scan
-    Dim prmNetAdjUMCsHitCount As New ADODB.Parameter            ' NET Adjustment hit count after final iteration
-    Dim prmNetAdjTopAbuPct As New ADODB.Parameter               ' NET Adjustment Top Abu Percent value after final iteration
-    Dim prmNetAdjIterationCount As New ADODB.Parameter          ' NET Adjustment Iteration Count
+    Dim prmComparisonMassTagCount As New adodb.Parameter        ' Number of MT tags loaded from database
+    Dim prmUMCTolerancePPM As New adodb.Parameter               ' Tolerance for finding LC-MS Features
+    Dim prmUMCCount As New adodb.Parameter                      ' Number of LC-MS Features (after filtering and refinement, if applicable)
+    Dim prmNetAdjTolerancePPM As New adodb.Parameter            ' NET Adjustment mass tolerance
+    Dim prmNetAdjNETMin As New adodb.Parameter                  ' NET Adjustment result: NET value of first scan
+    Dim prmNetAdjNETMax As New adodb.Parameter                  ' NET Adjustment result: NET value of last scan
+    Dim prmNetAdjUMCsHitCount As New adodb.Parameter            ' NET Adjustment hit count after final iteration
+    Dim prmNetAdjTopAbuPct As New adodb.Parameter               ' NET Adjustment Top Abu Percent value after final iteration
+    Dim prmNetAdjIterationCount As New adodb.Parameter          ' NET Adjustment Iteration Count
     
-    Dim prmMMATolerancePPM As New ADODB.Parameter               ' DB Search mass tolerance
-    Dim prmNETTolerance As New ADODB.Parameter                  ' DB Search net tolerance
-    Dim prmDriftTimeTolerance As New ADODB.Parameter            ' DB Search drift time tolerance
+    Dim prmMMATolerancePPM As New adodb.Parameter               ' DB Search mass tolerance
+    Dim prmNETTolerance As New adodb.Parameter                  ' DB Search net tolerance
+    Dim prmDriftTimeTolerance As New adodb.Parameter            ' DB Search drift time tolerance
     
-    Dim prmState As New ADODB.Parameter                         ' MD_State value; 1 = New, 2 = OK, 5 = Updated (i.e. old)
-    Dim prmGANETFit As New ADODB.Parameter                      ' GANET_Fit for this analysis
-    Dim prmGANETSlope As New ADODB.Parameter                    ' GANET_Slope for this analysis
-    Dim prmGANETIntercept As New ADODB.Parameter                ' GANET_Intercept for this analysis
-    Dim prmRefineMassCalPPMShift As New ADODB.Parameter         ' Amount of shift for mass calibration
-    Dim prmRefineMassCalPeakHeightCounts As New ADODB.Parameter ' Peak height of the mass error plot for mass calibration
-    Dim prmRefineMassTolUsed As New ADODB.Parameter             ' 1 if mass tolerance refinement was used
-    Dim prmRefineNETTolUsed As New ADODB.Parameter              ' 1 if net tolerance refinement was used
-    Dim prmMinimumHighNormalizedScore As New ADODB.Parameter    ' Minimum High Normalized Score for MT tags loaded from database
-    Dim prmMinimumPMTQualityScore As New ADODB.Parameter        ' Minimum PMT Quality Score for MT tags loaded from database
-    Dim prmIniFileName As New ADODB.Parameter                   ' Ini File Name (if applicable); blank otherwise
+    Dim prmState As New adodb.Parameter                         ' MD_State value; 1 = New, 2 = OK, 5 = Updated (i.e. old)
+    Dim prmGANETFit As New adodb.Parameter                      ' GANET_Fit for this analysis
+    Dim prmGANETSlope As New adodb.Parameter                    ' GANET_Slope for this analysis
+    Dim prmGANETIntercept As New adodb.Parameter                ' GANET_Intercept for this analysis
+    Dim prmRefineMassCalPPMShift As New adodb.Parameter         ' Amount of shift for mass calibration
+    Dim prmRefineMassCalPeakHeightCounts As New adodb.Parameter ' Peak height of the mass error plot for mass calibration
+    Dim prmRefineMassTolUsed As New adodb.Parameter             ' 1 if mass tolerance refinement was used
+    Dim prmRefineNETTolUsed As New adodb.Parameter              ' 1 if net tolerance refinement was used
+    Dim prmMinimumHighNormalizedScore As New adodb.Parameter    ' Minimum High Normalized Score for MT tags loaded from database
+    Dim prmMinimumPMTQualityScore As New adodb.Parameter        ' Minimum PMT Quality Score for MT tags loaded from database
+    Dim prmIniFileName As New adodb.Parameter                   ' Ini File Name (if applicable); blank otherwise
     
-    Dim prmMinimumHighDiscriminantScore As New ADODB.Parameter  ' Minimum High Discriminant Score for MT tags loaded from database
-    Dim prmExperimentInclusionFilter As New ADODB.Parameter     ' Experiment Inclusion Filter for MT tags loaded from database
-    Dim prmExperimentExclusionFilter As New ADODB.Parameter     ' Experiment Exclusion Filter for MT tags loaded from database
+    Dim prmMinimumHighDiscriminantScore As New adodb.Parameter  ' Minimum High Discriminant Score for MT tags loaded from database
+    Dim prmExperimentInclusionFilter As New adodb.Parameter     ' Experiment Inclusion Filter for MT tags loaded from database
+    Dim prmExperimentExclusionFilter As New adodb.Parameter     ' Experiment Exclusion Filter for MT tags loaded from database
 
-    Dim prmRefineMassCalPeakWidthPPM As New ADODB.Parameter     ' Peak width of the mass error plot for mass calibration
-    Dim prmRefineMassCalPeakCenterPPM As New ADODB.Parameter    ' Peak center of the mass error plot for mass calibration
+    Dim prmRefineMassCalPeakWidthPPM As New adodb.Parameter     ' Peak width of the mass error plot for mass calibration
+    Dim prmRefineMassCalPeakCenterPPM As New adodb.Parameter    ' Peak center of the mass error plot for mass calibration
     
-    Dim prmRefineNETTolPeakHeightCounts As New ADODB.Parameter  ' Peak height of the NET error plot for NET tolerance adjustment
-    Dim prmRefineNETTolPeakWidthNET As New ADODB.Parameter      ' Peak height of the NET error plot for NET tolerance adjustment
-    Dim prmRefineNETTolPeakCenterNET As New ADODB.Parameter     ' Peak height of the NET error plot for NET tolerance adjustment
+    Dim prmRefineNETTolPeakHeightCounts As New adodb.Parameter  ' Peak height of the NET error plot for NET tolerance adjustment
+    Dim prmRefineNETTolPeakWidthNET As New adodb.Parameter      ' Peak height of the NET error plot for NET tolerance adjustment
+    Dim prmRefineNETTolPeakCenterNET As New adodb.Parameter     ' Peak height of the NET error plot for NET tolerance adjustment
     
-    Dim prmLimitToPMTsFromDataset As New ADODB.Parameter        ' 1 if the MT tags were limited to only come from the dataset associated with the loaded job
+    Dim prmLimitToPMTsFromDataset As New adodb.Parameter        ' 1 if the MT tags were limited to only come from the dataset associated with the loaded job
     
-    Dim prmMinimumPeptideProphetProbability As New ADODB.Parameter  ' Minimum Peptide Prophet Probability for MT tags loaded from database
-    Dim prmMatchScoreMode As New ADODB.Parameter                ' 0 if .UseStac = False; 1 if .UseStac = True
-    Dim prmSTACUsedPriorProbability As New ADODB.Parameter      ' 1 if we used prior probabilities when searching with STAC
+    Dim prmMinimumPeptideProphetProbability As New adodb.Parameter  ' Minimum Peptide Prophet Probability for MT tags loaded from database
+    Dim prmMatchScoreMode As New adodb.Parameter                ' 0 if .UseStac = False; 1 if .UseStac = True
+    Dim prmSTACUsedPriorProbability As New adodb.Parameter      ' 1 if we used prior probabilities when searching with STAC
     
-    Dim prmAMTCount1pctFDR As New ADODB.Parameter               ' Unique count of AMT tags with FDR <= 0.01
-    Dim prmAMTCount5pctFDR As New ADODB.Parameter               ' Unique count of AMT tags with FDR <= 0.05
-    Dim prmAMTCount10pctFDR As New ADODB.Parameter              ' Unique count of AMT tags with FDR <= 0.10
-    Dim prmAMTCount25pctFDR As New ADODB.Parameter              ' Unique count of AMT tags with FDR <= 0.25
-    Dim prmAMTCount50pctFDR As New ADODB.Parameter              ' Unique count of AMT tags with FDR <= 0.50
+    Dim prmAMTCount1pctFDR As New adodb.Parameter               ' Unique count of AMT tags with FDR <= 0.01
+    Dim prmAMTCount5pctFDR As New adodb.Parameter               ' Unique count of AMT tags with FDR <= 0.05
+    Dim prmAMTCount10pctFDR As New adodb.Parameter              ' Unique count of AMT tags with FDR <= 0.10
+    Dim prmAMTCount25pctFDR As New adodb.Parameter              ' Unique count of AMT tags with FDR <= 0.25
+    Dim prmAMTCount50pctFDR As New adodb.Parameter              ' Unique count of AMT tags with FDR <= 0.50
     
-    Dim prmDriftTimeAlignmentSlope As New ADODB.Parameter            ' Drift time alignment slope (computed by STAC)
-    Dim prmDriftTimeAlignmentIntercept As New ADODB.Parameter            ' Drift time alignment intercept (computed by STAC)
+    Dim prmDriftTimeAlignmentSlope As New adodb.Parameter            ' Drift time alignment slope (computed by STAC)
+    Dim prmDriftTimeAlignmentIntercept As New adodb.Parameter            ' Drift time alignment intercept (computed by STAC)
     
     Dim strEntryInAnalysisHistory As String, lngValueFromAnalysisHistory As Long
     Dim strNetAdjUMCsWithDBHits As String
@@ -593,10 +593,12 @@ AddEntryToMatchMakingDescriptionTableErrorHandler:
     Debug.Assert False
     lngErrorNumber = Err.Number
     If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-        MsgBox "Error making entry in Match Making Description " & vbCrLf & "(most likely the job number is not defined in T_FTICR_Analysis_Description): " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, glFGTU
+        MsgBox "Error making entry in Match Making Description (job " & GelAnalysis(lngGelIndex).MD_Reference_Job & "); most likely the job number is not defined in T_FTICR_Analysis_Description: " & vbCrLf & Err.Description, vbExclamation + vbOKOnly, glFGTU
+    Else
+        AddToAnalysisHistory lngGelIndex, "Error making entry in Match Making Description (job " & GelAnalysis(lngGelIndex).MD_Reference_Job & "); perhaps the job number is not defined in T_FTICR_Analysis_Description: " & Err.Description
     End If
     
-    LogErrors Err.Number, "AddEntryToMatchMakingDescriptionTableEx", Err.Description, lngGelIndex
+    LogErrors Err.Number, "AddEntryToMatchMakingDescriptionTableEx (job " & GelAnalysis(lngGelIndex).MD_Reference_Job & ")", Err.Description, lngGelIndex
     
     If lngErrorNumber = 0 Then
         AddEntryToMatchMakingDescriptionTableEx = 50000
@@ -620,50 +622,50 @@ Public Function CSqlReal(ByVal dblValue As Double) As Single
         
 End Function
 
-Public Sub ExportMTDBInitializePutNewUMCParams(cnNew As ADODB.Connection, cmdPutNewUMC As ADODB.Command, udtPutUMCParams As udtPutUMCParamsListType, lngMDID As Long, strStoredProcName As String)
+Public Sub ExportMTDBInitializePutNewUMCParams(cnNew As adodb.Connection, cmdPutNewUMC As adodb.Command, udtPutUMCParams As udtPutUMCParamsListType, lngMDID As Long, strStoredProcName As String)
 
 ' Initialize the SP
 InitializeSPCommand cmdPutNewUMC, cnNew, strStoredProcName
 
 With udtPutUMCParams
     
-    Set .MDID = New ADODB.Parameter
-    Set .UMCInd = New ADODB.Parameter
-    Set .MemberCount = New ADODB.Parameter
-    Set .MemberCountUsedForAbu = New ADODB.Parameter
-    Set .UMCScore = New ADODB.Parameter
-    Set .ScanFirst = New ADODB.Parameter
-    Set .ScanLast = New ADODB.Parameter
-    Set .ScanMaxAbundance = New ADODB.Parameter
-    Set .ClassMass = New ADODB.Parameter
-    Set .MonoisotopicMassMin = New ADODB.Parameter
-    Set .MonoisotopicMassMax = New ADODB.Parameter
-    Set .MonoisotopicMassStDev = New ADODB.Parameter
-    Set .MonoisotopicMassMaxAbu = New ADODB.Parameter
-    Set .ClassAbundance = New ADODB.Parameter
-    Set .AbundanceMin = New ADODB.Parameter
-    Set .AbundanceMax = New ADODB.Parameter
-    Set .ChargeStateMin = New ADODB.Parameter
-    Set .ChargeStateMax = New ADODB.Parameter
-    Set .ChargeStateMaxAbu = New ADODB.Parameter
-    Set .FitAverage = New ADODB.Parameter
-    Set .FitMin = New ADODB.Parameter
-    Set .FitMax = New ADODB.Parameter
-    Set .FitStDev = New ADODB.Parameter
-    Set .ElutionTime = New ADODB.Parameter
-    Set .ExpressionRatio = New ADODB.Parameter
-    Set .ExpressionRatioStDev = New ADODB.Parameter
-    Set .ExpressionRatioChargeStateBasisCount = New ADODB.Parameter
-    Set .ExpressionRatioMemberBasisCount = New ADODB.Parameter
+    Set .MDID = New adodb.Parameter
+    Set .UMCInd = New adodb.Parameter
+    Set .MemberCount = New adodb.Parameter
+    Set .MemberCountUsedForAbu = New adodb.Parameter
+    Set .UMCScore = New adodb.Parameter
+    Set .ScanFirst = New adodb.Parameter
+    Set .ScanLast = New adodb.Parameter
+    Set .ScanMaxAbundance = New adodb.Parameter
+    Set .ClassMass = New adodb.Parameter
+    Set .MonoisotopicMassMin = New adodb.Parameter
+    Set .MonoisotopicMassMax = New adodb.Parameter
+    Set .MonoisotopicMassStDev = New adodb.Parameter
+    Set .MonoisotopicMassMaxAbu = New adodb.Parameter
+    Set .ClassAbundance = New adodb.Parameter
+    Set .AbundanceMin = New adodb.Parameter
+    Set .AbundanceMax = New adodb.Parameter
+    Set .ChargeStateMin = New adodb.Parameter
+    Set .ChargeStateMax = New adodb.Parameter
+    Set .ChargeStateMaxAbu = New adodb.Parameter
+    Set .FitAverage = New adodb.Parameter
+    Set .FitMin = New adodb.Parameter
+    Set .FitMax = New adodb.Parameter
+    Set .FitStDev = New adodb.Parameter
+    Set .ElutionTime = New adodb.Parameter
+    Set .ExpressionRatio = New adodb.Parameter
+    Set .ExpressionRatioStDev = New adodb.Parameter
+    Set .ExpressionRatioChargeStateBasisCount = New adodb.Parameter
+    Set .ExpressionRatioMemberBasisCount = New adodb.Parameter
     
-    Set .PeakFPRType = New ADODB.Parameter
-    Set .MassTagHitCount = New ADODB.Parameter
-    Set .PairUMCInd = New ADODB.Parameter
-    Set .UMCResultsIDReturn = New ADODB.Parameter
-    Set .ClassStatsChargeBasis = New ADODB.Parameter
-    Set .InternalStdCount = New ADODB.Parameter
-    Set .DriftTime = New ADODB.Parameter
-    Set .DriftTimeAligned = New ADODB.Parameter
+    Set .PeakFPRType = New adodb.Parameter
+    Set .MassTagHitCount = New adodb.Parameter
+    Set .PairUMCInd = New adodb.Parameter
+    Set .UMCResultsIDReturn = New adodb.Parameter
+    Set .ClassStatsChargeBasis = New adodb.Parameter
+    Set .InternalStdCount = New adodb.Parameter
+    Set .DriftTime = New adodb.Parameter
+    Set .DriftTimeAligned = New adodb.Parameter
 
 ' Future parameters
 ''    Set .LabellingEfficiencyF = New ADODB.Parameter
@@ -770,23 +772,23 @@ End With
 
 End Sub
 
-Public Sub ExportMTDBInitializePutNewUMCMemberParams(cnNew As ADODB.Connection, cmdPutNewUMCMember As ADODB.Command, udtPutUMCMemberParams As udtPutUMCMemberParamsListType, strStoredProcName As String)
+Public Sub ExportMTDBInitializePutNewUMCMemberParams(cnNew As adodb.Connection, cmdPutNewUMCMember As adodb.Command, udtPutUMCMemberParams As udtPutUMCMemberParamsListType, strStoredProcName As String)
     
     ' Initialize the SP
     InitializeSPCommand cmdPutNewUMCMember, cnNew, strStoredProcName
         
     With udtPutUMCMemberParams
-        Set .UMCResultsID = New ADODB.Parameter
-        Set .MemberTypeID = New ADODB.Parameter
-        Set .IndexInUMC = New ADODB.Parameter
-        Set .ScanNumber = New ADODB.Parameter
-        Set .MZ = New ADODB.Parameter
-        Set .ChargeState = New ADODB.Parameter
-        Set .MonoisotopicMass = New ADODB.Parameter
-        Set .Abundance = New ADODB.Parameter
-        Set .IsotopicFit = New ADODB.Parameter
-        Set .ElutionTime = New ADODB.Parameter
-        Set .IsChargeStateRep = New ADODB.Parameter
+        Set .UMCResultsID = New adodb.Parameter
+        Set .MemberTypeID = New adodb.Parameter
+        Set .IndexInUMC = New adodb.Parameter
+        Set .ScanNumber = New adodb.Parameter
+        Set .MZ = New adodb.Parameter
+        Set .ChargeState = New adodb.Parameter
+        Set .MonoisotopicMass = New adodb.Parameter
+        Set .Abundance = New adodb.Parameter
+        Set .IsotopicFit = New adodb.Parameter
+        Set .ElutionTime = New adodb.Parameter
+        Set .IsChargeStateRep = New adodb.Parameter
         
         Set .UMCResultsID = cmdPutNewUMCMember.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
         cmdPutNewUMCMember.Parameters.Append .UMCResultsID
@@ -823,7 +825,7 @@ Public Sub ExportMTDBInitializePutNewUMCMemberParams(cnNew As ADODB.Connection, 
 
 End Sub
 
-Public Sub ExportMTDBInitializePutUMCMatchParams(cnNew As ADODB.Connection, cmdPutNewUMCMatch As ADODB.Command, udtPutUMCMatchParams As udtPutUMCMatchParamsListType, strStoredProcName As String)
+Public Sub ExportMTDBInitializePutUMCMatchParams(cnNew As adodb.Connection, cmdPutNewUMCMatch As adodb.Command, udtPutUMCMatchParams As udtPutUMCMatchParamsListType, strStoredProcName As String)
     
 ' Initialize the SP
 InitializeSPCommand cmdPutNewUMCMatch, cnNew, strStoredProcName
@@ -886,21 +888,21 @@ End With
 
 End Sub
 
-Public Sub ExportMTDBInitializePutUMCInternalStdMatchParams(cnNew As ADODB.Connection, cmPutNewUMCInternalStdMatch As ADODB.Command, udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType, strStoredProcName As String)
+Public Sub ExportMTDBInitializePutUMCInternalStdMatchParams(cnNew As adodb.Connection, cmPutNewUMCInternalStdMatch As adodb.Command, udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType, strStoredProcName As String)
     
 ' Initialize the SP
 InitializeSPCommand cmPutNewUMCInternalStdMatch, cnNew, strStoredProcName
     
 With udtPutUMCInternalStdMatchParams
-    Set .UMCResultsID = New ADODB.Parameter
-    Set .SeqID = New ADODB.Parameter
-    Set .MatchingMemberCount = New ADODB.Parameter
-    Set .MatchScore = New ADODB.Parameter
-    Set .MatchState = New ADODB.Parameter
-    Set .ExpectedNET = New ADODB.Parameter
-    Set .DelMatchScore = New ADODB.Parameter
-    Set .UniquenessProbability = New ADODB.Parameter
-    Set .FDRThreshold = New ADODB.Parameter
+    Set .UMCResultsID = New adodb.Parameter
+    Set .SeqID = New adodb.Parameter
+    Set .MatchingMemberCount = New adodb.Parameter
+    Set .MatchScore = New adodb.Parameter
+    Set .MatchState = New adodb.Parameter
+    Set .ExpectedNET = New adodb.Parameter
+    Set .DelMatchScore = New adodb.Parameter
+    Set .UniquenessProbability = New adodb.Parameter
+    Set .FDRThreshold = New adodb.Parameter
     
     Set .UMCResultsID = cmPutNewUMCInternalStdMatch.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
     cmPutNewUMCInternalStdMatch.Parameters.Append .UMCResultsID
@@ -945,8 +947,8 @@ End With
 End Sub
 
 
-Public Sub ExportMTDBInitializePutUMCCSStatsParams(cnNew As ADODB.Connection, _
-                                                   cmdPutNewUMCCSStat As ADODB.Command, _
+Public Sub ExportMTDBInitializePutUMCCSStatsParams(cnNew As adodb.Connection, _
+                                                   cmdPutNewUMCCSStat As adodb.Command, _
                                                    udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType, _
                                                    strStoredProcName As String)
   
@@ -954,13 +956,13 @@ Public Sub ExportMTDBInitializePutUMCCSStatsParams(cnNew As ADODB.Connection, _
     InitializeSPCommand cmdPutNewUMCCSStat, cnNew, strStoredProcName
         
     With udtPutUMCCSStatsParams
-        Set .UMCResultsID = New ADODB.Parameter
-        Set .ChargeState = New ADODB.Parameter
-        Set .MemberCount = New ADODB.Parameter
-        Set .MonoisotopicMass = New ADODB.Parameter
-        Set .Abundance = New ADODB.Parameter
-        Set .ElutionTime = New ADODB.Parameter
-        Set .DriftTime = New ADODB.Parameter
+        Set .UMCResultsID = New adodb.Parameter
+        Set .ChargeState = New adodb.Parameter
+        Set .MemberCount = New adodb.Parameter
+        Set .MonoisotopicMass = New adodb.Parameter
+        Set .Abundance = New adodb.Parameter
+        Set .ElutionTime = New adodb.Parameter
+        Set .DriftTime = New adodb.Parameter
        
         Set .UMCResultsID = cmdPutNewUMCCSStat.CreateParameter("UMCResultsID", adInteger, adParamInput, , 0)
         cmdPutNewUMCCSStat.Parameters.Append .UMCResultsID
@@ -987,16 +989,16 @@ Public Sub ExportMTDBInitializePutUMCCSStatsParams(cnNew As ADODB.Connection, _
 
 End Sub
 
-Public Sub ExportMTDBInitializeStoreSTACStats(cnNew As ADODB.Connection, _
-                                              cmdStoreSTACStats As ADODB.Command, _
+Public Sub ExportMTDBInitializeStoreSTACStats(cnNew As adodb.Connection, _
+                                              cmdStoreSTACStats As adodb.Command, _
                                               udtStoreSTACStatsParams As udtStoreSTACStatsParamsListType, _
                                               strStoredProcName As String)
   
     ' Initialize the SP
     InitializeSPCommand cmdStoreSTACStats, cnNew, strStoredProcName
     
-    Dim Matches As ADODB.Parameter
-    Dim UPFilteredMatches As ADODB.Parameter
+    Dim Matches As adodb.Parameter
+    Dim UPFilteredMatches As adodb.Parameter
     
     With udtStoreSTACStatsParams
         
@@ -1043,11 +1045,11 @@ Public Sub ExportMTDBInitializeStoreSTACStats(cnNew As ADODB.Connection, _
 End Sub
 
 Public Sub ExportMTDBAddUMCResultRow( _
-            ByRef cmdPutNewUMC As ADODB.Command, _
+            ByRef cmdPutNewUMC As adodb.Command, _
             ByRef udtPutUMCParams As udtPutUMCParamsListType, _
-            ByRef cmdPutNewUMCMember As ADODB.Command, _
+            ByRef cmdPutNewUMCMember As adodb.Command, _
             ByRef udtPutUMCMemberParams As udtPutUMCMemberParamsListType, _
-            ByRef cmdPutNewUMCCSStats As ADODB.Command, _
+            ByRef cmdPutNewUMCCSStats As adodb.Command, _
             ByRef udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType, _
             ByVal blnExportUMCMembers As Boolean, _
             ByVal lngGelIndex As Long, _
@@ -1216,7 +1218,7 @@ On Error GoTo AddAddnlInfoErrorHandler
 AddUMCErrorHandler:
     ' Error populating or executing cmdPutNewUMC
     
-    Debug.Print "Error occurred at AddUMCErrorHandler: Err Code = " & Err.Number & vbCrLf & Err.Description
+    LogErrors Err.Number, "ExportMTDBAddUMCResultRow (MDID " & udtPutUMCParams.MDID & ")", "Error occurred at AddUMCErrorHandler: " & Err.Description
     Debug.Assert False
     
     Err.Raise Err.Number
@@ -1224,7 +1226,7 @@ AddUMCErrorHandler:
 
 AddAddnlInfoErrorHandler:
 
-    Debug.Print "Error occurred at AddAddnlInfoErrorHandler: Err Code = " & Err.Number & vbCrLf & Err.Description
+    LogErrors Err.Number, "ExportMTDBAddUMCResultRow (MDID " & udtPutUMCParams.MDID & ")", "Error occurred at AddAddnlInfoErrorHandler: " & Err.Description
     Debug.Assert False
     
     Err.Raise Err.Number
@@ -1233,7 +1235,7 @@ AddAddnlInfoErrorHandler:
 End Sub
 
 Private Sub ExportMTDBAddUMCCSStatsRow( _
-            ByRef cmdPutNewUMCCSStats As ADODB.Command, _
+            ByRef cmdPutNewUMCCSStats As adodb.Command, _
             ByRef udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType, _
             ByVal lngGelIndex As Long, _
             ByVal lngUMCIndexOriginal As Long, _
@@ -1318,7 +1320,7 @@ On Error GoTo AddUMCCSStatsErrorHandler
 AddUMCCSStatsErrorHandler:
     ' Error populating or executing cmdPutNewUMCCSStats
     
-    Debug.Print "Error occurred in ExportMTDBAddUMCCSStatsRow: Err Code = " & Err.Number & vbCrLf & Err.Description
+    LogErrors Err.Number, "ExportMTDBAddUMCCSStatsRow", Err.Description
     Debug.Assert False
     
     Err.Raise Err.Number
@@ -1326,7 +1328,7 @@ AddUMCCSStatsErrorHandler:
 End Sub
 
 Private Sub ExportMTDBAddUMCResultMemberRow( _
-            ByRef cmdPutNewUMCMember As ADODB.Command, _
+            ByRef cmdPutNewUMCMember As adodb.Command, _
             ByRef udtPutUMCMemberParams As udtPutUMCMemberParamsListType, _
             ByVal lngGelIndex As Long, _
             ByVal lngUMCIndexOriginal As Long, _
@@ -1408,7 +1410,7 @@ On Error GoTo AddUMCMembersErrorHandler
 AddUMCMembersErrorHandler:
     ' Error populating or executing cmdPutNewUMCMember
     
-    Debug.Print "Error occurred in ExportMTDBAddUMCResultMemberRow: Err Code = " & Err.Number & vbCrLf & Err.Description
+    LogErrors Err.Number, "ExportMTDBAddUMCResultMemberRow", Err.Description
     Debug.Assert False
     
     Err.Raise Err.Number
@@ -1438,21 +1440,21 @@ Public Function ExportMTDBAddQuantitationDescriptionEntry(ByRef frmCallingForm A
     Dim strCaptionAddOn As String
     
     'ADO objects for stored procedure
-    Dim cnNew As New ADODB.Connection
-    Dim cmdPutQuantitationDesc As New ADODB.Command
-    Dim prmSampleName As New ADODB.Parameter
-    Dim prmMDID As New ADODB.Parameter
-    Dim prmReplicate As New ADODB.Parameter
-    Dim prmFraction As New ADODB.Parameter
-    Dim prmTopLevelFraction As New ADODB.Parameter
-    Dim prmComment As New ADODB.Parameter
-    Dim prmProcessImmediately As New ADODB.Parameter
+    Dim cnNew As New adodb.Connection
+    Dim cmdPutQuantitationDesc As New adodb.Command
+    Dim prmSampleName As New adodb.Parameter
+    Dim prmMDID As New adodb.Parameter
+    Dim prmReplicate As New adodb.Parameter
+    Dim prmFraction As New adodb.Parameter
+    Dim prmTopLevelFraction As New adodb.Parameter
+    Dim prmComment As New adodb.Parameter
+    Dim prmProcessImmediately As New adodb.Parameter
     
-    Dim prmQuantitationID As New ADODB.Parameter            ' Output
-    Dim prmQ_MDID_ID As New ADODB.Parameter                 ' Output
-    Dim prmEntriesProcessedReturn As New ADODB.Parameter    ' Output
+    Dim prmQuantitationID As New adodb.Parameter            ' Output
+    Dim prmQ_MDID_ID As New adodb.Parameter                 ' Output
+    Dim prmEntriesProcessedReturn As New adodb.Parameter    ' Output
 
-    Dim prmLookupDefaultOptions As New ADODB.Parameter
+    Dim prmLookupDefaultOptions As New adodb.Parameter
 
     ' The remaining parameter are not defined or supplied to the SP since defaults are used instead
 ''    Dim prmFractionHighestAbuToUse As New ADODB.Parameter
@@ -1643,6 +1645,7 @@ ExportMTDBAddQuantitationDescriptionEntryErrorHandler:
     Debug.Print "Error, probably timeout: Err Code = " & Err.Number & vbCrLf & Err.Description
     Debug.Assert False
     LogErrors Err.Number, "ExportMTDBAddQuantitationDescriptionEntry (Possibly timeout error)"
+    
     ExportMTDBAddQuantitationDescriptionEntry = "Error: " & Err.Number & vbCrLf & Err.Description
     lngErrorNumber = Err.Number
     On Error Resume Next

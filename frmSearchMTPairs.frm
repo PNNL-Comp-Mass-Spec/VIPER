@@ -915,23 +915,23 @@ Dim strMassMods As String
 Dim udtPairMatchStats As udtPairMatchStatsType
 
 'ADO objects for stored procedure adding Match Making row
-Dim cnNew As New ADODB.Connection
+Dim cnNew As New adodb.Connection
 Dim sngDBSchemaVersion As Single
 
 'ADO objects for stored procedure that adds FTICR UMC rows
-Dim cmdPutNewUMC As New ADODB.Command
+Dim cmdPutNewUMC As New adodb.Command
 Dim udtPutUMCParams As udtPutUMCParamsListType
     
 'ADO objects for stored procedure that adds FTICR UMC member rows
-Dim cmdPutNewUMCMember As New ADODB.Command
+Dim cmdPutNewUMCMember As New adodb.Command
 Dim udtPutUMCMemberParams As udtPutUMCMemberParamsListType
     
 'ADO objects for stored procedure adding UMC UMC Details
-Dim cmdPutNewUMCMatch As New ADODB.Command
+Dim cmdPutNewUMCMatch As New adodb.Command
 Dim udtPutUMCMatchParams As udtPutUMCMatchParamsListType
 
 'ADO objects for stored procedure adding FTICR UMC CS Stats
-Dim cmdPutNewUMCCSStats As New ADODB.Command
+Dim cmdPutNewUMCCSStats As New adodb.Command
 Dim udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType
 
 Dim strSearchDescription As String
@@ -1051,12 +1051,12 @@ For lngPairInd = 0 To PCount - 1
             udtPutUMCMatchParams.MatchingMemberCount.Value = mUMCMatchStats(lngMassTagIndexPointer).MemberHitCount
             udtPutUMCMatchParams.MatchScore.Value = mUMCMatchStats(lngMassTagIndexPointer).StacOrSLiC
             udtPutUMCMatchParams.DelMatchScore.Value = mUMCMatchStats(lngMassTagIndexPointer).DelScore
-            udtPutUMCMatchParams.UniquenessProbability.Value = CSng(mUMCMatchStats(lngMassTagIndexPointer).UniquenessProbability)
+            udtPutUMCMatchParams.UniquenessProbability.Value = CSqlReal(mUMCMatchStats(lngMassTagIndexPointer).UniquenessProbability)
             
             strMassMods = MOD_TKN_PAIR_LIGHT
             If Len(mMTMods(mMTInd(mUMCMatchStats(lngMassTagIndexPointer).IDIndex))) > 0 Then
                 strMassMods = strMassMods & " " & Trim(mMTMods(mMTInd(mUMCMatchStats(lngMassTagIndexPointer).IDIndex)))
-                udtPutUMCMatchParams.MassTagModMass.Value = CSng(mMTMWN14(mUMCMatchStats(lngMassTagIndexPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW)
+                udtPutUMCMatchParams.MassTagModMass.Value = CSqlReal(mMTMWN14(mUMCMatchStats(lngMassTagIndexPointer).IDIndex) - AMTData(lngMassTagIndexOriginal).MW)
             Else
                 udtPutUMCMatchParams.MassTagModMass.Value = 0
             End If
@@ -1106,9 +1106,12 @@ Exit Function
 err_ExportMTDBbyUMC:
 TraceLog 5, "frmSearchMTPairs->ExportIDPairsToUMCResultsTable", "Error occurred: " & Err.Description
 Debug.Assert False
-LogErrors Err.Number, "ExportIDPairsToUMCResultsTable"
+
+LogErrors Err.Number, "ExportIDPairsToUMCResultsTable (Job " & GelAnalysis(CallerID).MD_Reference_Job & ", MD_ID " & lngMDID & ")"
 If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-    MsgBox "Error exporting matches to the UMC results table: " & Err.Description, vbExclamation + vbOKOnly, glFGTU
+    MsgBox "Error exporting matches to the LC-MS Feature results table: " & Err.Description, vbExclamation + vbOKOnly, glFGTU
+Else
+    AddToAnalysisHistory CallerID, "Error exporting to LC-MS Feature Results table (occurred at " & lngPairInd & "/" & PCount & "; MDID is " & lngMDID & "): " & Err.Description
 End If
 
 err_Cleanup:
