@@ -29,6 +29,7 @@ Private Const SCANS_COLUMN_BPI As String = "bpi"
 Private Const SCANS_COLUMN_TIME_DOMAIN_SIGNAL As String = "time_domain_signal"
 Private Const SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD As String = "peak_intensity_threshold"
 Private Const SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD As String = "peptide_intensity_threshold"
+Private Const SCANS_COLUMN_INFO As String = "info"
 Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE As String = "frame_pressure"
 Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT As String = "frame_pressure_front"
 Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_BACK As String = "frame_pressure_back"
@@ -65,7 +66,7 @@ Private Const ISOS_COLUMN_INTERFERENCE_SCORE As String = "interference_score"
 Private Const SCAN_INFO_DIM_CHUNK As Long = 10000
 Private Const ISO_DATA_DIM_CHUNK As Long = 25000
 
-Private Const SCAN_FILE_COLUMN_COUNT As Integer = 13
+Private Const SCAN_FILE_COLUMN_COUNT As Integer = 14
 Private Enum ScanFileColumnConstants
     ScanNumber = 0
     ScanTime = 1
@@ -78,8 +79,9 @@ Private Enum ScanFileColumnConstants
     TimeDomainSignal = 8
     PeakIntensityThreshold = 9
     PeptideIntensityThreshold = 10
-    IMSFramePressureFront = 11               ' Only present in IMS datafiles
-    IMSFramePressureBack = 12               ' Only present in IMS datafiles
+    Info = 11
+    IMSFramePressureFront = 12               ' Only present in IMS datafiles
+    IMSFramePressureBack = 13                ' Only present in IMS datafiles
 End Enum
 
 Private Const ISOS_FILE_COLUMN_COUNT As Integer = 16
@@ -358,14 +360,15 @@ Private Function GetDefaultScansColumnHeaders(blnRequiredColumnsOnly As Boolean,
     strHeaders = strHeaders & ", " & SCANS_COLUMN_TYPE
     
     If Not blnRequiredColumnsOnly Then
-        strHeaders = strHeaders & ", " & SCANS_COLUMN_NUM_DEISOTOPED
-        strHeaders = strHeaders & ", " & SCANS_COLUMN_NUM_PEAKS
-        strHeaders = strHeaders & ", " & SCANS_COLUMN_TIC
-        strHeaders = strHeaders & ", " & SCANS_COLUMN_BPI_MZ
-        strHeaders = strHeaders & ", " & SCANS_COLUMN_BPI
-        strHeaders = strHeaders & ", " & SCANS_COLUMN_TIME_DOMAIN_SIGNAL
-        strHeaders = strHeaders & ", " & SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD
-        strHeaders = strHeaders & ", " & SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD
+        strHeaders = strHeaders & ", " & SCANS_COLUMN_NUM_DEISOTOPED & _
+                                  ", " & SCANS_COLUMN_NUM_PEAKS & _
+                                  ", " & SCANS_COLUMN_TIC & _
+                                  ", " & SCANS_COLUMN_BPI_MZ & _
+                                  ", " & SCANS_COLUMN_BPI & _
+                                  ", " & SCANS_COLUMN_TIME_DOMAIN_SIGNAL & _
+                                  ", " & SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD & _
+                                  ", " & SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD & _
+                                  ", " & SCANS_COLUMN_INFO
         
         If blnIncludeIMSFileHeaders Then
             strHeaders = strHeaders & ", " & SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT & ", " & SCANS_COLUMN_IMS_FRAME_PRESSURE_BACK
@@ -1857,6 +1860,7 @@ On Error GoTo ReadCSVScanFileErrorHandler
                             Case SCANS_COLUMN_TIME_DOMAIN_SIGNAL: intColumnMapping(ScanFileColumnConstants.TimeDomainSignal) = lngIndex
                             Case SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD: intColumnMapping(ScanFileColumnConstants.PeakIntensityThreshold) = lngIndex
                             Case SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD: intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold) = lngIndex
+                            Case SCANS_COLUMN_INFO: intColumnMapping(ScanFileColumnConstants.Info) = lngIndex
                             Case SCANS_COLUMN_IMS_FRAME_PRESSURE, SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT
                                 intColumnMapping(ScanFileColumnConstants.IMSFramePressureFront) = lngIndex
                             Case SCANS_COLUMN_IMS_FRAME_PRESSURE_BACK
@@ -1933,6 +1937,8 @@ On Error GoTo ReadCSVScanFileErrorHandler
                         .PeakIntensityThreshold = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.PeakIntensityThreshold), 0)
                         .PeptideIntensityThreshold = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold), 0)
     
+                        ' Note: Not reading the Info column
+                        
                         .FrequencyShift = 0
                     
                         .IMSFramePressure = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.IMSFramePressureFront), 0)

@@ -1,5 +1,8 @@
 VIPER Change Log
 
+Version 3.48 - Build 454; September 15, 2011
+	- Added support for the "info" column in DeconTools _scans.csv files
+
 Version 3.48 - Build 453; September 14, 2011
 	- Fixed bug that failed to plot UP-Filtered Unique AMTs on the STAC plot
 	- New version of STAC
