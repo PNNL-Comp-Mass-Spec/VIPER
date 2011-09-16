@@ -8,9 +8,11 @@ Set @PMTQualityScoreFilter = 2
 Set @PeptideObsCountFilter = 3
 
 -- Data for T_Mass_Tags
-SELECT Mass_Tag_ID, Peptide, Monoisotopic_Mass, Multiple_Proteins, Created, Last_Affected, Number_Of_Peptides, 
-    Peptide_Obs_Count_Passing_Filter, High_Normalized_Score, High_Discriminant_Score, High_Peptide_Prophet_Probability, 
-    Min_Log_EValue, Mod_Count, Mod_Description, PMT_Quality_Score
+SELECT Mass_Tag_ID, Peptide, Monoisotopic_Mass, Is_Confirmed, Multiple_Proteins, 
+       Created, Last_Affected, Number_Of_Peptides, Peptide_Obs_Count_Passing_Filter, 
+       High_Normalized_Score, High_Discriminant_Score, High_Peptide_Prophet_Probability, 
+       Min_Log_EValue, Mod_Count, Mod_Description, PMT_Quality_Score, 
+       Cleavage_State_Max, Min_MSGF_SpecProb
 FROM T_Mass_Tags
 WHERE (PMT_Quality_Score >= @PMTQualityScoreFilter) AND 
       (Peptide_Obs_Count_Passing_Filter >= @PeptideObsCountFilter)
@@ -113,22 +115,51 @@ WHERE (MT.PMT_Quality_Score >= @PMTQualityScoreFilter) AND
 ORDER BY MTC.Conformer_ID
 
 
--- No longer used: T_Mass_Tag_Peptide_Prophet_Stats
-SELECT MTP.Mass_Tag_ID, MTP.ObsCount_CS1, MTP.ObsCount_CS2, MTP.ObsCount_CS3, MTP.PepProphet_FScore_Avg_CS1, 
-    MTP.PepProphet_FScore_Avg_CS2, MTP.PepProphet_FScore_Avg_CS3
-FROM T_Mass_Tag_Peptide_Prophet_Stats MTP INNER JOIN
-     T_Mass_Tags MT ON MTP.Mass_Tag_ID = MT.Mass_Tag_ID
-WHERE (MT.PMT_Quality_Score >= @PMTQualityScoreFilter) AND 
-      (MT.Peptide_Obs_Count_Passing_Filter >= @PeptideObsCountFilter)
-ORDER BY MTP.Mass_Tag_ID
-
-
-
--- The following tables do not need to be populated
 
 -- Populate V_Filter_Set_Overview_Ex
 SELECT *
 FROM V_Filter_Set_Overview_Ex
+-- Populate T_Analysis_Description
+
+SELECT Job,
+       Dataset,
+       Dataset_ID,
+       CONVERT(varchar(64), Dataset_Created_DMS, 101) + ' ' + 
+         CONVERT(varchar(64), Dataset_Created_DMS, 108) AS Dataset_Created_DMS,
+       CONVERT(varchar(64), Dataset_Acq_Time_Start, 101) + ' ' + 
+         CONVERT(varchar(64), Dataset_Acq_Time_Start, 108) AS Dataset_Acq_Time_Start,
+       CONVERT(varchar(64), Dataset_Acq_Time_End, 101) + ' ' + 
+         CONVERT(varchar(64), Dataset_Acq_Time_End, 108) AS Dataset_Acq_Time_End,
+       Dataset_Acq_Length,
+       Dataset_Scan_Count,
+       Experiment,
+       Campaign,
+       Experiment_Organism,
+       Instrument_Class,
+       Instrument,
+       Analysis_Tool,
+       Parameter_File_Name,
+       Settings_File_Name,
+       Organism_DB_Name,
+       Protein_Collection_List,
+       Protein_Options_List,
+       CONVERT(varchar(64), Completed, 101) + ' ' + 
+         CONVERT(varchar(64), Completed, 108) AS Completed,
+       ResultType,
+       Separation_Sys_Type,
+       RowCount_Loaded,
+       ScanTime_NET_Slope,
+       ScanTime_NET_Intercept,
+       ScanTime_NET_RSquared,
+       ScanTime_NET_Fit,
+       Regression_Order,
+       Regression_Filtered_Data_Count,
+       Regression_Equation
+FROM T_Analysis_Description
+ORDER BY Job
+
+
+-- The following tables do not need to be populated
 
 -- Find jobs to use
 SELECT *
@@ -153,18 +184,19 @@ WHERE InstrumentRank <= 2
 
 
 -- Populate T_Analysis_Description using the desired jobs
-SELECT Job, Dataset, Dataset_ID, Dataset_Created_DMS, 
-    Dataset_Acq_Time_Start, Dataset_Acq_Time_End, 
-    Dataset_Scan_Count, Experiment, Campaign, Experiment_Organism, 
-    Instrument_Class, Instrument, Analysis_Tool, 
-    Parameter_File_Name, Settings_File_Name, 
-    Organism_DB_Name, Protein_Collection_List, 
-    Protein_Options_List, Completed, ResultType, 
-    Separation_Sys_Type, ScanTime_NET_Slope, 
-    ScanTime_NET_Intercept, ScanTime_NET_RSquared, 
-    ScanTime_NET_Fit
+SELECT Job, Dataset, Dataset_ID, CONVERT(varchar(64), Dataset_Created_DMS, 101) + ' ' + CONVERT(varchar(64), 
+    Dataset_Created_DMS, 108) AS Dataset_Created_DMS, CONVERT(varchar(64), Dataset_Acq_Time_Start, 101) 
+    + ' ' + CONVERT(varchar(64), Dataset_Acq_Time_Start, 108) AS Dataset_Acq_Time_Start, CONVERT(varchar(64), 
+    Dataset_Acq_Time_End, 101) + ' ' + CONVERT(varchar(64), Dataset_Acq_Time_End, 108) AS Dataset_Acq_Time_End, 
+    Dataset_Acq_Length, Dataset_Scan_Count, Experiment, Campaign, Experiment_Organism, Instrument_Class, Instrument, 
+    Analysis_Tool, Parameter_File_Name, Settings_File_Name, Organism_DB_Name, Protein_Collection_List, 
+    Protein_Options_List, CONVERT(varchar(64), Completed, 101) + ' ' + CONVERT(varchar(64), Completed, 108) AS Completed, 
+    ResultType, Separation_Sys_Type, RowCount_Loaded, ScanTime_NET_Slope, ScanTime_NET_Intercept, 
+    ScanTime_NET_RSquared, ScanTime_NET_Fit, Regression_Order, Regression_Filtered_Data_Count, 
+    Regression_Equation
 FROM T_Analysis_Description
 WHERE (Job IN (287491,317820,312973,317831,312977,263718,287343,265349))
+ORDER BY Job
 
 -- Populate T_Peptides using the desired jobs
 SELECT Pep.Peptide_ID, Pep.Analysis_ID, Pep.Scan_Number, 
