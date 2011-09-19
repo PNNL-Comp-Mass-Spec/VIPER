@@ -1539,7 +1539,7 @@ Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False
             End If
         Else
             fraDriftTime.Visible = False
-            fraMods.Top = fraNET.Top + fraNET.Height + 10
+            fraMods.Top = fraNet.Top + fraNet.Height + 10
             If Me.UseSTAC Then
                 lngMinimumHeight = 8500
             Else
@@ -5019,6 +5019,7 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                     sngDriftTimeCorrectionFromSTAC = mUMCMatchStats(lngIndex).DriftTimeAligned - GelUMC(CallerID).UMCs(lngUMCIndexOriginal).DriftTime
                 Else
                     ' This should typically only happen if blnDriftTimesWereUsed is false
+                    ' However, if the database doesn't have any conformers, then this will happen for every search result
                     Debug.Assert blnDriftTimesWereUsed = False
                     
                     sngDriftTimeCorrectionFromSTAC = 0

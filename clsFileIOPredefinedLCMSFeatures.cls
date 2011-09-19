@@ -1067,7 +1067,7 @@ On Error GoTo CacheScanCenterForLCMSFeaturesErrorHandler
             lngScanEnd = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ScanEnd), 0)
             lngScanCenter = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Scan), 0)
             
-            dblAbundance = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance), 0)
+            dblAbundance = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.Abundance), 0)
             
             dblIMSConformerScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.ConformationFitScore), 0)
             dblLCFitScore = GetColumnValueDbl(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.LCFitScore), 0)

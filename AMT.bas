@@ -639,8 +639,13 @@ Public Function ConstructAMTReference(ByVal MW As Double, _
     'Debug.Assert Abs(MWTolRef) < 1
         
     If blnIncludeConformerNum Then
+        ' Encoding conformer info after the decimal point
+        ' For example, AMT tag ID 120450 with conformer charge 2 and Conformer Number 1 would be: "120450.02001"
+        ' and,         AMT tag ID 120450 with conformer charge 3 and Conformer Number 2 would be: "120450.03002"
+        ' and,         AMT tag ID 120451 with conformer charge 4 and Conformer Number 1 would be: "120451.04001"
+        
         AMTID = Trim(AMTData(AMTMatchIndex).ID) + _
-                     Format(AMTData(AMTMatchIndex).Conformer_Charge / 100# + AMTData(AMTMatchIndex).Conformer / 10000#, ".0000")
+                     Format(AMTData(AMTMatchIndex).Conformer_Charge / 100# + AMTData(AMTMatchIndex).Conformer / 100000#, ".00000")
     Else
         AMTID = Trim(AMTData(AMTMatchIndex).ID)
     End If

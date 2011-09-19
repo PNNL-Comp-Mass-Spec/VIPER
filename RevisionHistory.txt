@@ -1,5 +1,11 @@
 VIPER Change Log
 
+Version 3.48 - Build 455; September 19, 2011
+	- Now including Conformer information when you use search IMS features against AMT tag conformers, then use "Edit->Copy LC-MS Features (UMCs) in view" to Clipboard / File
+		- New Columns are:  Conformer_ID, Conformer_Charge, Conformer, Drift_Time_Avg, Conformer_Obs_Count
+	- Fixed bug that changed abundance values larger than 2147483647 to 0 when caching data in a _LCMSFeatures.txt file in order to determine the top N data points to load
+		- Bug would only occur if a Minimum Abundance value was defined
+
 Version 3.48 - Build 454; September 15, 2011
 	- Added support for the "info" column in DeconTools _scans.csv files
 

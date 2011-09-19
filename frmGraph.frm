@@ -1183,14 +1183,14 @@ picGraph.Refresh
 End Sub
 
 Private Sub PointVisiblilityShowAll()
-    Dim i As Integer
+    Dim I As Integer
     lAction = glNoAction
     
     ' Set all points to visible (positive ids) and clear selection
     With GelData(nMyIndex)
-         For i = 1 To MAX_FILTER_COUNT
-            .DataFilter(i, 0) = False
-         Next i
+         For I = 1 To MAX_FILTER_COUNT
+            .DataFilter(I, 0) = False
+         Next I
          .DataFilter(fltID, 1) = 0      'identity
          
          GelCSIncludeAll (nMyIndex)
@@ -1211,14 +1211,14 @@ Private Sub PointVisibilityShowUMCPoints()
 End Sub
 
 Private Sub PointVisiblilityInvert()
-    Dim i As Integer
+    Dim I As Integer
     lAction = glNoAction
     
     ' Invert the visible points and clear selection
     With GelData(nMyIndex)
-         For i = 1 To MAX_FILTER_COUNT
-            .DataFilter(i, 0) = False
-         Next i
+         For I = 1 To MAX_FILTER_COUNT
+            .DataFilter(I, 0) = False
+         Next I
          .DataFilter(fltID, 1) = 0      'identity
          
          GelCSInvertVisible (nMyIndex)
@@ -2455,7 +2455,7 @@ End Sub
 
 Private Sub mnu2lsOptions_Click()
 Dim blnAutoAdjSizeSaved As Boolean
-Dim i As Integer
+Dim I As Integer
 
 frmOptions.Tag = nMyIndex
 If IsWinLoaded(TrackerCaption) Then frmTracker.Hide
@@ -2501,11 +2501,11 @@ csMyCooSys.ZoomInR lngXMin, dblYMin, lngXMax, dblYMax
 
 If Abs(vWhatever) >= 2 Then
     ' Need to call Coordinate draw for the other Gels (it gets called for this gel in the above call to .ZoomInR
-    For i = 1 To UBound(GelBody)
-        If i <> nMyIndex And Not GelStatus(i).Deleted Then
-            GelBody(i).csMyCooSys.CoordinateDraw
+    For I = 1 To UBound(GelBody)
+        If I <> nMyIndex And Not GelStatus(I).Deleted Then
+            GelBody(I).csMyCooSys.CoordinateDraw
         End If
-    Next i
+    Next I
 End If
 
 bNeedToUpdate = True
@@ -3645,7 +3645,7 @@ End Sub
 
 Public Sub CopyAllPointsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1, Optional blnPromptForFileToExportTo As Boolean = False, Optional strFilePathForce As String = "")
     
-    Dim i As Long, j As Long
+    Dim I As Long, j As Long
     Dim dblMW As Double, dblMtoZ As Double, dblAbu As Double
     Dim dblAbuIReportMWMono As Double, dblAbuIReport2Da As Double
     Dim dblNET As Double
@@ -3831,11 +3831,11 @@ On Error GoTo CopyAllPointsInViewErrorHandler
         If Len(strFilePath) > 0 Then Print #OutFileNum, strExport(0)
         
         lngExportCount = 1
-        For i = 1 To lngIonCount
+        For I = 1 To lngIonCount
             If blnCSPoints Then
-                lngFN = .CSData(lngIonPointerArray(i)).ScanNumber
+                lngFN = .CSData(lngIonPointerArray(I)).ScanNumber
             Else
-                lngFN = .IsoData(lngIonPointerArray(i)).ScanNumber
+                lngFN = .IsoData(lngIonPointerArray(I)).ScanNumber
             End If
             
             If lngFN > lngFNPrevious Then
@@ -3854,7 +3854,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 lngFNPrevious = lngFN
             End If
             
-            lngIonIndex = lngIonPointerArray(i)
+            lngIonIndex = lngIonPointerArray(I)
             If blnCSPoints Then
                 dblAbu = .CSData(lngIonIndex).Abundance
                 intCharge = .CSData(lngIonIndex).Charge
@@ -3987,11 +3987,11 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 End If
             Loop While Len(strDBMatchList) > 0
             
-            If i Mod 100 = 0 Then
-                frmProgress.UpdateProgressBar i
+            If I Mod 100 = 0 Then
+                frmProgress.UpdateProgressBar I
                 If KeyPressAbortProcess > 1 Then Exit For
             End If
-        Next i
+        Next I
     End With
     
     If Len(strFilePath) > 0 Then
@@ -4055,6 +4055,7 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim lngIonIndex As Long
     Dim lngUMCIndex As Long, lngUMCIndexOriginal As Long
     Dim lngMassTagIndexPointer As Long, lngMassTagIndexOriginal As Long
+    Dim blnConformerDefined As Boolean
     
     Dim lngScanClassRep As Long
     Dim dblGANETClassRep As Double, dblAMTMW As Double, dblAMTNET As Double, dblAMTNetStDev As Double
@@ -4063,12 +4064,20 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     
     Dim strPeptideSequence As String
     
+    Dim lngConformerID As Long
+    Dim intConformerCharge As Integer
+    Dim intConformerNum As Integer
+    Dim dblConformerDriftTime As Double
+    Dim lngConformerObsCount As Long
+    
     ' The following two arrays are used to look up the mass of each MT tag, given the MT tag ID
     ' If the user specified a mass modification (like alkylation, ICAT, or N15), then the standard mass
     '  for the MT tag will not be correct; we won't try to correct for this since it would require a bit of guessing, and
     '  the user can get this information using the official Results by UMC or Results by Ion report on the search form
-    Dim blnIncludeAMTMass As Boolean
+    ' These are 0-based arrays
     Dim lngAMTID() As Long, lngAMTIDPointer() As Long
+    Dim blnIncludeAddnlAMTInfo As Boolean
+    
     Dim lngIndex As Long
     Dim QSL As New QSLong
     
@@ -4201,9 +4210,9 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     End If
     
     If AMTCnt > 0 Then
-        blnIncludeAMTMass = True
+        blnIncludeAddnlAMTInfo = True
             
-        ' Construct the MT tag mass lookup arrays
+        ' Construct the MT tag lookup arrays
         ReDim lngAMTID(0 To AMTCnt - 1)
         ReDim lngAMTIDPointer(0 To AMTCnt - 1)
         
@@ -4322,8 +4331,17 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
         strLineOut = strLineOut & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar
     End If
     
+    If CurrMTFilteringOptions.LoadConformers Then
+        strLineOut = strLineOut & _
+                        "Conformer_ID" & strSepChar & _
+                        "Conformer_Charge" & strSepChar & _
+                        "Conformer" & strSepChar & _
+                        "Drift_Time_Avg" & strSepChar & _
+                        "Conformer_Obs_Count" & strSepChar
+    End If
+          
     strLineOut = strLineOut & "MemberCountMatchingMassTag" & strSepChar & "IsInternalStdMatch" & strSepChar & "PeptideProphetProbability" & strSepChar & "Peptide"
-    
+
     With GelP_D_L(nMyIndex)
         If blnPairsPresent And .SearchDef.IReportEROptions.Enabled And .SearchDef.ComputeERScanByScan Then
             strLineOut = strLineOut & strSepChar & "Labelling Efficiency F" & strSepChar & "Log2(ER) Corrected for F" & strSepChar & "Log2(ER) Corrected Standard Error"
@@ -4471,11 +4489,55 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
         strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).MultiAMTHitCount & strSepChar
         
         If mnuSCopyPointsInViewByUMCIncludeSearchResults.Checked And _
-           blnIncludeAMTMass And udtUMCsInView(lngUMCIndex).IDIndex >= 0 And _
+           blnIncludeAddnlAMTInfo And udtUMCsInView(lngUMCIndex).IDIndex >= 0 And _
            Not udtUMCsInView(lngUMCIndex).IDIsInternalStd Then
+           
+            ' Search for AMT tag ID udtUMCsInView(lngUMCIndex).IDIndex in lngAMTID()
             lngMassTagIndexPointer = BinarySearchLng(lngAMTID(), udtUMCsInView(lngUMCIndex).IDIndex, 0, AMTCnt - 1)
+            blnConformerDefined = False
             
             If lngMassTagIndexPointer >= 0 Then
+            
+                If CurrMTFilteringOptions.LoadConformers Then
+                    ' Use udtUMCsInView(lngUMCIndex).ConformerNum to find the correct entry in AMTData()
+                    ' This step is necessary since lngAMTID() only tracks AMT IDs, and thus if an AMT tag has multiple conformers, then lngAMTID() will have multiple entries for the same AMT tag ID
+                    
+                    Do While lngMassTagIndexPointer > 0
+                        If AMTData(lngAMTIDPointer(lngMassTagIndexPointer)).Conformer = udtUMCsInView(lngUMCIndex).ConformerNum Then
+                            blnConformerDefined = True
+                            Exit Do
+                        End If
+                        
+                        If lngAMTID(lngMassTagIndexPointer - 1) = lngAMTID(lngMassTagIndexPointer) Then
+                            lngMassTagIndexPointer = lngMassTagIndexPointer - 1
+                        Else
+                            Exit Do
+                        End If
+                    Loop
+                    
+                    
+                    Do While Not blnConformerDefined
+                        If AMTData(lngAMTIDPointer(lngMassTagIndexPointer)).Conformer = udtUMCsInView(lngUMCIndex).ConformerNum Then
+                            blnConformerDefined = True
+                            Exit Do
+                        Else
+                            If lngMassTagIndexPointer = AMTCnt - 1 Then
+                                ' Conformer not found, and cannot increment lngMassTagIndexPointer anymore
+                                Debug.Assert False
+                                Exit Do
+                            Else
+                                If lngAMTID(lngMassTagIndexPointer + 1) = lngAMTID(lngMassTagIndexPointer) Then
+                                    lngMassTagIndexPointer = lngMassTagIndexPointer + 1
+                                Else
+                                    ' Conformer not found, and next entry in lngAMTID() is not the same AMT tag id
+                                    Exit Do
+                                End If
+                            End If
+                        End If
+                    Loop
+                
+                End If
+                
                 lngMassTagIndexOriginal = lngAMTIDPointer(lngMassTagIndexPointer)
                 dblAMTMW = AMTData(lngMassTagIndexOriginal).MW
                 dblAMTNET = AMTData(lngMassTagIndexOriginal).NET
@@ -4483,6 +4545,22 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 sngPeptideProphetProbability = AMTData(lngMassTagIndexOriginal).PeptideProphetProbability
                 strPeptideSequence = AMTData(lngMassTagIndexOriginal).Sequence
                 Debug.Assert AMTData(lngMassTagIndexOriginal).ID = udtUMCsInView(lngUMCIndex).IDIndex
+                
+                If CurrMTFilteringOptions.LoadConformers Then
+                    
+                    If blnConformerDefined Then
+                        ' Also include the conformer information
+                        lngConformerID = AMTData(lngMassTagIndexOriginal).Conformer_ID
+                        intConformerCharge = AMTData(lngMassTagIndexOriginal).Conformer_Charge
+                        intConformerNum = AMTData(lngMassTagIndexOriginal).Conformer
+                        dblConformerDriftTime = AMTData(lngMassTagIndexOriginal).Drift_Time_Avg
+                        lngConformerObsCount = AMTData(lngMassTagIndexOriginal).Conformer_Obs_Count
+                    Else
+                        ' Conformer not found
+                        Debug.Assert False
+                    End If
+                End If
+                
             Else
                 dblAMTMW = 0
                 dblAMTNET = 0
@@ -4498,6 +4576,15 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             strPeptideSequence = ""
         End If
         
+        If Not blnConformerDefined Then
+            ' Either we did not search IMS Conformers, or there was a problem finding the correct IMS conformer
+            lngConformerID = 0
+            intConformerCharge = 0
+            intConformerNum = 0
+            dblConformerDriftTime = 0
+            lngConformerObsCount = 0
+        End If
+        
         strLineOutEnd = strLineOutEnd & _
                         udtUMCsInView(lngUMCIndex).IDIndex & strSepChar & _
                         Round(dblAMTMW, 6) & strSepChar & _
@@ -4505,9 +4592,18 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                         Round(dblAMTNetStDev, 4) & strSepChar & _
                         Round(udtUMCsInView(lngUMCIndex).StacOrSLiC, 4) & strSepChar & _
                         Round(udtUMCsInView(lngUMCIndex).DelScore, 4)
-        
+           
         If GelData(nMyIndex).MostRecentSearchUsedSTAC Then
             strLineOutEnd = strLineOutEnd & strSepChar & Round(udtUMCsInView(lngUMCIndex).UniquenessProbability, 4)
+        End If
+        
+        If CurrMTFilteringOptions.LoadConformers Then
+            strLineOutEnd = strLineOutEnd & strSepChar & _
+                            lngConformerID & strSepChar & _
+                            intConformerCharge & strSepChar & _
+                            intConformerNum & strSepChar & _
+                            Round(dblConformerDriftTime, 3) & strSepChar & _
+                            lngConformerObsCount
         End If
         
         strLineOutEnd = strLineOutEnd & strSepChar & _

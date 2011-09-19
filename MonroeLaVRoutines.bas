@@ -1392,8 +1392,8 @@ End Function
 ''
 ''End Sub
 
-Public Function InitializeSPCommand(cmdSPCommand As adodb.Command, _
-                                    cnnConnection As adodb.Connection, _
+Public Function InitializeSPCommand(cmdSPCommand As ADODB.Command, _
+                                    cnnConnection As ADODB.Connection, _
                                     strSPName As String) As Boolean
                                     
     ' Returns True if success, False if an error
@@ -2073,8 +2073,11 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
     Dim strRefMark As String, strRefIDEnd As String
     Dim strDBMatchSingle As String
     Dim strMatchID As String, strMassDiffPPM As String
+    Dim strConformerInfo As String
     
     Dim lngMatchID As Long, lngCharLoc As Long
+    Dim intConformerNumber As Integer
+    Dim lngPeriodLoc As Long
 
     Dim strStacOrSLiC As String
     Dim strDelSLiC As String
@@ -2114,11 +2117,43 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
             If IsNumeric(strMatchID) Then
                 blnInheritedMatch = IsAMTMatchInherited(strDBMatchSingle)
                 
+                lngPeriodLoc = InStr(strMatchID, ".")
+                If lngPeriodLoc > 0 Then
+                    ' strMatchID contains conformer info after the decimal point
+                    ' For example, "120450.02001" represents AMT tag ID 120450 with conformer charge 2 and Conformer Number 1
+                    ' and,         "120450.03002" represents AMT tag ID 120450 with conformer charge 3 and Conformer Number 2
+                    ' and,         "120451.04001" represents AMT tag ID 120451 with conformer charge 4 and Conformer Number 1
+                    
+                
+                    On Error GoTo ConformerParserErrorHandler
+                
+                    ' MatchID contains conformer information; need to remove that
+                    strConformerInfo = Mid(strMatchID, lngPeriodLoc + 1)
+                    
+                    ' Parse out the conformer number from strConformerInfo
+                    If Len(strConformerInfo) = 4 Then
+                        ' Old style, used prior to September 19, 2011
+                        ' Example: "120450.0201"
+                        intConformerNumber = val(Mid(strConformerInfo, Len(strConformerInfo) - 1, 2))
+                    Else
+                        ' New style
+                        intConformerNumber = val(Mid(strConformerInfo, Len(strConformerInfo) - 2, 3))
+                    End If
+                    
+                    strMatchID = Left(strMatchID, lngPeriodLoc - 1)
+                    
+                    On Error GoTo 0
+                    
+                Else
+                    intConformerNumber = 0
+                End If
+                
                 lngMatchID = val(strMatchID)
                 
                 ' This only applies when this function is called for a UMC (from ExtractMTHitsFromUMCMembers, for example)
                 For lngMatchIndex = 0 To lngCurrIDCnt - 1
-                    If udtCurrIDMatchStats(lngMatchIndex).IDIndex = lngMatchID Then
+                    If udtCurrIDMatchStats(lngMatchIndex).IDIndex = lngMatchID And _
+                       udtCurrIDMatchStats(lngMatchIndex).ConformerNum = intConformerNumber Then
                         If blnIncludeInheritedMatchesInMemberHitCountStat Or Not blnInheritedMatch Then
                             udtCurrIDMatchStats(lngMatchIndex).MemberHitCount = udtCurrIDMatchStats(lngMatchIndex).MemberHitCount + 1
                         End If
@@ -2128,9 +2163,12 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
                 
                 If lngMatchIndex >= lngCurrIDCnt Then
                     ' Match not found
+                    ' Add a new entry to udtCurrIDMatchStats
+                    
                     ReDim Preserve udtCurrIDMatchStats(lngCurrIDCnt)
                     
                     udtCurrIDMatchStats(lngCurrIDCnt).IDIndex = lngMatchID
+                    udtCurrIDMatchStats(lngCurrIDCnt).ConformerNum = intConformerNumber
                     
                     If blnIncludeInheritedMatchesInMemberHitCountStat Or Not blnInheritedMatch Then
                         udtCurrIDMatchStats(lngCurrIDCnt).MemberHitCount = 1
@@ -2168,6 +2206,10 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
 
     Loop While Len(strDBMatchList) > 0
 
+    Exit Sub
+    
+ConformerParserErrorHandler:
+    Debug.Assert False
 End Sub
 
 Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIndex As Long, ByVal blnFindInternalStdRefs As Boolean, ByRef udtUMCList() As udtUMCMassTagMatchStats, ByRef lngUMCListCount As Long, ByRef lngUMCListCountDimmed As Long, ByVal blnIncludeFirstMTIDMatchOnly As Boolean, ByVal blnIncludeInheritedMatchesInMemberHitCountStat As Boolean)
@@ -2223,6 +2265,7 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
                  
                 If blnNoMatchesForCurrID Then
                     udtUMCList(lngUMCListCount).IDIndex = 0
+                    udtUMCList(lngUMCListCount).ConformerNum = 0
                     udtUMCList(lngUMCListCount).MemberHitCount = 0
                     udtUMCList(lngUMCListCount).MultiAMTHitCount = 0
                     udtUMCList(lngUMCListCount).StacOrSLiC = 0
@@ -2231,6 +2274,7 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
                 Else
                                        
                     udtUMCList(lngUMCListCount).IDIndex = udtCurrIDMatchStats(lngMatchIndex).IDIndex
+                    udtUMCList(lngUMCListCount).ConformerNum = udtCurrIDMatchStats(lngMatchIndex).ConformerNum
                     udtUMCList(lngUMCListCount).MemberHitCount = udtCurrIDMatchStats(lngMatchIndex).MemberHitCount
                     udtUMCList(lngUMCListCount).StacOrSLiC = udtCurrIDMatchStats(lngMatchIndex).StacOrSLiC
                     udtUMCList(lngUMCListCount).DelScore = udtCurrIDMatchStats(lngMatchIndex).DelScore
@@ -3925,26 +3969,26 @@ Public Function GetMassTagMatchCount(ByRef udtDBSettings As udtDBSettingsType, B
     ' Returns the count if successful, 0 if no matching records, and 0 if an error
 
     Dim intDBConnectionTimeOutSeconds As Integer
-    Dim cnnConnection As adodb.Connection
-    Dim rstRecordset As New adodb.Recordset
+    Dim cnnConnection As ADODB.Connection
+    Dim rstRecordset As New ADODB.Recordset
 
     Dim sngDBSchemaVersion As Single
 
     Dim sCommand As String
-    Dim cmdGetMassTagMatchCount As New adodb.Command
+    Dim cmdGetMassTagMatchCount As New ADODB.Command
 
     ' Stored procedure parameters
-    Dim prmMTsubsetID As adodb.Parameter
-    Dim prmAMTsOnly As adodb.Parameter
-    Dim prmConfirmedOnly As adodb.Parameter
-    Dim prmLockersOnly As adodb.Parameter
-    Dim prmMinimumPMTQualityScore As adodb.Parameter
-    Dim prmMinimumHighNormalizedScore As adodb.Parameter
-    Dim prmMinimumHighDiscriminantScore As adodb.Parameter
-    Dim prmExperimentInclusionFilter As adodb.Parameter
-    Dim prmExperimentExclusionFilter As adodb.Parameter
-    Dim prmJobToFilterOnByDataset As adodb.Parameter
-    Dim prmMinimumPeptideProphetProbability As adodb.Parameter
+    Dim prmMTsubsetID As ADODB.Parameter
+    Dim prmAMTsOnly As ADODB.Parameter
+    Dim prmConfirmedOnly As ADODB.Parameter
+    Dim prmLockersOnly As ADODB.Parameter
+    Dim prmMinimumPMTQualityScore As ADODB.Parameter
+    Dim prmMinimumHighNormalizedScore As ADODB.Parameter
+    Dim prmMinimumHighDiscriminantScore As ADODB.Parameter
+    Dim prmExperimentInclusionFilter As ADODB.Parameter
+    Dim prmExperimentExclusionFilter As ADODB.Parameter
+    Dim prmJobToFilterOnByDataset As ADODB.Parameter
+    Dim prmMinimumPeptideProphetProbability As ADODB.Parameter
     
     Dim strConnectionString As String
     Dim strCaptionSaved As String
