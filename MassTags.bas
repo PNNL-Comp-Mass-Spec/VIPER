@@ -451,8 +451,8 @@ Public Function LoadMassTags(ByVal lngGelIndex As Long, _
             If udtFilteringOptions.LoadConformers Then
                 ' Load conformer information
                 AMTData(AMTCnt).Conformer_ID = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer_ID, 0)
-                AMTData(AMTCnt).Conformer_Charge = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer_Charge, 0)
-                AMTData(AMTCnt).Conformer = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer, 0)
+                AMTData(AMTCnt).ConformerCharge = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer_Charge, 0)
+                AMTData(AMTCnt).ConformerNum = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer, 0)
                  
                 AMTData(AMTCnt).Drift_Time_Avg = LoadMassTagsGetValueDbl(rsMassTags, intFieldMapping, mtfMTFieldConstants.Drift_Time_Avg, 0)
                 AMTData(AMTCnt).Conformer_Obs_Count = LoadMassTagsGetValueLng(rsMassTags, intFieldMapping, mtfMTFieldConstants.Conformer_Obs_Count, 0)

@@ -247,8 +247,8 @@ Public Type udtAMTDataType
     Sequence As String                  'peptide sequences;
     
     Conformer_ID As Long                ' IMS conformer ID
-    Conformer_Charge As Byte            ' IMS conformer charge
-    Conformer As Integer                ' Conformer number for the given AMT tag (0, 1, 2, etc.)
+    ConformerCharge As Byte             ' IMS conformer charge
+    ConformerNum As Integer             ' Conformer number for the given AMT tag (0, 1, 2, etc.)
     Drift_Time_Avg As Double            ' Average IMS Drift time
     Conformer_Obs_Count As Long         ' IMS conformer observation count
 End Type
@@ -645,7 +645,7 @@ Public Function ConstructAMTReference(ByVal MW As Double, _
         ' and,         AMT tag ID 120451 with conformer charge 4 and Conformer Number 1 would be: "120451.04001"
         
         AMTID = Trim(AMTData(AMTMatchIndex).ID) + _
-                     Format(AMTData(AMTMatchIndex).Conformer_Charge / 100# + AMTData(AMTMatchIndex).Conformer / 100000#, ".00000")
+                     Format(AMTData(AMTMatchIndex).ConformerCharge / 100# + AMTData(AMTMatchIndex).ConformerNum / 100000#, ".00000")
     Else
         AMTID = Trim(AMTData(AMTMatchIndex).ID)
     End If
@@ -1303,11 +1303,11 @@ On Error GoTo LegacyDBLoadAMTDataWorkErrorHandler
                 End If
                 
                 If Not IsNull(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer_Charge).Value) Then
-                      AMTData(lngIndex).Conformer_Charge = CByte(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer_Charge).Value)
+                      AMTData(lngIndex).ConformerCharge = CByte(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer_Charge).Value)
                 End If
                 
                 If Not IsNull(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer).Value) Then
-                      AMTData(lngIndex).Conformer = CInt(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer).Value)
+                      AMTData(lngIndex).ConformerNum = CInt(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Conformer).Value)
                 End If
                 
                 If Not IsNull(.Fields(DB_FIELD_TMASSTAGCONFORMERS_Drift_Time_Avg).Value) Then
@@ -2804,8 +2804,8 @@ Public Sub InitializeAMTDataEntry(ByRef udtAMTDataPoint As udtAMTDataType, Optio
         .Sequence = ""
         
         .Conformer_ID = 0
-        .Conformer_Charge = 0
-        .Conformer = 0
+        .ConformerCharge = 0
+        .ConformerNum = 0
         .Drift_Time_Avg = 0
         .Conformer_Obs_Count = 0
     End With

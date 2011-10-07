@@ -1316,21 +1316,29 @@ Public Function GetProgramVersion() As String
     GetProgramVersion = App.major & "." & App.minor & " Build " & App.Revision
 End Function
 
-Public Function GetUMCClassRepScanAndNET(ByVal CallerID As Long, ByVal lngUMCIndex As Long, ByRef lngScanClassRep As Long, ByRef dblNETClassRep As Double, ByRef dblDriftTimeClassRep As Double) As Boolean
+Public Function GetUMCClassRepScanAndNET(ByVal CallerID As Long, _
+                                         ByVal lngUMCIndex As Long, _
+                                         ByRef lngScanClassRep As Long, _
+                                         ByRef dblNETClassRep As Double, _
+                                         ByRef dblDriftTimeClassRep As Double, _
+                                         ByRef dblClassRepAbundance As Double) As Boolean
 
 On Error GoTo GetUMCClassRepScanAndNETErrorHandler
 
     lngScanClassRep = 0
     dblNETClassRep = 0
     dblDriftTimeClassRep = 0
+    dblClassRepAbundance = 0
 
     Select Case GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepType
-    Case gldtCS
-        lngScanClassRep = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).ScanNumber
-        dblDriftTimeClassRep = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).IMSDriftTime
     Case gldtIS
         lngScanClassRep = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).ScanNumber
         dblDriftTimeClassRep = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).IMSDriftTime
+        dblClassRepAbundance = GelData(CallerID).IsoData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).Abundance
+    Case gldtCS
+        lngScanClassRep = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).ScanNumber
+        dblDriftTimeClassRep = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).IMSDriftTime
+        dblClassRepAbundance = GelData(CallerID).CSData(GelUMC(CallerID).UMCs(lngUMCIndex).ClassRepInd).Abundance
     Case Else
         Debug.Assert False
         lngScanClassRep = (GelUMC(CallerID).UMCs(lngUMCIndex).MinScan + GelUMC(CallerID).UMCs(lngUMCIndex).MaxScan) / 2
@@ -2076,6 +2084,7 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
     Dim strConformerInfo As String
     
     Dim lngMatchID As Long, lngCharLoc As Long
+    Dim intConformerCharge As Integer
     Dim intConformerNumber As Integer
     Dim lngPeriodLoc As Long
 
@@ -2134,9 +2143,11 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
                     If Len(strConformerInfo) = 4 Then
                         ' Old style, used prior to September 19, 2011
                         ' Example: "120450.0201"
+                        intConformerCharge = val(Left(strConformerInfo, 2))
                         intConformerNumber = val(Mid(strConformerInfo, Len(strConformerInfo) - 1, 2))
                     Else
                         ' New style
+                        intConformerCharge = val(Left(strConformerInfo, 2))
                         intConformerNumber = val(Mid(strConformerInfo, Len(strConformerInfo) - 2, 3))
                     End If
                     
@@ -2145,6 +2156,7 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
                     On Error GoTo 0
                     
                 Else
+                    intConformerCharge = 0
                     intConformerNumber = 0
                 End If
                 
@@ -2153,6 +2165,7 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
                 ' This only applies when this function is called for a UMC (from ExtractMTHitsFromUMCMembers, for example)
                 For lngMatchIndex = 0 To lngCurrIDCnt - 1
                     If udtCurrIDMatchStats(lngMatchIndex).IDIndex = lngMatchID And _
+                       udtCurrIDMatchStats(lngMatchIndex).ConformerCharge = intConformerCharge And _
                        udtCurrIDMatchStats(lngMatchIndex).ConformerNum = intConformerNumber Then
                         If blnIncludeInheritedMatchesInMemberHitCountStat Or Not blnInheritedMatch Then
                             udtCurrIDMatchStats(lngMatchIndex).MemberHitCount = udtCurrIDMatchStats(lngMatchIndex).MemberHitCount + 1
@@ -2168,6 +2181,7 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
                     ReDim Preserve udtCurrIDMatchStats(lngCurrIDCnt)
                     
                     udtCurrIDMatchStats(lngCurrIDCnt).IDIndex = lngMatchID
+                    udtCurrIDMatchStats(lngCurrIDCnt).ConformerCharge = intConformerCharge
                     udtCurrIDMatchStats(lngCurrIDCnt).ConformerNum = intConformerNumber
                     
                     If blnIncludeInheritedMatchesInMemberHitCountStat Or Not blnInheritedMatch Then
@@ -2222,8 +2236,23 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
 
     Dim lngMemberIndex As Long
     Dim lngMatchIndex As Long
+    Dim dblUMCAbundanceMax As Double
     
     With GelUMC(lngGelIndex).UMCs(lngUMCIndex)
+    
+        ' Determine the maximum abundance value associated with this UMC
+        Select Case .ClassRepType
+        Case gldtIS
+            dblUMCAbundanceMax = GelData(lngGelIndex).IsoData(.ClassRepInd).Abundance
+        Case gldtCS
+            dblUMCAbundanceMax = GelData(lngGelIndex).CSData(.ClassRepInd).Abundance
+        Case Else
+            ' Unknown type
+            Debug.Assert False
+            dblUMCAbundanceMax = 0
+        End Select
+    
+        
         ' Collect stats on all of the matches for the ions belonging to this UMC
         
         lngCurrIDCnt = 0
@@ -2262,9 +2291,11 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
                 udtUMCList(lngUMCListCount).UMCIndex = lngUMCIndex
                 udtUMCList(lngUMCListCount).IDIsInternalStd = blnFindInternalStdRefs
                 udtUMCList(lngUMCListCount).FDRThreshold = 1
-                 
+                udtUMCList(lngUMCListCount).ClassRepAbundance = dblUMCAbundanceMax
+                
                 If blnNoMatchesForCurrID Then
                     udtUMCList(lngUMCListCount).IDIndex = 0
+                    udtUMCList(lngUMCListCount).ConformerCharge = 0
                     udtUMCList(lngUMCListCount).ConformerNum = 0
                     udtUMCList(lngUMCListCount).MemberHitCount = 0
                     udtUMCList(lngUMCListCount).MultiAMTHitCount = 0
@@ -2274,6 +2305,7 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
                 Else
                                        
                     udtUMCList(lngUMCListCount).IDIndex = udtCurrIDMatchStats(lngMatchIndex).IDIndex
+                    udtUMCList(lngUMCListCount).ConformerCharge = udtCurrIDMatchStats(lngMatchIndex).ConformerCharge
                     udtUMCList(lngUMCListCount).ConformerNum = udtCurrIDMatchStats(lngMatchIndex).ConformerNum
                     udtUMCList(lngUMCListCount).MemberHitCount = udtCurrIDMatchStats(lngMatchIndex).MemberHitCount
                     udtUMCList(lngUMCListCount).StacOrSLiC = udtCurrIDMatchStats(lngMatchIndex).StacOrSLiC

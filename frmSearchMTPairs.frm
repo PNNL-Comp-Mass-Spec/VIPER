@@ -915,23 +915,23 @@ Dim strMassMods As String
 Dim udtPairMatchStats As udtPairMatchStatsType
 
 'ADO objects for stored procedure adding Match Making row
-Dim cnNew As New adodb.Connection
+Dim cnNew As New ADODB.Connection
 Dim sngDBSchemaVersion As Single
 
 'ADO objects for stored procedure that adds FTICR UMC rows
-Dim cmdPutNewUMC As New adodb.Command
+Dim cmdPutNewUMC As New ADODB.Command
 Dim udtPutUMCParams As udtPutUMCParamsListType
     
 'ADO objects for stored procedure that adds FTICR UMC member rows
-Dim cmdPutNewUMCMember As New adodb.Command
+Dim cmdPutNewUMCMember As New ADODB.Command
 Dim udtPutUMCMemberParams As udtPutUMCMemberParamsListType
     
 'ADO objects for stored procedure adding UMC UMC Details
-Dim cmdPutNewUMCMatch As New adodb.Command
+Dim cmdPutNewUMCMatch As New ADODB.Command
 Dim udtPutUMCMatchParams As udtPutUMCMatchParamsListType
 
 'ADO objects for stored procedure adding FTICR UMC CS Stats
-Dim cmdPutNewUMCCSStats As New adodb.Command
+Dim cmdPutNewUMCCSStats As New ADODB.Command
 Dim udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType
 
 Dim strSearchDescription As String
@@ -2135,13 +2135,16 @@ Public Function ShowOrSavePairsAndIDs(Optional strOutputFilePath As String = "",
     Dim dblMassErrorPPM As Double
     Dim dblGANETError As Double
     
-    Dim dblDriftTimeClassRep As Double
     
     Dim lngLightScanClassRep As Long
     Dim dblLightNETClassRep As Double
+    Dim dblLightDriftTimeClassRep As Double
+    Dim dblLightClassRepAbundance As Double
     
     Dim lngHeavyScanClassRep As Long
     Dim dblHeavyNETClassRep As Double
+    Dim dblHeavyDriftTimeClassRep As Double
+    Dim dblHeavyClassRepAbundance As Double
 
     Dim blnReportAllPairs As Boolean
     Dim strReportHeader As String
@@ -2214,13 +2217,13 @@ Public Function ShowOrSavePairsAndIDs(Optional strOutputFilePath As String = "",
         ts.WriteLine "Total MT tags: " & AMTCnt
         ts.WriteLine
     End If
-    
+                        
     strLineOut = "Pair Index" & strSepChar & "UMC Light Ind" & strSepChar & "Light MW" & strSepChar & "Light Abu" & strSepChar
-    strLineOut = strLineOut & "Light ScanStart" & strSepChar & "Light ScanEnd" & strSepChar & "Light MemberCount" & strSepChar
-    strLineOut = strLineOut & "Light ScanClassRep" & strSepChar & "Light NETClassRep" & strSepChar
+    strLineOut = strLineOut & "Light ScanStart" & strSepChar & "Light ScanEnd" & strSepChar & "Light MemberCount" & strSepChar & "Light Drift Time" & strSepChar
+    strLineOut = strLineOut & "Light ScanClassRep" & strSepChar & "Light NETClassRep" & strSepChar & "Light AbundanceClassRep" & strSepChar
     strLineOut = strLineOut & "UMC Heavy Ind" & strSepChar & "Heavy MW" & strSepChar & "Heavy Abu" & strSepChar & "Delta Count" & strSepChar
-    strLineOut = strLineOut & "Heavy ScanStart" & strSepChar & "Heavy ScanEnd" & strSepChar & "Heavy MemberCount" & strSepChar
-    strLineOut = strLineOut & "Heavy ScanClassRep" & strSepChar & "Heavy NETClassRep" & strSepChar
+    strLineOut = strLineOut & "Heavy ScanStart" & strSepChar & "Heavy ScanEnd" & strSepChar & "Heavy MemberCount" & strSepChar & "Heavy Drift Time" & strSepChar
+    strLineOut = strLineOut & "Heavy ScanClassRep" & strSepChar & "Heavy NETClassRep" & strSepChar & "Heavy AbundanceClassRep" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatio StDev" & strSepChar & "ER Charge State Basis Count" & strSepChar & "ER Member Basis Count" & strSepChar
     strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar
     strLineOut = strLineOut & "SLiC Score" & strSepChar & "Del_SLiC" & strSepChar
@@ -2243,8 +2246,8 @@ Public Function ShowOrSavePairsAndIDs(Optional strOutputFilePath As String = "",
                     
                 strPairInfo = Trim(lngPairInd) & strSepChar
 
-                GetUMCClassRepScanAndNET CallerID, lngUMCIndexLight, lngLightScanClassRep, dblLightNETClassRep, dblDriftTimeClassRep
-                GetUMCClassRepScanAndNET CallerID, lngUMCIndexHeavy, lngHeavyScanClassRep, dblHeavyNETClassRep, dblDriftTimeClassRep
+                GetUMCClassRepScanAndNET CallerID, lngUMCIndexLight, lngLightScanClassRep, dblLightNETClassRep, dblLightDriftTimeClassRep, dblLightClassRepAbundance
+                GetUMCClassRepScanAndNET CallerID, lngUMCIndexHeavy, lngHeavyScanClassRep, dblHeavyNETClassRep, dblHeavyDriftTimeClassRep, dblHeavyClassRepAbundance
                 
                 With GelUMC(CallerID)
                     ' Light Member
@@ -2256,9 +2259,11 @@ Public Function ShowOrSavePairsAndIDs(Optional strOutputFilePath As String = "",
                                         .MinScan & strSepChar & _
                                         .MaxScan & strSepChar & _
                                         .ClassCount & strSepChar & _
+                                        dblLightDriftTimeClassRep & strSepChar & _
                                         lngLightScanClassRep & strSepChar & _
-                                        Format(dblLightNETClassRep, "0.0000") & strSepChar
-                        
+                                        Format(dblLightNETClassRep, "0.0000") & strSepChar & _
+                                        dblLightClassRepAbundance & strSepChar
+
                         dblUMCMass = .ClassMW
                     End With
                     
@@ -2272,8 +2277,10 @@ Public Function ShowOrSavePairsAndIDs(Optional strOutputFilePath As String = "",
                                         .MinScan & strSepChar & _
                                         .MaxScan & strSepChar & _
                                         .ClassCount & strSepChar & _
+                                        dblHeavyDriftTimeClassRep & strSepChar & _
                                         lngHeavyScanClassRep & strSepChar & _
-                                        Format(dblHeavyNETClassRep, "0.0000") & strSepChar
+                                        Format(dblHeavyNETClassRep, "0.0000") & strSepChar & _
+                                        dblHeavyClassRepAbundance & strSepChar
 
                     End With
                 

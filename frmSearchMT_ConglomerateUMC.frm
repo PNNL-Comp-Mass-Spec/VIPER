@@ -5114,8 +5114,10 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                     ' If it's not empty, then use InStr to see if .MTID contains AMTorInternalStdRef (a relatively slow operation)
                     If Len(.IsoData(lngIonIndexOriginal).MTID) = 0 Then
                         blnAddRef = True
-                    ElseIf InStr(.IsoData(lngIonIndexOriginal).MTID, AMTorInternalStdRef) <= 0 Then
-                        blnAddRef = True
+                    Else
+                        If InStr(.IsoData(lngIonIndexOriginal).MTID, AMTorInternalStdRef) <= 0 Then
+                            blnAddRef = True
+                        End If
                     End If
                     
                     If blnAddRef Then
@@ -5916,8 +5918,8 @@ Private Function SearchUMCsUsingSTACExportData(ByRef fso As FileSystemObject, _
                 If blnUseDriftTime Then
                     strLineOut = strLineOut & vbTab & _
                                  .Conformer_ID & vbTab & _
-                                 .Conformer_Charge & vbTab & _
-                                 .Conformer & vbTab & _
+                                 .ConformerCharge & vbTab & _
+                                 .ConformerNum & vbTab & _
                                  .Drift_Time_Avg & vbTab & _
                                  .Conformer_Obs_Count
                 End If
@@ -6889,6 +6891,7 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     
     Dim dblDriftTimeClassRep As Double
     Dim dblDriftTimeError As Double
+    Dim dblClassRepAbundance As Double
     
     Dim objORFNameFastSearch As New FastSearchArrayLong
     Dim blnSuccess As Boolean
@@ -6907,7 +6910,9 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     
     Dim lngPeakFPRType As Long
     
-    Dim intConformer As Integer
+    Dim intConformerCharge As Integer
+    Dim intConformerNum As Integer
+    
     Dim dblMTDriftTime As Double
     Dim lngMTDriftTimeObsCount As Long
     Dim lngConformerID As Long
@@ -6952,15 +6957,18 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     
     strSepChar = LookupDefaultSeparationCharacter()
     
-    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; PairMemberType; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; Uniqueness_Probability; FDR_Threshold, IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
-    strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
+    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; UMCClassRepAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; PairMemberType; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; Uniqueness_Probability; FDR_Threshold, IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
+    strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar & "UMCClassRepAbundance" & strSepChar
+    If mMTListContainsConformers Then
+        strLineOut = strLineOut & "IMS_Drift_Time" & strSepChar
+    End If
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar & "PairMemberType" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar
     strLineOut = strLineOut & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagMods" & strSepChar
     
     If mMTListContainsConformers Then
-        strLineOut = strLineOut & "Conformer" & strSepChar & "MassTagDriftTime" & strSepChar & "MassTagDriftTimeObsCount" & strSepChar & "ConformerID" & strSepChar
+        strLineOut = strLineOut & "Conformer_Charge" & strSepChar & "Conformer" & strSepChar & "MassTagDriftTime" & strSepChar & "MassTagDriftTimeObsCount" & strSepChar & "Conformer_ID" & strSepChar
     End If
     
     strLineOut = strLineOut & "MemberCountMatchingMassTag" & strSepChar & "MassErrorPPM" & strSepChar & "NETError" & strSepChar
@@ -7004,7 +7012,8 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             End With
             sngPeptideProphetProbability = 0
             
-            intConformer = 0
+            intConformerCharge = 0
+            intConformerNum = 0
             dblMTDriftTime = 0
             lngMTDriftTimeObsCount = 0
             lngConformerID = 0
@@ -7028,18 +7037,24 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             sngPeptideProphetProbability = AMTData(lngMassTagIndexOriginal).PeptideProphetProbability
             strPeptideSequence = AMTData(lngMassTagIndexOriginal).Sequence
             
-            intConformer = AMTData(lngMassTagIndexOriginal).Conformer
+            intConformerCharge = AMTData(lngMassTagIndexOriginal).ConformerCharge
+            intConformerNum = AMTData(lngMassTagIndexOriginal).ConformerNum
+            
             dblMTDriftTime = AMTData(lngMassTagIndexOriginal).Drift_Time_Avg
             lngMTDriftTimeObsCount = AMTData(lngMassTagIndexOriginal).Conformer_Obs_Count
             lngConformerID = AMTData(lngMassTagIndexOriginal).Conformer_ID
         End If
     
-        GetUMCClassRepScanAndNET CallerID, lngUMCIndexOriginal, lngScanClassRep, dblGANETClassRep, dblDriftTimeClassRep
+        GetUMCClassRepScanAndNET CallerID, lngUMCIndexOriginal, lngScanClassRep, dblGANETClassRep, dblDriftTimeClassRep, dblClassRepAbundance
         
         With GelUMC(CallerID).UMCs(lngUMCIndexOriginal)
             strLineOut = lngUMCIndexOriginal & strSepChar & .MinScan & strSepChar & .MaxScan & strSepChar & lngScanClassRep & strSepChar & Format(dblGANETClassRep, "0.0000") & strSepChar & Round(.ClassMW, 6) & strSepChar
-            strLineOut = strLineOut & Round(.ClassMWStD, 6) & strSepChar & .MinMW & strSepChar & .MaxMW & strSepChar & .ClassAbundance & strSepChar
+            strLineOut = strLineOut & Round(.ClassMWStD, 6) & strSepChar & .MinMW & strSepChar & .MaxMW & strSepChar & .ClassAbundance & strSepChar & dblClassRepAbundance & strSepChar
             
+            If mMTListContainsConformers Then
+                strLineOut = strLineOut & Round(.DriftTime, 3) & strSepChar
+            End If
+    
             strMinMaxCharges = ClsStat(lngUMCIndexOriginal, ustChargeMin) & strSepChar & ClsStat(lngUMCIndexOriginal, ustChargeMax) & strSepChar
             
             ' Record ClassStatsChargeBasis, ChargeMin, ChargeMax, UMCMZForChargeBasis, UMCMemberCount, and UMCMemberCountUsedForAbu
@@ -7099,9 +7114,10 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
         End If
         
         If mMTListContainsConformers Then
-            ' Conformer   MassTagDriftTime    MassTagDriftTimeObsCount    ConformerID
+            ' Conformer_Charge  Conformer   MassTagDriftTime    MassTagDriftTimeObsCount    ConformerID
             strLineOutEnd = strLineOutEnd & strSepChar & _
-                            intConformer & strSepChar & _
+                            intConformerCharge & strSepChar & _
+                            intConformerNum & strSepChar & _
                             Round(dblMTDriftTime, 4) & strSepChar & _
                             lngMTDriftTimeObsCount & strSepChar & _
                             lngConformerID
@@ -7547,8 +7563,8 @@ Private Sub WriteAMTMatchesForIon(ts As TextStream, strLineOutPrefix As String, 
             
             If mMTListContainsConformers And lngMatchCount > 1 Then
                 For lngPointerIndex = 0 To lngMatchCount - 1
-                    If AMTData(lngMatchingIndices(lngPointerIndex)).Conformer_Charge = intConformerCharge Then
-                        If AMTData(lngMatchingIndices(lngPointerIndex)).Conformer = intConformer Then
+                    If AMTData(lngMatchingIndices(lngPointerIndex)).ConformerCharge = intConformerCharge Then
+                        If AMTData(lngMatchingIndices(lngPointerIndex)).ConformerNum = intConformer Then
                             ' Update lngOriginalAMTIndex
                             lngOriginalAMTIndex = lngMatchingIndices(lngPointerIndex)
                         End If
@@ -8070,14 +8086,14 @@ Private Sub mnuFReportIncludeORFs_Click()
 End Sub
 
 Private Sub mnuFResetExclusionFlags_Click()
-Dim strMessage As String
-strMessage = PairsResetExclusionFlag(CallerID)
-UpdateUMCsPairingStatusNow
-UpdateStatus strMessage
+    Dim strMessage As String
+    strMessage = PairsResetExclusionFlag(CallerID)
+    UpdateUMCsPairingStatusNow
+    UpdateStatus strMessage
 End Sub
 
 Private Sub mnuFSearchAll_Click()
-StartSearchAll
+    StartSearchAll
 End Sub
 
 Private Sub mnuFSearchN14LabeledFeatures_Click()
@@ -8099,11 +8115,11 @@ Private Sub mnuFSearchN14LabeledFeatures_Click()
 End Sub
 
 Private Sub mnuFSearchNonPaired_Click()
-StartSearchNonPaired
+    StartSearchNonPaired
 End Sub
 
 Private Sub mnuFSearchPaired_Click()
-StartSearchPaired
+    StartSearchPaired
 End Sub
 
 Private Sub mnuFSearchPairedPlusNonPaired_Click()

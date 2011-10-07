@@ -4304,8 +4304,8 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     ReDim strExport(lngExportCountDimmed)
     
     ' Construct the header line
-    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; ExpressionRatioStDev; ExpressionRatioBasisCount; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagNET; MassTagNETStDev; SLiC Score; DelSLiC; MemberCountMatchingMassTag; IsInternalStdMatch; PeptideProphetProbability
-    strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar
+    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; UMCClassRepAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; ExpressionRatioStDev; ExpressionRatioBasisCount; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagNET; MassTagNETStDev; SLiC Score; DelSLiC; MemberCountMatchingMassTag; IsInternalStdMatch; PeptideProphetProbability
+    strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar & "UMCClassRepAbundance" & strSepChar
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "MassShiftPPMClassRep" & strSepChar
     
     blnIMSDataPresent = (GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
@@ -4389,7 +4389,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             dblGANETClassRep = ScanToGANET(nMyIndex, lngScanClassRep)
             
             strLineOut = lngUMCIndexOriginal & strSepChar & .MinScan & strSepChar & .MaxScan & strSepChar & lngScanClassRep & strSepChar & Format(dblGANETClassRep, "0.0000") & strSepChar & Round(.ClassMW, 6) & strSepChar
-            strLineOut = strLineOut & Round(.ClassMWStD, 6) & strSepChar & .MinMW & strSepChar & .MaxMW & strSepChar & .ClassAbundance & strSepChar
+            strLineOut = strLineOut & Round(.ClassMWStD, 6) & strSepChar & .MinMW & strSepChar & .MaxMW & strSepChar & .ClassAbundance & strSepChar & udtUMCsInView(lngUMCIndex).ClassRepAbundance & strSepChar
             
             strMinMaxCharges = ClsStat(lngUMCIndexOriginal, ustChargeMin) & strSepChar & ClsStat(lngUMCIndexOriginal, ustChargeMax) & strSepChar
             
@@ -4488,6 +4488,18 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
         strLineOutEnd = ""
         strLineOutEnd = strLineOutEnd & udtUMCsInView(lngUMCIndex).MultiAMTHitCount & strSepChar
         
+        dblAMTMW = 0
+        dblAMTNET = 0
+        dblAMTNetStDev = 0
+        sngPeptideProphetProbability = 0
+        strPeptideSequence = ""
+
+        lngConformerID = 0
+        intConformerCharge = 0
+        intConformerNum = 0
+        dblConformerDriftTime = 0
+        lngConformerObsCount = 0
+
         If mnuSCopyPointsInViewByUMCIncludeSearchResults.Checked And _
            blnIncludeAddnlAMTInfo And udtUMCsInView(lngUMCIndex).IDIndex >= 0 And _
            Not udtUMCsInView(lngUMCIndex).IDIsInternalStd Then
@@ -4498,16 +4510,11 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
             
             If lngMassTagIndexPointer >= 0 Then
             
-                If CurrMTFilteringOptions.LoadConformers Then
-                    ' Use udtUMCsInView(lngUMCIndex).ConformerNum to find the correct entry in AMTData()
+                If CurrMTFilteringOptions.LoadConformers And (udtUMCsInView(lngUMCIndex).ConformerNum > 0 Or udtUMCsInView(lngUMCIndex).ConformerCharge > 0) Then
+                    ' Use udtUMCsInView(lngUMCIndex).ConformerCharge and .ConformerNum to find the correct entry in AMTData()
                     ' This step is necessary since lngAMTID() only tracks AMT IDs, and thus if an AMT tag has multiple conformers, then lngAMTID() will have multiple entries for the same AMT tag ID
                     
                     Do While lngMassTagIndexPointer > 0
-                        If AMTData(lngAMTIDPointer(lngMassTagIndexPointer)).Conformer = udtUMCsInView(lngUMCIndex).ConformerNum Then
-                            blnConformerDefined = True
-                            Exit Do
-                        End If
-                        
                         If lngAMTID(lngMassTagIndexPointer - 1) = lngAMTID(lngMassTagIndexPointer) Then
                             lngMassTagIndexPointer = lngMassTagIndexPointer - 1
                         Else
@@ -4517,7 +4524,8 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                     
                     
                     Do While Not blnConformerDefined
-                        If AMTData(lngAMTIDPointer(lngMassTagIndexPointer)).Conformer = udtUMCsInView(lngUMCIndex).ConformerNum Then
+                        If AMTData(lngAMTIDPointer(lngMassTagIndexPointer)).ConformerNum = udtUMCsInView(lngUMCIndex).ConformerNum And _
+                           AMTData(lngAMTIDPointer(lngMassTagIndexPointer)).ConformerCharge = udtUMCsInView(lngUMCIndex).ConformerCharge Then
                             blnConformerDefined = True
                             Exit Do
                         Else
@@ -4546,13 +4554,13 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 strPeptideSequence = AMTData(lngMassTagIndexOriginal).Sequence
                 Debug.Assert AMTData(lngMassTagIndexOriginal).ID = udtUMCsInView(lngUMCIndex).IDIndex
                 
-                If CurrMTFilteringOptions.LoadConformers Then
+                If CurrMTFilteringOptions.LoadConformers And (udtUMCsInView(lngUMCIndex).ConformerNum > 0 Or udtUMCsInView(lngUMCIndex).ConformerCharge > 0) Then
                     
                     If blnConformerDefined Then
                         ' Also include the conformer information
                         lngConformerID = AMTData(lngMassTagIndexOriginal).Conformer_ID
-                        intConformerCharge = AMTData(lngMassTagIndexOriginal).Conformer_Charge
-                        intConformerNum = AMTData(lngMassTagIndexOriginal).Conformer
+                        intConformerCharge = AMTData(lngMassTagIndexOriginal).ConformerCharge
+                        intConformerNum = AMTData(lngMassTagIndexOriginal).ConformerNum
                         dblConformerDriftTime = AMTData(lngMassTagIndexOriginal).Drift_Time_Avg
                         lngConformerObsCount = AMTData(lngMassTagIndexOriginal).Conformer_Obs_Count
                     Else
@@ -4560,29 +4568,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                         Debug.Assert False
                     End If
                 End If
-                
-            Else
-                dblAMTMW = 0
-                dblAMTNET = 0
-                dblAMTNetStDev = 0
-                sngPeptideProphetProbability = 0
-                strPeptideSequence = ""
             End If
-        Else
-            dblAMTMW = 0
-            dblAMTNET = 0
-            dblAMTNetStDev = 0
-            sngPeptideProphetProbability = 0
-            strPeptideSequence = ""
-        End If
-        
-        If Not blnConformerDefined Then
-            ' Either we did not search IMS Conformers, or there was a problem finding the correct IMS conformer
-            lngConformerID = 0
-            intConformerCharge = 0
-            intConformerNum = 0
-            dblConformerDriftTime = 0
-            lngConformerObsCount = 0
         End If
         
         strLineOutEnd = strLineOutEnd & _

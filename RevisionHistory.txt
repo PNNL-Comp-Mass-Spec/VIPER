@@ -1,5 +1,17 @@
 VIPER Change Log
 
+Version 3.48 - Build 458; September 29, 2011
+	- Added column UMCClassRepAbundance to the data included when using "Edit->Copy LC-MS Features (UMCs) in view" to Clipboard / File
+		- This column is also included when you use "Report Results by UMCs" on the Database Search form
+
+Version 3.48 - Build 457; September 23, 2011
+	- Fixed bug in auto analysis that failed to use the LegacyAMTDBPath entry defined in the auto-analysis .Ini file
+
+Version 3.48 - Build 456; September 20, 2011
+	- Fixed bug that showed the wrong Conformer_ID when using "Edit->Copy LC-MS Features (UMCs) in view" to Clipboard / File
+	- New version of STAC that fixes the counts in the last line of the FDR summary file (_FDR.csv)
+		- A few results were not getting included in the stats when filtering on STAC Score >= 0 due to a rounding bug
+
 Version 3.48 - Build 455; September 19, 2011
 	- Now including Conformer information when you use search IMS features against AMT tag conformers, then use "Edit->Copy LC-MS Features (UMCs) in view" to Clipboard / File
 		- New Columns are:  Conformer_ID, Conformer_Charge, Conformer, Drift_Time_Avg, Conformer_Obs_Count

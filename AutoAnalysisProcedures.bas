@@ -3180,6 +3180,9 @@ On Error GoTo LoadInputFileErrorHandler
                         udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, 0, strErrorMessage)
                     End If
                     udtWorkingParams.LoadedGelFile = False
+                    
+                    ' Need to clear .PathToDatabase so that it will properly populate later
+                    GelData(udtWorkingParams.GelIndex).PathtoDatabase = ""
                 End If
             Else
                 udtWorkingParams.LoadedGelFile = False

@@ -44,7 +44,8 @@ FROM T_Mass_Tags MT INNER JOIN
     MT.Mass_Tag_ID = MTPM.Mass_Tag_ID INNER JOIN
     T_Proteins Prot ON MTPM.Ref_ID = Prot.Ref_ID
 WHERE (MT.PMT_Quality_Score >= @PMTQualityScoreFilter) AND 
-      (MT.Peptide_Obs_Count_Passing_Filter >= @PeptideObsCountFilter)
+      (MT.Peptide_Obs_Count_Passing_Filter >= @PeptideObsCountFilter) AND
+      Not Prot.Reference LIKE 'Reversed%'
 GROUP BY Prot.Ref_ID, Prot.Reference, Prot.Description, 
     Prot.Protein_Residue_Count, Prot.Monoisotopic_Mass, 
     Prot.Protein_Collection_ID, Prot.Last_Affected,
@@ -59,12 +60,13 @@ SELECT Prot.Ref_ID, Prot.Reference, Prot.Reference AS Description,
     '' AS Protein_Sequence, 0 AS Protein_DB_ID, 
     0 AS External_Reference_ID, 0 AS External_Protein_ID
 FROM T_Mass_Tags MT INNER JOIN
-    T_Mass_Tag_to_Protein_Map MTPM ON 
-    MT.Mass_Tag_ID = MTPM.Mass_Tag_ID INNER JOIN
-    T_Proteins Prot ON MTPM.Ref_ID = Prot.Ref_ID
+     T_Mass_Tag_to_Protein_Map MTPM ON 
+     MT.Mass_Tag_ID = MTPM.Mass_Tag_ID INNER JOIN
+     T_Proteins Prot ON MTPM.Ref_ID = Prot.Ref_ID
 WHERE (MT.PMT_Quality_Score >= @PMTQualityScoreFilter) AND 
-      (MT.Peptide_Obs_Count_Passing_Filter >= @PeptideObsCountFilter)
-      AND Protein_Collection_ID Is Null
+      (MT.Peptide_Obs_Count_Passing_Filter >= @PeptideObsCountFilter) AND
+      Protein_Collection_ID Is Null AND
+      Not Prot.Reference LIKE 'Reversed%'
 GROUP BY Prot.Ref_ID, Prot.Reference, Prot.Description, 
     Prot.Protein_Residue_Count, Prot.Monoisotopic_Mass, 
     Prot.Protein_Collection_ID, Prot.Last_Affected,
@@ -79,11 +81,14 @@ SELECT MTPM.Mass_Tag_ID, MTPM.Mass_Tag_Name,
     MTPM.Residue_Start, MTPM.Residue_End, 
     MTPM.Repeat_Count, MTPM.Terminus_State, 
     MTPM.Missed_Cleavage_Count
-FROM T_Mass_Tags MT INNER JOIN
-    T_Mass_Tag_to_Protein_Map MTPM ON 
-    MT.Mass_Tag_ID = MTPM.Mass_Tag_ID
-WHERE (MT.PMT_Quality_Score >= @PMTQualityScoreFilter) AND 
-      (MT.Peptide_Obs_Count_Passing_Filter >= @PeptideObsCountFilter)
+FROM T_Mass_Tags MT
+     INNER JOIN T_Mass_Tag_to_Protein_Map MTPM
+       ON MT.Mass_Tag_ID = MTPM.Mass_Tag_ID
+     INNER JOIN T_Proteins Prot
+       ON MTPM.Ref_ID = Prot.Ref_ID
+WHERE (MT.PMT_Quality_Score >= @PMTQualityScoreFilter) AND
+      (MT.Peptide_Obs_Count_Passing_Filter >= @PeptideObsCountFilter) AND
+      NOT Prot.Reference LIKE 'Reversed%'
 ORDER BY MT.Mass_Tag_ID, MTPM.Ref_ID
 
 -- Populate T_Mass_Tag_to_Protein_Map with entries where Mass_Tag_Name is null
@@ -93,12 +98,15 @@ SELECT MTPM.Mass_Tag_ID, '' AS Mass_Tag_Name,
     0 AS Residue_Start, 0 AS Residue_End, 
     0 AS Repeat_Count, MTPM.Terminus_State, 
     0 AS Missed_Cleavage_Count
-FROM T_Mass_Tags MT INNER JOIN
-    T_Mass_Tag_to_Protein_Map MTPM ON 
-    MT.Mass_Tag_ID = MTPM.Mass_Tag_ID
+FROM T_Mass_Tags MT
+     INNER JOIN T_Mass_Tag_to_Protein_Map MTPM
+       ON MT.Mass_Tag_ID = MTPM.Mass_Tag_ID
+     INNER JOIN T_Proteins Prot
+       ON MTPM.Ref_ID = Prot.Ref_ID
 WHERE (MT.PMT_Quality_Score >= @PMTQualityScoreFilter) AND 
       (MT.Peptide_Obs_Count_Passing_Filter >= @PeptideObsCountFilter) AND
-      Mass_Tag_Name IS NULL
+      Mass_Tag_Name IS NULL AND
+      NOT Prot.Reference LIKE 'Reversed%'
 ORDER BY MT.Mass_Tag_ID, MTPM.Ref_ID
 
 
@@ -119,8 +127,8 @@ ORDER BY MTC.Conformer_ID
 -- Populate V_Filter_Set_Overview_Ex
 SELECT *
 FROM V_Filter_Set_Overview_Ex
--- Populate T_Analysis_Description
 
+-- Populate T_Analysis_Description
 SELECT Job,
        Dataset,
        Dataset_ID,

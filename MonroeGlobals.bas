@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "September 19, 2011"
+Public Const APP_BUILD_DATE As String = "September 29, 2011"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -924,7 +924,9 @@ Public Type udtUMCMassTagMatchStats
     MassDiffPPM As Double           ' Mass difference between AMT and given UMC or given point
     MultiAMTHitCount As Long        ' The number of Unique MT tag hits for each UMC; only applies to AMT's (in other words, ignores Internal Standard)
     DriftTimeAligned As Single      ' Aligned Drift Time computed via STAC
-    ConformerNum As Integer         ' IMS Conformer Number (first conformer of each AMT tag is Conformer 1)
+    ConformerNum As Integer         ' IMS Conformer Number (first conformer of each charge state for an AMT tag is Conformer 1)
+    ConformerCharge As Integer      ' IMS Conformer Charge state
+    ClassRepAbundance As Double     ' Abundance of this UMC's class rep (most likely the maximum abundance of the UMC)
 End Type
 
 Public Type udtExclusionIonType
