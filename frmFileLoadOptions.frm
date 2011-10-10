@@ -749,7 +749,7 @@ Private Sub EnableDisableControls()
     Case ifmInputFileModeConstants.ifmCSVFile, ifmInputFileModeConstants.ifmPEKFile
         blnEnableDataTypeFilter = True
         blnEnableIsoFitFilter = True
-        blnEnableMSLevelFilter = False
+        blnEnableMSLevelFilter = True
         blnEnableDreamsFilters = True
         blnEnableAbundanceFilters = True
         blnEnableDatacountFilters = True

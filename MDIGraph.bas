@@ -1910,7 +1910,7 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                                            .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
                                            .MaximumDataCountEnabled, .MaximumDataCountToLoad, _
                                            .TotalIntensityPercentageFilterEnabled, .TotalIntensityPercentageFilter, _
-                                           eScanFilterMode, eDataFilterMode)
+                                           eScanFilterMode, eDataFilterMode, blnMSLevelFilter)
             End With
             
             If intReturnCode <> 0 Then

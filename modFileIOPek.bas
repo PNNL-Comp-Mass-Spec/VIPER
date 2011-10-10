@@ -2,82 +2,85 @@ Attribute VB_Name = "modFileIOPEK"
 Option Explicit
 
 'following set of constants is used with PEK functions
-Public Const PEK_D_FILENAME = "Filename:"
-Private Const PEK_D_TIME_DOMAIN_SIGNAL_LEVEL = "Time domain signal level:"
-''Private Const PEK_D_MEDIA = "Media type:"
-''Private Const PEK_D_mOVERz_RANGE = "m/z Range:"
-''Private Const PEK_D_MAX_CS = "Maximum CS:"
-''Private Const PEK_D_THRESHOLD = "Threshold:"
-''Private Const PEK_D_MIN_SNR = "Minimum peak S/N:"
-''Private Const PEK_D_MAX_FIT = "Maximum fit:"
-''Private Const PEK_N_CS_BLOCK = "First CS,"
-''Private Const PEK_N_IS_BLOCK = "CS,  Abundance,   m/z,"
-Private Const PEK_D_PEAKS_CNT = "Number of peaks in spectrum ="
-Private Const PEK_D_IS_CNT = "Number of isotopic distributions detected ="
-''Private Const PEK_N_CS_BLOCK_1 = "Charge state mass transform results:"
-''Private Const PEK_N_IS_BLOCK_1 = "Isotopic mass transform results:"
-''Private Const PEK_N_CALIBRATION = "Calibration:"
+Public Const PEK_D_FILENAME As String = "Filename:"
+Private Const PEK_D_TIME_DOMAIN_SIGNAL_LEVEL As String = "Time domain signal level:"
+''Private Const PEK_D_MEDIA As String = "Media type:"
+''Private Const PEK_D_mOVERz_RANGE As String = "m/z Range:"
+''Private Const PEK_D_MAX_CS As String = "Maximum CS:"
+''Private Const PEK_D_THRESHOLD As String = "Threshold:"
+''Private Const PEK_D_MIN_SNR As String = "Minimum peak S/N:"
+''Private Const PEK_D_MAX_FIT As String = "Maximum fit:"
+''Private Const PEK_N_CS_BLOCK As String = "First CS,"
+''Private Const PEK_N_IS_BLOCK As String = "CS,  Abundance,   m/z,"
+Private Const PEK_D_PEAKS_CNT As String = "Number of peaks in spectrum ="
+Private Const PEK_D_IS_CNT As String = "Number of isotopic distributions detected ="
+''Private Const PEK_N_CS_BLOCK_1 As String = "Charge state mass transform results:"
+''Private Const PEK_N_IS_BLOCK_1 As String = "Isotopic mass transform results:"
+''Private Const PEK_N_CALIBRATION As String = "Calibration:"
 
 'this constants are used only during reading of PEK file
 'they are used to identify line by it's left 8 characters
-Private Const t8CALIBRATION1 = "Calibrat"
-Private Const t8CALIBRATION2 = " Calibra"
-Private Const t8FILENAME = "Filename"
-Private Const t8DATABASE = "Database"
-Public Const t8DATA_CS = "First CS"
-Public Const t8DATA_ISO = "CS,  Abu"
-Public Const t8DATA_ISO_Tabbed = "CS" & vbTab & "Abund"
+Private Const t8CALIBRATION1 As String = "Calibrat"
+Private Const t8CALIBRATION2 As String = " Calibra"
+Private Const t8FILENAME As String = "Filename"
+Private Const t8DATABASE As String = "Database"
+Public Const t8DATA_CS As String = "First CS"
+Public Const t8DATA_ISO As String = "CS,  Abu"
+Public Const t8DATA_ISO_Tabbed As String = "CS" & vbTab & "Abund"
 
-Private Const t8MEDIATYPE = "Media ty"
-Private Const t8FREQSHIFT = " Freq sh"
-''Private Const t8DELTADATABLOCK = "Monoisot"
-''Private Const t8DELTABLOCKEND = "End of d"      'not used
-''Private Const t8DELTA = " Delta ="
-''Private Const t8DELTA_TOL = " Toleren"
-''Private Const t8DELTA_TOL_1 = " Toleran"
-''Private Const t8TAG_MASS = " Tag Mas"
-Private Const t8MAX_DELTAS = " Maximum"
-Private Const t8TTL_SEQ_TIME = ""               'time for one scan
-Private Const t8TIME_DOMAIN = "Time dom"
+Private Const t8MEDIATYPE As String = "Media ty"
+Private Const t8FREQSHIFT As String = " Freq sh"
+''Private Const t8DELTADATABLOCK As String = "Monoisot"
+''Private Const t8DELTABLOCKEND As String = "End of d"      'not used
+''Private Const t8DELTA As String = " Delta ="
+''Private Const t8DELTA_TOL As String = " Toleren"
+''Private Const t8DELTA_TOL_1 As String = " Toleran"
+''Private Const t8TAG_MASS As String = " Tag Mas"
+Private Const t8MAX_DELTAS As String = " Maximum"
+Private Const t8TTL_SEQ_TIME As String = ""               'time for one scan
+Private Const t8TIME_DOMAIN As String = "Time dom"
 
-Private Const t3ARG_A = "A ="
-Private Const t3ARG_B = "B ="
-Private Const t3ARG_C = "C ="
-Private Const t3ARG_D = "D ="
-Private Const t3ARG_E = "E ="
-Private Const t3ARG_F = "F ="
-Private Const t3ARG_G = "G ="
-Private Const t3ARG_H = "H ="
-Private Const t3ARG_I = "I ="
-Private Const t3ARG_J = "J ="
-Private Const t3EQUATION = "m/z"
+Private Const t3ARG_A As String = "A ="
+Private Const t3ARG_B As String = "B ="
+Private Const t3ARG_C As String = "C ="
+Private Const t3ARG_D As String = "D ="
+Private Const t3ARG_E As String = "E ="
+Private Const t3ARG_F As String = "F ="
+Private Const t3ARG_G As String = "G ="
+Private Const t3ARG_H As String = "H ="
+Private Const t3ARG_I As String = "I ="
+Private Const t3ARG_J As String = "J ="
+Private Const t3EQUATION As String = "m/z"
 
-Private Const t4RT = "RT ="
+Private Const t4RT As String = "RT ="
 
-Private Const t5WIFF = "wiff-"    'used with scan number in QTof files
+Private Const t5WIFF As String = "wiff-"    'used with scan number in QTof files
 
-Private Const LINE_NOTHING = -1
-Private Const LINE_CALIBRATION = 0
-Private Const LINE_DATA_CS = 1
-Private Const LINE_DATA_ISO = 2
-Private Const LINE_FILENAME_AKA_SCAN_NUMBER = 3
-Private Const LINE_DATABASE = 4
-Private Const LINE_EQUATION = 5
-Private Const LINE_CAL_ARGUMENT = 6
-Private Const LINE_FREQUENCY = 7
-Private Const LINE_INTENSITY = 8
-Private Const LINE_MEDIA = 9
-''Private Const LINE_DELTA = 10
-''Private Const LINE_DELTA_TOLERANCE = 11
-''Private Const LINE_DELTA_TAGMASS = 12
-''Private Const LINE_DELTA_MAX = 13
-''Private Const LINE_DATA_DD = 14
-''Private Const LINE_DATA_DD_END = 15
-Private Const LINE_WHATEVER = 16
-Private Const LINE_TIME_DOMAIN_SIGNAL = 17
-Private Const LINE_RETENTION_TIME = 18
-Private Const LINE_NUMBER_OF_PEAKS = 19
-Private Const LINE_NUMBER_OF_ISOTOPIC_DISTRIBUTIONS = 20
+Private Const t6SCAN As String = "Scan ="
+
+Private Const LINE_NOTHING As Integer = -1
+Private Const LINE_CALIBRATION As Integer = 0
+Private Const LINE_DATA_CS As Integer = 1
+Private Const LINE_DATA_ISO As Integer = 2
+Private Const LINE_FILENAME_AKA_SCAN_NUMBER As Integer = 3
+Private Const LINE_DATABASE As Integer = 4
+Private Const LINE_EQUATION As Integer = 5
+Private Const LINE_CAL_ARGUMENT As Integer = 6
+Private Const LINE_FREQUENCY As Integer = 7
+Private Const LINE_INTENSITY As Integer = 8
+Private Const LINE_MEDIA As Integer = 9
+''Private Const LINE_DELTA As Integer = 10
+''Private Const LINE_DELTA_TOLERANCE As Integer = 11
+''Private Const LINE_DELTA_TAGMASS As Integer = 12
+''Private Const LINE_DELTA_MAX As Integer = 13
+''Private Const LINE_DATA_DD As Integer = 14
+''Private Const LINE_DATA_DD_END As Integer = 15
+Private Const LINE_WHATEVER As Integer = 16
+Private Const LINE_TIME_DOMAIN_SIGNAL As Integer = 17
+Private Const LINE_RETENTION_TIME As Integer = 18
+Private Const LINE_NUMBER_OF_PEAKS As Integer = 19
+Private Const LINE_NUMBER_OF_ISOTOPIC_DISTRIBUTIONS As Integer = 20
+Private Const LINE_SCAN_NUMBER As Integer = 21
 
 Private Const SCAN_INFO_DIM_CHUNK As Long = 10000
 Private Const ISO_DATA_DIM_CHUNK As Long = 25000
@@ -203,6 +206,46 @@ Private CalibrationIn As Boolean   'read only once
 Private DatabaseIn As Boolean      'read only once
 Private MediaTypeIn As Boolean     'read only once
 '
+
+Private Function ExtractMSLevel(ByVal strFilterText As String, ByRef intMSLevel As Integer) As Boolean
+    ' Looks for "Full ms2" or "Full ms3" or " p ms2" in strFilterText
+    ' Returns True if found and False if no match
+    
+    ' Populates intMSLevel with the number after "ms"
+    ' RegEx that works is ( p|Full|SRM|CRM) ms([2-9]|[1-9][0-9])
+    ' However, VB6 doesn't natively support RegEx, so we'll use the string searrching approach
+    ' If we really wanted to use RegEx, one option is to use "Microsoft VBScript Regular Expressions 5.5" (see http://www.regular-expressions.info/vb.html)
+    
+    Dim lngCharLoc As Long
+    Dim strMSLevel As String
+    Dim blnSuccess As Boolean
+    
+    intMSLevel = 1
+    blnSuccess = False
+    
+    lngCharLoc = InStr(strFilterText, "Full ms")
+    If lngCharLoc > 0 Then
+        strMSLevel = Mid(strFilterText, lngCharLoc + 7, 1)
+        blnSuccess = True
+    End If
+    
+    If lngCharLoc = 0 Then
+        lngCharLoc = InStr(strFilterText, "p ms")
+        If lngCharLoc > 0 Then
+            strMSLevel = Mid(strFilterText, lngCharLoc + 4, 1)
+            blnSuccess = True
+        End If
+    End If
+    
+    If Len(strMSLevel) > 0 Then
+        If IsNumeric(strMSLevel) Then
+            intMSLevel = CInt(strMSLevel)
+        End If
+    End If
+
+    ExtractMSLevel = blnSuccess
+    
+End Function
 
 Private Function ExtractTimeDomainSignalFromPEK(ByVal strInputFilePath As String, ByVal Ind As Long) As Boolean
 '-------------------------------------------------------------------------
@@ -418,7 +461,8 @@ Public Function LoadNewPEK(ByVal strPEKFilePath As String, ByVal lngGelIndex As 
                            ByVal blnMaximumDataCountEnabled As Boolean, ByVal lngMaximumDataCountToLoad As Long, _
                            ByVal blnTotalIntensityPercentageFilterEnabled, ByVal sngTotalIntensityPercentageFilter, _
                            ByVal eScanFilterMode As eosEvenOddScanFilterModeConstants, _
-                           ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants) As Long
+                           ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants, _
+                           ByRef blnMSLevelFilter() As Boolean) As Long
     '-------------------------------------------------------------------------
     'Returns 0 if data successfuly loaded, -2 if data set is too large,
     '-3 if problems with scan numbers, -4 if no data found, -5 if user cancels load,
@@ -571,7 +615,7 @@ On Error GoTo LoadNewPEKErrorHandler
         mValidDataPointCount = 0
         lngTotalBytesRead = 0
         
-        lngReturnValue = ReadPEKFile(fso, strPEKFilePath, lngTotalBytesRead, blnFilePrescanEnabled)
+        lngReturnValue = ReadPEKFile(fso, strPEKFilePath, lngTotalBytesRead, blnFilePrescanEnabled, blnMSLevelFilter)
         If lngReturnValue <> 0 Then
             ' Error occurred
             Debug.Assert False
@@ -762,7 +806,9 @@ End Function
 Private Function ReadPEKFile(ByRef fso As FileSystemObject, _
                              ByVal strPEKFilePath As String, _
                              ByRef lngTotalBytesRead As Long, _
-                             ByVal blnFilePrescanEnabled As Boolean) As Long
+                             ByVal blnFilePrescanEnabled As Boolean, _
+                             ByRef blnMSLevelFilter() As Boolean) As Long
+                             
     Dim tsInFile As TextStream
     Dim strLineIn As String
 
@@ -803,6 +849,9 @@ Private Function ReadPEKFile(ByRef fso As FileSystemObject, _
     Dim intIsosColumnMapping() As Integer
     Dim intCSColumnMapping() As Integer
    
+    Dim intMSLevel As Integer
+    Dim blnParseLine As Boolean
+   
 On Error GoTo ReadPEKFileErrorHandler
     
     ReDim intIsosColumnMapping(ISOS_DATA_COLUMN_COUNT) As Integer
@@ -830,6 +879,8 @@ On Error GoTo ReadPEKFileErrorHandler
     CurrDataElutionTime = 0
     mMaxElutionTime = 0
         
+    intMSLevel = 0
+    
     Set tsInFile = fso.OpenTextFile(strPEKFilePath, ForReading, False)
     Do While Not tsInFile.AtEndOfStream
         
@@ -847,8 +898,27 @@ On Error GoTo ReadPEKFileErrorHandler
             GelData(mGelIndex).LinesRead = lngLinesRead
         End If
         
-        LineNow strLineIn, LineType, Special, varData, intDataColumnCount, intIsosColumnMapping, intCSColumnMapping, strPEKFilePath
+        blnParseLine = True
+        If intMSLevel = -1 Then
+            ' Try to determine the MSLevel from the current line
+            If ExtractMSLevel(strLineIn, intMSLevel) Then
+                blnParseLine = False
+            End If
+        End If
+        
+        If blnParseLine Then
+            LineNow strLineIn, LineType, Special, varData, intDataColumnCount, intIsosColumnMapping, intCSColumnMapping, strPEKFilePath
+        Else
+            LineType = LINE_NOTHING
+        End If
+        
+        
         Select Case LineType
+        Case LINE_SCAN_NUMBER
+            ' Scan number line found
+            ' The next line should have the MSLevel; set MSLevel to -1 to indicate that the next line should be parsed to read the MSLevel
+            intMSLevel = -1
+        
         Case LINE_FILENAME_AKA_SCAN_NUMBER
             CurrDataFName = varData(0)
             
@@ -977,6 +1047,14 @@ On Error GoTo ReadPEKFileErrorHandler
                     blnValidDataPoint = False
                 End If
                 
+                If blnValidDataPoint And intMSLevel > 0 And Not blnMSLevelFilter(0) Then
+                    If intMSLevel > UBound(blnMSLevelFilter) Then
+                        blnValidDataPoint = False
+                    Else
+                        blnValidDataPoint = blnMSLevelFilter(intMSLevel)
+                    End If
+                End If
+                
                 If blnValidDataPoint Then
                     If mReadMode = rmReadModeConstants.rmPrescanData Then
                         mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
@@ -1062,6 +1140,14 @@ On Error GoTo ReadPEKFileErrorHandler
                         blnValidDataPoint = False
                     End If
                     
+                    If blnValidDataPoint And intMSLevel > 0 And Not blnMSLevelFilter(0) Then
+                        If intMSLevel > UBound(blnMSLevelFilter) Then
+                            blnValidDataPoint = False
+                        Else
+                            blnValidDataPoint = blnMSLevelFilter(intMSLevel)
+                        End If
+                    End If
+                
                     If blnValidDataPoint Then
                         If mReadMode = rmReadModeConstants.rmPrescanData Then
                             mPrescannedData.AddDataPoint sngAbundance, intCharge, mValidDataPointCount
@@ -1453,7 +1539,11 @@ Private Sub LineNow(ByVal strLineIn As String, ByRef LineType As Integer, ByRef 
                 varData(0) = 0
                 LineType = LINE_NOTHING
             End If
-    
+        ElseIf Left(strLineIn, 6) = t6SCAN Then
+            ' Scan number
+            ' Note that the t8FILENAME line also tracks scan number
+            varData(0) = GetNumberEqual(strLineIn)      ' Scan number
+            LineType = LINE_SCAN_NUMBER
         Else
             Select Case ThisLine
             Case LINE_DATA_CS
@@ -1634,7 +1724,7 @@ End Sub
 
 
 Private Function IsDataLine(ByVal strLineIn As String, ByRef varData As Variant, ByRef intDataColumnCount As Integer, ByRef Special As String, ByVal strFilePath As String) As Boolean
-    Dim k As Integer, i As Integer
+    Dim k As Integer, I As Integer
     Dim LineElement As Variant
     Dim TmpLine As String
     Dim Done As Boolean
@@ -1690,9 +1780,9 @@ Private Function IsDataLine(ByVal strLineIn As String, ByRef varData As Variant,
           
           'make sure that there are no dot-zeros among data
           If intDataColumnCount > 0 Then
-             For i = 0 To intDataColumnCount - 1
-                 If varData(i) = "." Then varData(i) = 0
-             Next i
+             For I = 0 To intDataColumnCount - 1
+                 If varData(I) = "." Then varData(I) = 0
+             Next I
              IsDataLine = True
           End If
        End If
@@ -2993,32 +3083,32 @@ Dim Indx() As Long
 Dim Abu() As Double
 Dim sLine As String
 Dim qsdSort As New QSDouble
-Dim i As Long
+Dim I As Long
 On Error Resume Next
 With GelData(Ind)
     If .CSLines > 0 Then
        ReDim Indx(1 To .CSLines)
        ReDim Abu(1 To .CSLines)
        FNCnt = 0
-       For i = 1 To .CSLines
-           If .CSData(i).ScanNumber = FN Then
+       For I = 1 To .CSLines
+           If .CSData(I).ScanNumber = FN Then
               FNCnt = FNCnt + 1
-              Indx(FNCnt) = i
-              Abu(FNCnt) = .CSData(i).Abundance
-           ElseIf .CSData(i).ScanNumber > FN Then
+              Indx(FNCnt) = I
+              Abu(FNCnt) = .CSData(I).Abundance
+           ElseIf .CSData(I).ScanNumber > FN Then
               Exit For
            End If
-       Next i
+       Next I
        If FNCnt > 0 Then
           ReDim Preserve Indx(1 To FNCnt)
           ReDim Preserve Abu(1 To FNCnt)
           If qsdSort.QSDesc(Abu(), Indx()) Then
-             For i = 1 To FNCnt
+             For I = 1 To FNCnt
                 'this part is always included
-                sLine = .CSData(Indx(i)).Charge & vbTab & .CSData(Indx(i)).ChargeCount _
-                    & vbTab & Format$(.CSData(Indx(i)).Abundance, "Scientific") _
-                    & vbTab & Format$(.CSData(Indx(i)).AverageMW, "0.0000") _
-                    & vbTab & Format$(.CSData(Indx(i)).MassStDev, "0.0000")
+                sLine = .CSData(Indx(I)).Charge & vbTab & .CSData(Indx(I)).ChargeCount _
+                    & vbTab & Format$(.CSData(Indx(I)).Abundance, "Scientific") _
+                    & vbTab & Format$(.CSData(Indx(I)).AverageMW, "0.0000") _
+                    & vbTab & Format$(.CSData(Indx(I)).MassStDev, "0.0000")
                 'add ER if included
 ''                If Not IsNull(.CSVar(Indx(i), csvfMTDDRatio)) Then
 ''                   If IsNumeric(.CSVar(Indx(i), csvfMTDDRatio)) Then
@@ -3041,7 +3131,7 @@ With GelData(Ind)
 ''                End If
 
                 Print #hfile, sLine
-             Next i
+             Next I
           End If
        End If
     End If
@@ -3061,7 +3151,7 @@ Dim Abu() As Double
 Dim sLine As String
 Dim strAppendText As String
 Dim qsdSort As New QSDouble
-Dim i As Long
+Dim I As Long
 Dim blnSuccess As Boolean
 
 Dim strIsotopeLabel As String
@@ -3075,15 +3165,15 @@ With GelData(Ind)
      DataMatchCount = 0
      If lngIsoDataStartIndex < 1 Then lngIsoDataStartIndex = 1
      If lngIsoDataStartIndex > .IsoLines Then lngIsoDataStartIndex = .IsoLines
-     For i = lngIsoDataStartIndex To .IsoLines
-         If .IsoData(i).ScanNumber = FN Then
+     For I = lngIsoDataStartIndex To .IsoLines
+         If .IsoData(I).ScanNumber = FN Then
             DataMatchCount = DataMatchCount + 1
-            Indx(DataMatchCount) = i
-            Abu(DataMatchCount) = .IsoData(i).Abundance        'Intensity
-         ElseIf .IsoData(i).ScanNumber > FN Then
+            Indx(DataMatchCount) = I
+            Abu(DataMatchCount) = .IsoData(I).Abundance        'Intensity
+         ElseIf .IsoData(I).ScanNumber > FN Then
             Exit For
          End If
-     Next i
+     Next I
      If DataMatchCount > 0 Then
         lngIsoDataStartIndex = lngIsoDataStartIndex + DataMatchCount
         
@@ -3097,7 +3187,7 @@ With GelData(Ind)
         End If
         
         If blnSuccess Then
-           For i = 1 To DataMatchCount
+           For I = 1 To DataMatchCount
 ''              If Not IsNull(.IsoVar(Indx(i), isvfIsotopeLabel)) Then
 ''                 strIsotopeLabel = CStr(.IsoVar(Indx(i), isvfIsotopeLabel))
 ''              Else
@@ -3113,16 +3203,16 @@ With GelData(Ind)
 ''                 blnLegacyIsotopeLabel = False
 ''              End If
 
-              sLine = " " & Trim(.IsoData(Indx(i)).Charge) & vbTab & _
-                        Format$(.IsoData(Indx(i)).Abundance, "Scientific") & vbTab & _
-                        Format$(.IsoData(Indx(i)).MZ, "0.0000") & vbTab & _
-                        Format$(.IsoData(Indx(i)).Fit, "0.0000") & vbTab & _
-                        Format$(.IsoData(Indx(i)).AverageMW, "0.0000") & vbTab & _
-                        Format$(.IsoData(Indx(i)).MonoisotopicMW, "0.0000") & vbTab & _
-                        Format$(.IsoData(Indx(i)).MostAbundantMW, "0.0000")
+              sLine = " " & Trim(.IsoData(Indx(I)).Charge) & vbTab & _
+                        Format$(.IsoData(Indx(I)).Abundance, "Scientific") & vbTab & _
+                        Format$(.IsoData(Indx(I)).MZ, "0.0000") & vbTab & _
+                        Format$(.IsoData(Indx(I)).Fit, "0.0000") & vbTab & _
+                        Format$(.IsoData(Indx(I)).AverageMW, "0.0000") & vbTab & _
+                        Format$(.IsoData(Indx(I)).MonoisotopicMW, "0.0000") & vbTab & _
+                        Format$(.IsoData(Indx(I)).MostAbundantMW, "0.0000")
 
-              If .IsoData(Indx(i)).IsotopeLabel <> iltNone Then
-                sLine = sLine & vbTab & GetIsotopeLabelTagName(.IsoData(Indx(i)).IsotopeLabel)
+              If .IsoData(Indx(I)).IsotopeLabel <> iltNone Then
+                sLine = sLine & vbTab & GetIsotopeLabelTagName(.IsoData(Indx(I)).IsotopeLabel)
               End If
 
 ''              strAppendText = ""
@@ -3154,7 +3244,7 @@ With GelData(Ind)
 ''              End If
               
               Print #hfile, sLine
-           Next i
+           Next I
         End If
      End If
   End If

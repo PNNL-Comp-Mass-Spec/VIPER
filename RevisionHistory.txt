@@ -1,5 +1,9 @@
 VIPER Change Log
 
+Version 3.48 - Build 459; October 10, 2011
+	- Added support for MSLevel filtering when reading .PEK files that have a ScanFilter line; example line:
+		FTMS + p NSI d Full ms2 1424.82@etd15.00 [100.00-2000.00] 
+
 Version 3.48 - Build 458; September 29, 2011
 	- Added column UMCClassRepAbundance to the data included when using "Edit->Copy LC-MS Features (UMCs) in view" to Clipboard / File
 		- This column is also included when you use "Report Results by UMCs" on the Database Search form
@@ -99,7 +103,7 @@ Version 3.48 - Build 441; January 31, 2011
 Version 3.48 - Build 440; January 28, 2011
 	- Now skipping _Filtered_Isos.csv files when finding candidate files to load during auto-analysis
 
-Version 3.48 - Build 349; January 27, 2011
+Version 3.48 - Build 439; January 27, 2011
 	- Disabled splitting of LC-MS features by abundance when reading _LCMSFeatures.txt files
 	- Fixed bug that was changing LC-MS Feature class mass values to the mass value of the most abundant member of a feature at inappropriate times:
 		- After applying a mass calibration adjustment (either when using LCMSWarp or when using Tolerance Refinement)
