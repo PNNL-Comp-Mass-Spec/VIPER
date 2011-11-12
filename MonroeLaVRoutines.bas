@@ -2203,6 +2203,7 @@ Public Sub ExtractMTHitsFromMatchList(ByVal strDBMatchList As String, _
                     strUPScore = Trim(GetIDFromString(strDBMatchSingle, MTUPMark, MTUpEND))
                     If IsNumeric(strUPScore) Then
                         udtCurrIDMatchStats(lngCurrIDCnt).UniquenessProbability = val(strUPScore)
+                        udtCurrIDMatchStats(lngCurrIDCnt).wSTAC = udtCurrIDMatchStats(lngCurrIDCnt).StacOrSLiC * udtCurrIDMatchStats(lngCurrIDCnt).UniquenessProbability
                     End If
                     
                     If Not blnFindInternalStdRefs Then
@@ -2291,6 +2292,7 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
                 udtUMCList(lngUMCListCount).UMCIndex = lngUMCIndex
                 udtUMCList(lngUMCListCount).IDIsInternalStd = blnFindInternalStdRefs
                 udtUMCList(lngUMCListCount).FDRThreshold = 1
+                udtUMCList(lngUMCListCount).wSTACFDR = 1
                 udtUMCList(lngUMCListCount).ClassRepAbundance = dblUMCAbundanceMax
                 
                 If blnNoMatchesForCurrID Then
@@ -2302,6 +2304,7 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
                     udtUMCList(lngUMCListCount).StacOrSLiC = 0
                     udtUMCList(lngUMCListCount).DelScore = 0
                     udtUMCList(lngUMCListCount).UniquenessProbability = 0
+                    udtUMCList(lngUMCListCount).wSTAC = 0
                 Else
                                        
                     udtUMCList(lngUMCListCount).IDIndex = udtCurrIDMatchStats(lngMatchIndex).IDIndex
@@ -2311,6 +2314,9 @@ Public Sub ExtractMTHitsFromUMCMembers(ByVal lngGelIndex As Long, ByVal lngUMCIn
                     udtUMCList(lngUMCListCount).StacOrSLiC = udtCurrIDMatchStats(lngMatchIndex).StacOrSLiC
                     udtUMCList(lngUMCListCount).DelScore = udtCurrIDMatchStats(lngMatchIndex).DelScore
                     udtUMCList(lngUMCListCount).UniquenessProbability = udtCurrIDMatchStats(lngMatchIndex).UniquenessProbability
+                    
+                    udtUMCList(lngUMCListCount).wSTAC = udtCurrIDMatchStats(lngMatchIndex).wSTAC
+                    udtUMCList(lngUMCListCount).wSTACFDR = udtCurrIDMatchStats(lngMatchIndex).wSTACFDR
                     
                     If blnFindInternalStdRefs Then
                         udtUMCList(lngUMCListCount).MultiAMTHitCount = 0
@@ -2936,7 +2942,7 @@ Public Sub CopyLegacyCSToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, B
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
          
         .IReportTagType = irtIReportTagTypeConstants.irtNone
-        .AdditionalValue1 = 0
+        .SaturationFlag = 0
         .IMSDriftTime = 0
         
         On Error Resume Next
@@ -2980,7 +2986,7 @@ Public Sub CopyLegacyIso2005ToCurrentIso(ByRef udtIsotopicData As udtIsotopicDat
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
          
         .IReportTagType = irtIReportTagTypeConstants.irtNone
-        .AdditionalValue1 = 0
+        .SaturationFlag = 0
         .IMSDriftTime = 0
         
         .MTID = udtIsotopicDataOld.MTID
@@ -3026,7 +3032,7 @@ Public Sub CopyLegacyIsoToIsoData(ByRef udtIsotopicData As udtIsotopicDataType, 
         .IsotopeLabel = iltIsotopeLabelTagConstants.iltNone
          
         .IReportTagType = irtIReportTagTypeConstants.irtNone
-        .AdditionalValue1 = 0
+        .SaturationFlag = 0
         .IMSDriftTime = 0
         
         On Error Resume Next
@@ -5131,6 +5137,14 @@ End Function
 ''    ReplaceDBNameInConnectionString = strNewConnectionString
 ''
 ''End Function
+
+Public Function RoundSTAC(ByVal dblValue As Double) As String
+    If dblValue = 0 Or dblValue >= 0.01 Then
+        RoundSTAC = Round(dblValue, 4)
+    Else
+        RoundSTAC = Round(dblValue, 6)
+    End If
+End Function
 
 Public Function ScanToGANET(ByVal lngGelIndex As Long, ByVal lngScanNumber As Long) As Double
     Dim dblSlope As Double, dblIntercept As Double

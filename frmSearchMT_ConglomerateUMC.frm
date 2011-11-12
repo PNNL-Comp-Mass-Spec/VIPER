@@ -65,18 +65,28 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Left            =   60
       Locked          =   -1  'True
       MultiLine       =   -1  'True
-      TabIndex        =   75
+      TabIndex        =   76
       Top             =   7695
       Width           =   7455
    End
    Begin VB.Frame fraSTACPlotOptions 
       BackColor       =   &H00FFFFFF&
       Caption         =   "STAC Plot Options"
-      Height          =   1575
+      Height          =   1815
       Left            =   11880
       TabIndex        =   69
       Top             =   960
       Width           =   2055
+      Begin VB.CheckBox chkPlotwSTACData 
+         BackColor       =   &H00FFFFFF&
+         Caption         =   "Use &wSTAC  data"
+         Height          =   255
+         Left            =   120
+         TabIndex        =   71
+         Top             =   520
+         Visible         =   0   'False
+         Width           =   1815
+      End
       Begin VB.CheckBox chkPlotUPFilteredFDR 
          BackColor       =   &H00FFFFFF&
          Caption         =   "&UP Filtered FDR"
@@ -92,8 +102,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "FDR Gridlines"
          Height          =   255
          Left            =   120
-         TabIndex        =   73
-         Top             =   1200
+         TabIndex        =   74
+         Top             =   1440
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -102,8 +112,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Matches Gridlines"
          Height          =   255
          Left            =   120
-         TabIndex        =   72
-         Top             =   960
+         TabIndex        =   73
+         Top             =   1200
          Width           =   1815
       End
       Begin VB.CheckBox chkSTACPlotXGridlines 
@@ -111,8 +121,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
          Caption         =   "Vertical Gridlines"
          Height          =   255
          Left            =   120
-         TabIndex        =   71
-         Top             =   720
+         TabIndex        =   72
+         Top             =   960
          Value           =   1  'Checked
          Width           =   1815
       End
@@ -121,7 +131,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Caption         =   "&Zoom Out"
       Height          =   375
       Left            =   11880
-      TabIndex        =   74
+      TabIndex        =   75
       Top             =   3000
       Width           =   1335
    End
@@ -1258,7 +1268,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Const NET_PRECISION As Integer = 5
-Private Const STAC_STATS_LISTVIEW_COLCOUNT_WITH_CONFORMERS As Integer = 9
+Private Const STAC_STATS_LISTVIEW_COLCOUNT_WITH_CONFORMERS As Integer = 12
 
 Const MOD_TKN_NONE As String = "none"
 Const MOD_TKN_PEO As String = "PEO"
@@ -1418,7 +1428,6 @@ Private Enum sfcSTACFDRColumnConstants
     sfcFDRUPpt5 = 8
 End Enum
 
-
 '
 Public Property Get PlotUPFilteredFDR() As Boolean
     PlotUPFilteredFDR = cChkBox(chkPlotUPFilteredFDR)
@@ -1426,6 +1435,17 @@ End Property
 Public Property Let PlotUPFilteredFDR(Value As Boolean)
     SetCheckBox chkPlotUPFilteredFDR, Value
 End Property
+
+'''''''''''''
+' Disabled in November 2011 until we determine how to properly compute FDR from wSTAC values
+'''''''''''''
+'
+'Public Property Get PlotwSTACData() As Boolean
+'    PlotwSTACData = cChkBox(chkPlotwSTACData)
+'End Property
+'Public Property Let PlotwSTACData(Value As Boolean)
+'    SetCheckBox chkPlotwSTACData, Value
+'End Property
 
 Public Property Get SearchRegionShape() As srsSearchRegionShapeConstants
     SearchRegionShape = mSearchRegionShape
@@ -1496,6 +1516,8 @@ Private Function AddCurrIDsToAllIDs(ClsInd As Long) As Boolean
             .DelScore = mCurrIDMatches(lngIndex).DelScore
             .UniquenessProbability = mCurrIDMatches(lngIndex).UniquenessProbability
             .FDRThreshold = 1
+            .wSTAC = .StacOrSLiC * .UniquenessProbability
+            .wSTACFDR = 1
             .IDIsInternalStd = mCurrIDMatches(lngIndex).IDIsInternalStd
             .MultiAMTHitCount = lngAMTHitCount
             .DriftTimeAligned = mCurrIDMatches(lngIndex).FeatureDriftTimeAligned
@@ -1539,7 +1561,7 @@ Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False
             End If
         Else
             fraDriftTime.Visible = False
-            fraMods.Top = fraNet.Top + fraNet.Height + 10
+            fraMods.Top = fraNET.Top + fraNET.Height + 10
             If Me.UseSTAC Then
                 lngMinimumHeight = 8500
             Else
@@ -1593,6 +1615,29 @@ Private Function CheckVsMinimum(ByVal lngValue As Long, Optional ByVal lngMinimu
 End Function
 
 Private Function ComputePeptideLevelSTACFDR() As Boolean
+    
+    Dim intComputationMode As Integer
+    Dim blnSuccess As Boolean
+    
+    '''''''''''''
+    ' Disabled computation of FDR for wSTAC values in November 2011 until we determine how to properly compute FDR from wSTAC values
+    '''''''''''''
+    '
+    For intComputationMode = 0 To 0
+        ' Iteration 0 means to compute FDR for STAC values
+        ' Iteration 1 means to compute FDR for wSTAC values (disabled since doesn't compute accurate FDR values)
+        blnSuccess = ComputePeptideLevelSTACFDRWork(intComputationMode)
+        If Not blnSuccess Then
+            Debug.Assert False
+            Exit For
+        End If
+    Next intComputationMode
+    
+    ComputePeptideLevelSTACFDR = blnSuccess
+    
+End Function
+
+Private Function ComputePeptideLevelSTACFDRWork(ByVal intComputationMode As Integer) As Boolean
 
     Dim lngIndex As Long
     
@@ -1608,7 +1653,7 @@ Private Function ComputePeptideLevelSTACFDR() As Boolean
     
     Dim blnSuccess As Boolean
     
-On Error GoTo ComputePeptideLevelSTACFDRErrorHandler
+On Error GoTo ComputePeptideLevelSTACFDRWorkErrorHandler
     
     If mMatchStatsCount > 0 Then
         
@@ -1620,7 +1665,13 @@ On Error GoTo ComputePeptideLevelSTACFDRErrorHandler
         
         For lngIndex = 0 To mMatchStatsCount - 1
             lngPointerArray(lngIndex) = lngIndex
-            dblSTACScores(lngIndex) = mUMCMatchStats(lngIndex).StacOrSLiC
+            
+            If intComputationMode = 0 Then
+                dblSTACScores(lngIndex) = mUMCMatchStats(lngIndex).StacOrSLiC
+            Else
+                dblSTACScores(lngIndex) = mUMCMatchStats(lngIndex).wSTAC
+            End If
+            
         Next lngIndex
         
         ' Sort dblSTACScores() and sort lngPointerArray() in parallel
@@ -1631,9 +1682,12 @@ On Error GoTo ComputePeptideLevelSTACFDRErrorHandler
         ' Now step through the data and compute the FDR values
         ' FDR = (CountToThisPoint - RunningSTACSum) / CountToThisPoint
         
+        
         dblRunningSum = 0
         For lngIndex = 0 To mMatchStatsCount - 1
-            dblRunningSum = dblRunningSum + dblSTACScores(lngIndex)
+            
+            dblRunningSum = dblRunningSum + mUMCMatchStats(lngPointerArray(lngIndex)).StacOrSLiC
+            
             lngRunningCount = lngIndex + 1
             dblFDR(lngIndex) = (lngRunningCount - dblRunningSum) / lngRunningCount
         Next lngIndex
@@ -1651,23 +1705,161 @@ On Error GoTo ComputePeptideLevelSTACFDRErrorHandler
         blnSuccess = objQSLong.QSAsc(lngPointerArray, dblFDR)
         
         ' Finally, store the FDR values
-        ' We're also counting the number of features that pass each threshold
         For lngIndex = 0 To mMatchStatsCount - 1
-            mUMCMatchStats(lngIndex).FDRThreshold = dblFDR(lngIndex)
+        
+            If intComputationMode = 0 Then
+                mUMCMatchStats(lngIndex).FDRThreshold = dblFDR(lngIndex)
+            Else
+                mUMCMatchStats(lngIndex).wSTACFDR = dblFDR(lngIndex)
+            End If
+            
         Next lngIndex
         
-        ' This code was never completed ... Count the number of features passing each FDR threshold
-        ''For lngIndex = 0 To mMatchStatsCount - 1
-        ''Next lngIndex
     End If
     
-    ComputePeptideLevelSTACFDR = True
+    ComputePeptideLevelSTACFDRWork = True
     Exit Function
 
-ComputePeptideLevelSTACFDRErrorHandler:
+ComputePeptideLevelSTACFDRWorkErrorHandler:
     Debug.Assert False
-    LogErrors Err.Number, "ComputePeptideLevelSTACFDR"
+    LogErrors Err.Number, "ComputePeptideLevelSTACFDRWork"
+
+End Function
+
+Private Function ComputeWeightedSTACStats() As Boolean
+
+    Dim htConformers As Dictionary
+    Dim htAMTs As Dictionary
     
+    Dim lngIndex As Long
+    Dim lngMassTagIndexPointer As Long
+    Dim lngMassTagIndexOriginal As Long
+    
+    Dim lngPointerArray() As Long
+    Dim dblSTACScores() As Double
+    
+    Dim intSTACStatsIndexCurrent As Integer
+    Dim dblwSTACFDRCurrent As Double
+    
+    Dim objQSDbl As QSDouble
+    
+    Dim blnSuccess As Boolean
+    
+On Error GoTo ComputeComputeWeightedSTACStatsErrorHandler
+    
+    If mMatchStatsCount > 0 Then
+        
+        ReDim lngPointerArray(mMatchStatsCount - 1)
+        ReDim dblSTACScores(mMatchStatsCount - 1)
+        
+        If STACStatsCount = 0 Then
+            ReDim STACStats(50)
+            STACStats(0).STACCuttoff = 0.99
+            STACStats(1).STACCuttoff = 0.98
+            STACStats(2).STACCuttoff = 0.97
+            STACStats(3).STACCuttoff = 0.96
+            STACStats(4).STACCuttoff = 0.95
+            STACStats(5).STACCuttoff = 0.94
+            STACStats(6).STACCuttoff = 0.93
+            STACStats(7).STACCuttoff = 0.92
+            STACStats(8).STACCuttoff = 0.91
+            STACStats(9).STACCuttoff = 0.9
+            STACStats(10).STACCuttoff = 0.8
+            STACStats(11).STACCuttoff = 0.7
+            STACStats(12).STACCuttoff = 0.6
+            STACStats(13).STACCuttoff = 0.5
+            STACStats(14).STACCuttoff = 0.4
+            STACStats(15).STACCuttoff = 0.3
+            STACStats(16).STACCuttoff = 0.2
+            STACStats(17).STACCuttoff = 0.1
+            STACStats(18).STACCuttoff = 0
+            
+            STACStatsCount = 19
+        End If
+        
+        intSTACStatsIndexCurrent = 0
+        dblwSTACFDRCurrent = 0
+        
+        Set htConformers = New Dictionary
+        Set htAMTs = New Dictionary
+        
+        ' Populate two parallel arrays
+        
+        For lngIndex = 0 To mMatchStatsCount - 1
+            lngPointerArray(lngIndex) = lngIndex
+            dblSTACScores(lngIndex) = mUMCMatchStats(lngIndex).wSTAC
+        Next lngIndex
+        
+        ' Sort dblSTACScores() and sort lngPointerArray() in parallel
+        
+        Set objQSDbl = New QSDouble
+        blnSuccess = objQSDbl.QSDesc(dblSTACScores, lngPointerArray)
+                
+        ' Now step through the data and count the number of unique AMTs and Conformers with the given STAC score or higher
+        ' Record the stats at certain intervals
+        
+        
+        For lngIndex = 0 To mMatchStatsCount - 1
+        
+            If intSTACStatsIndexCurrent < STACStatsCount Then
+                Do While dblSTACScores(lngIndex) < STACStats(intSTACStatsIndexCurrent).STACCuttoff
+                    
+                    STACStats(intSTACStatsIndexCurrent).wSTAC_FDR = dblwSTACFDRCurrent * 100#
+                    STACStats(intSTACStatsIndexCurrent).wSTAC_UniqueAMTs = htAMTs.Count
+                    STACStats(intSTACStatsIndexCurrent).wSTAC_UniqueConformers = htConformers.Count
+                    
+                    intSTACStatsIndexCurrent = intSTACStatsIndexCurrent + 1
+                    If intSTACStatsIndexCurrent >= STACStatsCount Then Exit Do
+                Loop
+            End If
+            
+            If mUMCMatchStats(lngPointerArray(lngIndex)).IDIsInternalStd Then
+                ' Note: This function doesn't use internal standard matches
+                ' lngInternalStdIndexOriginal = mInternalStdIndexPointers(mUMCMatchStats(lngPointerArray(lngIndex)).IDIndex)
+            Else
+                lngMassTagIndexPointer = mMTInd(mUMCMatchStats(lngPointerArray(lngIndex)).IDIndex)
+                lngMassTagIndexOriginal = mMTOrInd(lngMassTagIndexPointer)
+                 
+                If lngMassTagIndexOriginal <= AMTCnt Then
+                     
+                    If Not htAMTs.Exists(AMTData(lngMassTagIndexOriginal).ID) Then
+                        htAMTs.add AMTData(lngMassTagIndexOriginal).ID, 1
+                    End If
+                    
+                    If AMTData(lngMassTagIndexOriginal).Conformer_ID > 0 Then
+                        If Not htConformers.Exists(AMTData(lngMassTagIndexOriginal).Conformer_ID) Then
+                            htConformers.add AMTData(lngMassTagIndexOriginal).Conformer_ID, 1
+                        End If
+                    End If
+            
+                    dblwSTACFDRCurrent = mUMCMatchStats(lngPointerArray(lngIndex)).wSTACFDR
+                 Else
+                     ' Invalid MT tag index
+                     Debug.Assert False
+                 End If
+            End If
+             
+        
+        Next lngIndex
+        
+        ' Populate the remaining entries
+        Do While intSTACStatsIndexCurrent < STACStatsCount
+            STACStats(intSTACStatsIndexCurrent).wSTAC_FDR = dblwSTACFDRCurrent * 100#
+            STACStats(intSTACStatsIndexCurrent).wSTAC_UniqueAMTs = htAMTs.Count
+            STACStats(intSTACStatsIndexCurrent).wSTAC_UniqueConformers = htConformers.Count
+            
+            intSTACStatsIndexCurrent = intSTACStatsIndexCurrent + 1
+        Loop
+        
+    End If
+    
+    ComputeWeightedSTACStats = True
+    Exit Function
+
+ComputeComputeWeightedSTACStatsErrorHandler:
+    Debug.Assert False
+    LogErrors Err.Number, "ComputeWeightedSTACStats"
+
 End Function
 
 Private Function ConvertScanToNET(lngScanNumber As Long) As Double
@@ -1862,6 +2054,61 @@ Private Function DisplayHitSummary(strSearchScope As String) As String
 
     DisplayHitSummary = strMessage
 
+End Function
+
+Private Function DisplaySTACStats() As Boolean
+    
+    ' Update the lvwSTACStats list view
+
+    Dim lngIndex As Long
+
+On Error GoTo DisplaySTACStatsErrorHandler
+    
+    Dim lstNewItem As MSComctlLib.ListItem
+    lvwSTACStats.ListItems.Clear
+    
+    If CurrMTFilteringOptions.LoadConformers And lvwSTACStats.ColumnHeaders.Count < STAC_STATS_LISTVIEW_COLCOUNT_WITH_CONFORMERS Then
+        lvwSTACStats.ColumnHeaders.add , , "Unique Conformers", 1200
+        
+        '''''''''''''
+        ' Future: add wSTAC data to lvwSTACStats
+        '''''''''''''
+        ' lvwSTACStats.ColumnHeaders.add , , "wSTAC Unique Conformers", 1200
+        
+        lvwSTACStats.ColumnHeaders.add , , "Unique Conformers, UP>0.5", 1500
+    End If
+    
+    For lngIndex = 0 To STACStatsCount - 1
+        Set lstNewItem = lvwSTACStats.ListItems.add(, , Round(STACStats(lngIndex).STACCuttoff, 2))
+                
+        lstNewItem.SubItems(1) = STACStats(lngIndex).UniqueAMTs
+        lstNewItem.SubItems(2) = Round(STACStats(lngIndex).FDR, 2)
+        lstNewItem.SubItems(3) = Round(STACStats(lngIndex).Errors, 1)
+        
+        '''''''''''''
+        ' Future: add wSTAC data to lvwSTACStats
+        '''''''''''''
+        'lstNewItem.SubItems(4) = Round(STACStats(lngIndex).wSTAC_UniqueAMTs, 1)
+        'lstNewItem.SubItems(5) = Round(STACStats(lngIndex).wSTAC_FDR, 1)
+        
+        lstNewItem.SubItems(4) = STACStats(lngIndex).UP_Filtered_UniqueAMTs
+        lstNewItem.SubItems(5) = Round(STACStats(lngIndex).UP_Filtered_FDR, 2)
+        lstNewItem.SubItems(6) = Round(STACStats(lngIndex).UP_Filtered_Errors, 1)
+            
+        If CurrMTFilteringOptions.LoadConformers Then
+            lstNewItem.SubItems(7) = STACStats(lngIndex).UniqueConformers
+            'lstNewItem.SubItems(10) = Round(STACStats(lngIndex).wSTAC_UniqueConformers, 1)
+            lstNewItem.SubItems(8) = STACStats(lngIndex).UP_Filtered_UniqueConformers
+        End If
+    Next lngIndex
+
+    DisplaySTACStats = True
+    Exit Function
+    
+DisplaySTACStatsErrorHandler:
+    Debug.Assert False
+    DisplaySTACStats = False
+    
 End Function
 
 Private Function Elution(FN As Long, MinFN As Long, MaxFN As Long) As Double
@@ -2434,6 +2681,17 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
         ' Use CSqlReal instead of CSng to avoid transport errors for values between 1E-45 and 1.1E-38
         udtPutUMCInternalStdMatchParams.UniquenessProbability.Value = CSqlReal(mUMCMatchStats(lngPointer).UniquenessProbability)
         udtPutUMCInternalStdMatchParams.FDRThreshold.Value = CSqlReal(mUMCMatchStats(lngPointer).FDRThreshold)
+       
+        
+        '''''''''''''
+        ' Future: store wSTAC data in database
+        '''''''''''''
+        '
+        'udtPutUMCInternalStdMatchParams.wSTAC.Value = CSqlReal(mUMCMatchStats(lngPointer).wSTAC)
+        'udtPutUMCInternalStdMatchParams.wSTACFDR.Value = CSqlReal(mUMCMatchStats(lngPointer).wSTACFDR)
+        
+        udtPutUMCInternalStdMatchParams.wSTAC.Value = Null
+        udtPutUMCInternalStdMatchParams.wSTACFDR.Value = Null
         
         cmdPutNewUMCInternalStdMatch.Execute
         
@@ -2471,6 +2729,16 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
         ' Use CSqlReal instead of CSng to avoid transport errors for values between 1E-45 and 1.1E-38
         udtPutUMCMatchParams.UniquenessProbability.Value = CSqlReal(mUMCMatchStats(lngPointer).UniquenessProbability)
         udtPutUMCMatchParams.FDRThreshold.Value = CSqlReal(mUMCMatchStats(lngPointer).FDRThreshold)
+        
+        '''''''''''''
+        ' Future: store wSTAC data in database
+        '''''''''''''
+        '
+        'udtPutUMCMatchParams.wSTAC.Value = CSqlReal(mUMCMatchStats(lngPointer).wSTAC)
+        'udtPutUMCMatchParams.wSTACFDR.Value = CSqlReal(mUMCMatchStats(lngPointer).wSTACFDR)
+        
+        udtPutUMCMatchParams.wSTAC.Value = Null
+        udtPutUMCMatchParams.wSTACFDR.Value = Null
         
         If mMTListContainsConformers Then
             If AMTData(lngMassTagIndexOriginal).Conformer_ID > 0 Then
@@ -2523,6 +2791,18 @@ On Error GoTo AddMatchMakingFDRRowErrorHandler
             
             udtStoreSTACStatsParams.UPFilteredFDR = CSqlReal(.UP_Filtered_FDR / 100#)
             udtStoreSTACStatsParams.UPFilteredErrors = CSqlReal(.UP_Filtered_Errors)
+            
+            '''''''''''''
+            ' Future: store wSTAC data in database
+            '''''''''''''
+            '
+            'udtStoreSTACStatsParams.wSTACUniqueAMTs = .wSTAC_UniqueAMTs
+            'udtStoreSTACStatsParams.wSTACUniqueConformers = .wSTAC_UniqueConformers
+            'udtStoreSTACStatsParams.wSTACFDR = CSqlReal(.wSTAC_FDR / 100#)
+            
+            udtStoreSTACStatsParams.wSTACUniqueAMTs = Null
+            udtStoreSTACStatsParams.wSTACUniqueConformers = Null
+            udtStoreSTACStatsParams.wSTACFDR = Null
             
         End With
         
@@ -3089,6 +3369,13 @@ Private Sub InitializeSTACStatsListView()
     lvwSTACStats.ColumnHeaders.add , , "FDR %", 800
     lvwSTACStats.ColumnHeaders.add , , "Errors", 900
     
+    '''''''''''''
+    ' Future: add wSTAC data to lvwSTACStats
+    '''''''''''''
+    '
+    'lvwSTACStats.ColumnHeaders.add , , "wSTAC Unique AMTs", 1600
+    'lvwSTACStats.ColumnHeaders.add , , "wSTAC FDR %", 1300
+    
     lvwSTACStats.ColumnHeaders.add , , "Unique AMTs, UP>0.5", 1400
     lvwSTACStats.ColumnHeaders.add , , "FDR %, UP>0.5", 1000
     lvwSTACStats.ColumnHeaders.add , , "Errors, UP>0.5", 1100
@@ -3524,7 +3811,6 @@ On Error GoTo LoadSTACResultsErrorHandler
                     
                     mCurrIDMatches(mCurrIDCnt).UniquenessProbability = dblUP
 
-
                     If mCurrIDMatches(mCurrIDCnt).IDIsInternalStd Then
                         lngInternalStdIndexOriginal = mInternalStdIndexPointers(mCurrIDMatches(mCurrIDCnt).IDInd)
                         dblMatchMass = UMCInternalStandards.InternalStandards(lngInternalStdIndexOriginal).MonoisotopicMass
@@ -3640,8 +3926,6 @@ Private Function LoadSTACStats(ByRef fso As FileSystemObject, _
     
     Dim blnValidData As Boolean
     
-    Dim lstNewItem As MSComctlLib.ListItem
-    
 On Error GoTo LoadSTACStatsErrorHandler
     
     ' Initialize
@@ -3651,8 +3935,6 @@ On Error GoTo LoadSTACStatsErrorHandler
     Next intColIndex
     
     UpdateStatus "Reading STAC FDR stats"
-    
-    lvwSTACStats.ListItems.Clear
     
     STACStatsCount = 0
     ReDim STACStats(50)
@@ -3717,26 +3999,6 @@ On Error GoTo LoadSTACStatsErrorHandler
                             .UP_Filtered_Errors = dblUPFilteredErrors
                             .UP_Filtered_UniqueConformers = lngUPFilteredUniqueConformers
                         End With
-                        
-                        If CurrMTFilteringOptions.LoadConformers And lvwSTACStats.ColumnHeaders.Count < STAC_STATS_LISTVIEW_COLCOUNT_WITH_CONFORMERS Then
-                            lvwSTACStats.ColumnHeaders.add , , "Unique Conformers", 1200
-                            lvwSTACStats.ColumnHeaders.add , , "Unique Conformers, UP>0.5", 1500
-                        End If
-                        
-                        Set lstNewItem = lvwSTACStats.ListItems.add(, , Round(dblCutoff, 2))
-                                
-                        lstNewItem.SubItems(1) = lngUniqueAMTs
-                        lstNewItem.SubItems(2) = Round(dblFDR, 2)
-                        lstNewItem.SubItems(3) = Round(dblErrors, 1)
-    
-                        lstNewItem.SubItems(4) = lngUniqueAMTsUPFiltered
-                        lstNewItem.SubItems(5) = Round(dblUPFilteredFDR, 2)
-                        lstNewItem.SubItems(6) = Round(dblUPFilteredErrors, 1)
-    
-                        If CurrMTFilteringOptions.LoadConformers Then
-                            lstNewItem.SubItems(7) = lngUniqueConformers
-                            lstNewItem.SubItems(8) = lngUPFilteredUniqueConformers
-                        End If
                         
                         STACStatsCount = STACStatsCount + 1
                     End If
@@ -6128,14 +6390,21 @@ On Error GoTo SearchUMCsUsingSTACLoadResultsErrorHandler
         ' Load the STAC FDR stats
         blnSuccess = LoadSTACStats(fso, strSTACFDRFilePath)
         
+        ' Compute the peptide-level FDR values
+        blnSuccess = ComputePeptideLevelSTACFDR()
+        
+        ''' Added as a test in November 2011, but not accurate
+        '' Compute wSTAC UniqueAMT and UniqueConformer stats
+        ''blnSuccess = ComputeWeightedSTACStats()
+        
+        blnSuccess = DisplaySTACStats()
+                
         ' Update the STAC FDR Plot
         If blnSuccess Then
             UpdateSTACPlot
             AutoSizeForm
         End If
     
-        ' Compute the peptide-level FDR values
-        blnSuccess = ComputePeptideLevelSTACFDR()
     Else
         blnSuccess = False
     End If
@@ -6770,6 +7039,13 @@ On Error GoTo ShowOrSaveSTACStatsErrorHandler
     strSepChar = LookupDefaultSeparationCharacter()
     strClipboardText = ""
     
+    '''''''''''''
+    ' Future: include wSTAC value and FDR
+    '''''''''''''
+    '             "wSTAC UniqueAMTs" & strSepChar &
+    '             "wSTAC FDR" & strSepChar &
+    '             "wSTAC UniqueConformers" & strSepChar &
+
     ' Write the header line
     strLineOut = "STAC Cutoff" & strSepChar & _
                  "UniqueAMTs" & strSepChar & _
@@ -6792,6 +7068,12 @@ On Error GoTo ShowOrSaveSTACStatsErrorHandler
     For lngIndex = 0 To STACStatsCount - 1
        
         With STACStats(lngIndex)
+            
+            '''''''''''''
+            ' Future: include wSTAC value and FDR
+            '''''''''''''
+            ' strLineOut = Round(.STACCuttoff, 2) & strSepChar & .UniqueAMTs & strSepChar & Format(.FDR / 100#, "0.000%") & strSepChar & Round(.Errors, 1) & strSepChar & .wSTAC_UniqueAMTs & strSepChar & Format(.wSTAC_FDR / 100#, "0.000%") & strSepChar & .UP_Filtered_UniqueAMTs & strSepChar & Format(.UP_Filtered_FDR / 100#, "0.000%") & strSepChar & Round(.UP_Filtered_Errors, 1)
+            
             strLineOut = Round(.STACCuttoff, 2) & strSepChar & _
                          .UniqueAMTs & strSepChar & _
                          Format(.FDR / 100#, "0.000%") & strSepChar & _
@@ -6801,6 +7083,9 @@ On Error GoTo ShowOrSaveSTACStatsErrorHandler
                          Round(.UP_Filtered_Errors, 1)
             
             If mMTListContainsConformers Then
+                ' Future: include wSTAC Unique Conformers
+                ' strLineOut = strLineOut & strSepChar & .UniqueConformers & strSepChar & .wSTAC_UniqueConformers & strSepChar & .UP_Filtered_UniqueConformers
+                
                 strLineOut = strLineOut & strSepChar & .UniqueConformers & strSepChar & .UP_Filtered_UniqueConformers
             End If
 
@@ -6898,6 +7183,7 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     
     Dim lngPairIndex As Long
     Dim blnPairsPresent As Boolean
+    Dim blnIMSDataPresent As Boolean
     Dim blnCorrectedIReportEREnabled As Boolean
         
     Dim objP1IndFastSearch As FastSearchArrayLong
@@ -6916,7 +7202,7 @@ Public Function ShowOrSaveResultsByUMC(Optional strOutputFilePath As String = ""
     Dim dblMTDriftTime As Double
     Dim lngMTDriftTimeObsCount As Long
     Dim lngConformerID As Long
-
+    Dim sngPercentSaturated As Single
 
 On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     
@@ -6954,14 +7240,20 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     
     ' Initialize the PairIndex lookup objects
     blnPairsPresent = PairIndexLookupInitialize(CallerID, objP1IndFastSearch, objP2IndFastSearch)
+    blnIMSDataPresent = (GelData(CallerID).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
     
     strSepChar = LookupDefaultSeparationCharacter()
     
-    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; UMCClassRepAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; PairMemberType; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; Uniqueness_Probability; FDR_Threshold, IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
+    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; UMCClassRepAbundance; IMS_Drift_Time; Saturated_Member_Count; Percent_Saturated; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; PairMemberType; ExpressionRatio; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagMods; MemberCountMatchingMassTag; MassErrorPPM; GANETError; SLiC_Score; Del_SLiC; Uniqueness_Probability; FDR_Threshold, IsInternalStdMatch; PeptideProphetProbability; TIC_from_Raw_Data; Deisotoping_Peak_Count
     strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar & "UMCClassRepAbundance" & strSepChar
     If mMTListContainsConformers Then
         strLineOut = strLineOut & "IMS_Drift_Time" & strSepChar
     End If
+    
+    If blnIMSDataPresent Then
+        strLineOut = strLineOut & "Saturated_Member_Count" & strSepChar & "Percent_Saturated" & strSepChar
+    End If
+    
     strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "PairIndex" & strSepChar & "PairMemberType" & strSepChar
     strLineOut = strLineOut & "ExpressionRatio" & strSepChar & "ExpressionRatioStDev" & strSepChar & "ExpressionRatioChargeStateBasisCount" & strSepChar & "ExpressionRatioMemberBasisCount" & strSepChar
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar
@@ -6978,6 +7270,11 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
     End If
     
     If GelData(CallerID).MostRecentSearchUsedSTAC Then
+        '''''''''''''
+        ' Future: include wSTAC value and FDR
+        '''''''''''''
+        ' strLineOut = strLineOut & "STAC_Score" & strSepChar & "Del_STAC" & strSepChar & "Uniqueness Probability" & strSepChar & "FDR Threshold" & strSepChar & "wSTAC" & strSepChar & "wSTAC FDR Threshold" & strSepChar
+        
         strLineOut = strLineOut & "STAC_Score" & strSepChar & "Del_STAC" & strSepChar & "Uniqueness Probability" & strSepChar & "FDR Threshold" & strSepChar
     Else
         strLineOut = strLineOut & "SLiC_Score" & strSepChar & "Del_SLiC" & strSepChar
@@ -7055,6 +7352,17 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
                 strLineOut = strLineOut & Round(.DriftTime, 3) & strSepChar
             End If
     
+            If blnIMSDataPresent Then
+                sngPercentSaturated = 0
+                If .ClassCountPredefinedLCMSFeatures >= .ClassCount And .ClassCountPredefinedLCMSFeatures > 0 Then
+                    sngPercentSaturated = .SaturatedMemberCount / .ClassCountPredefinedLCMSFeatures
+                ElseIf .ClassCount > 0 Then
+                    sngPercentSaturated = .SaturatedMemberCount / .ClassCount
+                End If
+                
+                strLineOut = strLineOut & .SaturatedMemberCount & strSepChar & Format(sngPercentSaturated, "0.000%") & strSepChar
+            End If
+            
             strMinMaxCharges = ClsStat(lngUMCIndexOriginal, ustChargeMin) & strSepChar & ClsStat(lngUMCIndexOriginal, ustChargeMax) & strSepChar
             
             ' Record ClassStatsChargeBasis, ChargeMin, ChargeMax, UMCMZForChargeBasis, UMCMemberCount, and UMCMemberCountUsedForAbu
@@ -7129,12 +7437,18 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             strLineOutEnd = strLineOutEnd & strSepChar & Round(dblDriftTimeError, 4)
         End If
     
-        strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).StacOrSLiC, 4)
-        strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).DelScore, 4)
+        strLineOutEnd = strLineOutEnd & strSepChar & RoundSTAC(mUMCMatchStats(mgInd).StacOrSLiC) & strSepChar & Round(mUMCMatchStats(mgInd).DelScore, 4)
         
         If GelData(CallerID).MostRecentSearchUsedSTAC Then
-            strLineOutEnd = strLineOutEnd & strSepChar & Round(mUMCMatchStats(mgInd).UniquenessProbability, 4)
-            strLineOutEnd = strLineOutEnd & strSepChar & Format(mUMCMatchStats(mgInd).FDRThreshold, "0.000%")
+            strLineOutEnd = strLineOutEnd & strSepChar & RoundSTAC(mUMCMatchStats(mgInd).UniquenessProbability) & _
+                                            strSepChar & Format(mUMCMatchStats(mgInd).FDRThreshold, "0.000%")
+            '''''''''''''
+            ' Future: include wSTAC value and FDR
+            '''''''''''''
+            '                                     strSepChar & RoundSTAC(mUMCMatchStats(mgInd).wSTAC) & _
+            '                                     strSepChar & Format(mUMCMatchStats(mgInd).wSTACFDR, "0.000%")
+        
+        
         End If
 
         strLineOutEnd = strLineOutEnd & strSepChar & mUMCMatchStats(mgInd).IDIsInternalStd
@@ -7367,6 +7681,7 @@ Private Sub UpdateSTACPlot()
     
     Dim blnUniqueAMTs As Boolean
     Dim blnUPFilteredFDR As Boolean
+    Dim blnUsewSTACCData As Boolean
     
 On Error GoTo UpdateSTACPlotErrorHandler
     
@@ -7378,10 +7693,21 @@ On Error GoTo UpdateSTACPlotErrorHandler
     
     blnUPFilteredFDR = Me.PlotUPFilteredFDR
     
+    '''''''''''''
+    ' Future: plot wSTAC
+    '''''''''''''
+    ' blnUsewSTACCData = Me.PlotwSTACData
+    blnUsewSTACCData = False
+    
     ' Find the first non-zero Matches entry in STACStats()
     For lngIndex = 0 To STACStatsCount - 1
         lngEndIndex = lngIndex
-        If STACStats(lngIndex).UniqueAMTs > 0 Then Exit For
+        If blnUsewSTACCData Then
+            If STACStats(lngIndex).wSTAC_UniqueAMTs > 0 Then Exit For
+        Else
+            If STACStats(lngIndex).UniqueAMTs > 0 Then Exit For
+        End If
+        
     Next lngIndex
     
     If lngEndIndex >= STACStatsCount - 1 Then
@@ -7400,18 +7726,35 @@ On Error GoTo UpdateSTACPlotErrorHandler
         varMatchesFiltered(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
         
         If mMTListContainsConformers Then
-            varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueConformers
-            varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueConformers
+            If blnUsewSTACCData Then
+                varMatches(1, lngTargetIndex) = STACStats(lngIndex).wSTAC_UniqueConformers
+                varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).wSTAC_UniqueConformers
+            Else
+                varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueConformers
+                varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueConformers
+            End If
+            
         Else
-            varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueAMTs
-            varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueAMTs
+            If blnUsewSTACCData Then
+                varMatches(1, lngTargetIndex) = STACStats(lngIndex).wSTAC_UniqueAMTs
+                varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).wSTAC_UniqueAMTs
+            Else
+                varMatches(1, lngTargetIndex) = STACStats(lngIndex).UniqueAMTs
+                varMatchesFiltered(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_UniqueAMTs
+            End If
+            
         End If
 
         varFDR(0, lngTargetIndex) = STACStats(lngIndex).STACCuttoff
-        If blnUPFilteredFDR Then
-            varFDR(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_FDR / 100#
+
+        If blnUsewSTACCData Then
+            varFDR(1, lngTargetIndex) = STACStats(lngIndex).wSTAC_FDR / 100#
         Else
-            varFDR(1, lngTargetIndex) = STACStats(lngIndex).FDR / 100#
+            If blnUPFilteredFDR Then
+                varFDR(1, lngTargetIndex) = STACStats(lngIndex).UP_Filtered_FDR / 100#
+            Else
+                varFDR(1, lngTargetIndex) = STACStats(lngIndex).FDR / 100#
+            End If
         End If
         
         If varFDR(1, lngTargetIndex) = 0 And lngTargetIndex > 0 Then
@@ -7419,7 +7762,8 @@ On Error GoTo UpdateSTACPlotErrorHandler
             varFDR(1, lngTargetIndex) = varFDR(1, lngTargetIndex - 1)
         End If
         
-        If varFDR(1, lngTargetIndex) > mMaxPlottedFDR Then
+        ' Only update the MaxPlotted FDR value if the STACThreshold is > 0
+        If varFDR(1, lngTargetIndex) > mMaxPlottedFDR And lngIndex < STACStatsCount - 1 Then
             mMaxPlottedFDR = varFDR(1, lngTargetIndex)
         End If
         
@@ -7444,17 +7788,39 @@ End Sub
 Private Sub UpdateSTACPlotLayout()
     
     Dim strCaption As String
+    Dim strSTAC As String
+    Dim blnUsewSTACCData As Boolean
     
-    If mMTListContainsConformers Then
-        strCaption = "STAC Trends -- Red=FDR, Blue=Unique Conf, Green=UP Filtered Conf"
+    
+    '''''''''''''
+    ' Future: plot wSTAC
+    '''''''''''''
+    ' blnUsewSTACCData = Me.PlotwSTACData
+    blnUsewSTACCData = False
+    
+    If blnUsewSTACCData Then
+        strSTAC = "wSTAC"
+        
+        If mMTListContainsConformers Then
+            strCaption = strSTAC & " Trends -- Red=FDR, Blue=Unique Conformers"
+        Else
+            strCaption = strSTAC & " Trends -- Red=FDR, Blue=Unique AMTs"
+        End If
+        
     Else
-        strCaption = "STAC Trends -- Red=FDR, Blue=Unique AMTs, Green=UP Filtered AMTs"
-    End If
+        strSTAC = "STAC"
     
+        If mMTListContainsConformers Then
+            strCaption = strSTAC & " Trends -- Red=FDR, Blue=Unique Conf, Green=UP Filtered Conf"
+        Else
+            strCaption = strSTAC & " Trends -- Red=FDR, Blue=Unique AMTs, Green=UP Filtered AMTs"
+        End If
+    
+    End If
     
     ctlSTACStats.Caption = strCaption
     
-    ctlSTACStats.Axes(1).Caption = "STAC Threshold"
+    ctlSTACStats.Axes(1).Caption = strSTAC & " Threshold"
     
     If mMTListContainsConformers Then
         ctlSTACStats.Axes(2).Caption = "Unique Conformers"
@@ -7462,12 +7828,15 @@ Private Sub UpdateSTACPlotLayout()
         ctlSTACStats.Axes(2).Caption = "Unique AMTs"
     End If
     
-    If Me.PlotUPFilteredFDR Then
-        ctlSTACStats.Axes(3).Caption = "FDR, UP > 0.5"
-    Else
+    If blnUsewSTACCData Then
         ctlSTACStats.Axes(3).Caption = "FDR"
+    Else
+        If Me.PlotUPFilteredFDR Then
+            ctlSTACStats.Axes(3).Caption = "FDR, UP > 0.5"
+        Else
+            ctlSTACStats.Axes(3).Caption = "FDR"
+        End If
     End If
-    
   
     ctlSTACStats.Axes(1).Ticks.MajorGrid = cChkBox(chkSTACPlotXGridlines)
     ctlSTACStats.Axes(1).Ticks.MajorGridColor = vbBlack
@@ -7492,6 +7861,12 @@ Private Sub UpdateSTACPlotLayout()
         .LineStyle = cwLineSolid
         .LineWidth = 2
         .PointStyle = cwPointNone
+        
+        If blnUsewSTACCData Then
+            .Visible = False
+        Else
+            .Visible = True
+        End If
     End With
     
     ' FDR
@@ -7777,6 +8152,11 @@ Private Sub chkDisableCustomNETs_Click()
 End Sub
 
 Private Sub chkPlotUPFilteredFDR_Click()
+    UpdateSTACPlot
+End Sub
+
+Private Sub chkPlotwSTACData_Click()
+    chkPlotUPFilteredFDR.Enabled = Not cChkBox(chkPlotwSTACData.Value)
     UpdateSTACPlot
 End Sub
 

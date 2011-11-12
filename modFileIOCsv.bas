@@ -52,6 +52,8 @@ Private Const ISOS_COLUMN_MONO_ABUNDANCE As String = "mono_abundance"
 Private Const ISOS_COLUMN_MONO_PLUS2_ABUNDANCE As String = "mono_plus2_abundance"
 Private Const ISOS_COLUMN_MONO_PLUS4_ABUNDANCE As String = "mono_plus4_abundance"
 Private Const ISOS_COLUMN_MONO_MINUS4_ABUNDANCE As String = "mono_minus4_abundance"
+Private Const ISOS_COLUMN_UNSUMMED_INTENSITY As String = "unsummed_intensity"
+Private Const ISOS_COLUMN_SATURATION_FLAG As String = "saturation_flag"
 Private Const ISOS_COLUMN_IMS_DRIFT_TIME As String = "drift_time"
 Private Const ISOS_COLUMN_IMS_CUMULATIVE_DRIFT_TIME As String = "cumulative_drift_time"
 
@@ -84,7 +86,7 @@ Private Enum ScanFileColumnConstants
     IMSFramePressureBack = 13                ' Only present in IMS datafiles
 End Enum
 
-Private Const ISOS_FILE_COLUMN_COUNT As Integer = 16
+Private Const ISOS_FILE_COLUMN_COUNT As Integer = 18
 Private Enum IsosFileColumnConstants
     ScanNumber = 0
     Charge = 1
@@ -102,6 +104,8 @@ Private Enum IsosFileColumnConstants
     MonoMinus4Abundance = 13
     IMSDriftTime = 14               ' Only present in IMS data files
     InterferenceScore = 15
+    UnsummedIntensity = 16
+    SaturationFlag = 17
 End Enum
 
 Private Enum rmReadModeConstants
@@ -336,6 +340,9 @@ Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean, 
         strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_PLUS2_ABUNDANCE
         strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_PLUS4_ABUNDANCE
         strHeaders = strHeaders & ", " & ISOS_COLUMN_MONO_MINUS4_ABUNDANCE
+        
+        strHeaders = strHeaders & ", " & ISOS_COLUMN_UNSUMMED_INTENSITY
+        strHeaders = strHeaders & ", " & ISOS_COLUMN_SATURATION_FLAG
         
         If blnIncludeIMSFileHeaders Then
             strHeaders = strHeaders & ", " & ISOS_COLUMN_IMS_DRIFT_TIME
@@ -1156,6 +1163,7 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
     Dim sngAbundance As Single
     Dim intCharge As Integer
     Dim sngInterferenceScore As Single
+    Dim sngUnsummedIntensity As Single
     
     Dim strUnknownColumnList As String
     Dim strMessage As String
@@ -1239,8 +1247,10 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) = IsosFileColumnConstants.MonoPlus2Abundance
                     intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance) = IsosFileColumnConstants.MonoPlus4Abundance
                     intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance) = IsosFileColumnConstants.MonoMinus4Abundance
-                    intColumnMapping(IsosFileColumnConstants.IMSDriftTime) = IsosFileColumnConstants.IMSDriftTime
-                    intColumnMapping(IsosFileColumnConstants.InterferenceScore) = IsosFileColumnConstants.InterferenceScore
+                    intColumnMapping(IsosFileColumnConstants.IMSDriftTime) = -1
+                    intColumnMapping(IsosFileColumnConstants.InterferenceScore) = -1
+                    intColumnMapping(IsosFileColumnConstants.UnsummedIntensity) = -1
+                    intColumnMapping(IsosFileColumnConstants.SaturationFlag) = -1
 
                     ' Column headers were not present
                      AddToAnalysisHistory mGelIndex, "Isos file " & fso.GetFileName(strIsosFilePath) & " did not contain column headers; using the default headers (" & GetDefaultIsosColumnHeaders(False, False) & ")"
@@ -1276,6 +1286,10 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         Case ISOS_COLUMN_MONO_PLUS2_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance) = lngIndex
                         Case ISOS_COLUMN_MONO_PLUS4_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoPlus4Abundance) = lngIndex
                         Case ISOS_COLUMN_MONO_MINUS4_ABUNDANCE: intColumnMapping(IsosFileColumnConstants.MonoMinus4Abundance) = lngIndex
+                        
+                        Case ISOS_COLUMN_UNSUMMED_INTENSITY: intColumnMapping(IsosFileColumnConstants.UnsummedIntensity) = lngIndex
+                        Case ISOS_COLUMN_SATURATION_FLAG: intColumnMapping(IsosFileColumnConstants.SaturationFlag) = lngIndex
+
                         Case ISOS_COLUMN_IMS_DRIFT_TIME: intColumnMapping(IsosFileColumnConstants.IMSDriftTime) = lngIndex
                         Case ISOS_COLUMN_IMS_CUMULATIVE_DRIFT_TIME
                             ' Ignore this column; VIPER does not track the IMS cumulative drift time
@@ -1530,7 +1544,14 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                                         .IntensityMonoPlus2 = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.MonoPlus2Abundance), 0)
                                         .IMSDriftTime = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.IMSDriftTime), 0)
                                         
-                                        ' We'll read the interference score, but not store it
+                                        If GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.SaturationFlag), 0) > 0 Then
+                                            .SaturationFlag = 1
+                                        Else
+                                            .SaturationFlag = 0
+                                        End If
+                                        
+                                        ' We'll read the following two values, but not store them
+                                        sngUnsummedIntensity = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.UnsummedIntensity), 0)
                                         sngInterferenceScore = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.InterferenceScore), 0)
                                     End With
                                 

@@ -482,10 +482,10 @@ Public Type udtIsotopicDataType
 
     IReportTagType As Byte          ' 1 byte; Actually type irtIReportTagTypeConstants (was previously AdditionalIntValue, which itself was previously part of AdditionalValue1, which was a single)
     
-    AdditionalValue1 As Byte        ' 1 byte; use for future expanasion
+    SaturationFlag As Byte          ' 1 byte (was previously AdditionalValue1)
     IMSDriftTime As Single          ' 4 bytes (was previously AdditionalValue2, a single)
     
-    MTID As String                      ' List of MT tags and/or Internal Standards that match this data point
+    MTID As String                  ' List of MT tags and/or Internal Standards that match this data point
 
 End Type
 
@@ -714,8 +714,8 @@ Public Type udtUMCType
   MassShiftOverallPPM As Single   ' overall mass correction applied to this point (in ppm); if multiple adjustments are applied, this will track the overall adjustment applied (was previously AdditionalValue3, a single)
   MassShiftCount As Byte          ' Number of mass corrections applied (maximum value is 255)
   
-  AdditionalValue3 As Byte        ' Use for future expansion (name can be changed in the future); 1 byte
-  AdditionalValue4 As Integer     ' Use for future expansion (name can be changed in the future); 2 bytes
+  AdditionalValue3 As Byte            ' Use for future expansion (name can be changed in the future); 1 byte
+  SaturatedMemberCount As Integer     ' Only used when reading _LCMSFeature.txt files (was previously AdditionalValue4, 2 bytes)
   
   OtherInfo As String
 End Type

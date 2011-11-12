@@ -3658,6 +3658,7 @@ Public Sub CopyAllPointsInView(Optional ByVal lngMaxPointsCountToCopy As Long = 
     Dim lngIonCount As Long
     Dim strIsotopeLabelTag As String
     Dim sngIMSDriftTime As Single
+    Dim bytSaturationFlag As Byte
     
     Dim blnCSPoints As Boolean
     Dim blnContainsIsotopeTags As Boolean
@@ -3792,7 +3793,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
         
         If (.DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA Then
             blnIMSDataPresent = True
-             strExport(0) = strExport(0) & "IMS_Drift_Time" & strSepChar
+             strExport(0) = strExport(0) & "IMS_Drift_Time" & strSepChar & "Saturation_Flag" & strSepChar
         End If
         
         strExport(0) = strExport(0) & "Abundance" & strSepChar
@@ -3823,7 +3824,14 @@ On Error GoTo CopyAllPointsInViewErrorHandler
         strExport(0) = strExport(0) & strSepChar & "UMC Indices"
         
         If blnIncludeAMTMassDetails Then
-            strExport(0) = strExport(0) & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "MassDiff (ppm)" & strSepChar & "STAC Score"
+            strExport(0) = strExport(0) & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar
+            
+            If GelData(nMyIndex).MostRecentSearchUsedSTAC Then
+                strExport(0) = strExport(0) & "STAC Score" & strSepChar & "MassDiff (ppm)" & strSepChar & "Uniqueness Probability" & strSepChar & "wSTAC"
+            Else
+                strExport(0) = strExport(0) & "SLiC Score" & strSepChar & "MassDiff (ppm)"
+            End If
+            
         Else
             strExport(0) = strExport(0) & strSepChar & "DB Matches"
         End If
@@ -3865,6 +3873,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 
                 strIsotopeLabelTag = ""
                 sngIMSDriftTime = 0
+                bytSaturationFlag = 0
                 
                 strUMCIndices = ""
                 strDBMatchList = .CSData(lngIonIndex).MTID
@@ -3887,6 +3896,8 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 
                 strIsotopeLabelTag = GetIsotopeLabelTagName(.IsoData(lngIonIndex).IsotopeLabel)
                 sngIMSDriftTime = .IsoData(lngIonIndex).IMSDriftTime
+                bytSaturationFlag = .IsoData(lngIonIndex).SaturationFlag
+                
                 
                 strUMCIndices = ConstructUMCIndexList(nMyIndex, lngIonIndex, glIsoType)
                 strDBMatchList = .IsoData(lngIonIndex).MTID
@@ -3913,7 +3924,7 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                 strExport(lngExportCount) = lngFN & strSepChar & Format$(dblNET, "0.0000") & strSepChar & lngIonIndex & strSepChar
                 
                 If blnIMSDataPresent Then
-                    strExport(lngExportCount) = strExport(lngExportCount) & sngIMSDriftTime & strSepChar
+                    strExport(lngExportCount) = strExport(lngExportCount) & sngIMSDriftTime & strSepChar & bytSaturationFlag & strSepChar
                 End If
                 
                  strExport(lngExportCount) = strExport(lngExportCount) & Round(dblAbu, 0) & strSepChar
@@ -3963,8 +3974,19 @@ On Error GoTo CopyAllPointsInViewErrorHandler
                         
                         
                         With udtCurrIDMatchStats(0)
-                            ' "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar & "SLiC Score" & strSepChar & "MassDiff (ppm)" & strSepChar & "Uniqueness Probability"
-                            strExport(lngExportCount) = strExport(lngExportCount) & .IDIndex & strSepChar & dblAMTMW & strSepChar & dblAMTNET & strSepChar & dblAMTNetStDev & strSepChar & Round(.StacOrSLiC, 4) & strSepChar & Round(.MassDiffPPM, 4) & strSepChar & Round(.UniquenessProbability, 4)
+
+                            strExport(lngExportCount) = strExport(lngExportCount) & _
+                                                        .IDIndex & strSepChar & _
+                                                        dblAMTMW & strSepChar & _
+                                                        dblAMTNET & strSepChar & _
+                                                        dblAMTNetStDev & strSepChar & _
+                                                        Round(.StacOrSLiC, 4) & strSepChar & _
+                                                        Round(.MassDiffPPM, 4)
+                                                        
+                            If GelData(nMyIndex).MostRecentSearchUsedSTAC Then
+                                strExport(lngExportCount) = strExport(lngExportCount) & Round(.UniquenessProbability, 4) & strSepChar & Round(.wSTAC, 4)
+                            End If
+
                         End With
                         
                     Else
@@ -4069,6 +4091,7 @@ Public Sub CopyAllUMCsInView(Optional ByVal lngMaxPointsCountToCopy As Long = -1
     Dim intConformerNum As Integer
     Dim dblConformerDriftTime As Double
     Dim lngConformerObsCount As Long
+    Dim sngPercentSaturated As Single
     
     ' The following two arrays are used to look up the mass of each MT tag, given the MT tag ID
     ' If the user specified a mass modification (like alkylation, ICAT, or N15), then the standard mass
@@ -4303,13 +4326,20 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     lngExportCountDimmed = lngCSCount + lngIsoCount
     ReDim strExport(lngExportCountDimmed)
     
-    ' Construct the header line
-    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; UMCClassRepAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; UMCAverageFit; PairIndex; ExpressionRatio; ExpressionRatioStDev; ExpressionRatioBasisCount; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagNET; MassTagNETStDev; SLiC Score; DelSLiC; MemberCountMatchingMassTag; IsInternalStdMatch; PeptideProphetProbability
-    strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar & "UMCClassRepAbundance" & strSepChar
-    strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar & "UMCAverageFit" & strSepChar & "MassShiftPPMClassRep" & strSepChar
-    
     blnIMSDataPresent = (GelData(nMyIndex).DataStatusBits And GEL_DATA_STATUS_BIT_IMS_DATA) = GEL_DATA_STATUS_BIT_IMS_DATA
-        
+    
+    ' Construct the header line
+    ' UMCIndex; ScanStart; ScanEnd; ScanClassRep; GANETClassRep; UMCMonoMW; UMCMWStDev; UMCMWMin; UMCMWMax; UMCAbundance; UMCClassRepAbundance; ClassStatsChargeBasis; ChargeStateMin; ChargeStateMax; UMCMZForChargeBasis; UMCMemberCount; UMCMemberCountUsedForAbu; Saturated_Member_Count; Percent_Saturated; UMCAverageFit; MassShiftPPMClassRep; IMS_Drift_Time; IMS_Conformation_Fit_Score; PairIndex; ExpressionRatio; ExpressionRatioStDev; ExpressionRatioBasisCount; MultiMassTagHitCount; MassTagID; MassTagMonoMW; MassTagNET; MassTagNETStDev; SLiC Score; DelSLiC; MemberCountMatchingMassTag; IsInternalStdMatch; PeptideProphetProbability
+    
+    strLineOut = "UMCIndex" & strSepChar & "ScanStart" & strSepChar & "ScanEnd" & strSepChar & "ScanClassRep" & strSepChar & "NETClassRep" & strSepChar & "UMCMonoMW" & strSepChar & "UMCMWStDev" & strSepChar & "UMCMWMin" & strSepChar & "UMCMWMax" & strSepChar & "UMCAbundance" & strSepChar & "UMCClassRepAbundance" & strSepChar
+    strLineOut = strLineOut & "ClassStatsChargeBasis" & strSepChar & "ChargeStateMin" & strSepChar & "ChargeStateMax" & strSepChar & "UMCMZForChargeBasis" & strSepChar & "UMCMemberCount" & strSepChar & "UMCMemberCountUsedForAbu" & strSepChar
+    
+    If blnIMSDataPresent Then
+        strLineOut = strLineOut & "Saturated_Member_Count" & strSepChar & "Percent_Saturated" & strSepChar
+    End If
+    
+    strLineOut = strLineOut & "UMCAverageFit" & strSepChar & "MassShiftPPMClassRep" & strSepChar
+    
     If blnIMSDataPresent Then
         strLineOut = strLineOut & "IMS_Drift_Time" & strSepChar & "IMS_Conformation_Fit_Score" & strSepChar
     End If
@@ -4326,7 +4356,7 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
     strLineOut = strLineOut & "MultiMassTagHitCount" & strSepChar & "MassTagID" & strSepChar & "MassTagMonoMW" & strSepChar & "MassTagNET" & strSepChar & "MassTagNETStDev" & strSepChar
     
     If GelData(nMyIndex).MostRecentSearchUsedSTAC Then
-        strLineOut = strLineOut & "STAC Score" & strSepChar & "DelSTAC" & strSepChar & "Uniqueness Probability" & strSepChar
+        strLineOut = strLineOut & "STAC Score" & strSepChar & "DelSTAC" & strSepChar & "Uniqueness Probability" & strSepChar & "wSTAC" & strSepChar
     Else
         strLineOut = strLineOut & "SLiC Score" & strSepChar & "DelSLiC" & strSepChar
     End If
@@ -4420,6 +4450,19 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 strLineOut = strLineOut & .ClassCount & strSepChar
             End If
         
+            If blnIMSDataPresent Then
+                
+                sngPercentSaturated = 0
+                If .ClassCountPredefinedLCMSFeatures >= .ClassCount And .ClassCountPredefinedLCMSFeatures > 0 Then
+                    sngPercentSaturated = .SaturatedMemberCount / .ClassCountPredefinedLCMSFeatures
+                ElseIf .ClassCount > 0 Then
+                    sngPercentSaturated = .SaturatedMemberCount / .ClassCount
+                End If
+                
+                strLineOut = strLineOut & .SaturatedMemberCount & strSepChar & Format(sngPercentSaturated, "0.000%") & strSepChar
+            End If
+        
+            ' UMCAverageFit
             strLineOut = strLineOut & Round(ClsStat(lngUMCIndexOriginal, ustFitAverage), 3) & strSepChar
             
             If sngMassShiftPPMClassRep = 0 Then
@@ -4437,6 +4480,8 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                 Else
                     strLineOut = strLineOut & Round(.DriftTime, 3) & strSepChar
                 End If
+                
+                ' Conformation fit score
                 strLineOut = strLineOut & Round(.ClassScore, 4) & strSepChar
             End If
             
@@ -4576,11 +4621,11 @@ On Error GoTo CopyAllUMCsInViewErrorHandler
                         Round(dblAMTMW, 6) & strSepChar & _
                         Round(dblAMTNET, 4) & strSepChar & _
                         Round(dblAMTNetStDev, 4) & strSepChar & _
-                        Round(udtUMCsInView(lngUMCIndex).StacOrSLiC, 4) & strSepChar & _
+                        RoundSTAC(udtUMCsInView(lngUMCIndex).StacOrSLiC) & strSepChar & _
                         Round(udtUMCsInView(lngUMCIndex).DelScore, 4)
            
         If GelData(nMyIndex).MostRecentSearchUsedSTAC Then
-            strLineOutEnd = strLineOutEnd & strSepChar & Round(udtUMCsInView(lngUMCIndex).UniquenessProbability, 4)
+            strLineOutEnd = strLineOutEnd & strSepChar & RoundSTAC(udtUMCsInView(lngUMCIndex).UniquenessProbability) & strSepChar & RoundSTAC(udtUMCsInView(lngUMCIndex).wSTAC)
         End If
         
         If CurrMTFilteringOptions.LoadConformers Then

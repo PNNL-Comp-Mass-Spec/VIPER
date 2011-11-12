@@ -68,12 +68,13 @@ Private Const LCMSFEATURES_COLUMN_AVERAGE_MONO_MASS As String = "average_mono_ma
 Private Const LCMSFEATURES_COLUMN_UMC_MW_MIN As String = "umc_mw_min"
 Private Const LCMSFEATURES_COLUMN_UMC_MW_MAX As String = "umc_mw_max"
 Private Const LCMSFEATURES_COLUMN_UMC_MEMBER_COUNT As String = "umc_member_count"
+Private Const LCMSFEATURES_COLUMN_SATURATED_MEMBER_COUNT As String = "saturated_member_count"
 
 Private Const PEAK_MAP_COLUMN_FEATURE_INDEX As String = "feature_index"
 Private Const PEAK_MAP_COLUMN_PEAK_INDEX As String = "peak_index"
 Private Const PEAK_MAP_COLUMN_FILTERED_PEAK_INDEX As String = "filtered_peak_index"
 
-Private Const LCMSFEATURES_FILE_COLUMN_COUNT As Integer = 23
+Private Const LCMSFEATURES_FILE_COLUMN_COUNT As Integer = 24
 Private Enum LCMSFeaturesFileColumnConstants
     FeatureIndex = 0
     Scan = 1
@@ -98,6 +99,7 @@ Private Enum LCMSFeaturesFileColumnConstants
     InterferenceScore = 20
     DeconToolsFitScore = 21
     MaxAbundance = 22
+    SaturatedMemberCount = 23
 End Enum
 
 Private Const PEAK_MAP_FILE_COLUMN_COUNT As Integer = 3
@@ -1711,6 +1713,7 @@ Private Function ReadLCMSFeaturesFile(ByRef fso As FileSystemObject, _
     Dim dblInterferenceScore As Double
     
     Dim dblConformerScoreToFilterOn As Double
+    Dim lngSaturatedMemberCount As Long
     
     Dim blnSuccess As Boolean
     
@@ -1813,6 +1816,7 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                         Case LCMSFEATURES_COLUMN_UMC_MW_MIN:            intColumnMapping(LCMSFeaturesFileColumnConstants.MWMin) = lngIndex
                         Case LCMSFEATURES_COLUMN_UMC_MW_MAX:            intColumnMapping(LCMSFeaturesFileColumnConstants.MWMax) = lngIndex
                         Case LCMSFEATURES_COLUMN_UMC_MEMBER_COUNT:      intColumnMapping(LCMSFeaturesFileColumnConstants.MemberCount) = lngIndex
+                        Case LCMSFEATURES_COLUMN_SATURATED_MEMBER_COUNT: intColumnMapping(LCMSFeaturesFileColumnConstants.SaturatedMemberCount) = lngIndex
 
                         Case LCMSFEATURES_COLUMN_AVERAGE_MONO_MASS:
                             ' Ignore this column
@@ -1946,6 +1950,14 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                             .ClassCountPredefinedLCMSFeatures = 32767
                         Else
                             .ClassCountPredefinedLCMSFeatures = .ClassCount
+                        End If
+                                                
+                        lngSaturatedMemberCount = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.SaturatedMemberCount), 0)
+                        If lngSaturatedMemberCount > 32767 Then
+                            ' This is a 32-bit integer; cap the saturated count at 32767
+                            .SaturatedMemberCount = 32767
+                        Else
+                            .SaturatedMemberCount = lngSaturatedMemberCount
                         End If
                         
                         

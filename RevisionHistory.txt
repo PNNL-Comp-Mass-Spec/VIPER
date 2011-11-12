@@ -1,5 +1,15 @@
 VIPER Change Log
 
+Version 3.49 - Build 461; November 11, 2011
+	- No longer showing or saving wSTAC FDR since we need to refine the method used to estimate FDR for a given wSTAC threshold
+
+Version 3.49 - Build 460; November 10, 2011
+	- Now reporting wSTAC and wSTAC FDR Threshold when exporting LC-MS Features
+	- Added option to plot wSTAC instead of STAC on STAC plots
+	- Now reading Saturated_Member_Count values from _LCMSFeatures.txt files and saturation_flag values from _isos.csv files
+		- Copy LC-MS Features in View now includes columns Saturated_Member_Count and Percent_Saturated
+		- Copy Points in View now includes column "Saturation_Flag" 
+
 Version 3.48 - Build 459; October 10, 2011
 	- Added support for MSLevel filtering when reading .PEK files that have a ScanFilter line; example line:
 		FTMS + p NSI d Full ms2 1424.82@etd15.00 [100.00-2000.00] 

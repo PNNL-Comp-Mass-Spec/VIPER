@@ -1053,6 +1053,16 @@ For lngPairInd = 0 To PCount - 1
             udtPutUMCMatchParams.DelMatchScore.Value = mUMCMatchStats(lngMassTagIndexPointer).DelScore
             udtPutUMCMatchParams.UniquenessProbability.Value = CSqlReal(mUMCMatchStats(lngMassTagIndexPointer).UniquenessProbability)
             
+            '''''''''''''
+            ' Future: store wSTAC data in database
+            '''''''''''''
+            '
+            'udtPutUMCMatchParams.wSTAC.Value = CSqlReal(mUMCMatchStats(lngMassTagIndexPointer).wSTAC)
+            'udtPutUMCMatchParams.wSTACFDR.Value = CSqlReal(mUMCMatchStats(lngMassTagIndexPointer).wSTACFDR)
+            
+            udtPutUMCMatchParams.wSTAC.Value = Null
+            udtPutUMCMatchParams.wSTACFDR.Value = Null
+            
             strMassMods = MOD_TKN_PAIR_LIGHT
             If Len(mMTMods(mMTInd(mUMCMatchStats(lngMassTagIndexPointer).IDIndex))) > 0 Then
                 strMassMods = strMassMods & " " & Trim(mMTMods(mMTInd(mUMCMatchStats(lngMassTagIndexPointer).IDIndex)))
@@ -1897,6 +1907,8 @@ If ManageCurrID(MNG_RESET) Then
                      .DelScore = mCurrIDMatches(lngIndex).DelScore
                      .UniquenessProbability = 0
                      .FDRThreshold = 1
+                     .wSTAC = 0
+                     .wSTACFDR = 0
                      .MultiAMTHitCount = mCurrIDCnt
                      .IDIsInternalStd = False
                    End With

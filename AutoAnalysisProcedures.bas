@@ -4619,7 +4619,7 @@ On Error GoTo SaveErrorGraphicErrorHandler
                         lngError = frmErrorDistribution2DLoadedData.SaveChartPictureToFile(True, strFilePath, False)
                     End If
                 
-                    intRowToUse = 5
+                    intRowToUse = 6
                     Select Case eErrorHistogramMode
                     Case ehmErrorHistogramModeConstants.ehmBeforeRefinement
                         strFigureCaption = "Drift Time Errors Before Refinement"
@@ -5395,17 +5395,30 @@ On Error GoTo SearchDatabaseErrorHandler
                             ' Enlarge the form to make the plots look better
                             .AutoSizeForm True
                              
-                             ' Save two STAC plots; the first is unfiltered, the second is filtered on UP > 0.5
+                            ' Future: Save three STAC plots; the first is unfiltered, the second is filtered on UP > 0.5, the third uses wSTAC
+                            
+                            ' Save two STAC plots; the first is unfiltered, the second is filtered on UP > 0.5
                             For intSTACPlotIndex = 0 To 1
                                 
                                 If intSTACPlotIndex = 0 Then
+                                    '.PlotwSTACData = False
                                     .PlotUPFilteredFDR = False
+                                    
                                     strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC.png"
                                     strPlotLabel = "STAC Trends"
-                                Else
+                                    
+                                ElseIf intSTACPlotIndex = 1 Then
+                                    '.PlotwSTACData = False
                                     .PlotUPFilteredFDR = True
+                                    
                                     strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_STAC_UP.png"
                                     strPlotLabel = "STAC Trends, FDR with UP > 0.5"
+                                    
+                                ' Else
+                                '     .PlotwSTACData = True
+                                '
+                                '     strSTACFilePath = udtWorkingParams.ResultsFileNameBase & "_wSTAC.png"
+                                '     strPlotLabel = "wSTAC Trends"
                                 End If
                              
                                 ' Save the STAC plot
@@ -5416,8 +5429,10 @@ On Error GoTo SearchDatabaseErrorHandler
                                 
                                 If intSTACPlotIndex = 0 Then
                                     intTargetRow = 4
-                                Else
+                                ElseIf intSTACPlotIndex = 1 Then
                                     intTargetRow = 1
+                                Else
+                                    intTargetRow = 5
                                 End If
                                 AddNewOutputFileForHtml udtWorkingParams, fso.GetFileName(strSTACFilePath), strPlotLabel, intTargetRow, 3, 350
                                 

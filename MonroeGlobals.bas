@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "October 10, 2011"
+Public Const APP_BUILD_DATE As String = "November 11, 2011"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -927,6 +927,8 @@ Public Type udtUMCMassTagMatchStats
     ConformerNum As Integer         ' IMS Conformer Number (first conformer of each charge state for an AMT tag is Conformer 1)
     ConformerCharge As Integer      ' IMS Conformer Charge state
     ClassRepAbundance As Double     ' Abundance of this UMC's class rep (most likely the maximum abundance of the UMC)
+    wSTAC As Double                 ' Weighted STAC score, computed as STAC * UP
+    wSTACFDR As Double              ' FDR threshold that the given wSTAC score corresponds to
 End Type
 
 Public Type udtExclusionIonType
