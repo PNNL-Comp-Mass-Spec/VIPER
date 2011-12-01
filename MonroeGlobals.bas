@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "November 11, 2011"
+Public Const APP_BUILD_DATE As String = "November 30, 2011"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -771,6 +771,7 @@ Public Type udtUMCIonNetOptionsType
     ConnectionLengthPostFilterMaxNET As Double
     UMCRepresentative As Integer                    ' UMCFROMNet_REP_ABU, UMCFROMNet_REP_FIT, UMCFROMNet_REP_FST_SCAN, UMCFROMNet_REP_LST_SCAN, or UMCFROMNet_REP_MED_SCAN
     MakeSingleMemberClasses As Boolean
+    LimitToSingleChargeState As Boolean
 End Type
 
 Public Type udtUMCAdvancedStatsOptionsType

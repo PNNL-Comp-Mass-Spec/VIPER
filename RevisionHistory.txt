@@ -1,5 +1,10 @@
 VIPER Change Log
 
+Version 3.49 - Build 462; November 30, 2011
+	- Added option when finding LC-MS Features to restrict them to only contain ions of the same charge state
+		- Option works with both the VB6 and the C++ versions of the feature finding algorithm
+		- New version of LCMSFeatureFinder.exe (and UMCCreation.dll and UMCManipulation.dll)
+
 Version 3.49 - Build 461; November 11, 2011
 	- No longer showing or saving wSTAC FDR since we need to refine the method used to estimate FDR for a given wSTAC threshold
 

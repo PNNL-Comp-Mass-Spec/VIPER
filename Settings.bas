@@ -617,6 +617,7 @@ On Error GoTo LoadSettingsFileHandler
         .UMCRepresentative = GetIniFileSettingInt(IniStuff, "UMCIonNetDef", "UMCRepresentative", .UMCRepresentative)
         .MakeSingleMemberClasses = GetIniFileSettingBln(IniStuff, "UMCIonNetDef", "MakeSingleMemberClasses", .MakeSingleMemberClasses)
         .ConnectionLengthPostFilterMaxNET = GetIniFileSettingDbl(IniStuff, "UMCIonNetDef", "ConnectionLengthPostFilterMaxNET", .ConnectionLengthPostFilterMaxNET)
+        .LimitToSingleChargeState = GetIniFileSettingBln(IniStuff, "UMCIonNetDef", "LimitToSingleChargeState", .LimitToSingleChargeState)
     End With
     
     ' UMCAdvancedStatsOptions Options stored in udtPrefsExpanded
@@ -1743,6 +1744,7 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingInt sKeys, sVals, iKVCount, "UMCRepresentative", .UMCRepresentative
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "MakeSingleMemberClasses", .MakeSingleMemberClasses
         AddKeyValueSettingDbl sKeys, sVals, iKVCount, "ConnectionLengthPostFilterMaxNET", .ConnectionLengthPostFilterMaxNET
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "LimitToSingleChargeState", .LimitToSingleChargeState
     End With
     
     IniStuff.WriteSection "UMCIonNetDef", sKeys(), sVals(), iKVCount
@@ -3468,6 +3470,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 
                 .UMCRepresentative = UMCFROMNet_REP_ABU
                 .MakeSingleMemberClasses = False
+                .LimitToSingleChargeState = False
             End With
             
             If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then

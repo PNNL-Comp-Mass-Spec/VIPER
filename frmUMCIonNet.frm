@@ -56,8 +56,8 @@ Begin VB.Form frmUMCIonNet
       TabCaption(1)   =   "2. Edit/Filter Connections"
       TabPicture(1)   =   "frmUMCIonNet.frx":001C
       Tab(1).ControlEnabled=   0   'False
-      Tab(1).Control(0)=   "lblFilterConnections"
-      Tab(1).Control(1)=   "Frame1"
+      Tab(1).Control(0)=   "Frame1"
+      Tab(1).Control(1)=   "lblFilterConnections"
       Tab(1).ControlCount=   2
       TabCaption(2)   =   "3. Define LC-MS Features using Connections"
       TabPicture(2)   =   "frmUMCIonNet.frx":0038
@@ -949,6 +949,15 @@ Begin VB.Form frmUMCIonNet
          TabIndex        =   9
          Top             =   420
          Width           =   8535
+         Begin VB.CheckBox chkLimitToSingleChargeState 
+            Caption         =   "Limit to single charge"
+            Height          =   255
+            Left            =   3600
+            TabIndex        =   153
+            ToolTipText     =   "When enabled, then each LC-MS Feature will only contain points with the same charge state"
+            Top             =   2760
+            Width           =   2025
+         End
          Begin VB.CommandButton cmdResetToOldDefaults 
             Caption         =   "Set to Old Defaults"
             Height          =   250
@@ -1712,6 +1721,15 @@ Private Sub ChangeStatus(ByVal StatusMsg As String)
     DoEvents
 End Sub
 
+Private Function CheckChargeStatesMatch(ByVal lngOriginalIndex1, ByVal lngOriginalIndex2 As Long) As Boolean
+    If GelData(CallerID).IsoData(GelDraw(CallerID).IsoID(DataOInd(lngOriginalIndex1))).Charge = _
+       GelData(CallerID).IsoData(GelDraw(CallerID).IsoID(DataOInd(lngOriginalIndex2))).Charge Then
+       CheckChargeStatesMatch = True
+    Else
+        CheckChargeStatesMatch = False
+    End If
+End Function
+
 Private Function CheckOddEvenIterationForDataPoint(ByVal intOddEvenIteration As Integer, ByVal lngOriginalIndex As Long) As Boolean
     If intOddEvenIteration = 1 Then
         ' Return True if the point has an odd scan number
@@ -2326,6 +2344,9 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     tsOutfile.WriteLine "MinScan=" & Trim(lngGelScanNumberMin)
     tsOutfile.WriteLine "MaxScan=" & Trim(lngGelScanNumberMax)
     
+    tsOutfile.WriteLine "LCMinScan=" & Trim(lngGelScanNumberMin)
+    tsOutfile.WriteLine "LCMaxScan=" & Trim(lngGelScanNumberMax)
+    
     If UMCMakeSingleMemberClasses Then
         intMinLength = 1
     Else
@@ -2333,6 +2354,8 @@ On Error GoTo ExportPeaksForUMCFindingErrorHandler
     End If
     strLineOut = "MinFeatureLengthPoints=" & Trim(intMinLength)
     tsOutfile.WriteLine strLineOut
+
+    tsOutfile.WriteLine "UseCharge=" & cChkBox(chkLimitToSingleChargeState)
 
     tsOutfile.Close
     Set tsOutfile = Nothing
@@ -2466,7 +2489,7 @@ FinalizeNewUMCsErrorHandler:
     
 End Function
 
-Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcessingMode)
+Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcessingMode, ByVal blnLimitToSingleChargeState As Boolean)
     Dim I As Long, j As Long                'loop controlers
     Dim iOInd As Long, jOInd As Long        'indexes in original Data arrays
     Dim BestForI As Long                    'index of best match for index i
@@ -2537,18 +2560,24 @@ Private Sub FindBestMatches(ByVal eOddEvenProcessingMode As oepUMCOddEvenProcess
     
                                       blnComputeDistance = CheckOddEvenIterationForDataPoint(intOddEvenIteration, jOInd)
                                       If blnComputeDistance Then
-                                          CurrDistance = MetricEuclid(iOInd, jOInd)
-                                          If CurrDistance < MyDef.TooDistant Then
-                                              If Not SubjectToConstraintEuclid(iOInd, jOInd) Then
-                                                  ResCnt = ResCnt + 1
-                                                  'put in results original indexes; always smaller index first
-                                                  If iOInd < jOInd Then
-                                                      ResInd1(ResCnt - 1) = iOInd: ResInd2(ResCnt - 1) = jOInd
-                                                  Else
-                                                      ResInd1(ResCnt - 1) = jOInd: ResInd2(ResCnt - 1) = iOInd
-                                                  End If
-                                                  ResDist(ResCnt - 1) = CurrDistance
-                                              End If
+                                          If blnLimitToSingleChargeState Then
+                                            blnComputeDistance = CheckChargeStatesMatch(iOInd, jOInd)
+                                          End If
+                                          
+                                          If blnComputeDistance Then
+                                            CurrDistance = MetricEuclid(iOInd, jOInd)
+                                            If CurrDistance < MyDef.TooDistant Then
+                                                If Not SubjectToConstraintEuclid(iOInd, jOInd) Then
+                                                    ResCnt = ResCnt + 1
+                                                    'put in results original indexes; always smaller index first
+                                                    If iOInd < jOInd Then
+                                                        ResInd1(ResCnt - 1) = iOInd: ResInd2(ResCnt - 1) = jOInd
+                                                    Else
+                                                        ResInd1(ResCnt - 1) = jOInd: ResInd2(ResCnt - 1) = iOInd
+                                                    End If
+                                                    ResDist(ResCnt - 1) = CurrDistance
+                                                End If
+                                            End If
                                           End If
                                       End If
                                   End If
@@ -3104,7 +3133,7 @@ Private Sub FindIonNetConnections()
     If PrepareDataArrays() Then
        If PrepareOptimization() Then
           If ManageResArrays(amtInitialize) Then
-             FindBestMatches eOddEvenProcessingMode
+             FindBestMatches eOddEvenProcessingMode, glbPreferencesExpanded.UMCIonNetOptions.LimitToSingleChargeState
              
              lngConnectionsEliminated = EliminateLongConnections(MyDef.TooDistant)
              
@@ -4335,6 +4364,7 @@ Private Sub ResetToDefaults()
             .ConnectionLengthPostFilterMaxNET = 0.2
             .UMCRepresentative = UMCFROMNet_REP_ABU
             .MakeSingleMemberClasses = False
+            .LimitToSingleChargeState = False
             
             UMCRepresentative = .UMCRepresentative
             UMCMakeSingleMemberClasses = .MakeSingleMemberClasses
@@ -4521,7 +4551,10 @@ With glbPreferencesExpanded.UMCIonNetOptions
     End If
     txtNetEditTooDistant.Text = .ConnectionLengthPostFilterMaxNET
     cmbUMCRepresentative.ListIndex = .UMCRepresentative
+    
     SetCheckBox chkUseUntangledAsSingle, .MakeSingleMemberClasses
+    SetCheckBox chkLimitToSingleChargeState, .LimitToSingleChargeState
+
 End With
 
 Exit Sub
@@ -4812,6 +4845,10 @@ Private Sub cboMolecularMassField_Click()
     Else
         UMCDef.MWField = GetMolecularMassFieldFromDropdown
     End If
+End Sub
+
+Private Sub chkLimitToSingleChargeState_Click()
+    glbPreferencesExpanded.UMCIonNetOptions.LimitToSingleChargeState = cChkBox(chkLimitToSingleChargeState)
 End Sub
 
 Private Sub chkRequireMatchingIsotopeTag_Click()
