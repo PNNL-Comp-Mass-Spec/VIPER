@@ -296,6 +296,16 @@ If Len(sCoolString) > 0 Then
 End If
 End Function
 
+Public Function CoalesceStrings(String1 As String, String2 As String)
+' This procedure examines String1 and if it contains text, it returns String1, otherwise it returns String2
+If Len(LTrim(RTrim(String1))) = 0 Then
+    CoalesceStrings = String2
+Else
+    CoalesceStrings = String1
+End If
+
+End Function
+
 Public Sub Initialize()
 '---------------------------------------------------------
 'This procedure is called when program starts

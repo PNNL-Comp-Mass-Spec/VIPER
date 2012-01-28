@@ -5547,7 +5547,7 @@ On Error GoTo SearchDatabaseErrorHandler
             End If
             
             If lngExportDataToDiskErrorCode <> 0 Then
-                AddToAnalysisHistory udtWorkingParams.GelIndex, "Error - Unable to save search results to disk (" & strResultsFilePath & "): " & Error(lngExportDataToDBErrorCode)
+                AddToAnalysisHistory udtWorkingParams.GelIndex, "Error - Unable to save search results to disk (" & strResultsFilePath & "): " & Error(lngExportDataToDiskErrorCode)
                 udtWorkingParams.ErrorBits = udtWorkingParams.ErrorBits Or EXPORTRESULTS_ERROR_BIT
             End If
             

@@ -2643,9 +2643,9 @@ err_ExportMTDBbyUMC:
 Debug.Assert False
 LogErrors Err.Number, "ExportMTDBbyUMCToUMCResultsTable (Job " & GelAnalysis(CallerID).MD_Reference_Job & ", MD_ID " & lngMDID & ")"
 If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
-    MsgBox "Error exporting matches to the LC-MS Feature results table: " & Err.Description, vbExclamation + vbOKOnly, glFGTU
+    MsgBox "Error exporting matches to the LC-MS Feature results table: " & CoalesceStrings(Err.Description, "Unknown database error"), vbExclamation + vbOKOnly, glFGTU
 Else
-    AddToAnalysisHistory CallerID, "Error exporting to LC-MS Feature Results table (occurred at " & lngPointer & "/" & mMatchStatsCount & "; MDID is " & lngMDID & "): " & Err.Description
+    AddToAnalysisHistory CallerID, "Error exporting to LC-MS Feature Results table (occurred at " & lngPointer & "/" & mMatchStatsCount & "; MDID is " & lngMDID & "): " & CoalesceStrings(Err.Description, "Unknown database error")
 End If
 
 err_Cleanup:
@@ -2655,7 +2655,7 @@ Me.Caption = strCaptionSaved
 Set objP1IndFastSearch = Nothing
 Set objP2IndFastSearch = Nothing
 
-If Err.Number <> 0 Then lngErrorNumber = Err.Number
+If Err.Number <> 0 Then lngErrorNumber = Err.Number Else lngErrorNumber = -1
 ExportMTDBbyUMCToUMCResultsTable = "Error: " & lngErrorNumber & vbCrLf & Err.Description
 
 End Function

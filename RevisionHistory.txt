@@ -1,5 +1,10 @@
 VIPER Change Log
 
+Version 3.49 - Build 462; January 27, 2012
+	- Fixed auto-analysis bug that occurred when an error occured while exporting to the database yet the VB6-reported error code is 0
+		- Previously, an error message was being logged but the overall peak matching tasks's error code remained at 0
+		- Now the overall error code should have bit EXPORTRESULTS_ERROR_BIT=64 enabled
+
 Version 3.49 - Build 462; November 30, 2011
 	- Added option when finding LC-MS Features to restrict them to only contain ions of the same charge state
 		- Option works with both the VB6 and the C++ versions of the feature finding algorithm
