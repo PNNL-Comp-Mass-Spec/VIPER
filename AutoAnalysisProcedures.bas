@@ -2779,7 +2779,7 @@ On Error GoTo LoadInputFileErrorHandler
                     
                     If intFileExtensionsPrefListCount = 0 Then
                         Debug.Assert False
-                        intFileExtensionsPrefListCount = 8
+                        intFileExtensionsPrefListCount = 9
                         strFileExtensionsPrefList(0) = LCMS_FEATURES_FILE_SUFFIX
                         strFileExtensionsPrefList(1) = CSV_ISOS_IC_FILE_SUFFIX
                         strFileExtensionsPrefList(2) = CSV_ISOS_FILE_SUFFIX
@@ -2788,6 +2788,7 @@ On Error GoTo LoadInputFileErrorHandler
                         strFileExtensionsPrefList(5) = "mzxml.xml"
                         strFileExtensionsPrefList(6) = "mzdata.xml"
                         strFileExtensionsPrefList(7) = ".pek"
+                        strFileExtensionsPrefList(8) = ".msalign"
                     ElseIf intFileExtensionsPrefListCount < MAX_FILE_EXTENSIONS_PREF_LIST_COUNT Then
                         ' Make sure strFileExtensionsPrefList() contains LCMS_FEATURES_FILE_SUFFIX
                         ' If it doesn't, then add it as the first item

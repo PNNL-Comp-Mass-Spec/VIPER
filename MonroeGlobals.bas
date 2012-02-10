@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "January 27, 2012"
+Public Const APP_BUILD_DATE As String = "February 10, 2012"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -28,10 +28,10 @@ Public Const PRISM_AUTOMATION_SP_POST_LOG_ENTRY_DEFAULT = "PostLogEntry"
 '       This should be a comma delimited list
 '
 ' This list is also used during automated analysis to automatically find the best file to load
-Public Const DEFAULT_PEK_FILE_EXTENSION_ORDER As String = LCMS_FEATURES_FILE_SUFFIX & ", " & CSV_ISOS_IC_FILE_SUFFIX & ", " & CSV_ISOS_FILE_SUFFIX & ", .mzxml, .mzdata, mzxml.xml, mzdata.xml, _ic.pek, _s.pek, .pek, DeCal.pek-3, .pek-3"
+Public Const DEFAULT_PEK_FILE_EXTENSION_ORDER As String = LCMS_FEATURES_FILE_SUFFIX & ", " & CSV_ISOS_IC_FILE_SUFFIX & ", " & CSV_ISOS_FILE_SUFFIX & ", .mzxml, .msalign, .mzdata, mzxml.xml, mzdata.xml, _ic.pek, _s.pek, .pek, DeCal.pek-3, .pek-3"
 
-Public Const KNOWN_FILE_EXTENSIONS As String = ".Pek, .CSV, .mzXML, mzxml.xml, .mzData, or mzdata.xml"
-Public Const KNOWN_FILE_EXTENSIONS_WITH_GEL As String = ".Pek, .CSV, .mzXML, mzxml.xml, .mzData, mzdata.xml, or .Gel"
+Public Const KNOWN_FILE_EXTENSIONS As String = ".Pek, .CSV, .mzXML, mzxml.xml, .msalign, .mzData, or mzdata.xml"
+Public Const KNOWN_FILE_EXTENSIONS_WITH_GEL As String = ".Pek, .CSV, .mzXML, mzxml.xml, .msalign, .mzData, mzdata.xml, or .Gel"
 
 Public Const UMC_NET_ADJ_UMCs_IN_TOLERANCE = "LC-MS Features in tolerance"
 Public Const UMC_NET_ADJ_UMCs_WITH_DB_HITS = "LC-MS Feature Count with DB hits"
@@ -182,6 +182,7 @@ Public Enum ifmInputFileModeConstants
     ifmmzDataFileWithXMLExtension = 5       ' i.e. InputFile_mzData.xml
     ifmGelFile = 6
     ifmDelimitedTextFile = 7
+    ifmMSAlign = 8
 End Enum
 
 Public Enum pftPictureFileTypeConstants

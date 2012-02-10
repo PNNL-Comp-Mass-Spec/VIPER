@@ -1009,6 +1009,8 @@ Public Function ConstructAnalysisParametersText(ByVal lngGelIndex As Long, ByVal
         strMatch = "mzData"
     ElseIf InStr(strFileName, ".xml") Then
         strMatch = "mzXML or mzData"
+    ElseIf InStr(strFileName, ".msalign") Then
+        strMatch = "msAlign"
     Else
         strMatch = "PEK"
     End If

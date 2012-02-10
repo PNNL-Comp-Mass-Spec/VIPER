@@ -1983,6 +1983,8 @@ Public Function SelectFile(ByVal Ownerhwnd As Long, ByVal sTitle As String, Opti
     Dim strSelectedFile As String
     Dim strSuggestedFileName As String
     
+On Error GoTo SelectFileErrorHandler
+    
     If Len(strFileFilterCodes) = 0 Then
         sFilter = "All Files" & Chr(0) & "*.*"
         nFilterInd = 1
@@ -2056,6 +2058,11 @@ Public Function SelectFile(ByVal Ownerhwnd As Long, ByVal sTitle As String, Opti
         SelectFile = strSelectedFile
     End If
     
+    Exit Function
+
+SelectFileErrorHandler:
+    Debug.Assert False
+
 End Function
 
 Private Function SelectValue(ByRef sngInputArrayOneBased() As Single, lngArrayCount As Long, lngElementToSelect As Long) As Single
@@ -2066,7 +2073,7 @@ Private Function SelectValue(ByRef sngInputArrayOneBased() As Single, lngArrayCo
     ' to have this value in location arr[k], with all smaller elements moved to arr[1..k-1] (in
     ' arbitrary order) and all larger elements in arr[k+1..n] (also in arbitrary order).
 
-    Dim i As Long, ir As Long, j As Long, L As Long, lngMidPoint As Long
+    Dim I As Long, ir As Long, j As Long, L As Long, lngMidPoint As Long
     
     Dim A As Single
 
@@ -2094,27 +2101,27 @@ Private Function SelectValue(ByRef sngInputArrayOneBased() As Single, lngArrayCo
             If sngInputArrayOneBased(L) > sngInputArrayOneBased(L + 1) Then
                 SwapSingle sngInputArrayOneBased(L), sngInputArrayOneBased(L + 1)
             End If
-            i = L + 1
+            I = L + 1
             j = ir
             A = sngInputArrayOneBased(L + 1)
             
             Do
                 Do
-                    i = i + 1
-                Loop While sngInputArrayOneBased(i) < A
+                    I = I + 1
+                Loop While sngInputArrayOneBased(I) < A
                 
                 Do
                     j = j - 1
                 Loop While sngInputArrayOneBased(j) > A
                 
-                If j < i Then Exit Do
+                If j < I Then Exit Do
                 
-                SwapSingle sngInputArrayOneBased(i), sngInputArrayOneBased(j)
+                SwapSingle sngInputArrayOneBased(I), sngInputArrayOneBased(j)
             Loop
             sngInputArrayOneBased(L + 1) = sngInputArrayOneBased(j)
             sngInputArrayOneBased(j) = A
             If j >= lngElementToSelect Then ir = j - 1
-            If j <= lngElementToSelect Then L = i
+            If j <= lngElementToSelect Then L = I
             
         End If
     Loop
@@ -2683,7 +2690,7 @@ Public Sub QuickSort(ByRef sngArray() As Single, ByVal lngLowIndex As Long, ByVa
     Dim lngCurrentLowerBoundIndex As Long             ' current lower-bound
     Dim lngCurrentUpperBoundIndex As Long             ' current upper-bound
     Dim lngPivotIndex As Long               ' index to pivot
-    Dim i As Long
+    Dim I As Long
     Dim j As Long
     Dim m As Long
     Dim sngSwapVal As Single            ' temp used for exchanges
@@ -2706,28 +2713,28 @@ Public Sub QuickSort(ByRef sngArray() As Single, ByVal lngLowIndex As Long, ByVa
             sngArray(lngPivotIndex) = sngSwapVal
 
             ' partition into two segments
-            i = lngCurrentLowerBoundIndex + 1
+            I = lngCurrentLowerBoundIndex + 1
             j = lngCurrentUpperBoundIndex
             Do
-                Do While i < j
-                    If sngArray(lngCurrentLowerBoundIndex) <= sngArray(i) Then Exit Do
-                    i = i + 1
+                Do While I < j
+                    If sngArray(lngCurrentLowerBoundIndex) <= sngArray(I) Then Exit Do
+                    I = I + 1
                 Loop
 
-                Do While j >= i
+                Do While j >= I
                     If sngArray(j) <= sngArray(lngCurrentLowerBoundIndex) Then Exit Do
                     j = j - 1
                 Loop
 
-                If i >= j Then Exit Do
+                If I >= j Then Exit Do
 
                 ' exchange i, j
-                sngSwapVal = sngArray(i)
-                sngArray(i) = sngArray(j)
+                sngSwapVal = sngArray(I)
+                sngArray(I) = sngArray(j)
                 sngArray(j) = sngSwapVal
 
                 j = j - 1
-                i = i + 1
+                I = I + 1
             Loop
 
             ' pivot belongs in sngArray[j]

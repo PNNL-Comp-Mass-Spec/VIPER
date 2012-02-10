@@ -1563,7 +1563,7 @@ Public Function FileNewSelectFile(hwndOwner As Long) As String
     Dim sFileName As String
     
     sFileName = SelectFile(hwndOwner, _
-                      "Select source .Pek, .CSV, .mzXML, or .mzData file", "", False, "", _
+                      "Select source .Pek, .CSV, .msalign, .mzXML, or .mzData file", "", False, "", _
                       "All Files (*.*)|*.*|" & _
                       "PEK Files (*.pek)|*.pek|" & _
                       "CSV Files (*.csv)|*.csv|" & _
@@ -1571,7 +1571,8 @@ Public Function FileNewSelectFile(hwndOwner As Long) As String
                       "mzXML Files (*mzXML.xml)|*mzXML.xml|" & _
                       "mzData Files (*.mzData)|*.mzData|" & _
                       "mzData Files (*mzData.xml)|*mzData.xml|" & _
-                      "LCMSFeature Files (*LCMSFeatures.txt)|*LCMSFeatures.txt", _
+                      "LCMSFeature Files (*LCMSFeatures.txt)|*LCMSFeatures.txt|" & _
+                      "msAlign Files (*.msalign)|*.msalign", _
                       glbPreferencesExpanded.LastInputFileMode + 2)
 
     FileNewSelectFile = sFileName
@@ -1980,6 +1981,22 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
             
             If intReturnCode <> 0 Then
                 strErrorMessage = "LoadNewMZData returned non-zero return code: " & intReturnCode
+            End If
+            
+        Case ifmInputFileModeConstants.ifmMSAlign
+            ' Override this to false to avoid erroneous log messages
+            udtFilterPrefs.FilterLCMSFeatures = False
+            
+            With udtFilterPrefs
+                intReturnCode = LoadNewMSAlign(strInputFilePath, lngGelIndex, _
+                                           .RestrictIsoByAbundance, .RestrictIsoAbundanceMin, .RestrictIsoAbundanceMax, _
+                                           .MaximumDataCountEnabled, .MaximumDataCountToLoad, _
+                                           .TotalIntensityPercentageFilterEnabled, .TotalIntensityPercentageFilter, _
+                                           eScanFilterMode, eDataFilterMode, strErrorMessage)
+            End With
+            
+            If intReturnCode <> 0 And Len(strErrorMessage) = 0 Then
+                strErrorMessage = "LoadNewMSAlign returned non-zero return code: " & intReturnCode
             End If
             
         Case Else

@@ -27,8 +27,8 @@ Begin VB.Form frmParameters
       TabCaption(0)   =   "Calibration"
       TabPicture(0)   =   "frmParameters.frx":030A
       Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "fraCalibration"
-      Tab(0).Control(1)=   "lblRecalibration(0)"
+      Tab(0).Control(0)=   "lblRecalibration(0)"
+      Tab(0).Control(1)=   "fraCalibration"
       Tab(0).ControlCount=   2
       TabCaption(1)   =   "Comments"
       TabPicture(1)   =   "frmParameters.frx":0326
@@ -505,7 +505,7 @@ Private Sub cmdBrowseForInputFile_Click()
     
     On Error Resume Next
     PathToInputFile = SelectFile(Me.hwnd, _
-                          "Select source .Pek, .CSV, .mzXML, or .mzData file", "", False, "", _
+                          "Select source .Pek, .CSV, .msalign, .mzXML, or .mzData file", "", False, "", _
                           "All Files (*.*)|*.*|" & _
                           "PEK Files (*.pek)|*.pek|" & _
                           "CSV Files (*.csv)|*.csv|" & _
@@ -513,6 +513,8 @@ Private Sub cmdBrowseForInputFile_Click()
                           "mzXML Files (*mzXML.xml)|*mzXML.xml|" & _
                           "mzData Files (*.mzData)|*.mzData|" & _
                           "mzData Files (*mzData.xml)|*mzData.xml", _
+                          "LCMSFeature Files (*LCMSFeatures.txt)|*LCMSFeatures.txt|" & _
+                          "msAlign Files (*.msalign)|*.msalign", _
                           glbPreferencesExpanded.LastInputFileMode + 2)
                           
     If Len(PathToInputFile) > 0 Then
@@ -524,16 +526,16 @@ Private Sub cmdBrowseForInputFile_Click()
 End Sub
 
 Private Sub cmdCalClear_Click()
-Dim i As Long
+Dim I As Long
 With GelData(CallerID)
     .CalEquation = ""
-    For i = 1 To 10
-        .CalArg(i) = 0
-    Next i
+    For I = 1 To 10
+        .CalArg(I) = 0
+    Next I
     FillCalEqCombo
-    For i = 0 To 3
-        txtCalEqPar(i).Text = 0
-    Next i
+    For I = 0 To 3
+        txtCalEqPar(I).Text = 0
+    Next I
 End With
 End Sub
 
@@ -704,7 +706,7 @@ End With
 End Sub
 
 Private Sub Settings()
-Dim i As Long
+Dim I As Long
     With GelData(CallerID)
         Select Case UCase(.CalEquation)
         Case UCase(CAL_EQUATION_1)
@@ -718,9 +720,9 @@ Dim i As Long
         Case UCase(CAL_EQUATION_5)
              cmbCalEq.Text = CAL_EQUATION_5
         End Select
-        For i = 1 To 4
-          txtCalEqPar(i - 1).Text = .CalArg(i)
-        Next i
+        For I = 1 To 4
+          txtCalEqPar(I - 1).Text = .CalArg(I)
+        Next I
         txtComment = .Comment
         txtDFilesPath = .PathtoDataFiles
         
@@ -801,13 +803,13 @@ End If
 End Sub
 
 Private Function ParametersChange() As Boolean
-Dim i As Integer
+Dim I As Integer
 ParametersChange = True
 With GelData(CallerID)
     If .CalEquation <> OldCalEq Then Exit Function
-    For i = 1 To 10
-       If .CalArg(i) <> OldCalArg(i) Then Exit Function
-    Next i
+    For I = 1 To 10
+       If .CalArg(I) <> OldCalArg(I) Then Exit Function
+    Next I
     If .Comment <> OldComment Then Exit Function
     If .PathtoDatabase <> OldPathToDB Then Exit Function
     

@@ -51,6 +51,8 @@ On Error GoTo DetermineFileTypeErrorHandler
         End If
     Case ".txt"
         eFileType = ifmInputFileModeConstants.ifmDelimitedTextFile
+    Case ".msalign"
+        eFileType = ifmInputFileModeConstants.ifmMSAlign
     Case Else
         blnKnownType = False
     End Select

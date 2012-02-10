@@ -789,6 +789,15 @@ Private Sub EnableDisableControls()
         blnEnableDatacountFilters = False
         blnEnableLCMSFeatureFilters = True
     
+    Case ifmMSAlign
+        blnEnableDataTypeFilter = False
+        blnEnableIsoFitFilter = False
+        blnEnableMSLevelFilter = False
+        blnEnableDreamsFilters = True
+        blnEnableAbundanceFilters = True
+        blnEnableDatacountFilters = True
+        blnEnableLCMSFeatureFilters = False
+    
     Case Else
         ' Unknown file type
         Debug.Assert False

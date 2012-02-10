@@ -1,6 +1,9 @@
 VIPER Change Log
 
-Version 3.49 - Build 462; January 27, 2012
+Version 3.49 - Build 464; February 10, 2012
+	- Added support for MSAlign files
+
+Version 3.49 - Build 463; January 27, 2012
 	- Fixed auto-analysis bug that occurred when an error occured while exporting to the database yet the VB6-reported error code is 0
 		- Previously, an error message was being logged but the overall peak matching tasks's error code remained at 0
 		- Now the overall error code should have bit EXPORTRESULTS_ERROR_BIT=64 enabled
