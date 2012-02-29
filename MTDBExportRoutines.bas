@@ -265,6 +265,8 @@ Public Function AddEntryToMatchMakingDescriptionTableEx(ByRef cnNew As ADODB.Con
     Dim prmDriftTimeAlignmentSlope As New ADODB.Parameter            ' Drift time alignment slope (computed by STAC)
     Dim prmDriftTimeAlignmentIntercept As New ADODB.Parameter            ' Drift time alignment intercept (computed by STAC)
     
+    Dim prmPMTCollectionID As New ADODB.Parameter
+    
     Dim strEntryInAnalysisHistory As String, lngValueFromAnalysisHistory As Long
     Dim strNetAdjUMCsWithDBHits As String
     Dim lngHistoryIndexOfMatch As Long
@@ -588,6 +590,15 @@ On Error GoTo AddEntryToMatchMakingDescriptionTableErrorHandler
     End If
     cmdPutNewMM.Parameters.Append prmDriftTimeAlignmentSlope
     cmdPutNewMM.Parameters.Append prmDriftTimeAlignmentIntercept
+    
+    Set prmPMTCollectionID = cmdPutNewMM.CreateParameter("PMTCollectionID", adInteger, adParamInput)
+    If glbPreferencesExpanded.MassTagStalenessOptions.PMTCollectionID <> 0 Then
+        prmPMTCollectionID.Value = glbPreferencesExpanded.MassTagStalenessOptions.PMTCollectionID
+    Else
+        ' Leave the PMTCollectionID parameter as null
+    End If
+    cmdPutNewMM.Parameters.Append prmPMTCollectionID
+    
     
     ' Call the SP
     cmdPutNewMM.Execute

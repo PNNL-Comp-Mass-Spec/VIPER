@@ -1,5 +1,9 @@
 VIPER Change Log
 
+Version 3.49 - Build 465; February 28, 2012
+	- Now retrieving PMTCollectionID from GetMassTagsGANETParam and GetMassTagsPlusConformers
+		- This value is sent to AddMatchMaking when storing results in the database
+
 Version 3.49 - Build 464; February 10, 2012
 	- Added support for MSAlign files
 

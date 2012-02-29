@@ -63,6 +63,7 @@ Public Type udtMTFilteringOptionsType
     MinimumHighNormalizedScore As Single
     MinimumHighDiscriminantScore As Single      ' Only used in Schema Version 2
     MinimumPeptideProphetProbability As Single  ' Only used in Schema Version 2
+    'MaximumMSGFSpecProb As Single               ' Only used in Schema Version 2; possible future use
     MinimumPMTQualityScore As Single
     
     ExperimentInclusionFilter As String         ' Only used in Schema Version 2
@@ -162,6 +163,8 @@ Public Function LoadMassTags(ByVal lngGelIndex As Long, _
     Dim prmJobToFilterOnByDataset As ADODB.Parameter
     
     Dim prmMinimumPeptideProphetProbability As ADODB.Parameter
+    Dim prmMaximumMSGFSpecProb As ADODB.Parameter
+    Dim prmPMTCollectionID As ADODB.Parameter
     
     ' MonroeMod
     Dim strProgressDots As String
@@ -267,6 +270,8 @@ Public Function LoadMassTags(ByVal lngGelIndex As Long, _
     AMTGeneration = dbgMTSOnline
     Screen.MousePointer = vbHourglass
     AMTCnt = 0
+    glbPreferencesExpanded.MassTagStalenessOptions.PMTCollectionID = 0
+    
     lngMassTagsParseCount = 0
     lngMassTagCountWithNullValues = 0
     
@@ -376,6 +381,15 @@ Public Function LoadMassTags(ByVal lngGelIndex As Long, _
     
         Set prmMinimumPeptideProphetProbability = cmdGetMassTags.CreateParameter("MinimumPeptideProphetProbability", adSingle, adParamInput, , udtFilteringOptions.MinimumPeptideProphetProbability)
         cmdGetMassTags.Parameters.Append prmMinimumPeptideProphetProbability
+    
+        ' Possible future use:
+        ' Set prmMaximumMSGFSpecProb = cmdGetMassTags.CreateParameter("MaximumMSGFSpecProb", adSingle, adParamInput, , udtFilteringOptions.MaximumMSGFSpecProb)
+        Set prmMaximumMSGFSpecProb = cmdGetMassTags.CreateParameter("MaximumMSGFSpecProb", adSingle, adParamInput, , 0)
+        cmdGetMassTags.Parameters.Append prmMaximumMSGFSpecProb
+        
+        Set prmPMTCollectionID = cmdGetMassTags.CreateParameter("PMTCollectionID", adInteger, adParamInputOutput, , 0)
+        cmdGetMassTags.Parameters.Append prmPMTCollectionID
+    
     End If
     
     'procedure returns error number or 0 if OK
@@ -515,6 +529,7 @@ Public Function LoadMassTags(ByVal lngGelIndex As Long, _
         .AMTLoadTime = Now()
         .AMTCountInDB = lngMassTagsParseCount
         .AMTCountWithNulls = lngMassTagCountWithNullValues
+        .PMTCollectionID = CIntSafe(cmdGetMassTags.Parameters("PMTCollectionID"))
     End With
     
     '' Code that was used by the ORFViewer; No longer supported (March 2006)

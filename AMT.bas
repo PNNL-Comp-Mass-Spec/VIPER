@@ -1160,6 +1160,7 @@ exit_LegacyDBLoadAMTData:
             .AMTLoadTime = Now()
             .AMTCountInDB = AMTCnt
             .AMTCountWithNulls = lngMassTagCountWithNullValues
+            .PMTCollectionID = 0
         End With
         
         LegacyDBLoadAMTData = True
