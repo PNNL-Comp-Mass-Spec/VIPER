@@ -1,8 +1,13 @@
 VIPER Change Log
 
+Version 3.49 - Build 466; February 29, 2012
+	- Changed the timeout for storing UMCs and UMC matches to be 120 seconds
+		- Now retrying calling the stored procedure up to 10 times
+
 Version 3.49 - Build 465; February 28, 2012
 	- Now retrieving PMTCollectionID from GetMassTagsGANETParam and GetMassTagsPlusConformers
 		- This value is sent to AddMatchMaking when storing results in the database
+	- Updated to recognize and ignore column "msfeature_id" in the _isos.csv file
 
 Version 3.49 - Build 464; February 10, 2012
 	- Added support for MSAlign files

@@ -2244,6 +2244,7 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
     Dim lngMatchHitCount As Long
     
     Dim blnContinueCompare As Boolean
+    Dim blnSuccess As Boolean
     
     Dim lngInternalStdMatchCount As Long
     Dim MassTagExpCnt As Long
@@ -2469,7 +2470,11 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                         dblDriftTimeAligned = 0
                     End If
 
-                    ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, lngInternalStdMatchCount, dblDriftTimeAligned
+                    blnSuccess = ExportMTDBAddUMCResultRow(cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, lngInternalStdMatchCount, dblDriftTimeAligned)
+                    If Not blnSuccess Then
+                        Err.Raise 10000, "ExportMTDBbyUMCToUMCResultsTable", "Failure calling ExportMTDBAddUMCResultRow at A"
+                    End If
+                    
                     blnUMCMatchFound(lngUMCIndexOriginal) = True
         
                     ' Populate array with return value
@@ -2493,7 +2498,10 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                         
                         dblDriftTimeAligned = LookupAlignedDriftTime(dblDriftTimeMapOriginal, dblDriftTimeMapAligned, lngDriftTimeMapCount, GelUMC(CallerID).UMCs(lngUMCIndexOriginalPairOther).DriftTime)
                         
-                        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginalPairOther, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0, dblDriftTimeAligned
+                        blnSuccess = ExportMTDBAddUMCResultRow(cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginalPairOther, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0, dblDriftTimeAligned)
+                        If Not blnSuccess Then
+                            Err.Raise 10000, "ExportMTDBbyUMCToUMCResultsTable", "Failure calling ExportMTDBAddUMCResultRow at B"
+                        End If
                         blnUMCMatchFound(lngUMCIndexOriginalPairOther) = True
                         
                     End With
@@ -2512,7 +2520,11 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                     dblDriftTimeAligned = 0
                 End If
 
-                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, lngInternalStdMatchCount, dblDriftTimeAligned
+                blnSuccess = ExportMTDBAddUMCResultRow(cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndexOriginal, mUMCMatchStats(lngPointer).MultiAMTHitCount, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, lngInternalStdMatchCount, dblDriftTimeAligned)
+                If Not blnSuccess Then
+                    Err.Raise 10000, "ExportMTDBbyUMCToUMCResultsTable", "Failure calling ExportMTDBAddUMCResultRow at C"
+                End If
+                
                 blnUMCMatchFound(lngUMCIndexOriginal) = True
         
                 udtPutUMCMatchParams.UMCResultsID.Value = FixNullLng(udtPutUMCParams.UMCResultsIDReturn.Value)
@@ -2527,10 +2539,16 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                 udtPutUMCMatchParams.UMCResultsID.Value = lngUMCResultsIDReturn(lngPairMatchIndex)
                 udtPutUMCInternalStdMatchParams.UMCResultsID.Value = lngUMCResultsIDReturn(lngPairMatchIndex)
                 
-                ExportMTDBbyUMCToUMCResultDetailsTable lngPointer, udtPutUMCInternalStdMatchParams, cmdPutNewUMCInternalStdMatch, udtPutUMCMatchParams, cmdPutNewUMCMatch
+                blnSuccess = ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer, udtPutUMCInternalStdMatchParams, cmdPutNewUMCInternalStdMatch, udtPutUMCMatchParams, cmdPutNewUMCMatch)
+                If Not blnSuccess Then
+                    Err.Raise 10000, "ExportMTDBbyUMCToUMCResultsTable", "Failure calling ExportMTDBbyUMCToUMCResultDetailsTable at A"
+                End If
             Next lngPairMatchIndex
         Else
-            ExportMTDBbyUMCToUMCResultDetailsTable lngPointer, udtPutUMCInternalStdMatchParams, cmdPutNewUMCInternalStdMatch, udtPutUMCMatchParams, cmdPutNewUMCMatch
+            blnSuccess = ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer, udtPutUMCInternalStdMatchParams, cmdPutNewUMCInternalStdMatch, udtPutUMCMatchParams, cmdPutNewUMCMatch)
+            If Not blnSuccess Then
+                Err.Raise 10000, "ExportMTDBbyUMCToUMCResultsTable", "Failure calling ExportMTDBbyUMCToUMCResultDetailsTable at B"
+            End If
         End If
             
         If mUMCMatchStats(lngPointer).IDIsInternalStd Then
@@ -2594,13 +2612,20 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
                                         
                                 dblDriftTimeAligned = LookupAlignedDriftTime(dblDriftTimeMapOriginal, dblDriftTimeMapAligned, lngDriftTimeMapCount, GelUMC(CallerID).UMCs(lngUMCIndex).DriftTime)
                                 
-                                ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0, dblDriftTimeAligned
+                                blnSuccess = ExportMTDBAddUMCResultRow(cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(lngPairMatchIndex), lngPeakFPRType, 0, dblDriftTimeAligned)
+                                If Not blnSuccess Then
+                                    Err.Raise 10000, "ExportMTDBbyUMCToUMCResultsTable", "Failure calling ExportMTDBAddUMCResultRow at D"
+                                End If
+                                
                             Next lngPairMatchIndex
                         Else
                             lngPeakFPRType = FPR_Type_Standard
                             dblDriftTimeAligned = LookupAlignedDriftTime(dblDriftTimeMapOriginal, dblDriftTimeMapAligned, lngDriftTimeMapCount, GelUMC(CallerID).UMCs(lngUMCIndex).DriftTime)
                                 
-                            ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, 0, dblDriftTimeAligned
+                            blnSuccess = ExportMTDBAddUMCResultRow(cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, lngUMCIndex, 0, ClsStat(), udtPairMatchStats(0), lngPeakFPRType, 0, dblDriftTimeAligned)
+                            If Not blnSuccess Then
+                                Err.Raise 10000, "ExportMTDBbyUMCToUMCResultsTable", "Failure calling ExportMTDBAddUMCResultRow at E"
+                            End If
                         End If
                             
                     End If
@@ -2666,6 +2691,8 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
     Dim lngMassTagIndexPointer As Long, lngMassTagIndexOriginal As Long
 
     Dim strMassMods As String
+    Dim intExecCountPutNewUMC As Integer
+    Dim intExecCountPutIntStd As Integer
 
     If mUMCMatchStats(lngPointer).IDIsInternalStd Then
     
@@ -2693,6 +2720,10 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
         udtPutUMCInternalStdMatchParams.wSTAC.Value = Null
         udtPutUMCInternalStdMatchParams.wSTACFDR.Value = Null
         
+        On Error GoTo ExecutePutIntStdErrorHandler
+        intExecCountPutIntStd = 0
+    
+RetryPutIntStd:
         cmdPutNewUMCInternalStdMatch.Execute
         
     Else
@@ -2749,9 +2780,49 @@ Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRe
             End If
         End If
         
+On Error GoTo ExecutePutNewUMCErrorHandler
+        intExecCountPutNewUMC = 0
+        
+RetryPutNewUMC:
         cmdPutNewUMCMatch.Execute
     
     End If
+    
+    ExportMTDBbyUMCToUMCResultDetailsTable = True
+    Exit Function
+    
+    
+ExecutePutNewUMCErrorHandler:
+    ' Error calling the stored procedure
+    intExecCountPutNewUMC = intExecCountPutNewUMC + 1
+    
+    If intExecCountPutNewUMC <= 10 Then
+        ' Wait 250 msec then try again
+        Sleep 250
+        GoTo RetryPutNewUMC
+    Else
+        
+        ' Too many attempts; abort
+        ExportMTDBbyUMCToUMCResultDetailsTable = False
+        Exit Function
+    End If
+
+
+ExecutePutIntStdErrorHandler:
+    ' Error calling the stored procedure
+    intExecCountPutIntStd = intExecCountPutIntStd + 1
+    
+    If intExecCountPutIntStd <= 10 Then
+        ' Wait 250 msec then try again
+        Sleep 250
+        GoTo RetryPutIntStd
+    Else
+        
+        ' Too many attempts; abort
+        ExportMTDBbyUMCToUMCResultDetailsTable = False
+        Exit Function
+    End If
+
 
 End Function
  

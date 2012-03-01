@@ -935,6 +935,7 @@ Dim cmdPutNewUMCCSStats As New ADODB.Command
 Dim udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType
 
 Dim strSearchDescription As String
+Dim blnSuccess As Boolean
 
 On Error GoTo err_ExportMTDBbyUMC
 
@@ -1039,7 +1040,10 @@ For lngPairInd = 0 To PCount - 1
             udtPairMatchStats.ExpressionRatioMemberBasisCount = .ERMemberBasisCount
         End With
         
-        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndL, PIDCnt(lngPairInd), ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_L, 0, GelUMC(CallerID).UMCs(IndL).DriftTime
+        blnSuccess = ExportMTDBAddUMCResultRow(cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndL, PIDCnt(lngPairInd), ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_L, 0, GelUMC(CallerID).UMCs(IndL).DriftTime)
+        If Not blnSuccess Then
+            Err.Raise 10000, "ExportIDPairsToUMCResultsTable", "Failure calling ExportMTDBAddUMCResultRow at Pairs_A"
+        End If
         
         ' Write the match results for this UMC
         udtPutUMCMatchParams.UMCResultsID.Value = FixNullLng(udtPutUMCParams.UMCResultsIDReturn.Value)
@@ -1079,7 +1083,10 @@ For lngPairInd = 0 To PCount - 1
         
         ' Second, add a new row to T_FTICR_UMC_Results for the heavy member of the pair
         ' Note that we do not record any MT tag hits for the heavy member of the pair
-        ExportMTDBAddUMCResultRow cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndH, 0, ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_H, 0, GelUMC(CallerID).UMCs(IndH).DriftTime
+        blnSuccess = ExportMTDBAddUMCResultRow(cmdPutNewUMC, udtPutUMCParams, cmdPutNewUMCMember, udtPutUMCMemberParams, cmdPutNewUMCCSStats, udtPutUMCCSStatsParams, blnExportUMCMembers, CallerID, IndH, 0, ClsStat(), udtPairMatchStats, FPR_Type_N14_N15_H, 0, GelUMC(CallerID).UMCs(IndH).DriftTime)
+        If Not blnSuccess Then
+            Err.Raise 10000, "ExportIDPairsToUMCResultsTable", "Failure calling ExportMTDBAddUMCResultRow at Pairs_B"
+        End If
         
     End If
 Next lngPairInd

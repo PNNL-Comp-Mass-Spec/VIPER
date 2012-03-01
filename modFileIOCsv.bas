@@ -35,6 +35,7 @@ Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT As String = "frame_pressure_
 Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_BACK As String = "frame_pressure_back"
 
 ' Note: These should all be lowercase string values
+Private Const ISOS_COLUMN_MSFEATURE_ID As String = "msfeature_id"
 Private Const ISOS_COLUMN_SCAN_NUM_A As String = "scan_num"
 Private Const ISOS_COLUMN_SCAN_NUM_B As String = "lc_scan_num"  ' Represented Frame Number in the 2008 version of the IMS File format
 Private Const ISOS_COLUMN_FRAME_NUM As String = "frame_num"     ' Represents MS Frame Number; VIPER treats this as scan_num
@@ -315,9 +316,9 @@ Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean, 
     Dim strHeaders As String
     
     If blnIncludeIMSFileHeaders Then
-        strHeaders = ISOS_COLUMN_FRAME_NUM & ", " & ISOS_COLUMN_IMS_SCAN_NUM
+        strHeaders = ISOS_COLUMN_MSFEATURE_ID & ", " & ISOS_COLUMN_FRAME_NUM & ", " & ISOS_COLUMN_IMS_SCAN_NUM
     Else
-        strHeaders = ISOS_COLUMN_SCAN_NUM_A
+        strHeaders = ISOS_COLUMN_MSFEATURE_ID & ", " & ISOS_COLUMN_SCAN_NUM_A
     End If
     
     If Not blnRequiredColumnsOnly Then
@@ -1267,6 +1268,8 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                         strColumnHeader = StripQuotes(LCase(Trim(strData(lngIndex))))
                         
                         Select Case strColumnHeader
+                        Case ISOS_COLUMN_MSFEATURE_ID
+                            ' Ignore this column
                         Case ISOS_COLUMN_SCAN_NUM_A, ISOS_COLUMN_SCAN_NUM_B: intColumnMapping(IsosFileColumnConstants.ScanNumber) = lngIndex
                         Case ISOS_COLUMN_FRAME_NUM
                             ' We treat IMS frame number as if it is the primary scan number

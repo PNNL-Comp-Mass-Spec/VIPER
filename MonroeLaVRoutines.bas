@@ -1404,18 +1404,23 @@ End Function
 
 Public Function InitializeSPCommand(cmdSPCommand As ADODB.Command, _
                                     cnnConnection As ADODB.Connection, _
-                                    strSPName As String) As Boolean
+                                    strSPName As String, _
+                                    Optional intTimeoutSeconds As Integer = 0) As Boolean
                                     
     ' Returns True if success, False if an error
     
 On Error GoTo InitializeSPCommandErrorHandler
 
+    If intTimeoutSeconds <= 0 Then
+        intTimeoutSeconds = glbPreferencesExpanded.AutoAnalysisOptions.DBConnectionTimeoutSeconds
+    End If
+        
     TraceLog 3, "InitializeSPCommand", "Set cmdSPCommand.ActiveConnection"
     Set cmdSPCommand.ActiveConnection = cnnConnection
     With cmdSPCommand
         .CommandText = strSPName
         .CommandType = adCmdStoredProc
-        .CommandTimeout = glbPreferencesExpanded.AutoAnalysisOptions.DBConnectionTimeoutSeconds
+        .CommandTimeout = intTimeoutSeconds
     End With
 
     InitializeSPCommand = True
