@@ -5599,6 +5599,7 @@ On Error GoTo DisplayCurrentAnalysisSettingsErrorHandler
             
             ' Note: Skipping .UseSTAC
             ' Note: Skipping .STACUsesPriorProbability
+            ' Note: Skipping .STACAlignsDriftTime
             ' Note: Skipping .KeepTempSTACFiles
             ' Note: Skipping .IReportAutoAddMonoPlus4AndMinus4Data
             

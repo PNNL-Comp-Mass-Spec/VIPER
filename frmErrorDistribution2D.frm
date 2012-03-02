@@ -106,7 +106,7 @@ Begin VB.Form frmErrorDistribution2DLoadedData
             Height          =   285
             Left            =   2040
             TabIndex        =   106
-            Text            =   "10"
+            Text            =   "3"
             Top             =   1920
             Width           =   735
          End
@@ -619,20 +619,20 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabCaption(0)   =   "Mass Calibration Refinement"
          TabPicture(0)   =   "frmErrorDistribution2D.frx":01F3
          Tab(0).ControlEnabled=   0   'False
-         Tab(0).Control(0)=   "lblMassCalibrationRefinementDescription"
-         Tab(0).Control(1)=   "lblMassCalibrationRefinementUnits(2)"
-         Tab(0).Control(2)=   "lblMassCalibrationAdjustment"
-         Tab(0).Control(3)=   "lblMassCalibrationRefinementUnits(1)"
-         Tab(0).Control(4)=   "lblMassCalibrationOverallAdjustment"
-         Tab(0).Control(5)=   "cmdMassCalibrationRefinementStart"
-         Tab(0).Control(6)=   "fraMassCalibrationRefinement"
-         Tab(0).Control(7)=   "cmdMassCalibrationManual"
-         Tab(0).Control(8)=   "txtMassCalibrationNewIncrementalAdjustment"
-         Tab(0).Control(9)=   "txtMassCalibrationOverallAdjustment"
-         Tab(0).Control(10)=   "cmdMassCalibrationRevert"
-         Tab(0).Control(11)=   "cmdRecomputeHistograms(0)"
-         Tab(0).Control(12)=   "cmdAbortProcessing(0)"
-         Tab(0).Control(13)=   "cmdResetToDefaults"
+         Tab(0).Control(0)=   "cmdResetToDefaults"
+         Tab(0).Control(1)=   "cmdAbortProcessing(0)"
+         Tab(0).Control(2)=   "cmdRecomputeHistograms(0)"
+         Tab(0).Control(3)=   "cmdMassCalibrationRevert"
+         Tab(0).Control(4)=   "txtMassCalibrationOverallAdjustment"
+         Tab(0).Control(5)=   "txtMassCalibrationNewIncrementalAdjustment"
+         Tab(0).Control(6)=   "cmdMassCalibrationManual"
+         Tab(0).Control(7)=   "fraMassCalibrationRefinement"
+         Tab(0).Control(8)=   "cmdMassCalibrationRefinementStart"
+         Tab(0).Control(9)=   "lblMassCalibrationOverallAdjustment"
+         Tab(0).Control(10)=   "lblMassCalibrationRefinementUnits(1)"
+         Tab(0).Control(11)=   "lblMassCalibrationAdjustment"
+         Tab(0).Control(12)=   "lblMassCalibrationRefinementUnits(2)"
+         Tab(0).Control(13)=   "lblMassCalibrationRefinementDescription"
          Tab(0).ControlCount=   14
          TabCaption(1)   =   "Tolerance Refinement"
          TabPicture(1)   =   "frmErrorDistribution2D.frx":020F
@@ -657,10 +657,10 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabCaption(2)   =   "Pairwise Diffs"
          TabPicture(2)   =   "frmErrorDistribution2D.frx":022B
          Tab(2).ControlEnabled=   0   'False
-         Tab(2).Control(0)=   "lblPairwiseDifferencesOverview"
-         Tab(2).Control(1)=   "fraPairwiseDifferences"
-         Tab(2).Control(2)=   "cmdRecomputeHistograms(1)"
-         Tab(2).Control(3)=   "cmdAbortProcessing(2)"
+         Tab(2).Control(0)=   "cmdAbortProcessing(2)"
+         Tab(2).Control(1)=   "cmdRecomputeHistograms(1)"
+         Tab(2).Control(2)=   "fraPairwiseDifferences"
+         Tab(2).Control(3)=   "lblPairwiseDifferencesOverview"
          Tab(2).ControlCount=   4
          Begin VB.CommandButton cmdAbortProcessing 
             Caption         =   "Abort Processing"
@@ -1453,6 +1453,7 @@ Private Const SIGMA_WIDTH_AT_BASE As Single = 5
 Public CallerID As Long
 
 Private mRawErrorsCount As Long
+Private mRawErrorUMCIDs() As Long            ' 0-based array; holds UMC index values
 Private mRawMassErrorsPPM() As Single        ' 0-based array, in PPM
 Private mRawMassErrorsDa() As Single         ' 0-based array, in Da
 Private mRawNETErrors() As Single            ' 0-based array
@@ -1464,6 +1465,7 @@ Private mRawDriftTimeErrors() As Single      ' 0-based array
 '  populated using UMC-based stats.  This data is then used by
 '  RefineDBSearchMassToleranceStart & RefineDBSearchNETToleranceStart
 Private mRawErrorsIndividualPointsCount As Long             ' Initially set to 0
+Private mRawErrorIndividualPointIDs() As Long               ' 0-based array; holds data point indices
 Private mRawMassErrorsIndividualPointsPPM() As Single       ' 0-based array, in PPM
 Private mRawMassErrorsIndividualPointsDa() As Single        ' 0-based array, in Da
 Private mRawNETErrorsIndividualPoints() As Single           ' 0-based array
@@ -1512,17 +1514,20 @@ Private mGelAnalysisIsValid As Boolean
 Private mAbortProcessing As Boolean
 '
 
-Private Function AddNewErrValues(ByRef sngRawMassErrorsPPM() As Single, _
+Private Function AddNewErrValues(ByRef lngRawErrorDataPointIDs() As Long, _
+                                 ByRef sngRawMassErrorsPPM() As Single, _
                                  ByRef sngRawMassErrorsDa() As Single, _
                                  ByRef sngRawNETErrors() As Single, _
                                  ByRef sngRawDriftTimeErrors() As Single, _
                                  ByRef lngRawErrorsCount As Long, _
                                  ByRef Refs() As String, _
                                  ByVal RefsCnt As Long, _
+                                 ByVal lngDataPointID As Long, _
                                  ByVal dblIonMass As Double, _
                                  ByVal sngIonGANET As Single, _
                                  ByVal dblIonAbundance As Double, _
                                  ByVal dblMassErrPPMCorrection As Double, _
+                                 ByVal dblDriftTimeCorrection As Double, _
                                  ByVal blnInternalStdMatch As Boolean) As Boolean
     
     Dim strRefID As String
@@ -1660,7 +1665,7 @@ On Error GoTo AddNewErrValuesErrorHandler
             End If
             
             If IsNumeric(strDriftTimeError) Then
-                dblDriftTimeErrorFromID = CDbl(strDriftTimeError)
+                dblDriftTimeErrorFromID = CDbl(strDriftTimeError) + dblDriftTimeCorrection
             Else
                 dblDriftTimeErrorFromID = 0
             End If
@@ -1718,6 +1723,7 @@ On Error GoTo AddNewErrValuesErrorHandler
                     
                         If lngRawErrorsCount >= UBound(sngRawMassErrorsPPM) + 1 Then
                             lngNewDataCount = (UBound(sngRawMassErrorsPPM) + 1) * 2
+                            ReDim Preserve lngRawErrorDataPointIDs(lngNewDataCount - 1)
                             ReDim Preserve sngRawMassErrorsPPM(lngNewDataCount - 1)
                             ReDim Preserve sngRawMassErrorsDa(lngNewDataCount - 1)
                             ReDim Preserve sngRawNETErrors(lngNewDataCount - 1)
@@ -1725,7 +1731,8 @@ On Error GoTo AddNewErrValuesErrorHandler
                             ''ReDim Preserve mDataSourceIonIndex(lngNewDataCount - 1)
                         End If
                         
-                        ' Add Errors to sngRawMassErrorsPPM(), sngRawMassErrorsDa(), sngRawNETErrors(), and sngRawDriftTimeErrors
+                        ' Add Errors to lngRawErrorDataPointIDs(), sngRawMassErrorsPPM(), sngRawMassErrorsDa(), sngRawNETErrors(), and sngRawDriftTimeErrors
+                        lngRawErrorDataPointIDs(lngRawErrorsCount) = lngDataPointID
                         sngRawMassErrorsPPM(lngRawErrorsCount) = dblMassErrorPPM
                         sngRawMassErrorsDa(lngRawErrorsCount) = CSng(dblMassErrorDa)
                         sngRawNETErrors(lngRawErrorsCount) = sngGANETError
@@ -1998,6 +2005,7 @@ End Sub
 
 Private Sub ClearRawDataArrays()
     mRawErrorsCount = 0
+    ReDim mRawErrorUMCIDs(0)
     ReDim mRawMassErrorsPPM(0)
     ReDim mRawMassErrorsDa(0)
     ReDim mRawNETErrors(0)
@@ -2006,6 +2014,7 @@ End Sub
 
 Private Sub ClearRawDataIndividualPointsArrays()
     mRawErrorsIndividualPointsCount = 0
+    ReDim mRawErrorIndividualPointIDs(0)
     ReDim mRawMassErrorsIndividualPointsPPM(0)
     ReDim mRawMassErrorsIndividualPointsDa(0)
     ReDim mRawNETErrorsIndividualPoints(0)
@@ -2166,7 +2175,7 @@ On Error GoTo ComputeMassErrorsErrorHandler
         ClearRawDataIndividualPointsArrays
     End If
     
-    ComputeErrorsWork mRawMassErrorsPPM, mRawMassErrorsDa, mRawNETErrors, mRawDriftTimeErrors, mRawErrorsCount, glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats, lngDataWithHits
+    ComputeErrorsWork mRawErrorUMCIDs, mRawMassErrorsPPM, mRawMassErrorsDa, mRawNETErrors, mRawDriftTimeErrors, mRawErrorsCount, glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats, lngDataWithHits
     
     If mRawErrorsCount > 0 Then
         UpdateStatus "Binning data"
@@ -2332,7 +2341,7 @@ On Error GoTo ComputeErrorsIndividualPointsErrorHandler
     
     UpdateStatus "Populating individual point error arrays"
     
-    ComputeErrorsWork mRawMassErrorsIndividualPointsPPM, mRawMassErrorsIndividualPointsDa, mRawNETErrorsIndividualPoints, mRawDriftTimeErrorsIndividualPointsCount, mRawErrorsIndividualPointsCount, False, 0
+    ComputeErrorsWork mRawErrorIndividualPointIDs, mRawMassErrorsIndividualPointsPPM, mRawMassErrorsIndividualPointsDa, mRawNETErrorsIndividualPoints, mRawDriftTimeErrorsIndividualPointsCount, mRawErrorsIndividualPointsCount, False, 0
     
     Exit Sub
     
@@ -2344,7 +2353,8 @@ ComputeErrorsIndividualPointsErrorHandler:
     
 End Sub
 
-Private Sub ComputeErrorsWork(ByRef sngRawMassErrorsPPM() As Single, _
+Private Sub ComputeErrorsWork(ByRef lngRawErrorDataPointIDs() As Long, _
+                              ByRef sngRawMassErrorsPPM() As Single, _
                               ByRef sngRawMassErrorsDa() As Single, _
                               ByRef sngRawNETErrors() As Single, _
                               ByRef sngRawDriftTimeErrors() As Single, _
@@ -2358,12 +2368,14 @@ Private Sub ComputeErrorsWork(ByRef sngRawMassErrorsPPM() As Single, _
     Dim lngIsoDataIndex As Long
     
     Dim dblMassErrPPMCorrection As Double
+    Dim dblDriftTimeCorrection As Double
     
 On Error GoTo ComputeMassErrorsErrorWorkHandler
     
     Const INITIAL_DATA_COUNT As Integer = 100
     
     lngRawErrorsCount = 0
+    ReDim lngRawErrorDataPointIDs(INITIAL_DATA_COUNT - 1)
     ReDim sngRawMassErrorsPPM(INITIAL_DATA_COUNT - 1)
     ReDim sngRawMassErrorsDa(INITIAL_DATA_COUNT - 1)
     ReDim sngRawNETErrors(INITIAL_DATA_COUNT - 1)
@@ -2376,6 +2388,7 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
     lngDataWithHits = 0
     
     ' First fill sngRawMassErrorsPPM(), sngRawMassErrorsDa(), sngRawNETErrors(), and sngRawDriftTimeErrors with all of the observed errors
+    ' lngRawErrorDataPointIDs() holds the original UMC Index values or original data point indices
     If blnUseUMCClassStats Then
         ' Working with LC-MS Features
         With GelUMC(CallerID)
@@ -2386,19 +2399,22 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
                     Case gldtCS
                         ' Note: Since the match to the MT tag is stored with a mass error value relative to a given data point's mass,
                         '       we need to compute the difference in mass between the class rep and the class mass (converted to ppm)
+                        '       We also need to compute a correction factor for the DriftTime Error (for the same reason)
                         dblMassErrPPMCorrection = MassToPPM(.ClassMW - GelData(CallerID).CSData(.ClassRepInd).AverageMW, .ClassMW)
-                        If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
-                                                     GelData(CallerID).CSData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, _
-                                                     GelData(CallerID).CSData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
+                        dblDriftTimeCorrection = .DriftTime - GelData(CallerID).CSData(.ClassRepInd).IMSDriftTime
+                        If ComputeErrorsExtractValues(lngRawErrorDataPointIDs, sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                                     lngIndex, GelData(CallerID).CSData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, _
+                                                     GelData(CallerID).CSData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection, dblDriftTimeCorrection) Then
                            ' Hit found
                            lngDataWithHits = lngDataWithHits + 1
                        End If
                     Case gldtIS
                         ' See note above
                         dblMassErrPPMCorrection = MassToPPM(.ClassMW - GetIsoMass(GelData(CallerID).IsoData(.ClassRepInd), IsoField), .ClassMW)
-                        If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
-                                                      GelData(CallerID).IsoData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, _
-                                                      GelData(CallerID).IsoData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection) Then
+                        dblDriftTimeCorrection = .DriftTime - GelData(CallerID).IsoData(.ClassRepInd).IMSDriftTime
+                        If ComputeErrorsExtractValues(lngRawErrorDataPointIDs, sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                                      lngIndex, GelData(CallerID).IsoData(.ClassRepInd).MTID, .ClassMW, .ClassAbundance, _
+                                                      GelData(CallerID).IsoData(.ClassRepInd).ScanNumber, dblMassErrPPMCorrection, dblDriftTimeCorrection) Then
                             ' Hit found
                             lngDataWithHits = lngDataWithHits + 1
                         End If
@@ -2418,8 +2434,8 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
             ' Charge state data
             For lngCSDataIndex = 1 To .CSLines
                 With .CSData(lngCSDataIndex)
-                    If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
-                                                  .MTID, .AverageMW, .Abundance, .ScanNumber, 0) Then
+                    If ComputeErrorsExtractValues(lngRawErrorDataPointIDs, sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                                  lngCSDataIndex, .MTID, .AverageMW, .Abundance, .ScanNumber, 0, 0) Then
                         ' Hit found
                         lngDataWithHits = lngDataWithHits + 1
                     End If
@@ -2433,8 +2449,8 @@ On Error GoTo ComputeMassErrorsErrorWorkHandler
             ' Isotopic data
             For lngIsoDataIndex = 1 To .IsoLines
                 With .IsoData(lngIsoDataIndex)
-                    If ComputeErrorsExtractValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
-                                                  .MTID, GetIsoMass(GelData(CallerID).IsoData(lngIsoDataIndex), IsoField), .Abundance, .ScanNumber, 0) Then
+                    If ComputeErrorsExtractValues(lngRawErrorDataPointIDs, sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                                  lngIsoDataIndex, .MTID, GetIsoMass(GelData(CallerID).IsoData(lngIsoDataIndex), IsoField), .Abundance, .ScanNumber, 0, 0) Then
                         ' Hit found
                         lngDataWithHits = lngDataWithHits + 1
                     End If
@@ -2478,16 +2494,19 @@ End Sub
 '''    ComputeErrorsExtractValuesIso = blnSuccess
 '''End Function
 
-Private Function ComputeErrorsExtractValues(ByRef sngRawMassErrorsPPM() As Single, _
+Private Function ComputeErrorsExtractValues(ByRef lngRawErrorDataPointIDs() As Long, _
+                                            ByRef sngRawMassErrorsPPM() As Single, _
                                             ByRef sngRawMassErrorsDa() As Single, _
                                             ByRef sngRawNETErrors() As Single, _
                                             ByRef sngRawDriftTimeErrors() As Single, _
                                             ByRef lngRawErrorsCount As Long, _
+                                            ByVal lngDataPointID As Long, _
                                             ByVal strRefString As String, _
                                             ByVal dblIonMass As Double, _
                                             ByVal dblIonAbundance As Double, _
                                             ByVal lngScanNumber As Long, _
-                                            dblMassErrPPMCorrection As Double) As Boolean
+                                            ByVal dblMassErrPPMCorrection As Double, _
+                                            ByVal dblDriftTimeCorrection As Double) As Boolean
     Dim sngIonGANET As Single
     
     Dim Refs() As String         ' 1-based array
@@ -2500,9 +2519,9 @@ Private Function ComputeErrorsExtractValues(ByRef sngRawMassErrorsPPM() As Singl
         sngIonGANET = ConvertScanToNET(lngScanNumber)
         
         ' Compute mass error in ppm between AMT and actual data
-        ' Record in sngRawMassErrorsPPM(), sngRawMassErrorsDa(), sngRawNETErrors(), and sngRawDriftTimeErrors
-        blnHitFound = AddNewErrValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
-                                      Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, False)
+        ' Record in lngRawErrorDataPointIDs(), sngRawMassErrorsPPM(), sngRawMassErrorsDa(), sngRawNETErrors(), and sngRawDriftTimeErrors
+        blnHitFound = AddNewErrValues(lngRawErrorDataPointIDs, sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                      Refs(), RefsCnt, lngDataPointID, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, dblDriftTimeCorrection, False)
     End If
     
     If glbPreferencesExpanded.RefineMSDataOptions.IncludeInternalStdMatches Then
@@ -2513,8 +2532,8 @@ Private Function ComputeErrorsExtractValues(ByRef sngRawMassErrorsPPM() As Singl
                 sngIonGANET = ConvertScanToNET(lngScanNumber)
             End If
         
-            blnHitFound = AddNewErrValues(sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
-                                          Refs(), RefsCnt, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, True)
+            blnHitFound = AddNewErrValues(lngRawErrorDataPointIDs, sngRawMassErrorsPPM, sngRawMassErrorsDa, sngRawNETErrors, sngRawDriftTimeErrors, lngRawErrorsCount, _
+                                          Refs(), RefsCnt, lngDataPointID, dblIonMass, sngIonGANET, dblIonAbundance, dblMassErrPPMCorrection, dblDriftTimeCorrection, True)
         End If
     End If
     
@@ -2980,6 +2999,7 @@ Private Function ExportErrorsToClipboardOrFile(Optional strFilePath As String = 
 
     Dim strErrorData() As String
     Dim strTextToCopy As String
+    Dim strDataPointIDTitle As String
     
     Dim OutFileNum As Integer
     Dim lngIndex As Long, lngOutputArrayCount As Long
@@ -3003,17 +3023,23 @@ On Error GoTo ExportMassErrorsErrorHandler
     
     ' Fill strErrorData() with the Mass Errors and GANET errors
     
-    If mDriftTimesDefined Then
-        strErrorData(0) = "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError" & vbTab & "DriftTimeError"
+    If glbPreferencesExpanded.RefineMSDataOptions.UseUMCClassStats Then
+        strDataPointIDTitle = "LCMSFeatureID"
     Else
-        strErrorData(0) = "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError"
+        strDataPointIDTitle = "DataPointID"
+    End If
+    
+    If mDriftTimesDefined Then
+        strErrorData(0) = strDataPointIDTitle & vbTab & "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError" & vbTab & "DriftTimeError"
+    Else
+        strErrorData(0) = strDataPointIDTitle & vbTab & "MassErrorPPM" & vbTab & "MassErrorDa" & vbTab & "NETError"
     End If
     
     For lngIndex = 0 To mRawErrorsCount - 1
         If mDriftTimesDefined Then
-            strErrorData(lngIndex + 1) = Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRawNETErrors(lngIndex)) & vbTab & Trim(mRawDriftTimeErrors(lngIndex))
+            strErrorData(lngIndex + 1) = Trim(mRawErrorUMCIDs(lngIndex)) & vbTab & Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRawNETErrors(lngIndex)) & vbTab & Trim(mRawDriftTimeErrors(lngIndex))
         Else
-            strErrorData(lngIndex + 1) = Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRawNETErrors(lngIndex))
+            strErrorData(lngIndex + 1) = Trim(mRawErrorUMCIDs(lngIndex)) & vbTab & Trim(mRawMassErrorsPPM(lngIndex)) & vbTab & Trim(mRawMassErrorsDa(lngIndex)) & vbTab & Trim(mRawNETErrors(lngIndex))
         End If
         
         If lngIndex Mod 1000 = 0 Then UpdateStatus "Exporting: " & Trim(lngIndex) & " / " & mRawErrorsCount
@@ -5468,7 +5494,7 @@ Private Sub txtDriftTimeRange_KeyPress(KeyAscii As Integer)
 End Sub
 
 Private Sub txtDriftTimeRange_Validate(Cancel As Boolean)
-    ValidateTextboxValueLng txtDriftTimeRange, 0.25, 10000, 10
+    ValidateTextboxValueLng txtDriftTimeRange, 0.1, 1000, 3
     glbPreferencesExpanded.ErrorPlottingOptions.DriftTimeRange = CSngSafe(txtDriftTimeRange)
     UpdatePlot
 End Sub

@@ -12,6 +12,15 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
    ScaleHeight     =   8385
    ScaleWidth      =   14025
    StartUpPosition =   1  'CenterOwner
+   Begin VB.CheckBox chkSTACAlignsDriftTime 
+      BackColor       =   &H00FFFFFF&
+      Caption         =   "Use Drift Time Alignment"
+      Height          =   495
+      Left            =   5640
+      TabIndex        =   77
+      Top             =   600
+      Width           =   1815
+   End
    Begin VB.Frame fraDriftTime 
       BackColor       =   &H00FFFFFF&
       Caption         =   "IMS Drift Time Tolerance"
@@ -520,17 +529,17 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       BackColor       =   &H00FFFFFF&
       Caption         =   "Use Prior Prob"
       Height          =   255
-      Left            =   6240
+      Left            =   5640
       TabIndex        =   7
       Top             =   360
       Value           =   1  'Checked
-      Width           =   1335
+      Width           =   1575
    End
    Begin VB.CheckBox chkUseSTAC 
       BackColor       =   &H00FFFFFF&
       Caption         =   "Use STAC"
       Height          =   255
-      Left            =   5040
+      Left            =   4320
       TabIndex        =   6
       Top             =   360
       Value           =   1  'Checked
@@ -606,13 +615,13 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
    End
    Begin VB.CheckBox chkUpdateGelDataWithSearchResults 
       BackColor       =   &H00FFFFFF&
-      Caption         =   "Update data in current file with results of search"
+      Caption         =   "Store results in data"
       Height          =   495
-      Left            =   5040
+      Left            =   4320
       TabIndex        =   8
       Top             =   600
       Value           =   1  'Checked
-      Width           =   2535
+      Width           =   1215
    End
    Begin VB.CommandButton cmdSearchAllUMCs 
       Caption         =   "Search All LC-MS Features"
@@ -1036,15 +1045,6 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Top             =   120
       Width           =   2295
    End
-   Begin VB.Label lblMTStatus 
-      BackStyle       =   0  'Transparent
-      Caption         =   "Loading..."
-      Height          =   255
-      Left            =   1200
-      TabIndex        =   1
-      Top             =   120
-      Width           =   6015
-   End
    Begin VB.Label lblDescription 
       BackStyle       =   0  'Transparent
       Caption         =   "Minimum Peptide Prophet Probability"
@@ -1121,6 +1121,15 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       ToolTipText     =   "Status of the MT Tag database"
       Top             =   120
       Width           =   1095
+   End
+   Begin VB.Label lblMTStatus 
+      BackStyle       =   0  'Transparent
+      Caption         =   "Loading..."
+      Height          =   255
+      Left            =   1200
+      TabIndex        =   1
+      Top             =   120
+      Width           =   6015
    End
    Begin VB.Menu mnuF 
       Caption         =   "&Function"
@@ -1462,6 +1471,16 @@ Public Property Let UpdateGelDataWithSearchResults(ByVal Value As Boolean)
     SetCheckBox chkUpdateGelDataWithSearchResults, Value
 End Property
 
+Public Property Get STACAlignsDriftTime() As Boolean
+    STACAlignsDriftTime = cChkBox(chkSTACAlignsDriftTime)
+End Property
+Public Property Let STACAlignsDriftTime(ByVal Value As Boolean)
+    If cChkBox(chkSTACAlignsDriftTime) <> Value Then
+        SetCheckBox chkSTACAlignsDriftTime, Value
+    End If
+    glbPreferencesExpanded.STACAlignsDriftTime = Value
+End Property
+
 Public Property Get STACUsesPriorProbability() As Boolean
     STACUsesPriorProbability = cChkBox(chkSTACUsesPriorProbability)
 End Property
@@ -1561,7 +1580,7 @@ Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False
             End If
         Else
             fraDriftTime.Visible = False
-            fraMods.Top = fraNET.Top + fraNET.Height + 10
+            fraMods.Top = fraNet.Top + fraNet.Height + 10
             If Me.UseSTAC Then
                 lngMinimumHeight = 8500
             Else
@@ -2130,9 +2149,11 @@ Private Sub EnableDisableControls()
     
     If Me.UseSTAC Then
         chkSTACUsesPriorProbability.Enabled = True
+        chkSTACAlignsDriftTime.Enabled = True
         txtSTACMatchStats.Visible = True
     Else
         chkSTACUsesPriorProbability.Enabled = False
+        chkSTACAlignsDriftTime.Enabled = False
         txtSTACMatchStats.Visible = False
     End If
     
@@ -2253,28 +2274,28 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
     Dim strExportStatus As String
     
     'ADO objects for stored procedure adding Match Making row
-    Dim cnNew As New ADODB.Connection
+    Dim cnNew As New adodb.Connection
     
     Dim sngDBSchemaVersion As Single
     
     'ADO objects for stored procedure that adds FTICR UMC rows
-    Dim cmdPutNewUMC As New ADODB.Command
+    Dim cmdPutNewUMC As New adodb.Command
     Dim udtPutUMCParams As udtPutUMCParamsListType
         
     'ADO objects for stored procedure that adds FTICR UMC member rows
-    Dim cmdPutNewUMCMember As New ADODB.Command
+    Dim cmdPutNewUMCMember As New adodb.Command
     Dim udtPutUMCMemberParams As udtPutUMCMemberParamsListType
         
     'ADO objects for stored procedure adding FTICR UMC Details
-    Dim cmdPutNewUMCMatch As New ADODB.Command
+    Dim cmdPutNewUMCMatch As New adodb.Command
     Dim udtPutUMCMatchParams As udtPutUMCMatchParamsListType
     
     'ADO objects for stored procedure adding FTICR UMC Internal Standard Details
-    Dim cmdPutNewUMCInternalStdMatch As New ADODB.Command
+    Dim cmdPutNewUMCInternalStdMatch As New adodb.Command
     Dim udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType
     
     'ADO objects for stored procedure adding FTICR UMC CS Stats
-    Dim cmdPutNewUMCCSStats As New ADODB.Command
+    Dim cmdPutNewUMCCSStats As New adodb.Command
     Dim udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType
     
     Dim blnUMCMatchFound() As Boolean       ' 0-based array, used to keep track of whether or not the UMC matched any MT tags or Internal Standards
@@ -2685,7 +2706,7 @@ ExportMTDBbyUMCToUMCResultsTable = "Error: " & lngErrorNumber & vbCrLf & Err.Des
 
 End Function
 
-Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRef udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType, ByRef cmdPutNewUMCInternalStdMatch As ADODB.Command, ByRef udtPutUMCMatchParams As udtPutUMCMatchParamsListType, cmdPutNewUMCMatch As ADODB.Command)
+Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRef udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType, ByRef cmdPutNewUMCInternalStdMatch As adodb.Command, ByRef udtPutUMCMatchParams As udtPutUMCMatchParamsListType, cmdPutNewUMCMatch As adodb.Command)
 
     Dim lngInternalStdIndexOriginal As Long
     Dim lngMassTagIndexPointer As Long, lngMassTagIndexOriginal As Long
@@ -2826,11 +2847,11 @@ ExecutePutIntStdErrorHandler:
 
 End Function
  
-Private Sub ExportMTDBStoreSTACStats(ByRef cnNew As ADODB.Connection, ByVal lngMDID As Long)
+Private Sub ExportMTDBStoreSTACStats(ByRef cnNew As adodb.Connection, ByVal lngMDID As Long)
 
     ' Adds new rows to the T_Match_Making_FDR table
  
-    Dim cmdStoreSTACStats As New ADODB.Command
+    Dim cmdStoreSTACStats As New adodb.Command
     Dim udtStoreSTACStatsParams As udtStoreSTACStatsParamsListType
     
     Dim lngIndex As Long
@@ -5302,6 +5323,8 @@ Private Sub RecordSearchResultsInData()
     Dim sngMatchDriftTime As Single
     Dim sngDriftTimeError As Single
      
+    Dim lngMissingDriftTimeWarningCount As Long
+    
     'always reinitialize statistics arrays
     InitAMTStat
     
@@ -5353,7 +5376,11 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                 Else
                     ' This should typically only happen if blnDriftTimesWereUsed is false
                     ' However, if the database doesn't have any conformers, then this will happen for every search result
-                    Debug.Assert blnDriftTimesWereUsed = False
+                    
+                    lngMissingDriftTimeWarningCount = lngMissingDriftTimeWarningCount + 1
+                    If lngMissingDriftTimeWarningCount < 5 Then
+                        Debug.Assert blnDriftTimesWereUsed = False
+                    End If
                     
                     sngDriftTimeCorrectionFromSTAC = 0
                 End If
@@ -6054,6 +6081,9 @@ Private Function SearchUMCsUsingSTAC(ByVal eSearchMode As eSearchModeConstants) 
             strArguments = strArguments & " -useP F"
         End If
         
+        If cChkBox(chkSTACAlignsDriftTime) Then
+            strArguments = strArguments & " -alignDriftTimes"
+        End If
         
         
         Select Case samtDef.TolType
@@ -6679,6 +6709,7 @@ Private Sub SetDefaultOptions(ByVal blnUseToleranceRefinementSettings As Boolean
     End If
     
     Me.STACUsesPriorProbability = True
+    Me.STACAlignsDriftTime = False
     
     glbPreferencesExpanded.KeepTempSTACFiles = False
     
@@ -8231,6 +8262,10 @@ Private Sub chkPlotwSTACData_Click()
     UpdateSTACPlot
 End Sub
 
+Private Sub chkSTACAlignsDriftTime_Click()
+    Me.STACAlignsDriftTime = cChkBox(chkSTACAlignsDriftTime)
+End Sub
+
 Private Sub chkSTACPlotXGridlines_Click()
     UpdateSTACPlotLayout
 End Sub
@@ -8338,6 +8373,7 @@ Private Sub Form_Load()
     
     Me.UseSTAC = glbPreferencesExpanded.UseSTAC
     Me.STACUsesPriorProbability = glbPreferencesExpanded.STACUsesPriorProbability
+    Me.STACAlignsDriftTime = glbPreferencesExpanded.STACAlignsDriftTime
     
     With GelSearchDef(CallerID).AMTSearchMassMods
         SetCheckBox chkPEO, .PEO

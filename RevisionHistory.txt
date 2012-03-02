@@ -1,5 +1,11 @@
 VIPER Change Log
 
+Version 3.49 - Build 467; March 1, 2012
+	- New version of STAC that defaults to have drift time alignment turned off
+		- Optionally enable this via the "Use Drift Time Alignment" option in the Search MT DB window
+		- Corresponding .Ini file option is STACAlignsDriftTime in the ExpandedPreferences section
+	- Fixed bug on the Tolerance Refinement form that computed slightly shifted Drift Time errors when using UMC class stats
+
 Version 3.49 - Build 466; February 29, 2012
 	- Changed the timeout for storing UMCs and UMC matches to be 120 seconds
 		- Now retrying calling the stored procedure up to 10 times

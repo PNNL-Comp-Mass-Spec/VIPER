@@ -892,6 +892,7 @@ On Error GoTo LoadSettingsFileHandler
         .UseMassTagsWithNullNET = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseMassTagsWithNullNET", .UseMassTagsWithNullNET)
         .UseSTAC = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "UseSTAC", .UseSTAC)
         .STACUsesPriorProbability = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "STACUsesPriorProbability", .STACUsesPriorProbability)
+        .STACAlignsDriftTime = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "STACAlignsDriftTime", .STACAlignsDriftTime)
         .KeepTempSTACFiles = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "KeepTempSTACFiles", .KeepTempSTACFiles)
         
         .IReportAutoAddMonoPlus4AndMinus4Data = GetIniFileSettingBln(IniStuff, "ExpandedPreferences", "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data)
@@ -2029,6 +2030,7 @@ On Error GoTo SaveSettingsFileHandler
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseMassTagsWithNullNET", .UseMassTagsWithNullNET
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseSTAC", .UseSTAC
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "STACUsesPriorProbability", .STACUsesPriorProbability
+        AddKeyValueSettingBln sKeys, sVals, iKVCount, "STACAlignsDriftTime", .STACAlignsDriftTime
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "KeepTempSTACFiles", .KeepTempSTACFiles
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "IReportAutoAddMonoPlus4AndMinus4Data", .IReportAutoAddMonoPlus4AndMinus4Data
         AddKeyValueSettingBln sKeys, sVals, iKVCount, "UseUMCConglomerateNET", .UseUMCConglomerateNET
@@ -3445,6 +3447,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
             
             .UseSTAC = True
             .STACUsesPriorProbability = True
+            .STACAlignsDriftTime = False
             .KeepTempSTACFiles = False
             
             .IReportAutoAddMonoPlus4AndMinus4Data = True
@@ -3506,7 +3509,7 @@ Public Sub ResetExpandedPreferences(udtPreferencesExpanded As udtPreferencesExpa
                 .MassBinSizePPM = DEFAULT_MASS_BIN_SIZE_PPM
                 .GANETRange = 0.15
                 .GANETBinSize = DEFAULT_GANET_BIN_SIZE
-                .DriftTimeRange = 5
+                .DriftTimeRange = 3
                 .DriftTimeBinSize = DEFAULT_DRIFTTIME_BIN_SIZE
                 .ButterWorthFrequency = 0.2
                 

@@ -180,3 +180,4 @@ clsParallelLngArrays = 0, 0, 0, 0, C
 clsFilterDataArrayMaxCount = 0, 0, 0, 0, C
 QSDoubleWithDouble = 0, 0, 0, 0, C
 MTAMIsc = 0, 0, 0, 0, C
+modFileIOmsalign = 0, 0, 0, 0, C
