@@ -415,7 +415,7 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
                            ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants, _
                            ByVal blnLoadPredefinedLCMSFeatures As Boolean, _
                            ByVal sngAutoMapDataPointsMassTolerancePPM As Single, _
-                           ByRef strErrorMessage, _
+                           ByRef strErrorMessage As String, _
                            ByVal plmPointsLoadMode As Integer, _
                            ByVal dblLCMSFeatureAbuMin As Double, _
                            ByVal lngLCMSFeatureScanCountMin As Long, _

@@ -113,7 +113,7 @@ Public Function LoadNewMSAlign(ByVal MSAlignFilePath As String, ByVal lngGelInde
                                 ByVal blnTotalIntensityPercentageFilterEnabled, ByVal sngTotalIntensityPercentageFilter, _
                                 ByVal eScanFilterMode As eosEvenOddScanFilterModeConstants, _
                                 ByVal eDataFilterMode As dfmCSandIsoDataFilterModeConstants, _
-                                ByRef strErrorMessage) As Long
+                                ByRef strErrorMessage As String) As Long
                            
     '-------------------------------------------------------------------------
     'Returns 0 if data successfuly loaded, -2 if data set is too large,

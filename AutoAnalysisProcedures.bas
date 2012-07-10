@@ -2658,6 +2658,8 @@ Private Function AutoAnalysisLoadInputFile(ByRef udtWorkingParams As udtAutoAnal
     
     Dim eResponse As VbMsgBoxResult
     Dim strErrorMessage As String
+    Dim intOpenResultCode As Integer
+    
     Dim fsInputFile As File
     
 On Error GoTo LoadInputFileErrorHandler
@@ -3176,9 +3178,9 @@ On Error GoTo LoadInputFileErrorHandler
                 Else
                     ' Loading a .Pek, .CSV, .mzXML, .mzData, or _LCMSFeatures file; use FileNew
                     If udtAutoParams.GelIndexToForce > 0 And udtAutoParams.GelIndexToForce <= UBound(GelBody()) Then
-                        udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, udtAutoParams.GelIndexToForce, strErrorMessage)
+                        udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, udtAutoParams.GelIndexToForce, strErrorMessage, intOpenResultCode)
                     Else
-                        udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, 0, strErrorMessage)
+                        udtWorkingParams.GelIndex = FileNew(MDIForm1.hwnd, udtAutoParams.FilePaths.InputFilePath, 0, strErrorMessage, intOpenResultCode)
                     End If
                     udtWorkingParams.LoadedGelFile = False
                     
@@ -3217,8 +3219,17 @@ On Error GoTo LoadInputFileErrorHandler
             End If
             
             AutoAnalysisLog udtAutoParams, udtWorkingParams, "Error - " & strErrorMessage & ": " & udtAutoParams.FilePaths.InputFilePath
+            AutoAnalysisLog udtAutoParams, udtWorkingParams, "Error Time: " & Format(Now(), "yyyy.mm.dd Hh:Nn:Ss")
             udtWorkingParams.ErrorBits = udtWorkingParams.ErrorBits Or DATAFILE_LOAD_ERROR_BIT
             blnSuccess = False
+            
+            If intOpenResultCode = 7 Then
+                ' Out of Memory Error; stop Viper as soon as possible
+                udtAutoParams.ExitViperASAP = True
+                udtAutoParams.ExitViperReason = "Out of memory"
+                udtAutoParams.RestartAfterExit = True
+            End If
+
         End If
         
         If blnGeneratedMonoPlus4IsoLabelingFile Then

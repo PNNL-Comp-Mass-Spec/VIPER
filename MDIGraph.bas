@@ -1384,7 +1384,8 @@ End Sub
 Public Function FileNew(ByVal hwndOwner As Long, _
                         Optional ByVal strInputFilePath As String = "", _
                         Optional lngGelIndexToForce As Long = 0, _
-                        Optional ByRef strErrorMessage As String = "") As Long
+                        Optional ByRef strErrorMessage As String = "", _
+                        Optional ByRef intOpenResultCode As Integer = 0) As Long
     '---------------------------------------------------------------------------------------
     'Opens the file given by strInputFilePath, or prompts the user to choose a .Pek, .CSV, .mzXML, or .mzData file
     'Returns the index of the file in memory if success, 0 otherwise
@@ -1393,7 +1394,6 @@ Public Function FileNew(ByVal hwndOwner As Long, _
     
     Dim fIndex As Long
     Dim sFileName As String
-    Dim OpenResult As Integer
     Dim blnInteractiveMode As Boolean
     
     Dim fso As New FileSystemObject
@@ -1402,6 +1402,7 @@ Public Function FileNew(ByVal hwndOwner As Long, _
     On Error Resume Next
     
     strErrorMessage = ""
+    intOpenResultCode = -12345
     
     If Len(strInputFilePath) = 0 Then
         blnInteractiveMode = True
@@ -1481,9 +1482,9 @@ Public Function FileNew(ByVal hwndOwner As Long, _
     ''     OpenResult = LoadNewDBGel(sFileName, fIndex)
     ''   Else
        
-       OpenResult = LoadNewData(fso, sFileName, fIndex, blnInteractiveMode, strErrorMessage)
+       intOpenResultCode = LoadNewData(fso, sFileName, fIndex, blnInteractiveMode, strErrorMessage)
        
-       Select Case OpenResult
+       Select Case intOpenResultCode
        Case 0      'success
           Debug.Assert Not GelStatus(fIndex).Deleted
           GelStatus(fIndex).Dirty = True
@@ -1534,19 +1535,23 @@ Public Function FileNew(ByVal hwndOwner As Long, _
        Case -6, -7
           MDIStatus False, "Done"
           If strErrorMessage = "" Then strErrorMessage = "File not found"
-          If OpenResult = -6 And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+          If intOpenResultCode = -6 And Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
               MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
           End If
           GelStatus(fIndex).Deleted = True
           FileNew = 0
        Case Else   'some other error
           MDIStatus False, "Done"
-          If strErrorMessage = "" Then strErrorMessage = "Error loading data from file; file maybe contains no data or structure does not match expected format"
+          If strErrorMessage = "" Then strErrorMessage = "Error loading data from file; file maybe contains no data or structure does not match expected format.  intOpenResultCode=" & intOpenResultCode
           If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
               MsgBox strErrorMessage & "; File Path = " & sFileName, vbOKOnly, glFGTU
           End If
           GelStatus(fIndex).Deleted = True
           FileNew = 0
+          
+          ' Note: if intOpenResultCode = 7, then an "Out of meory" error occurred
+          ' If performing automated processing, then AutoAnalysisLoadInputFile will auto-exit VIPER
+          
        End Select
        If GelStatus(fIndex).Deleted Then
            SetGelStateToDeleted fIndex
@@ -1557,6 +1562,7 @@ Public Function FileNew(ByVal hwndOwner As Long, _
     End If
     frmProgress.HideForm
     Screen.MousePointer = vbDefault
+    
 End Function
 
 Public Function FileNewSelectFile(hwndOwner As Long) As String
@@ -2123,6 +2129,7 @@ If Err.Number = 53 Then
     LoadNewData = -6
 Else
     Debug.Assert False
+    strErrorMessage = "Error in LoadNewData: " & Err.Description
     LoadNewData = -10
 End If
 Screen.MousePointer = vbDefault
