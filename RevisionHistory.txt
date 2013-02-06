@@ -1,5 +1,8 @@
 VIPER Change Log
 
+Version 3.49 - Build 469; February 5, 2013
+	- Now allowing the _scans.csv file to be missing during automated processing of an _isos.csv file
+
 Version 3.49 - Build 468; July 9, 2012
 	- Now exiting the program if an out of memory error occurs while loading the input data file during automated processing
 

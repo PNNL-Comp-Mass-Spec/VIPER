@@ -584,7 +584,7 @@ On Error GoTo LoadNewCSVErrorHandler
         Else
             If Not mLoadPredefinedLCMSFeatures Then
                 AddToAnalysisHistory mGelIndex, "Error: CSV Scans file not found: " & strScansFilePath
-                eResponse = vbCancel
+                eResponse = vbYes
             Else
                 ' We're loading predefined LCMSFeatures; it's OK that the file is missing.
                 eResponse = vbYes
