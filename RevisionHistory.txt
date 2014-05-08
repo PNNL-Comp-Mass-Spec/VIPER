@@ -1,5 +1,8 @@
 VIPER Change Log
 
+Version 3.48 - Build 470; November 4, 2013
+	- Recompiled due to new computer OS
+
 Version 3.49 - Build 469; February 5, 2013
 	- Now allowing the _scans.csv file to be missing during automated processing of an _isos.csv file
 

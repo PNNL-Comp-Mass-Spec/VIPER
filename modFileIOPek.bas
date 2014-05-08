@@ -213,7 +213,7 @@ Private Function ExtractMSLevel(ByVal strFilterText As String, ByRef intMSLevel 
     
     ' Populates intMSLevel with the number after "ms"
     ' RegEx that works is ( p|Full|SRM|CRM) ms([2-9]|[1-9][0-9])
-    ' However, VB6 doesn't natively support RegEx, so we'll use the string searrching approach
+    ' However, VB6 doesn't natively support RegEx, so we'll use the string searching approach
     ' If we really wanted to use RegEx, one option is to use "Microsoft VBScript Regular Expressions 5.5" (see http://www.regular-expressions.info/vb.html)
     
     Dim lngCharLoc As Long

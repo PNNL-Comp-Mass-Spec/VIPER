@@ -1,13 +1,13 @@
 VERSION 5.00
 Object = "{92D71E90-25A8-11CF-A640-9986B64D9618}#5.0#0"; "olch2x32.ocx"
 Begin VB.UserControl ctlSpectraPlotter 
-   ClientHeight    =   5385
+   ClientHeight    =   5388
    ClientLeft      =   0
    ClientTop       =   0
-   ClientWidth     =   9465
+   ClientWidth     =   9468
    KeyPreview      =   -1  'True
-   ScaleHeight     =   5385
-   ScaleWidth      =   9465
+   ScaleHeight     =   5388
+   ScaleWidth      =   9468
    Begin VB.Timer tmrAutoScale 
       Enabled         =   0   'False
       Interval        =   50

@@ -1,17 +1,17 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "RICHTX32.OCX"
 Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
 Begin VB.Form frmSearchForNETAdjustmentUMC 
    Caption         =   "Search MT Tag Database For NET Adjustment"
    ClientHeight    =   8760
    ClientLeft      =   60
-   ClientTop       =   630
-   ClientWidth     =   13110
+   ClientTop       =   636
+   ClientWidth     =   13116
    LinkTopic       =   "Form1"
    MinButton       =   0   'False
    ScaleHeight     =   8760
-   ScaleWidth      =   13110
+   ScaleWidth      =   13116
    StartUpPosition =   1  'CenterOwner
    Begin VB.Timer tmrTimer 
       Interval        =   500
@@ -30,8 +30,8 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          TabIndex        =   124
          Top             =   360
          Width           =   5415
-         _ExtentX        =   9340
-         _ExtentY        =   4895
+         _ExtentX        =   9335
+         _ExtentY        =   4890
       End
       Begin VIPER.ctlSpectraPlotter ctlPlotMassErrorHistogram 
          Height          =   3255
@@ -39,8 +39,8 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          TabIndex        =   125
          Top             =   3720
          Width           =   5415
-         _ExtentX        =   9551
-         _ExtentY        =   5741
+         _ExtentX        =   9546
+         _ExtentY        =   5736
       End
       Begin VIPER.ctlSpectraPlotter ctlPlotNETRange 
          Height          =   3135
@@ -48,8 +48,8 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          TabIndex        =   126
          Top             =   360
          Width           =   5415
-         _ExtentX        =   9551
-         _ExtentY        =   5530
+         _ExtentX        =   9546
+         _ExtentY        =   5525
       End
       Begin VIPER.ctlSpectraPlotter ctlPlotNETErrorHistogram 
          Height          =   3255
@@ -57,8 +57,8 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          TabIndex        =   127
          Top             =   3720
          Width           =   5415
-         _ExtentX        =   9551
-         _ExtentY        =   5741
+         _ExtentX        =   9546
+         _ExtentY        =   5736
       End
       Begin VB.Label lblPlotNETErrorHistogram 
          Caption         =   "NET Error Histogram: Red = Current, Blue = Best"
@@ -123,8 +123,8 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
       TabIndex        =   23
       Top             =   120
       Width           =   6645
-      _ExtentX        =   11721
-      _ExtentY        =   6006
+      _ExtentX        =   11726
+      _ExtentY        =   6011
       _Version        =   393216
       Style           =   1
       Tab             =   2
@@ -805,8 +805,8 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          TabIndex        =   110
          Top             =   240
          Width           =   5415
-         _ExtentX        =   9551
-         _ExtentY        =   3889
+         _ExtentX        =   9546
+         _ExtentY        =   3895
          _Version        =   393217
          ScrollBars      =   2
          TextRTF         =   $"frmSearchForNETAdjustmentUMC.frx":0054
@@ -977,8 +977,8 @@ Begin VB.Form frmSearchForNETAdjustmentUMC
          Top             =   2520
          Visible         =   0   'False
          Width           =   2055
-         _ExtentX        =   3625
-         _ExtentY        =   556
+         _ExtentX        =   3620
+         _ExtentY        =   550
          _Version        =   393216
          Appearance      =   1
          Max             =   10
@@ -1766,14 +1766,21 @@ Private Sub CalculateIterationAutoIncrementTopAbuPct(intPlotUpdateInterval As In
         
         blnUseAbbreviatedFormat = True
         With glbPreferencesExpanded.AutoAnalysisOptions
-            If (IDCnt < .NETAdjustmentMinIDCount Or mIterationCount < .NETAdjustmentMinIterationCount Or AdjSlp <= 0) And Not bStop Then
+            
+            Dim blnInvalidSlope As Boolean
+            blnInvalidSlope = IsNaN(AdjSlp)
+            If Not blnInvalidSlope Then
+                If AdjSlp <= 0 Then blnInvalidSlope = True
+            End If
+            
+            If (IDCnt < .NETAdjustmentMinIDCount Or mIterationCount < .NETAdjustmentMinIterationCount Or blnInvalidSlope) And Not bStop Then
                     
                 blnDone = False
                 SetNetAdjFailed
                 If IDCnt < .NETAdjustmentMinIDCount Then
                     ' Not enough ID's
                     strNetAdjFailureReason = "Not enough LC-MS Features matched MT tags in the database"
-                ElseIf AdjSlp <= 0 Then
+                ElseIf blnInvalidSlope Then
                     ' Zero or Negative slope
                     strNetAdjFailureReason = "Negative slope was computed"
                 Else
@@ -3600,6 +3607,19 @@ Private Sub ComputeScoreForIterationStats(ByRef udtIterationStats As udtIteratio
     
     Dim blnMassErrorPeakFound As Boolean
     Dim blnSingleGoodPeakFound As Boolean
+        
+    Dim blnInvalidSlope As Boolean
+    
+    ' Check for slope of -1.#IND
+    blnInvalidSlope = IsNaN(udtIterationStats.slope)
+    
+    If blnInvalidSlope Then
+        ' Slope is invalid
+        udtIterationStats.NETMatchScore = 0
+        Exit Sub
+    End If
+    
+    On Error GoTo 0
     
     With udtIterationStats
         ' Update the NET Histogram
@@ -5879,6 +5899,11 @@ Private Function ValidatePositiveSlope(blnResetToDefaultIfInvalid As Boolean) As
     
     mNegativeSlopeComputed = False
     If Not GelAnalysis(CallerID) Is Nothing Then
+    
+        If IsNaN(GelAnalysis(CallerID).GANET_Slope) Then
+            GelAnalysis(CallerID).GANET_Slope = -1
+        End If
+        
         If GelAnalysis(CallerID).GANET_Slope <= 0 Then
             ' Negative slope was computed
             ' Inform user if not in auto analysis mode, then reset to the default slope and intercept

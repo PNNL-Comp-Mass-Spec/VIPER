@@ -1485,6 +1485,22 @@ InterpolateChromatogramGapsErrorHandler:
     
 End Sub
 
+Public Function IsNaN(ByVal dblValue As Double) As Boolean
+
+    Dim blnIsInvalid As Boolean
+    
+    On Error Resume Next
+    
+    blnIsInvalid = Abs(dblValue) <> Abs(dblValue)
+        
+    If Err <> 0 Then
+        blnIsInvalid = True
+    End If
+    
+    IsNaN = blnIsInvalid
+    
+End Function
+
 Public Function LookupCollectionArrayValueByName(ByRef udtThisCollectionArray() As udtCollectionArrayType, ByVal lngArrayCount As Long, ByVal strNameToFind As String, Optional blnCaseSensitive As Boolean = False, Optional strNotFoundIndicator As String = "") As String
     ' Looks for entry in udtThisCollectionArray with .Name = strNameToFind
     ' Returns .Value if found
@@ -2020,6 +2036,37 @@ Public Function NitrogenCount(ByVal strSequenceOneLetter As String) As Long
     Dim lngResidueIndex As Long
     Dim strResidueSymbol As String
     
+    Static myRegExp As RegExp
+    Static blnRegExInitialized As Boolean
+    
+    If Not blnRegExInitialized Then
+        Set myRegExp = New RegExp
+        myRegExp.IgnoreCase = True
+        myRegExp.Global = True
+        myRegExp.Pattern = "C\d*H\d*(N\d*)O\d*"
+        
+        blnRegExInitialized = True
+    End If
+    
+    Dim myMatches As MatchCollection
+    Set myMatches = myRegExp.Execute(strSequenceOneLetter)
+    If myMatches.Count > 0 Then
+        ' This is an empirical formula
+        
+        Dim strNitrogenInfo As String
+        strNitrogenInfo = myMatches(0).SubMatches(0)
+        
+        If Len(strNitrogenInfo) > 1 Then
+            lngNCount = CInt(Mid(strNitrogenInfo, 2))
+        Else
+            lngNCount = 1
+        End If
+        NitrogenCount = lngNCount
+        
+        Exit Function
+        
+    End If
+
     For lngResidueIndex = 1 To Len(strSequenceOneLetter)
         Select Case Asc(Mid(strSequenceOneLetter, lngResidueIndex, 1))
         Case 65, 67 To 71, 73, 76, 77, 80, 83, 84, 85, 86, 89
@@ -2694,14 +2741,17 @@ Public Function ConvertEmfToPng(ByVal strEmfFilePath As String, ByVal strTargetF
     Dim strLastGoodLocation As String
     
     Dim fso As FileSystemObject
-    Dim objImage As ImageMagickObject.MagickImage
+    
+    Const ALWAYS_USE_EXE As Boolean = True
+    
+    ' Disabled: Dim objImage As ImageMagickObject.MagickImage
     
     Dim lngResult As Long
     Dim blnImageConverted As Boolean
     
 On Error GoTo ConvertEmfToPngErrorHandler
 
-    If intImageMagickObjectFailureCount > 3 Then
+    If ALWAYS_USE_EXE Or intImageMagickObjectFailureCount > 3 Then
         ' Conversion has failed 3 or more times; use Convert.exe to conver the image
         lngResult = ConvertEmfToPngUsingEXE(strEmfFilePath, strTargetFilePath, lngWidthPixels, lngHeightPixels)
         
@@ -2709,29 +2759,31 @@ On Error GoTo ConvertEmfToPngErrorHandler
         Exit Function
     End If
     
-    strLastGoodLocation = "Instantiate objImage as ImageMagickObject.MagickImage"
-    Set objImage = New ImageMagickObject.MagickImage
-    Set fso = New FileSystemObject
+    ' The following code is Disabled
+    '
+    'strLastGoodLocation = "Instantiate objImage as ImageMagickObject.MagickImage"
+    'Set objImage = New ImageMagickObject.MagickImage
+    'Set fso = New FileSystemObject
     
-    strTargetFilePath = FileExtensionForce(strTargetFilePath, "png")
-    strGeometry = lngWidthPixels & "X" & lngHeightPixels
+    'strTargetFilePath = FileExtensionForce(strTargetFilePath, "png")
+    'strGeometry = lngWidthPixels & "X" & lngHeightPixels
     
-    strLastGoodLocation = "Call objImage.Convert with params: '" & strGeometry & "', '" & strEmfFilePath & "', '" & strTargetFilePath & "'"
-    strResult = objImage.Convert("-size", strGeometry, strEmfFilePath, strTargetFilePath)
+    'strLastGoodLocation = "Call objImage.Convert with params: '" & strGeometry & "', '" & strEmfFilePath & "', '" & strTargetFilePath & "'"
+    'strResult = objImage.Convert("-size", strGeometry, strEmfFilePath, strTargetFilePath)
     
-    blnImageConverted = True
+    'blnImageConverted = True
     
-    strLastGoodLocation = "objImage.Convert returned: " & strResult
-    If Len(strResult) > 0 Then
-        fso.DeleteFile strEmfFilePath
-        ConvertEmfToPng = 0
-    Else
-        ConvertEmfToPng = -1
-    End If
+    'strLastGoodLocation = "objImage.Convert returned: " & strResult
+    'If Len(strResult) > 0 Then
+    '    fso.DeleteFile strEmfFilePath
+    '    ConvertEmfToPng = 0
+    'Else
+    '    ConvertEmfToPng = -1
+    'End If
     
-    strLastGoodLocation = "Destroy objects"
-    Set fso = Nothing
-    Set objImage = Nothing
+    'strLastGoodLocation = "Destroy objects"
+    'Set fso = Nothing
+    'Set objImage = Nothing
     
     Exit Function
     
@@ -3072,13 +3124,16 @@ Public Function CreateMontageImage(ByVal strFilePathA As String, ByVal strFilePa
     Dim lngMaxHeight As Long
     
     Dim fso As FileSystemObject
-    Dim objImage As ImageMagickObject.MagickImage
+    
+    Const ALWAYS_USE_EXE As Boolean = True
+    
+    ' Disabled: Dim objImage As ImageMagickObject.MagickImage
     
     Dim blnImageCreated As Boolean
     
 On Error GoTo CreateMontageImageErrorHandler
     
-    If intImageMagickObjectFailureCount > 3 Then
+    If ALWAYS_USE_EXE Or intImageMagickObjectFailureCount > 3 Then
         ' Conversion has failed 3 or more times; use Montage.exe to convert the image
         lngResult = CreateMontageImageUsingEXE(strFilePathA, strFilePathB, strOutputFilePath, blnDeleteSourceFiles, lngDefaultMaxWidth, lngDefaultMaxHeight)
         
@@ -3086,40 +3141,42 @@ On Error GoTo CreateMontageImageErrorHandler
         Exit Function
     End If
      
-     
-    Set objImage = New ImageMagickObject.MagickImage
+    ' The following code is Disabled
+    '
+    'Set objImage = New ImageMagickObject.MagickImage
+    
     Set fso = New FileSystemObject
     
-    ' Determine the size of the input files (width and height in pixels)
-    ' We'll use this size when defining the Geometry switch for the Montage command
+    '' Determine the size of the input files (width and height in pixels)
+    '' We'll use this size when defining the Geometry switch for the Montage command
     
 On Error GoTo CreateMontageImageIdentifyErrorHandler
     
-    ' File A
-    strResult = objImage.Identify("-format", "%w", strFilePathA)
-    lngValue = CLngSafe(strResult)
-    If lngValue > lngMaxWidth Then lngMaxWidth = lngValue
+    '' File A
+    'strResult = objImage.Identify("-format", "%w", strFilePathA)
+    'lngValue = CLngSafe(strResult)
+    'If lngValue > lngMaxWidth Then lngMaxWidth = lngValue
     
-    Sleep 200
+    'Sleep 200
     
-    strResult = objImage.Identify("-format", "%h", strFilePathA)
-    lngValue = CLngSafe(strResult)
-    If lngValue > lngMaxHeight Then lngMaxHeight = lngValue
+    'strResult = objImage.Identify("-format", "%h", strFilePathA)
+    'lngValue = CLngSafe(strResult)
+    'If lngValue > lngMaxHeight Then lngMaxHeight = lngValue
     
-    Sleep 200
+    'Sleep 200
     
     ' File B
-    strResult = objImage.Identify("-format", "%w", strFilePathB)
-    lngValue = CLngSafe(strResult)
-    If lngValue > lngMaxWidth Then lngMaxWidth = lngValue
+    'strResult = objImage.Identify("-format", "%w", strFilePathB)
+    'lngValue = CLngSafe(strResult)
+    'If lngValue > lngMaxWidth Then lngMaxWidth = lngValue
     
-    Sleep 200
+    'Sleep 200
     
-    strResult = objImage.Identify("-format", "%h", strFilePathB)
-    lngValue = CLngSafe(strResult)
-    If lngValue > lngMaxHeight Then lngMaxHeight = lngValue
+    'strResult = objImage.Identify("-format", "%h", strFilePathB)
+    'lngValue = CLngSafe(strResult)
+    'If lngValue > lngMaxHeight Then lngMaxHeight = lngValue
     
-    Sleep 200
+    'Sleep 200
     
 On Error GoTo CreateMontageImageErrorHandler
 
@@ -3127,7 +3184,7 @@ CreateMontageImageContinue:
     strGeometry = Trim(lngMaxWidth) & "X" & Trim(lngMaxHeight) & "+" & Trim(BORDER_WIDTH) & "+" & Trim(BORDER_WIDTH)
 
     TraceLog 5, "CreateMontageImage", "Creating montage of " & strFilePathA & " and " & strFilePathB
-    strResult = objImage.Montage("-tile", "1x2", "-geometry", strGeometry, "-borderwidth", Trim(BORDER_WIDTH), "-bordercolor", "black", strFilePathA, strFilePathB, strOutputFilePath)
+    'strResult = objImage.Montage("-tile", "1x2", "-geometry", strGeometry, "-borderwidth", Trim(BORDER_WIDTH), "-bordercolor", "black", strFilePathA, strFilePathB, strOutputFilePath)
     
     If Len(strResult) > 0 Then
         blnImageCreated = True
@@ -3144,7 +3201,7 @@ CreateMontageImageContinue:
     End If
     
     Set fso = Nothing
-    Set objImage = Nothing
+    ' Disabled: Set objImage = Nothing
     
     Exit Function
     

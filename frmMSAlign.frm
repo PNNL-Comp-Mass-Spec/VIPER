@@ -5,13 +5,13 @@ Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
 Begin VB.Form frmMSAlign 
    BackColor       =   &H00FFFFFF&
    Caption         =   "LCMSWarp"
-   ClientHeight    =   10410
-   ClientLeft      =   225
-   ClientTop       =   855
+   ClientHeight    =   10416
+   ClientLeft      =   192
+   ClientTop       =   816
    ClientWidth     =   14340
    LinkTopic       =   "MS Align"
    MinButton       =   0   'False
-   ScaleHeight     =   10410
+   ScaleHeight     =   10416
    ScaleWidth      =   14340
    StartUpPosition =   3  'Windows Default
    Begin VB.ComboBox cboStepsToPerform 
@@ -92,8 +92,8 @@ Begin VB.Form frmMSAlign
       TabIndex        =   7
       Top             =   7800
       Width           =   6375
-      _ExtentX        =   11245
-      _ExtentY        =   3201
+      _ExtentX        =   11240
+      _ExtentY        =   3196
       _Version        =   393216
       Style           =   1
       Tabs            =   7
@@ -114,8 +114,8 @@ Begin VB.Form frmMSAlign
       TabCaption(2)   =   "Tolerances"
       TabPicture(2)   =   "frmMSAlign.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraNETTolerances"
-      Tab(2).Control(1)=   "fraBinningOptions"
+      Tab(2).Control(0)=   "fraBinningOptions"
+      Tab(2).Control(1)=   "fraNETTolerances"
       Tab(2).ControlCount=   2
       TabCaption(3)   =   "Calib Type"
       TabPicture(3)   =   "frmMSAlign.frx":0054
@@ -125,11 +125,11 @@ Begin VB.Form frmMSAlign
       TabCaption(4)   =   "Adv1"
       TabPicture(4)   =   "frmMSAlign.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "Label21"
-      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(0)=   "fraMTRangeFilters"
+      Tab(4).Control(1)=   "txtWarpMassZScoreTolerance"
       Tab(4).Control(2)=   "Frame1"
-      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
-      Tab(4).Control(4)=   "fraMTRangeFilters"
+      Tab(4).Control(3)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(4)=   "Label21"
       Tab(4).ControlCount=   5
       TabCaption(5)   =   "Adv2"
       TabPicture(5)   =   "frmMSAlign.frx":008C
@@ -1043,7 +1043,7 @@ Begin VB.Form frmMSAlign
          BackColor       =   -2147483633
          BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   8.25
+            Size            =   7.81
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -1085,8 +1085,8 @@ Begin VB.Form frmMSAlign
          Scale_6         =   8
          ClassName_8     =   "CCWScale"
          opts_8          =   90112
-         rMin_8          =   38
-         rMax_8          =   270
+         rMin_8          =   43
+         rMax_8          =   339
          dMax_8          =   10
          discInterval_8  =   1
          Radial_6        =   0
@@ -1119,8 +1119,8 @@ Begin VB.Form frmMSAlign
          Scale_13        =   15
          ClassName_15    =   "CCWScale"
          opts_15         =   122880
-         rMin_15         =   24
-         rMax_15         =   185
+         rMin_15         =   28
+         rMax_15         =   235
          dMax_15         =   10
          discInterval_15 =   1
          Radial_13       =   0
@@ -1250,7 +1250,7 @@ Begin VB.Form frmMSAlign
          bFont_36        =   -1  'True
          BeginProperty Font_36 {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   8.25
+            Size            =   7.8
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -1309,7 +1309,7 @@ Begin VB.Form frmMSAlign
          BackColor       =   -2147483633
          BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   8.25
+            Size            =   7.81
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -1351,8 +1351,8 @@ Begin VB.Form frmMSAlign
          Scale_6         =   8
          ClassName_8     =   "CCWScale"
          opts_8          =   90112
-         rMin_8          =   38
-         rMax_8          =   270
+         rMin_8          =   43
+         rMax_8          =   339
          dMax_8          =   10
          discInterval_8  =   1
          Radial_6        =   0
@@ -1385,8 +1385,8 @@ Begin VB.Form frmMSAlign
          Scale_13        =   15
          ClassName_15    =   "CCWScale"
          opts_15         =   122880
-         rMin_15         =   24
-         rMax_15         =   185
+         rMin_15         =   28
+         rMax_15         =   235
          dMax_15         =   10
          discInterval_15 =   1
          Radial_13       =   0
@@ -1516,7 +1516,7 @@ Begin VB.Form frmMSAlign
          bFont_36        =   -1  'True
          BeginProperty Font_36 {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   8.25
+            Size            =   7.8
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -1582,7 +1582,7 @@ Begin VB.Form frmMSAlign
          _StockProps     =   71
          BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   9.75
+            Size            =   9.61
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -1624,8 +1624,8 @@ Begin VB.Form frmMSAlign
          Scale_6         =   8
          ClassName_8     =   "CCWScale"
          opts_8          =   90112
-         rMin_8          =   27
-         rMax_8          =   397
+         rMin_8          =   31
+         rMax_8          =   497
          dMax_8          =   10
          discInterval_8  =   1
          Radial_6        =   0
@@ -1657,8 +1657,8 @@ Begin VB.Form frmMSAlign
          Scale_13        =   15
          ClassName_15    =   "CCWScale"
          opts_15         =   122880
-         rMin_15         =   28
-         rMax_15         =   267
+         rMin_15         =   34
+         rMax_15         =   337
          dMax_15         =   10
          discInterval_15 =   1
          Radial_13       =   0
@@ -1834,7 +1834,7 @@ Begin VB.Form frmMSAlign
          bFont_39        =   -1  'True
          BeginProperty Font_39 {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   8.25
+            Size            =   7.8
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -1892,7 +1892,7 @@ Begin VB.Form frmMSAlign
          _StockProps     =   71
          BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   9.75
+            Size            =   9.61
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -1934,8 +1934,8 @@ Begin VB.Form frmMSAlign
          Scale_6         =   8
          ClassName_8     =   "CCWScale"
          opts_8          =   90112
-         rMin_8          =   27
-         rMax_8          =   397
+         rMin_8          =   31
+         rMax_8          =   497
          dMax_8          =   10
          discInterval_8  =   1
          Radial_6        =   0
@@ -1967,8 +1967,8 @@ Begin VB.Form frmMSAlign
          Scale_13        =   15
          ClassName_15    =   "CCWScale"
          opts_15         =   122880
-         rMin_15         =   28
-         rMax_15         =   267
+         rMin_15         =   34
+         rMax_15         =   337
          dMax_15         =   10
          discInterval_15 =   1
          Radial_13       =   0
@@ -2144,7 +2144,7 @@ Begin VB.Form frmMSAlign
          bFont_39        =   -1  'True
          BeginProperty Font_39 {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   8.25
+            Size            =   7.8
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -2196,8 +2196,8 @@ Begin VB.Form frmMSAlign
          TabIndex        =   113
          Top             =   360
          Width           =   5055
-         _ExtentX        =   8916
-         _ExtentY        =   2566
+         _ExtentX        =   8911
+         _ExtentY        =   2561
       End
       Begin VB.CheckBox chkSurfaceShowsZScore 
          BackColor       =   &H00FFFFFF&
@@ -2242,7 +2242,7 @@ Begin VB.Form frmMSAlign
          _StockProps     =   68
          BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   8.25
+            Size            =   7.81
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -2333,8 +2333,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   5.01546619392668E-234
-         DataMax_5       =   5.01546619392668E-234
+         DataMin_5       =   5.98718945111304E-297
+         DataMax_5       =   5.98718945111304E-297
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2400,8 +2400,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   7.36027105276457E-298
-         DataMax_14      =   7.36027105276457E-298
+         DataMin_14      =   5.81476899755442E-297
+         DataMax_14      =   5.81476899755442E-297
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2469,8 +2469,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   7.36875791879731E-298
-         DataMax_23      =   7.36875791879731E-298
+         DataMin_23      =   5.82543153439831E-297
+         DataMax_23      =   5.82543153439831E-297
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -2652,7 +2652,7 @@ Begin VB.Form frmMSAlign
          GridXY_1        =   -1  'True
          GridXZ_1        =   -1  'True
          viewMode_1      =   3
-         aspectRatio_1   =   1.20983606557377
+         aspectRatio_1   =   1.20997375328084
          autoDistance_1  =   -1  'True
          eyeLongitude_1  =   45
          eyeLatitude_1   =   45
@@ -2675,7 +2675,7 @@ Begin VB.Form frmMSAlign
          _StockProps     =   71
          BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   9.75
+            Size            =   9.61
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -2717,8 +2717,8 @@ Begin VB.Form frmMSAlign
          Scale_6         =   8
          ClassName_8     =   "CCWScale"
          opts_8          =   90112
-         rMin_8          =   27
-         rMax_8          =   397
+         rMin_8          =   31
+         rMax_8          =   497
          dMax_8          =   10
          discInterval_8  =   1
          Radial_6        =   0
@@ -2750,8 +2750,8 @@ Begin VB.Form frmMSAlign
          Scale_13        =   15
          ClassName_15    =   "CCWScale"
          opts_15         =   122880
-         rMin_15         =   28
-         rMax_15         =   267
+         rMin_15         =   34
+         rMax_15         =   337
          dMax_15         =   10
          discInterval_15 =   1
          Radial_13       =   0
@@ -2927,7 +2927,7 @@ Begin VB.Form frmMSAlign
          bFont_39        =   -1  'True
          BeginProperty Font_39 {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
             Name            =   "MS Sans Serif"
-            Size            =   8.25
+            Size            =   7.8
             Charset         =   0
             Weight          =   400
             Underline       =   0   'False
@@ -5160,7 +5160,7 @@ End Sub
 
 Private Sub LoadPMTsFromFile()
     Dim OldPath As String
-    Dim i As Long
+    Dim I As Long
     Dim j As Integer
     Dim FileNum As Integer
     
@@ -5204,10 +5204,10 @@ On Error GoTo LoadPMTsFromFileErrorHandler
         Line Input #FileNum, strLineIn
                 
         strSplitLine = Split(strLineIn, ",")
-        For i = 0 To UBound(strSplitLine)
-            If i >= PMT_COLUMN_COUNT Then Exit For
-            dblTempPMTs(i, mLocalPMTCount) = val(strSplitLine(i))
-        Next i
+        For I = 0 To UBound(strSplitLine)
+            If I >= PMT_COLUMN_COUNT Then Exit For
+            dblTempPMTs(I, mLocalPMTCount) = val(strSplitLine(I))
+        Next I
         
         If dblTempPMTs(PMTColumnConstants.pccObservationCount, mLocalPMTCount) > UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount Then
             mLocalPMTCount = mLocalPMTCount + 1
@@ -5227,11 +5227,11 @@ On Error GoTo LoadPMTsFromFileErrorHandler
     
     txtPMTCountLoaded.Text = LongToStringWithCommas(mLocalPMTCount)
     ReDim mLocalPMTs(mLocalPMTCount - 1, PMT_COLUMN_COUNT - 1)
-    For i = 0 To mLocalPMTCount - 1
+    For I = 0 To mLocalPMTCount - 1
         For j = 0 To PMT_COLUMN_COUNT - 1
-            mLocalPMTs(i, j) = dblTempPMTs(j, i)
+            mLocalPMTs(I, j) = dblTempPMTs(j, I)
         Next j
-    Next i
+    Next I
 
     If mAbortRequested Then
         UpdateStatus "Aborted load"
@@ -5296,7 +5296,7 @@ End Sub
 
 Private Sub LoadLCMSFeaturesFromFile()
     Dim OldPath As String
-    Dim i As Long
+    Dim I As Long
     Dim j As Integer
     
     Dim strLineIn As String
@@ -5344,25 +5344,25 @@ On Error GoTo LoadLCMSFeaturesFromFileErrorHandler
      
         lngClassMemberCount = 0
         strSplitLine = Split(strLineIn, vbTab)
-        For i = 0 To UBound(strSplitLine)
-            Select Case i
+        For I = 0 To UBound(strSplitLine)
+            Select Case I
             Case UMCFileColumnConstants.ufcCenterScan
-                dblTempUMCs(FeatureColumnConstants.fccScanClassRep, mLocalFeatureCount) = val(strSplitLine(i))
+                dblTempUMCs(FeatureColumnConstants.fccScanClassRep, mLocalFeatureCount) = val(strSplitLine(I))
             Case UMCFileColumnConstants.ufcClassMonoisotopicMass
-                dblTempUMCs(FeatureColumnConstants.fccClassMass, mLocalFeatureCount) = val(strSplitLine(i))
+                dblTempUMCs(FeatureColumnConstants.fccClassMass, mLocalFeatureCount) = val(strSplitLine(I))
             Case UMCFileColumnConstants.ufcClassAbundance
-                dblTempUMCs(FeatureColumnConstants.fccClassAbundance, mLocalFeatureCount) = val(strSplitLine(i))
+                dblTempUMCs(FeatureColumnConstants.fccClassAbundance, mLocalFeatureCount) = val(strSplitLine(I))
                 
             Case UMCFileColumnConstants.ufcPairIndex
-                dblTempUMCs(FeatureColumnConstants.fccPairIndex, mLocalFeatureCount) = val(strSplitLine(i))
+                dblTempUMCs(FeatureColumnConstants.fccPairIndex, mLocalFeatureCount) = val(strSplitLine(I))
             Case UMCFileColumnConstants.ufcPMTTagID
-                dblTempUMCs(FeatureColumnConstants.fccPMTTagID, mLocalFeatureCount) = val(strSplitLine(i))
+                dblTempUMCs(FeatureColumnConstants.fccPMTTagID, mLocalFeatureCount) = val(strSplitLine(I))
             Case UMCFileColumnConstants.ufcUMCID
-                dblTempUMCs(FeatureColumnConstants.fccUMCID, mLocalFeatureCount) = val(strSplitLine(i))
+                dblTempUMCs(FeatureColumnConstants.fccUMCID, mLocalFeatureCount) = val(strSplitLine(I))
             Case UMCFileColumnConstants.ufcMemberCount
-                lngClassMemberCount = val(strSplitLine(i))
+                lngClassMemberCount = val(strSplitLine(I))
             End Select
-        Next i
+        Next I
         
         If lngClassMemberCount + 1 > min_scan_members Then
             mLocalFeatureCount = mLocalFeatureCount + 1
@@ -5382,11 +5382,11 @@ On Error GoTo LoadLCMSFeaturesFromFileErrorHandler
     
     txtFeatureCountLoaded.Text = LongToStringWithCommas(mLocalFeatureCount)
     ReDim mLocalFeatures(mLocalFeatureCount - 1, FEATURE_COLUMN_COUNT - 1)
-    For i = 0 To mLocalFeatureCount - 1
+    For I = 0 To mLocalFeatureCount - 1
         For j = 0 To FEATURE_COLUMN_COUNT - 1
-            mLocalFeatures(i, j) = dblTempUMCs(j, i)
+            mLocalFeatures(I, j) = dblTempUMCs(j, I)
         Next j
-    Next i
+    Next I
     
     mLocalFeaturesAreFiltered = False
 
@@ -7089,7 +7089,7 @@ End Sub
 
 Public Sub StartAlignment()
     Dim lngPMTCount As Long
-    Dim i As Long, j As Long
+    Dim I As Long, j As Long
     
     Dim lngObsCountFilterActual
     
@@ -7172,11 +7172,11 @@ On Error GoTo StartAlignmentErrorHandler
     ' Populate mLocalPMTsFiltered()
     ' First find the number of MT tags passing the observation count filter
     lngPMTCount = 0
-    For i = 0 To mLocalPMTCount - 1
-        If mLocalPMTs(i, PMTColumnConstants.pccObservationCount) >= UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount Then
+    For I = 0 To mLocalPMTCount - 1
+        If mLocalPMTs(I, PMTColumnConstants.pccObservationCount) >= UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount Then
             lngPMTCount = lngPMTCount + 1
         End If
-    Next i
+    Next I
     
     If lngPMTCount = 0 Then
         ' No MT tags match the filter; use all of them
@@ -7188,11 +7188,11 @@ On Error GoTo StartAlignmentErrorHandler
 
     ' Now determine the number of MT tags that will pass both the observation count filter and the mass and NET filters
     lngPMTCount = 0
-    For i = 0 To mLocalPMTCount - 1
-        If MTPassesFilters(i, lngObsCountFilterActual, blnUseNETFilter, dblNETMinimum, dblNETMaximum, blnUseMassFilter, dblMassMinimum, dblMassMaximum) Then
+    For I = 0 To mLocalPMTCount - 1
+        If MTPassesFilters(I, lngObsCountFilterActual, blnUseNETFilter, dblNETMinimum, dblNETMaximum, blnUseMassFilter, dblMassMinimum, dblMassMaximum) Then
             lngPMTCount = lngPMTCount + 1
         End If
-    Next i
+    Next I
     
     strFilterMessage = ""
     If blnUseMassFilter Or blnUseNETFilter Then
@@ -7225,14 +7225,14 @@ On Error GoTo StartAlignmentErrorHandler
     ' Now copy the valid data from mLocalPMTs into mLocalPMTsFiltered
     ' We will also apply the mass and NET filters at this time (if applicable)
     lngPMTCount = 0
-    For i = 0 To mLocalPMTCount - 1
-        If MTPassesFilters(i, lngObsCountFilterActual, blnUseNETFilter, dblNETMinimum, dblNETMaximum, blnUseMassFilter, dblMassMinimum, dblMassMaximum) Then
+    For I = 0 To mLocalPMTCount - 1
+        If MTPassesFilters(I, lngObsCountFilterActual, blnUseNETFilter, dblNETMinimum, dblNETMaximum, blnUseMassFilter, dblMassMinimum, dblMassMaximum) Then
             For j = 0 To PMT_COLUMN_COUNT - 1
-                mLocalPMTsFiltered(lngPMTCount, j) = mLocalPMTs(i, j)
+                mLocalPMTsFiltered(lngPMTCount, j) = mLocalPMTs(I, j)
             Next j
             lngPMTCount = lngPMTCount + 1
         End If
-    Next i
+    Next I
 
     ' Verify that mLocalPMTsFiltered was populated the way we expected it to be
     Debug.Assert UBound(mLocalPMTsFiltered, 1) = lngPMTCount - 1

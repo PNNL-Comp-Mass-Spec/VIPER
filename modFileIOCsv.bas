@@ -31,6 +31,8 @@ Private Const SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD As String = "peak_intensity_
 Private Const SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD As String = "peptide_intensity_threshold"
 Private Const SCANS_COLUMN_INFO As String = "info"
 Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE As String = "frame_pressure"
+Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_SMOOTHED As String = "framepressuresmoothed"
+Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_UNSMOOTHED As String = "framepressureunsmoothed"
 Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT As String = "frame_pressure_front"
 Private Const SCANS_COLUMN_IMS_FRAME_PRESSURE_BACK As String = "frame_pressure_back"
 
@@ -1885,10 +1887,12 @@ On Error GoTo ReadCSVScanFileErrorHandler
                             Case SCANS_COLUMN_PEAK_INTENSITY_THRESHOLD: intColumnMapping(ScanFileColumnConstants.PeakIntensityThreshold) = lngIndex
                             Case SCANS_COLUMN_PEPTIDE_INTENSITY_THRESHOLD: intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold) = lngIndex
                             Case SCANS_COLUMN_INFO: intColumnMapping(ScanFileColumnConstants.Info) = lngIndex
-                            Case SCANS_COLUMN_IMS_FRAME_PRESSURE, SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT
+                            Case SCANS_COLUMN_IMS_FRAME_PRESSURE, SCANS_COLUMN_IMS_FRAME_PRESSURE_FRONT, SCANS_COLUMN_IMS_FRAME_PRESSURE_SMOOTHED
                                 intColumnMapping(ScanFileColumnConstants.IMSFramePressureFront) = lngIndex
                             Case SCANS_COLUMN_IMS_FRAME_PRESSURE_BACK
                                 intColumnMapping(ScanFileColumnConstants.IMSFramePressureBack) = lngIndex
+                            Case SCANS_COLUMN_IMS_FRAME_PRESSURE_UNSMOOTHED
+                                ' Ignore this column
                             Case Else
                                 ' Unknown column header; ignore it, but post an entry to the analysis history
                                 If Len(strUnknownColumnList) > 0 Then
