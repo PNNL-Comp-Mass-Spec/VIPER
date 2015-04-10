@@ -1950,7 +1950,8 @@ Public Function LoadNewData(ByRef fso As FileSystemObject, _
                                            .LCMSFeaturePointsLoadMode, _
                                            .LCMSFeatureAbuMin, _
                                            .LCMSFeatureScanCountMin, _
-                                           .IMSConformerScoreMin)
+                                           .IMSConformerScoreMin, _
+                                           blnMSLevelFilter)
             End With
             
         Case ifmInputFileModeConstants.ifmmzXMLFile, ifmInputFileModeConstants.ifmmzXMLFileWithXMLExtension

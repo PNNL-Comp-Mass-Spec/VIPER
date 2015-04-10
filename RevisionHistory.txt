@@ -1,6 +1,12 @@
 VIPER Change Log
 
-Version 3.48 - Build 470; November 4, 2013
+Version 3.49 - Build 474; April 10, 2015
+	- Fix bug reporting UMC Drift Time when searching IMS data that was loaded from a _isos.csv file and searched without STAC
+
+Version 3.49 - Build 471; August 26, 2014
+	- Fixed bug in frmMSAlign that reset MassBinSizePPM and GANETBinSize to default values during auto-analysis, thus ignoring the value defined in the .ini file
+
+Version 3.49 - Build 470; November 4, 2013
 	- Recompiled due to new computer OS
 
 Version 3.49 - Build 469; February 5, 2013

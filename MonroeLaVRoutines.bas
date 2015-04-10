@@ -2089,7 +2089,7 @@ Public Function NitrogenCount(ByVal strSequenceOneLetter As String) As Long
             If strResidueSymbol <> "*" And strResidueSymbol <> "@" And strResidueSymbol <> "#" Then
                 ' Unknown symbol found
                 If Left(strSequenceOneLetter, 10) <> "NOSEQUENCE" Then
-                    Debug.Assert False
+                    ' Debug.Assert False
                 End If
             End If
         End Select

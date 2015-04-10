@@ -4,12 +4,12 @@ Begin VB.Form frmErrorDistribution2DLoadedData
    BackColor       =   &H00FFFFFF&
    Caption         =   "Tolerance Refinement (Mass and NET Error Plots)"
    ClientHeight    =   8460
-   ClientLeft      =   225
-   ClientTop       =   855
-   ClientWidth     =   13155
+   ClientLeft      =   192
+   ClientTop       =   816
+   ClientWidth     =   13152
    LinkTopic       =   "Form1"
    ScaleHeight     =   8460
-   ScaleWidth      =   13155
+   ScaleWidth      =   13152
    StartUpPosition =   3  'Windows Default
    Begin VB.Frame fraDriftTimeErrors 
       BackColor       =   &H00FFFFFF&
@@ -358,8 +358,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabIndex        =   136
          Top             =   1680
          Width           =   6855
-         _ExtentX        =   12091
-         _ExtentY        =   8493
+         _ExtentX        =   12086
+         _ExtentY        =   8488
       End
       Begin VB.Label lblMinimumUP 
          Alignment       =   1  'Right Justify
@@ -609,8 +609,8 @@ Begin VB.Form frmErrorDistribution2DLoadedData
          TabIndex        =   1
          Top             =   60
          Width           =   5415
-         _ExtentX        =   9551
-         _ExtentY        =   7911
+         _ExtentX        =   9546
+         _ExtentY        =   7916
          _Version        =   393216
          Style           =   1
          Tab             =   1

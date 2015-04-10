@@ -602,7 +602,7 @@ On Error GoTo SplitUMCsDoSplittingErrorHandler
                 .ClassCount = lngSplitIndexMemberIndex
                 
                 ' Update the MaxScan value
-                ' Need to dereference from the relative value to the true value using .ScanInfo()
+                ' Need to de-reference from the relative value to the true value using .ScanInfo()
                 .MaxScan = GelData(lngGelIndex).ScanInfo(lngMemberScanNumbersRelative(lngSplitIndexMemberIndex - 1)).ScanNumber
                 
                 ReDim Preserve .ClassMInd(0 To .ClassCount - 1)

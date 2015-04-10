@@ -320,7 +320,7 @@ Private Function GetDefaultIsosColumnHeaders(blnRequiredColumnsOnly As Boolean, 
     If blnIncludeIMSFileHeaders Then
         strHeaders = ISOS_COLUMN_MSFEATURE_ID & ", " & ISOS_COLUMN_FRAME_NUM & ", " & ISOS_COLUMN_IMS_SCAN_NUM
     Else
-        strHeaders = ISOS_COLUMN_MSFEATURE_ID & ", " & ISOS_COLUMN_SCAN_NUM_A
+        strHeaders = ISOS_COLUMN_SCAN_NUM_A
     End If
     
     If Not blnRequiredColumnsOnly Then
@@ -407,6 +407,21 @@ Private Function GetLCMSFeaturePointLoadModeText(ByVal plmPointsLoadMode As Inte
 
 End Function
 
+Private Function GetMSLevel(ByVal lngScanNumber As Long) As Integer
+
+    Dim lngScanIndex As Integer
+    Dim intMSLevel As Integer
+    
+    lngScanIndex = LookupScanNumberRelativeIndex(mGelIndex, lngScanNumber)
+    
+    If lngScanIndex > 0 Then
+        intMSLevel = GelData(mGelIndex).ScanInfo(lngScanIndex).ScanType
+    End If
+
+    GetMSLevel = intMSLevel
+    
+End Function
+
 Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Long, _
                            ByVal MaxFit As Double, _
                            ByVal blnFilterByAbundance As Boolean, _
@@ -421,7 +436,8 @@ Public Function LoadNewCSV(ByVal CSVFilePath As String, ByVal lngGelIndex As Lon
                            ByVal plmPointsLoadMode As Integer, _
                            ByVal dblLCMSFeatureAbuMin As Double, _
                            ByVal lngLCMSFeatureScanCountMin As Long, _
-                           ByVal dblIMSConformerScoreMin As Double) As Long
+                           ByVal dblIMSConformerScoreMin As Double, _
+                           ByRef blnMSLevelFilter() As Boolean) As Long
                            
     '-------------------------------------------------------------------------
     'Returns 0 if data successfuly loaded, -2 if data set is too large,
@@ -728,7 +744,8 @@ On Error GoTo LoadNewCSVErrorHandler
                                          plmPointsLoadMode, _
                                          objFeatureToScanMap, _
                                          objPointsToKeepSortedByPeak, _
-                                         objHashMapOfPointsKept)
+                                         objHashMapOfPointsKept, _
+                                         blnMSLevelFilter)
     
         If lngReturnValue = 0 Then
             If mLoadPredefinedLCMSFeatures Then
@@ -771,7 +788,8 @@ Private Function ReadCSVIsosFile(ByRef fso As FileSystemObject, ByVal strIsosFil
                                  ByVal plmPointsLoadMode As Integer, _
                                  ByRef objFeatureToScanMap As clsParallelLngArrays, _
                                  ByRef objPointsToKeep As clsParallelLngArrays, _
-                                 ByRef objHashMapOfPointsKept As clsParallelLngArrays) As Long
+                                 ByRef objHashMapOfPointsKept As clsParallelLngArrays, _
+                                 ByRef blnMSLevelFilter() As Boolean) As Long
 
     ' Returns 0 if no error, the error number if an error
 
@@ -896,7 +914,8 @@ On Error GoTo ReadCSVIsosFileErrorHandler
                                              plmPointsLoadMode, _
                                              objFeatureToScanMap, _
                                              objPointsToKeep, _
-                                             objHashMapOfPointsKept)
+                                             objHashMapOfPointsKept, _
+                                             blnMSLevelFilter)
         If lngReturnValue <> 0 Then
             ' Error occurred
             Debug.Assert False
@@ -1139,7 +1158,8 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
                                      ByVal plmPointsLoadMode As Integer, _
                                      ByRef objFeatureToScanMap As clsParallelLngArrays, _
                                      ByRef objPointsToKeep As clsParallelLngArrays, _
-                                     ByRef objHashMapOfPointsKept As clsParallelLngArrays) As Long
+                                     ByRef objHashMapOfPointsKept As clsParallelLngArrays, _
+                                     ByRef blnMSLevelFilter() As Boolean) As Long
     
     Dim tsInFile As TextStream
     Dim strLineIn As String
@@ -1152,6 +1172,11 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
     Dim lngFeatureIndex As Long
     Dim lngFeatureIndexCount As Long
     Dim lngFeatureIndexList() As Long
+    
+    ' intMSLevel stores the MSLevel for the current scan (1 for MS1, 2 for MS2)
+    ' lngMSLevelScanNumber is used to track which scan intMSLevel corresponds to (so that we don't have to lookup intMSLevel for every data point in the same scan)
+    Dim intMSLevel As Integer
+    Dim lngMSLevelScanNumber As Long
     
     Dim blnColumnsDefined As Boolean
     Dim blnDataLine As Boolean
@@ -1191,6 +1216,8 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
     End If
     
     lngLinesRead = 0
+    lngMSLevelScanNumber = -1
+    intMSLevel = 0
     
     ' This variable is used when loading data from LCMSFeature.txt files
     ' Need to start at 1 to remain consistent with .IsoLines starting at 1
@@ -1462,6 +1489,23 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                             End If
                         Else
                             blnValidDataPoint = False
+                        End If
+                        
+                        If blnValidScansFile And blnValidDataPoint Then
+                        
+                            If lngMSLevelScanNumber <> lngScanNumber Then
+                                intMSLevel = GetMSLevel(lngScanNumber)
+                                lngMSLevelScanNumber = lngScanNumber
+                            End If
+                        
+                            If intMSLevel > 0 And Not blnMSLevelFilter(0) Then
+                                If intMSLevel > UBound(blnMSLevelFilter) Then
+                                    blnValidDataPoint = False
+                                Else
+                                    blnValidDataPoint = blnMSLevelFilter(intMSLevel)
+                                End If
+                            End If
+                            
                         End If
                     End If
                
@@ -1771,7 +1815,12 @@ Private Sub ReadCSVIsosFilePostFilterPreviousScan(ByVal lngIsoDataCurrentScanCou
     
 End Sub
                                 
-Private Function ReadCSVScanFile(ByRef fso As FileSystemObject, ByVal strScansFilePath As String, ByVal strBaseFilePath As String, ByRef dblTotalBytesRead As Double, ByVal dblByteCountTotal As Double) As Long
+Private Function ReadCSVScanFile(ByRef fso As FileSystemObject, _
+                                 ByVal strScansFilePath As String, _
+                                 ByVal strBaseFilePath As String, _
+                                 ByRef dblTotalBytesRead As Double, _
+                                 ByVal dblByteCountTotal As Double) As Long
+                                 
     ' Returns 0 if no error, the error number if an error
 
     Dim tsInFile As TextStream
@@ -1935,47 +1984,46 @@ On Error GoTo ReadCSVScanFileErrorHandler
                 strData = Split(strLineIn, ",")
                 intScanType = CInt(GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.ScanType), 1))
     
-                If intScanType <= 1 Then
-                    mScanInfoCount = mScanInfoCount + 1
-                    If mScanInfoCount > UBound(.ScanInfo) Then
-                        ReDim Preserve .ScanInfo(UBound(.ScanInfo) + SCAN_INFO_DIM_CHUNK)
-                    End If
-                    
-                    ' Update the scan Info data
-                    With .ScanInfo(mScanInfoCount)
-                        .ScanNumber = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.ScanNumber), 0)
-                        .ElutionTime = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.ScanTime), 0)
-                        If .ElutionTime > sngMaxElutionTime Then sngMaxElutionTime = .ElutionTime
-                        
-                        .ScanType = intScanType
-                        If .ScanType < 1 Then .ScanType = 1
-    
-                        .ScanFileName = strBaseFilePath & "." & Format(.ScanNumber, "00000")
-                        .ScanPI = 0
-    
-                        .NumDeisotoped = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.NumDeisotoped), 0)
-                        .NumPeaks = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.NumPeaks), 0)
-                        
-                        .TIC = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.TIC), 0)
-                        .BPI = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.BPI), 0)
-                        .BPImz = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.BPImz), 0)
-    
-                        .TimeDomainSignal = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.TimeDomainSignal), 0)
-    
-                        .PeakIntensityThreshold = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.PeakIntensityThreshold), 0)
-                        .PeptideIntensityThreshold = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold), 0)
-    
-                        ' Note: Not reading the Info column
-                        
-                        .FrequencyShift = 0
-                    
-                        .IMSFramePressure = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.IMSFramePressureFront), 0)
-                        
-                        ' Note: Not reading IMSFramePressureBack
-                        ' .IMSFramePressureBack = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.IMSFramePressureBack), 0)
-                    
-                    End With
+                mScanInfoCount = mScanInfoCount + 1
+                If mScanInfoCount > UBound(.ScanInfo) Then
+                    ReDim Preserve .ScanInfo(UBound(.ScanInfo) + SCAN_INFO_DIM_CHUNK)
                 End If
+                
+                ' Update the scan Info data
+                With .ScanInfo(mScanInfoCount)
+                    .ScanNumber = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.ScanNumber), 0)
+                    .ElutionTime = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.ScanTime), 0)
+                    If .ElutionTime > sngMaxElutionTime Then sngMaxElutionTime = .ElutionTime
+                    
+                    .ScanType = intScanType
+                    If .ScanType < 1 Then .ScanType = 1
+
+                    .ScanFileName = strBaseFilePath & "." & Format(.ScanNumber, "00000")
+                    .ScanPI = 0
+
+                    .NumDeisotoped = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.NumDeisotoped), 0)
+                    .NumPeaks = GetColumnValueLng(strData, intColumnMapping(ScanFileColumnConstants.NumPeaks), 0)
+                    
+                    .TIC = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.TIC), 0)
+                    .BPI = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.BPI), 0)
+                    .BPImz = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.BPImz), 0)
+
+                    .TimeDomainSignal = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.TimeDomainSignal), 0)
+
+                    .PeakIntensityThreshold = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.PeakIntensityThreshold), 0)
+                    .PeptideIntensityThreshold = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.PeptideIntensityThreshold), 0)
+
+                    ' Note: Not reading the Info column
+                    
+                    .FrequencyShift = 0
+                
+                    .IMSFramePressure = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.IMSFramePressureFront), 0)
+                    
+                    ' Note: Not reading IMSFramePressureBack
+                    ' .IMSFramePressureBack = GetColumnValueSng(strData, intColumnMapping(ScanFileColumnConstants.IMSFramePressureBack), 0)
+                
+                End With
+                
             End If
         
         Loop

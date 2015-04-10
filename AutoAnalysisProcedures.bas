@@ -3379,6 +3379,7 @@ On Error GoTo PerformNETAdjustmentErrorHandler
                     GelAnalysis(udtWorkingParams.GelIndex).GANET_Intercept = GelUMCNETAdjDef(udtWorkingParams.GelIndex).InitialIntercept
                     ' Need to assign a non-zero value to GANET_Fit; we'll assign 1.11E-3 with all 1's so it stands out
                     GelAnalysis(udtWorkingParams.GelIndex).GANET_Fit = 1.11111111111111E-03
+                    GelData(udtWorkingParams.GelIndex).CustomNETsDefined = False
                     blnSkipGANETComputation = True
                 End If
             End If

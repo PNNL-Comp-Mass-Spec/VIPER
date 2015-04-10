@@ -34,10 +34,6 @@ section below for more info).
 
 Double click the VIPER_Installer.msi file to install.  The application will be 
 installed, along with the LCMSFeatureFinder.exe program (and required DLLs).  
-Note that the LCMSFeatureFinder requires that the Microsoft .NET Framework v1.1 
-be installed. See http://msdn2.microsoft.com/en-us/netframework/aa569264.aspx 
-for instructions on how to validate that the Framework is installed.  Follow 
-this link to install it: http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=262D25E3-F589-4842-8157-034D1E7CF3A3
 
 The shortcut for starting VIPER can be found at Start Menu -> Programs -> PAST Toolkit -> VIPER
 

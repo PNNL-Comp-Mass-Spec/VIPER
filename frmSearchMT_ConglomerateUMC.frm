@@ -1,16 +1,16 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Object = "{D940E4E4-6079-11CE-88CB-0020AF6845F6}#1.6#0"; "cwui.ocx"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
 Begin VB.Form frmSearchMT_ConglomerateUMC 
    BackColor       =   &H00FFFFFF&
    Caption         =   "Search MT tag DB - Single LC-MS Feature Mass"
-   ClientHeight    =   8385
+   ClientHeight    =   8376
    ClientLeft      =   60
-   ClientTop       =   630
-   ClientWidth     =   14025
+   ClientTop       =   636
+   ClientWidth     =   14028
    LinkTopic       =   "Form1"
-   ScaleHeight     =   8385
-   ScaleWidth      =   14025
+   ScaleHeight     =   8376
+   ScaleWidth      =   14028
    StartUpPosition =   1  'CenterOwner
    Begin VB.CheckBox chkSTACAlignsDriftTime 
       BackColor       =   &H00FFFFFF&
@@ -164,7 +164,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       _StockProps     =   71
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "MS Sans Serif"
-         Size            =   9.75
+         Size            =   9.61
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -206,8 +206,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Scale_6         =   8
       ClassName_8     =   "CCWScale"
       opts_8          =   90112
-      rMin_8          =   43
-      rMax_8          =   210
+      rMin_8          =   51
+      rMax_8          =   266
       dMax_8          =   1
       discInterval_8  =   1
       Radial_6        =   0
@@ -241,8 +241,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Scale_13        =   15
       ClassName_15    =   "CCWScale"
       opts_15         =   122880
-      rMin_15         =   28
-      rMax_15         =   187
+      rMin_15         =   34
+      rMax_15         =   237
       dMax_15         =   10
       discInterval_15 =   1
       Radial_13       =   0
@@ -309,8 +309,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       Scale_22        =   24
       ClassName_24    =   "CCWScale"
       opts_24         =   90112
-      rMin_24         =   28
-      rMax_24         =   187
+      rMin_24         =   34
+      rMax_24         =   237
       dMax_24         =   1
       discInterval_24 =   1
       Radial_22       =   0
@@ -458,7 +458,7 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       bFont_46        =   -1  'True
       BeginProperty Font_46 {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "MS Sans Serif"
-         Size            =   8.25
+         Size            =   7.8
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -510,8 +510,8 @@ Begin VB.Form frmSearchMT_ConglomerateUMC
       TabIndex        =   66
       Top             =   360
       Width           =   3975
-      _ExtentX        =   7011
-      _ExtentY        =   5318
+      _ExtentX        =   7006
+      _ExtentY        =   5313
       View            =   3
       LabelEdit       =   1
       MultiSelect     =   -1  'True
@@ -1580,7 +1580,7 @@ Public Sub AutoSizeForm(Optional ByVal blnSizeForSTACPlotSave As Boolean = False
             End If
         Else
             fraDriftTime.Visible = False
-            fraMods.Top = fraNet.Top + fraNet.Height + 10
+            fraMods.Top = fraNET.Top + fraNET.Height + 10
             If Me.UseSTAC Then
                 lngMinimumHeight = 8500
             Else
@@ -2274,28 +2274,28 @@ Private Function ExportMTDBbyUMCToUMCResultsTable(ByRef lngMDID As Long, Optiona
     Dim strExportStatus As String
     
     'ADO objects for stored procedure adding Match Making row
-    Dim cnNew As New adodb.Connection
+    Dim cnNew As New ADODB.Connection
     
     Dim sngDBSchemaVersion As Single
     
     'ADO objects for stored procedure that adds FTICR UMC rows
-    Dim cmdPutNewUMC As New adodb.Command
+    Dim cmdPutNewUMC As New ADODB.Command
     Dim udtPutUMCParams As udtPutUMCParamsListType
         
     'ADO objects for stored procedure that adds FTICR UMC member rows
-    Dim cmdPutNewUMCMember As New adodb.Command
+    Dim cmdPutNewUMCMember As New ADODB.Command
     Dim udtPutUMCMemberParams As udtPutUMCMemberParamsListType
         
     'ADO objects for stored procedure adding FTICR UMC Details
-    Dim cmdPutNewUMCMatch As New adodb.Command
+    Dim cmdPutNewUMCMatch As New ADODB.Command
     Dim udtPutUMCMatchParams As udtPutUMCMatchParamsListType
     
     'ADO objects for stored procedure adding FTICR UMC Internal Standard Details
-    Dim cmdPutNewUMCInternalStdMatch As New adodb.Command
+    Dim cmdPutNewUMCInternalStdMatch As New ADODB.Command
     Dim udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType
     
     'ADO objects for stored procedure adding FTICR UMC CS Stats
-    Dim cmdPutNewUMCCSStats As New adodb.Command
+    Dim cmdPutNewUMCCSStats As New ADODB.Command
     Dim udtPutUMCCSStatsParams As udtPutUMCCSStatsParamsListType
     
     Dim blnUMCMatchFound() As Boolean       ' 0-based array, used to keep track of whether or not the UMC matched any MT tags or Internal Standards
@@ -2706,7 +2706,7 @@ ExportMTDBbyUMCToUMCResultsTable = "Error: " & lngErrorNumber & vbCrLf & Err.Des
 
 End Function
 
-Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRef udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType, ByRef cmdPutNewUMCInternalStdMatch As adodb.Command, ByRef udtPutUMCMatchParams As udtPutUMCMatchParamsListType, cmdPutNewUMCMatch As adodb.Command)
+Private Function ExportMTDBbyUMCToUMCResultDetailsTable(lngPointer As Long, ByRef udtPutUMCInternalStdMatchParams As udtPutUMCInternalStdMatchParamsListType, ByRef cmdPutNewUMCInternalStdMatch As ADODB.Command, ByRef udtPutUMCMatchParams As udtPutUMCMatchParamsListType, cmdPutNewUMCMatch As ADODB.Command)
 
     Dim lngInternalStdIndexOriginal As Long
     Dim lngMassTagIndexPointer As Long, lngMassTagIndexOriginal As Long
@@ -2847,11 +2847,11 @@ ExecutePutIntStdErrorHandler:
 
 End Function
  
-Private Sub ExportMTDBStoreSTACStats(ByRef cnNew As adodb.Connection, ByVal lngMDID As Long)
+Private Sub ExportMTDBStoreSTACStats(ByRef cnNew As ADODB.Connection, ByVal lngMDID As Long)
 
     ' Adds new rows to the T_Match_Making_FDR table
  
-    Dim cmdStoreSTACStats As New adodb.Command
+    Dim cmdStoreSTACStats As New ADODB.Command
     Dim udtStoreSTACStatsParams As udtStoreSTACStatsParamsListType
     
     Dim lngIndex As Long
@@ -3250,8 +3250,10 @@ Private Sub InitializeDriftTimeMapping(ByRef dblDriftTimeMapOriginal() As Double
     blnCreateDriftTimeMap = False
     For lngIndex = 0 To mMatchStatsCount - 1
         If mUMCMatchStats(lngIndex).DriftTimeAligned > 0 Then
-            blnCreateDriftTimeMap = True
-            Exit For
+            If GelUMC(CallerID).UMCs(mUMCMatchStats(lngIndex).UMCIndex).DriftTime > 0 Then
+                blnCreateDriftTimeMap = True
+                Exit For
+            End If
         End If
     Next lngIndex
 
@@ -5370,15 +5372,16 @@ On Error GoTo RecordSearchResultsInDataErrorHandler
                 sngMatchDriftTime = CSng(AMTData(lngMassTagIndexOriginal).Drift_Time_Avg)
                 blnIncludeDriftTimeError = blnDriftTimesWereUsed
                     
-                If mUMCMatchStats(lngIndex).DriftTimeAligned > 0 Then
+                If mUMCMatchStats(lngIndex).DriftTimeAligned > 0 And GelUMC(CallerID).UMCs(lngUMCIndexOriginal).DriftTime > 0 Then
                     ' Compute the distance that drift times tracked by VIPER need to be shifted to obtain the correct drift time relative to the AMT tags in memory
                     sngDriftTimeCorrectionFromSTAC = mUMCMatchStats(lngIndex).DriftTimeAligned - GelUMC(CallerID).UMCs(lngUMCIndexOriginal).DriftTime
                 Else
                     ' This should typically only happen if blnDriftTimesWereUsed is false
                     ' However, if the database doesn't have any conformers, then this will happen for every search result
+                    ' Alternatively, if we don't use STAC, you will also reach this warning for every search results
                     
                     lngMissingDriftTimeWarningCount = lngMissingDriftTimeWarningCount + 1
-                    If lngMissingDriftTimeWarningCount < 5 Then
+                    If lngMissingDriftTimeWarningCount < 3 Then
                         Debug.Assert blnDriftTimesWereUsed = False
                     End If
                     
@@ -5751,7 +5754,7 @@ If ManageCurrID(MNG_RESET) Then
     If blnProceed Then
         If eInternalStdSearchMode <> issmFindOnlyInternalStandards Then
             ' Search for the MT tags using broad tolerances
-            SearchUMCSingleMassAMT GelUMC(CallerID).UMCs(ClassInd), MWTolAbsBroad, NETTolBroad, dblDriftTimeTol
+            SearchUMCSingleMassAMT GelUMC(CallerID).UMCs(ClassInd), ClassInd, MWTolAbsBroad, NETTolBroad, dblDriftTimeTol
         End If
         ' MassTagHitCount holds the number of matching MT tags, excluding Internal Standards
         MassTagHitCount = mCurrIDCnt
@@ -5762,7 +5765,7 @@ If ManageCurrID(MNG_RESET) Then
     
     If eInternalStdSearchMode <> issmFindOnlyMassTags Then
         ' Search for Internal Standards using broad tolerances
-        SearchUMCSingleMassInternalStd GelUMC(CallerID).UMCs(ClassInd), MWTolAbsBroad, NETTolBroad, dblDriftTimeTol
+        SearchUMCSingleMassInternalStd GelUMC(CallerID).UMCs(ClassInd), ClassInd, MWTolAbsBroad, NETTolBroad, dblDriftTimeTol
     End If
      
     If mCurrIDCnt > 0 Then
@@ -5802,7 +5805,7 @@ err_SearchUMCSingleMass:
     SearchUMCSingleMass = -1
 End Function
 
-Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTol As Double, ByVal dblNETTol As Double, ByVal dblDriftTimeTol As Double)
+Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal lngClassIndex As Long, ByVal dblMWTol As Double, ByVal dblNETTol As Double, ByVal dblDriftTimeTol As Double)
     ' Compare this LC-MS Feature's mass, NET, and charge with the MT tags
 
     Dim FastSearchMatchInd As Long
@@ -5828,7 +5831,7 @@ Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTo
                     dblAMTDriftTime = AMTData(mMTOrInd(mMTInd(FastSearchMatchInd))).Drift_Time_Avg
                 End If
                 
-                SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, dblDriftTimeTol, udtTestUMC, dblAMTMass, dblAMTNET, dblAMTDriftTime, False
+                SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, dblDriftTimeTol, udtTestUMC, lngClassIndex, dblAMTMass, dblAMTNET, dblAMTDriftTime, False
             
             Next FastSearchMatchInd
         End If
@@ -5836,7 +5839,7 @@ Private Sub SearchUMCSingleMassAMT(ByRef udtTestUMC As udtUMCType, ByVal dblMWTo
 
 End Sub
 
-Private Sub SearchUMCSingleMassInternalStd(ByRef udtTestUMC As udtUMCType, ByVal dblMWTol As Double, ByVal dblNETTol As Double, ByVal dblDriftTimeTol As Double)
+Private Sub SearchUMCSingleMassInternalStd(ByRef udtTestUMC As udtUMCType, ByVal lngClassIndex As Long, ByVal dblMWTol As Double, ByVal dblNETTol As Double, ByVal dblDriftTimeTol As Double)
     ' Compare this LC-MS Feature's mass, NET, and charge with the Internal Standard in UMCInternalStandards
 
     Dim FastSearchMatchInd As Long
@@ -5860,7 +5863,7 @@ Private Sub SearchUMCSingleMassInternalStd(ByRef udtTestUMC As udtUMCType, ByVal
                 If SearchUMCTestCharge(udtTestUMC.ClassRepType, udtTestUMC.ClassRepInd, udtInternalStd) Then
                     'dblInternalStandardDriftTime = ??
                     'SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, dblDriftTimeTol, udtTestUMC, udtInternalStd.MonoisotopicMass, udtInternalStd.NET, dblInternalStandardDriftTime, True
-                    SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, -1, udtTestUMC, udtInternalStd.MonoisotopicMass, udtInternalStd.NET, 0, True
+                    SearchUMCSingleMassValidate FastSearchMatchInd, dblMWTol, dblNETTol, -1, udtTestUMC, lngClassIndex, udtInternalStd.MonoisotopicMass, udtInternalStd.NET, 0, True
                 End If
                 
             Next FastSearchMatchInd
@@ -5870,7 +5873,7 @@ Private Sub SearchUMCSingleMassInternalStd(ByRef udtTestUMC As udtUMCType, ByVal
 End Sub
 
 Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal dblMWTol As Double, ByVal dblNETTol As Double, ByVal dblDriftTimeTol As Double, _
-                                        ByRef udtTestUMC As udtUMCType, ByVal dblAMTMass As Double, ByVal dblAMTNET As Double, ByRef dblAMTDriftTime, _
+                                        ByRef udtTestUMC As udtUMCType, ByVal lngClassIndex As Long, ByVal dblAMTMass As Double, ByVal dblAMTNET As Double, ByRef dblAMTDriftTime, _
                                         ByVal blnIsInternalStdMatch As Boolean)
                                         
     ' Note: This sub is called by both SearchUMCSingleMassAMT and SearchUMCSingleMassInternalStd
@@ -5928,7 +5931,12 @@ Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal 
                     
                     ' Note that .FeatureDriftTimeAligned will simply be the orginal drift time of the UMC since VIPER doesn't compute aligned drift times
                     ' In contrast, STAC performs an alignment and thus computes an improved drift time
-                    mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned = .DriftTime
+                    If .DriftTime = 0 Then
+                        mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned = ClsStat(lngClassIndex, ustDriftTime)
+                        Debug.Assert Math.Abs(dblAMTDriftTime + dblDriftTimeDifference - mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned) < 0.05
+                    Else
+                        mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned = .DriftTime
+                    End If
                     
                     If dblDriftTimeTol > 0 Then
                         ' This will be true if STAC was used; not if VIPER was used
@@ -7451,7 +7459,11 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             strLineOut = strLineOut & Round(.ClassMWStD, 6) & strSepChar & .MinMW & strSepChar & .MaxMW & strSepChar & .ClassAbundance & strSepChar & dblClassRepAbundance & strSepChar
             
             If mMTListContainsConformers Then
-                strLineOut = strLineOut & Round(.DriftTime, 3) & strSepChar
+                If .DriftTime = 0 Then
+                    strLineOut = strLineOut & Round(dblDriftTimeClassRep, 3) & strSepChar
+                Else
+                    strLineOut = strLineOut & Round(.DriftTime, 3) & strSepChar
+                End If
             End If
     
             If blnIMSDataPresent Then
@@ -7510,8 +7522,12 @@ On Error GoTo ShowOrSaveResultsByUMCErrorHandler
             dblMassErrorPPM = MassToPPM(.ClassMW - dblMatchMass, .ClassMW)
             dblGANETError = dblGANETClassRep - dblMatchNET
             
-            ' Note: use .DriftTimeAligned and not dblDriftTimeClassRep
-            dblDriftTimeError = mUMCMatchStats(mgInd).DriftTimeAligned - dblMTDriftTime
+            If mUMCMatchStats(mgInd).DriftTimeAligned = 0 Then
+                dblDriftTimeError = dblDriftTimeClassRep - dblMTDriftTime
+            Else
+                ' Note: use .DriftTimeAligned and not dblDriftTimeClassRep
+                dblDriftTimeError = mUMCMatchStats(mgInd).DriftTimeAligned - dblMTDriftTime
+            End If
         End With
 
         strLineOutEnd = strLineOutEnd & strMatchID & strSepChar & Round(dblMatchMass, 6) & strSepChar

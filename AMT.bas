@@ -243,7 +243,7 @@ Public Type udtAMTDataType
     CNT_Cys As Integer                  'count of Cysteines
     HighNormalizedScore As Single       'High normalized score (typically XCorr)
     HighDiscriminantScore As Single     'High discriminant score
-    PeptideProphetProbability As Single 'High Peptide Prophet Probability
+    PeptideProphetProbability As Single 'High Peptide Prophet Probability.  In AMT tag databases created after ~2013, this value in the database is computed as (1 - T_Score_MSGFDB.PValue)
     Sequence As String                  'peptide sequences;
     
     Conformer_ID As Long                ' IMS conformer ID
