@@ -603,6 +603,7 @@ On Error GoTo LoadNewPEKErrorHandler
                 .MaximumDataCountToLoad = mMaximumDataCountToLoad
                 .TotalIntensityPercentageFilterEnabled = mTotalIntensityPercentageFilterEnabled
                 .TotalIntensityPercentageFilter = mTotalIntensityPercentageFilter
+                .GelIndex = mGelIndex
             End With
             
             mSubtaskMessage = "Pre-scanning PEK file to determine data to load"

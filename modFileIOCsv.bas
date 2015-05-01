@@ -409,7 +409,7 @@ End Function
 
 Private Function GetMSLevel(ByVal lngScanNumber As Long) As Integer
 
-    Dim lngScanIndex As Integer
+    Dim lngScanIndex As Long
     Dim intMSLevel As Integer
     
     lngScanIndex = LookupScanNumberRelativeIndex(mGelIndex, lngScanNumber)
@@ -883,6 +883,7 @@ On Error GoTo ReadCSVIsosFileErrorHandler
                 .MaximumDataCountToLoad = mMaximumDataCountToLoad
                 .TotalIntensityPercentageFilterEnabled = mTotalIntensityPercentageFilterEnabled
                 .TotalIntensityPercentageFilter = mTotalIntensityPercentageFilter
+                .GelIndex = mGelIndex
             End With
             
             mSubtaskMessage = "Pre-scanning Isotopic CSV file to determine data to load"
@@ -1651,8 +1652,12 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
     Loop
     
     If mReadMode <> rmReadModeConstants.rmPrescanData Then
+    
+        ' This is usually true, but may not be true if over 2,883,200 data points were read and data was removed using ScrubLowAbundanceData
+        
         Debug.Assert GelData(mGelIndex).IsoLines = mValidDataPointCount
-        AddToAnalysisHistory mGelIndex, "Processed " & Format(GelData(mGelIndex).LinesRead, "0,000") & " isotopic data lines; retained " & Format(mValidDataPointCount, "0,000") & " data points"
+        
+        AddToAnalysisHistory mGelIndex, "Processed " & Format(GelData(mGelIndex).LinesRead, "0,000") & " isotopic data lines; retained " & Format(GelData(mGelIndex).IsoLines, "0,000") & " data points"
     
         ' Sort the data in objHashMapOfPointsKept
         objHashMapOfPointsKept.SortNow

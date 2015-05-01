@@ -1,5 +1,12 @@
 VIPER Change Log
 
+Version 3.49 - Build 476; May 1, 2015
+	- Fix overflow bug in GetMSLevel
+	- clsFileIOPrescannedData now caches at most 2,883,200 data points
+
+Version 3.49 - Build 475; April 19, 2015
+	- Now checking for UMC Member Count being larger than 32767 when calling stored procedure AddFTICRUmcCSStats
+
 Version 3.49 - Build 474; April 10, 2015
 	- Fix bug reporting UMC Drift Time when searching IMS data that was loaded from a _isos.csv file and searched without STAC
 

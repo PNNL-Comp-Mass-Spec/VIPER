@@ -1387,7 +1387,10 @@ On Error GoTo AddUMCCSStatsErrorHandler
         For intChargeIndex = 0 To .ChargeStateCount - 1
                 
             udtPutUMCCSStatsParams.ChargeState = .ChargeStateBasedStats(intChargeIndex).Charge
-            udtPutUMCCSStatsParams.MemberCount = .ChargeStateBasedStats(intChargeIndex).Count
+            
+            ' This is stored as a 32-bit integer in the database; cap the class count at 32767
+            udtPutUMCCSStatsParams.MemberCount = AssureInt32(.ChargeStateBasedStats(intChargeIndex).Count)
+            
             udtPutUMCCSStatsParams.MonoisotopicMass = Round(.ChargeStateBasedStats(intChargeIndex).Mass, MASS_PRECISION)
             udtPutUMCCSStatsParams.Abundance = .ChargeStateBasedStats(intChargeIndex).Abundance
             

@@ -5933,7 +5933,9 @@ Private Sub SearchUMCSingleMassValidate(ByVal FastSearchMatchInd As Long, ByVal 
                     ' In contrast, STAC performs an alignment and thus computes an improved drift time
                     If .DriftTime = 0 Then
                         mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned = ClsStat(lngClassIndex, ustDriftTime)
-                        Debug.Assert Math.Abs(dblAMTDriftTime + dblDriftTimeDifference - mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned) < 0.05
+                        If dblDriftTimeTol > 0 Then
+                            Debug.Assert Math.Abs(dblAMTDriftTime + dblDriftTimeDifference - mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned) < 0.05
+                        End If
                     Else
                         mCurrIDMatches(mCurrIDCnt).FeatureDriftTimeAligned = .DriftTime
                     End If

@@ -44,35 +44,45 @@ Private mPrescanDataAbundances() As Single
 Private mPrescanDataCharges() As Integer
 Private mPrescanDataIndices() As Long
 
+Private mGelIndex As Integer
+Private mDataScrubbed As Boolean
+
 Private mMaximumDataCountEnabled As Boolean
 Private mMaximumDataCountToLoad As Long
 
 Private mTotalIntensityPercentageFilterEnabled As Boolean
 Private mTotalIntensityPercentageFilter As Single
 
+Public Property Get GelIndex() As Integer
+    GelIndex = mGelIndex
+End Property
+Public Property Let GelIndex(value As Integer)
+    mGelIndex = value
+End Property
+
 Public Property Get MaximumDataCountEnabled() As Boolean
     MaximumDataCountEnabled = mMaximumDataCountEnabled
 End Property
-Public Property Let MaximumDataCountEnabled(Value As Boolean)
-    mMaximumDataCountEnabled = Value
+Public Property Let MaximumDataCountEnabled(value As Boolean)
+    mMaximumDataCountEnabled = value
 End Property
 
-Public Property Let MaximumDataCountToLoad(Value As Long)
-    mMaximumDataCountToLoad = Value
+Public Property Let MaximumDataCountToLoad(value As Long)
+    mMaximumDataCountToLoad = value
 End Property
 Public Property Get MaximumDataCountToLoad() As Long
     MaximumDataCountToLoad = mMaximumDataCountToLoad
 End Property
 
-Public Property Let TotalIntensityPercentageFilterEnabled(Value As Boolean)
-    mTotalIntensityPercentageFilterEnabled = Value
+Public Property Let TotalIntensityPercentageFilterEnabled(value As Boolean)
+    mTotalIntensityPercentageFilterEnabled = value
 End Property
 Public Property Get TotalIntensityPercentageFilterEnabled() As Boolean
     TotalIntensityPercentageFilterEnabled = mTotalIntensityPercentageFilterEnabled
 End Property
 
-Public Property Let TotalIntensityPercentageFilter(Value As Single)
-    mTotalIntensityPercentageFilter = Value
+Public Property Let TotalIntensityPercentageFilter(value As Single)
+    mTotalIntensityPercentageFilter = value
 End Property
 Public Property Get TotalIntensityPercentageFilter() As Single
     TotalIntensityPercentageFilter = mTotalIntensityPercentageFilter
@@ -82,9 +92,22 @@ End Property
 Public Sub AddDataPoint(sngAbundance As Single, intCharge As Integer, lngDataPointIndex As Long)
     
     If mPrescanDataCount >= UBound(mPrescanDataAbundances) Then
-        ReDim Preserve mPrescanDataAbundances(UBound(mPrescanDataAbundances) * 1.5)
-        ReDim Preserve mPrescanDataCharges(UBound(mPrescanDataAbundances))
-        ReDim Preserve mPrescanDataIndices(UBound(mPrescanDataAbundances))
+        ' Reserve more memory
+        ' However, since we ultimately cannot process more than ~2 million data points,
+        ' if we have over 2.8 million data points, we will remove data to bring us back down to 2.25 million points tracked
+        
+        ' Since we multiply by 1.5 the amount reserved will follow this series:
+        ' 50000, 75000,  112500, 168750,  253125,  379688,  569531,  854297
+        ' 1281445, 1922170, 2883255
+
+        If mPrescanDataCount > 2883200 Then
+            ScrubLowAbundanceData (2250000)
+        Else
+            ReDim Preserve mPrescanDataAbundances(UBound(mPrescanDataAbundances) * 1.5)
+            ReDim Preserve mPrescanDataCharges(UBound(mPrescanDataAbundances))
+            ReDim Preserve mPrescanDataIndices(UBound(mPrescanDataAbundances))
+        End If
+        
     End If
     
     mPrescanDataAbundances(mPrescanDataCount) = sngAbundance
@@ -95,6 +118,9 @@ Public Sub AddDataPoint(sngAbundance As Single, intCharge As Integer, lngDataPoi
 End Sub
 
 Public Sub Clear()
+    ' Note: if you change this value you will need to adjust the limits
+    ' used in AddDataPoint for deciding when to remove data because we're
+    ' now tracking too many data points
     Const INITIAL_MEMORY_RESERVE As Long = 50000
 
     mMaximumDataCountEnabled = False
@@ -114,8 +140,11 @@ Public Function GetAbundanceByIndex(lngDataPointIndex As Long) As Single
         GetAbundanceByIndex = mPrescanDataAbundances(lngDataPointIndex)
     Else
         ' Invalid data point index value
+        ' This will happen if ScrubLowAbundanceData was called
         GetAbundanceByIndex = -1
-        Debug.Assert False
+        If Not mDataScrubbed Then
+            Debug.Assert False
+        End If
     End If
 End Function
 
@@ -490,6 +519,48 @@ Public Sub PrescannedDataSortAndMarkPointsToSkip(ByRef sngAbundances() As Single
     
     frmProgress.UpdateSubtaskProgressBar 3 / intSubtaskStepCount * 100#
     
+End Sub
+
+Private Sub ScrubLowAbundanceData(ByVal targetDataCount As Long)
+
+    Dim maxDataCountSaved As Long
+    maxDataCountSaved = mMaximumDataCountToLoad
+    
+    mMaximumDataCountToLoad = targetDataCount
+    
+    FilterDataByMaxDataCountToLoad
+
+    ' Remove data from the arrays (copy in place)
+    
+    Dim index As Long
+    Dim targetIndex As Long
+    targetIndex = 0
+    
+    For index = 0 To targetDataCount - 1
+        If mPrescanDataAbundances(index) > 0 Then
+            mPrescanDataAbundances(targetIndex) = mPrescanDataAbundances(index)
+            mPrescanDataCharges(targetIndex) = mPrescanDataCharges(index)
+            mPrescanDataIndices(targetIndex) = mPrescanDataIndices(index)
+            targetIndex = targetIndex + 1
+        End If
+    Next index
+    
+    AddToAnalysisHistory mGelIndex, "Culled excess pre-scanned data points down from " & mPrescanDataCount & " points to " & targetIndex & " points to avoid out-of-memory errors"
+    
+    ' Update mPrescanDataCount with the number of non-zero data points that were kept
+    mPrescanDataCount = targetIndex
+    mDataScrubbed = True
+    
+    ' Zero out the remaining points just to be safe (shouldn't really be necessary, but doesn't hurt)
+    Do While targetIndex <= UBound(mPrescanDataAbundances)
+        mPrescanDataAbundances(targetIndex) = 0
+        mPrescanDataCharges(targetIndex) = 0
+        mPrescanDataIndices(targetIndex) = 0
+        targetIndex = targetIndex + 1
+    Loop
+
+    mMaximumDataCountToLoad = maxDataCountSaved
+
 End Sub
 
 Private Sub Class_Initialize()

@@ -251,6 +251,7 @@ On Error GoTo ReadMZXMLFileErrorHandler
                 .MaximumDataCountToLoad = mMaximumDataCountToLoad
                 .TotalIntensityPercentageFilterEnabled = mTotalIntensityPercentageFilterEnabled
                 .TotalIntensityPercentageFilter = mTotalIntensityPercentageFilter
+                .GelIndex = mGelIndex
             End With
             
             mSubtaskMessage = "Pre-scanning mzXML file to determine data to load"

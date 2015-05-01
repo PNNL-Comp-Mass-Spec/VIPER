@@ -306,6 +306,7 @@ On Error GoTo ReadMSAlignFileErrorHandler
                 .MaximumDataCountToLoad = mMaximumDataCountToLoad
                 .TotalIntensityPercentageFilterEnabled = mTotalIntensityPercentageFilterEnabled
                 .TotalIntensityPercentageFilter = mTotalIntensityPercentageFilter
+                .GelIndex = mGelIndex
             End With
             
             mSubtaskMessage = "Pre-scanning MSAlign file to determine data to load"

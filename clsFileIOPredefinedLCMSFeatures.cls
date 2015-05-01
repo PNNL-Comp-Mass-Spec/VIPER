@@ -1945,20 +1945,13 @@ On Error GoTo ReadLCMSFeaturesFileErrorHandler
                         .ClassRepType = gldtIS
                         .ClassCount = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.MemberCount), 0)
                         
-                        If .ClassCount > 32767 Then
-                            ' This is a 32-bit integer; cap the class count at 32767
-                            .ClassCountPredefinedLCMSFeatures = 32767
-                        Else
-                            .ClassCountPredefinedLCMSFeatures = .ClassCount
-                        End If
+                        ' This is a 32-bit integer; cap the class count at 32767
+                        .ClassCountPredefinedLCMSFeatures = AssureInt32(.ClassCount)
                                                 
                         lngSaturatedMemberCount = GetColumnValueLng(strData, intColumnMapping(LCMSFeaturesFileColumnConstants.SaturatedMemberCount), 0)
-                        If lngSaturatedMemberCount > 32767 Then
-                            ' This is a 32-bit integer; cap the saturated count at 32767
-                            .SaturatedMemberCount = 32767
-                        Else
-                            .SaturatedMemberCount = lngSaturatedMemberCount
-                        End If
+                        
+                        ' This is a 32-bit integer; cap the saturated count at 32767
+                        .SaturatedMemberCount = AssureInt32(lngSaturatedMemberCount)
                         
                         
                         ReDim .ClassMInd(0)         ' members of the UMC(including representative)         (0-based array); index of the member in GelData

@@ -231,7 +231,17 @@ Public Sub AppendToString(ByRef strThisString As String, strAppendText As String
     End If
 End Sub
 
-Public Function AssureNonZero(lngNumber As Long) As Long
+Public Function AssureInt32(ByVal lngNumber As Long) As Integer
+    If lngNumber > 32767 Then
+        AssureInt32 = 32767
+    ElseIf lngNumber < -32768 Then
+        AssureInt32 = -32768
+    Else
+        AssureInt32 = CInt(lngNumber)
+    End If
+End Function
+
+Public Function AssureNonZero(ByVal lngNumber As Long) As Long
     ' Returns a non-zero number, either -1 if lngNumber = 0 or lngNumber if it's nonzero
     If lngNumber = 0 Then
         AssureNonZero = -1
