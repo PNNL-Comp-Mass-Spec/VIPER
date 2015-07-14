@@ -13,7 +13,7 @@ Public Const INI_FILENAME = "VIPERSettings.ini"
 Public Const RECENT_DB_INI_FILENAME = "VIPERRecentDB.ini"
 
 
-Public Const APP_BUILD_DATE As String = "May 1, 2015"
+Public Const APP_BUILD_DATE As String = "July 13, 2015"
 
 Public Const PRISM_AUTOMATION_CONNECTION_STRING_DEFAULT = "Provider=sqloledb;Data Source=pogo;Initial Catalog=PRISM_RPT;User ID=mtuser;Password=mt4fun"
 Public Const PRISM_AUTOMATION_SP_REQUEST_TASK_DEFAULT = "RequestPeakMatchingTaskMaster"
@@ -247,7 +247,7 @@ Public Const MATCH_STATE_HIT = 6
 
 
 Public Type udtCollectionArrayType
-    value As String
+    Value As String
     Name As String
 End Type
 

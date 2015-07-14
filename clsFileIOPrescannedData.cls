@@ -46,6 +46,7 @@ Private mPrescanDataIndices() As Long
 
 Private mGelIndex As Integer
 Private mDataScrubbed As Boolean
+Private mSortedByIndex As Boolean
 
 Private mMaximumDataCountEnabled As Boolean
 Private mMaximumDataCountToLoad As Long
@@ -53,36 +54,40 @@ Private mMaximumDataCountToLoad As Long
 Private mTotalIntensityPercentageFilterEnabled As Boolean
 Private mTotalIntensityPercentageFilter As Single
 
+Public Property Get DataScrubbed() As Boolean
+    DataScrubbed = mDataScrubbed
+End Property
+
 Public Property Get GelIndex() As Integer
     GelIndex = mGelIndex
 End Property
-Public Property Let GelIndex(value As Integer)
-    mGelIndex = value
+Public Property Let GelIndex(Value As Integer)
+    mGelIndex = Value
 End Property
 
 Public Property Get MaximumDataCountEnabled() As Boolean
     MaximumDataCountEnabled = mMaximumDataCountEnabled
 End Property
-Public Property Let MaximumDataCountEnabled(value As Boolean)
-    mMaximumDataCountEnabled = value
+Public Property Let MaximumDataCountEnabled(Value As Boolean)
+    mMaximumDataCountEnabled = Value
 End Property
 
-Public Property Let MaximumDataCountToLoad(value As Long)
-    mMaximumDataCountToLoad = value
+Public Property Let MaximumDataCountToLoad(Value As Long)
+    mMaximumDataCountToLoad = Value
 End Property
 Public Property Get MaximumDataCountToLoad() As Long
     MaximumDataCountToLoad = mMaximumDataCountToLoad
 End Property
 
-Public Property Let TotalIntensityPercentageFilterEnabled(value As Boolean)
-    mTotalIntensityPercentageFilterEnabled = value
+Public Property Let TotalIntensityPercentageFilterEnabled(Value As Boolean)
+    mTotalIntensityPercentageFilterEnabled = Value
 End Property
 Public Property Get TotalIntensityPercentageFilterEnabled() As Boolean
     TotalIntensityPercentageFilterEnabled = mTotalIntensityPercentageFilterEnabled
 End Property
 
-Public Property Let TotalIntensityPercentageFilter(value As Single)
-    mTotalIntensityPercentageFilter = value
+Public Property Let TotalIntensityPercentageFilter(Value As Single)
+    mTotalIntensityPercentageFilter = Value
 End Property
 Public Property Get TotalIntensityPercentageFilter() As Single
     TotalIntensityPercentageFilter = mTotalIntensityPercentageFilter
@@ -115,6 +120,9 @@ Public Sub AddDataPoint(sngAbundance As Single, intCharge As Integer, lngDataPoi
     mPrescanDataIndices(mPrescanDataCount) = lngDataPointIndex
     
     mPrescanDataCount = mPrescanDataCount + 1
+    
+    mSortedByIndex = False
+    
 End Sub
 
 Public Sub Clear()
@@ -125,6 +133,7 @@ Public Sub Clear()
 
     mMaximumDataCountEnabled = False
     mMaximumDataCountToLoad = 400000
+    mSortedByIndex = False
     
     mTotalIntensityPercentageFilterEnabled = False
     mTotalIntensityPercentageFilter = 90
@@ -136,16 +145,49 @@ Public Sub Clear()
 End Sub
 
 Public Function GetAbundanceByIndex(lngDataPointIndex As Long) As Single
-    If lngDataPointIndex >= 0 And lngDataPointIndex < mPrescanDataCount Then
-        GetAbundanceByIndex = mPrescanDataAbundances(lngDataPointIndex)
-    Else
-        ' Invalid data point index value
-        ' This will happen if ScrubLowAbundanceData was called
-        GetAbundanceByIndex = -1
-        If Not mDataScrubbed Then
+
+    If Not mSortedByIndex Then
+        ' Confirm that things are sorted properly
+        Dim needToSort As Boolean
+        Dim lngIndex As Long
+        
+        For lngIndex = 1 To mPrescanDataCount - 1
+            If mPrescanDataIndices(lngIndex) < mPrescanDataIndices(lngIndex - 1) Then
+                needToSort = True
+            End If
+        Next lngIndex
+        
+        If needToSort Then
+            ' We shouldn't normally need to sort
             Debug.Assert False
+            
+            ShellSortLongWithParallelSingle mPrescanDataIndices, mPrescanDataAbundances, 0, mPrescanDataCount - 1
+            
+            ' Data in mPrescanDataCharges is no longer parallel with those arrays; wipe it out
+            ReDim mPrescanDataCharges(1)
+            
+        End If
+        
+        mSortedByIndex = True
+    End If
+    
+    Dim indexMatch As Long
+    
+    indexMatch = BinarySearchLng(mPrescanDataIndices, lngDataPointIndex, 0, mPrescanDataCount - 1)
+    
+    If indexMatch < 0 Then
+        ' Index value not found; assume we do not want this data point
+        GetAbundanceByIndex = -1
+    Else
+        If indexMatch >= 0 And indexMatch < mPrescanDataCount Then
+            GetAbundanceByIndex = mPrescanDataAbundances(indexMatch)
+        Else
+            ' Invalid data point index value
+            Debug.Assert False
+            GetAbundanceByIndex = -1
         End If
     End If
+    
 End Function
 
 Public Sub ParsePrescannedData()
@@ -360,7 +402,9 @@ On Error GoTo ParsePrescannedDataErrorHandler
 
             lngHistogramBinCounts(lngTargetBin) = lngHistogramBinCounts(lngTargetBin) + 1
             
-            Debug.Assert mPrescanDataAbundances(lngIndex) >= dblHistogramBinStartIntensity(lngTargetBin)
+            If mPrescanDataAbundances(lngIndex) > 0 Then
+                Debug.Assert mPrescanDataAbundances(lngIndex) >= dblHistogramBinStartIntensity(lngTargetBin)
+            End If
             
             If lngIndex Mod 10000 = 0 Then
                 dblSubtaskProgress = (0 + (lngIndex + 1) / CDbl(mPrescanDataCount)) / SUBTASK_STEP_COUNT * 100#
@@ -447,9 +491,14 @@ On Error GoTo ParsePrescannedDataErrorHandler
                     PrescannedDataSortAndMarkPointsToSkip sngBinToSortAbundances, lngBinToSortDataIndices, lngBinToSortDataCount, mMaximumDataCountToLoad - lngDataCountImplicitlyIncluded, SUBTASK_STEP_COUNT
                 End If
             
-                ' Synchronize the data in sngBinToSortAbundances and lngBinToSortDataIndices with mPrescanDataAbundances and mPrescanDataAbundances
-                ' mPrescanDataAbundances and mPrescanDataIndices have not been sorted and therefore mPrescanDataIndices should currently be sorted ascending on "valid data point index"
-                ' lngBinToSortDataIndices should also currently be sorted ascending on "valid data point index" so the following Do Loop within a For Loop should sync things up
+                ' Synchronize the data in sngBinToSortAbundances and lngBinToSortDataIndices
+                ' with mPrescanDataAbundances and mPrescanDataAbundances
+                
+                ' mPrescanDataAbundances and mPrescanDataIndices have not been sorted and therefore
+                ' mPrescanDataIndices should currently be sorted ascending on "valid data point index"
+                
+                ' lngBinToSortDataIndices should also currently be sorted ascending on "valid data point index"
+                ' so the following Do Loop within a For Loop should sync things up
                 
                 lngOriginalDataArrayIndex = 0
                 For lngIndex = 0 To lngBinToSortDataCount - 1
@@ -461,7 +510,8 @@ On Error GoTo ParsePrescannedDataErrorHandler
                         If mPrescanDataIndices(lngOriginalDataArrayIndex) = lngBinToSortDataIndices(lngIndex) Then
                             mPrescanDataAbundances(lngOriginalDataArrayIndex) = SKIP_DATA_POINT_FLAG
                         Else
-                        ' This code shouldn't be reached
+                            ' Index tracking bug
+                            ' This code shouldn't be reached
                             Debug.Assert False
                         End If
                     End If
@@ -474,6 +524,8 @@ On Error GoTo ParsePrescannedDataErrorHandler
                 Next lngIndex
             End If
         Else
+            ' lngBinToSort is less than 0
+            ' We have to perform a full sort
             blnUseFullDataSort = True
         End If
         
@@ -526,24 +578,28 @@ Private Sub ScrubLowAbundanceData(ByVal targetDataCount As Long)
     Dim maxDataCountSaved As Long
     maxDataCountSaved = mMaximumDataCountToLoad
     
+    ' Temporarily override mMaximumDataCountToLoad
     mMaximumDataCountToLoad = targetDataCount
     
     FilterDataByMaxDataCountToLoad
 
     ' Remove data from the arrays (copy in place)
     
-    Dim index As Long
+    Dim Index As Long
     Dim targetIndex As Long
     targetIndex = 0
     
-    For index = 0 To targetDataCount - 1
-        If mPrescanDataAbundances(index) > 0 Then
-            mPrescanDataAbundances(targetIndex) = mPrescanDataAbundances(index)
-            mPrescanDataCharges(targetIndex) = mPrescanDataCharges(index)
-            mPrescanDataIndices(targetIndex) = mPrescanDataIndices(index)
+    For Index = 0 To mPrescanDataCount - 1
+        If mPrescanDataAbundances(Index) > 0 Then
+            mPrescanDataAbundances(targetIndex) = mPrescanDataAbundances(Index)
+            mPrescanDataCharges(targetIndex) = mPrescanDataCharges(Index)
+            mPrescanDataIndices(targetIndex) = mPrescanDataIndices(Index)
             targetIndex = targetIndex + 1
+        Else
+            ' Skip this data point
+            ' Debug.Print "Skip " & Index
         End If
-    Next index
+    Next Index
     
     AddToAnalysisHistory mGelIndex, "Culled excess pre-scanned data points down from " & mPrescanDataCount & " points to " & targetIndex & " points to avoid out-of-memory errors"
     
@@ -559,6 +615,7 @@ Private Sub ScrubLowAbundanceData(ByVal targetDataCount As Long)
         targetIndex = targetIndex + 1
     Loop
 
+    ' mMaximumDataCountToLoad was overridden earlier; change it back now
     mMaximumDataCountToLoad = maxDataCountSaved
 
 End Sub

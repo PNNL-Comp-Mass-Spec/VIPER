@@ -1,5 +1,9 @@
 VIPER Change Log
 
+Version 3.49 - Build 477; July 14, 2015
+	- Fix bugs in clsFileIOPrescannedData, specifically functions GetAbundanceByIndex and ScrubLowAbundanceData
+	- Now logging a warning if negative abundances are encountered when reading an _isos.csv file
+
 Version 3.49 - Build 476; May 1, 2015
 	- Fix overflow bug in GetMSLevel
 	- clsFileIOPrescannedData now caches at most 2,883,200 data points

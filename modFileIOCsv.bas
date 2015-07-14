@@ -1167,6 +1167,7 @@ Private Function ReadCSVIsosFileWork(ByRef fso As FileSystemObject, _
     
     Dim lngLinesRead As Long
     Dim lngCurrentDataLine As Long
+    Dim lngNegativeAbundances As Long
     
     Dim lngIndex As Long
     Dim lngScanNumber As Long
@@ -1224,6 +1225,8 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
     ' Need to start at 1 to remain consistent with .IsoLines starting at 1
     ' and to remain consistent with objPointsToKeep
     lngCurrentDataLine = 1
+    
+    lngNegativeAbundances = 0
     
     ' Initialize the variables used by ReadCSVIsosFilePostFilterPreviousScan
     lngIsoDataCurrentScanNum = -100
@@ -1477,6 +1480,16 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
                     sngAbundance = GetColumnValueSng(strData, intColumnMapping(IsosFileColumnConstants.Abundance), 0)
                     intCharge = CInt(GetColumnValueLng(strData, intColumnMapping(IsosFileColumnConstants.Charge), 1))
                     
+                    If sngAbundance < 0 Then
+                        ' We shouldn't see negative abundances
+                        ' DeconTools probably had an overflow
+                        ' Log the first 5 occurrences of a negative abundance value
+                        lngNegativeAbundances = lngNegativeAbundances + 1
+                        If lngNegativeAbundances <= 5 Then
+                            AddToAnalysisHistory mGelIndex, "Warning: negative abundance value read from Isos file on line " & lngLinesRead & ": " & sngAbundance
+                        End If
+                    End If
+                    
                     Debug.Assert intCharge > 0
 
                     blnValidDataPoint = True
@@ -1653,14 +1666,26 @@ On Error GoTo ReadCSVIsosFileWorkErrorHandler
     
     If mReadMode <> rmReadModeConstants.rmPrescanData Then
     
-        ' This is usually true, but may not be true if over 2,883,200 data points were read and data was removed using ScrubLowAbundanceData
-        
-        Debug.Assert GelData(mGelIndex).IsoLines = mValidDataPointCount
+        If blnFilePrescanEnabled Then
+            If Not mPrescannedData.DataScrubbed Then
+                ' This is usually true, but may not be true if over 2,883,200 data points were read and data was removed using ScrubLowAbundanceData
+                Debug.Assert GelData(mGelIndex).IsoLines = mValidDataPointCount
+            End If
+        Else
+            ' This should be true
+            Debug.Assert GelData(mGelIndex).IsoLines = mValidDataPointCount
+        End If
         
         AddToAnalysisHistory mGelIndex, "Processed " & Format(GelData(mGelIndex).LinesRead, "0,000") & " isotopic data lines; retained " & Format(GelData(mGelIndex).IsoLines, "0,000") & " data points"
     
         ' Sort the data in objHashMapOfPointsKept
         objHashMapOfPointsKept.SortNow
+    
+        If lngNegativeAbundances > 5 Then
+            Debug.Assert False
+            AddToAnalysisHistory mGelIndex, "Warning: Isos file had " & lngNegativeAbundances & " negative abundance values"
+        End If
+    
     End If
     
     tsInFile.Close
