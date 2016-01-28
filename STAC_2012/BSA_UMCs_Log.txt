@@ -1,0 +1,20 @@
+STAC Version 1.2.10991.30918 started on 1/27/2016 3:35:02 PM
+Running STAC on
+	Mass Tags file: F:\My Documents\Projects\DataMining\VIPER\STAC_2012\MT_BSA_P171.txt
+	UMC file: F:\My Documents\Projects\DataMining\VIPER\STAC_2012\BSA_UMCs.txt
+	Mass Tolerance = 25
+	NET Tolerance = 0.05
+Output Files: STAC file = F:\My Documents\Projects\DataMining\VIPER\STAC_2012\BSA_UMCs_STAC.csv
+	FDR file = F:\My Documents\Projects\DataMining\VIPER\STAC_2012\BSA_UMCs_FDR.csv
+Loading features...
+Loaded 2544 features.
+Loading mass tags...
+Loaded 6068 mass tags.
+Using 6068 mass tags.
+Performing STAC...
+ToleranceMassPPM: 5.87166309370461
+ToleranceNET: 0.0267595888765428
+Writing Results...
+Output file written.
+FDR file written.
+STAC finished on 1/27/2016 3:35:02 PM
