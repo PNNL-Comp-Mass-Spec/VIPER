@@ -33,12 +33,21 @@ section below for more info).
 == Installation ==
 
 Double click the VIPER_Installer.msi file to install.  The application will be 
-installed, along with the LCMSFeatureFinder.exe program (and required DLLs).  
+installed, along with an old copy of the LCMSFeatureFinder.exe program.  
+That old copy of LCMSFeatureFinder requires that the Microsoft .NET Framework v1.1 
+be installed. See http://msdn2.microsoft.com/en-us/netframework/aa569264.aspx 
+for instructions on how to validate that the Framework is installed.  Follow 
+this link to install it: http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=262D25E3-F589-4842-8157-034D1E7CF3A3
+
+A new version of LCMSFeatureFinder.exe that uses .NET 4 can be found in folder \\floyd\software\VIPER\Exe_Only
+Copy both LCMSFeatureFinder.exe and UMCCreation.dll to folder C:\Program Files (x86)\VIPER
 
 The shortcut for starting VIPER can be found at Start Menu -> Programs -> PAST Toolkit -> VIPER
 
-If, after installing VIPER, the LCMSFeatureFinder does not run properly, then 
-install it separately using the LCMSFeatureFinder.msi file (aka "LCMSFeatureFinder (Install this after installing Viper).msi")
+If, after installing VIPER, the LCMSFeatureFinder does not run properly, 
+make sure you have copied LCMSFeatureFinder.exe and UMCCreation.dll from \\floyd\software\VIPER\Exe_Only as indicated above.
+ 
+(Old: use "LCMSFeatureFinder (Install this after installing Viper).msi")
 
 
 == ActiveX Error ==

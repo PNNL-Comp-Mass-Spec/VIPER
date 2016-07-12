@@ -7,8 +7,11 @@
 2) Run the installer at \\floyd\software\VIPER\VIPER_MTS_Installer.msi
 	a) Install to C:\DMS_Programs\VIPER  (NOT to C:\Program Files (x86)\...)
 
-3) Run the LCMSFeature Finder installer at 
-	"\\floyd\software\VIPER\LCMSFeatureFinder (Install this after installing Viper).msi"
+3) Copy LCMSFeatureFinder.exe and UMCCreation.dll 
+   from \\floyd\software\VIPER\Exe_Only
+   to C:\DMS_Programs\VIPER
+
+   (old: used installer "\\floyd\software\VIPER\LCMSFeatureFinder (Install this after installing Viper).msi")
 
 4) Update the permissions on folder C:\DMS_Programs\VIPER
 	Grant user pnl\MTSProc Modify permission on the folder
