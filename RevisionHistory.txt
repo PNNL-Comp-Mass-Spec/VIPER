@@ -1,5 +1,11 @@
 VIPER Change Log
 
+Version 3.49 - Build 478; July 12, 2016
+	- Now using a C# based version of LCMSFeatureFinder.exe
+		- Compiled with Visual Studio 2013 against .NET 4
+		- Requires the VS2013 C++ runtimes, msvcp120.dll and msvcr120.dll
+	- Removed auto-registration of UMCManipulation.dll since LCMSFeatureFinder.exe only uses UMCCreation.dll
+
 Version 3.49 - Build 477; July 14, 2015
 	- Fix bugs in clsFileIOPrescannedData, specifically functions GetAbundanceByIndex and ScrubLowAbundanceData
 	- Now logging a warning if negative abundances are encountered when reading an _isos.csv file

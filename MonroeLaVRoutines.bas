@@ -5905,9 +5905,7 @@ On Error GoTo ValidateDotNETDLLsErrorHandler
 
     IniStuff.FileName = strIniFilePath
     
-    blnSuccess = ValidateDOTNETDllWork(IniStuff, fso, "UMCManipulation.dll", 1, 1)
-    blnSuccess = ValidateDOTNETDllWork(IniStuff, fso, "UMCCreation.dll", 1, 1)
-    
+    blnSuccess = ValidateDOTNETDllWork(IniStuff, fso, "UMCCreation.dll", 4, 0)
     
     Set IniStuff = Nothing
     
