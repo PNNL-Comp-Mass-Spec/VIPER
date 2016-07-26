@@ -33,22 +33,21 @@ section below for more info).
 == Installation ==
 
 Double click the VIPER_Installer.msi file to install.  The application will be 
-installed, along with an old copy of the LCMSFeatureFinder.exe program.  
-That old copy of LCMSFeatureFinder requires that the Microsoft .NET Framework v1.1 
-be installed. See http://msdn2.microsoft.com/en-us/netframework/aa569264.aspx 
-for instructions on how to validate that the Framework is installed.  Follow 
-this link to install it: http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=262D25E3-F589-4842-8157-034D1E7CF3A3
+installed, along with a copy of the LCMSFeatureFinder.exe program (now compiled against .NET 4)
 
-A new version of LCMSFeatureFinder.exe that uses .NET 4 can be found in folder \\floyd\software\VIPER\Exe_Only
-Copy both LCMSFeatureFinder.exe and UMCCreation.dll to folder C:\Program Files (x86)\VIPER
+Note that the new LCMSFeatureFinder.exe only uses UMCCreation.dll (UMCManipulation.dll is no longer needed)
 
 The shortcut for starting VIPER can be found at Start Menu -> Programs -> PAST Toolkit -> VIPER
 
-If, after installing VIPER, the LCMSFeatureFinder does not run properly, 
-make sure you have copied LCMSFeatureFinder.exe and UMCCreation.dll from \\floyd\software\VIPER\Exe_Only as indicated above.
- 
-(Old: use "LCMSFeatureFinder (Install this after installing Viper).msi")
+If, after installing VIPER, the LCMSFeatureFinder does not run properly, try these steps:
 
+If at PNNL:
+1) Copy LCMSFeatureFinder.exe and UMCCreation.dll from \\floyd\software\VIPER\Exe_Only
+2) Run vcredist_x86.exe at \\floyd\software\Visual_Studio_CPP_Runtimes\VS2013
+ 
+If outside PNNL:
+1) Download and run the "Visual C++ Redistributable Packages for Visual Studio 2013" from:
+   https://www.microsoft.com/en-us/download/details.aspx?id=40784
 
 == ActiveX Error ==
 
@@ -72,13 +71,11 @@ When you run the regsvr32 command, if you get this error:
    at the specified path or debug it to check for problems with the binary or 
    dependent .DLL files. The specified module could not be found."
 
-then you're likely missing DLLs MSVCP71.dll and MSVCR71.dll.  To verify this, check whether files
-MSVCP71.DLL and MSVCR71.DLL exist at c:\windows\system32 (or at c:\windows\SysWOW64 on 64-bit windows).
+then you're likely missing DLLs MSVCP120.dll and MSVCR120.dll.  To verify this, check whether files
+MSVCP120.DLL and MSVCR120.DLL exist at c:\windows\system32 (or at c:\windows\SysWOW64 on 64-bit windows).
 
-If the files are missing, then follow the directions at 
-http://www.addictivetips.com/windows-tips/fix-msvcp71-dll-and-msvcr71-dll-missing-error-in-windows-7/ 
-to download the files and place them in folder c:\windows\system32 (or folder
-c:\windows\SysWOW64 on 64-bit windows).
+If the files are missing, download and run the "Visual C++ Redistributable Packages for Visual Studio 2013" from:
+https://www.microsoft.com/en-us/download/details.aspx?id=40784
 
 
 == Microsoft Access MT Databases ==

@@ -1,100 +1,142 @@
-== VIPER Overview ==
+﻿== VIPER Overview  ==
 
-VIPER stands for '''V'''isual '''I'''nspection of '''P'''eak/'''E'''lution '''R'''elationships
+VIPER stands for '''V'''isual '''I'''nspection of '''P'''eak/'''E'''lution '''R'''elationships 
 
-VIPER can be used to visualize and characterize the features detected during
-LC-MS analyses.  It is primarily intended for processing deisotoped data from 
-high mass measurement accuracy instruments (e.g. FT, TOF, or Orbitrap) and 
-comparing the features found to a list of expected peptides (aka mass and 
-time (MT) tags), as practiced by the AMT Tag approach (see Zimmer, Monroe, 
-Qian, & Smith, Mass Spec Reviews, 2006, 25, 450-482).
+VIPER can be used to visualize and characterize the features detected during LC-MS analyses. It is primarily intended for processing deisotoped data from high mass measurement accuracy instruments (e.g. FT, TOF, or Orbitrap) and comparing the features found to a list of expected peptides (aka mass and time (MT) tags), as practiced by the AMT Tag approach (see Zimmer, Monroe, Qian, &amp; Smith, Mass Spec Reviews, 2006, 25, 450-482). 
 
-The software allows one to display the data as a two-dimensional plot of 
-spectrum number (i.e. elution time) vs. mass.  It can read MS data from 
-several file formats: .PEK, .CSV, .mzXML, and .mzData.  See below for 
-additional details on the various file formats. VIPER can process a data 
-file in an automated fashion to:
-# Load and filter the data
-# Find features and their chromatographic peak profile
-# Align the observed elution times of the features with the elution times of the expected peptides (i.e. MT Tags)
-# Refine the mass calibration
-# Match the features to the MT tags
-# Export the results to a report file
+The software allows one to display the data as a two-dimensional plot of spectrum number (i.e. elution time) vs. mass. It can read MS data from several file formats: .PEK, .CSV, .mzXML, and .mzData. See below for additional details on the various file formats. VIPER can process a data file in an automated fashion to: 
 
-VIPER has a rich, full featured graphical user interface with numerous options 
-for exploring the data and customizing the analysis parameters.  It runs on 
-Windows computers and requires Microsoft Access be installed to create and edit
-the MT tag databases.  In order to view mass spectra from raw data files (e.g.
-Finnigan .Raw files, you will also need to install ICR-2LS (see the .PEK files 
-section below for more info).
+#Load and filter the data 
+#Find features and their chromatographic peak profile 
+#Align the observed elution times of the features with the elution times of the expected peptides (i.e. MT Tags) 
+#Refine the mass calibration 
+#Match the features to the MT tags 
+#Export the results to a report file
+
+VIPER has a rich, full featured graphical user interface with numerous options for exploring the data and customizing the analysis parameters. It runs on Windows computers and requires Microsoft Access be installed to create and edit the MT tag databases. In order to view mass spectra from raw data files (e.g. Finnigan .Raw files, you will also need to install ICR-2LS (see the .PEK files section below for more info). 
+
+Both the [[Media:Monroe_VIPER_Bioinformatics_2007.pdf|PDF]] of the VIPER Application Note and its [[Media:Monroe_VIPER_Bioinformatics_2007_Supplementary_Data.doc|Supplementary Materials]] contain details of the VIPER processing details. A [[VIPER Analysis Tutorial|Step-by-Step Tutorial for using VIPER]] is also available.
+
+== Journal Article  ==
+
+An application note describing VIPER has been published at 
+
+:"VIPER: an advanced software package to support high-throughput LC-MS peptide identification," M. E. Monroe, N. Tolic, N. Jaitly, J. L. Shaw, J. N. Adkins, and R. D. Smith. ''Bioinformatics'', '''23''' (15), 2021-2023 (2007).
+
+*Download the [[Media:Monroe_VIPER_Bioinformatics_2007.pdf|Article PDF]] 
+*Download the [[Media:Monroe_VIPER_Bioinformatics_2007_Supplementary_Data.doc|Supplementary Materials]]
 
 == VIPER Installation ==
 
-To install, go to '''\\floyd\software\VIPER\''' and double-click file '''VIPER_MTS_Installer.msi'''  You also need ICR-2LS installed; go to '''\\floyd\software\ICR-2LS\''' and double-click file '''ICR-2LS.msi'''  After installing Viper, run it using "Start Menu->Programs->PAST Toolkit-> VIPER (MTS Version)"  When you run it, if you get an error message concerning the "Molecular Weight Calculator" or "mwtwin.dll", then install the Molecular Weight Calculator from '''\\floyd\software\MolecularWeightCalculator\'''
+To install, follow these steps:
+* Go to '''\\floyd\software\VIPER\Installer_VIPER_2016\'''
+* Double click '''VIPER_MTS_Installer.msi'''
+* Optionally install ICR-2LS, which VIPER can use to display individual spectra
+** To install, go to '''\\floyd\software\ICR-2LS\''' then right click the '''ICR-2LS.msi''' file and choose '''PM - Install Elevated''' (or double-click)
 
-== VIPER QuickStart ==
+After installing VIPER, run it using "Start Menu&rarr;Programs&rarr;PAST Toolkit&rarr; VIPER (MTS Version)"  
 
-After installing, to load one the results of an ICR-2LS or Decon2LS analysis, run Viper and choose "File->New Analysis (Choose from DMS)".  Now, select your database (e.g. MT_Shewanella_P196) then click "Select Mass Tags".  For this DB, I suggest using minimum Discriminant Score of 0.2 and Minimum PMT Quality Score of 2.  Click OK to close the Mass Tags Selection window, then click Next in the "Choose Analysis to Load" window.  Either find your dataset in the list, or type some text in "Search for" and click "Search".  For example, entering "drms" and clicking "Search" brings up Dreams datasets and analysis jobs in that DB.  Select an analysis job, click Next again, and you'll see the files located on the DMS storage server for the selected job.  Here you can select the .Pek file or the _ic.pek file.  If the dataset had internal standards infused at the end (it typically does), choose the _ic.pek file, otherwise choose the .pek file.  Click next and you see a screen with a bunch of settings that don't really matter, so you now click OK.  
+When you run VIPER, if you get an error message concerning the "Molecular Weight Calculator" or "mwtwin.dll", then install the Molecular Weight Calculator from '''\\floyd\software\MolecularWeightCalculator\'''
 
-The program now asks if you want to Auto-Analyze the file.  Choose No.  Now you can define the settings to be applied to the data when loading, including maximum isotopit fit, abundance range, maximum data points to load, and scans to load.  After customizing the filters, click Load, and the data will load.  Once the data is loaded, go to the Steps menu and choose each of the pertinent steps, typically:
+== VIPER QuickStart  ==
+
+After installing, to load one the results of an ICR-2LS or Decon2LS analysis, run Viper and choose "File→New Analysis (Choose from DMS)". Now, select your database (e.g. MT_Shewanella_P196) then click "Select Mass Tags". For this DB, I suggest using minimum Discriminant Score of 0.2 and Minimum [[PMT Quality Score]] of 2. Click OK to close the Mass Tags Selection window, then click Next in the "Choose Analysis to Load" window. Either find your dataset in the list, or type some text in "Search for" and click "Search". For example, entering "drms" and clicking "Search" brings up Dreams datasets and analysis jobs in that DB. Select an analysis job, click Next again, and you'll see the files located on the DMS storage server for the selected job. Here you can select the .Pek file or the _ic.pek file. If the dataset had internal standards infused at the end (it typically does), choose the _ic.pek file, otherwise choose the .pek file. Click next and you see a screen with a bunch of settings that don't really matter, so you now click OK. 
+
+The program now asks if you want to Auto-Analyze the file. Choose No. Now you can define the settings to be applied to the data when loading, including maximum isotopit fit, abundance range, maximum data points to load, and scans to load. After customizing the filters, click Load, and the data will load. Once the data is loaded, go to the Steps menu and choose each of the pertinent steps, typically: 
 
 :2) Find UMCs
 
-:3) Select MT Tags (to confirm what you chose when selecting the dataset and clicked "Select Mass Tags").  For P196, with Discriminant Score >= 0.2 and PMT Quality Score >= 2, there should be ~85000 MT Tags.
+:3) Select MT Tags (to confirm what you chose when selecting the dataset and clicked "Select Mass Tags"). For P196, with Discriminant Score ≥ 0.2 and [[PMT Quality Score]] ≥ 2, there should be ~85000 MT Tags.
 
-:4) Find pairs (only if appropriate, e.g. 16O/18O or 14N/15N pairs)
+:4) Find pairs (only if appropriate, e.g. <sup>16</sup>O/<sup>18</sup>O or <sup>14</sup>N/<sup>15</sup>N pairs)
 
-:5) NET Adjustment->Align and Warp
+:5) NET Adjustment→Align and Warp (see the [[LCMSWarp]] page for more info)
 
 :6) Database Search
 
-From the Database Search screen, after searching, you can choose "Function->Mass Calibration and Tolerance Refinement" to see the mass and NET error histograms.  You can also choose "Function->Report Results by UMCs" to see the peptides matched (and the UMC details that matched them).  You can copy the text of this report and paste into Excel for browsing, sorting, and filtering.  Or, choose "Function->Export Results to MT Tag DB", enter the password (contact [[Matt_Monroe|Matt]] for this) and export the data (for the question "Include UMCs that did not match any PMT Tags?", you typically select "No").
+From the Database Search screen, after searching, you can choose "Function→Mass Calibration and Tolerance Refinement" to see the mass and NET error histograms. You can also choose "Function→Report Results by UMCs" to see the peptides matched (and the UMC details that matched them). You can copy the text of this report and paste into Excel for browsing, sorting, and filtering. Or, choose "Function→Export Results to MT Tag DB", enter the password (contact [[Matt Monroe|Matt]] for this) and export the data (for the question "Include UMCs that did not match any PMT Tags?", you typically select "No"). 
 
-After the matches have been exported to the DB for several analyses, you can run the Q Rollup program to export the data and generate a crosstab report comparing the peptides.  To install Q Rollup, go to '''\\floyd\software\QRollupExport\'''
+After the matches have been exported to the DB for several analyses, you can run the Q Rollup program to export the data and generate a crosstab report comparing the peptides. To install Q Rollup, go to '''\\floyd\software\QRollupExport\''' 
 
-== VIPER FAQ ==
+=== Tutorial  ===
 
-'''Question:''' After searching the database using "Steps->6. Database Search", then choosing "Function->Export Results to MT Tag DB", I receive error messsage: ''"Error making entry in Match Making Description (most likely the job number is not defined in T_FTICR_Analysis_Description): INSERT statement conflicted with COLUMN FOREIGN KEY constraint 'FK_T_Match_Making_Description_T_FTICR_Analysis_Description"'' What should I do?
-: '''Answer:''' Either the job you're analyzing isn't defined in the given database or VIPER doesn't know the job number of the .PEK file you loaded.  To fix this, you can:
-:* Load the data using "File->New Analysis (Choose form DMS)".  If the job is not listed under the desired database, then you'll need to submit a [[Useful_Links|Footprints Support Queue]] request to have the job added to the given database.
-:* Manually set the job number in VIPER by going to "Steps->3. Select MT Tags", then clicking "Override Job Info", typing the job number in the Job Number spot, and clicking "Save Job Info Changes".  VIPER needs to have the job number properly defined, both in VIPER and in T_FTICR_Analysis_Description in order to export data to the database.
+See also the [[VIPER Analysis Tutorial|screenshot-based VIPER tutorial]].
 
+== VIPER FAQ  ==
+
+'''Question:''' How can I get the sequence of peptides from the Viper results (i.e. from the Mass Tag IDs)? 
+
+:'''Answer:''' You have to export the results to the AMT Tag DB that you searched against, then create a [[Q Rollup Export|Q Rollup report]] to summarize the peptide results, then use [[Q Rollup Export|Q Rollup]] to export the results to an Excel file; those results will contain the peptide sequences. Note that the DB you search against must have the analysis job number defined for the [[Decon2LS]] (or [[ICR-2LS]]) data you loaded. Also, depending on how you loaded the data, you may need to define the job number within VIPER. The next Q/A entry in the FAQ discusses job number issues.
+
+'''Question:''' After searching the database using "Steps→6. Database Search", then choosing "Function→Export Results to MT Tag DB", I receive error messsage: ''"Error making entry in Match Making Description (most likely the job number is not defined in T_FTICR_Analysis_Description): INSERT statement conflicted with COLUMN FOREIGN KEY constraint 'FK_T_Match_Making_Description_T_FTICR_Analysis_Description"'' What should I do? 
+
+:'''Answer:''' Either the job you're analyzing isn't defined in the given database or VIPER doesn't know the job number of the .PEK or .CSV file you loaded. To fix this, you can: 
+:*Load the data using "File→New Analysis (Choose form DMS)". If the job is not listed under the desired database, then you'll need to submit a [[OMICS Data Analysis Support]] queue request to have the job added to the given database. 
+:*Manually set the [[Decon2LS]]/[[ICR-2LS]] job number in VIPER by going to "Steps→3. Select MT Tags", then clicking "Override Job Info", typing the job number in the Job Number spot, and clicking "Save Job Info Changes". VIPER needs to have the job number properly defined, both in VIPER and in T_FTICR_Analysis_Description in order to export data to the database.
+
+'''Question:''' How do I process an LTQ-Orbitrap file to find LC-MS Features and match them to a database? 
+
+:'''Answer:''' See the [[VIPER Analysis Tutorial]] for details of both processing a Finnigan dataset file with [[Decon2LS]] and processing the data with VIPER to features and match them to a database
+
+'''Question:''' Can VIPER find paired features that are spaced apart by a varying amount, for example [[SILAC]] pairs? 
+
+:'''Answer:''' Yes, the pair finding options are quite flexible. See the [[VIPER Analysis Tutorial]] for a description of finding SILAC pairs.
+
+'''Question:''' How do I match an LC-MS dataset to an arbitrary list of peptides from MASCOT (or another search engine that you run locally)? 
+
+:'''Answer:''' Store the peptide details in a [[VIPER Access DB Files|Microsoft Access DB File]], then link to the file using "Steps→3. Select MT Tags (Connect to DB)". See the [[VIPER Access DB Files#Populating_a_VIPER_Access_DB_File|Populating a VIPER Access DB File]] topic for details on importing peptides into a VIPER Access DB File.
+
+'''Question:''' What steps does VIPER perform during automated analysis. 
+
+:'''Answer:''' This information is tracked in the VIPER Auto Analysis log file. Please see the [[VIPER Auto Analysis Log File]] page for an example, annotated log file.
 
 == Microsoft Access MT Database files ==
-An Access database is used to store the details of the MT tags to match against.  You can have multiple Microsoft Access database files, each with a different set of MT tags.  Use "Steps->3. Select MT Tags (Connect to DB)" to specify or change the database.
+An Access database is used to store the details of the MT tags to match against.  You can have multiple Microsoft Access database files, each with a different set of MT tags.  Use "Steps&rarr;3. Select MT Tags (Connect to DB)" to specify or change the database.
 
-The Access database file must have a table named AMT, containing the fields:
-* AMT_ID
-* AMTMonoisotopicMass
-* NET
-* PNET or RetentionTime (the RetentionTime field is skipped if PNET is present)
-
-The AMT table can also optionally contain the fields: 
-* MSMS_Obs_Count
-* High_Normalized_Score
-* High_Discriminant_Score
-* NitrogenAtom
-* AA_Cystine_Count
-* Status
-
-The Access database file can optionally contain two tables containing Protein information and MT to Protein Mapping information.  If these tables are present, then Viper can optionally display the protein names along with the MT tags matched.
-* The Protein table must be named Proteins, containing the fields:
-** Protein_ID
-** Protein_Name
-* The MT to Protein Mapping table must be named AMT_to_Protein_Map, with fields:
-** AMT_ID
-** Protein_ID
-* The advantage of using two tables to track protein information is that additional information for each protein can be defined in the Proteins table while the AMT_to_Protein_Map simply associates MT tags with proteins
-* The database can contain other tables, but Viper will only read data from the AMT table.  Also, the AMT, AMT_to_Protein_Map, and AMT_Proteins tables can contain other columns besides those mentioned above, but Viper will only read the data from the known columns.
-* The column order in the tables does not matter; Viper can cope with rearranged columns.
-
-See file QCStandards.mdb for an example database and example AMT tables (installed by VIPER_Installer.msi at C:\Program Files\Viper\)
+See the [[VIPER Access DB Files]] page for details of the tables in columns that must be present in [[VIPER Access DB Files|Microsoft Access DB Files]] that VIPER reads.
 
 == Auto-analysis files ==
 
-You can save a .Ini file using File->Save/Load/Edit Analysis Settings to capture all of the parameters used for analyzing data.  This .Ini file can be used to auto-analyze one or more input files.  For more information, please run VIPER from the command line (aka the command prompt or Dos shell) using "VIPER /?" to see a help screen with info on initiating automated analyses.
+You can save a .Ini file using File&rarr;Save/Load/Edit Analysis Settings to capture all of the parameters used for analyzing data.  This .Ini file can be used to auto-analyze one or more input files.  For more information, please run VIPER from the [[Command Line Application Help|command line]] (aka the command prompt or Dos shell) using "VIPER /?" to see a help screen with info on initiating automated analyses.
 
-== Additional Information ==
-* A tutorial for Viper is available in file '''VIPER_HelpFile_v3.20.ppt''' at '''\\floyd\software\VIPER\'''
-* Please see the Readme.txt file that is installed with Viper for additional information (particularly on Input file format notes)
-* Contact [[Matt_Monroe|Matt]] at matthew.monroe@pnl.gov if you have specific questions
+=== Standard .Ini Files ===
+
+See the [[Proteomics_Data_Analysis_Guidelines#VIPER|Proteomics Data Analysis Guidelines]] page for the list of suggested VIPER .Ini files for each instrument
+
+== Additional Information  ==
+
+*See the [[VIPER_Analysis_Tutorial|Screenshot-based VIPER Tutorial]]
+*A tutorial for Viper is available in file '''VIPER_HelpFile_v3.20.ppt''' at '''\\floyd\software\VIPER\''' 
+*Data can be exported from Viper and plotted in Excel or [[Igor Pro]]. See the [[Igor Pro]] page for a quick tutorial on plotting Viper data. 
+*Please see the Readme.txt file that is installed with Viper for additional information (particularly on Input file format notes) 
+*Contact [[Matt Monroe|Matt]] at matthew.monroe@pnl.gov if you have specific questions
+
+== LCMSWarp ActiveX Error  ==
+
+If, while using [[LCMSWarp]] in VIPER you receive an error about an ActiveX component (Error starting alignment: ActiveX component can't create object), then you need to manually register the MassMatchCOM.dll by following these steps: 
+
+*Exit Viper 
+*Start the&nbsp;[[Command Line Application Help|Windows Command prompt]]&nbsp;as an administrator 
+**In Windows 7, find the shortcut to the Command Prompt in the start menu, right click, and choose Run As Administrator<br> 
+*Change the directory to C:\program files\Viper using either of these commands (depends on where VIPER is installed): 
+**<code>cd "\program files\viper"</code> 
+**<code>cd "\program files (x86)\viper"</code> 
+*Register the DLL using the command: 
+**<code>regsvr32 MassMatchCOM.dll</code>
+
+=== Regsvr32 error  ===
+
+When you run the regsvr32 command, if you get the following error, you're likely missing DLLs MSVCP120.dll and MSVCR120.dll.
+<pre>The module "MassMatchCOM.dll" failed to load. Make sure the binary is stored
+at the specified path or debug it to check for problems with the binary or
+dependent .DLL files. The specified module could not be found.</pre>
+
+To verify this, check whether files <code>MSVCP120.DLL</code> and <code>MSVCR120.DLL</code> exist at <code>c:\windows\system32</code> (or at <code>c:\windows\SysWOW64</code> on 64-bit windows).
+
+If the files are missing, and inside PNNL:
+* Run <code>vcredist_x86.exe</code> at <code>\\floyd\software\Visual_Studio_CPP_Runtimes\VS2013</code>
+
+If offside PNNL:
+* Download and run the "Visual C++ Redistributable Packages for Visual Studio 2013" from [https://www.microsoft.com/en-us/download/details.aspx?id=40784 https://www.microsoft.com/en-us/download/details.aspx?id=40784]
+
+[[Category:Software]] [[Category:Tutorials]]
