@@ -136,7 +136,7 @@ To verify this, check whether files <code>MSVCP120.DLL</code> and <code>MSVCR120
 If the files are missing, and inside PNNL:
 * Run <code>vcredist_x86.exe</code> at <code>\\floyd\software\Visual_Studio_CPP_Runtimes\VS2013</code>
 
-If offside PNNL:
+If offsite:
 * Download and run the "Visual C++ Redistributable Packages for Visual Studio 2013" from [https://www.microsoft.com/en-us/download/details.aspx?id=40784 https://www.microsoft.com/en-us/download/details.aspx?id=40784]
 
 [[Category:Software]] [[Category:Tutorials]]

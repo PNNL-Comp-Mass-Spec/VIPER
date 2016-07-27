@@ -11,7 +11,7 @@
    from \\floyd\software\VIPER\Exe_Only
    to C:\DMS_Programs\VIPER
 
-   (old: used installer "\\floyd\software\VIPER\LCMSFeatureFinder (Install this after installing Viper).msi")
+   (old: use installer "\\floyd\software\VIPER\LCMSFeatureFinder (Install this after installing Viper).msi")
 
 4) Update the permissions on folder C:\DMS_Programs\VIPER
 	Grant user pnl\MTSProc Modify permission on the folder
@@ -46,9 +46,13 @@
 	Note: If any of these files is missing from c:\Windows\SysWOW64, copy them from:
 	\\floyd\software\VIPER\OCX
 
-6) Unreg/Re-register MassMatchCom.dll
-	regsvr32 /u C:\DMS_Programs\VIPER\MassMatchCom.dll
-	regsvr32 C:\DMS_Programs\VIPER\MassMatchCom.dll
+6) Install Visual C++ Redistributable Packages for Visual Studio 2013 (required for MassMatchCOM.dll)
+	Onsite: \\floyd\software\Visual_Studio_CPP_Runtimes\VS2013\vcredist_x86.exe
+	Offsite: Download from https://www.microsoft.com/en-us/download/details.aspx?id=40784
+
+7) Unreg/Re-register MassMatchCOM.dll
+	regsvr32 /u C:\DMS_Programs\VIPER\MassMatchCOM.dll
+	regsvr32 C:\DMS_Programs\VIPER\MassMatchCOM.dll
 
 7) Unreg/Re-register Imagemagickobject.dll
 	regsvr32 /u C:\DMS_Programs\VIPER\imagemagickobject.dll
@@ -57,10 +61,10 @@
 8) Maybe: 
 	Run VIPER_MTS.exe as an administrators
 
-9) Maybe:
+9) Old:
 	Install Visual C++ 2008 Runtime (the 32 bit version and maybe also the 64-bit version)
 
-10) Maybe: unregister / Re-register UMCManipulation.dll and UMCCreation.dll
+10) Old: unregister / Re-register UMCManipulation.dll and UMCCreation.dll
 	regsvr32 /u C:\DMS_Programs\VIPER\UMCManipulation.dll
 	regsvr32 C:\DMS_Programs\VIPER\UMCManipulation.dll
 
