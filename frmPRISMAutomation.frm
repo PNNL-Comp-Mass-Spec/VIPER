@@ -1,14 +1,14 @@
 VERSION 5.00
-Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.Ocx"
+Object = "{3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0"; "richtx32.ocx"
 Begin VB.Form frmPRISMAutomation 
    Caption         =   "VIPER -- PRISM Automation"
-   ClientHeight    =   6975
+   ClientHeight    =   6984
    ClientLeft      =   60
-   ClientTop       =   375
-   ClientWidth     =   6795
+   ClientTop       =   372
+   ClientWidth     =   6792
    LinkTopic       =   "Form1"
-   ScaleHeight     =   6975
-   ScaleWidth      =   6795
+   ScaleHeight     =   6984
+   ScaleWidth      =   6792
    StartUpPosition =   3  'Windows Default
    Begin VB.Frame fraOptions 
       Height          =   1695
@@ -186,16 +186,15 @@ Begin VB.Form frmPRISMAutomation
       TabIndex        =   16
       Top             =   3000
       Width           =   6495
-      _ExtentX        =   11456
-      _ExtentY        =   4471
+      _ExtentX        =   11451
+      _ExtentY        =   4466
       _Version        =   393217
-      Enabled         =   -1  'True
       ReadOnly        =   -1  'True
       ScrollBars      =   3
       TextRTF         =   $"frmPRISMAutomation.frx":0000
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "Courier New"
-         Size            =   8.25
+         Size            =   8.4
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -238,6 +237,7 @@ Private mPaused As Boolean
 Private mViperLocalOnServer As Boolean
 Private mDebug As Boolean
 Private mInitiatedViaCommandLine As Boolean
+Private mExitAutomationWhenIdle As Boolean
 
 ' mForcePRISMQueryNow is used to force a re-query of PRISM directly after a job has completed processing
 Private mForcePRISMQueryNow As Boolean
@@ -503,10 +503,11 @@ Private Function GetCurrentTimeStamp() As String
     GetCurrentTimeStamp = Format(Now(), "yyyy.mm.dd Hh:Nn:Ss")
 End Function
 
-Public Sub InitiateFromCommandLine()
+Public Sub InitiateFromCommandLine(ByVal blnExitAutomationWhenIdle As Boolean)
     AddToPrismAutoAnalysisLog vbCrLf & vbCrLf
     AddToPrismAutoAnalysisLog GetCurrentTimeStamp() & " > Automated PRISM analysis started"
     mInitiatedViaCommandLine = True
+    mExitAutomationWhenIdle = blnExitAutomationWhenIdle
     
     ToggleLockoutControls True
     ForceQueryUpdateNow
@@ -560,11 +561,11 @@ Private Sub PostLogEntryToDB(strLogEntryType As String, strLogMessage As String)
     Dim strComputerName As String
     Dim strPostedBy As String
     
-    Dim cnnConnection As adodb.Connection
-    Dim cmdPostLogEntry As New adodb.Command
-    Dim prmType As New adodb.Parameter
-    Dim prmMessage As New adodb.Parameter
-    Dim prmPostedBy As New adodb.Parameter
+    Dim cnnConnection As ADODB.Connection
+    Dim cmdPostLogEntry As New ADODB.Command
+    Dim prmType As New ADODB.Parameter
+    Dim prmMessage As New ADODB.Parameter
+    Dim prmPostedBy As New ADODB.Parameter
     
 On Error GoTo PostLogEntryToDBErrorHandler
 
@@ -671,7 +672,7 @@ Private Sub QueryPRISM()
     
     Dim udtAutoParams As udtAutoAnalysisParametersType
     
-    Dim cnnConnection As adodb.Connection
+    Dim cnnConnection As ADODB.Connection
     
     Dim strConnectionString As String
     
@@ -696,42 +697,42 @@ Private Sub QueryPRISM()
     Dim strSetTaskCompleteSPName As String
     Dim strLogEntryType As String
     
-    Dim cmdGetPMTask As New adodb.Command
-    Dim prmProcessorName As New adodb.Parameter
-    Dim prmClientPerspective As New adodb.Parameter
-    Dim prmPriorityMin As New adodb.Parameter
-    Dim prmPriorityMax As New adodb.Parameter
-    Dim prmRestrictToMtdbName As New adodb.Parameter
-    Dim prmTaskID As New adodb.Parameter
-    Dim prmTaskPriority As New adodb.Parameter
-    Dim prmAnalysisJob As New adodb.Parameter
-    Dim prmAnalysisResultsFolderPath As New adodb.Parameter
-    Dim prmServerName As New adodb.Parameter
-    Dim prmMtdbName As New adodb.Parameter
-    Dim prmAMTsOnly As New adodb.Parameter
-    Dim prmConfirmedOnly As New adodb.Parameter
-    Dim prmLockersOnly As New adodb.Parameter
-    Dim prmLimitToPMTsFromDataset As New adodb.Parameter
+    Dim cmdGetPMTask As New ADODB.Command
+    Dim prmProcessorName As New ADODB.Parameter
+    Dim prmClientPerspective As New ADODB.Parameter
+    Dim prmPriorityMin As New ADODB.Parameter
+    Dim prmPriorityMax As New ADODB.Parameter
+    Dim prmRestrictToMtdbName As New ADODB.Parameter
+    Dim prmTaskID As New ADODB.Parameter
+    Dim prmTaskPriority As New ADODB.Parameter
+    Dim prmAnalysisJob As New ADODB.Parameter
+    Dim prmAnalysisResultsFolderPath As New ADODB.Parameter
+    Dim prmServerName As New ADODB.Parameter
+    Dim prmMtdbName As New ADODB.Parameter
+    Dim prmAMTsOnly As New ADODB.Parameter
+    Dim prmConfirmedOnly As New ADODB.Parameter
+    Dim prmLockersOnly As New ADODB.Parameter
+    Dim prmLimitToPMTsFromDataset As New ADODB.Parameter
     
-    Dim prmMTsubsetID As New adodb.Parameter
-    Dim prmModList As New adodb.Parameter
+    Dim prmMTsubsetID As New ADODB.Parameter
+    Dim prmModList As New ADODB.Parameter
     
-    Dim prmMinimumHighNormalizedScore As New adodb.Parameter
-    Dim prmMinimumHighDiscriminantScore As New adodb.Parameter
-    Dim prmMinimumPMTQualityScore As New adodb.Parameter
-    Dim prmExperimentInclusionFilter As New adodb.Parameter
-    Dim prmExperimentExclusionFilter As New adodb.Parameter
-    Dim prmInternalStdExplicit As New adodb.Parameter
+    Dim prmMinimumHighNormalizedScore As New ADODB.Parameter
+    Dim prmMinimumHighDiscriminantScore As New ADODB.Parameter
+    Dim prmMinimumPMTQualityScore As New ADODB.Parameter
+    Dim prmExperimentInclusionFilter As New ADODB.Parameter
+    Dim prmExperimentExclusionFilter As New ADODB.Parameter
+    Dim prmInternalStdExplicit As New ADODB.Parameter
 
-    Dim prmNETValueType As New adodb.Parameter
-    Dim prmIniFilePath As New adodb.Parameter
-    Dim prmOutputFolderPath As New adodb.Parameter
-    Dim prmLogFilePath As New adodb.Parameter
-    Dim prmTaskAvailable As New adodb.Parameter
-    Dim prmMessage As New adodb.Parameter
-    Dim prmDBSchemaVersion As New adodb.Parameter
-    Dim prmToolVersion As New adodb.Parameter
-    Dim prmMinimumPeptideProphetProbability As New adodb.Parameter
+    Dim prmNETValueType As New ADODB.Parameter
+    Dim prmIniFilePath As New ADODB.Parameter
+    Dim prmOutputFolderPath As New ADODB.Parameter
+    Dim prmLogFilePath As New ADODB.Parameter
+    Dim prmTaskAvailable As New ADODB.Parameter
+    Dim prmMessage As New ADODB.Parameter
+    Dim prmDBSchemaVersion As New ADODB.Parameter
+    Dim prmToolVersion As New ADODB.Parameter
+    Dim prmMinimumPeptideProphetProbability As New ADODB.Parameter
     
     Dim strMessage As String
     
@@ -1153,7 +1154,13 @@ QueryPRISMCleanup:
         
         ExitProgramQueryUser False, udtAutoParams.RestartAfterExit, udtAutoParams.ExitViperReason
     Else
-        If Not mPaused Then tmrPRISMQueryDelay.Enabled = True
+        If Not mPaused Then
+            If mExitAutomationWhenIdle And lngAvailableJobID < 0 Then
+                ExitProgramQueryUser False, False, "No available tasks"
+            End If
+            
+            tmrPRISMQueryDelay.Enabled = True
+        End If
     End If
     
     Me.MousePointer = vbDefault
@@ -1167,22 +1174,22 @@ QueryPRISMErrorHandler:
     
 End Sub
 
-Private Function SetPeakMatchingTaskComplete(cnnConnection As adodb.Connection, udtAutoParams As udtAutoAnalysisParametersType) As Boolean
+Private Function SetPeakMatchingTaskComplete(cnnConnection As ADODB.Connection, udtAutoParams As udtAutoAnalysisParametersType) As Boolean
     ' Call SetPeakMatchingTaskCompleteMaster SP to mark task as complete
     ' Returns True if successfully called, False if an error occurs
     
     Dim strSetPMTaskComplete As String
     
-    Dim cmdSetPMTaskComplete As New adodb.Command
+    Dim cmdSetPMTaskComplete As New ADODB.Command
         
-    Dim prmTaskID As New adodb.Parameter
-    Dim prmServerName As New adodb.Parameter
-    Dim prmMtdbName As New adodb.Parameter
-    Dim prmMessage As New adodb.Parameter
+    Dim prmTaskID As New ADODB.Parameter
+    Dim prmServerName As New ADODB.Parameter
+    Dim prmMtdbName As New ADODB.Parameter
+    Dim prmMessage As New ADODB.Parameter
     
-    Dim prmErrorCode As New adodb.Parameter
-    Dim prmWarningCode As New adodb.Parameter
-    Dim prmMDID As New adodb.Parameter
+    Dim prmErrorCode As New ADODB.Parameter
+    Dim prmWarningCode As New ADODB.Parameter
+    Dim prmMDID As New ADODB.Parameter
 
 On Error GoTo SetPeakMatchingTaskCompleteErrorHandler
         
@@ -1245,18 +1252,18 @@ SetPeakMatchingTaskCompleteErrorHandler:
 
 End Function
 
-Private Function SetPeakMatchingTaskToRestart(cnnConnection As adodb.Connection, udtAutoParams As udtAutoAnalysisParametersType) As Boolean
+Private Function SetPeakMatchingTaskToRestart(cnnConnection As ADODB.Connection, udtAutoParams As udtAutoAnalysisParametersType) As Boolean
     ' Call SetPeakMatchingTaskToRestartMaster SP to mark task as complete
     ' Returns True if successfully called, False if an error occurs
     
     Dim strSetPeakMatchingTaskToRestart As String
     
-    Dim cmdSetPeakMatchingTaskToRestart As New adodb.Command
+    Dim cmdSetPeakMatchingTaskToRestart As New ADODB.Command
         
-    Dim prmTaskID As New adodb.Parameter
-    Dim prmServerName As New adodb.Parameter
-    Dim prmMtdbName As New adodb.Parameter
-    Dim prmMessage As New adodb.Parameter
+    Dim prmTaskID As New ADODB.Parameter
+    Dim prmServerName As New ADODB.Parameter
+    Dim prmMtdbName As New ADODB.Parameter
+    Dim prmMessage As New ADODB.Parameter
     
 On Error GoTo SetPeakMatchingTaskToRestartErrorHandler
         

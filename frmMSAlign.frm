@@ -114,8 +114,8 @@ Begin VB.Form frmMSAlign
       TabCaption(2)   =   "Tolerances"
       TabPicture(2)   =   "frmMSAlign.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraNETTolerances"
-      Tab(2).Control(1)=   "fraBinningOptions"
+      Tab(2).Control(0)=   "fraBinningOptions"
+      Tab(2).Control(1)=   "fraNETTolerances"
       Tab(2).ControlCount=   2
       TabCaption(3)   =   "Calib Type"
       TabPicture(3)   =   "frmMSAlign.frx":0054
@@ -125,11 +125,11 @@ Begin VB.Form frmMSAlign
       TabCaption(4)   =   "Adv1"
       TabPicture(4)   =   "frmMSAlign.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "Label21"
-      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(0)=   "fraMTRangeFilters"
+      Tab(4).Control(1)=   "txtWarpMassZScoreTolerance"
       Tab(4).Control(2)=   "Frame1"
-      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
-      Tab(4).Control(4)=   "fraMTRangeFilters"
+      Tab(4).Control(3)=   "chkWarpMassUseLSQ"
+      Tab(4).Control(4)=   "Label21"
       Tab(4).ControlCount=   5
       TabCaption(5)   =   "Adv2"
       TabPicture(5)   =   "frmMSAlign.frx":008C
@@ -2333,8 +2333,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   1.05443122830224E-249
-         DataMax_5       =   1.05443122830224E-249
+         DataMin_5       =   8.25149952280674E-302
+         DataMax_5       =   8.25149952280674E-302
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2400,8 +2400,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   1.0548489429837E-249
-         DataMax_14      =   1.0548489429837E-249
+         DataMin_14      =   8.26776926286394E-302
+         DataMax_14      =   8.26776926286394E-302
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2469,8 +2469,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   6.85823596278464E-250
-         DataMax_23      =   6.85823596278464E-250
+         DataMin_23      =   8.28403900292113E-302
+         DataMax_23      =   8.28403900292113E-302
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -3166,7 +3166,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Option Explicit
+        
 
 
 Private Const MAX_NET_TOL As Single = 0.15
@@ -3379,6 +3379,8 @@ Private mMostRecentMassVsMZResidualsViewMode As pvmPlotViewModeConstants
 Private mResidualPlotPointSize As Integer
 Private mResidualPlotTransformationFnLineSize As Integer
 Private mUpdatingPlotRanges As Boolean
+
+Private mExportDataPriorToAlignment As Boolean
 
 Public CallerID As Long
 
@@ -3748,8 +3750,7 @@ On Error GoTo CopyLocalDataToGelErrorHandler
                     .ScanInfo(lngIndex).CustomNET = dblScanNETs(lngIndex - 1)
                 Next lngIndex
             
-                ' The last few scans will have invalid NET values; check for this
-                ' ToDo: This is a bug that Deep needs to fix
+                ' The last few scans may have invalid NET values; check for this
                 
                 lngStartIndex = UBound(.ScanInfo) * 0.95
                 If lngStartIndex < 1 Then lngStartIndex = 1
@@ -4577,6 +4578,148 @@ EstimateLinearNETErrorHandler:
     
 End Function
 
+Private Function ExportAlignmentOptionsAndInputData(ByVal netMin As Single, ByVal netMax As Single) As Boolean
+
+On Error GoTo ExportAlignmentOptionsErrorHandler:
+
+    Dim success As Boolean
+    Dim CurrentTask As String
+    
+    success = True
+    CurrentTask = "Initializing"
+    
+    ' Export the data to temporary files so we can debug things
+                
+    Dim fso As FileSystemObject
+    Set fso = New FileSystemObject
+
+    Dim tsOut As TextStream
+
+    Dim optionsFilePath As String
+    Dim lcmsFeaturesFilePath As String
+    Dim filteredPMTsFilePath As String
+    
+    optionsFilePath = fso.BuildPath(GetTemporaryDir(), "MassMatchCom_Options.txt")
+    lcmsFeaturesFilePath = fso.BuildPath(GetTemporaryDir(), "MassMatchCom_LCMSFeaturesFile.txt")
+    filteredPMTsFilePath = fso.BuildPath(GetTemporaryDir(), "MassMatchCom_PMTs.txt")
+    
+    ' Write the processing options
+    
+    CurrentTask = "Writing the processing options to file: " & optionsFilePath
+    
+    With UMCNetAdjDef
+        Set tsOut = fso.CreateTextFile(optionsFilePath, True)
+        
+        tsOut.WriteLine "NumberOfSections = " & CLng(.MSWarpOptions.NumberOfSections)
+        tsOut.WriteLine "MSWarpOptions_ContractionFactor = " & CInt(.MSWarpOptions.ContractionFactor)
+        tsOut.WriteLine "MSWarpOptions_MaxDistortion = " & CInt(.MSWarpOptions.MaxDistortion)
+        tsOut.WriteLine "MSWarpOptions_NETTol = " & CDbl(.MSWarpOptions.NETTol)
+        tsOut.WriteLine "NET_MIN = " & CDbl(netMin)
+        tsOut.WriteLine "NET_MAX = " & CDbl(netMax)
+        tsOut.WriteLine "MSWarpOptions_MatchPromiscuity = " & CLng(.MSWarpOptions.MatchPromiscuity)
+
+        tsOut.WriteLine "MWTol = " & CDbl(.MWTol)
+        tsOut.WriteLine "MSWarpOptions_MassNumMassDeltaBins = " & CLng(.MSWarpOptions.MassNumMassDeltaBins)
+        tsOut.WriteLine "MSWarpOptions_MassWindowPPM = " & CDbl(.MSWarpOptions.MassWindowPPM)
+        tsOut.WriteLine "MSWarpOptions_MassMaxJump = " & CLng(.MSWarpOptions.MassMaxJump)
+        tsOut.WriteLine "MSWarpOptions_MassNumXSlices = " & CLng(.MSWarpOptions.MassNumXSlices)
+        tsOut.WriteLine "MSWarpOptions_MassZScoreTolerance = " & CDbl(UMCNetAdjDef.MSWarpOptions.MassZScoreTolerance)
+        tsOut.WriteLine "MSWarpOptions_MassUseLSQ = " & .MSWarpOptions.MassUseLSQ
+        
+        tsOut.WriteLine "MSWarpOptions_MassLSQNumKnots = " & UMCNetAdjDef.MSWarpOptions.MassLSQNumKnots
+    
+        tsOut.WriteLine "MassCalibrationType = " & .MSWarpOptions.MassCalibrationType
+        tsOut.WriteLine "MassSplineOrder = " & .MSWarpOptions.MassSplineOrder
+    
+        If .RobustNETAdjustmentMode = UMCRobustNETModeConstants.UMCRobustNETWarpTimeAndMass Then
+            ' Warp Time and Mass
+            tsOut.WriteLine "AlignmentType=1"
+        Else
+            ' Warp Time
+            tsOut.WriteLine "AlignmentType=0"
+        End If
+        
+        tsOut.WriteLine "MinimumAMTTagObsCount = " & .MSWarpOptions.MinimumPMTTagObsCount
+        
+        tsOut.WriteLine "MassBinSize = " & glbPreferencesExpanded.ErrorPlottingOptions.MassBinSizePPM
+        tsOut.WriteLine "NetBinSize = " & glbPreferencesExpanded.ErrorPlottingOptions.GANETBinSize
+        tsOut.WriteLine "DriftTimeBinSize = " & glbPreferencesExpanded.ErrorPlottingOptions.DriftTimeBinSize
+
+        tsOut.Close
+    End With
+    
+    
+    ' Export the data in mLocalFeatures
+    ' 2D Array, ranging from 0 to mLocalFeatureCount-1 in the 1st dimension and 0 to FEATURE_COLUMN_COUNT-1 in the second dimension
+    ' Columns for the 2nd dimension are given by FeatureColumnConstants
+    
+    CurrentTask = "Exporting the LC/MS Features: " & lcmsFeaturesFilePath
+    
+    Set tsOut = fso.CreateTextFile(lcmsFeaturesFilePath, True)
+    
+    Dim I As Long
+    Dim j As Integer
+    Dim lineOut As String
+       
+    ' Header line
+    lineOut = "ClassMZ" & vbTab & "ClassMass" & vbTab & "ScanClassRep" & vbTab & "ClassAbundance" & vbTab & "PairIndex" & vbTab & "PMTTagID" & vbTab & "UMCID"
+    tsOut.WriteLine (lineOut)
+    
+    For I = 0 To mLocalFeatureCount - 1
+        lineOut = mLocalFeatures(I, 0)
+        For j = 1 To FEATURE_COLUMN_COUNT - 1
+            lineOut = lineOut & vbTab & mLocalFeatures(I, j)
+        Next j
+        tsOut.WriteLine (lineOut)
+    Next I
+        
+    tsOut.Close
+    
+    ' Export the Filtered PMTs
+    ' 2D Array; containing a subset of mLocalPMTs, filtered on UMCNetAdjDef.MSWarpOptions.MinimumPMTTagObsCount
+    
+    Dim filteredPMTsCount As Long
+    filteredPMTsCount = UBound(mLocalPMTsFiltered, 1)
+    
+    CurrentTask = "Exporting the Filtered PMTs: " & filteredPMTsFilePath
+    
+    Set tsOut = fso.CreateTextFile(filteredPMTsFilePath, True)
+    
+    ' Header line
+    lineOut = "NET" & vbTab & "MonoisotopicMass" & vbTab & "ObservationCount" & vbTab & "PMTTagID"
+    tsOut.WriteLine (lineOut)
+    
+    For I = 0 To filteredPMTsCount - 1
+        lineOut = mLocalPMTsFiltered(I, 0)
+        For j = 1 To PMT_COLUMN_COUNT - 1
+            lineOut = lineOut & vbTab & mLocalPMTsFiltered(I, j)
+        Next j
+        tsOut.WriteLine (lineOut)
+    Next I
+    
+    tsOut.Close
+
+ExportAlignmentOptionsContinue:
+
+    ExportAlignmentOptionsAndInputData = success
+    Exit Function
+
+ExportAlignmentOptionsErrorHandler:
+
+    If Not glbPreferencesExpanded.AutoAnalysisStatus.Enabled Then
+        MsgBox "Error exporting alignment options and input dat (task " & CurrentTask & "): " & Err.Description, vbExclamation + vbOKOnly, "Error"
+    Else
+        Debug.Assert False
+        LogErrors Err.Number, "frmMSAlign.ExportAlignmentOptionsAndInputData"
+    End If
+    
+    success = False
+    
+    Resume ExportAlignmentOptionsContinue
+
+
+End Function
+
 Private Sub FilterAndAlignFeatures(ByVal intIteration As Integer)
     Const NET_MIN As Double = 0
     Const NET_MAX As Double = 1
@@ -4639,6 +4782,12 @@ Private Sub FilterAndAlignFeatures(ByVal intIteration As Integer)
     End If
     
     If blnStartAlignment Then
+            
+        If mExportDataPriorToAlignment Then
+            Dim success As Boolean
+            success = ExportAlignmentOptionsAndInputData(NET_MIN, NET_MAX)
+        End If
+        
         tmrAlignment.Enabled = True
         
         With UMCNetAdjDef
@@ -4844,10 +4993,10 @@ On Error GoTo GetNETsFromScansErrorHandler
     lngTimeSliceCount = UBound(mAlignmentFunc, 1)
     
     If lngTimeSliceCount > 0 Then
-        dblFinalSectionNETStart = mTransformRT(lngTimeSliceCount - 1, trcTransformRTColumns.trcNET)
-        dblFinalSectionNETEnd = mTransformRT(lngTimeSliceCount, trcTransformRTColumns.trcNET)
-        dblFinalSectionScanStart = mTransformRT(lngTimeSliceCount - 1, trcTransformRTColumns.trcScanNum)
-        dblFinalSectionScanEnd = mTransformRT(lngTimeSliceCount, trcTransformRTColumns.trcScanNum)
+        dblFinalSectionNETStart = mAlignmentFunc(lngTimeSliceCount - 1, afAlignmentFuncColumnConstants.NETStart)
+        dblFinalSectionNETEnd = mAlignmentFunc(lngTimeSliceCount, afAlignmentFuncColumnConstants.NETStart)
+        dblFinalSectionScanStart = mAlignmentFunc(lngTimeSliceCount - 1, afAlignmentFuncColumnConstants.ScanStart)
+        dblFinalSectionScanEnd = mAlignmentFunc(lngTimeSliceCount, afAlignmentFuncColumnConstants.ScanStart)
             
         For lngScanIndex = 0 To lngIndexMax
             lngScanNumber = lngScanNumbers(lngScanIndex)
@@ -5016,6 +5165,8 @@ On Error GoTo FormLoadErrorHandler
     strLastGoodLocation = "SetDefaultOptions"
     SetDefaultOptions
     tbsOptions.TabIndex = 3
+    
+    mExportDataPriorToAlignment = True
     
     mLoading = False
     mControlsEnabled = True

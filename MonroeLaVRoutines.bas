@@ -4564,6 +4564,7 @@ Public Sub ParseCommandLine()
     Dim lngCharLoc As Long, lngNextCharLoc As Long
     Dim blnAutoProcess As Boolean, blnExitProgramWhenDone As Boolean
     Dim blnPRISMAutomationMode As Boolean
+    Dim blnExitAutomationWhenIdle As Boolean
     
     Dim blnGenerateIndexHtmlFiles As Boolean
     Dim blnOverwriteExistingFiles As Boolean
@@ -4680,6 +4681,8 @@ On Error GoTo ParseCommandLineErrorHandler
                 Else
                     blnPRISMAutomationMode = True
                 End If
+            Case "IDLESTOP"
+                blnExitAutomationWhenIdle = True
             Case "T"
                 If IsNumeric(strSwitchParameters(intIndex)) Then
                     SetTraceLogLevel val(strSwitchParameters(intIndex))
@@ -4736,7 +4739,7 @@ On Error GoTo ParseCommandLineErrorHandler
     If blnShowHelp Then
         strMessage = "Syntax:" & vbCrLf
         If Not APP_BUILD_DISABLE_MTS Then
-            strMessage = strMessage & App.EXEName & " /A [/T:TraceLogLevel]" & vbCrLf
+            strMessage = strMessage & App.EXEName & " /A [/T:TraceLogLevel [/IdleStop]" & vbCrLf
             strMessage = strMessage & "   or" & vbCrLf
         End If
         
@@ -4747,7 +4750,7 @@ On Error GoTo ParseCommandLineErrorHandler
         strMessage = strMessage & App.EXEName & " /G:FolderStartPath /O" & vbCrLf & vbCrLf
         
         If Not APP_BUILD_DISABLE_MTS Then
-            strMessage = strMessage & "Use of /A will initiate fully automated PRISM automation mode.  The database will be queried periodically to look for available jobs." & vbCrLf & vbCrLf
+            strMessage = strMessage & "Use of /A will initiate fully automated PRISM automation mode.  The database will be queried periodically to look for available jobs.  If /IdleStop is provided, the program will query for available jobs, but exit if no jobs are available." & vbCrLf & vbCrLf
         End If
         strMessage = strMessage & "A parameter file can be used to list the input file path and JobNumber for auto analysis, along with other paths.  Example parameter file:" & vbCrLf
         strMessage = strMessage & vbCrLf
@@ -4813,7 +4816,7 @@ On Error GoTo ParseCommandLineErrorHandler
     
     ElseIf blnPRISMAutomationMode Then
         blnExitProgramWhenDone = False
-        MDIForm1.InitiatePRISMAutomation True
+        MDIForm1.InitiatePRISMAutomation True, blnExitAutomationWhenIdle
     ElseIf blnAutoProcess Then
     
         If Len(strParameterFilePath) > 0 Then

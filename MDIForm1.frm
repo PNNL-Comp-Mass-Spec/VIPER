@@ -3,9 +3,9 @@ Begin VB.MDIForm MDIForm1
    AutoShowChildren=   0   'False
    BackColor       =   &H8000000C&
    Caption         =   "VIPER"
-   ClientHeight    =   8310
+   ClientHeight    =   8304
    ClientLeft      =   60
-   ClientTop       =   630
+   ClientTop       =   636
    ClientWidth     =   8880
    Icon            =   "MDIForm1.frx":0000
    LinkTopic       =   "MDIForm1"
@@ -13,8 +13,8 @@ Begin VB.MDIForm MDIForm1
       Align           =   1  'Align Top
       Height          =   375
       Left            =   0
-      ScaleHeight     =   315
-      ScaleWidth      =   8820
+      ScaleHeight     =   324
+      ScaleWidth      =   8832
       TabIndex        =   0
       Top             =   0
       Width           =   8880
@@ -387,7 +387,7 @@ Option Explicit
 Public WithEvents MyAnalysisInit As AnalysisInitiator
 Attribute MyAnalysisInit.VB_VarHelpID = -1
 
-Public Sub InitiatePRISMAutomation(Optional blnInitiatedViaCommandLine As Boolean = False)
+Public Sub InitiatePRISMAutomation(Optional blnInitiatedViaCommandLine As Boolean = False, Optional blnExitAutomationWhenIdle As Boolean = False)
     
     Dim strMessage As String
     
@@ -404,7 +404,7 @@ Public Sub InitiatePRISMAutomation(Optional blnInitiatedViaCommandLine As Boolea
     frmPRISMAutomation.InitializeControls
     
     If blnInitiatedViaCommandLine Then
-        frmPRISMAutomation.InitiateFromCommandLine
+        frmPRISMAutomation.InitiateFromCommandLine blnExitAutomationWhenIdle
     Else
         frmPRISMAutomation.TogglePause True
     End If
@@ -952,11 +952,11 @@ Private Sub mnuV2DGelHelp_Click()
 End Sub
 
 Public Sub ProperToolbar(ByVal bAnyChild As Boolean)
-Dim i As Long
-For i = 0 To 5
-    cmdHFineTune(i).Enabled = bAnyChild
-    cmdVFineTune(i).Enabled = bAnyChild
-Next i
+Dim I As Long
+For I = 0 To 5
+    cmdHFineTune(I).Enabled = bAnyChild
+    cmdVFineTune(I).Enabled = bAnyChild
+Next I
 cmdCopy.Enabled = bAnyChild
 cmdPrint.Enabled = bAnyChild
 cmdSave.Enabled = bAnyChild

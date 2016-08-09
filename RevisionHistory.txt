@@ -1,5 +1,9 @@
 VIPER Change Log
 
+Version 3.49 - Build 480; August 9, 2016
+	- Add command line switch /IdleStop
+		Use /A /IdleStop to query the database to look for tasks to process, then exit the program if no tasks are available
+
 Version 3.49 - Build 478; July 12, 2016
 	- Now using a C# based version of LCMSFeatureFinder.exe
 		- Compiled with Visual Studio 2013 against .NET 4
