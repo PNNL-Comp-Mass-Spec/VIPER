@@ -114,8 +114,8 @@ Begin VB.Form frmMSAlign
       TabCaption(2)   =   "Tolerances"
       TabPicture(2)   =   "frmMSAlign.frx":0038
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "fraBinningOptions"
-      Tab(2).Control(1)=   "fraNETTolerances"
+      Tab(2).Control(0)=   "fraNETTolerances"
+      Tab(2).Control(1)=   "fraBinningOptions"
       Tab(2).ControlCount=   2
       TabCaption(3)   =   "Calib Type"
       TabPicture(3)   =   "frmMSAlign.frx":0054
@@ -125,11 +125,11 @@ Begin VB.Form frmMSAlign
       TabCaption(4)   =   "Adv1"
       TabPicture(4)   =   "frmMSAlign.frx":0070
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "fraMTRangeFilters"
-      Tab(4).Control(1)=   "txtWarpMassZScoreTolerance"
+      Tab(4).Control(0)=   "Label21"
+      Tab(4).Control(1)=   "chkWarpMassUseLSQ"
       Tab(4).Control(2)=   "Frame1"
-      Tab(4).Control(3)=   "chkWarpMassUseLSQ"
-      Tab(4).Control(4)=   "Label21"
+      Tab(4).Control(3)=   "txtWarpMassZScoreTolerance"
+      Tab(4).Control(4)=   "fraMTRangeFilters"
       Tab(4).ControlCount=   5
       TabCaption(5)   =   "Adv2"
       TabPicture(5)   =   "frmMSAlign.frx":008C
@@ -2333,8 +2333,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_5=   3
          MajorUnitsInterval_5=   2
          MinorUnitsInterval_5=   0.666666666666667
-         DataMin_5       =   8.25149952280674E-302
-         DataMax_5       =   8.25149952280674E-302
+         DataMin_5       =   6.01409077492266E-297
+         DataMax_5       =   6.01409077492266E-297
          Y_4             =   14
          ClassName_14    =   "CCWAxis3D"
          opts_14         =   1599
@@ -2400,8 +2400,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_14=   3
          MajorUnitsInterval_14=   2
          MinorUnitsInterval_14=   0.666666666666667
-         DataMin_14      =   8.26776926286394E-302
-         DataMax_14      =   8.26776926286394E-302
+         DataMin_14      =   6.07010992363636E-297
+         DataMax_14      =   6.07010992363636E-297
          PointStyle_4    =   31
          LineStyle_4     =   1
          Z_4             =   23
@@ -2469,8 +2469,8 @@ Begin VB.Form frmMSAlign
          MinorDivisions_23=   3
          MajorUnitsInterval_23=   2
          MinorUnitsInterval_23=   0.666666666666667
-         DataMin_23      =   8.28403900292113E-302
-         DataMax_23      =   8.28403900292113E-302
+         DataMin_23      =   6.08448218336465E-297
+         DataMax_23      =   6.08448218336465E-297
          ContourData_4   =   32
          ClassName_32    =   "ContourData"
          opts_32         =   62
@@ -5166,7 +5166,7 @@ On Error GoTo FormLoadErrorHandler
     SetDefaultOptions
     tbsOptions.TabIndex = 3
     
-    mExportDataPriorToAlignment = True
+    mExportDataPriorToAlignment = False
     
     mLoading = False
     mControlsEnabled = True
