@@ -239,6 +239,9 @@ Private mDebug As Boolean
 Private mInitiatedViaCommandLine As Boolean
 Private mExitAutomationWhenIdle As Boolean
 
+Private mMaxTasks As Integer
+Private mTasksProcessed As Integer
+
 ' mForcePRISMQueryNow is used to force a re-query of PRISM directly after a job has completed processing
 Private mForcePRISMQueryNow As Boolean
 
@@ -301,6 +304,11 @@ On Error GoTo CheckElapsedIterationsErrorHandler
         lblTimeToNextQuery = "Time to next query: 0 seconds"
         
         QueryPRISM
+        
+        If mTasksProcessed >= mMaxTasks Then
+            ExitProgramQueryUser False, False, "MaxTasks processed (" & mMaxTasks & ")"
+        End If
+        
     Else
         lblTimeToNextQuery = "Time to next query: " & CStr(mPRISMQueryInterval - SecondsElapsed) & " seconds"
     End If
@@ -503,11 +511,12 @@ Private Function GetCurrentTimeStamp() As String
     GetCurrentTimeStamp = Format(Now(), "yyyy.mm.dd Hh:Nn:Ss")
 End Function
 
-Public Sub InitiateFromCommandLine(ByVal blnExitAutomationWhenIdle As Boolean)
+Public Sub InitiateFromCommandLine(ByVal blnExitAutomationWhenIdle As Boolean, maxTasks As Integer)
     AddToPrismAutoAnalysisLog vbCrLf & vbCrLf
     AddToPrismAutoAnalysisLog GetCurrentTimeStamp() & " > Automated PRISM analysis started"
     mInitiatedViaCommandLine = True
     mExitAutomationWhenIdle = blnExitAutomationWhenIdle
+    mMaxTasks = maxTasks
     
     ToggleLockoutControls True
     ForceQueryUpdateNow
@@ -635,6 +644,9 @@ Private Function ProcessJob(udtAutoParams As udtAutoAnalysisParametersType) As B
     
     Dim blnSuccess As Boolean
     Dim strMemoryLog As String
+        
+    ' Increment the task process count now, before we do any work, in case an error occurs
+    mTasksProcessed = mTasksProcessed + 1
     
     ' Call AutoAnalysisStart to do all the work
     blnSuccess = AutoAnalysisStart(udtAutoParams, True, mDebug)
@@ -1079,7 +1091,7 @@ On Error GoTo QueryPRISMErrorHandler
 
         strLastGoodLocation = "Process job " & Trim(lngAvailableJobID)
         If mDebug Then AddToPrismAutoAnalysisLog strLastGoodLocation
-
+        
         ' Process the job
         blnSuccess = ProcessJob(udtAutoParams)
 

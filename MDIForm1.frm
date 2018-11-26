@@ -387,7 +387,7 @@ Option Explicit
 Public WithEvents MyAnalysisInit As AnalysisInitiator
 Attribute MyAnalysisInit.VB_VarHelpID = -1
 
-Public Sub InitiatePRISMAutomation(Optional blnInitiatedViaCommandLine As Boolean = False, Optional blnExitAutomationWhenIdle As Boolean = False)
+Public Sub InitiatePRISMAutomation(Optional blnInitiatedViaCommandLine As Boolean = False, Optional blnExitAutomationWhenIdle As Boolean = False, Optional maxTasks As Integer = 50)
     
     Dim strMessage As String
     
@@ -404,7 +404,7 @@ Public Sub InitiatePRISMAutomation(Optional blnInitiatedViaCommandLine As Boolea
     frmPRISMAutomation.InitializeControls
     
     If blnInitiatedViaCommandLine Then
-        frmPRISMAutomation.InitiateFromCommandLine blnExitAutomationWhenIdle
+        frmPRISMAutomation.InitiateFromCommandLine blnExitAutomationWhenIdle, maxTasks
     Else
         frmPRISMAutomation.TogglePause True
     End If

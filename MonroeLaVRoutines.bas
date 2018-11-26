@@ -4548,6 +4548,7 @@ Public Sub ParseCommandLine()
     Const MAX_SWITCH_COUNT = 15
     Const SWITCH_START_CHAR = "/"
     Const SWITCH_PARAMETER_CHAR = ":"
+    Const DEFAULT_MAX_TASKS = 50
     
     Dim fso As New FileSystemObject
     Dim ts As TextStream
@@ -4565,6 +4566,10 @@ Public Sub ParseCommandLine()
     Dim blnAutoProcess As Boolean, blnExitProgramWhenDone As Boolean
     Dim blnPRISMAutomationMode As Boolean
     Dim blnExitAutomationWhenIdle As Boolean
+    
+    Dim strValue As String
+    Dim maxTasks As Integer
+    maxTasks = DEFAULT_MAX_TASKS
     
     Dim blnGenerateIndexHtmlFiles As Boolean
     Dim blnOverwriteExistingFiles As Boolean
@@ -4664,6 +4669,7 @@ On Error GoTo ParseCommandLineErrorHandler
         For intIndex = 0 To intSwitchCount - 1
             Select Case UCase(strSwitches(intIndex))
             Case "I"
+                ' Input file path, /I
                 strInputFilePathSingle = strSwitchParameters(intIndex)
                 If Len(strInputFilePathSingle) > 0 Then
                     blnAutoProcess = True
@@ -4671,23 +4677,33 @@ On Error GoTo ParseCommandLineErrorHandler
                     blnShowHelp = True
                 End If
             Case "N"
+                ' Parameter file path, /N
                 strIniFilePath = strSwitchParameters(intIndex)
             Case "R"
-                ' Do not exit the program when done auto processing (Remain Open)
+                ' Do not exit the program when done auto processing (Remain Open), /R
                 blnExitProgramWhenDone = False
             Case "A"
+                ' Automation mode, /A:MaxTasks
                 If APP_BUILD_DISABLE_MTS Then
                     MsgBox "Prism Automation Mode is not enabled in this version of Viper"
                 Else
                     blnPRISMAutomationMode = True
                 End If
+                strValue = strSwitchParameters(intIndex)
+                If IsNumeric(strValue) Then
+                    maxTasks = CInt(strValue)
+                End If
+                
             Case "IDLESTOP"
+                ' Close the program when idle, /IdleStop
                 blnExitAutomationWhenIdle = True
             Case "T"
+                ' Trace log level, /T
                 If IsNumeric(strSwitchParameters(intIndex)) Then
                     SetTraceLogLevel val(strSwitchParameters(intIndex))
                 End If
             Case "G"
+                ' Generate index.html files, /G
                 strIndexHtmlFilesFolderPath = strSwitchParameters(intIndex)
                 If Len(strIndexHtmlFilesFolderPath) > 0 Then
                     blnGenerateIndexHtmlFiles = True
@@ -4695,9 +4711,10 @@ On Error GoTo ParseCommandLineErrorHandler
                     blnShowHelp = True
                 End If
             Case "O"
+                ' Overwrite, /O
                 blnOverwriteExistingFiles = True
             Case Else
-                ' Includes "?", "HELP"
+                ' Includes /? and /Help
                 blnShowHelp = True
                 Exit For
             End Select
@@ -4739,7 +4756,7 @@ On Error GoTo ParseCommandLineErrorHandler
     If blnShowHelp Then
         strMessage = "Syntax:" & vbCrLf
         If Not APP_BUILD_DISABLE_MTS Then
-            strMessage = strMessage & App.EXEName & " /A [/T:TraceLogLevel [/IdleStop]" & vbCrLf
+            strMessage = strMessage & App.EXEName & " /A:MaxTasks [/T:TraceLogLevel [/IdleStop]" & vbCrLf
             strMessage = strMessage & "   or" & vbCrLf
         End If
         
@@ -4750,7 +4767,12 @@ On Error GoTo ParseCommandLineErrorHandler
         strMessage = strMessage & App.EXEName & " /G:FolderStartPath /O" & vbCrLf & vbCrLf
         
         If Not APP_BUILD_DISABLE_MTS Then
-            strMessage = strMessage & "Use of /A will initiate fully automated PRISM automation mode.  The database will be queried periodically to look for available jobs.  If /IdleStop is provided, the program will query for available jobs, but exit if no jobs are available." & vbCrLf & vbCrLf
+            strMessage = strMessage & "Use of /A will initiate fully automated PRISM automation mode. " & _
+               "The database will be queried periodically to look for available jobs. " & _
+               "If /IdleStop is provided, the program will query for available jobs, but exit if no jobs are available. " & _
+               "Provide a number after /A to specify the maximum number of tasks to run, for example /A:5 for a maximum of 5 tasks. " & _
+               "The default is /A:" & DEFAULT_MAX_TASKS & vbCrLf & vbCrLf
+               
         End If
         strMessage = strMessage & "A parameter file can be used to list the input file path and JobNumber for auto analysis, along with other paths.  Example parameter file:" & vbCrLf
         strMessage = strMessage & vbCrLf
@@ -4816,7 +4838,7 @@ On Error GoTo ParseCommandLineErrorHandler
     
     ElseIf blnPRISMAutomationMode Then
         blnExitProgramWhenDone = False
-        MDIForm1.InitiatePRISMAutomation True, blnExitAutomationWhenIdle
+        MDIForm1.InitiatePRISMAutomation True, blnExitAutomationWhenIdle, maxTasks
     ElseIf blnAutoProcess Then
     
         If Len(strParameterFilePath) > 0 Then
