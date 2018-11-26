@@ -1,1 +1,1 @@
-"C:\Program Files (x86)\Microsoft Visual Studio\Common\IDE\IDE98\DEVENV.EXE" "F:\My Documents\Projects\DataMining\VIPER\VIPER_MTS_Installer\VIPER_MTS_Installer.sln"
+"C:\Program Files (x86)\Microsoft Visual Studio\Common\IDE\IDE98\DEVENV.EXE" "F:\Documents\Projects\DataMining\VIPER\VIPER_MTS_Installer\VIPER_MTS_Installer.sln"
