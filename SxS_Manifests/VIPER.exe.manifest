@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="Battelle.-.PNNL.VIPER" processorArchitecture="X86" type="win32" version="3.49.0.468" />
+  <description>VIPER (Public Version)</description>
+  <file name="MZXmlFileReaderDLL.dll">
+    <typelib tlbid="{A4FAA10E-F44A-4DC6-A581-35DE920AA8C7}" version="22.0" flags="" helpdir="" />
+    <comClass clsid="{76384580-E68C-4145-A5E3-D86034C2C2E5}" tlbid="{A4FAA10E-F44A-4DC6-A581-35DE920AA8C7}" progid="MZXmlFileReaderDLL.mzXMLReader" description="" />
+    <comClass clsid="{57E7828E-7F94-4289-9EF6-F59B6E46097A}" tlbid="{A4FAA10E-F44A-4DC6-A581-35DE920AA8C7}" progid="MZXmlFileReaderDLL.mzXMLSpectrumInfo" description="" />
+    <comClass clsid="{6B5D0C19-8023-43A6-A5F3-A0BCC2EC01C6}" tlbid="{A4FAA10E-F44A-4DC6-A581-35DE920AA8C7}" progid="MZXmlFileReaderDLL.mzXMLFileAccessor" description="" />
+    <comClass clsid="{A279ABA8-B0B4-473F-B465-45DC4C6AA289}" tlbid="{A4FAA10E-F44A-4DC6-A581-35DE920AA8C7}" progid="MZXmlFileReaderDLL.clsBinaryTextReader" description="" />
+  </file>
+  <file name="MZDataFileReaderDLL.dll">
+    <typelib tlbid="{D20ABF1C-82D8-4FA6-A551-12707A690BCB}" version="48.0" flags="" helpdir="" />
+    <comClass clsid="{151F73C2-64DF-4775-A338-84D1FC3B1B07}" tlbid="{D20ABF1C-82D8-4FA6-A551-12707A690BCB}" progid="MZDataFileReaderDLL.mzDataReader" description="" />
+    <comClass clsid="{04FD89C1-752A-47FA-9839-8EDEFC718E6B}" tlbid="{D20ABF1C-82D8-4FA6-A551-12707A690BCB}" progid="MZDataFileReaderDLL.mzDataFileAccessor" description="" />
+    <comClass clsid="{A3EE1E1F-E64A-4574-A5D6-E51E1BA5443F}" tlbid="{D20ABF1C-82D8-4FA6-A551-12707A690BCB}" progid="MZDataFileReaderDLL.mzDataSpectrumInfo" description="" />
+    <comClass clsid="{D46353B7-BE02-4CC9-9015-22F91E58F76E}" tlbid="{D20ABF1C-82D8-4FA6-A551-12707A690BCB}" progid="MZDataFileReaderDLL.clsBinaryTextReader" description="" />
+  </file>
+  <!--<file name="oledb32.dll">
+    <typelib tlbid="{2206CEB0-19C1-11D1-89E0-00C04FD7A829}" version="1.0" flags="" helpdir="" />
+    <comClass clsid="{2206CDB2-19C1-11D1-89E0-00C04FD7A829}" tlbid="{2206CEB0-19C1-11D1-89E0-00C04FD7A829}" threadingModel="Both" progid="DataLinks" description="Microsoft OLE DB Service Component Data Link" />
+    <comClass clsid="{2206CDB0-19C1-11D1-89E0-00C04FD7A829}" tlbid="{2206CEB0-19C1-11D1-89E0-00C04FD7A829}" threadingModel="Both" progid="MSDASC.MSDAINITIALIZE.1" description="Microsoft OLE DB Service Component Initialization Component" />
+    <comClass clsid="{CCB4EC60-B9DC-11D1-AC80-00A0C9034873}" tlbid="{2206CEB0-19C1-11D1-89E0-00C04FD7A829}" threadingModel="Both" progid="MSDASC.PDPO.1" description="Persisted Datasource/Pooling Object" />
+    <comClass clsid="{FF151822-B0BF-11D1-A80D-000000000000}" tlbid="{2206CEB0-19C1-11D1-89E0-00C04FD7A829}" threadingModel="Both" progid="MSDAURL.Binder.1" description="Microsoft OLE DB Root Binder" />
+  </file>-->
+  <file name="MassMatchCOM.dll">
+    <typelib tlbid="{0AA200D1-621E-4A3C-8EB6-BDC17766E9B0}" version="1.0" flags="" helpdir="" />
+    <comClass clsid="{6C4CFBF4-A6A3-4E02-B9A1-37A478107A36}" tlbid="{0AA200D1-621E-4A3C-8EB6-BDC17766E9B0}" threadingModel="apartment" progid="MassMatchCOM.MassMatchWrapper.1" description="MassMatchWrapper Class" />
+  </file>
+  
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="comctl32.sxs" version="6.0.98.34" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="comdlg32.sxs" version="6.1.98.16" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="mscomctl.sxs" version="6.1.98.34" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="msinet.sxs" version="6.1.98.16" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="richtx32.sxs" version="6.1.98.16" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="tabctl32.sxs" version="6.1.98.16" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="cwui.sxs" version="7.1.0.306" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="cw3dgrph.sxs" version="7.1.0.306" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="olch2x32.sxs" version="5.0.0.0" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="olch3x32.sxs" version="5.0.0.0" type="win32" processorArchitecture="X86" />
+    </dependentAssembly>
+  </dependency>
+</assembly>
