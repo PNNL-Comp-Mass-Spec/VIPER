@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="olch2x32.sxs" version="5.0.0.0" type="win32" processorArchitecture="X86" />
+  <file name="olch2x32.ocx" hashalg="SHA1">
+    <typelib tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" version="5.0" flags="control" helpdir="" />
+    <comClass clsid="{92D71E93-25A8-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" threadingModel="Apartment" progid="OlectraChart2D.Control.1" description="Olectra Chart Control" />
+    <comClass clsid="{92D71E99-25A8-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The border around parts of the chart."/>
+    <comClass clsid="{92D71E9B-25A8-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A chart title (header or footer)."/>
+    <comClass clsid="{92D71E9D-25A8-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A text label."/>
+    <comClass clsid="{8847CF31-2610-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The colors used for the interior of the object."/>
+    <comClass clsid="{8847CF33-2610-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A long integer value, normally calculated by the chart."/>
+    <comClass clsid="{8847CF35-2610-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The size and position of a chart area."/>
+    <comClass clsid="{2BB6A8B1-268F-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The chart legend."/>
+    <comClass clsid="{FC2C9F11-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The main body of the chart."/>
+    <comClass clsid="{FC2C9F13-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties affecting the appearance of a bar chart."/>
+    <comClass clsid="{FC2C9F15-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The three-dimensional features of a chart."/>
+    <comClass clsid="{FC2C9F17-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties affecting the appearance of a pie chart."/>
+    <comClass clsid="{FC2C9F19-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The pattern and color used for a data series in area, bar, and pie charts."/>
+    <comClass clsid="{FC2C9F1B-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The area inside the axes of a chart."/>
+    <comClass clsid="{FC2C9F1D-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The scale for an X-axis representing the time dimension."/>
+    <comClass clsid="{FC2C9F1F-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A string value, normally calculated by the chart."/>
+    <comClass clsid="{FC2C9F21-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A double-precision floating-point value, normally calculated by the chart."/>
+    <comClass clsid="{FC2C9F23-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="One of the axes in the chart."/>
+    <comClass clsid="{FC2C9F25-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The color, pattern, and width used for a series of data in plot charts."/>
+    <comClass clsid="{FC2C9F27-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The shape, size, and color used in plot charts for the points in a series."/>
+    <comClass clsid="{FC2C9F29-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The horizontal or vertical grid-lines on a chart."/>
+    <comClass clsid="{FC2C9F2B-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The set of axes used in the chart."/>
+    <comClass clsid="{05478A91-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Identifies a particular data element on the screen."/>
+    <comClass clsid="{05478A93-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A data coordinate from a specified chart group."/>
+    <comClass clsid="{05478A95-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A data index from a specified chart group."/>
+    <comClass clsid="{05478A97-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A screen coordinate."/>
+    <comClass clsid="{05478A99-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The data markers available."/>
+    <comClass clsid="{D86FB461-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" progid="OlectraChart2D.Data.1" description="The data associated with a particular chart group." />
+    <comClass clsid="{D86FB463-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Contains data, styles, and series/point labels."/>
+    <comClass clsid="{D86FB465-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The collection of ChartGroups in the chart."/>
+    <comClass clsid="{D86FB467-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The style applied to one series in the chart."/>
+    <comClass clsid="{D86FB469-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The set of styles used for drawing the data."/>
+    <comClass clsid="{D86FB46B-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A collection of labels."/>
+    <comClass clsid="{D86FB46D-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A text string labelling a significant axis value."/>
+    <comClass clsid="{D86FB46F-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A collection of ValueLabels."/>
+    <comClass clsid="{D86FB471-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A label containing text that can be attached to the chart."/>
+    <comClass clsid="{D86FB473-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A collection of ChartLabels."/>
+    <comClass clsid="{F4CC7DE1-9AE0-11CF-B9E2-00A024169263}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Maps a Windows message to a Chart action."/>
+    <comClass clsid="{F4CC7DE3-9AE0-11CF-B9E2-00A024169263}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A collection of ActionMaps."/>
+    <comClass clsid="{245631F1-F6C4-11CF-811C-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties affecting the appearance of a hilo chart."/>
+    <comClass clsid="{245631F3-F6C4-11CF-811C-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties affecting the appearance of a candle chart."/>
+    <comClass clsid="{7BF6C921-333E-11D0-8126-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties affecting the appearance of a polar chart."/>
+    <comClass clsid="{86E43511-1D29-11D0-B3FB-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A collection of strings."/>
+    <comClass clsid="{5DF9BF62-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A boolean value, normally calculated by the chart."/>
+    <comClass clsid="{5DF9BF6C-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties available when the value format category is number."/>
+    <comClass clsid="{5DF9BF6E-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties available when the value format category is currency."/>
+    <comClass clsid="{5DF9BF70-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties available when the value format category is accounting.  Currency symbols and decimal points are aligned."/>
+    <comClass clsid="{5DF9BF72-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties available when the value format category is percentage.  Values are multiplied by 100 and displayed with a percent symbol."/>
+    <comClass clsid="{5DF9BF74-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties available when the value format category is fraction."/>
+    <comClass clsid="{5DF9BF76-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="Properties available when the value format category is scientific."/>
+    <comClass clsid="{5DF9BF7A-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="A string used to format axis annotation values."/>
+    <comClass clsid="{6E5B3FD5-4C5D-11D0-813A-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="An image used as a background."/>
+    <comClass clsid="{C23B5F12-79F1-11D0-813F-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The result of mapping a data coordinate to a pixel coordinate."/>
+    <comClass clsid="{C23B5F14-79F1-11D0-813F-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The result of mapping a pixel coordinate to a data coordinate."/>
+    <comClass clsid="{C23B5F16-79F1-11D0-813F-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The result of picking the displayed data closest to the given pixel coordinate."/>
+    <comClass clsid="{C23B5F19-79F1-11D0-813F-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="The result of determining if additional data requires a chart repaint."/>
+    <comClass clsid="{8027AB64-85DC-11D0-B4AF-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" description="An enumeration value, normally calculated by the chart."/>
+  </file>
+  <comInterfaceExternalProxyStub name="IDataCursor" iid="{9F6AA700-D188-11CD-AD48-00AA003C9CB6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{9F6AA700-D188-11CD-AD48-00AA003C9CB6}"/>
+  <comInterfaceExternalProxyStub name="IBorder" iid="{92D71E98-25A8-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITitle" iid="{92D71E9A-25A8-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILabel" iid="{92D71E9C-25A8-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IInterior" iid="{8847CF30-2610-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImage" iid="{6E5B3FD4-4C5D-11D0-813A-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILocation" iid="{8847CF34-2610-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedLong" iid="{8847CF32-2610-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILegend" iid="{2BB6A8B0-268F-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartArea" iid="{FC2C9F10-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPlotArea" iid="{FC2C9F1A-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IBar" iid="{FC2C9F12-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPie" iid="{FC2C9F16-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IFillStyle" iid="{FC2C9F18-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IMarkerCollection" iid="{05478A98-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IMarker" iid="{05478A90-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILineStyle" iid="{FC2C9F24-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataIndex" iid="{05478A94-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataCoord" iid="{05478A92-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAxisCollection" iid="{FC2C9F2A-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAxis" iid="{FC2C9F22-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedDouble" iid="{FC2C9F20-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueLabelCollection" iid="{D86FB46E-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueLabel" iid="{D86FB46C-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITimeScale" iid="{FC2C9F1C-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedString" iid="{FC2C9F1E-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IGridLines" iid="{FC2C9F28-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueFormat" iid="{5DF9BF79-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="INumberVF" iid="{5DF9BF6B-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedEnum" iid="{8027AB63-85DC-11D0-B4AF-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedBoolean" iid="{5DF9BF61-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICurrencyVF" iid="{5DF9BF6D-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAccountingVF" iid="{5DF9BF6F-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPercentageVF" iid="{5DF9BF71-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IFractionVF" iid="{5DF9BF73-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IScientificVF" iid="{5DF9BF75-59A9-11D0-B476-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IView3D" iid="{FC2C9F14-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IHiLoOpenClose" iid="{245631F0-F6C4-11CF-811C-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICandle" iid="{245631F2-F6C4-11CF-811C-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPolar" iid="{7BF6C920-333E-11D0-8126-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ISymbolStyle" iid="{FC2C9F26-26A2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICoord" iid="{05478A96-26E2-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DData" iid="{D86FB460-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DCheckNewPointsResult" iid="{C23B5F18-79F1-11D0-813F-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartGroup" iid="{D86FB462-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartStyleCollection" iid="{D86FB468-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartStyle" iid="{D86FB466-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILabelCollection" iid="{D86FB46A-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IStringCollection" iid="{86E43510-1D29-11D0-B3FB-0020AFD59EF6}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DDataCoordResult" iid="{C23B5F13-79F1-11D0-813F-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DCoordResult" iid="{C23B5F11-79F1-11D0-813F-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DDataIndexResult" iid="{C23B5F15-79F1-11D0-813F-0020AF19EE14}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartGroupCollection" iid="{D86FB464-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartLabel" iid="{D86FB470-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartLabelCollection" iid="{D86FB472-2743-11CF-A641-E996DF2C9318}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IActionMap" iid="{F4CC7DE0-9AE0-11CF-B9E2-00A024169263}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IActionMapCollection" iid="{F4CC7DE2-9AE0-11CF-B9E2-00A024169263}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedLong_Dual" iid="{03727C80-51FF-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedEnum_Dual" iid="{609AA2E3-5432-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedBoolean_Dual" iid="{609AA2E2-5432-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedDouble_Dual" iid="{609AA2E0-5432-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedString_Dual" iid="{03727C81-51FF-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImage_Dual" iid="{F03CF301-5453-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILabel_Dual" iid="{F03CF302-5453-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILocation_Dual" iid="{F03CF305-5453-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IBorder_Dual" iid="{26E525C0-51E4-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IInterior_Dual" iid="{72688F61-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IHiLoOpenClose_Dual" iid="{72688F64-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICandle_Dual" iid="{72688F63-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPolar_Dual" iid="{F03CF303-5453-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPlotArea_Dual" iid="{72688F62-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPie_Dual" iid="{72688F67-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IFillStyle_Dual" iid="{72688F65-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IView3D_Dual" iid="{F03CF304-5453-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IBar_Dual" iid="{609AA2E4-5432-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITitle_Dual" iid="{72688F66-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILineStyle_Dual" iid="{72688F68-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataIndex_Dual" iid="{72688F69-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataCoord_Dual" iid="{72688F6A-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IMarker_Dual" iid="{72688F6B-54F9-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IMarkerCollection_Dual" iid="{823E00E1-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IGridLines_Dual" iid="{823E00E2-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITimeScale_Dual" iid="{823E00E3-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAccountingVF_Dual" iid="{823E00E4-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICurrencyVF_Dual" iid="{823E00E5-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="INumberVF_Dual" iid="{823E00E6-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPercentageVF_Dual" iid="{823E00E7-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IFractionVF_Dual" iid="{823E00E8-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IScientificVF_Dual" iid="{823E00E9-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueFormat_Dual" iid="{823E00EA-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueLabel_Dual" iid="{823E00EB-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueLabelCollection_Dual" iid="{823E00EC-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAxis_Dual" iid="{823E00ED-55B8-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAxisCollection_Dual" iid="{6DEC4A61-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartArea_Dual" iid="{6DEC4A62-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IActionMap_Dual" iid="{6DEC4A63-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IActionMapCollection_Dual" iid="{6DEC4A64-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILegend_Dual" iid="{6DEC4A65-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ISymbolStyle_Dual" iid="{6DEC4A66-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICoord_Dual" iid="{6DEC4A68-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DCoordResult_Dual" iid="{6DEC4A69-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DDataCoordResult_Dual" iid="{6DEC4A6A-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DDataIndexResult_Dual" iid="{6DEC4A6B-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DCheckNewPointsResult_Dual" iid="{6DEC4A6C-568B-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IStringCollection_Dual" iid="{6DE87AC1-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartLabel_Dual" iid="{6DE87AC2-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartLabelCollection_Dual" iid="{6DE87AC3-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartStyle_Dual" iid="{6DE87AC5-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartStyleCollection_Dual" iid="{6DE87AC6-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILabelCollection_Dual" iid="{6DE87AC4-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartGroup_Dual" iid="{6DE87AC7-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2DData_Dual" iid="{6DE87AC9-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartGroupCollection_Dual" iid="{6DE87AC8-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart2D_Dual" iid="{6DE87AD0-5744-11D1-AA18-00A0245E13F3}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DChart2D" iid="{92D71E91-25A8-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DChart2DEvents" iid="{92D71E92-25A8-11CF-A640-9986B64D9618}" tlbid="{92D71E90-25A8-11CF-A640-9986B64D9618}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+</assembly>

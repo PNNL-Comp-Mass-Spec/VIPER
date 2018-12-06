@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="comdlg32.sxs" version="6.1.98.16" type="win32" processorArchitecture="X86" />
+  <file name="ComDlg32.OCX">
+    <typelib tlbid="{F9043C88-F6F2-101A-A3C9-08002B2F49FB}" version="1.2" flags="control" helpdir=""/>
+    <comClass clsid="{F9043C85-F6F2-101A-A3C9-08002B2F49FB}" tlbid="{F9043C88-F6F2-101A-A3C9-08002B2F49FB}" threadingModel="Apartment" progid="MSComDlg.CommonDialog.1" description="Microsoft Common Dialog Control 6.0 (SP6)" />
+    <comClass clsid="{8F0F480A-4366-4737-8265-2AD6FDAC8C31}" tlbid="{F9043C88-F6F2-101A-A3C9-08002B2F49FB}" description="Microsoft Common Dialog Control 6.0 (SP6)"/>
+  </file>
+  <comInterfaceExternalProxyStub name="ICommonDialog" iid="{083039C2-13F4-11D1-8B7E-0000F8754DA1}" tlbid="{F9043C88-F6F2-101A-A3C9-08002B2F49FB}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICommonDialogEvents" iid="{F9043C87-F6F2-101A-A3C9-08002B2F49FB}" tlbid="{F9043C88-F6F2-101A-A3C9-08002B2F49FB}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+</assembly>

@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="olch3x32.sxs" version="5.0.0.0" type="win32" processorArchitecture="X86" />
+  <file name="olch3x32.ocx" hashalg="SHA1">
+    <typelib tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" version="5.0" flags="control" helpdir="" />
+    <comClass clsid="{CA888F03-45F5-11CF-80B2-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" threadingModel="Apartment" progid="OlectraChart3D.Control.1" description="Olectra Chart 3D Control" />
+    <comClass clsid="{55DAF6E1-49C6-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A chart title (header or footer)."/>
+    <comClass clsid="{B85A87F1-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The border around parts of the chart."/>
+    <comClass clsid="{B85A87F3-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The colors used for the interior of a parent object."/>
+    <comClass clsid="{B85A87F5-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A long integer value, normally calculated by the chart."/>
+    <comClass clsid="{B85A87F7-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The size and position of an object."/>
+    <comClass clsid="{B85A87FA-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The chart legend."/>
+    <comClass clsid="{7E8F14D1-4B83-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A screen coordinate."/>
+    <comClass clsid="{4A19A3A1-4F44-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The main body of the chart."/>
+    <comClass clsid="{4A19A3A3-4F44-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The rectangular region in the chart which is mapped to by the plot cube."/>
+    <comClass clsid="{4A19A3A5-4F44-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A double-precision floating-point value, normally calculated by the chart."/>
+    <comClass clsid="{10E35F03-4F81-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The grid lines appearing on a chart along the specified axis."/>
+    <comClass clsid="{10E35F1E-4F81-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A stroke font."/>
+    <comClass clsid="{10E35F20-4F81-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="One of the three axes in the chart."/>
+    <comClass clsid="{10E35F22-4F81-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The set of axes used in the chart."/>
+    <comClass clsid="{7FA9BBF1-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The projection of contours and zones."/>
+    <comClass clsid="{7FA9BBF3-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The top plane of the plot cube."/>
+    <comClass clsid="{7FA9BBF5-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The bottom plane of the plot cube."/>
+    <comClass clsid="{7FA9BBF7-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The plot cube."/>
+    <comClass clsid="{7FA9BBF9-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The three-dimensional view of the plot cube."/>
+    <comClass clsid="{022ED8B1-50F0-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The surface in a surface format chart."/>
+    <comClass clsid="{022ED8B3-50F0-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A data index."/>
+    <comClass clsid="{022ED8B9-50F0-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A color applied to a data index."/>
+    <comClass clsid="{022ED8BB-50F0-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A collection of data colors."/>
+    <comClass clsid="{46746D21-5181-11CF-BE90-99AECC0C381F}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The bars in a bar chart."/>
+    <comClass clsid="{46746D23-5181-11CF-BE90-99AECC0C381F}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A set of attributes controlling the behavior of the three-dimensional view."/>
+    <comClass clsid="{F05F4885-5272-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" progid="OlectraChart3D.Data.1" description="The data describing a surface." />
+    <comClass clsid="{0BDF1A11-54D2-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="Contains the contour data, elevation data, and row/column labels."/>
+    <comClass clsid="{0BDF1A13-54D2-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The collection of chart groups."/>
+    <comClass clsid="{18111691-54F6-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The fill style used when drawing zones."/>
+    <comClass clsid="{18111693-54F6-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The line style to use when drawing contours."/>
+    <comClass clsid="{18111695-54F6-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="Describes how a contour level is rendered."/>
+    <comClass clsid="{8D78AF21-5682-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The contour lines and zone regions displayed in a chart."/>
+    <comClass clsid="{7951F673-5749-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The collection of contour styles."/>
+    <comClass clsid="{7951F675-5749-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The contour levels displayed in the chart."/>
+    <comClass clsid="{7205ECE1-5B24-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The collection of chart labels."/>
+    <comClass clsid="{7205ECE3-5B24-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A label containing text that can be attached to the chart."/>
+    <comClass clsid="{7205ECE5-5B24-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A three-dimensional data coordinate."/>
+    <comClass clsid="{2DC4A1F5-5CB3-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A text label."/>
+    <comClass clsid="{2DC4A1F7-5CB3-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A collection of text labels."/>
+    <comClass clsid="{2DC4A1F9-5CB3-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A text string labelling a significant axis value."/>
+    <comClass clsid="{2DC4A1FB-5CB3-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A collection of ValueLabels."/>
+    <comClass clsid="{7DAA7404-93E3-11CF-B9E1-00A024169263}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="Maps a Windows message to a Chart action."/>
+    <comClass clsid="{7DAA7406-93E3-11CF-B9E1-00A024169263}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="A collection of ActionMaps."/>
+    <comClass clsid="{C0228B64-6FAD-11D0-813C-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="An image used as a background."/>
+    <comClass clsid="{C23B5F1C-79F1-11D0-813F-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The result of mapping a data coordinate to a pixel coordinate."/>
+    <comClass clsid="{C23B5F1E-79F1-11D0-813F-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The result of mapping a pixel coordinate to a data coordinate."/>
+    <comClass clsid="{C23B5F20-79F1-11D0-813F-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" description="The result of picking the displayed data closest to the given pixel coordinate."/>
+  </file>
+  <comInterfaceExternalProxyStub name="ITitle" iid="{55DAF6E0-49C6-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IBorder" iid="{B85A87F0-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IInterior" iid="{B85A87F2-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImage" iid="{C0228B63-6FAD-11D0-813C-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILocation" iid="{B85A87F6-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedLong" iid="{B85A87F4-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILabel" iid="{2DC4A1F4-5CB3-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILegend" iid="{B85A87F9-4B59-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILabelCollection" iid="{2DC4A1F6-5CB3-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICoord" iid="{7E8F14D0-4B83-11CF-80BA-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartArea" iid="{4A19A3A0-4F44-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IViewport" iid="{4A19A3A2-4F44-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPlotCube" iid="{7FA9BBF6-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICeiling" iid="{7FA9BBF2-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IProjection" iid="{7FA9BBF0-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IFloor" iid="{7FA9BBF4-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAxisCollection" iid="{10E35F21-4F81-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAxis" iid="{10E35F1F-4F81-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IStrokeFont" iid="{10E35F1D-4F81-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedDouble" iid="{4A19A3A4-4F44-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IGridLines" iid="{10E35F02-4F81-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueLabelCollection" iid="{2DC4A1FA-5CB3-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueLabel" iid="{2DC4A1F8-5CB3-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IView3D" iid="{7FA9BBF8-504A-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ISurface" iid="{022ED8B0-50F0-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IBar" iid="{46746D20-5181-11CF-BE90-99AECC0C381F}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataColorCollection" iid="{022ED8BA-50F0-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataColor" iid="{022ED8B8-50F0-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataIndex" iid="{022ED8B2-50F0-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IElevation" iid="{46746D22-5181-11CF-BE90-99AECC0C381F}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart3DData" iid="{F05F4884-5272-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartGroup" iid="{0BDF1A10-54D2-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IContour" iid="{8D78AF20-5682-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IContourLevels" iid="{7951F674-5749-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IContourStyleCollection" iid="{7951F672-5749-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IContourStyle" iid="{18111694-54F6-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILineStyle" iid="{18111692-54F6-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IFillStyle" iid="{18111690-54F6-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart3DDataCoordResult" iid="{C23B5F1D-79F1-11D0-813F-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart3DCoordResult" iid="{C23B5F1B-79F1-11D0-813F-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart3DDataIndexResult" iid="{C23B5F1F-79F1-11D0-813F-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartGroupCollection" iid="{0BDF1A12-54D2-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartLabelCollection" iid="{7205ECE0-5B24-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartLabel" iid="{7205ECE2-5B24-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataCoord" iid="{7205ECE4-5B24-11CF-80BC-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IActionMap" iid="{7DAA7403-93E3-11CF-B9E1-00A024169263}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IActionMapCollection" iid="{7DAA7405-93E3-11CF-B9E1-00A024169263}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IBorder_Dual" iid="{5AABECA1-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedLong_Dual" iid="{5AABECA2-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDerivedDouble_Dual" iid="{5AABECA3-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImage_Dual" iid="{5AABECA4-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IInterior_Dual" iid="{5AABECA5-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILabel_Dual" iid="{5AABECA6-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILabelCollection_Dual" iid="{5AABECA7-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILocation_Dual" iid="{5AABECA8-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILegend_Dual" iid="{5AABECA9-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITitle_Dual" iid="{5AABECAA-5B6B-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IFillStyle_Dual" iid="{146B71C1-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ILineStyle_Dual" iid="{146B71C2-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IContourLevels_Dual" iid="{146B71C3-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IContourStyle_Dual" iid="{146B71C4-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IContourStyleCollection_Dual" iid="{146B71C5-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IContour_Dual" iid="{146B71C6-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IElevation_Dual" iid="{146B71C7-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart3DCoordResult_Dual" iid="{146B71C9-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart3DDataCoordResult_Dual" iid="{146B71C8-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart3DDataIndexResult_Dual" iid="{146B71CA-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart3DData_Dual" iid="{146B71CB-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartGroup_Dual" iid="{146B71CC-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartGroupCollection_Dual" iid="{146B71CD-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICoord_Dual" iid="{146B71CE-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataCoord_Dual" iid="{146B71CF-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataIndex_Dual" iid="{146B71D0-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IStrokeFont_Dual" iid="{146B71D1-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartLabel_Dual" iid="{146B71D2-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartLabelCollection_Dual" iid="{146B71D3-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IProjection_Dual" iid="{146B71D4-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IFloor_Dual" iid="{146B71D5-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ICeiling_Dual" iid="{146B71D6-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPlotCube_Dual" iid="{146B71D7-5C06-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataColor_Dual" iid="{0D9B7D01-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IDataColorCollection_Dual" iid="{0D9B7D02-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IView3D_Dual" iid="{0D9B7D03-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IViewport_Dual" iid="{0D9B7D04-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ISurface_Dual" iid="{0D9B7D05-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IBar_Dual" iid="{0D9B7D06-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueLabel_Dual" iid="{0D9B7D07-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IValueLabelCollection_Dual" iid="{0D9B7D08-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IGridLines_Dual" iid="{0D9B7D09-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAxis_Dual" iid="{0D9B7D0A-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IAxisCollection_Dual" iid="{0D9B7D0B-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChartArea_Dual" iid="{0D9B7D0C-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IActionMap_Dual" iid="{0D9B7D0D-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IActionMapCollection_Dual" iid="{0D9B7D0E-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IChart3D_Dual" iid="{0D9B7D0F-5CCD-11D1-AA18-00A0245E13F3}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DChart3D" iid="{3D931501-4601-11CF-80B2-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DChart3DEvents" iid="{3D931502-4601-11CF-80B2-0020AF19EE14}" tlbid="{3D931500-4601-11CF-80B2-0020AF19EE14}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+</assembly>

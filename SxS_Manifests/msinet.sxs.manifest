@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="msinet.sxs" version="6.1.98.16" type="win32" processorArchitecture="X86" />
+  <file name="MSINET.Ocx">
+    <typelib tlbid="{48E59290-9880-11CF-9754-00AA00C00908}" version="1.0" flags="control" helpdir="" />
+    <comClass clsid="{48E59293-9880-11CF-9754-00AA00C00908}" tlbid="{48E59290-9880-11CF-9754-00AA00C00908}" threadingModel="Apartment" progid="InetCtls.Inet.1" description="Microsoft Internet Transfer Control" />
+    <comClass clsid="{E2D211D5-11E4-4D9E-B6DB-1E902C851A49}" tlbid="{48E59290-9880-11CF-9754-00AA00C00908}" description="Microsoft Internet Transfer Control"/>
+  </file>
+  <comInterfaceExternalProxyStub name="IInet" iid="{48E59291-9880-11CF-9754-00AA00C00908}" tlbid="{48E59290-9880-11CF-9754-00AA00C00908}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="DInetEvents" iid="{48E59292-9880-11CF-9754-00AA00C00908}" tlbid="{48E59290-9880-11CF-9754-00AA00C00908}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+</assembly>

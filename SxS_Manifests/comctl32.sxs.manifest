@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="comctl32.sxs" version="6.0.98.34" type="win32" processorArchitecture="X86" />
+  <file name="comctl32.Ocx">
+    <typelib tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" version="1.4" flags="control" helpdir="" />
+    <comClass clsid="{2334D2B2-713E-11CF-8AE5-00AA00C00905}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}"/>
+    <comClass clsid="{2334D2B4-713E-11CF-8AE5-00AA00C00905}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}"/>
+    <comClass clsid="{9ED94440-E5E8-101B-B9B5-444553540000}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" threadingModel="Apartment" progid="COMCTL.TabStrip.1" description="Microsoft TabStrip Control" />
+    <comClass clsid="{44E266A2-CD46-47A0-9ED5-EEEC5F0C2A6E}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Microsoft TabStrip Control"/>
+    <comClass clsid="{703EAF2B-FD9F-41BC-BB81-6C6757A46E5E}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Microsoft TabStrip Control"/>
+    <comClass clsid="{0713E432-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Returns a reference to a collection of Tab objects in the TabStrip control."/>
+    <comClass clsid="{0713F341-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Returns a reference to a collection of Tab objects in the TabStrip control."/>
+    <comClass clsid="{612A8624-0FB3-11CE-8747-524153480004}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" threadingModel="Apartment" progid="COMCTL.Toolbar.1" description="Microsoft Toolbar Control" />
+    <comClass clsid="{97992019-74A6-46C7-9CA3-7F8C0D39940B}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Microsoft Toolbar Control"/>
+    <comClass clsid="{29D5EC7E-6245-4DC9-9E53-A9A945AD4ABB}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Microsoft Toolbar Control"/>
+    <comClass clsid="{0713E452-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="ToolBar Buttons"/>
+    <comClass clsid="{0713F354-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="ToolBar Button"/>
+    <comClass clsid="{6B7E638F-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" threadingModel="Apartment" progid="COMCTL.SBarCtrl.1" description="Microsoft StatusBar Control" />
+    <comClass clsid="{E8F8E80F-02EB-44CC-ABB5-6E5132BA6B24}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Microsoft StatusBar Control"/>
+    <comClass clsid="{962F28D6-107D-47A5-9515-2864454CFDD1}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Microsoft StatusBar Control"/>
+    <comClass clsid="{0713E89E-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="StatusBar Panels collection"/>
+    <comClass clsid="{0713E89F-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="StatusBar Panel"/>
+    <comClass clsid="{0713E8D2-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" threadingModel="Apartment" progid="COMCTL.ProgCtrl.1" description="Microsoft ProgressBar Control" />
+    <comClass clsid="{612685EF-57C8-469F-88AB-E4E0B595C5AB}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Microsoft ProgressBar Control"/>
+    <comClass clsid="{0713E8A2-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" threadingModel="Apartment" progid="COMCTL.TreeCtrl.1" description="Displays a hierarchical list of Node objects, each of which consists of a label and an optional bitmap." />
+    <comClass clsid="{E44F7BD4-3AB1-4D55-9190-FC53343AD2D2}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Displays a hierarchical list of Node objects, each of which consists of a label and an optional bitmap."/>
+    <comClass clsid="{0713E8C0-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Treeview Nodes collection"/>
+    <comClass clsid="{0713E8C1-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="An object in a TreeView control that can contain images and text."/>
+    <comClass clsid="{58DA8D8A-9D6A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" threadingModel="Apartment" progid="COMCTL.ListViewCtrl.1" description="Displays a collection of ListItems such as files or folders." />
+    <comClass clsid="{79C784C5-8F0D-4A55-ADB3-590CCFC8EB0D}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Displays a collection of ListItems such as files or folders."/>
+    <comClass clsid="{80B51087-CE4C-4FAE-8401-B6B3809DD234}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Displays a collection of ListItems such as files or folders."/>
+    <comClass clsid="{0713E8C4-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" threadingModel="Apartment" progid="MSDataListLib.RowSource.1" description="ListView Item collection" />
+    <comClass clsid="{0713E8C5-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="An item in a ListView control that contains the index of icons associated with it, text, and an array of strings representing subitems that are displayed in Report view."/>
+    <comClass clsid="{0713E8C6-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="ListView Column Header collection"/>
+    <comClass clsid="{0713E8C7-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="ListView Column Header"/>
+    <comClass clsid="{58DA8D8F-9D6A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" threadingModel="Apartment" progid="COMCTL.ImageListCtrl.1" description="Contains a collection of ListImage objects, each of which can be referred to by its index or key" />
+    <comClass clsid="{53749718-F78D-4A67-8703-8AE050075170}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Contains a collection of ListImage objects, each of which can be referred to by its index or key"/>
+    <comClass clsid="{25A3C2C9-8F6E-4140-BEF3-535D4B9709D8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Contains a collection of ListImage objects, each of which can be referred to by its index or key"/>
+    <comClass clsid="{0713E8C2-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="A bitmap or icon of any size that can be used in other controls."/>
+    <comClass clsid="{0713E8C3-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="A bitmap or icon of any size that can be used in other controls."/>
+    <comClass clsid="{373FF7F0-EB8B-11CD-8820-08002B2F4F5A}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" threadingModel="Apartment" progid="COMCTL.Slider.1" description="A calibrated control with a slider for setting or selecting values." />
+    <comClass clsid="{2B577565-36F7-4351-B2E7-DAFC75E9D72A}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="A calibrated control with a slider for setting or selecting values."/>
+    <comClass clsid="{01D1F0A0-DE88-11CF-89B6-00AA00688B10}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" description="Controls collection"/>
+  </file>
+  <comInterfaceExternalProxyStub name="IVBDataObject" iid="{2334D2B1-713E-11CF-8AE5-00AA00C00905}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IVBDataObjectFiles" iid="{2334D2B3-713E-11CF-8AE5-00AA00C00905}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITabStrip" iid="{E6E17E8A-DF38-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITabStripEvents" iid="{9ED94442-E5E8-101B-B9B5-444553540000}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITabs" iid="{7791BA50-E020-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITab" iid="{7791BA52-E020-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITabs10" iid="{0713E791-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITab10" iid="{0713E944-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITabStrip10" iid="{9ED94441-E5E8-101B-B9B5-444553540000}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IToolbar" iid="{E6E17E8C-DF38-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IToolbarEvents" iid="{612A8626-0FB3-11CE-8747-524153480004}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IButtons" iid="{7791BA40-E020-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IButton" iid="{7791BA42-E020-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IButtons10" iid="{0713E451-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IButton10" iid="{0713E953-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IToolbar10" iid="{612A8625-0FB3-11CE-8747-524153480004}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IStatusBar" iid="{E6E17E88-DF38-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IStatusBarEvents" iid="{6B7E6391-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPanels" iid="{2C787A50-E01C-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPanel11" iid="{2C787A52-E01C-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPanel" iid="{6E1B5150-DB62-11D0-A0D8-0080C7E7B78D}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPanels10" iid="{0713E8A0-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPanel10" iid="{0713E8A1-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IStatusBar10" iid="{6B7E6390-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IProgressBar" iid="{E6E17E84-DF38-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IProgressBarEvents" iid="{0713E8D1-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IProgressBar10" iid="{0713E8D0-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITreeView" iid="{E6E17E8E-DF38-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITreeViewEvents" iid="{0713E8A4-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="INodes" iid="{7791BA60-E020-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="INode" iid="{7791BA62-E020-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="INodes10" iid="{0713E8A7-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="INode10" iid="{0713E8A5-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ITreeView10" iid="{0713E8A3-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IListView" iid="{F4D83600-895E-11D0-B0A6-000000000000}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ListViewEvents" iid="{58DA8D8C-9D6A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IListItems" iid="{F4D83601-895E-11D0-B0A6-000000000000}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IListItem" iid="{F4D83602-895E-11D0-B0A6-000000000000}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IColumnHeaders" iid="{F4D83603-895E-11D0-B0A6-000000000000}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IColumnHeader" iid="{F4D83604-895E-11D0-B0A6-000000000000}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IListItems10" iid="{0713E8AE-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IListItem10" iid="{0713E8AF-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IColumnHeaders10" iid="{0713E8B0-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IColumnHeader10" iid="{0713E8B1-850A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IListView10" iid="{58DA8D8B-9D6A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IListItem11" iid="{BF877892-E026-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IListItems11" iid="{BF877890-E026-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IColumnHeader11" iid="{BF877896-E026-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IColumnHeaders11" iid="{BF877894-E026-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IListView11" iid="{E6E17E82-DF38-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImageList" iid="{E6E17E80-DF38-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ImageListEvents" iid="{58DA8D91-9D6A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImages" iid="{8556BCD0-E01E-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImage" iid="{8556BCD2-E01E-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImages10" iid="{58DA8D94-9D6A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImage10" iid="{58DA8D95-9D6A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IImageList10" iid="{58DA8D90-9D6A-101B-AFC0-4210102A8DA7}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ISlider" iid="{E6E17E86-DF38-11CF-8E74-00A0C90F26F8}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ISliderEvents" iid="{373FF7F2-EB8B-11CD-8820-08002B2F4F5A}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="ISlider10" iid="{373FF7F1-EB8B-11CD-8820-08002B2F4F5A}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IControls" iid="{EC0AB1C0-6CAB-11CF-8998-00AA00688B10}" tlbid="{6B7E6392-850A-101B-AFC0-4210102A8DA7}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+</assembly>

@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="cwui.sxs" version="7.1.0.306" type="win32" processorArchitecture="X86" />
+  <file name="cwui.ocx">
+    <typelib tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" version="1.6" flags="control" helpdir="" />
+    <comClass clsid="{D940E4BE-6079-11CE-88CB-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" threadingModel="Apartment" progid="CWUIControlsLib.CWBoolean.1" description="Button control." />
+    <comClass clsid="{D940E4C8-6079-11CE-88CB-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" threadingModel="Apartment" progid="CWUIControlsLib.CWSlide.1" description="Slide control." />
+    <comClass clsid="{D940E4D2-6079-11CE-88CB-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" threadingModel="Apartment" progid="CWUIControlsLib.CWKnob.1" description="Knob control." />
+    <comClass clsid="{B68DBFAB-16A0-11CE-80BF-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" threadingModel="Apartment" progid="CWUIControlsLib.CWGraph.1" description="CWGraph Control." />
+    <comClass clsid="{17301DA3-C84D-11CF-AE6F-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" threadingModel="Apartment" progid="CWUIControlsLib.CWNumEdit.1" description="CWNumEdit is the top-level object for the Numeric Edit control." />
+  </file>
+  <comInterfaceExternalProxyStub name="CWAnnotation" iid="{42AF72CF-47FC-4C3F-B42F-5240F7305050}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWAnnotation_CI" iid="{0EE897B1-38BC-4BBF-B68A-FF75F5AC9B8E}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWAnnotations" iid="{C18556F1-EB35-479C-8167-0F789AF2E241}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWAnnotations_CI" iid="{D2BF8C17-2E12-4C5F-BCB0-972BFF8F31A5}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWArrow" iid="{42AF72D1-47FC-4C3F-B42F-5240F7305050}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWArrow_CI" iid="{8BB39A75-C48F-41A8-BAF0-EE958242E089}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWAxes" iid="{14AE3BE4-1A81-11CF-AE6F-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWAxes_CI" iid="{73C7C0B6-116C-41B8-BDBC-55F5719336FA}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWAxis" iid="{0414ADF0-A0DE-11CE-A870-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWAxis_CI" iid="{924D43D9-89B7-4137-9D03-454F2432E5F2}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWBinding" iid="{6F7EA121-D1A1-11D2-A4EE-00A024D63828}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWBinding_CI" iid="{BC6C02BD-8F0C-4724-8756-FD01D57D80A3}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWBindings" iid="{6F7EA122-D1A1-11D2-A4EE-00A024D63828}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWBindings_CI" iid="{18915301-AA28-4B76-962C-ABE5971F7259}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWCaption" iid="{A483B4F5-16E8-4859-A9C5-ABD34E38200D}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWCaption_CI" iid="{21029DFC-CEAC-4D04-ABD1-BB7281F7FBED}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWCursor" iid="{85041CC0-E78C-11CE-AE6E-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWCursor_CI" iid="{668521B2-CD1E-4DBF-A8DF-39953583E905}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWCursors" iid="{35575F41-E7AD-11CE-AE6E-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWCursors_CI" iid="{73F599C7-417B-4204-BDEB-FB7E8245AC70}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWData" iid="{AC74EF34-F94C-11D0-80F9-00A02454310A}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWImage" iid="{2C36E3E8-478D-11D0-A547-0020AF1E73B9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWImage_CI" iid="{36E7F165-992A-4711-8E23-4FCC40038AC5}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWLabels" iid="{E4012F00-1073-11CF-9617-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWLabels_CI" iid="{56E3A320-5AE3-4FBC-800B-5B00A8D0413E}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPictureDisp" iid="{B29D1C40-5270-11D0-A547-0020AF1E73B9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPicture_CI" iid="{41349D83-7BFD-4036-BF32-F7E9487FF19E}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPlot" iid="{B8ED1000-53EE-11CE-80BF-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPlot_CI" iid="{B07DB7C5-6B6B-40F1-9E98-9B9649BDEBDB}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPlots" iid="{CA90E9C0-6D11-11CF-A543-0020AF1E73B9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPlots_CI" iid="{5E2332D4-C762-4A63-AE49-02140CF4A8FF}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPointer" iid="{9A41C7E2-9ACD-11CE-A86E-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPointer_CI" iid="{9EEEE92E-5861-4900-9159-EB6681C58E99}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPointers" iid="{E93425C7-2038-11CF-A543-0020AF1E73B9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWPointers_CI" iid="{D1174CB4-E617-4EF1-8B1D-C54210241607}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWShape" iid="{42AF72D0-47FC-4C3F-B42F-5240F7305050}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWShape_CI" iid="{57A6AAFD-20DE-4D3C-BE9F-3DD3D287C2ED}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWStatistics" iid="{0EED9920-0DF3-11CF-9617-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWStatistics_CI" iid="{F717E0AA-C97A-48CB-9B2B-1B5B1A2CDA0E}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWTicks" iid="{65FD2500-C067-11CE-A88D-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWTicks_CI" iid="{EC6BE38D-DD26-4059-B003-051C2F58124C}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWValuePair" iid="{37715970-C76B-11CE-A890-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWValuePair_CI" iid="{1707911E-094A-47DC-98DF-E83BC5AF3FF0}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWValuePairs" iid="{E168E231-C75C-11CE-A890-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="CWValuePairs_CI" iid="{74362B99-2D80-4283-8BA9-AFC0DC182FCA}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IFontDisp" iid="{BEF6E003-A874-101A-8BBA-00AA00300CAB}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IPictureDisp" iid="{7BF80981-BF32-101A-8BBB-00AA00300CAB}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWButton" iid="{D940E4BF-6079-11CE-88CB-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWButtonEvents" iid="{D940E4C0-6079-11CE-88CB-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWButton_CI" iid="{57FC8B21-CA0A-40BB-A616-0707990735E2}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWGraph" iid="{B68DBFAC-16A0-11CE-80BF-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWGraphEvents" iid="{B68DBFAD-16A0-11CE-80BF-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWGraph_CI" iid="{423E10C9-B6C5-45E0-8B5E-9DED0A6B2FDA}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWKnob" iid="{D940E4D3-6079-11CE-88CB-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWKnobEvents" iid="{D940E4D4-6079-11CE-88CB-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWKnob_CI" iid="{4D79497E-BCBB-4477-9E5C-CBD7284EE8AC}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWNumEdit" iid="{17301DA1-C84D-11CF-AE6F-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWNumEditEvents" iid="{17301DA2-C84D-11CF-AE6F-0020AF31CEF9}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWNumEdit_CI" iid="{44EFA9A2-F809-4539-9287-19EAA9AB0EAC}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWSlide" iid="{D940E4C9-6079-11CE-88CB-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWSlideEvents" iid="{D940E4CA-6079-11CE-88CB-0020AF6845F6}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="_DCWSlide_CI" iid="{87124FB5-F081-4DE8-8BE7-052753EF8F44}" tlbid="{D940E4E4-6079-11CE-88CB-0020AF6845F6}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <!--<dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="comctl32.sxs" version="6.0.98.34" type="win32" processorArchitecture="X86" language="en-US" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity name="comdlg32.sxs" version="6.1.98.16" type="win32" processorArchitecture="X86" language="en-US" />
+    </dependentAssembly>
+  </dependency>-->
+</assembly>

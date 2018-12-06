@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="richtx32.sxs" version="6.1.98.16" type="win32" processorArchitecture="X86" />
+  <file name="richtx32.ocx" hashalg="SHA1">
+    <typelib tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" version="1.2" flags="control" helpdir="" />
+    <!--<comClass clsid="{2334D2B2-713E-11CF-8AE5-00AA00C00905}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}"/>
+    <comClass clsid="{2334D2B4-713E-11CF-8AE5-00AA00C00905}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}"/>-->
+    <comClass clsid="{3B7C8860-D78F-101B-B9B5-04021C009402}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" threadingModel="Apartment" progid="RICHTEXT.RichtextCtrl.1" description="Microsoft Rich Textbox Control 6.0 (SP6)" />
+    <comClass clsid="{894BA3A3-3CA3-402F-B4FE-CD08337E9535}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" description="Microsoft Rich Textbox Control 6.0 (SP6)"/>
+    <comClass clsid="{4A8F35A0-D900-11CF-89B4-00AA00688B10}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" description="RichText Control OLEObjects Collection Interface"/>
+    <comClass clsid="{4A8F35A1-D900-11CF-89B4-00AA00688B10}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" description="The RichTextBox control enables you to add insertable objects to an RTF file. Insertable objects are represented by the OLEObject."/>
+  </file>
+  <!--<comInterfaceExternalProxyStub name="IVBDataObject" iid="{2334D2B1-713E-11CF-8AE5-00AA00C00905}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IVBDataObjectFiles" iid="{2334D2B3-713E-11CF-8AE5-00AA00C00905}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>-->
+  <comInterfaceExternalProxyStub name="IOLEObject" iid="{ED117630-4090-11CF-8981-00AA00688B10}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IOLEObjects" iid="{859321D0-3FD1-11CF-8981-00AA00688B10}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IRichText" iid="{E9A5593C-CAB0-11D1-8C0B-0000F8754DA1}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="DRichTextEvents" iid="{3B7C8862-D78F-101B-B9B5-04021C009402}" tlbid="{3B7C8863-D78F-101B-B9B5-04021C009402}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+</assembly>

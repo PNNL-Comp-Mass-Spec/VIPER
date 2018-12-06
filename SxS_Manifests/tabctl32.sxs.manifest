@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity name="tabctl32.sxs" version="6.1.98.16" type="win32" processorArchitecture="X86" />
+  <file name="TabCtl32.Ocx">
+    <typelib tlbid="{BDC217C8-ED16-11CD-956C-0000C04E4C0A}" version="1.1" flags="control" helpdir="" />
+    <!--<comClass clsid="{2334D2B2-713E-11CF-8AE5-00AA00C00905}" tlbid="{BDC217C8-ED16-11CD-956C-0000C04E4C0A}"/>
+    <comClass clsid="{2334D2B4-713E-11CF-8AE5-00AA00C00905}" tlbid="{BDC217C8-ED16-11CD-956C-0000C04E4C0A}"/>-->
+    <comClass clsid="{BDC217C5-ED16-11CD-956C-0000C04E4C0A}" tlbid="{BDC217C8-ED16-11CD-956C-0000C04E4C0A}" threadingModel="Apartment" progid="TabDlg.SSTab.1" description="A Tabbed Dialog control that can be used to group controls on separate tabs." />
+    <comClass clsid="{942085FD-8AEE-465F-ADD7-5E7AA28F8C14}" tlbid="{BDC217C8-ED16-11CD-956C-0000C04E4C0A}" description="A Tabbed Dialog control that can be used to group controls on separate tabs."/>
+  </file>
+  <!--<comInterfaceExternalProxyStub name="IVBDataObject" iid="{2334D2B1-713E-11CF-8AE5-00AA00C00905}" tlbid="{BDC217C8-ED16-11CD-956C-0000C04E4C0A}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="IVBDataObjectFiles" iid="{2334D2B3-713E-11CF-8AE5-00AA00C00905}" tlbid="{BDC217C8-ED16-11CD-956C-0000C04E4C0A}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>-->
+  <comInterfaceExternalProxyStub name="ISSTabCtl" iid="{2A4FCCB0-DFF1-11CF-8E74-00A0C90F26F8}" tlbid="{BDC217C8-ED16-11CD-956C-0000C04E4C0A}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}"/>
+  <comInterfaceExternalProxyStub name="DSSTabCtlEvents" iid="{BDC217C7-ED16-11CD-956C-0000C04E4C0A}" tlbid="{BDC217C8-ED16-11CD-956C-0000C04E4C0A}" proxyStubClsid32="{00020420-0000-0000-C000-000000000046}"/>
+</assembly>
