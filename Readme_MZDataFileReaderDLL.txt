@@ -22,8 +22,8 @@ Project->Referencs to define references in VB6.
 Written by Matthew Monroe for the Department of Energy (PNNL, Richland, WA)
 Copyright 2006, Battelle Memorial Institute.  All Rights Reserved.
 
-E-mail: matthew.monroe@pnl.gov or matt@alchemistmatt.com
-Website: http://ncrr.pnl.gov/ or http://www.sysbio.org/resources/staff/
+E-mail: matthew.monroe@pnl.gov or proteomics@pnnl.gov
+Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://www.pnnl.gov/integrative-omics
 -------------------------------------------------------------------------------
 
 Licensed under the Apache License, Version 2.0; you may not use this file except 
