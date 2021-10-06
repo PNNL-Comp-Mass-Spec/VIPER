@@ -1,0 +1,27 @@
+Steps to install the backwards-compatible ADO drivers:
+
+
+1) Download the .tlb files from
+	http://download.microsoft.com/download/6/4/3/64318ED2-7E18-4A5C-80E2-9BDA0DF02DB3/msado60_Backcompat_i386.tlb
+	http://download.microsoft.com/download/6/4/3/64318ED2-7E18-4A5C-80E2-9BDA0DF02DB3/msado60_Backcompat_x64.tlb
+
+2) Start the command prompt using Run As Administrator
+
+3) Enter commands:
+	c:
+	cd %CommonProgramFiles(x86)%\System\ado\
+	copy f:*.tlb .
+
+4) Got to C:\Program Files (x86)\Microsoft Visual Studio\VB98 and right click VB6.EXE. Select Run as administrator
+
+5) Open VIPER_MTS.vbp
+	Choose Project|References... then click the Browse button. Navigate to the new .TLB file and open it. 
+		C:\Program Files (x86)\Common Files\System\ado\msado60_Backcompat_i386.tlb
+	Check the box to select the item and close the References dialog.
+	The .TLB should now be referenced
+
+
+See also http://stackoverflow.com/questions/7027750/getting-vb6-ado-application-to-work-in-windows-7
+ and
+http://support.microsoft.com/kb/2517589
+

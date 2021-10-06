@@ -1,0 +1,1 @@
+STACConsole.exe using -m C:\Users\d3l243\AppData\Local\Temp\STAC_Mouse\STAC_AMT_DB_41694_39504.txt -u C:\Users\d3l243\AppData\Local\Temp\STAC_Mouse\STAC_UMCs_41694_39504.txt -useP T -ppm 25 -NET 0.035 -driftTime 2.5
